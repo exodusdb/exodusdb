@@ -2260,7 +2260,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
             //    glocked=false
             //    gchangesmade=false
             //}
-            if (!(/**/ yield* this.login())) {
+            if (!(yield* fromPromise( this.login() ))) {
                 this.data = ''
                 this.response = ('ERROR: Please login')
                 this.result = ''
@@ -3830,7 +3830,7 @@ async function sorttable(event, order) {
     var colid = event.target.sorttableelementid
 
     if (typeof form_presort == 'function') {
-        await exodusevaluate('await form_presort(','yield* formfunctions_onload()');
+        await exodusevaluate('await form_presort(','form_presort');
         if (!(await form_presort(colid)))
             return await exodusinvalid()
     }
@@ -3983,7 +3983,7 @@ async function sorttable(event, order) {
     gds.data['group' + groupno] = newdatarows
 
     if (typeof form_postsort == 'function') {
-        await exodusevaluate('await form_postsort(','yield* formfunctions_onload()');
+        await exodusevaluate('await form_postsort(','form_postsort');
         if (!(await form_postsort(colid)))
             return await exodusinvalid()
     }

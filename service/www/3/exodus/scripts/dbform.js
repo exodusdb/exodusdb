@@ -175,7 +175,7 @@ async function formfunctions_onload() {
 
     //check a parameter
     if (typeof gmodule == 'undefined') {
-        systemerror('yield* formfunctions_onload()', 'gmodule is not defined')
+        systemerror('formfunctions_onload()', 'gmodule is not defined')
         return false //logout('formfunctions_onload - no gmodule')
     }
 
@@ -192,8 +192,8 @@ async function formfunctions_onload() {
     }
 
     //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename)
-    var dictfunctionname = (guseyield ? 'yield * ' : '') + 'dict_' + gdictfilename
-    var dictarray = await exodusevaluate(dictfunctionname + '(gparameters)', 'yield* formfunctions_onload()');
+    var dictfunctionname = 'dict_' + gdictfilename
+    var dictarray = await exodusevaluate(dictfunctionname + '(gparameters)', 'formfunctions_onload');
     gro = new exodusrecord(dictarray, gdatafilename)
 
     gds.dict = gro.dict
@@ -260,7 +260,7 @@ async function formfunctions_onload() {
             if (!dictitem) {
                 //dont error if id not in dictionary because could be non form element but do error if datafld specified
                 if (datafld)
-                    systemerror('yield* formfunctions_onload()', 'Form element ' + exodusquote(fieldname) + ' is not in the ' + exodusquote(gdictfilename) + ' dictionary\nor is not in the correct group.')
+                    systemerror('formfunctions_onload()', 'Form element ' + exodusquote(fieldname) + ' is not in the ' + exodusquote(gdictfilename) + ' dictionary\nor is not in the correct group.')
                 continue
             }
 
@@ -806,7 +806,7 @@ async function formfunctions_onload() {
             if (element.tagName.match(gtexttagnames)) {
                 if (element.size != 1 && element.getAttribute('exoduslength')) {
                     if (!(parseInt(element.getAttribute('exoduslength')))) {
-                        systemerror('yield* formfunctions_onload()', element.id + '.getAttribute("exoduslength")=' + element.getAttribute('exoduslength') + ' is invalid. 10 used.')
+                        systemerror('formfunctions_onload()', element.id + '.getAttribute("exoduslength")=' + element.getAttribute('exoduslength') + ' is invalid. 10 used.')
                         element.setAttribute('exoduslength', 10)
                     }
                     element.size = parseInt(element.getAttribute('exoduslength'), 10)
@@ -913,7 +913,7 @@ async function formfunctions_onload() {
                     element.dataFormatAs = 'HTML'
                 }
                 catch (e) {
-                    systemerror('yield* formfunctions_onload()', element.name + ' should not be bound to an editable element ' + element.tagName)
+                    systemerror('formfunctions_onload()', element.name + ' should not be bound to an editable element ' + element.tagName)
                 }
             }
 
@@ -1108,7 +1108,7 @@ async function formfunctions_onload() {
                     //check that all fields in same table have same group no
                     //zzz should also check that the table has no other name in subtables
                     if (Number(tablex.getAttribute('exodusgroupno')) != groupno) {
-                        systemerror('yield* formfunctions_onload()', element.name + ' is in group ' + groupno + ' but the table has already been bound to group ' + Number(tablex.getAttribute('exodusgroupno')))
+                        systemerror('formfunctions_onload()', element.name + ' is in group ' + groupno + ' but the table has already been bound to group ' + Number(tablex.getAttribute('exodusgroupno')))
                         return
                     }
 
@@ -1144,7 +1144,7 @@ async function formfunctions_onload() {
 
                     //check this groupno not used on other tables
                     if (gtables[groupno]) {
-                        systemerror('yield* formfunctions_onload()', element.name + ' is in group ' + groupno + ' but that group is also used in another table by ' + gfields[gtables[groupno][0]].id)
+                        systemerror('formfunctions_onload()', element.name + ' is in group ' + groupno + ' but that group is also used in another table by ' + gfields[gtables[groupno][0]].id)
                         return
                     }
 
@@ -1347,7 +1347,7 @@ async function formfunctions_onload() {
     if (!gfirstnonkeyelement)
         gfirstnonkeyelement = gfields[0]
     if (!gfirstnonkeyelement) {
-        systemerror('yield* formfunctions_onload()', 'There are no non-key elements in the form or no data elements')
+        systemerror('formfunctions_onload()', 'There are no non-key elements in the form or no data elements')
         return
     }
 
@@ -7030,7 +7030,7 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
     var result
 
     if (typeof functionorcode == 'undefined') {
-        systemerror('yield* exodusevaluate()', 'The required argument "functionorcode" is missing. Called from\n' + callerfunctionname)
+        systemerror('exodusevaluate()', 'The required argument "functionorcode" is missing. Called from\n' + callerfunctionname)
         if (gstepping || gusername == 'EXODUS') crashhere
         return
     }
@@ -7069,7 +7069,7 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
             //chrome exception is not available except inside catch clause
             //} if (e) {
             //if (typeof callerfunctionname == 'undefined') callerfunctionname = '"not specified"'
-            systemerror('yield* exodusevaluate()' + functionorcode, e)
+            systemerror('exodusevaluate()' + functionorcode, e)
             return await exodusinvalid()
         }
 
@@ -7115,7 +7115,7 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
                 functionx = new Function(arg1name, functioncode)
             }
             catch (e) {
-                return systemerror('yield* exodusevaluate3()\nError creating function \n' + functioncode, e)
+                return systemerror('exodusevaluate3()\nError creating function \n' + functioncode, e)
             }
             if (gcatcherrors) {
                 try {
@@ -7127,7 +7127,7 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
                     return result
                 }
                 catch (e) {
-                    return systemerror('yield* exodusevaluate3()\n' + functioncode, e)
+                    return systemerror('exodusevaluate3()\n' + functioncode, e)
                 }
                 //commented out to enable showing of run time script errors
             } else {
@@ -7147,13 +7147,18 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
 
         //arg1name can be the textual name of any variable in the text of the function code
         //TODO should only add return if no return in functioncode - to allow multi-line function code with returns in later lines
+        if (functioncode.match && functioncode.match(/await\b/)) {
+            var AsyncFunction = (async function(){}).constructor;
+            functionx = new AsyncFunction(arg1name, functioncode)
+            return await functionx.call(thisobject || this, arg1)
+        }
         functionx = new Function(arg1name, functioncode)
     } catch (e) {
-        return systemerror('yield* exodusevaluate3()\n' + functioncode, e)
+        return systemerror('exodusevaluate3()\n' + functioncode, e)
     }
     //we pass in the value of the argument when calling the function
     //return functionx.apply(this,arg1)
-    return functionx.call(thisobject || this, arg1)
+    return await functionx.call(thisobject || this, arg1)
 }
 
 async function oconvertvalue(ivalue, conversion) {
@@ -7274,7 +7279,12 @@ async function form_deleterow(event, element) {
     //form specific after row delete function
     var postdeleterow = window['form_postdeleterow' + groupno]
     if (typeof postdeleterow == 'function') {
-        await exodusevaluate('yield * form_postdeleterow' + groupno + '()');
+        var p = postdeleterow(event);
+        if (p && typeof p.then === 'function') {
+            await p;
+        } else if (p && typeof p.next === 'function') {
+            exodusneweventhandler(p, 'postdeleterow');
+        }
     }
 
     var deps = tablex.getAttribute('exodusdependents')
@@ -7580,7 +7590,12 @@ async function form_insertrow(event, append) {
     //form specific before row insert function
     var preinsertrow = window['form_preinsertrow' + groupno]
     if (typeof preinsertrow == 'function') {
-        var p = await exodusevaluate('yield * form_preinsertrow' + groupno + '()');
+        var p = preinsertrow(event);
+        if (p && typeof p.then === 'function') {
+            p = await p;
+        } else if (p && typeof p.next === 'function') {
+            p = exodusneweventhandler(p, 'preinsertrow').value;
+        }
         if (!p)
             return false //logout('insertrow - preinsert false')
     }
@@ -7609,7 +7624,12 @@ async function form_insertrow(event, append) {
     //form specific after row insert function
     var postinsertrow = window['form_postinsertrow' + groupno]
     if (typeof postinsertrow == 'function') {
-        await exodusevaluate('yield * form_postinsertrow' + groupno + '()');
+        var p = postinsertrow(event);
+        if (p && typeof p.then === 'function') {
+            await p;
+        } else if (p && typeof p.next === 'function') {
+            exodusneweventhandler(p, 'postinsertrow');
+        }
     }
 
     //focus on first column of new row (after running postinsert routine to avoid event within event - if postinsert yields for some user input for example)
