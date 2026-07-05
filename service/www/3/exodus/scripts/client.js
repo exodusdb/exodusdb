@@ -127,13 +127,13 @@ if (typeof document.createElement('div').innerText == 'undefined') {
         */
     }
 }
-//define if our source contains function * and yield * statements (legacy only now)
+//define if our source contains function * and yield * statements (legacy only for dynamic strings)
 //HARD CODED DEPENDING ON PRESENCE OR NOT OF YIELD STATEMENTS IN SOURCE CODE (mostly for transition)
 //AND THEREFORE CANNOT BE CHANGED
 /* yield */ var guseyield = true
 // noyield // var guseyield=false
 var gyieldregex = /yield ?\*/g
-// legacy for any remaining generator code during transition to async/await
+// legacy regex to detect old 'yield * ' strings in dynamic code (settimeout, attrs, etc.)
 
 //determine if yield * supported by browser (legacy detection, only for old generator paths)
 var gcan_yield
@@ -942,46 +942,8 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 
 }
 
-function* exodus_yield(source) {
-
-    blockmodalui_sync()
-
-    logevent('          >> BEFORE YIELD ' + source)
-    logevent('          ... yielding ... pause this code and resume parent code')
-
-    ////////////////////////////////////////////////
-    //PAUSE HERE until something provides a result
-    //by executing geventhandler  .next(result)
-    ////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////
-    //NOTE IN YIELDING CODE THE FOLLOWING LINE IS NOT ONLY A COMMENT
-    //NOTE IN NON-YIELDING CODE THE FOLLOWING LINE IS ONLY A COMMENT
-    ////////////////////////////////////////////////////////////////
-
-    /* yield */   var result = yield source
-
-    logevent('          << AFTER YIELD ' + source)
-
-    return result
-
-}
-
-// Adapter so generator code can wait on a Promise using the existing
-// global geventhandler mechanism. This lets us introduce real Promises
-// (and later async/await) in leaf operations without changing all callers yet.
-function* fromPromise(p) {
-  let resolved;
-  p.then((v) => {
-    resolved = v;
-    exodus_resume(v, 'fromPromise');
-  }).catch((e) => {
-    resolved = { error: e };
-    exodus_resume(resolved, 'fromPromise error');
-  });
-  yield* exodus_yield('from promise');
-  return resolved;
-}
+// Legacy yield* bridges removed – the system is now fully async/await.
+// Old 'yield * ' strings in dynamic data (if any) are handled via adapters or async wrappers.
 
 //called by child windows to return result to the parent before closing
 function exoduswindowclose(returnvalues) {
@@ -2408,7 +2370,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
         // STEP 1 of incremental async/await migration:
         // The XHR network I/O is the isolated leaf. We drive ONLY the wait using
         // a real Promise + the existing fromPromise adapter. This introduces await-capable
-        // transport without touching geventhandler, gblockevents, exodus_yield, exodus_resume,
+        // transport without touching geventhandler, gblockevents, (legacy yield), exodus_resume,
         // starteventhandler, UI modals, or any business logic yield* call sites. (legacy notes)
         var netPromise
         if (gasynchronous) {
@@ -5023,8 +4985,9 @@ function exodussettimeout(command, milliseconds) {
     if (glogsettimeout)
         console.log('exodussetimeout(' + command + ')')
     if (typeof command == 'string' && command.match(gyieldregex)) {
+        // legacy 'yield * ' prefix – treat as await for modern path (cautious deprecation)
         command = command.replace(gyieldregex, '').replace(/"/g, "'")
-        return window.setTimeout('exodustimeout_sync("' + command + '")', milliseconds)
+        return window.setTimeout('exodustimeout_async_sync("' + command + '")', milliseconds)
     } else if (typeof command == 'string' && command.match(/await /)) {
         // support for new async style in commands
         command = command.replace(/await /g, '').replace(/"/g, "'")
@@ -5033,7 +4996,7 @@ function exodussettimeout(command, milliseconds) {
         return window.setTimeout(command, milliseconds)
 }
 
-//sync function called on timeout in yielding code
+//sync function called on timeout in yielding code (legacy, now rarely used as yield* routes to async)
 //spins off an async/yielding function
 function exodustimeout_sync(command) {
 
@@ -5067,10 +5030,10 @@ async function exodustimeout_async_sync(command) {
 
 //thin wrapper to handle timeouts with/without yielding code (legacy 'yield * ' support)
 function exodussetinterval(command, milliseconds) {
-    // legacy yield* support (commented check)
+    // legacy yield* support (commented check) – treat as await for modern path
     if (typeof command == 'string' && command.match(gyieldregex)) {
         command = command.replace(gyieldregex, '').replace(/"/g, "'")
-        return window.setInterval('exodusinterval_sync("' + command + '")', milliseconds)
+        return window.setInterval('exodusinterval_async_sync("' + command + '")', milliseconds)
     } else if (typeof command == 'string' && command.match(/await /)) {
         command = command.replace(/await /g, '').replace(/"/g, "'")
         return window.setInterval('exodusinterval_async_sync("' + command + '")', milliseconds)
@@ -5078,7 +5041,7 @@ function exodussetinterval(command, milliseconds) {
         return window.setInterval(command, milliseconds)
 }
 
-//sync function called at intervals in yielding code
+//sync function called at intervals in yielding code (legacy, now rarely used)
 //spins off an async/yielding function
 function exodusinterval_sync(command) {
 
@@ -5569,7 +5532,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
     // The various click/key handlers now resolve this promise (via resolvePendingConfirm).
     // fromPromise feeds the value to the existing generator machinery exactly as before.
     // All higher wrappers (exodusconfirm, decide*, yesno, input, filepopup etc.) and
-    // all call sites using yield* continue to work unchanged (via bridges for any remaining legacy generators).
+    // legacy 'yield * ' call sites (if any in old data) continue via adapters.
     var confirmResolve
     var confirmPromise = new Promise((resolve) => {
         confirmResolve = resolve
@@ -5616,7 +5579,7 @@ function exodus_confirm_function3(event) {
 function resolvePendingConfirm(value, source) {
     // Phase 1.2 microstep: route confirm/decide resumption through a Promise
     // so the leaf can be driven by native async while existing yield* callers
-    // continue to work via the fromPromise adapter (which does the exodus_resume). (legacy hybrid support)
+    // continue to work via adapters (legacy hybrid support)
     if (gpendingConfirmResolve) {
         var resolver = gpendingConfirmResolve;
         gpendingConfirmResolve = null;
