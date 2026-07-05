@@ -379,8 +379,8 @@ function exodus_client_init() {
 //end of main initialisation.
 //what follows should be functions and their global variables only
 
-function* window_onbeforeprint() {
-    yield* fromPromise( clientfunctions_setstyle() )
+async function window_onbeforeprint() {
+    await clientfunctions_setstyle()
 }
 
 async function exoduslogout_onclick() {
@@ -1501,7 +1501,7 @@ function adjust_bodymargin() {
 	}
 }
 
-function* clientfunctions_windowonload() {
+async function clientfunctions_windowonload() {
 
     ////login('clientfunctions_windowonload')
 
@@ -1515,7 +1515,7 @@ function* clientfunctions_windowonload() {
     //loginalert('wol'+glogincode)
     //    gdataset = exodusgetcookie2('dataset')
 
-    yield* fromPromise( clientfunctions_getglobals() )
+    await clientfunctions_getglobals()
 
     db = new exodusdblink
     //gusername is set in exodusdblink
@@ -1528,10 +1528,10 @@ function* clientfunctions_windowonload() {
         exodussetcookie(glogincode, 'EXODUSpending', '')
         console.log(pending)
         db.request = pending
-        yield* db.send()
+        await db.send()
     }
 
-    yield* fromPromise( clientfunctions_setstyle() )
+    await clientfunctions_setstyle()
 
     //if (gautofitwindow && document.getElementById('autofitwindowelement'))
     //    exodussettimeout('exodusautofitwindow()', 10)
@@ -1569,7 +1569,7 @@ function* clientfunctions_windowonload() {
 
     //trigger formfunctions_onload
     if (typeof formfunctions_onload == 'function')
-        yield* formfunctions_onload()
+        await formfunctions_onload()
 
     //add menu, logout and refresh buttons if not a popup, depending on gshowmenu, not /exodus/ location and no navbar elements
     //if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)

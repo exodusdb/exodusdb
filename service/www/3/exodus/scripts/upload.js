@@ -116,7 +116,7 @@ async function form_onkeydown(event) {
   return exoduswindowclose()
 }
 
-function* formfunctions_onload() {
+async function formfunctions_onload() {
 
  //global references to key elements
  $images=$$('images')
@@ -155,10 +155,10 @@ function* formfunctions_onload() {
  if (!gparameters.filename)
     gparameters.filename=''
 
- yield* fromPromise( loadimages() )
+ await loadimages()
 
  if (gparameters.showupload)
-     yield* fromPromise( showuploadtable() )
+     await showuploadtable()
 
  return true
 
