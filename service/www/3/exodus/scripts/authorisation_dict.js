@@ -18,7 +18,7 @@ async function dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('USER_ID', 'F', 1, '', usersgroupn)
     di.required = true
     di.validation = 'await user_val_userid()'
-    di.link = 'yield* windowopenkey("../exodus/users.htm")'
+    di.link = 'await windowopenkey("../exodus/users.htm")'
     //need to allow to move user up/down
     //di.unique=true
     di.noinsertrow = !(await exodussecurity('USER CREATE'))

@@ -1243,7 +1243,7 @@ async function windowopen(url, parameters, style) {
 
 //wrapper function to replace window.open()
 //to give warning if cannot open ... because of pop blockers etc.
-function* exodusbreak(cmd, funcname, position) {
+function exodusbreak(cmd, funcname, position) {
 
     if (!gstepping) return
 
@@ -2156,7 +2156,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 
         logindb.request = 'LOGIN\r' + arguments[0] + '\r' + arguments[1] + '\r' + arguments[2] + '\r' + arguments[3] + '\r\r' + arguments[5]
 
-        if (!(yield* logindb.send())) {
+        if (!(await logindb.send())) {
             var msg = logindb.response
             if (!msg)
                 msg = 'Invalid username or password'
@@ -3830,8 +3830,7 @@ async function sorttable(event, order) {
     var colid = event.target.sorttableelementid
 
     if (typeof form_presort == 'function') {
-        var _e = exodusevaluate('await form_presort(','yield* formfunctions_onload()');
-        (_e && _e.next ? exodusneweventhandler(_e, 'form_presort label').value : _e);
+        await exodusevaluate('await form_presort(','yield* formfunctions_onload()');
         if (!(await form_presort(colid)))
             return await exodusinvalid()
     }
@@ -3984,8 +3983,7 @@ async function sorttable(event, order) {
     gds.data['group' + groupno] = newdatarows
 
     if (typeof form_postsort == 'function') {
-        var _e = exodusevaluate('await form_postsort(','yield* formfunctions_onload()');
-        (_e && _e.next ? exodusneweventhandler(_e, 'form_postsort label').value : _e);
+        await exodusevaluate('await form_postsort(','yield* formfunctions_onload()');
         if (!(await form_postsort(colid)))
             return await exodusinvalid()
     }

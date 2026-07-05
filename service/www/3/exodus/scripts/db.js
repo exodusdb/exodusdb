@@ -601,7 +601,7 @@ function exodusrecord(dictarray,filename) {
 exodusrecord.prototype.readu=async function exodusrecord_readu() {
 
  //gets lock if possible and reads
- return /**/ yield * this.read(true)
+ return /**/ await this.read(true)
 }
 
 //READ
@@ -625,7 +625,7 @@ exodusrecord.prototype.read=async function exodusrecord_read(withlock) {
  db.request+='\r'+this.filename+'\r'+this.key+'\r'+glocktimeoutinmins
  if (this.readenvironment)
     db.request+='\r'+this.readenvironment
- if (!(yield* db.send())
+ if (!(await db.send())
  &&(db.response.toUpperCase().slice(0,16)!="ERROR: NO RECORD")
  &&(db.response.toUpperCase().slice(0,25)!="ERROR: CANNOT LOCK RECORD")
  ) {
@@ -691,7 +691,7 @@ exodusrecord.prototype.postread=function exodusrecord_postread() {
 exodusrecord.prototype.writeu=async function exodusrecord_writeu() {
 
  //writes and unlocks
- return /**/ yield * this.writex(true)
+ return /**/ await this.writex(true)
 }
 
 //WRITE
@@ -699,7 +699,7 @@ exodusrecord.prototype.writeu=async function exodusrecord_writeu() {
 exodusrecord.prototype.write=async function exodusrecord_write() {
 
  //writes and leaves lock (zzz is this implemented in DOS LISTEN yet?)
- return /**/ yield * this.writex(false)
+ return /**/ await this.writex(false)
 }
 
 //WRITEX
@@ -734,7 +734,7 @@ exodusrecord.prototype.writex=async function exodusrecord_writex(withunlock) {
  db.request+='\r'+this.filename+'\r'+this.key+'\r\r'+this.sessionid
  if (this.readenvironment)
     db.request+='\r'+this.readenvironment
- if (!(yield* db.send(this.revstr))) {
+ if (!(await db.send(this.revstr))) {
 
   this.response=db.response
   return 0
@@ -1225,7 +1225,7 @@ async function reado(filename,key,fieldno) {
  }
  
  db.request='CACHE\rREAD\r'+filename+'\r'+key
- if (!(yield* db.send()))
+ if (!(await db.send()))
   return ""
   
  if (!fieldno)

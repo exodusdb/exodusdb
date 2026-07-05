@@ -161,8 +161,7 @@ async function formfunctions_onload() {
 
     //form customisation
     if (typeof form_onload == 'function') {
-        var _e = exodusevaluate('await form_onload()', 'await form_onload()');
-        if (!(_e && _e.next ? exodusneweventhandler(_e, 'await form_onload()').value : _e))
+        if (!(await exodusevaluate('await form_onload()', 'await form_onload()')))
             return
     }
 
@@ -194,8 +193,7 @@ async function formfunctions_onload() {
 
     //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename)
     var dictfunctionname = (guseyield ? 'yield * ' : '') + 'dict_' + gdictfilename
-    var _e = exodusevaluate(dictfunctionname + '(gparameters)', 'yield* formfunctions_onload()');
-    var dictarray = (_e && _e.next ? exodusneweventhandler(_e, 'dict load').value : _e);
+    var dictarray = await exodusevaluate(dictfunctionname + '(gparameters)', 'yield* formfunctions_onload()');
     gro = new exodusrecord(dictarray, gdatafilename)
 
     gds.dict = gro.dict
@@ -1646,8 +1644,7 @@ async function formfunctions_onload() {
     //if form has a custom postinit routine
     if (typeof form_postinit == 'function') {
         //login('form_postinit before')
-        var _e = exodusevaluate('await form_postinit()', 'form_functions()');
-        (_e && _e.next ? exodusneweventhandler(_e, 'await form_postinit()').value : _e);
+        await exodusevaluate('await form_postinit()', 'form_functions()');
         //logout('form_postinit after')
 
         //reverse the effect of any setvalue commands in postinit
@@ -2016,8 +2013,7 @@ async function printsendrecord_onclick(event) {
         return
     }
     //alert('DEBUG: printfunction')
-    var _e = exodusevaluate(printfunction, 'await printsendrecord_onclick()');
-    (_e && _e.next ? exodusneweventhandler(_e, 'printfunction').value : _e);
+    await exodusevaluate(printfunction, 'await printsendrecord_onclick()');
     //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick()')",100)
 
 }
@@ -2039,8 +2035,7 @@ async function listrecord_onclick(event) {
         focusongpreviouselement()
         return
     }
-    var _e = exodusevaluate(listfunction, 'await listrecord_onclick()');
-    (_e && _e.next ? exodusneweventhandler(_e, 'listfunction').value : _e);
+    await exodusevaluate(listfunction, 'await listrecord_onclick()');
 
 }
 
@@ -3616,8 +3611,7 @@ async function saverecord_onclick() {
         //custom postwrite function
         if (typeof form_postwrite == 'function') {
             //yield* exodusevaluateall('await form_postwrite()')
-            var _e = exodusevaluateall('await form_postwrite()');
-            if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_postwrite()').value : _e)))
+            if (!(await exodusevaluateall('await form_postwrite()')))
                 return false
         }
         //otherwise automatic option to print if available
@@ -3635,8 +3629,7 @@ async function saverecord_onclick() {
 
     //custom prewrite function
     if (typeof (form_prewrite) == 'function') {
-        var _e = exodusevaluateall('await form_prewrite()', 'await saverecord_onclick()');
-        if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_prewrite()').value : _e)))
+        if (!(await exodusevaluateall('await form_prewrite()', 'await saverecord_onclick()')))
             return false
     }
 
@@ -3656,14 +3649,12 @@ async function saverecord_onclick() {
     //custom write and postwrite routine
     if (typeof form_write == 'function') {
 
-        var _e = exodusevaluateall('await form_write()', 'await saverecord_onclick()');
-        if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_write()').value : _e)))
+        if (!(await exodusevaluateall('await form_write()', 'await saverecord_onclick()')))
             return false
         setchangesmade(false)
 
         if (typeof (form_postwrite) == 'function') {
-            _e = exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
-            (_e && _e.next ? exodusneweventhandler(_e, 'await form_postwrite(db)').value : _e);
+            await exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
         }
 
         return true
@@ -3685,8 +3676,7 @@ async function saverecord_onclick() {
 
     //if postwrite routine
     if (typeof (form_postwrite) == 'function') {
-        var _e = exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
-        (_e && _e.next ? exodusneweventhandler(_e, 'await form_postwrite(db)').value : _e);
+        await exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
     }
 
     //otherwise, if no postwrite function then assume that
@@ -3784,8 +3774,7 @@ async function deleterecord_onclick(event) {
     //custom postdelete function
     if (typeof form_postdelete == 'function') {
         //yield* exodusevaluateall('form_postdelete()')
-        var _e = exodusevaluateall('form_postdelete()');
-        if (!((_e && _e.next ? exodusneweventhandler(_e, 'form_postdelete()').value : _e)))
+        if (!(await exodusevaluateall('form_postdelete()')))
             return false
     }
 
@@ -3924,8 +3913,7 @@ async function opendoc2(newkey0) {
     if (typeof (form_preread) == 'function') {
 
         ///log('preread external key=' + gkeyexternal + ' internalkey=' + gkey)
-        var _e = exodusevaluateall('await form_preread()', 'await opendoc2()');
-        if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_preread()').value : _e)))
+        if (!(await exodusevaluateall('await form_preread()', 'await opendoc2()')))
             return false //logout('opendoc2 - preread false')
 
     }
@@ -4075,8 +4063,7 @@ async function opendoc2(newkey0) {
     //postread
     if (typeof form_postread == 'function') {
         grecn = null
-        var _e = exodusevaluateall('await form_postread()', 'await opendoc2()');
-        if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_postread()').value : _e)))
+        if (!(await exodusevaluateall('await form_postread()', 'await opendoc2()')))
         //if (!(await form_postread()))
         {
             if (glocked)
@@ -4136,8 +4123,7 @@ async function opendoc2(newkey0) {
     //TODO convert all postpostread( to use this new hook function instead of timeout
     if (typeof form_postdisplay == 'function') {
         grecn = null
-        var _e = exodusevaluateall('await form_postdisplay()', 'await opendoc2()');
-        if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_postdisplay()').value : _e))) {
+        if (!(await exodusevaluateall('await form_postdisplay()', 'await opendoc2()'))) {
             if (glocked)
                 await unlockdoc()//fail safe
             await cleardoc()
@@ -4547,8 +4533,7 @@ async function cleardoc() {
     //TODO convert all postpostread( to use this new hook function instead of timeout
     if (typeof form_postdisplay == 'function') {
         grecn = null
-        var _e = exodusevaluateall('await form_postdisplay()', 'yield* formfunctions_onload()');
-    (_e && _e.next ? exodusneweventhandler(_e, 'await form_postdisplay()').value : _e);
+        await exodusevaluateall('await form_postdisplay()', 'await formfunctions_onload()');
     }
 
     //logout('cleardoc')
@@ -4834,8 +4819,7 @@ async function writedoc(unlock) {
     goldvalue = ''
     gvalue = ''
     if (typeof (form_prewrite) == 'function') {
-        var _e = exodusevaluateall('await form_prewrite()', 'await writedoc()');
-        if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_prewrite()').value : _e))) return false
+        if (!(await exodusevaluateall('await form_prewrite()', 'await writedoc()'))) return false
         ///log('form_prewrite - after')
     }
 
@@ -6438,8 +6422,7 @@ async function getdefault(element) {
     //login('getdefault ' + element.id)
 
     //calculate default
-    var _e = exodusevaluate(defaultvalueexpression, 'await getdefault(' + element.id + ')');
-    var defaultvalue = (_e && _e.next ? exodusneweventhandler(_e, 'getdefault').value : _e);
+    var defaultvalue = await exodusevaluate(defaultvalueexpression, 'await getdefault(' + element.id + ')');
 
     //select elements always have a default
     if (element.tagName == 'SELECT') {
@@ -6806,8 +6789,7 @@ async function validate(element) {
         var expression = convarray[0] + '(' + '"ICONV","' + value + '","' + convarray.slice(1) + '")'
 
         gmsg = ''
-        var _e = exodusevaluate(expression, 'await validate(' + element.id + ') iconv');
-        ivalue = (_e && _e.next ? exodusneweventhandler(_e, 'validate iconv').value : _e);
+        ivalue = await exodusevaluate(expression, 'await validate(' + element.id + ') iconv');
         if (typeof ivalue == 'undefined')
             return false //logout('validate - system error in input conversion')
 
@@ -6833,8 +6815,7 @@ async function validate(element) {
         if (typeof elementvalidation == 'function')
             ok = elementvalidation()
         else
-            var _e = exodusevaluate(elementvalidation, 'await validate() functioncode');
-            ok = (_e && _e.next ? exodusneweventhandler(_e, 'validate functioncode').value : _e);
+            ok = await exodusevaluate(elementvalidation, 'await validate() functioncode');
 
         if (gvalue == null)
             await exoduswarning(element.id + ' validation routine returned gvalue=null')
@@ -6949,8 +6930,7 @@ async function validateoconv(element, ivalue) {
     var expression = convarray[0] + '(' + '"OCONV","' + ivalue + '","' + convarray[1] + '")'
 
     gmsg = ''
-    var _e = exodusevaluate(expression);
-    var ovalue = (_e && _e.next ? exodusneweventhandler(_e, 'oconv expression').value : _e);
+    var ovalue = await exodusevaluate(expression);
     if (typeof ovalue == 'undefined')
         return false
 
@@ -7028,15 +7008,15 @@ async function calcfields(fieldns) {
 }
 
 //version to make grecn null and restore it afterwards
-function* exodusevaluateall(functioncode, callerfunctionname) {
+async function exodusevaluateall(functioncode, callerfunctionname) {
     var storegrecn = grecn
     grecn = null
-    var result = yield* exodusevaluate(functioncode, callerfunctionname)
+    var result = await exodusevaluate(functioncode, callerfunctionname)
     grecn = storegrecn
     return result
 }
 
-function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thisobject) {
+async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thisobject) {
 
     //wrapper to call custom functions or expressions (eg validation etc)
     //arg1name and arg1 are optional way of getting data into
@@ -7078,19 +7058,19 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
     //if (gstepping||(!ginitok&&gusername=='EXODUS'))
     // if (true||gstepping||gusername=='EXODUS')
     if (gstepping || gusername == 'EXODUS' || gusername == 'STEVE')
-        result = yield* exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
+        result = await exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
     else {
 
         //var e
         try {
-            result = yield* exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
+            result = await exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
         }
         catch (e) {
             //chrome exception is not available except inside catch clause
             //} if (e) {
             //if (typeof callerfunctionname == 'undefined') callerfunctionname = '"not specified"'
             systemerror('yield* exodusevaluate()' + functionorcode, e)
-            return yield* fromPromise( exodusinvalid() )
+            return await exodusinvalid()
         }
 
     }
@@ -7109,7 +7089,7 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
 //var gcatcherrors=true//use try/catch to show errors to users on screen
 var gcatcherrors = false//avoid try/catch thereby allowing javascript error line number etc to show in console and/or be caught by debugger
 
-function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobject) {
+async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobject) {
 
     //arg1name and arg1 are 'event' and event in some use cases
     //in order to pass event into exodusonclick functions
@@ -7141,7 +7121,9 @@ function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobje
                 try {
 
                     //we pass in the value of arg1 when calling the function
-                    /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
+                    var sub = functionx(arg1);
+                    var subcall = sub && sub.apply ? sub.apply(thisobject || this) : sub;
+                    var result = (subcall && subcall.next ? exodusneweventhandler(subcall, functioncode).value : (subcall && subcall.then ? await subcall : subcall));
                     return result
                 }
                 catch (e) {
@@ -7150,7 +7132,9 @@ function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobje
                 //commented out to enable showing of run time script errors
             } else {
                     //we pass in the value of arg1 when calling the function
-                    /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
+                    var sub = functionx(arg1);
+                    var subcall = sub && sub.apply ? sub.apply(thisobject || this) : sub;
+                    var result = (subcall && subcall.next ? exodusneweventhandler(subcall, functioncode).value : (subcall && subcall.then ? await subcall : subcall));
                 return result
             }
 
@@ -7290,8 +7274,7 @@ async function form_deleterow(event, element) {
     //form specific after row delete function
     var postdeleterow = window['form_postdeleterow' + groupno]
     if (typeof postdeleterow == 'function') {
-        var _e = exodusevaluate('yield * form_postdeleterow' + groupno + '()');
-        (_e && _e.next ? exodusneweventhandler(_e, 'postdeleterow').value : _e);
+        await exodusevaluate('yield * form_postdeleterow' + groupno + '()');
     }
 
     var deps = tablex.getAttribute('exodusdependents')
@@ -7597,8 +7580,7 @@ async function form_insertrow(event, append) {
     //form specific before row insert function
     var preinsertrow = window['form_preinsertrow' + groupno]
     if (typeof preinsertrow == 'function') {
-        var _e = exodusevaluate('yield * form_preinsertrow' + groupno + '()');
-        var p = (_e && _e.next ? exodusneweventhandler(_e, 'preinsertrow').value : _e);
+        var p = await exodusevaluate('yield * form_preinsertrow' + groupno + '()');
         if (!p)
             return false //logout('insertrow - preinsert false')
     }
@@ -7627,8 +7609,7 @@ async function form_insertrow(event, append) {
     //form specific after row insert function
     var postinsertrow = window['form_postinsertrow' + groupno]
     if (typeof postinsertrow == 'function') {
-        var _e = exodusevaluate('yield * form_postinsertrow' + groupno + '()');
-        (_e && _e.next ? exodusneweventhandler(_e, 'postinsertrow').value : _e);
+        await exodusevaluate('yield * form_postinsertrow' + groupno + '()');
     }
 
     //focus on first column of new row (after running postinsert routine to avoid event within event - if postinsert yields for some user input for example)
@@ -7809,7 +7790,7 @@ async function exoduslink(event, element) {
     if (!(element.getAttribute('exoduslowercase')))
         gvalue = gvalue.toUpperCase()
 
-    var reply = yield* exodusevaluate(element.getAttribute('exoduslink'), 'await exoduslink()')
+    var reply = await exodusevaluate(element.getAttribute('exoduslink'), 'await exoduslink()');
 
     //logout('exoduslink')
 
@@ -7989,7 +7970,7 @@ async function exoduspopup2(element) {
 
     //evaluate popup expression if provided
     if (expression) {
-        var reply = yield* exodusevaluate(expression, 'await exoduspopup2()')
+        var reply = await exodusevaluate(expression, 'await exoduspopup2()');
     }
 
     //otherwise build a list and select from the SELECT
