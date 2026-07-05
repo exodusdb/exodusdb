@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 :
-: switch.sh <branch> # Wrap git switch in named stash push/pop.
+: switch.sh \<branch\> # Wrap git switch in named stash push/pop.
 :
 : Check can switch
 :
