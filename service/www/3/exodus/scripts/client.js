@@ -2497,6 +2497,9 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
             ///////////////////////////////////////////////////////////////
             var result = await netPromise
 
+            if (xhttpaborted)
+                unblockmodalui_sync()
+
             // The transport signal (result) is 'ok' on success path or a descriptive
             // string (e.g. "ERROR exodusdblink...") on network failure. We still largely
             // ignore the signal value itself (original code did too) and rely on:

@@ -268,11 +268,13 @@
             else
                 returnvalue = Number(arg1)
 
-            if (arg1 == 2 && window.dialogArguments.xhttp) {
+            if (window.dialogArguments && window.dialogArguments.xhttp && (arg1 == 2 || arg1 == 0)) {
                 try {
                     window.dialogArguments.xhttp.abort()
                 } catch (e) { }
-                return false
+                if (window.opener && typeof window.opener.unblockmodalui_sync == 'function')
+                    window.opener.unblockmodalui_sync()
+                return exoduswindowclose(0)
             }
 
             return exoduswindowclose(returnvalue)
