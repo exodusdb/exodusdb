@@ -2,21 +2,21 @@
 
 //moved from general.js
 
-function* system_dict_datasetcode(di, many, orcurrent, test) {
+async function system_dict_datasetcode(di, many, orcurrent, test) {
     many = many || false
     orcurrent = orcurrent || false
     //test=test||false
     //"" means no restriction, true=only TEST databases, false=not TEST databases
     if (typeof test == 'undefined')
         test = '""'
-    di.popup = 'yield* system_pop_datasetcode(' + many + ',' + orcurrent + ')'
+    di.popup = 'await system_pop_datasetcode(' + many + ',' + orcurrent + ')'
 	di.lowercase = true;
-    di.validation = 'yield* system_val_datasetcode(' + many + ',' + orcurrent + ',' + test + ')'
+    di.validation = 'await system_val_datasetcode(' + many + ',' + orcurrent + ',' + test + ')'
     di.length = 8;
 }
 
-function* system_pop_datasetcode(many, orcurrent) {
-    if (!(yield* system_getdatasets())) return false
+async function system_pop_datasetcode(many, orcurrent) {
+    if (!(await system_getdatasets())) return false
 
     var popdata = exoduscloneobj(gdatasets)
     if (orcurrent) {
@@ -31,34 +31,34 @@ function* system_pop_datasetcode(many, orcurrent) {
     var returncoln = 1
     var defaultreply = ''
     var inverted = true
-    var datasetcode = yield* exodusdecide('Which dataset' + (many ? '(s' : '') + ' do you want?' + tt, popdata, cols, returncoln, defaultreply, many, inverted)
+    var datasetcode = await exodusdecide('Which dataset' + (many ? '(s' : '') + ' do you want?' + tt, popdata, cols, returncoln, defaultreply, many, inverted)
     return datasetcode
 }
 
-function* system_val_datasetcode(many, orcurrent, test) {
+async function system_val_datasetcode(many, orcurrent, test) {
 
     if (gvalue == 'CURRENT') {
-        if (!orcurrent) return yield* exodusinvalid('"CURRENT" is not allowed here')
+        if (!orcurrent) return await exodusinvalid('"CURRENT" is not allowed here')
         return true
     }
 
-    if (!(yield* system_getdatasets()))
+    if (!(await system_getdatasets()))
         return false
 
     if (gvalue != 'CURRENT' && gvalue.indexOf('CURRENT') >= 0)
-        return yield* exodusinvalid('You cannot choose CURRENT and other datasets')
+        return await exodusinvalid('You cannot choose CURRENT and other datasets')
 
     if (typeof test == 'boolean') {
         if (test && gvalue && gvalue.substr(-5) != '_test')
-            return yield* exodusinvalid('You can only choose TEST databases here')
+            return await exodusinvalid('You can only choose TEST databases here')
         else if (!test && gvalue.substr(-5) == '_test')
-            return yield* exodusinvalid('You cannot choose TEST databases here')
+            return await exodusinvalid('You cannot choose TEST databases here')
     }
 
     var values = many ? gvalue.split(':') : [gvalue]
     for (var ii = 0; ii < values.length; ii++) {
         if (!gdatasets[1].exoduslocate(values[ii]))
-            return yield* exodusinvalid(values[ii].exodusquote() + ' is not a valid dataset code')
+            return await exodusinvalid(values[ii].exodusquote() + ' is not a valid dataset code')
     }
 
     return true
@@ -66,10 +66,10 @@ function* system_val_datasetcode(many, orcurrent, test) {
 }
 
 var gdatasets
-function* system_getdatasets(refresh) {
+async function system_getdatasets(refresh) {
     if (refresh || !gdatasets) {
         db.request = 'EXECUTE\rGENERAL\rGETDATASETS'
-        if (!(yield* db.send())) return yield* exodusinvalid(db.response)
+        if (!(yield* db.send())) return await exodusinvalid(db.response)
         //split inverted
         gdatasets = db.data.exodussplit(vm + sm, true)
     }
@@ -79,7 +79,7 @@ function* system_getdatasets(refresh) {
 //users and security
 ////////////////////
 
-function* system_dict_usercode(di, many, withtask, haslocks, sselect) {
+async function system_dict_usercode(di, many, withtask, haslocks, sselect) {
     if (!many)
         many = false
     if (many && !di.groupno)
@@ -96,14 +96,14 @@ function* system_dict_usercode(di, many, withtask, haslocks, sselect) {
         sselect = '""'
     if ("'\"".indexOf(sselect.substr(0, 1)) == -1)
         sselect = '"' + sselect.exodusswap('"', '\\"') + '"'
-    di.popup = 'yield* system_pop_users(' + many + ',"' + withtask + '",' + haslocks + ',' + sselect + ')'
+    di.popup = 'await system_pop_users(' + many + ',"' + withtask + '",' + haslocks + ',' + sselect + ')'
     di.filename = 'USERS'
-    di.validation = 'yield* system_val_users()'
+    di.validation = 'await system_val_users()'
     if (many)
         di.unique = true
 }
 
-function* system_pop_users(many, withtask, haslocks, sselect) {
+async function system_pop_users(many, withtask, haslocks, sselect) {
     var sortselect = ' AND WITH ID NOT STARTING "%"'
     //currently available "authorisation groups" supported - easy to add any you like in DICT.USERS
     //AUTHORISED_JOURNAL_POST
@@ -118,29 +118,29 @@ function* system_pop_users(many, withtask, haslocks, sselect) {
     sortselect = 'BY RANK ' + sortselect.slice(5)
     var selcol0 = 1
 
-    return yield* exodusfilepopup('USERS', [['USER_NAME', 'User Name'], ['USER_CODE', 'User Code'], ['DEPARTMENT_CODE2', 'Department'], ['EMAIL_ADDRESS', 'Email'], ['LAST_LOGIN_DATETIME', 'Last Login Datetime'], ['LAST_LOGIN_LOCATION', 'Last Login Location']], selcol0, sortselect, many)
+    return await exodusfilepopup('USERS', [['USER_NAME', 'User Name'], ['USER_CODE', 'User Code'], ['DEPARTMENT_CODE2', 'Department'], ['EMAIL_ADDRESS', 'Email'], ['LAST_LOGIN_DATETIME', 'Last Login Datetime'], ['LAST_LOGIN_LOCATION', 'Last Login Location']], selcol0, sortselect, many)
 }
 
-function* system_val_users() {
+async function system_val_users() {
     return true
 }
 
-function* system_dict_username(di, usercodeid) {
+async function system_dict_username(di, usercodeid) {
     if (typeof usercodeid == 'undefined') usercodeid = 'USER_CODE'
     di.functioncode = 'return yield* this.xlate("' + usercodeid + '", "USERS",1)'
     di.length = 30
 }
 
 /*
-function* system_getdepartments_old() {
+async function system_getdepartments_old() {
 db.request = 'EXECUTE\rGENERAL\rGETDEPTS'
-if (!(yield* db.send())) return yield* exodusinvalid(db.response)
+if (!(yield* db.send())) return await exodusinvalid(db.response)
 gdepartments = db.data
 }
 */
 var gdepartments = ''
 var gdepts//0=deptids, 1=deptnames, 2=deptusernames
-function* system_getdepartments(deptoptions) {
+async function system_getdepartments(deptoptions) {
     if (!deptoptions)
         deptoptions = ''
 
@@ -150,7 +150,7 @@ function* system_getdepartments(deptoptions) {
 
     var security = []
     if (!(yield* security.exodusread('DEFINITIONS', 'SECURITY*USERS')))
-        return yield* exodusinvalid(security.exodusresponse)
+        return await exodusinvalid(security.exodusresponse)
     security = exodus_splitarray(security, [[[1, 9]], [[10, 11]]])
     gdepts = [[], [], []]
     var nusers = security[1].length
@@ -192,29 +192,29 @@ function* system_getdepartments(deptoptions) {
     return true
 }
 
-function* system_dict_departmentcode(di, many, deptoptions) {
+async function system_dict_departmentcode(di, many, deptoptions) {
     if (!many)
         many = false
     if (!deptoptions)
         deptoptions = ''
-    di.popup = 'yield* system_pop_department(' + many + ',' + deptoptions.exodusquote() + ')'
-    di.validation = 'yield* system_val_department(' + deptoptions.exodusquote() + ')'
+    di.popup = 'await system_pop_department(' + many + ',' + deptoptions.exodusquote() + ')'
+    di.validation = 'await system_val_department(' + deptoptions.exodusquote() + ')'
 }
 
-function* system_pop_department(many, deptoptions) {
+async function system_pop_department(many, deptoptions) {
     if (!many)
         many = false
-    if (!(yield* system_getdepartments(deptoptions)))
+    if (!(await system_getdepartments(deptoptions)))
         return false
-    //return yield* exodusdecide('', gdepartments.split(fm), '', 0, '', many)
+    //return await exodusdecide('', gdepartments.split(fm), '', 0, '', many)
     var cols = [[0, 'Department'], [1, 'Name'], [2, 'Users with email']]
-    return yield* exodusdecide('', gdepts, cols, 0, gvalue, many, true)
+    return await exodusdecide('', gdepts, cols, 0, gvalue, many, true)
 }
 
-function* system_val_department(deptoptions) {
-    if (!(yield* system_getdepartments(deptoptions)))
+async function system_val_department(deptoptions) {
+    if (!(await system_getdepartments(deptoptions)))
         return false
     if (gvalue && !gdepartments.split(fm).exoduslocate(gvalue))
-        return yield* exodusinvalid(gvalue + ' department does not exist')
+        return await exodusinvalid(gvalue + ' department does not exist')
     return true
 }

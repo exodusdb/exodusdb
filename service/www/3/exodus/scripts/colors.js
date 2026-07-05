@@ -1,27 +1,27 @@
 
-function* colors_val_screencolor() {
-    if (!(yield* exodus_val_color())) return yield* exodusinvalid()
+async function colors_val_screencolor() {
+    if (!(await exodus_val_color())) return await exodusinvalid()
     exodus_set_style('screencolor', gvalue)
     return true
 }
 
-function* colors_val_screenfont() {
-    if (!(yield* exodus_val_font())) return yield* exodusinvalid()
+async function colors_val_screenfont() {
+    if (!(await exodus_val_font())) return await exodusinvalid()
     exodus_set_style('screenfont', gvalue, yield* gds.getx('SCREEN_FONT_SIZE'))
     return true
 }
 
-function* colors_val_screenfontsize() {
+async function colors_val_screenfontsize() {
     exodus_set_style('screenfont', yield* gds.getx('SCREEN_FONT'), gvalue)
     return true
 }
 
-function* exodus_val_font() {
+async function exodus_val_font() {
     if (gvalue.toUpperCase() == 'DEFAULT') gvalue = ''
     return true
 }
 
-function* exodus_val_color() {
+async function exodus_val_color() {
     if (gvalue.toUpperCase() == 'DEFAULT') gvalue = ''
     return true
 }
@@ -38,7 +38,7 @@ function exodus_dict_font(di) {
 
     di.conversion = tt
 
-    di.popup = 'yield* exodus_pop_font('
+    di.popup = 'await exodus_pop_font('
     if (di.required) di.popup += 'true'
     di.popup += ')'
 
@@ -46,7 +46,7 @@ function exodus_dict_font(di) {
 
 }
 
-function* exodus_pop_font(required, many) {
+async function exodus_pop_font(required, many) {
 
     //get colors
     var tt = ''
@@ -64,7 +64,7 @@ function* exodus_pop_font(required, many) {
     }
     tt = tt.join(fm)
 
-    return yield* exodusdecide2('', tt, [[2, '']], 0, '', many)
+    return await exodusdecide2('', tt, [[2, '']], 0, '', many)
 
 }
 
@@ -80,7 +80,7 @@ function exodus_dict_color(di) {
 
     di.conversion = tt
 
-    di.popup = 'yield* exodus_pop_color('
+    di.popup = 'await exodus_pop_color('
     if (di.required) di.popup += 'true'
     di.popup += ')'
 
@@ -88,7 +88,7 @@ function exodus_dict_color(di) {
 
 }
 
-function* exodus_pop_color(required, many) {
+async function exodus_pop_color(required, many) {
 
     //get colors
     var tt = ''
@@ -106,7 +106,7 @@ function* exodus_pop_color(required, many) {
     }
     tt = tt.join(fm)
 
-    return yield* exodusdecide2('', tt, [[2, ''], [1, ''], [0, '']], 1, '', many)
+    return await exodusdecide2('', tt, [[2, ''], [1, ''], [0, '']], 1, '', many)
 
 }
 
@@ -366,21 +366,21 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.wordno = 5
     di.nwords = 1
     exodus_dict_color(di)
-    di.validation = 'yield* colors_val_screencolor()'
+    di.validation = 'await colors_val_screencolor()'
 
     di = dict[++din] = dictrec('SCREEN_FONT', 'F', fn)
     di.wordsep = vm
     di.wordno = 6
     di.nwords = 1
     exodus_dict_font(di)
-    di.validation = 'yield* colors_val_screenfont()'
+    di.validation = 'await colors_val_screenfont()'
     //di.required=true
 
     di = dict[++din] = dictrec('SCREEN_FONT_SIZE', 'F', fn)
     di.wordsep = vm
     di.wordno = 7
     di.nwords = 1
-    di.validation = 'yield* colors_val_screenfontsize()'
+    di.validation = 'await colors_val_screenfontsize()'
     //di.defaultvalue='100'
     exodus_dict_number(di, 0, 50, 200)
     di.length = 3

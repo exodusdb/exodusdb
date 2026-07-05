@@ -1,24 +1,24 @@
 //Copyright NEOSYS All Rights Reserved.//
 
-function* form_postinit() {
+async function form_postinit() {
     //exodussettimeout('focuson("NOTES")', 1000)
     gparameters.key='SYSTEM.CFG'
     return true
 }
 
-function* form_postdisplay() {
+async function form_postdisplay() {
     showhide('databasesection', (!gexodus_server && (yield* gds.getall('SCOPE'))=='SYSTEM.CFG'))
     showhide(['backupsection','old_server'], !gexodus_server)
     return true
 }
 
-function* form_prewrite() {
+async function form_prewrite() {
     if ((yield* gds.getx('SCOPE'))=='SYSTEM.CFG' && !(yield* gds.getx('HOST_NAME')))
-        return yield* exodusinvalid('Host Name is required when Scope is "Current Installation"')
+        return await exodusinvalid('Host Name is required when Scope is "Current Installation"')
     return true
 }
 
-function* sysconfig_copynow(event) {
+async function sysconfig_copynow(event) {
     
     event=getevent(event)
     grecn = getrecn()
@@ -26,7 +26,7 @@ function* sysconfig_copynow(event) {
     var fromdatabase=yield* gds.get1('DATABASE_CODE')
     var todatabase=yield* gds.get1('TEST_DATABASE_CODE')
 
-    if (!(yield* saveandunlockdoc()))
+    if (!(await saveandunlockdoc()))
         return false
 
     var question='WARNING! You MUST NOT copy large databases while users are actively'
@@ -35,16 +35,16 @@ function* sysconfig_copynow(event) {
     question+='\n although not a critical issue, damaged files in the target database.'
     question+='\n\nLarge, actively updated databases must only be copied using\nthe overnight "Automatic Copy" configuration option.'
     question+='\n\nOK to copy '+fromdatabase+' -> '+todatabase+' now?'
-    if (!(yield* exodusyesno(question,2)))
+    if (!(await exodusyesno(question,2)))
         return false
     
     db.request='EXECUTE\rGENERAL\rFILEMAN\rCOPYDB\r'+fromdatabase
     if (!(yield* db.send()))
-        return yield* exodusinvalid(db.response)
-    yield* exodusnote(db.response.slice(2))
+        return await exodusinvalid(db.response)
+    await exodusnote(db.response.slice(2))
 }
 
-function* dict_SYSTEMCONFIGURATION(parameters) {
+async function dict_SYSTEMCONFIGURATION(parameters) {
 
     //returns an array representing the client dictionary 
     var dict = []//of dictrecs
@@ -75,7 +75,7 @@ function* dict_SYSTEMCONFIGURATION(parameters) {
     groupn=1
 
     di = dict[++din] = dictrec('DATABASE_CODE', 'F', 58, '', groupn)
-    yield* system_dict_datasetcode(di, true, false)
+    await system_dict_datasetcode(di, true, false)
     //di.required=true;
     di.unique = true
 
@@ -93,7 +93,7 @@ function* dict_SYSTEMCONFIGURATION(parameters) {
     di.checkbox='1;'
 
     di = dict[++din] = dictrec('TEST_DATABASE_CODE', 'F', 63, '', groupn)
-    yield* system_dict_datasetcode(di, true, false, true)
+    await system_dict_datasetcode(di, true, false, true)
 
     di = dict[++din] = dictrec('BACKUP_TIME_FROM', 'F', 73)
     exodus_dict_time(di)

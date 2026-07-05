@@ -61,7 +61,7 @@ function* formfunctions_onload() {
         //gpassword_element.value=gDialogArguments[1]
         var datasetx = gDialogArguments[2]
         var datasetlist = gDialogArguments[4]
-        yield* setdropdown2(gdataset_element, datasetlist, Array("code", "name"), datasetx, null)
+        await setdropdown2(gdataset_element, datasetlist, Array("code", "name"), datasetx, null)
 
         if (gDialogArguments[5] == 'true') {
             gusername_element.innerText = gDialogArguments[0]
@@ -89,7 +89,7 @@ function* formfunctions_onload() {
             if (typeof exodusgetcookie == 'undefined')
                 datasetcode = datasetcode.substr(0,8).toUpperCase()
         }
-        yield* exodussetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
+        await exodussetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
         if (startinglocation != 'login' && exodusgetcookie2('a', 'EXODUS', '') == 'true') {
             gusername_element.value = exodusgetcookie2('u', 'EXODUS', '')
             gpassword_element.value = exodusgetcookie2('p', 'EXODUS', '')
@@ -123,12 +123,12 @@ function* formfunctions_onload() {
 
     //autologin (except if shift key is pressed - MSIE only)
     if ((!window.event || !window.event.shiftKey) && gautologin_element.value == 'on')
-        yield* dblogin()
+        await dblogin()
 
 }
 
-function* autologin_onclick() {
-    if (yield* hidepassword('yield* autologin_onclick()'))
+async function autologin_onclick() {
+    if (await hidepassword('await autologin_onclick()'))
         return
     
     if (!gautologin_element.checked) return true
@@ -136,35 +136,35 @@ function* autologin_onclick() {
 }
 
 //treat password reminders/resets like logins because we have validated session yet to pass requests
-function* passwordreset_onclick() {
+async function passwordreset_onclick() {
 
-    if (yield* hidepassword('yield* passwordreset_onclick()'))
+    if (await hidepassword('await passwordreset_onclick()'))
         return
     
     //var args={}
     //args.USER_ID=gusername_element.value
-    //yield* exodusshowmodaldialog(EXODUSlocation+'passwordreset.htm')
+    //await exodusshowmodaldialog(EXODUSlocation+'passwordreset.htm')
     var usercode = gusername_element.value.toUpperCase()
     if (!usercode) {
         exodussettimeout('gusername_element.focus()', 100)
         gusername_element.focus()
         gusername_element.select()
-        return yield* exodusinvalid('Username is required')
+        return await exodusinvalid('Username is required')
     }
     var oldpass = gpassword_element.value
-    var email = yield* exodusinput('Password reset for database "' + gdataset_element.value + '"\n\nWhat is your registered email address?')
+    var email = await exodusinput('Password reset for database "' + gdataset_element.value + '"\n\nWhat is your registered email address?')
     if (!email)
         return
     if (email.indexOf('@') < 0)
-        return yield* exodusinvalid('Email address must contain an @ character')
+        return await exodusinvalid('Email address must contain an @ character')
     gpassword_element.value = email
-    //yield* dblogin()
-    yield* login_onclick()
+    //await dblogin()
+    await login_onclick()
 
     gpassword_element.value = oldpass
 }
 
-function* document_onkeydown(event) {
+async function document_onkeydown(event) {
 
     event=getevent(event)
 
@@ -173,14 +173,14 @@ function* document_onkeydown(event) {
 
     //Enter or F9 moves on or clicks login
     if (gkeycode == 13 || gkeycode == 120) {
-        exodussettimeout('yield* dblogin()', 10)
-        //yield* dblogin()
+        exodussettimeout('await dblogin()', 10)
+        //await dblogin()
         return exoduscancelevent(event)
     }
 
 }
 
-function* dblogin() {
+async function dblogin() {
 
     //force selection of current selection in drop down if dropped down
     glogin_button.focus()
@@ -192,9 +192,9 @@ function* dblogin() {
 
 }
 
-function* login_onclick() {
+async function login_onclick() {
 
-    if (yield* hidepassword('yield* login_onclick()'))
+    if (await hidepassword('await login_onclick()'))
         return
     
     //prevent double execution due to onkeydown and enter gkeycode hitting login
@@ -231,7 +231,7 @@ function* login_onclick() {
     if (gusername_element.value.includes(' ')) {
         gusername_element.focus();
         gusername_element.select();
-        return yield* exodusinvalid("<b>Wrong username or password</b> \r → Check details and try again.");
+        return await exodusinvalid("<b>Wrong username or password</b> \r → Check details and try again.");
     }
 
     var authno = ''
@@ -270,7 +270,7 @@ function* login_onclick() {
 
             //any login messages/reminders/warnings
             if (db.response != 'OK') {
-                yield* exoduswarning(db.response.slice(3))
+                await exoduswarning(db.response.slice(3))
             }
 
             //cannot set cookie in modal dialog so this also has to be done in caller (clientfunctions)
@@ -348,9 +348,9 @@ function* login_onclick() {
         //quit login if actually a password reset
         if (db.response.indexOf('Password Reset ') >= 0) {
             if (db.response.indexOf('Password Reset Failed') >= 0)
-                return yield* exodusinvalid(db.response)
+                return await exodusinvalid(db.response)
             else
-                return yield* exodusnote(db.response)
+                return await exodusnote(db.response)
         }
 
         //option to relogin with authorisation number
@@ -362,10 +362,10 @@ function* login_onclick() {
         }
         else {
             if (db.response.toLowerCase().indexOf('password')>=0) {
-                //var choice=yield* exodusconfirm(db.response.split('|').join('\n'),1,'Try a different password, database or user code','Reset Password')
-                var choice=yield* exodusinvalid(db.response.split('|').join('\n'))
+                //var choice=await exodusconfirm(db.response.split('|').join('\n'),1,'Try a different password, database or user code','Reset Password')
+                var choice=await exodusinvalid(db.response.split('|').join('\n'))
             } else {
-                var choice=yield* exodusinvalid(db.response.split('|').join('\n'))
+                var choice=await exodusinvalid(db.response.split('|').join('\n'))
             }
             if (choice == 2) {
                 //exodussettimeout('gpasswordreset_button.click()',100)
@@ -383,7 +383,7 @@ function* login_onclick() {
 
 //using timeout to ensure password is hidden before any sync windows appear and block ui
 //only really required on older browsers?
-function* hidepassword(chainexpression) {
+async function hidepassword(chainexpression) {
     if (gsavedpasswordelement) {
         showpassword_sync()
         exodussettimeout(chainexpression,1)

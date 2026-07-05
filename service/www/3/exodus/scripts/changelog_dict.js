@@ -1,18 +1,18 @@
 //Copyright NEOSYS All Rights Reserved.
 
-function* changelog_pop_number(many) {
+async function changelog_pop_number(many) {
 
  //no way to return say the last 1000 records, so we request to return all
- return yield* exodusfilepopup('CHANGELOG',[['NUMBER'],['DATE'],['KEYWORDS'],['TEXT']],0,'BY-DSND NUMBER',many,'',0)
+ return await exodusfilepopup('CHANGELOG',[['NUMBER'],['DATE'],['KEYWORDS'],['TEXT']],0,'BY-DSND NUMBER',many,'',0)
 }
 
-function* changelog_list() {
+async function changelog_list() {
 
  yield* windowopen('../general/whatsnew.htm')
  return true
 }
 
-function* dict_CHANGELOG() {
+async function dict_CHANGELOG() {
 
  //returns an array representing the currency dictionary
  
@@ -26,8 +26,8 @@ function* dict_CHANGELOG() {
  exodus_dict_number(di,2)
  di.validcharacters='1234567890.'
  di.defaultvalue=exodusdate().exodusquote()
- di.popup='yield* changelog_pop_number(true)'
- di.listfunction='yield* changelog_list()'
+ di.popup='await changelog_pop_number(true)'
+ di.listfunction='await changelog_list()'
  
  di=dict[++din]=dictrec('CHANGELOG_DATE','F',1)
  di.required=true

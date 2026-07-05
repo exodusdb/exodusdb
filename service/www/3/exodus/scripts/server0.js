@@ -3,7 +3,7 @@
 //copied in xhttp.asp and server0
 
 //debug in ASP like this ...
-function* debug(msg,end) {
+async function debug(msg,end) {
 
  Response.Write(msg)
  if (end) Response.End()

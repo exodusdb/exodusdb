@@ -1,5 +1,5 @@
 var gusers_authorisation_update
-function* dict_USERS() {
+async function dict_USERS() {
 
  //returns an array representing the client dictionary
 
@@ -8,10 +8,10 @@ function* dict_USERS() {
  var di
  var groupn
 
- var istimesheetadmin=yield* exodussecurity('TIMESHEET ADMINISTRATION')
+ var istimesheetadmin=await exodussecurity('TIMESHEET ADMINISTRATION')
  var timesheetadminreadonlymsg=gmsg
  
- gusers_authorisation_update=yield* exodussecurity('AUTHORISATION UPDATE')
+ gusers_authorisation_update=await exodussecurity('AUTHORISATION UPDATE')
  var updateallowed=false
 
  di=dict[++din]=dictrec('USER_ID','F',0)
@@ -19,9 +19,9 @@ function* dict_USERS() {
  if (gusername!='EXODUS')
   di.defaultvalue='gusername'
  di.invalidcharacters='*'
- if (yield* exodussecurity('AUTHORISATION ACCESS')) {
+ if (await exodussecurity('AUTHORISATION ACCESS')) {
   updateallowed=gusers_authorisation_update
-  di.popup='yield* system_pop_users()'
+  di.popup='await system_pop_users()'
  }
  else {
   di.readonly=true

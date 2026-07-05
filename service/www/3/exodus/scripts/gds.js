@@ -40,17 +40,17 @@ function exodusdatasource() {
 
 //NB arguments are fieldname, filename not filename, fieldname as in server side xlate ATM
 //this is because rapid readability is vastly better due to sequence of sourcefieldname->filename/fieldno
-function* gds_xlate(sourcefieldname,targetfilename,targetfieldno,mode){
+async function gds_xlate(sourcefieldname,targetfilename,targetfieldno,mode){
     var keys=yield* this.getx(sourcefieldname)
     return yield* keys.exodusxlate(targetfilename,targetfieldno,mode)
 }
 
-function* gds_rexlate(sourcefieldname,targetfilename,targetfieldno,mode){
+async function gds_rexlate(sourcefieldname,targetfilename,targetfieldno,mode){
     var keys=yield* this.regetx(sourcefieldname)
     return yield* keys.exodusxlate(targetfilename,targetfieldno,mode)
 }
 
-function* gds_evaluate(functionx) {
+async function gds_evaluate(functionx) {
 
     if (typeof functionx == 'boolean')
         return functionx
@@ -77,7 +77,7 @@ function* gds_evaluate(functionx) {
     return result
 }
 
-function* gds_regetx(dictitemorid, recn) {
+async function gds_regetx(dictitemorid, recn) {
 
     //actually is screenelement not dictitem!
 
@@ -86,7 +86,7 @@ function* gds_regetx(dictitemorid, recn) {
     if (typeof dictitem == 'string') {
         dictitem = this.dictitem(dictitem)
         if (!dictitem) {
-            systemerror('yield* gds_regetx()', exodusquote(dictitemorid) + ' is not in the ' + gdatafilename + ' dictionary.')
+            systemerror('await gds_regetx()', exodusquote(dictitemorid) + ' is not in the ' + gdatafilename + ' dictionary.')
             return ''
         }
     }
@@ -128,13 +128,13 @@ function* gds_regetx(dictitemorid, recn) {
 }
 
 //getall
-function* gds_getall(name, oldtext) {
+async function gds_getall(name, oldtext) {
     return yield* this.getx(name,null,oldtext)
 }
 
 //get1 - should only be called on multivalued fields and only with specific recn (or null for grecn)
 //purpose is to return a value when given a specific recn ... not a 1 item array like getx does
-function* gds_get1(name, recn, oldtext) {
+async function gds_get1(name, recn, oldtext) {
     if (recn)
         exodusassertnumeric(recn,'gds_get1','recn')
     return (yield* this.getx(name,recn,oldtext))[0]
@@ -142,7 +142,7 @@ function* gds_get1(name, recn, oldtext) {
 
 //getx - NB returns an array if multivalued field even for one recn
 //recn can be -1 to get the last one
-function* gds_getx(name, recn, oldtext) {
+async function gds_getx(name, recn, oldtext) {
 
     //if no data section then return nothing
     //eg in postinit setting expressions based on gds before there is any data section
@@ -338,7 +338,7 @@ function gds_getcells(dbelementordbelementid, recn) {
 
 //setx
 ///////////
-function* gds_setx(element, recn, values) {
+async function gds_setx(element, recn, values) {
 
     //given a screen element or dbelement or element name
     //and values, update the screen and record
@@ -416,7 +416,7 @@ function gds_setdefaulted(element, recn, trueorfalse) {
 //make it do the async oconvertvalue (and setvalue) in a timeout
 //since nothing depends on screen values except visual appearance
 //only afterupdate() might be synchronous and that is only used by schedule_upd_extra which could be refactored
-function* gds_setx2(cells, values, forced) {
+async function gds_setx2(cells, values, forced) {
 
     var conversion = false
 
@@ -492,9 +492,9 @@ function* gds_setx2(cells, values, forced) {
                     conversion = screenelement.getAttribute('exodusconversion')
                 if (conversion) {
                     var ivalue = value
-                    value = yield* oconvertvalue(value, conversion)
+                    value = await oconvertvalue(value, conversion)
                     if (value == null) {
-                        systemerror('yield* gds_setx2("' + screenelement.id + '") ' + exodusquote(ivalue) + ' is not a ' + conversion)
+                        systemerror('await gds_setx2("' + screenelement.id + '") ' + exodusquote(ivalue) + ' is not a ' + conversion)
                         return
                     }
                 }
@@ -531,7 +531,7 @@ function* gds_setx2(cells, values, forced) {
                 /* yield */ if (result.next) result.next()
             }
             catch (e) {
-                systemerror(e.description + ' ' + e.number, 'in afterupdate() in yield* gds_setx(' + cells.dictid + ')')
+                systemerror(e.description + ' ' + e.number, 'in afterupdate() in await gds_setx(' + cells.dictid + ')')
             }
         }
     }
@@ -543,7 +543,7 @@ function* gds_setx2(cells, values, forced) {
 
 //LOAD
 //////
-function* gds_load(exodusrecordobject1) {
+async function gds_load(exodusrecordobject1) {
     //alert('gds_load')
     //login('load')
 
@@ -832,7 +832,7 @@ function gds_deleterow(groupno, rown1, rown2) {
 
 //BIND
 //////
-function* gds_bind(datasource, elements, rownx) {
+async function gds_bind(datasource, elements, rownx) {
 
     //login('bind')
 
@@ -884,7 +884,7 @@ function* gds_bind(datasource, elements, rownx) {
             
             //default immediately for radio/checkbox and dropdown
             //or if literal default (starts with " or ')
-            //do not default immediately for lines to avoid problem described in yield* validateall()
+            //do not default immediately for lines to avoid problem described in await validateall()
             if (!(Number(element.getAttribute('exodusgroupno'))) && element.getAttribute('exodusdefaultvalue')) {
                 var ischeckbox
                 if (dataitem.text == ''
@@ -904,7 +904,7 @@ function* gds_bind(datasource, elements, rownx) {
                     )
                    ) {
                     //if element.getAttribute('exodusdefaultvalue')
-                    dataitem.text = yield* getdefault(element)
+                    dataitem.text = await getdefault(element)
 
                     //allow : as separators of checkbox multiple default values
                     if (ischeckbox)
@@ -965,7 +965,7 @@ function* gds_bind(datasource, elements, rownx) {
 
     //BINDGROUP
     ///////////
-    function* gds_bindgroup(datasource, propname) {
+    async function gds_bindgroup(datasource, propname) {
         //alert('bindgroup')
         //locate the table element otherwise it is not required to be bound on screen
         var tablex = $$('exodus' + propname)
@@ -1025,7 +1025,7 @@ function* gds_bind(datasource, elements, rownx) {
             //alert('rownx:'+rowx)
             //alert('rowx.exodusfields:'+rowx.exodusfields)
             //call bind data recursively to the new row
-            //function* gds_bind(datasource,elements,rownx)
+            //async function gds_bind(datasource,elements,rownx)
             /**/ yield * this.bind(rows[rown], rowx.exodusfields, rown)
             //alert('bound:'+rown)
             //gtimers.stop(3)
@@ -1039,7 +1039,7 @@ function* gds_bind(datasource, elements, rownx) {
 
     //REBIND
     ////////
-    function* gds_rebind(newdatasource, olddatasource, forced) {
+    async function gds_rebind(newdatasource, olddatasource, forced) {
 
         //will fail a) if newdatasource has more group rows than the olddatasource
 

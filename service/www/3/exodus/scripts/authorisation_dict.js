@@ -1,7 +1,7 @@
 // Copyright NEOSYS All Rights Reserved.
 
 //partial copy betweem authorisation_dict and hourlyrates_dict
-function* dict_AUTHORISATION(parameters) {
+async function dict_AUTHORISATION(parameters) {
 
     var dict = []
     var di
@@ -10,30 +10,30 @@ function* dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('KEY', 'F', 0)
     di.defaultvalue = '"SECURITY"'
     di.required = true
-    di.listfunction = 'yield* authorisation_print()'
+    di.listfunction = 'await authorisation_print()'
 
     ///users f1-8 are parallel (maybe partial section of mvs for some users)
     var usersgroupn = 1
 
     di = dict[++din] = dictrec('USER_ID', 'F', 1, '', usersgroupn)
     di.required = true
-    di.validation = 'yield* user_val_userid()'
+    di.validation = 'await user_val_userid()'
     di.link = 'yield* windowopenkey("../exodus/users.htm")'
     //need to allow to move user up/down
     //di.unique=true
-    di.noinsertrow = !(yield* exodussecurity('USER CREATE'))
+    di.noinsertrow = !(await exodussecurity('USER CREATE'))
     //allow deleting blank rows if allowed to create users but how to stop them creating new groups or joining groups 
-    di.nodeleterow = !(yield* exodussecurity('USER DELETE')) && di.noinsertrow
+    di.nodeleterow = !(await exodussecurity('USER DELETE')) && di.noinsertrow
     //di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890-'
     di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-'
     di.allowemptyrows = true
 
     di = dict[++din] = dictrec('KEYS', 'F', 2, '', usersgroupn)
-    if (!(yield* exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
+    if (!(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
     exodus_dict_text(di)
     di.length = 40
     di.lowercase = false
-    di.validation = 'yield* user_val_keys()'
+    di.validation = 'await user_val_keys()'
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
     di.validcharacters='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ '
 
@@ -50,7 +50,7 @@ function* dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('HOURLY_RATE', 'F', 5, '', usersgroupn)
 
     di = dict[++din] = dictrec('IP_NUMBERS', 'F', 6, '', usersgroupn)
-    if (!(yield* exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
+    if (!(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
     exodus_dict_ipno(di, true, true, true)
     di.length = 40
 
@@ -70,15 +70,15 @@ function* dict_AUTHORISATION(parameters) {
     di.required = true
     di.unique = true
     di.length = 40
-    di.validation = 'yield* task_val_taskid()'
-    if (!(yield* exodussecurity('AUTHORISATION UPDATE LOCKS'))) {
+    di.validation = 'await task_val_taskid()'
+    if (!(await exodussecurity('AUTHORISATION UPDATE LOCKS'))) {
         di.readonly = gmsg
         di.nodeleterow = true
         di.noinsertrow = true
     }
 
     di = dict[++din] = dictrec('HIDDEN_LINES', 'S', '', '', tasksgroupn)
-    di.functioncode = function* authorisation_HIDDEN_LINES() {
+    di.functioncode = async function authorisation_HIDDEN_LINES() {
         var hides = ['0']//dont hide first item
         var taskcodes = yield* gds.getall('TASK_ID')
         var lasttaskcode = ''
@@ -91,8 +91,8 @@ function* dict_AUTHORISATION(parameters) {
     }
 
     di = dict[++din] = dictrec('LOCKS', 'F', 11, '', tasksgroupn)
-    di.validation = 'yield* task_val_lock()'
-    if (!(yield* exodussecurity('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
+    di.validation = 'await task_val_lock()'
+    if (!(await exodussecurity('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
     di.validcharacters='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ '
 
@@ -110,7 +110,7 @@ function* dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('PASSWORD_AUTOEXPIRY_DAYS', 'F', 25)
     exodus_dict_number(di, 0, 0)
     di.length = 3
-    if (!(yield* exodussecurity('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
+    if (!(await exodussecurity('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
 
     di = dict[++din] = dictrec('EMAIL_NEW_USERS', 'F', 26)
     di.conversion = ';Ask:1;Yes:0;No'

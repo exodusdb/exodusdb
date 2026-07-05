@@ -1,4 +1,4 @@
-function* dict_PARTS() {
+async function dict_PARTS() {
 
  var dict=[]//of dictrecs
  var din=-1
@@ -15,7 +15,7 @@ function* dict_PARTS() {
  di.unique=true
  di.validation=function () {
 
-  if (gvalue==gkey) return yield* exodusinvalid('Sorry, parts cannot be made of each other')
+  if (gvalue==gkey) return await exodusinvalid('Sorry, parts cannot be made of each other')
  }
  
  di=dict[++din]=dictrec('SUB_PART_NAME','S','','',1)

@@ -107,7 +107,7 @@ function upload_ondrop(event) {
 	previewimage_sync(inputfile)
 }
     
-function* form_onkeydown(event) {
+async function form_onkeydown(event) {
 
  event=getevent(event)
 
@@ -155,19 +155,19 @@ function* formfunctions_onload() {
  if (!gparameters.filename)
     gparameters.filename=''
 
- yield* loadimages()
+ await loadimages()
 
  if (gparameters.showupload)
-     yield* showuploadtable()
+     await showuploadtable()
 
  return true
 
 }
 
-function* showuploadtable() {
+async function showuploadtable() {
 
- if (!(yield* exodussecurity('UPLOAD CREATE')))
-    return yield* exodusinvalid(gmsg)
+ if (!(await exodussecurity('UPLOAD CREATE')))
+    return await exodusinvalid(gmsg)
 
  $table_upload.style.display=''
  $form1.filedata.focus()
@@ -177,7 +177,7 @@ function* showuploadtable() {
  $form1.filedata.click()
 }
 
-function* audiovisual_open(event) {
+async function audiovisual_open(event) {
 
  event=getevent(event)
 
@@ -187,30 +187,30 @@ function* audiovisual_open(event) {
   element.click()
 }
 
-function* audiovisual_delete(event) {
+async function audiovisual_delete(event) {
  
  event=getevent(event)
 
  var filename=event.target.getAttribute('exodusfilename')
  
  //confirm!
- if (!(yield* exodusyesno(filename+'\rWarning! Are you SURE that you want to irrevocably delete this file permanently?\r\rNote: This is irreversible!',2))) return yield* exodusinvalid()
+ if (!(await exodusyesno(filename+'\rWarning! Are you SURE that you want to irrevocably delete this file permanently?\r\rNote: This is irreversible!',2))) return await exodusinvalid()
  
  db.request='EXECUTE\rGENERAL\rDELETEUPLOAD\r'+filename.toLowerCase()
  if (!(yield* db.send()))
-  return yield* exodusinvalid(db.response)
+  return await exodusinvalid(db.response)
   
- yield* loadimages()
+ await loadimages()
  
 }
 
-function* upload_onclick() {
+async function upload_onclick() {
 
  //check file to upload entered
  var sourcefilename=$form1.filedata.value
  if (!sourcefilename) {
   exoduscancelevent()//prevent submit
-  return yield* exodusinvalid('Please browse for a file name to upload first')
+  return await exodusinvalid('Please browse for a file name to upload first')
  }
  
  //split off the actual file name
@@ -222,17 +222,17 @@ function* upload_onclick() {
  //so prevent such files being uploaded (from non-NTFS workstations like mac and linux)
  // /[/<>:"\?\\\*\|]/g
  if (sourcefilename.match(/[/<>:"\?\\\*\|]/g)) {
-  return yield* exodusinvalid('Sorry but the following characters are not allowed in file names being uploaded\r/ ? < > \\ : * &vert; "')
+  return await exodusinvalid('Sorry but the following characters are not allowed in file names being uploaded\r/ ? < > \\ : * &vert; "')
  }
  
  //check file extensions
  if (!gaudiovisualextensions.exoduslocate(extension))
-  return yield* exodusinvalid('Files ending .'+extension+' are not allowed to be uploaded\r\rThe allowed file extensions are:\r\r'+gaudiovisualextensions.join(', '))
+  return await exodusinvalid('Files ending .'+extension+' are not allowed to be uploaded\r\rThe allowed file extensions are:\r\r'+gaudiovisualextensions.join(', '))
 
  var thumbnail=$$('thumbnail')
  if ((gparameters.maxheight || gparameters.minheight) && !thumbnail.height) {
     msg='Cannot determine image height for file '+sourcefilename
-    return yield* exodusinvalid(msg)
+    return await exodusinvalid(msg)
  }
  if (gparameters.maxheight && thumbnail.height>gparameters.maxheight)
    var msg='too large'
@@ -242,7 +242,7 @@ function* upload_onclick() {
     msg='The image is '+msg+'. It is '+thumbnail.width + ' wide x ' + thumbnail.height+' high in pixels'
     msg+='\n\nThe image file must be between '+gparameters.minheight+' and '+gparameters.maxheight+' PIXELS HIGH'
     msg+='\n\nThere is no restriction on width.'
-    return yield* exodusinvalid(msg)
+    return await exodusinvalid(msg)
  }
  
  /*if (gparameters.originalkeyversionno.slice(-1)!='\\')
@@ -273,10 +273,10 @@ function* upload_onclick() {
 
  //confirm update
  if (mode=='UPDATE') {
-  if (!(yield* exodusyesno(question+'Warning! Are you SURE that you want to irrevocably overwrite the existing file permanently?\rThis action cannot be undone!',2)))
-    return yield* exodusinvalid()
+  if (!(await exodusyesno(question+'Warning! Are you SURE that you want to irrevocably overwrite the existing file permanently?\rThis action cannot be undone!',2)))
+    return await exodusinvalid()
  } else {
-  //if (!(yield* exodusokcancel(question+'\rOK to upload this file now?',1))) return yield* exodusinvalid()
+  //if (!(await exodusokcancel(question+'\rOK to upload this file now?',1))) return await exodusinvalid()
  }
  
  //ensure folders are made because upload may not be able to make them
@@ -289,11 +289,11 @@ function* upload_onclick() {
   +'\r'+gparameters.ensurenotlocked
   
   if (!(yield* db.send()))
-   return yield* exodusinvalid(db.response)
+   return await exodusinvalid(db.response)
  }
  
  //check allowed to update/create
- //if (!(yield* exodussecurity('MATERIAL '+mode))) return yield* exodusinvalid(gmsg)
+ //if (!(await exodussecurity('MATERIAL '+mode))) return await exodusinvalid(gmsg)
  
  //set the target filename
  $form1.filename.value=targetfilename
@@ -337,8 +337,8 @@ function* upload_onclick() {
 
  //set the custom response URL otherwise default response page is generated by the upload program
  //this page will signify success and add the file to the master (job/voucher etc) record etc
- //call yield* general_postupload() in this page for internet explorer browsers
- //call yield* general_postupload() in the calling page (jobs.htm/vouchers.htm etc) for non-internet explorer browsers
+ //call await general_postupload() in this page for internet explorer browsers
+ //call await general_postupload() in the calling page (jobs.htm/vouchers.htm etc) for non-internet explorer browsers
  $form1.redirectpage.value='/'+upload2htm+'?sourcefilename='+escape(sourcefilename)+'&targetpath='+escape($form1.pathdata.value)+'&autofit=true'
  //$form1.redirectpage.value='../upload2.htm?sourcefilename='+escape(sourcefilename)+'&targetpath='+escape(form1.pathdata.value)+'&autofit=true'
  if (gparameters.postuploadmessage)
@@ -351,7 +351,7 @@ function* upload_onclick() {
  
 }
 
-function* loadimages() {
+async function loadimages() {
   
  //prevent display all images if refreshing and no parameters
  if (typeof gparameters.database == 'undefined')
@@ -398,7 +398,7 @@ function* loadimages() {
     db.request+='\rNEW'
 
  if (!(yield* db.send()))
-  return yield* exodusinvalid(db.response)
+  return await exodusinvalid(db.response)
 
  var imagedata=(fm+db.data).split(fm)
  
@@ -407,7 +407,7 @@ function* loadimages() {
  //no images so show upload form
  if (!imagedata[2]) {
 
-  yield* showuploadtable()
+  await showuploadtable()
   return true
  }
 
@@ -458,7 +458,7 @@ function* loadimages() {
     
   //delete may be allowed
   if (gparameters.deleteallowed)
-   yield* adddeletebutton(filename)
+   await adddeletebutton(filename)
     
   //image
   if (gimageextensions.exoduslocate(fileextension)) {
@@ -487,10 +487,10 @@ function* loadimages() {
  
 }
 
-function* adddeletebutton(filename) {
+async function adddeletebutton(filename) {
 
  //add a delete button
- if (yield* exodussecurity('UPLOAD DELETE')) {
+ if (await exodussecurity('UPLOAD DELETE')) {
 
   var button=document.createElement('input')
   button.type="button"
@@ -504,12 +504,12 @@ function* adddeletebutton(filename) {
 
 //this function does not appear to be used and has a duplicate name function in general.js
 //delete it if no complaints about the funny message
-function* general_postupload() {
+async function general_postupload() {
 
  alert('general_postload in upload.js\nInform EXODUS Support')
  if (gparameters.versionno||gparameters.closeafterupload)
   //return window.close()
   return exoduswindowclose()
  else
-  yield* loadimages()
+  await loadimages()
 }

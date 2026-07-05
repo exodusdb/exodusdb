@@ -1,6 +1,6 @@
 // Copyright NEOSYS All Rights Reserved.
 
-function* form_postinit() {
+async function form_postinit() {
 
     //force retrieval of own record
     if (gro.dictitem('USER_ID').defaultvalue)
@@ -26,7 +26,7 @@ function* form_postinit() {
 
 }
 
-function* form_postdisplay() {
+async function form_postdisplay() {
 
     //enable/disable password changing button
     //exodussetexpression('button_password', 'disabled', '!gusers_authorisation_update&&gkey!=gusername')
@@ -50,13 +50,13 @@ function* form_postdisplay() {
 }
 
 //just to avoid confirmation
-function* form_prewrite() {
+async function form_prewrite() {
     return true
 }
 
 //in authorisation.js and users.htm
 var gtasks_newpassword
-function* form_postwrite() {
+async function form_postwrite() {
 
     //if change own password then login with the new one
     //otherwise cannot continue/unlock document so the lock hangs
@@ -82,7 +82,7 @@ function user_signature_onload_sync(event) {
     }
 }
 
-function* users_postdisplay() {
+async function users_postdisplay() {
 
     var signatureimageelement = document.getElementById('signature_image')
     if (signatureimageelement) {
@@ -99,10 +99,10 @@ function* users_postdisplay() {
     }
 
     //show only first five lines
-    yield* form_filter('refilter', 'LOGIN_DATE', '', 4)
+    await form_filter('refilter', 'LOGIN_DATE', '', 4)
 
     $expiryelement = $$('expiryelement')
-    $expiryelement.innerHTML = ''//also done in form_postdisplay because this function doesnt get called after yield* cleardoc()?
+    $expiryelement.innerHTML = ''//also done in form_postdisplay because this function doesnt get called after await cleardoc()?
 
     var userexpirydate=yield* gds.getx('EXPIRY_DATE')
     if (userexpirydate && userexpirydate <= exodusdate()) {
@@ -129,12 +129,12 @@ function* users_postdisplay() {
     return true
 }
 
-function* form_postread() {
-    exodussettimeout('yield* users_postdisplay()', 10)
+async function form_postread() {
+    exodussettimeout('await users_postdisplay()', 10)
     return true
 }
 
-function* users_upload_signature() {
+async function users_upload_signature() {
 
     //upload login users signature if no key
     var username=gkey
@@ -158,9 +158,9 @@ function* users_upload_signature() {
     params.minheight = 50//pixels
     params.maxheight = 200//pixels
 
-    var targetfilename = yield* exodusshowmodaldialog('../exodus/upload.htm', params)
+    var targetfilename = await exodusshowmodaldialog('../exodus/upload.htm', params)
     if (gkey)
-        exodussettimeout('yield* users_postdisplay()', 1)
+        exodussettimeout('await users_postdisplay()', 1)
     if (!targetfilename)
         return false
 

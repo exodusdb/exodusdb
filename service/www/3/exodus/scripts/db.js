@@ -18,10 +18,10 @@ function exodus_dict_dow(di,many) {
 function exodus_dict_url(di,protocol) {
 
  exodus_dict_text(di)
- di.validation='yield* exodus_val_url("'+protocol+'")'
+ di.validation='await exodus_val_url("'+protocol+'")'
 }
 
-function* exodus_val_url(protocol) {
+async function exodus_val_url(protocol) {
 
  //protocol should be http or https
  if (protocol=='http'||protocol=='https') {
@@ -41,13 +41,13 @@ function* exodus_val_url(protocol) {
  return true
 }
 
-function* exodus_val_html() {
+async function exodus_val_html() {
     var element=document.createElement('span')
     element.innerHTML=gvalue
     var normalisedhtml=element.innerHTML
     if (normalisedhtml!=gvalue) {
-        if ((yield* exodusokcancel('Something is not exactly right with that code.\nConvert to standardised HTML?\n(required)',1))!=1)
-            return yield* exodusinvalid()
+        if ((await exodusokcancel('Something is not exactly right with that code.\nConvert to standardised HTML?\n(required)',1))!=1)
+            return await exodusinvalid()
         gvalue=element.innerHTML
     }
     return true
@@ -74,16 +74,16 @@ function exodus_dict_emailaddress(di,sepchar) {
  if (!sepchar.slice(0,1).match(/[\'\"]/))
   sepchar='"'+sepchar+'"'
  exodus_dict_text(di,length)
- di.validation='yield* exodus_val_emailaddress('+sepchar+')'
+ di.validation='await exodus_val_emailaddress('+sepchar+')'
 }
 
-function* exodus_val_diskdrive() {
+async function exodus_val_diskdrive() {
 
  if (!gvalue) return true
 
  gvalue=gvalue.slice(0,1).toUpperCase()
  //if (!gvalue.match(/^[ABCDEFGHIJKLMNOPQRSTUVWXYZ](:)?$/))
-  //return yield* exodusinvalid('Please enter a letter A-Z')
+  //return await exodusinvalid('Please enter a letter A-Z')
 
  if (gvalue.length==1&&gvalue!='0') gvalue+=':'
 
@@ -94,12 +94,12 @@ function exodus_dict_diskdrive(di) {
 
  //di.conversion+='C:D:E:F:G:H:I:J:K:L:M:N:O:P:Q:R:S:T:U:V:W:X:Y:Z'
  di.validcharacters='CDEFGHIJKLMNOPQRSTUVWXYZ:'
- di.validation='yield* exodus_val_diskdrive()'
+ di.validation='await exodus_val_diskdrive()'
  di.length=1
  di.maxlength=1
 }
 
-function* exodus_val_emailaddress(sepchar) {
+async function exodus_val_emailaddress(sepchar) {
 
  if (!gvalue) return true
  //Description: Most email validation regexps are outdated and ignore the fact that domain names can contain any foreign character these days,
@@ -125,7 +125,7 @@ function* exodus_val_emailaddress(sepchar) {
    var msg=value+'\rEmail address must be in the format xxxxxx@xxxxxx.xxx'
    if (sepchar)
     msg+=' '+sepchar+'...'
-   return yield* exodusinvalid(msg)
+   return await exodusinvalid(msg)
   }
  }
  gvalue=values.join(sepchar)
@@ -144,9 +144,9 @@ function exodus_dict_index(di,filename,fieldname,many,allownew,warnnew) {
  if (typeof allownew == 'undefined') allownew=true
  if (typeof warnnew == 'undefined') warnnew=true
 
- if (!di.validation) di.validation='yield* form_val_index('+filename.exodusquote()+','+fieldname.exodusquote()+','+allownew+','+warnnew+')'
+ if (!di.validation) di.validation='await form_val_index('+filename.exodusquote()+','+fieldname.exodusquote()+','+allownew+','+warnnew+')'
 
- if (!di.popup) di.popup='yield* form_pop_index('+filename.exodusquote()+','+fieldname.exodusquote()+','+many+')'
+ if (!di.popup) di.popup='await form_pop_index('+filename.exodusquote()+','+fieldname.exodusquote()+','+many+')'
  
 }
 
@@ -209,13 +209,13 @@ function exodus_dict_time(di,mode,otherid,params) {
  di.length=5 
  if (mode&&otherid) {
 
-  di.defaultvalue='yield* exodus_def_time("'+mode+'","'+otherid+'")'
-  di.validation='yield* exodus_val_time("'+mode+'","'+otherid+'")'
+  di.defaultvalue='await exodus_def_time("'+mode+'","'+otherid+'")'
+  di.validation='await exodus_val_time("'+mode+'","'+otherid+'")'
  }
  
 }
 
-function* exodus_def_time(mode,othertimeid) {
+async function exodus_def_time(mode,othertimeid) {
 
  if (!othertimeid) return ''
  
@@ -225,7 +225,7 @@ function* exodus_def_time(mode,othertimeid) {
  return othertime
 }
 
-function* exodus_val_time(mode,otherid) {
+async function exodus_val_time(mode,otherid) {
  
  if (!gvalue||!mode||!otherid) return true
  
@@ -264,7 +264,7 @@ function exodus_dict_period(di,mode,otherperiodid,conversion) {
  // see exodus_dict_date() why switch to L
  di.align='L'
  di.length=5
- if (di.type=='F') di.validation='yield* exodus_val_period("'+mode+'","'+otherperiodid+'")'
+ if (di.type=='F') di.validation='await exodus_val_period("'+mode+'","'+otherperiodid+'")'
 }
 
 function exodus_dict_year_period(di,mode) {
@@ -278,7 +278,7 @@ function exodus_dict_year_period(di,mode) {
  di.length=5
 }
 
-function* exodus_val_period(mode,otherperiodid) {
+async function exodus_val_period(mode,otherperiodid) {
 
  if (!gvalue) return true
  
@@ -370,7 +370,7 @@ function exodus_dict_date(dicti,params) {
 
 
  dicti.length=10
- dicti.popup='yield* form_pop_calendar()'
+ dicti.popup='await form_pop_calendar()'
  if (!gcalendarscript) gcalendarscript=1
  if (params) dicti.lowercase=true
 }
@@ -598,7 +598,7 @@ function exodusrecord(dictarray,filename) {
 
 //READU
 ////////
-exodusrecord.prototype.readu=function* exodusrecord_readu() {
+exodusrecord.prototype.readu=async function exodusrecord_readu() {
 
  //gets lock if possible and reads
  return /**/ yield * this.read(true)
@@ -606,7 +606,7 @@ exodusrecord.prototype.readu=function* exodusrecord_readu() {
 
 //READ
 //////
-exodusrecord.prototype.read=function* exodusrecord_read(withlock) {
+exodusrecord.prototype.read=async function exodusrecord_read(withlock) {
  
  this.sessionid=''
  this.data=null
@@ -688,7 +688,7 @@ exodusrecord.prototype.postread=function exodusrecord_postread() {
  
 //WRITEU
 ////////
-exodusrecord.prototype.writeu=function* exodusrecord_writeu() {
+exodusrecord.prototype.writeu=async function exodusrecord_writeu() {
 
  //writes and unlocks
  return /**/ yield * this.writex(true)
@@ -696,7 +696,7 @@ exodusrecord.prototype.writeu=function* exodusrecord_writeu() {
 
 //WRITE
 ////////
-exodusrecord.prototype.write=function* exodusrecord_write() {
+exodusrecord.prototype.write=async function exodusrecord_write() {
 
  //writes and leaves lock (zzz is this implemented in DOS LISTEN yet?)
  return /**/ yield * this.writex(false)
@@ -704,7 +704,7 @@ exodusrecord.prototype.write=function* exodusrecord_write() {
 
 //WRITEX
 ////////
-exodusrecord.prototype.writex=function* exodusrecord_writex(withunlock) {
+exodusrecord.prototype.writex=async function exodusrecord_writex(withunlock) {
 
  if (no(this.data)) {
   this.response="data not defined in writex"
@@ -1195,7 +1195,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
   var words=code0.split('_')
   for (var wordn=0;wordn<words.length;++wordn) {
 
-   if (!(yield* exodussecurity(gdatafilename.exodussingular()+' UPDATE '+words.slice(0,wordn+1).join(' ').exodusquote()))) {
+   if (!(await exodussecurity(gdatafilename.exodussingular()+' UPDATE '+words.slice(0,wordn+1).join(' ').exodusquote()))) {
 
     newdictitem.readonly=gmsg
     break;
@@ -1208,7 +1208,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
  
 }
 
-function* reado(filename,key,fieldno) {
+async function reado(filename,key,fieldno) {
 
  if (no(key)) {
 
@@ -1220,7 +1220,7 @@ function* reado(filename,key,fieldno) {
  if (key.push) {
     var results=[]
     for (var ii=0;ii<key.length;++ii)
-        results[ii]=yield* reado(filename,key[ii],fieldno)
+        results[ii]=await reado(filename,key[ii],fieldno)
     return results
  }
  
