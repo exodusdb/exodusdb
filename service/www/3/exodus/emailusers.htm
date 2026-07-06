@@ -14,7 +14,7 @@
     <script type="text/javascript">
         var ggroupidgroupn
         var guseridgroupn
-        function* dict_EMAILUSERS(parameters) {
+        async function dict_EMAILUSERS(parameters) {
 
             //returns an array representing the client dictionary
 
@@ -28,31 +28,31 @@
             di = dict[++din] = dictrec('TO_GROUP_CODE', 'F', 1, '', groupn)
             //N=Include Dept Numbers
             //A=Groups with Active Users only
-            yield* system_dict_departmentcode(di, many = true, 'NA')
+            await system_dict_departmentcode(di, many = true, 'NA')
             di.required = true
             di.unique = true
 
             di = dict[++din] = dictrec('TO_GROUP_NAME', 'S', '', '', groupn)
-            yield* system_dict_username(di, 'TO_GROUP_CODE')
+            await system_dict_username(di, 'TO_GROUP_CODE')
 
             ++groupn
             guseridgroupn = groupn
 
             di = dict[++din] = dictrec('TO_USER_CODE', 'F', 2, '', groupn)
-            yield* system_dict_usercode(di, many = true, withtask = '', withlocks = '', sselect = 'WITH LIVE_USER_WITH_EMAIL')
+            await system_dict_usercode(di, many = true, withtask = '', withlocks = '', sselect = 'WITH LIVE_USER_WITH_EMAIL')
             di.required = true
             di.unique = true
 
             di = dict[++din] = dictrec('TO_USER_NAME', 'S', '', '', groupn)
-            yield* system_dict_username(di, 'TO_USER_CODE')
+            await system_dict_username(di, 'TO_USER_CODE')
 
             ++groupn
             di = dict[++din] = dictrec('CC_USER_CODE', 'F', 3, '', groupn)
-            yield* system_dict_usercode(di, many = true)
+            await system_dict_usercode(di, many = true)
             di.unique = true
 
             di = dict[++din] = dictrec('CC_USER_NAME', 'S', '', '', groupn)
-            yield* system_dict_username(di, 'CC_USER_CODE')
+            await system_dict_username(di, 'CC_USER_CODE')
 
             di = dict[++din] = dictrec('EMAIL_SUBJECT', 'F', 4)
             exodus_dict_text(di, 73)
@@ -66,19 +66,19 @@
 
         }
 
-        function* form_postinit() {
+        async function form_postinit() {
 
             gparameters.savebuttonvalue = 'Send'
 
             return true
 
         }
-        function* form_prewrite() {
-            return yield* exodusokcancel('Ok to send email ?', 2)
+        async function form_prewrite() {
+            return await exodusokcancel('Ok to send email ?', 2)
         }
-        function* form_postwrite() {
-            yield* deleteallrows(ggroupidgroupn)
-            yield* deleteallrows(guseridgroupn)
+        async function form_postwrite() {
+            await deleteallrows(ggroupidgroupn)
+            await deleteallrows(guseridgroupn)
             return true
         }
     </script>

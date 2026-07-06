@@ -19,7 +19,7 @@
 
     <script type="text/javascript">
 		
-function* dict_LISTREQUESTLOG(parameters) {
+async function dict_LISTREQUESTLOG(parameters) {
 
  //returns an array representing the client dictionary
  
@@ -33,14 +33,14 @@ function* dict_LISTREQUESTLOG(parameters) {
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',6)
  exodus_dict_date(di,'FROM=FROM_DATE')
- di.defaultvalue='yield* gds.getx("FROM_DATE")'
+ di.defaultvalue='await  gds.getx("FROM_DATE")'
 
  di=dict[++din]=dictrec('FROM_TIME', 'F',7)
  exodus_dict_time(di,'TO=UPTO_TIME')
  
  di=dict[++din]=dictrec('UPTO_TIME', 'F',8)
  exodus_dict_time(di,'FROM=FROM_TIME')
- di.defaultvalue='yield* gds.getx("FROM_TIME")'
+ di.defaultvalue='await  gds.getx("FROM_TIME")'
 
  di=dict[++din]=dictrec('CONTAINING','F',9)
  di.length=30
@@ -52,7 +52,7 @@ function* dict_LISTREQUESTLOG(parameters) {
  groupn=1
 
  di=dict[++din]=dictrec('USER_CODE','F',11,'',groupn)
- yield* system_dict_usercode(di,many=true)
+ await system_dict_usercode(di,many=true)
 
  di=dict[++din]=dictrec('RELOCKS','F',12)
  di.radio='1;Show:0;Hide'
@@ -63,7 +63,7 @@ function* dict_LISTREQUESTLOG(parameters) {
  
 }
 
-function* form_postinit() {
+async function form_postinit() {
  
  gparameters.savebuttonvalue='List'
  

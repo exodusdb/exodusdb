@@ -46,7 +46,7 @@
                     <td colspan="2" style=" padding:5px;" >
                         <input exodusgroup="0" id="button_password" title="Change the password" class="exodusbutton"
                             disabled="disabled" type="button" exodustype="B" tabindex="999" value="Reset password"
-                            exodusonclick="yield* user_setpassword(true)" />
+                            exodusonclick="await user_setpassword(true)" />
                     </td>
                 </tr>
                 <tr>
@@ -88,7 +88,7 @@
                                     <img src="" alt="" id="signature_image" onload="user_signature_onload_sync()" />
                                 </td>
                                 <td style="vertical-align: middle; padding:5px;">
-                                    <input exodustype="B" value="Upload" exodusonclick="yield* users_upload_signature()"
+                                    <input exodustype="B" value="Upload" exodusonclick="await users_upload_signature()"
                                         class="exodusbutton" type="button" title="upload user signature for various documents footings (where configured)"
                                         id="button_upload_signature" name="button_upload_signature" />
                                 </td>

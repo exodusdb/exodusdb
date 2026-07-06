@@ -7,7 +7,7 @@
 
     <script type="text/javascript">
 
-function* formfunctions_onload() {
+async function formfunctions_onload() {
 
  //global pointers to main form data elements
  grequestelement=$$('requestelement')
@@ -61,15 +61,15 @@ function* formfunctions_onload() {
  if (datax)
   gdataelement.value=datax
 
- yield* send_onclick(immediatemode=true)
+ await send_onclick(immediatemode=true)
  
 }
 
-function* send_onclick(immediatemode) {
+async function send_onclick(immediatemode) {
 
  db.request=grequestelement.value
  
- var result=yield* db.send(gdataelement.value)
+ var result=await db.send(gdataelement.value)
 
  gresultelement.value=result
  gdataelement.value=db.data
@@ -80,9 +80,9 @@ function* send_onclick(immediatemode) {
  else {
 
   if (result)
-   yield* exodusnote(db.data)
+   await exodusnote(db.data)
   else
-   yield* exodusinvalid(db.response+'\r'+db.data)
+   await exodusinvalid(db.response+'\r'+db.data)
  }
  
 }
@@ -126,7 +126,7 @@ function* send_onclick(immediatemode) {
                 </td>
             </tr>
         </table>
-        <input id="send" type="submit" value="Send" exodusonclick="yield* send_onclick()" />
+        <input id="send" type="submit" value="Send" exodusonclick="await send_onclick()" />
     </div>
 </body>
 </html>

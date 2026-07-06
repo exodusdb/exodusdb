@@ -11,17 +11,17 @@
 
 var gnosavelocation=true
 
-function backup_start_sync() {
-    exodussettimeout('yield* backup_start()')
+async function backup_start_sync() {
+    exodussettimeout('await  backup_start()')
 }
 
-function* backup_start() {
+async function backup_start() {
 
  db.request='BACKUP'
- if (!(yield* db.send()))
-  return yield* exodusinvalid(db.response)
+ if (!(await db.send()))
+  return await exodusinvalid(db.response)
  
- yield* exodusnote(db.response)
+ await exodusnote(db.response)
  
 }
 

@@ -12,18 +12,18 @@
 
 var data
 
-function* window_onload() {
+async function window_onload() {
 
  demoexodusdblink()
 }
 
-function demoexodusdblink() {
+async function demoexodusdblink() {
 
  db=new exodusdblink()
 // db.request="SELECT\rCURRENCIES\r\rCURRENCY_CODE CURRENCY_NAME\rXML"
  db.request='STOPDB'
  
- if (yield* db.send()){
+ if (await db.send()){
   alert(db.data+'\n'+db.response)
  }
  else {
@@ -38,7 +38,7 @@ function demoexodusdblink() {
     </script>
 
 </head>
-<body onload="return yield* window_onload()">
+<body onload="exodussettimeout('await window_onload()',1)">
     <p>
         &nbsp;</p>
 </body>

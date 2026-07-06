@@ -7,25 +7,25 @@
 var gmodule='GENERAL'
 var gdatafilename='WHATSNEW'
 
-function* whatsnew_pop_dates() {
+async function whatsnew_pop_dates() {
 
  //get a unique list of EXODUS version dates installed
  db.request='EXECUTE\rGENERAL\rGETVERSIONDATES'
- if (!(yield* db.send()))
-    return yield* exodusinvalid(db.response)
+ if (!(await db.send()))
+    return await exodusinvalid(db.response)
 
  //convert to human date and put latest dates at top
  var versiondates=db.data.split(fm).exodusoconv('[DATE]').reverse()
  
  var reply
- if (!(reply=yield* exodusdecide('From which EXODUS version date do you want to see whats new?',versiondates)))
+ if (!(reply=await exodusdecide('From which EXODUS version date do you want to see whats new?',versiondates)))
     return false
  
  return versiondates[reply-1]//.exodusiconv('[DATE]')
   
 }
 
-function* dict_WHATSNEW() {
+async function dict_WHATSNEW() {
 
  //returns an array representing the entry fields
  
@@ -42,7 +42,7 @@ function* dict_WHATSNEW() {
  
  di=dict[++din]=dictrec('FROM_DATE', 'F',2)
  exodus_dict_date(di,'TO=UPTO_DATE')
- di.popup='yield* whatsnew_pop_dates()'
+ di.popup='await  whatsnew_pop_dates()'
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',3)
  exodus_dict_date(di,'FROM=FROM_DATE')

@@ -15,10 +15,10 @@ var gnosavelocation=true
 //cannot work on .value since the characters are messed up
 //so work on ordinary variables/arrays
 
-function* getcodepage(n,cmd) {
+async function getcodepage(n,cmd) {
 
  db.request='EXECUTE\rGENERAL\rGETCODEPAGE'
- if (!(yield* db.send())) return yield* exodusinvalid(db.response)
+ if (!(await db.send())) return await exodusinvalid(db.response)
  input.value=db.data
  charset=db.data.split('')
 
@@ -125,27 +125,27 @@ function* getcodepage(n,cmd) {
   
 }
 
-function setcodepage() {
+async function setcodepage() {
 
- if (sortedcharset.length!=charset.join('').length) return yield* exodusinvalid('Sortorder length '+sortorder.length+' not the same as Input length '+charset.length)
+ if (sortedcharset.length!=charset.join('').length) return await exodusinvalid('Sortorder length '+sortorder.length+' not the same as Input length '+charset.length)
  
- if (uppercase.value.length!=lowercase.value.length) return yield* exodusinvalid('Uppercase length '+uppercase.value.length+' not the same as Lowercase length '+lowercase.value.length)
+ if (uppercase.value.length!=lowercase.value.length) return await exodusinvalid('Uppercase length '+uppercase.value.length+' not the same as Lowercase length '+lowercase.value.length)
  
  db.request='EXECUTE\rGENERAL\rSETCODEPAGE\rSORTORDER\r'+codepage.value
- if (!(yield* db.send(sortedcharset.join(''))))
-    return yield* exodusinvalid(db.response)
+ if (!(await db.send(sortedcharset.join(''))))
+    return await exodusinvalid(db.response)
  
  db.request='EXECUTE\rGENERAL\rSETCODEPAGE\rUPPERCASE\r'+codepage.value
- if (!(yield* db.send(uppercase.value)))
-    return yield* exodusinvalid(db.response)
+ if (!(await db.send(uppercase.value)))
+    return await exodusinvalid(db.response)
  
  db.request='EXECUTE\rGENERAL\rSETCODEPAGE\rLOWERCASE\r'+codepage.value
- if ((!yield* db.send(lowercase.value)))
-    return yield* exodusinvalid(db.response)
+ if ((!await db.send(lowercase.value)))
+    return await exodusinvalid(db.response)
  
 }
 
-exodussettimeout('yield* getcodepage()',100)
+exodussettimeout('await  getcodepage()',100)
 
     </script>
 
@@ -153,7 +153,7 @@ exodussettimeout('yield* getcodepage()',100)
 <body>
     <div align="center">
         <br />
-        <button exodusonclick="yield* getcodepage()">
+        <button exodusonclick="await getcodepage()">
             Get Codepage</button>
         <br />
         Input<br />

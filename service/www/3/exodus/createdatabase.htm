@@ -14,7 +14,7 @@
     <script type="text/javascript">
         var ggroupidgroupn
         var guseridgroupn
-        function* dict_CREATEDATABASE(parameters) {
+        async function dict_CREATEDATABASE(parameters) {
 
             //returns an array representing details to create new database
 
@@ -27,8 +27,8 @@
             ggroupidgroupn = groupn
 
             di = dict[++din] = dictrec('OLD_DATABASE_CODE', 'F', 3)
-			yield* system_dict_datasetcode(di, false, false,'')
-			di.validation = 'yield* database_val_olddatabasecode()'
+			await system_dict_datasetcode(di, false, false,'')
+			di.validation = 'await  database_val_olddatabasecode()'
 			exodus_dict_text(di,20)
             di.required = true
 
@@ -36,7 +36,7 @@
 			exodus_dict_text(di,20);	
             di.required = true
 			di.length = '25'
-			di.validation = 'yield* database_val_newdatabasecode()'
+			di.validation = 'await  database_val_newdatabasecode()'
 
             di = dict[++din] = dictrec('NEW_DATABASE_NAME', 'F', 1)
 			di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -53,30 +53,30 @@
 
         }
 
-        function* form_postinit() {
+        async function form_postinit() {
 
             gparameters.savebuttonvalue = 'Create'
 
             return true
 
         }
-        function* form_prewrite() {
-            return yield* exodusokcancel('Are you sure ?', 2)
+        async function form_prewrite() {
+            return await exodusokcancel('Are you sure ?', 2)
         }
-        function* form_postwrite() {
-			yield* cleardoc()
+        async function form_postwrite() {
+			await cleardoc()
             return true
         }
-        function* database_val_olddatabasecode(){
+        async function database_val_olddatabasecode(){
             if (gvalue==gdataset) {
-                return yield* exodusinvalid('The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.');
+                return await exodusinvalid('The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.');
             }
             return true
         }
 		//allow lowercase alphanumeric only
-		function* database_val_newdatabasecode(){
+		async function database_val_newdatabasecode(){
 			if (!gvalue.match('^[0-9a-z]+$')){
-				return yield* exodusinvalid('New Database code must be lowercase alphanumeric')
+				return await exodusinvalid('New Database code must be lowercase alphanumeric')
 				//return false
 			}
 			return true

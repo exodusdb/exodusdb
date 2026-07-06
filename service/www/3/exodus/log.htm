@@ -19,7 +19,7 @@
 
     <script type="text/javascript">
 		
-function* dict_VIEWLOG(parameters) {
+async function dict_VIEWLOG(parameters) {
 
  //returns an array representing the client dictionary
  
@@ -33,7 +33,7 @@ function* dict_VIEWLOG(parameters) {
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',6)
  exodus_dict_date(di,'FROM=FROM_DATE')
- di.defaultvalue='yield* gds.getx("FROM_DATE")'
+ di.defaultvalue='await  gds.getx("FROM_DATE")'
 
  di=dict[++din]=dictrec('CONTAINING','F',7)
  di.length=30
@@ -42,7 +42,7 @@ function* dict_VIEWLOG(parameters) {
  
 }
 
-function* form_postinit() {
+async function form_postinit() {
  
  gparameters.savebuttonvalue='List'
  

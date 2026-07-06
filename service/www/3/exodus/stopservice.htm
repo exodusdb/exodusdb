@@ -11,18 +11,18 @@
 
 var gnosavelocation=true
 
-function stopservice_sync() {
-    exodussettimeout('yield* stopservice()')
+async function stopservice_sync() {
+    exodussettimeout('await  stopservice()')
 }
 
-function* stopservice() {
+async function stopservice() {
 
  var modex=$$('mode')
  db.request='STOPDB'
  if (modex[1].checked)
     db.request+='\rRESTART'
- yield* db.send()
- yield* exodusnote(db.response)
+ await db.send()
+ await exodusnote(db.response)
  
 }
 
