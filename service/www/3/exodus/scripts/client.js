@@ -5432,8 +5432,6 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				Cancel</button>\
 			</td>\
 			</tr>'
-	}
-
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used starteventhandler()
 		html += `\
