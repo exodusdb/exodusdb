@@ -680,6 +680,10 @@ function blockmodalui_sync() {
     document.body.insertBefore(blocker, null)
 
     //keep focus off parent window and on child window or exodusdiv
+    var guiblockermousedown = false
+    blocker.onmousedown = function uiblockerdiv_onmousedown() {
+        guiblockermousedown = true
+    }
     blocker.onclick = function uiblockerdiv_onclick() {
 
         if ($$('exodusconfirmdiv')) {
@@ -689,6 +693,11 @@ function blockmodalui_sync() {
         else if (gchildwin) {
             var actualwin
             if (gchildwin.lazy) {
+                //ignore spurious click events without a prior mousedown on this blocker
+                //eg when a child popup closes after selection and the click falls through
+                if (!guiblockermousedown)
+                    return
+                guiblockermousedown = false
                 actualwin = gchildwin.actual
                 //open a 'please wait' window the first time that they click the blockerdiv or they close the 'please wait' window
                 if (!actualwin || actualwin.closed) {
