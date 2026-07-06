@@ -70,7 +70,9 @@ function exodus_dict_emailaddress(di,sepchar) {
  if (!sepchar)
   sepchar=''
  if (sepchar&&!di.groupno)
-  length=60
+  //length=60
+  //reduced length for email fields in new UI
+  length=30
  if (!sepchar.slice(0,1).match(/[\'\"]/))
   sepchar='"'+sepchar+'"'
  exodus_dict_text(di,length)
@@ -369,7 +371,9 @@ function exodus_dict_date(dicti,params) {
  dicti.align = 'L'
 
 
- dicti.length=10
+ //dicti.length=10
+ // reduced to remove overly excess right spacing
+ dicti.length=7
  dicti.popup='await form_pop_calendar()'
  if (!gcalendarscript) gcalendarscript=1
  if (params) dicti.lowercase=true

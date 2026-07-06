@@ -5,33 +5,42 @@ var gtexttagnames = /(^SPAN$)|(^INPUT$)|(^TEXTAREA$)/
 var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //var nbsp160 = String.fromCharCode(160)
 
+// set global image paths
 gnewimage = gimagetheme + 'application_form_add.png'
-//gnewimage = gimagetheme + 'application.png'//'add.png'
 gopenimage = gimagetheme + 'open.gif'
-gfindimage = gimagetheme + 'zoom.png'
+gfindimage = gimagetheme + 'zoom.svg'
 gcalendarimage = gimagetheme + 'calendar.gif'
 gsaveimage = gimagetheme + 'tick.png'
 gsavegreyimage = gimagetheme + 'tickgrey.png'
 gcopyimage = gimagetheme + 'page_copy.png'
-gcloseimage = gimagetheme + 'cross.png'
-//greleaseimage = gimagetheme + 'lock.png'
-//geditimage = gimagetheme + 'key.png'
-greleaseimage = gimagetheme + 'application_form_pencil.png'
+gcloseimage = gimagetheme + 'cross.svg'
+greleaseimage = gimagetheme + 'lock.svg'
 geditimage = gimagetheme + 'pencil_edit.png'
-gdeleteimage = gimagetheme + 'application_form_delete.png'//'delete.png'
-glistimage = gimagetheme + 'table.png'
-gprintsendimage = gimagetheme + 'printer.png'//'application_form.png'
-ginsertrowimage = gimagetheme + 'add.png'
-gdeleterowimage = gimagetheme + 'delete.png'
+gdeleteimage = gimagetheme + 'application_form_delete.png' //'delete.png'
+glistimage = gimagetheme + 'table.svg'
+gprintsendimage = gimagetheme + 'printer.svg' //'application_form.png'
+ginsertrowimage = gimagetheme + 'add.svg'
+gdeleterowimage = gimagetheme + 'delete.svg'
 gexpandrowimage = gimagetheme + 'smallexpand.gif'
 gsortimage = gimagetheme + 'smallsort.gif'
-glinkimage = gimagetheme + 'application_form.png'
+glinkimage = gimagetheme + 'application_form.svg'
 gfirstimage = gimagetheme + 'resultset_first.png'
 glastimage = gimagetheme + 'resultset_last.png'
 gnextimage = gimagetheme + 'resultset_next.png'
 gpreviousimage = gimagetheme + 'resultset_previous.png'
 gspacerimage = gimagetheme + 'spacer.png'
 gblankimage = gimagetheme + 'blank.gif'
+
+// Mitigate icon flash between default (light) to dark versions
+// gisdarktheme assigned in client.js init. See global.css file linking
+if (gisdarktheme) {
+	gfindimage = gimagetheme + 'zoom_darkmode.svg'
+	glinkimage = gimagetheme + 'application_form_darkmode.svg'
+	gthemeimage = gimagetheme + 'theme_button_darkmode.svg'
+	gprintsendimage = gimagetheme + 'printer_darkmode.svg'
+	glistimage = gimagetheme + 'table_darkmode.svg'
+	gcompanyimage = gimagetheme + 'formpage_companies_darkmode.svg'
+}
 
 // document.getElementsByTagName('BODY').onload=window_onload
 
@@ -612,8 +621,12 @@ async function formfunctions_onload() {
             }
 
             //prevent tab focussing on uneditable spans
-            if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S')
+            if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S') {
                 element.tabIndex = -1
+                //change styling for the calculated fields
+                element.style.fontStyle = 'italic'
+                element.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'
+            }
 
             //add button before element with popups (and selects to make it clear to users that F7 is available - especially since useful when selecting multivalues)
             if (

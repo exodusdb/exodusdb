@@ -46,9 +46,13 @@ var glogsettimeout
 //various images
 var gimagetheme = '../../exodus/images/theme2/'
 //var gmenuimage=gimagetheme+'menu.png'//'add.png'
-var gmenuimage = gimagetheme + 'menu.gif'//'add.gif'
-var glogoutimage = gimagetheme + 'disconnect.png'//'add.png'
-var grefreshimage = gimagetheme + 'refresh.png'
+var gmenuimage = gimagetheme + 'menu_burger.svg'
+var glogoutimage = gimagetheme + 'disconnect.png' //'add.png'
+var grefreshimage = gimagetheme + 'refresh.svg'
+var gthemeimage = gimagetheme + 'theme_button.svg'
+var gcompanyimage = gimagetheme + 'formpage_companies.svg'
+
+var gisdarktheme
 
 var gcache
 
@@ -290,6 +294,10 @@ function exodus_client_init() {
 	if (document.protocolcode == 'file') {
 		document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/server.js"></scr' + 'ipt>')
 	}
+
+	// Pre-emptively set CSS screen theme to avoid flash of switching from
+	// default theme (light or user color) mode to dark theme if dark theme is active
+	theme_toggle(exodusgetcookie2('dt', 'theme') ? 'dark_mode' : 'default')
 
 	//style sheet
 	document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
@@ -612,9 +620,11 @@ function showhide(element, show) {
 	if (typeof element == 'string') {
 		element = $$(element)
 		if (!element) {
-			exodusinvalid('element ' + elementid + ' does not exist in showhide(')
-			systemerror('showhide("' + elementid + '")', ' window element does not exist')
-			return
+			// Try to get elements by class name
+			var elements = document.querySelectorAll('.' + elementid)
+			if (elements.length == 0)
+				systemerror('showhide("' + elementid + '")', ' window element does not exist')
+			element = elements
 		}
 	}
 
@@ -1270,49 +1280,112 @@ async function exoduswarning(msg) {
 	return await exodusnote(msg, 'warning')
 }
 
+function add_theme_toggle_btn() {
+
+	// Interactive theme toggle: hidden checkbox + styled label (with SVGs + CSS animation).
+	const label = document.createElement('label');
+
+	const input = document.createElement('input');
+	input.type = 'checkbox';
+	input.id = 'theme_toggle';
+	input.checked = gisdarktheme;
+
+	const toggle_button_element = document.createElement('div');
+	toggle_button_element.className = 'toggle_button';
+
+	const knob = document.createElement('div');
+	knob.className = 'knob';
+
+	const sun_svg = `<svg viewBox="0 0 24 24" fill="none" stroke="#ffc53b" stroke-linecap="round" stroke-width="1.5"><circle cx="12" cy="12" r="6" fill="#ffc53b" stroke="none"/><path d="M12 6v-3M12 18v3M3.5 12h3M17.5 12h3M5.64 5.64l2.12 2.12M16.36 16.36l2.12 2.12M5.64 18.36l2.12-2.12M16.36 7.64l2.12-2.12"/></svg>`;
+	const moon_svg = `<svg viewBox="0 0 24 24" fill="#383838"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+	knob.innerHTML = gisdarktheme ? moon_svg : sun_svg;
+
+	toggle_button_element.appendChild(knob);
+	label.appendChild(input);
+	label.appendChild(toggle_button_element);
+
+	input.addEventListener('change', () => {
+		knob.innerHTML = input.checked ? moon_svg : sun_svg;
+		theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
+		exodussetcookie(glogincode, 'theme', (gisdarktheme ? 1 : ''), 'dt', true)
+	});
+
+	return label;
+}
+
+function theme_toggle(theme = 'default') {
+
+	// Switch between dark and light (color) modes using CSS themes
+	const html = document.documentElement;
+
+	// No dark theme for login
+	if (document.title.toUpperCase() == 'EXODUS LOGIN') {
+		html.removeAttribute('data-theme');
+		return true;
+	}
+
+	if (theme == 'default') {
+		gisdarktheme = false
+		exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
+		html.removeAttribute('data-theme')
+	} else {
+		gisdarktheme = true
+		html.setAttribute('data-theme', theme)
+		html.style.removeProperty('--exodus-cardcolor');
+	}
+
+	// Switch colour of button icons after page load
+	const xform_postload = document.readyState === 'complete'
+	if (xform_postload) {
+		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage }
+		if (gdatafilename == 'ADDRESSES')
+			icon_paths['gcompanyimage'] = gcompanyimage
+		const filetype_rex = /(\.[a-zA-Z]+$)/
+
+		for (let [icon_varname, icon_path] of Object.entries(icon_paths)) {
+			document.querySelectorAll(`img[src*="${icon_path}"]`).forEach(img => {
+				if (gisdarktheme)
+					img.setAttribute('src', img.getAttribute('src').replace(filetype_rex, "_darkmode$1"))
+				else
+					img.setAttribute('src', img.getAttribute('src').replace('_darkmode', ''))
+
+				if (img.getAttribute('src') != window[icon_path])
+					window[icon_varname] = img.getAttribute('src')
+			});
+		}
+	}
+
+	return true
+}
+
 function exodus_set_style(mode, value, value2) {
 
+	// Purpose is to override the styles of screen card colour and (fonts in the future)
+	// of the currently active CSS theme
 	if (value.toUpperCase() == 'DEFAULT') value = ''
 
-	//restore original value
-	if (!value && goriginalstyles[mode]) value = goriginalstyles[mode]
-
-	//ensure display is set to inline even if not changing color
-	//if (!value) return
-
-	//var rules = document.styleSheets[0].cssRules||document.styleSheets[0].rules
-	//var ss = document.getElementById('exodus_global_css');
-	var link=document.querySelector("link[href='../exodus/global.css']")
-	if (!link)
-		return
-	var ss = link.sheet
-	var rules = ss.cssRules || ss.rules
 	var oldvalue = ''
 
-	//screencolor
-	if (mode == 'screencolor'
-		&& rules) {
+	if (mode == 'screencolor') {
+		oldvalue = exodusgetcookie2('fc')
+		let gradient_endcolor = '#'
 
-		//make everything visible!
-		var style = rules[0].style
-		//style.display='block'//ie6/7 ok ff3 shows 100% width
-		//following is not supported in IE5.5 and FF2
-		//but ok in IE6 IE7 IE8b1 FF3 Saf3.0Win Saf3.1Win Opera9.5b Konqueror3.5.7
-		//IE 6/7 only where there is a natural display: inline.
-		//http://www.quirksmode.org/css/display.html
-		//style.display = 'inline-block'
-		style.display = ''
+		if (!value) value = '#fdf5e6' // oldlace
 
-		if (!value) {
-			//initial color is buff yellow
-			//value = '#ffffc0'
-			//initial color is oldlace
-			value = '#fdf5e6'
+		if (value.toUpperCase() == '#FDF5E6') {
+			gradient_endcolor = '#fefbf5'
+		} else {
+			let screencolour_hex = value.replace('#', '');
+			let strength = 12
+			gradient_endcolor = '#'
+			for (let hex_rgb_pos of ['0', '2', '4']) {
+				gradient_endcolor += Math.min(255, parseInt(screencolour_hex.substr(hex_rgb_pos, 2), 16) + strength).toString(16).padStart(2, '0')
+			}
 		}
 
-		oldvalue = style.backgroundColor
 		try {
-			style.backgroundColor = value
+			document.documentElement.style.setProperty('--exodus-cardcolor', 'linear-gradient(to bottom, ' + value + ', ' + gradient_endcolor);
 		}
 		catch (e) {
 			if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised color'); return }
@@ -1320,23 +1393,24 @@ function exodus_set_style(mode, value, value2) {
 		}
 	}
 
-	//screenfont
-	else if (mode == 'screenfont' && rules) {
+	var link = document.querySelector("link[href='../exodus/global.css']")
+	if (!link) return
+	var ss = link.sheet
+	var rules = ss.cssRules || ss.rules
 
-		//initial font is ... 8pt
-		var basefontsize = 8
-
+	if (mode == 'screenfont' && rules) {
 		if (!value) value = 'verdana,sans-serif,arial,helvetica'
 		if (!value2) value2 = 100
 		if (!(Number(value2))) {
 			alert(value2 + ' is not a recognised font size, using 100%')
 			value2 = 100
 		}
-		if (typeof gformfontscale != 'undefined' && gformfontscale) value2 *= gformfontscale
+		if (typeof gformfontscale != 'undefined' && gformfontscale)
+			value2 *= gformfontscale
+		var basefontsize = 8
 		value2 = (basefontsize * Number(value2) / 100) + 'pt'
 
 		for (var rulen = 0; rulen < rules.length; rulen++) {
-
 			var style = rules[rulen].style
 			if (!style || !style.fontFamily) continue
 
@@ -1353,16 +1427,15 @@ function exodus_set_style(mode, value, value2) {
 		}
 	}
 
-	//save the original style
-	if (!goriginalstyles[mode] && oldvalue) goriginalstyles[mode] = oldvalue
-
+	if (!goriginalstyles[mode] && oldvalue)
+		goriginalstyles[mode] = oldvalue
 }
 
 //called early in decide and decide2
 async function clientfunctions_setstyle() {
 	//set font first since setting color changes style display from none to inline
 	exodus_set_style('screenfont', exodusgetcookie2('ff'), exodusgetcookie2('fs'))
-	exodus_set_style('screencolor', exodusgetcookie2('fc'))
+	// screencolour is handled by theme_toggle() earlier in client.js just before global.css linked in
 }
 
 async function clientfunctions_getglobals() {
@@ -1532,6 +1605,11 @@ async function clientfunctions_windowonload() {
 			if (typeof gdictfilename == 'undefined')
 				addeventlistener(temp2, 'click', 'refreshcache_onclick')
 		}
+
+		//button to theme toggle
+		var button = add_theme_toggle_btn()
+		gexodus_menubar.insertBefore(button, gexodus_menubar.firstChild)
+		button.classList.add('theme_button')
 
 		//button to logout
 		var temp2 = document.createElement('span')
@@ -4691,6 +4769,10 @@ function starteventhandler(eventfunctionname, functionx) {
 					if (event.ctrlKey && event.which == 67)
 						return true
 
+					// Allow keyboard typing for text popups
+					if ($$('exodusconfirmdiv_textinput'))
+						return true
+
 					var keycode = event.keyCode ? event.keyCode : event.which
 					var keyletter = String.fromCharCode(keycode).toUpperCase()
 
@@ -5172,21 +5254,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	//create a centralised div with the appropriate buttons or input box
 	var div = document.createElement('div')
+	// id name determines style, see global.css
 	div.id = 'exodusconfirmdiv'
-	// popups should overlap menubar which has 100zIndex
-	div.style.zIndex = '200'
-	div.style.position = 'fixed'
-	div.style.textAlign = 'center'
-	div.style.background = 'lightgrey'
-	div.style.border = '1px solid grey'
-	div.style.borderRadius = '10px'
-	div.style.padding = '10px'
-	div.style.boxShadow = '0px 0px 7px #666666'
-	//div.style.fontSize=25//had no effect
-	div.style.maxHeight = (window.innerHeight - 50) + 'px'
+	div.classList.add('exodusconfirmdiv')
+	div.style.maxHeight = (window.innerHeight - 120) + 'px'
 	div.style.maxWidth = window.innerWidth + 'px'
-	//div.style.maxHeight=(window.outerHeight-50)+'px'
-	//div.style.maxWidth=window.outerWidth+'px'
 	div.style.overflow = 'auto'
 
 	//image
@@ -5202,25 +5274,20 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	}
 	if (imagesrc) {
 		if (imagesrc == 'critical') {
-			//imagesrc = 'xpcritical.gif'
 			imagesrc = 'xpcritical.webp'
-			div.style.backgroundColor = '#ffdddd'//reddish
+			div.classList.add('exodusconfirm_critical')
 		}
 		if (imagesrc == 'warning') {
-			//imagesrc = 'xpwarning.gif'
 			imagesrc = 'xpwarning.webp'
-			div.style.backgroundColor = '#ffff99'//yellowish
-			//darker than usual messages to distinguish from the usual buff document background color
+			div.classList.add('exodusconfirm_warning')
 		}
 		if (imagesrc == 'info') {
-			//imagesrc = 'xpinfo.gif'
 			imagesrc = 'xpinfo.webp'
-			div.style.backgroundColor = '#ddffdd'//greenish
+			div.classList.add('exodusconfirm_info')
 		}
 		if (imagesrc == 'question1') {
-			//imagesrc = 'xpquestion.gif'
 			imagesrc = 'xpquestion.webp'
-			div.style.backgroundColor = '#ddddff'//blueish
+			div.classList.add('exodusconfirm_question1')
 		}
 		if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
 			imagesrc = gimagetheme + imagesrc
@@ -5257,13 +5324,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			await addbutton('cancel', 3, cancelbuttonx, 'Esc')
 
 		//make sure no button is default unless specified
-		if (!defaultbuttonn) {
-			if (istextinput) {
-				exodussettimeout('focusontext()', 10)
-			}
-			else {
-				//xxtry{gbuttons[0].blur()}catch(e){}
-			}
+		if (!defaultbuttonn && !istextinput) {
+			//xxtry{gbuttons[0].blur()}catch(e){}
 		}
 	}
 	var buttonshtml = html
@@ -5372,8 +5434,22 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			</tr>'
 	}
 
+	} else if (istextinput) {
+		// NB id 'exodusconfirmdiv_textinput' used starteventhandler()
+		html += `\
+				<tr>\
+					<td>\
+						&nbsp;\
+					</td>\
+					<td>\
+						<input id="exodusconfirmdiv_textinput" size="60" style="display: block; margin-bottom: 15px;" value="${text}">\
+						<span id="yesnocancelbuttons">${buttonshtml}</span>\
+					</td>\
+				</tr>\
+				</table>`
+
 	//OK/Cancel/Print buttons at the bottom
-	else {
+	} else {
 		html += '\
 				<tr>\
 					<td>\
@@ -5400,6 +5476,9 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	//insert and centralise the div after it has autosized itself
 	document.body.insertBefore(div, null)
 
+	if (istextinput)
+		$$('exodusconfirmdiv_textinput').focus()
+
 	//build rows of decide popup
 	if (decide_args) {
 
@@ -5416,10 +5495,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	}
 
-	var top = window.innerHeight / 2 - div.offsetHeight / 2
-	var left = window.innerWidth / 2 - div.offsetWidth / 2
-	div.style.top = top + 'px'
-	div.style.left = left + 'px'
+	// centers exodusconfirmdiv popups via global.css (dynamic centering on resize)
 
 	//if case too much to fit vertically on the screen, use scrollbars
 	//for messages show the bottom of the message
@@ -5468,9 +5544,12 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	return response
 }
 
-//return 1
+//return 1 - Positive Button i.e. 'Ok' with optional text input
 function exodus_confirm_function1(event) {
-	return exodus_confirm_function(1, event)
+	var textinput
+	if ($$('exodusconfirmdiv_textinput'))
+		textinput = $$('exodusconfirmdiv_textinput').value
+	return exodus_confirm_function(textinput != undefined ? textinput : 1, event)
 }
 
 //return 2
