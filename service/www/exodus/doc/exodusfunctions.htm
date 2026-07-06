@@ -203,12 +203,12 @@
 	A&nbsp;default date in external format (eg 31/1/2004)
 	<LI>
 		FROM=XXXXX or UPTO=XXXXX<br />
-		in which case the default date is obtained from yield* gds.get1("XXXXX",grecn)</LI></UL>
+		in which case the default date is obtained from await gds.get1("XXXXX",grecn)</LI></UL>
 <P>If the month and/or year is missing from the input then the month and year will 
 	be obtained from the default date</P>
 <P>If mode is FROM or UPTO and the entered date is less than the FROM date or 
 	greater than the UPTO date then the FROM or UPTO date is changed to be the same 
-	using yield* gds.setx("XXXXX",input)</P>
+	using await gds.setx("XXXXX",input)</P>
 <P>In OCONV mode can be:</P>
 <P>DOW returns the day of the week&nbsp;1=Monday&nbsp;etc<br />
 	DAYNAME returns the name of the day of week eg Monday<br />

@@ -131,13 +131,6 @@ async function system_dict_username(di, usercodeid) {
     di.length = 30
 }
 
-/*
-async function system_getdepartments_old() {
-db.request = 'EXECUTE\rGENERAL\rGETDEPTS'
-if (!(yield* db.send())) return await exodusinvalid(db.response) // old commented code
-gdepartments = db.data
-}
-*/
 var gdepartments = ''
 var gdepts//0=deptids, 1=deptnames, 2=deptusernames
 async function system_getdepartments(deptoptions) {

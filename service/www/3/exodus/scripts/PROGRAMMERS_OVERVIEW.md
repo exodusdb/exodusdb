@@ -2,7 +2,7 @@
 
 **Location:** `exodus/service/www/3/exodus/scripts/`
 
-This document describes how to use the client-side JavaScript web framework in the Exodus system (version 3 UI). The framework provides modal dialogs, a generator-based asynchronous model (`yield*`), database access, dictionary-driven forms, security, uploads, and more. It is designed to work with the Exodus backend via the `xhttp.php` bridge (or file mode for local testing).
+This document describes how to use the client-side JavaScript web framework in the Exodus system (version 3 UI). The framework provides modal dialogs, a generator-based asynchronous model (`await`), database access, dictionary-driven forms, security, uploads, and more. It is designed to work with the Exodus backend via the `xhttp.php` bridge (or file mode for local testing).
 
 The framework originated in an era of older browsers (IE6+, etc.) and uses cooperative multitasking via JavaScript generators (pre-dating native async/await). It follows Revelation/Pick multivalue conventions with special delimiter characters.
 
@@ -18,7 +18,7 @@ The framework originated in an era of older browsers (IE6+, etc.) and uses coope
 - **Core file:** `client.js` — Must be included **first**. Core globals, yield infrastructure, `exodusdblink`, `exodusshowmodaldialog`, security, cookies, utilities, string/array prototypes.
 - **Form automation:** `dbform.js` + helpers in `db.js` — Dictionary-driven (`dict_*`) CRUD forms, MV groups, validation, buttons.
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
-- **Async model:** `function* myfunc() { ... yield* someOperation() ... }`. `yield*` pauses execution until the operation (dialog close, DB response) resumes it via the internal event/yield machinery (`exodus_yield`, `exodus_resume`, etc.).
+- **Async model:** `function* myfunc() { ... await someOperation() ... }`. `await` pauses execution until the operation (dialog close, DB response) resumes it via the internal event/yield machinery (`exodus_yield`, `exodus_resume`, etc.).
 - **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
 - **Security model:** PHP sessions (the real auth) + namespaced tokens. `exodussecurity('TASK')`. Once a valid session exists, the web layer trusts it.
@@ -103,18 +103,18 @@ Common additional includes (from examples):
 
 ```js
 function* myFunction() {
-  var ok = yield* exodusokcancel('Are you sure?', 1);
+  var ok = await exodusokcancel('Are you sure?', 1);
   if (!ok) return;
 
-  if (!(yield* db.send())) {
-    return yield* exodusinvalid(db.response);
+  if (!(await db.send())) {
+    return await exodusinvalid(db.response);
   }
 
-  var choice = yield* exodusdecide('Select', dataArray);
+  var choice = await exodusdecide('Select', dataArray);
 }
 ```
 
-`yield*` pauses the generator. The framework resumes it when the operation completes (dialog closes, DB response arrives, etc.).
+`await` pauses the generator. The framework resumes it when the operation completes (dialog closes, DB response arrives, etc.).
 
 ### Modal Dialogs
 
@@ -125,7 +125,7 @@ var params = {
   readonly: true,
   mycustom: 'value'
 };
-var returnedValue = yield* exodusshowmodaldialog('somedialog.htm', params);
+var returnedValue = await exodusshowmodaldialog('somedialog.htm', params);
 
 // In the dialog page, read:
 if (gparameters.key) { ... }
@@ -150,8 +150,8 @@ var db = new exodusdblink();   // auto-picks XMLHTTP or file mode
 db.request = 'EXECUTE\rGENERAL\rMYCOMMAND\rparam1\rparam2';
 db.data    = 'optional payload (multivalue ok)';
 
-if (!(yield* db.send())) {
-  return yield* exodusinvalid(db.response);
+if (!(await db.send())) {
+  return await exodusinvalid(db.response);
 }
 
 var resultData = db.data;
@@ -197,7 +197,7 @@ Many helpers exist in `db.js`:
 - `exodus_dict_amount(di)`
 - `exodus_dict_emailaddress(di)`
 - `exodus_dict_url(di, protocol)`
-- Validation functions (`exodus_val_*`) that you can assign to `di.validation = 'yield* myfunc()'`
+- Validation functions (`exodus_val_*`) that you can assign to `di.validation = 'await myfunc()'`
 
 You can attach:
 - `di.validation`
@@ -220,8 +220,8 @@ See `empty_dataform.htm`, `empty_fileform.htm`, and `template.htm` for complete 
 ## 6. Security
 
 ```js
-if (!(yield* exodussecurity('EDIT CUSTOMERS'))) {
-  return yield* exodusinvalid(gmsg);
+if (!(await exodussecurity('EDIT CUSTOMERS'))) {
+  return await exodusinvalid(gmsg);
 }
 ```
 
@@ -244,7 +244,7 @@ var params = {
   maxheight: 200
 };
 
-var returnedTargetFilename = yield* exodusshowmodaldialog('../exodus/upload.htm', params);
+var returnedTargetFilename = await exodusshowmodaldialog('../exodus/upload.htm', params);
 ```
 
 The upload posts to `upload.php` (which now safely derives its own redirect target). The result is the target filename that was written.
@@ -275,13 +275,13 @@ arr.exodustrim()
 See `exodus.js` and searches for `exodus` prototype methods.
 
 Other frequent utilities:
-- `yield* exodusinvalid(msg)`
-- `yield* exodusnote(msg)`
-- `yield* exoduswarning(msg)`
-- `yield* exodusokcancel(msg, default)`
-- `yield* exodusdecide(question, data, ...)`
+- `await exodusinvalid(msg)`
+- `await exodusnote(msg)`
+- `await exoduswarning(msg)`
+- `await exodusokcancel(msg, default)`
+- `await exodusdecide(question, data, ...)`
 - `exoduswindowclose(value)`
-- `exodussettimeout('yield* myfunc()', ms)`
+- `exodussettimeout('await myfunc()', ms)`
 - `$$('id')` or `$$('classname')` — element lookup
 
 ## 9. Sessions, Login, and the Token Model
@@ -298,8 +298,8 @@ Once a valid session exists, the web framework treats the user as authenticated 
 Preferred pattern:
 
 ```js
-if (!(yield* someOperation())) {
-  return yield* exodusinvalid(db.response || 'Something went wrong');
+if (!(await someOperation())) {
+  return await exodusinvalid(db.response || 'Something went wrong');
 }
 ```
 
@@ -311,7 +311,7 @@ Helpers:
 ## 11. Best Practices & Gotchas
 
 - **Order matters** — config → client.js → dict definition → HTML.
-- Use `yield*` for anything that yields.
+- Use `await` for anything that yields.
 - Prefer `gparameters` over URL query strings when opening dialogs.
 - Match input `id`s exactly to dictionary codes.
 - Field 0 is special (key).

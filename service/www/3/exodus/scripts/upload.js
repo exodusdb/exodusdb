@@ -106,7 +106,7 @@ function upload_ondrop(event) {
 	inputfile.files = dt.files
 	previewimage_sync(inputfile)
 }
-    
+
 async function form_onkeydown(event) {
 
  event=getevent(event)
@@ -148,7 +148,7 @@ async function formfunctions_onload() {
  //doesnt seem to work on ff at least
  if (gaudiovisualextensions.join('')=='jpg')
     $form1.filedata.accept='image/jpeg'
-    
+
  if (!gparameters.key)
     gparameters.key=''
 
@@ -188,20 +188,20 @@ async function audiovisual_open(event) {
 }
 
 async function audiovisual_delete(event) {
- 
+
  event=getevent(event)
 
  var filename=event.target.getAttribute('exodusfilename')
- 
+
  //confirm!
  if (!(await exodusyesno(filename+'\rWarning! Are you SURE that you want to irrevocably delete this file permanently?\r\rNote: This is irreversible!',2))) return await exodusinvalid()
- 
+
  db.request='EXECUTE\rGENERAL\rDELETEUPLOAD\r'+filename.toLowerCase()
  if (!(await db.send()))
   return await exodusinvalid(db.response)
-  
+
  await loadimages()
- 
+
 }
 
 async function upload_onclick() {
@@ -212,7 +212,7 @@ async function upload_onclick() {
   exoduscancelevent()//prevent submit
   return await exodusinvalid('Please browse for a file name to upload first')
  }
- 
+
  //split off the actual file name
  var sourcefilename=sourcefilename.split('/').slice(-1)[0].split('\\').slice(-1)[0]
  var extension=$form1.filedata.value.split('.').slice(-1)[0].toLowerCase()
@@ -224,7 +224,7 @@ async function upload_onclick() {
  if (sourcefilename.match(/[/<>:"\?\\\*\|]/g)) {
   return await exodusinvalid('Sorry but the following characters are not allowed in file names being uploaded\r/ ? < > \\ : * &vert; "')
  }
- 
+
  //check file extensions
  if (!gaudiovisualextensions.exoduslocate(extension))
   return await exodusinvalid('Files ending .'+extension+' are not allowed to be uploaded\r\rThe allowed file extensions are:\r\r'+gaudiovisualextensions.join(', '))
@@ -244,7 +244,7 @@ async function upload_onclick() {
     msg+='\n\nThere is no restriction on width.'
     return await exodusinvalid(msg)
  }
- 
+
  /*if (gparameters.originalkeyversionno.slice(-1)!='\\')
  if (gparameters.originalkeyversionno.slice(-1)!='\\')
   gparameters.originalkeyversionno+='.'
@@ -255,11 +255,11 @@ async function upload_onclick() {
  */
 
  var targetfilename=gparameters.originalkeyversionno+''
- 
+
  //append a dot if the last character of the path is not a \ or .
  if ('\\.'.indexOf(targetfilename.substr(-1))<0)
   targetfilename+='.'
-  
+
  if (gparameters.versionno||!gparameters.key)
   targetfilename+=sourcefilename
  else
@@ -278,7 +278,7 @@ async function upload_onclick() {
  } else {
   //if (!(await exodusokcancel(question+'\rOK to upload this file now?',1))) return await exodusinvalid()
  }
- 
+
  //ensure folders are made because upload may not be able to make them
  //dont create if file is being loaded without any path (has slashes or backslashes)(like media images)
  if (gparameters.originalkeyversionno.match(/[\\/]/)) {
@@ -287,24 +287,24 @@ async function upload_onclick() {
   +'\r'+gparameters.filename
   +'\r'+gparameters.key
   +'\r'+gparameters.ensurenotlocked
-  
+
   if (!(await db.send()))
    return await exodusinvalid(db.response)
  }
- 
+
  //check allowed to update/create
  //if (!(await exodussecurity('MATERIAL '+mode))) return await exodusinvalid(gmsg)
- 
+
  //set the target filename
  $form1.filename.value=targetfilename
- 
+
  //set the path
- 
+
  //"htmlfile: Access is denied." error on .submit() in MSIE seems to be solved by removing name attribute on file field
  //but firefox REQUIRES name tag on file field
  //if (isMSIE)
  //   document.getElementById('filedata').removeAttribute('name')
- 
+
  var temp=document.location.pathname.toString()
  //ensure prefixed by / (MSIE doesnt)
  //if (temp.substr(0,1)!='/')
@@ -348,18 +348,18 @@ async function upload_onclick() {
  $form1.submit()
 
  return true
- 
+
 }
 
 async function loadimages() {
-  
+
  //prevent display all images if refreshing and no parameters
  if (typeof gparameters.database == 'undefined')
     return false
-    
+
  //clear existing images
  $images.innerHTML=''
- 
+
  //display the primary key and versionno
  //it may be overiden below if the key uses the same versionno as a previous key
  //if changed also change VERIFYUPLOAD in UPLOAD.SUBS unless verify can be moved/implemented here from general_add_archive somehow
@@ -380,17 +380,15 @@ async function loadimages() {
 
  //eg \devdtest\upload\programs\
  gparameters.originalkeyversionno=uploadtarget
- 
+
  //$form1.button_submit.value='Upload '+gparameters.originalkeyversionno
  $form1.button_submit.value='Upload'
  //removed path as it is not relevant to user
  //document.getElementById("uploadpathtext").textContent = gparameters.originalkeyversionno;
- 
- //return yield* openwindow('EXECUTE\rGENERAL\rOPENUPLOAD',key+'.'+versionno) // old
- 
+
  gexistingextensions=[]
  gexistingbasefilenames=[]
-  
+
  db.request='EXECUTE\rGENERAL\rOPENUPLOAD\r'+gparameters.originalkeyversionno
 
  //NEW triggers deletion of any files already uploaded to the server but deleted on the record (by the user and within 24 hours)
@@ -401,7 +399,7 @@ async function loadimages() {
   return await exodusinvalid(db.response)
 
  var imagedata=(fm+db.data).split(fm)
- 
+
  gvirtualroot=imagedata[1]
 
  //no images so show upload form
@@ -411,29 +409,28 @@ async function loadimages() {
   return true
  }
 
- //update may be allowed 
+ //update may be allowed
  if (gparameters.updateallowed)
   $button_showupload.style.display=''
- 
+
  //load image(s) into the page
  var imageURLs=imagedata[2].split(vm)
  for (imagen=0;imagen<imageURLs.length;imagen++) {
-  
+
   //rule
   $images.insertBefore(document.createElement('hr'), null)
-   
+
   var filename=imageURLs[imagen]
   //var filename=imageURLs[imagen].split('/').slice(-1)[0]
   //var filename=filename.split('\\').slice(-1)[0]
-   
+
   var fileextension=imageURLs[imagen].split('.').slice(-1)[0]
   gexistingextensions[gexistingextensions.length]=fileextension
-   
+
   var basefilename=filename.split('\\').slice(-1)[0].split('/').slice(-1)[0].toLowerCase()
   gexistingbasefilenames[gexistingbasefilenames.length]=basefilename
 
   //show a link
-  
   var link=document.createElement('a')
   $images.insertBefore(link, null)
   //link.href='../../'+gvirtualroot+imageURLs[imagen]
@@ -455,14 +452,14 @@ async function loadimages() {
   button.value='Open'
   addeventlistener(button,'click','audiovisual_open')
   button.setAttribute('exodusimagen',imagen)
-    
+
   //delete may be allowed
   if (gparameters.deleteallowed)
    await adddeletebutton(filename)
-    
+
   //image
   if (gimageextensions.exoduslocate(fileextension)) {
- 
+
    //br
    var br=document.createElement('br')
    $images.insertBefore(br, null)
@@ -472,19 +469,17 @@ async function loadimages() {
    img.style.marginTop="5px"
    $images.insertBefore(img, null)
    img.src=link.href
- 
   }
-  
  }
- 
+
  //rule
  $images.insertBefore(document.createElement('hr'), null)
-   
+
  //P
  $images.insertBefore(document.createElement('p'), null).innerHTML='&nbsp;'
-    
+
  return true
- 
+
 }
 
 async function adddeletebutton(filename) {

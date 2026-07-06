@@ -1,6 +1,6 @@
 //Copyright NEOSYS All Rights Reserved.
 
-//designed to have no async code. no function * nor yield *
+//designed to have no async code. no function* nor yield*
 
 //Should not be dependent on gds/gds.getx/gds.setx or be related to screen/dom
 //There is currently one exception that we use gds.data[].text and timeout to gds.setx to get

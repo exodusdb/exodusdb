@@ -173,7 +173,7 @@
         <p>
         </p>
         <h3>
-            yield* array.exodusread(filename,key,fieldno)</h3>
+            await array.exodusread(filename,key,fieldno)</h3>
         <p>
             reads a record from the server into an array</p>
         <p>
@@ -182,14 +182,14 @@
         <p>
         </p>
         <h3>
-            yield* array.exodusxlate(filename,fieldno,mode)</h3>
+            await array.exodusxlate(filename,fieldno,mode)</h3>
         <p>
         </p>
         returns an array of records from the server given an array of keys
         <p>
         </p>
         <h3>
-            yield* string.exodusxlate(filename,fieldno,mode)</h3>
+            await string.exodusxlate(filename,fieldno,mode)</h3>
         <p>
             uses a string as a key to get a field or record from the server</p>
         <p>
@@ -257,7 +257,7 @@
             <p>
                 var exodusdblink1=new exodusdblink()<br />
                 exodusdblink1.request="TEST"<br />
-                if (!(exodusdblink1("DUMMYDATA"))) return yield* exodusinvalid(db.response)<br />
+                if (!(exodusdblink1("DUMMYDATA"))) return await exodusinvalid(db.response)<br />
                 alert(exodusdblink1.data)
             </p>
         </blockquote>
@@ -572,7 +572,7 @@
             For EXODUS forms the main form data is automatically&nbsp;available as the global
             variable <strong>gds. </strong>You&nbsp;may create your own <em>exodus_obj_source</em>
             objects if you wish but the <em>exodusrecord</em> object is&nbsp;simpler to use.&nbsp;The
-            very simple <em>yield* array.exodusread() </em>method can be used to obtain records from
+            very simple <em>await array.exodusread() </em>method can be used to obtain records from
             the server in a simple array object.</p>
         <p>
             This object represents a record with fields and multivalues like @RECORD but contains
@@ -626,7 +626,7 @@
         <h4>
             Methods</h4>
         <h5>
-            yield* gds.setx(dictid,rowno,value)</h5>
+            await gds.setx(dictid,rowno,value)</h5>
         <p>
             This method is very frequently used&nbsp;in&nbsp;client user interface programming
             to update form or record fields automatically.</p>
@@ -643,7 +643,7 @@
             Setting data to "" clears the "defaulted" property.</p>
         <h5>
             <h5>
-                yield* gds.getx(fieldname,rowno,oldtext)</h5>
+                await gds.getx(fieldname,rowno,oldtext)</h5>
         </h5>
         <p>
             This method is very frequently used&nbsp;in&nbsp;client user interface programming
@@ -661,9 +661,9 @@
             <em>oldtext </em>if true then returns&nbsp;the original value of the field before
             any user edits or programmatic updates.</p>
         <h5>
-            yield* gds.regetx(fieldname,rowno)</h5>
+            await gds.regetx(fieldname,rowno)</h5>
         <p>
-            Like yield* gds.getx() but for S type fields reevaluates the functioncode and can therefore
+            Like await gds.getx() but for S type fields reevaluates the functioncode and can therefore
             be used to obtain the values of S type fields that are not (or not yet) bound to
             HTML.</p>
         <h5>
@@ -739,7 +739,7 @@
             Note: This method does not rebind the row to the HTML form so .rebind&nbsp;should
             be specifically called afterwards.</p>
         <h5>
-            /**/ yield * gds.rebind(newdataobject,olddataobject,forced)</h5>
+            await gds.rebind(newdataobject,olddataobject,forced)</h5>
         <p>
             This method is often used to bind a row after it has been copied from somewhere
             else eg .updaterow. It is also used to refresh records on screen after&nbsp;they
@@ -755,7 +755,7 @@
             <em>forced </em>true to rebind even if the data values remain the same, otherwise
             not (only applies if olddataobject is present)</p>
         <h5>
-            yield* gds.load(generalrecordobject)</h5>
+            await gds.load(generalrecordobject)</h5>
         <p>
             This method is performed automatically by exodus forms and is&nbsp;not often used
             in&nbsp;client user interface programming</p>

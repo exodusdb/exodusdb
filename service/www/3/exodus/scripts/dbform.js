@@ -123,7 +123,6 @@ if (typeof gdictfilename == 'undefined' || !gdictfilename)
     gdictfilename = gdatafilename
 if (typeof gdatafilename == 'undefined' || !gdatafilename)
     gdatafilename = gdictfilename
-//  var temp='<SCR'+'IPT onload="yield* formfunctions_onload()" id=maindict src="scripts/'+gdictfilename.toLowerCase()+'_dict.js"></SCR'+'IPT>' // old legacy example
 if (eval('typeof dict_' + gdictfilename + '=="undefined"')) {
     var temp = '<SCR' + 'IPT id=maindict src="scripts/' + gdictfilename.toLowerCase() + '_dict.js"></SCR' + 'IPT>'
     document.writeln(temp)
@@ -191,7 +190,6 @@ async function formfunctions_onload() {
         return false //logout('formfunctions_onload - dict function missing')
     }
 
-    //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename) // old comment (legacy)
     var dictfunctionname = 'dict_' + gdictfilename
     var dictarray = await exodusevaluate(dictfunctionname + '(gparameters)', 'formfunctions_onload');
     gro = new exodusrecord(dictarray, gdatafilename)
@@ -469,11 +467,9 @@ async function formfunctions_onload() {
 
                     //convert element to a SELECT
 
-                    // if (element.id=='USER_CODE') yield* exodusbreak('x '+element.id+' '+element.getAttribute('exodusrequired')+' '+element.outerHTML) // legacy example
                     var temp = document.createElement('select')
                     copydictitem(dictitem, temp)
 
-                    //if (element.id=='USER_CODE') yield* exodusbreak('y '+temp.id+' '+temp.getAttribute('exodusrequired')+' '+temp.outerHTML) // legacy example
                     temp.size = 1
                     //element.swapNode(t)
                     element.parentNode.replaceChild(temp, element)
@@ -485,9 +481,7 @@ async function formfunctions_onload() {
 
                     element.tabIndex = elementtabindex
 
-                    //element.onchange=validateupdate
-                    // noyield // addeventlistener(element, 'change', 'validateupdate')
-                    /* yield */   addeventlistener(element, 'change', 'form_onchangeselect')
+                    addeventlistener(element, 'change', 'form_onchangeselect')
                 }
             }
 
@@ -2014,7 +2008,6 @@ async function printsendrecord_onclick(event) {
     }
     //alert('DEBUG: printfunction')
     await exodusevaluate(printfunction, 'await printsendrecord_onclick()');
-    //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick()')",100) // old yield example (legacy)
 
 }
 
@@ -3610,7 +3603,6 @@ async function saverecord_onclick() {
 
         //custom postwrite function
         if (typeof form_postwrite == 'function') {
-            //yield* exodusevaluateall('await form_postwrite()') // old
             if (!(await exodusevaluateall('await form_postwrite()')))
                 return false
         }
@@ -3773,7 +3765,6 @@ async function deleterecord_onclick(event) {
 
     //custom postdelete function
     if (typeof form_postdelete == 'function') {
-        //yield* exodusevaluateall('form_postdelete()') // old
         if (!(await exodusevaluateall('form_postdelete()')))
             return false
     }
@@ -7072,13 +7063,6 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
 
     }
 
-    //check that the function returned something
-    //if (typeof result == 'undefined') {
-    //    await exodusinvalid('Error in' + '\n' + functioncode.toString().substr(0, 500))
-    //    systemerror('yield* exodusevaluate()', 'Function returned "undefined"\nCalled from ' + callerfunctionname + '\n\n' + functioncode.toString().substr(0, 500))
-    //    result = ''
-    //}
-
     return result
 
 }
@@ -7103,7 +7087,7 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
     if (functioncode.indexOf('return ') < 0)
         functioncode = 'return ' + functioncode
 
-    //legacy 'yield * ' prefix in dynamic function code - strip and run via async path below
+    //legacy 'yield* ' prefix in dynamic function code - strip and run via async path below
     if (functioncode.match && functioncode.match(gyieldregex)) {
         functioncode = functioncode.replace(gyieldregex, '')
     }
@@ -7195,7 +7179,6 @@ async function form_deleterow(event, element) {
     //form specific before row delete function
     var predeleterow = window['form_predeleterow' + groupno]
     if (typeof predeleterow == 'function') {
-        //if (!(await exodusevaluate('yield * form_predeleterow' + groupno + '()')))  // legacy example
         var p = predeleterow(event);
         if (p && typeof p.then === 'function') {
             p = await p;
@@ -8035,7 +8018,6 @@ async function exoduspopup2(element) {
                         var key = reply[keyn]
                         if (key)
                             //doesnt work when multiple .. due to using cookies to communicate? perhaps chain opening passing remaining keys to each window
-                            //yield* windowopenkey(window.location.href.toString(), key) // legacy example
                             await windowopen(window.location.href.toString().split('?')[0] + '?key=' + key)
                     }
                     //window.location.assign(window.location.href.toString().split('?')[0] + '?key=' + reply[0])
@@ -8345,7 +8327,6 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     //prefilter
     if (typeof form_prefilter == 'function') {
-        //yield* exodusevaluate('form_prefilter()','yield* formfunctions_onload()') // old (legacy)
         if (!(form_prefilter(mode, colid)))
             return await exodusinvalid()
     }
@@ -8702,7 +8683,6 @@ async function copyrecord_onclick() {
     }
 
     //validate copy
-    //if (!(yield* exodusevaluate('await form_copyrecord()','await copyrecord_onclick()'))) // old (legacy)
     if (!(await form_copyrecord(copyrecord)))
         return await exodusinvalid()
 

@@ -158,7 +158,7 @@
             <td>
                 string</td>
             <td>
-                "return yield* gds.xlate('CLIENT_CODE', 'CLIENTS',1,'X')"</td>
+                "return await gds.xlate('CLIENT_CODE', 'CLIENTS',1,'X')"</td>
             <td>
                 <p>
                     For symbolic (calculated) fields only. A fragment of jscript that returns a value
@@ -924,17 +924,17 @@
     <p>
         Contains the initial record key&nbsp;for file&nbsp;forms.</p>
     <p>
-        Can be set anytime upto and including yield* form_postinit()</p>
+        Can be set anytime upto and including await form_postinit()</p>
     <h3>
         gparameters.defaultrevstr</h3>
     <p>
         Contains the initial form data for data forms.</p>
     <p>
-        Can be set anytime upto and including yield* form_postinit()</p>
+        Can be set anytime upto and including await form_postinit()</p>
     <h3>
         gparameters.documenttitle</h3>
     <p>
-        Can be set anytime upto but excluding yield* form_postinit()</p>
+        Can be set anytime upto but excluding await form_postinit()</p>
     <h3>
         gparameters.cancel=true</h3>
     <p>
