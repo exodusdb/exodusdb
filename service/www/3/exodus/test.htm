@@ -9,7 +9,7 @@
 
 var gnosavelocation=true
 
-function* formfunctions_onload() {
+async function formfunctions_onload() {
     if (gusername=='EXODUS')
         showhide('customcommandrow',true)
     return true
@@ -39,16 +39,19 @@ function test_run_sync(cmdcode) {
  $last_data_sent.innerText=''
  $last_data_received.innerText=''
 
- exodussettimeout('yield* test_run("'+cmdcode+'")',1)
+ exodussettimeout('await test_run("'+cmdcode+'")',1)
  
 }
 
-function* test_run(cmdcode) {
+async function test_run(cmdcode) {
 
  if (cmdcode=='ALL') {
-    check_LOOPBACK.checked && (yield* test_run('LOOPBACK'))
-    check_TEST.checked && (yield* test_run('TEST'))
-    check_SELECT.checked && (yield* test_run('SELECT'))
+    if (check_LOOPBACK.checked)
+        await test_run('LOOPBACK')
+    if (check_TEST.checked)
+        await test_run('TEST')
+    if (check_SELECT.checked)
+        await test_run('SELECT')
     return
  }
  
@@ -89,7 +92,7 @@ function* test_run(cmdcode) {
     var before=new Date
 
     ///////////////////////
-    var responded=yield* db.send(dbdatasent)
+    var responded=await db.send(dbdatasent)
     ///////////////////////
 
     //fix bug in KEEPALIVE
