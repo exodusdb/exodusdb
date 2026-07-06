@@ -1,7 +1,14 @@
 
 async function colors_val_screencolor() {
     if (!(await exodus_val_color())) return await exodusinvalid()
+    if (gisdarktheme) {
+        const toggle = document.getElementById("theme_toggle");
+        toggle.checked = false
+        toggle.dispatchEvent(new Event('change'));
+        theme_toggle('default')
+    }
     exodus_set_style('screencolor', gvalue)
+
     return true
 }
 
@@ -335,6 +342,8 @@ function exodus_get_fonts(tt) {
 function exodus_dict_colorfontsize(dict, fn) {
 
     var din = dict.length - 1
+
+    // DONT CHANGE ORDER UNLESS YOU CHANGE ORDER IN BACKEND
 
     di = dict[++din] = dictrec('REPORT_HEAD_COLOR', 'F', fn)
     di.wordsep = vm

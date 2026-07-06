@@ -1,322 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<!-- !!! NO LONGER BEING USED !!! -->
+	<!-- REPLACED BY IN WINDOW POPUPS -->
+	<script type="text/javascript">
+		var gformfontscale = 1.3
+	</script>
 
-    <script type="text/javascript">
-        var gformfontscale = 1.3
-    </script>
+	<script type="text/javascript" src="../exodus/scripts/client.js"></script>
 
-    <script type="text/javascript" src="../exodus/scripts/client.js"></script>
+	<script type="text/javascript">
 
-    <script type="text/javascript">
+		var gtexttagnames = /^(INPUT)|(TEXTAREA)$/
 
-        var gtexttagnames = /^(INPUT)|(TEXTAREA)$/
+		var gbuttons = []
+		var gdefaultbutton
 
-        var gbuttons = []
-        var gdefaultbutton
+		if (typeof window.dialogArguments == 'undefined') {
+			window.dialogArguments = []
+			window.dialogArguments = [, , 'OK', , 'Cancel', 'window.dialogArguments are missing in confirm.htm']
+			//return not in function
+			//window.close()
+			exoduswindowclose()
+		}
 
-        var questionx
-        var defaultbuttonn
-        var positivebuttonx
-        var negativebuttonx
-        var cancelbuttonx
-        var gtext
-        var gtexthidden
-        var gistextinput
-        var gimagesrc
+		//var dialogargs=[question,defaultbuttonn,positivebutton,negativebutton,cancelbutton]
+		var questionx = window.dialogArguments[0]
+		var defaultbuttonn = window.dialogArguments[1]
+		var positivebuttonx = window.dialogArguments[2]
+		var negativebuttonx = window.dialogArguments[3]
+		var cancelbuttonx = window.dialogArguments[4]
+		var gtext = window.dialogArguments[5]
+		var gtexthidden = window.dialogArguments[6]
+		var gistextinput = typeof gtext != 'undefined' && gtext != null
+		var gimagesrc = window.dialogArguments[7]
 
-        function resolveDialogArguments() {
-            if (typeof window.dialogArguments != 'undefined')
-                return window.dialogArguments
-            if (window.opener) {
-                try {
-                    if (window.opener.dialogArgumentsForChild)
-                        return window.opener.dialogArgumentsForChild
-                } catch (e) { }
-            }
-            return null
-        }
+		async function window_onunload(event) {
+			//doesnt work unfortunately - at least in firefox 34
+			if (window.opener)
+				window.opener.focus()
+		}
 
-        async function window_onunload(event) {
-            if (window.opener)
-                window.opener.focus()
-        }
+		async function formfunctions_onload() {
 
-        async function formfunctions_onload() {
+			//document.onkeydown=document_onkeydown
+			addeventlistener(document, 'keydown', 'document_onkeydown')
+			//addeventlistener(document,'click','document_onclick')
+			addeventlistener(window, 'unload', 'window_onunload')
+			
 
-            var dialogArguments = resolveDialogArguments()
-            if (!dialogArguments) {
-                await exodusinvalid('window.dialogArguments are missing in confirm.htm')
-                return exoduswindowclose()
-            }
-            window.dialogArguments = dialogArguments
+			//enable text box
+			if (gistextinput) {
 
-            questionx = dialogArguments[0]
-            defaultbuttonn = dialogArguments[1]
-            positivebuttonx = dialogArguments[2]
-            negativebuttonx = dialogArguments[3]
-            cancelbuttonx = dialogArguments[4]
-            gtext = dialogArguments[5]
-            gtexthidden = dialogArguments[6]
-            gistextinput = typeof gtext != 'undefined' && gtext != null
-            gimagesrc = dialogArguments[7]
+				//switch to hidden text if required
+				if (gtexthidden) {
+					document.getElementById('textinput').id = 'textinputoriginal'
+					document.getElementById('textinputhidden').id = 'textinput'
+				}
 
-            addeventlistener(document, 'keydown', 'document_onkeydown')
-            addeventlistener(window, 'unload', 'window_onunload')
+				document.getElementById('textinput').value = gtext
 
-            if (gistextinput) {
+				if (gtexthidden)
+					document.getElementById('textinputphidden').style.display = ''
+				else
+					document.getElementById('textinputp').style.display = ''
 
-                if (gtexthidden) {
-                    document.getElementById('textinput').id = 'textinputoriginal'
-                    document.getElementById('textinputhidden').id = 'textinput'
-                }
+			}
 
-                document.getElementById('textinput').value = gtext
+			if (!positivebuttonx && !negativebuttonx && !cancelbuttonx) {
+				positivebuttonx = 'Yes'
+				negativebuttonx = 'No'
+				cancelbuttonx = 'Cancel'
+			}
 
-                if (gtexthidden)
-                    document.getElementById('textinputphidden').style.display = ''
-                else
-                    document.getElementById('textinputp').style.display = ''
+			if (typeof questionx == 'undefined') questionx = 'OK to continue?'
+			questionx = questionx.replace(/\r\n/g, '\r')
+			questionx = questionx.replace(/\r\r/g, '<p class=statementclass>')
+			questionx = questionx.replace(/\r/g, '<br class=statementclass>')
+			questionx = questionx.replace(/\n/g, '<br class=statementclass>')
+			questionx = questionx.replace(FMre, '<br class=statementclass>')
+			questionx = questionx.replace(VMre, '<br class=statementclass>')
+			questionx = questionx.replace(/\|/g, '<br class=statementclass>')
 
-            }
+			questionx = document.getElementById('question1').innerHTML = questionx
 
-            if (!positivebuttonx && !negativebuttonx && !cancelbuttonx) {
-                positivebuttonx = 'Yes'
-                negativebuttonx = 'No'
-                cancelbuttonx = 'Cancel'
-            }
+			async function addbutton(buttonid,buttonn,buttontext,buttonfkey) {
 
-            if (typeof questionx == 'undefined') questionx = 'OK to continue?'
-            questionx = questionx.replace(/\r\n/g, '\r')
-            questionx = questionx.replace(/\r\r/g, '<p class=statementclass>')
-            questionx = questionx.replace(/\r/g, '<br class=statementclass>')
-            questionx = questionx.replace(/\n/g, '<br class=statementclass>')
-            questionx = questionx.replace(FMre, '<br class=statementclass>')
-            questionx = questionx.replace(VMre, '<br class=statementclass>')
-            questionx = questionx.replace(/\|/g, '<br class=statementclass>')
+				var button=document.createElement('span')
 
-            questionx = document.getElementById('question1').innerHTML = questionx
+				button.id=buttonid + 'button'
 
-            function addbutton(buttonid, buttonn, buttontext, buttonfkey) {
+				button.innerHTML=buttontext
+				button.tabIndex='0'
+				button.className="graphicbutton"
+				button.onmousedown=function(){this.style.borderStyle="inset"}
+				button.onmouseup=function(){this.style.borderStyle="outset"}
+				button.onmouseout=function(){this.style.borderStyle="outset"}
+				button.onclick=function(){closeit(buttonn%3)}
 
-                var button = document.createElement('span')
+				var letter=buttontext.match(/(<[uU]>)(.)/)
+				if (letter)
+					letter=letter[2]
+				else if (!gistextinput)
+					letter=buttontext.substr(0,1)
+				if (letter) {
+					letter=letter.toUpperCase()
+					button.setAttribute('exodusletter',letter)
+				}
+				button.title='Press '
+				if (letter)
+					button.title+=letter+' or '
+				button.title+=buttonfkey
 
-                button.id = buttonid + 'button'
+				document.getElementById('yesnocancelbuttons').insertBefore(button,null)
 
-                button.innerHTML = buttontext
-                button.tabIndex = '0'
-                button.className = "graphicbutton"
-                button.onmousedown = function () { this.style.borderStyle = "inset" }
-                button.onmouseup = function () { this.style.borderStyle = "outset" }
-                button.onmouseout = function () { this.style.borderStyle = "outset" }
-                button.onclick = function () { closeit(buttonn % 3) }
+				//array of visible buttons
+				gbuttons[gbuttons.length] = button
 
-                var letter = buttontext.match(/(<[uU]>)(.)/)
-                if (letter)
-                    letter = letter[2]
-                else if (!gistextinput)
-                    letter = buttontext.substr(0, 1)
-                if (letter) {
-                    letter = letter.toUpperCase()
-                    button.setAttribute('exodusletter', letter)
-                }
-                button.title = 'Press '
-                if (letter)
-                    button.title += letter + ' or '
-                button.title += buttonfkey
+				//set the button number
+				button.setAttribute('exodusbuttonnumber',gbuttons.length-1)
+				button.setAttribute('exodusyesnocancel',buttonn%3)
 
-                document.getElementById('yesnocancelbuttons').insertBefore(button, null)
+				//set the default button
+				if (gbuttons.length == defaultbuttonn) {
+					gdefaultbutton = button
+					window.setTimeout('gdefaultbutton.focus()', 10)
+				}
 
-                gbuttons[gbuttons.length] = button
+			}
 
-                button.setAttribute('exodusbuttonnumber', gbuttons.length - 1)
-                button.setAttribute('exodusyesnocancel', buttonn % 3)
+			if (positivebuttonx)
+				await addbutton('positive',1,positivebuttonx,'F9')
+			if (negativebuttonx)
+				await addbutton('negative',2,negativebuttonx,'F8')
+			if (cancelbuttonx)
+				await addbutton('cancel',3,cancelbuttonx,'Esc')
 
-                if (gbuttons.length == defaultbuttonn) {
-                    gdefaultbutton = button
-                    window.setTimeout('gdefaultbutton.focus()', 10)
-                }
+			//check some buttons exist
+			if (gbuttons.length < 0) {
+				alert('Error: No buttons specified in confirm.htm')
+				closeit('')
+			}
 
-            }
+			//make sure no button is default unless specified
+			if (!defaultbuttonn) {
+				if (gistextinput) {
+					exodussettimeout('focusontext()', 10)
+				}
+				else {
+					//xxtry{gbuttons[0].blur()}catch(e){}
+				}
+			}
 
-            if (positivebuttonx)
-                addbutton('positive', 1, positivebuttonx, 'F9')
-            if (negativebuttonx)
-                addbutton('negative', 2, negativebuttonx, 'F8')
-            if (cancelbuttonx)
-                addbutton('cancel', 3, cancelbuttonx, 'Esc')
+			//image
+			if (!gimagesrc && (questionx.indexOf('!') + 1 || questionx.toLowerCase().indexOf('are you sure ') + 1))
+				gimagesrc = 'warning'
+			else if (!gimagesrc) {
+				if (gbuttons.length == 1)
+					gimagesrc = 'info'
+				else
+					gimagesrc = 'question1'
+			}
+			if (gimagesrc) {
+				if (gimagesrc == 'critical') {
+					//gimagesrc = 'xpcritical.gif'
+					gimagesrc = 'xpcritical.webp'
+					document.body.style.backgroundColor = '#ffdddd'
+				}
+				if (gimagesrc == 'warning') {
+					//gimagesrc = 'xpwarning.gif'
+					gimagesrc = 'xpwarning.webp'
+					//darker than usual messages to distinguish from the usual buff document background color
+					document.body.style.backgroundColor = '#ffff99'
+				}
+				if (gimagesrc == 'info') {
+					//gimagesrc = 'xpinfo.gif'
+					gimagesrc = 'xpinfo.webp'
+					document.body.style.backgroundColor = '#ddffdd'
+				}
+				if (gimagesrc == 'question1') {
+					//gimagesrc = 'xpquestion.gif'
+					gimagesrc = 'xpquestion.webp'
+					document.body.style.backgroundColor = '#ddddff'
+				}
+				if (!(gimagesrc.indexOf('/') + 1 + gimagesrc.indexOf('\\') + 1)) {
+					gimagesrc = gimagetheme+gimagesrc
+					if (window.location.href.toString().indexOf('index.html')>=0)
+						imagesrc=imagesrc.slice(3)
+				}
+				var img = document.getElementById('img1')
+				img.src = gimagesrc
+				img.style.display = ''
+			}
 
-            if (gbuttons.length < 0) {
-                alert('Error: No buttons specified in confirm.htm')
-                closeit('')
-            }
+			//position the dialog
+			//exodussettimeout('exodusautofitwindow()', 100)
 
-            if (!defaultbuttonn) {
-                if (gistextinput) {
-                    exodussettimeout('focusontext()', 10)
-                }
-            }
+		}
 
-            if (!gimagesrc && (questionx.indexOf('!') + 1 || questionx.toLowerCase().indexOf('are you sure ') + 1))
-                gimagesrc = 'warning'
-            else if (!gimagesrc) {
-                if (gbuttons.length == 1)
-                    gimagesrc = 'info'
-                else
-                    gimagesrc = 'question1'
-            }
-            if (gimagesrc) {
-                if (gimagesrc == 'critical') {
-                    gimagesrc = 'xpcritical.webp'
-                    document.body.style.backgroundColor = '#ffdddd'
-                }
-                if (gimagesrc == 'warning') {
-                    gimagesrc = 'xpwarning.webp'
-                    document.body.style.backgroundColor = '#ffff99'
-                }
-                if (gimagesrc == 'info') {
-                    gimagesrc = 'xpinfo.webp'
-                    document.body.style.backgroundColor = '#ddffdd'
-                }
-                if (gimagesrc == 'question1') {
-                    gimagesrc = 'xpquestion.webp'
-                    document.body.style.backgroundColor = '#ddddff'
-                }
-                if (!(gimagesrc.indexOf('/') + 1 + gimagesrc.indexOf('\\') + 1)) {
-                    gimagesrc = gimagetheme + gimagesrc
-                    if (window.location.href.toString().indexOf('index.html') >= 0)
-                        gimagesrc = gimagesrc.slice(3)
-                }
-                var img = document.getElementById('img1')
-                img.src = gimagesrc
-                img.style.display = ''
-            }
+		function focusontext() {
+			document.getElementById('textinput').focus()
+			document.getElementById('textinput').select()
+		}
 
-        }
+		async function document_onkeydown(event) {
 
-        function focusontext() {
-            document.getElementById('textinput').focus()
-            document.getElementById('textinput').select()
-        }
+			event=getevent(event)
 
-        function document_onkeydown(event) {
+			var key = event.keyCode
+			var letter = String.fromCharCode(key).toUpperCase()
 
-            event = getevent(event)
+			//cursor keys on buttons
+			if (event.target.getAttribute&&event.target.getAttribute('exodusyesnocancel')!='undefined') {
 
-            var key = event.keyCode
-            var letter = String.fromCharCode(key).toUpperCase()
+				//left, up means back
+				if (key == 37 || key == 38) {
+					cursor(event.target, -1)
+					return
+				}
 
-            if (event.target.getAttribute && event.target.getAttribute('exodusyesnocancel') != 'undefined') {
+				//right, down means forwards
+				if (key == 39 || key == 40) {
+					cursor(event.target, 1)
+					return
+				}
 
-                if (key == 37 || key == 38) {
-                    cursor(event.target, -1)
-                    return
-                }
+			}
 
-                if (key == 39 || key == 40) {
-                    cursor(event.target, 1)
-                    return
-                }
+			//Positive=F9 or
+			if (positivebuttonx) {
+				if (key == 120 || letter == document.getElementById('positivebutton').getAttribute('exodusletter')) {
+					closeit(1)
+				}
+			}
 
-            }
+			//Negative=F8 or
+			if (negativebuttonx) {
+				if (key == 119 || letter == document.getElementById('negativebutton').getAttribute('exodusletter')) {
+					closeit(2)
+				}
+			}
 
-            if (positivebuttonx) {
-                if (key == 120 || letter == document.getElementById('positivebutton').getAttribute('exodusletter')) {
-                    closeit(1)
-                }
-            }
+			//Go Back=Esc or
+			//(allow esc to press positivebutton if there is no negative button (like alert()))
+			if (cancelbuttonx || !negativebuttonx) {
+				if (key == 27 || (cancelbuttonx && letter == document.getElementById('cancelbutton').getAttribute('exodusletter'))) {
+					closeit(0)
+				}
+			}
 
-            if (negativebuttonx) {
-                if (key == 119 || letter == document.getElementById('negativebutton').getAttribute('exodusletter')) {
-                    closeit(2)
-                }
-            }
+			//Enter for text
+			if (key == 13 && gistextinput) {
+				closeit(1)
+			}
 
-            if (cancelbuttonx || !negativebuttonx) {
-                if (key == 27 || (cancelbuttonx && letter == document.getElementById('cancelbutton').getAttribute('exodusletter'))) {
-                    closeit(0)
-                }
-            }
+			//Enter or space to click on buttons
+			if ((key == 13 || key == 32) && !gistextinput) {
+				var result=event.target.getAttribute('exodusyesnocancel')
+				if (typeof result!='undefined')
+					closeit(Number(result))
+			}
 
-            if (key == 13 && gistextinput) {
-                closeit(1)
-            }
+		}
 
-            if ((key == 13 || key == 32) && !gistextinput) {
-                var result = event.target.getAttribute('exodusyesnocancel')
-                if (typeof result != 'undefined')
-                    closeit(Number(result))
-            }
+		function cursor(eventtarget, arg1) {
+			if (eventtarget.className != 'graphicbutton')
+				return
+			var newbuttonn = (Number(eventtarget.getAttribute('exodusbuttonnumber')) + gbuttons.length + arg1) % gbuttons.length
 
-        }
+			gbuttons[newbuttonn].focus()
+		}
 
-        function cursor(eventtarget, arg1) {
-            if (eventtarget.className != 'graphicbutton')
-                return
-            var newbuttonn = (Number(eventtarget.getAttribute('exodusbuttonnumber')) + gbuttons.length + arg1) % gbuttons.length
+		function closeit(arg1) {
 
-            gbuttons[newbuttonn].focus()
-        }
+			var returnvalue
+			if (gistextinput) {
+				if (arg1 == 1)
+					returnvalue = document.getElementById('textinput').value
+			}
+			else
+				returnvalue = Number(arg1)
 
-        function closeit(arg1) {
+			if (window.dialogArguments && window.dialogArguments.xhttp && (arg1 == 2 || arg1 == 0)) {
+				try {
+					window.dialogArguments.xhttp.abort()
+				} catch (e) { }
+				if (window.opener && typeof window.opener.unblockmodalui_sync == 'function')
+					window.opener.unblockmodalui_sync()
+				return exoduswindowclose(0)
+			}
 
-            var returnvalue
-            if (gistextinput) {
-                if (arg1 == 1)
-                    returnvalue = document.getElementById('textinput').value
-            }
-            else
-                returnvalue = Number(arg1)
+			return exoduswindowclose(returnvalue)
+		}
 
-            if (window.dialogArguments && window.dialogArguments.xhttp && (arg1 == 2 || arg1 == 0)) {
-                try {
-                    window.dialogArguments.xhttp.abort()
-                } catch (e) { }
-                if (window.opener && typeof window.opener.unblockmodalui_sync == 'function')
-                    window.opener.unblockmodalui_sync()
-                return exoduswindowclose(0)
-            }
+	</script>
 
-            return exoduswindowclose(returnvalue)
-        }
-
-    </script>
-
-    <style type="text/css">
-        .statementclass {
-
-            /*font-size:medium*/
-        }
-    </style>
-    <title>Confirmation</title>
+	<style type="text/css">
+		.statementclass {
+			/*font-size:medium*/
+		}
+	</style>
+	<title>Confirmation</title>
 </head>
 <body>
-    <div align="center">
-        <table cellspacing="1" cellpadding="1">
-            <tr>
-                <td style="vertical-align: middle" style="padding: 20px">
-                    <img src="" alt="" style="display: none" id="img1" height="32" width="32" />
-                </td>
-                <td>
-                    <div class="statementclass" id="question1">
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    &nbsp;
-                </td>
-                <td>
-                    <p id="textinputp" style="display: none">
-                        <input size="60" id="textinput" autocomplete="new-password" />
-                    </p>
-                    <p id="textinputphidden" style="display: none">
-                        <input type="password" size="60" id="textinputhidden" autocomplete="new-password" />
-                    </p>
-                    <span id="yesnocancelbuttons"></span>
-                </td>
-            </tr>
-        </table>
-    </div>
+	<!--<div align="center">-->
+	<!-- margin-top: 38vh centers the div vertically to 38% of viewport height-->
+	<!-- make div be 100% of viewport to prevent blocky gradient, remove min-height: 100vh to see the problem-->
+	<div align="center" style="margin-top: 38vh; min-height: 100vh;">
+		<table cellspacing="1" cellpadding="1">
+			<tr>
+				<td style="vertical-align: middle" style="padding: 20px">
+					<img src="" alt="" style="display: none" id="img1" height="32" width="32" />
+				</td>
+				<td>
+					<div class="statementclass" id="question1">
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					&nbsp;
+				</td>
+				<td>
+					<p id="textinputp" style="display: none">
+						<!-- <input size="60" id="textinput" autocomplete="nope" /> -->
+						<input size="60" id="textinput" autocomplete="new-password" />
+					</p>
+					<p id="textinputphidden" style="display: none">
+						<input type="password" size="60" id="textinputhidden" id="textinputhidden" autocomplete="new-password" />
+					</p>
+					<span id="yesnocancelbuttons"></span>
+				</td>
+			</tr>
+		</table>
+	</div>
 </body>
 </html>
