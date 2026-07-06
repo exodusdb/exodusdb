@@ -661,6 +661,31 @@ function setinnerHTML(elementsorid, html) {
         elementsorid[i].innerHTML = html
 }
 
+function loguiblockerwaitcancel_event(event, action) {
+
+    event = getevent(event)
+    var target = event.target
+    var msg = 'uiblocker Wait/Cancel: ' + action
+    if (event.type)
+        msg += ' type=' + event.type
+    if (typeof event.isTrusted != 'undefined')
+        msg += ' isTrusted=' + event.isTrusted
+    if (typeof event.detail != 'undefined')
+        msg += ' detail=' + event.detail
+    if (event.timeStamp)
+        msg += ' timeStamp=' + event.timeStamp
+    if (typeof event.clientX != 'undefined')
+        msg += ' clientXY=' + event.clientX + ',' + event.clientY
+    if (target) {
+        msg += ' target=' + (target.tagName || '')
+        if (target.id)
+            msg += '#' + target.id
+    }
+    console.log(msg)
+    logevent(msg)
+
+}
+
 function blockmodalui_sync() {
 
     unblockmodalui_sync()
@@ -684,7 +709,7 @@ function blockmodalui_sync() {
     blocker.onmousedown = function uiblockerdiv_onmousedown() {
         guiblockermousedown = true
     }
-    blocker.onclick = function uiblockerdiv_onclick() {
+    blocker.onclick = function uiblockerdiv_onclick(event) {
 
         if ($$('exodusconfirmdiv')) {
             window.setTimeout('exodus_confirm_function3()', 10)
@@ -695,12 +720,15 @@ function blockmodalui_sync() {
             if (gchildwin.lazy) {
                 //ignore spurious click events without a prior mousedown on this blocker
                 //eg when a child popup closes after selection and the click falls through
-                if (!guiblockermousedown)
+                if (!guiblockermousedown) {
+                    loguiblockerwaitcancel_event(event, 'ignored (no mousedown on blocker)')
                     return
+                }
                 guiblockermousedown = false
                 actualwin = gchildwin.actual
                 //open a 'please wait' window the first time that they click the blockerdiv or they close the 'please wait' window
                 if (!actualwin || actualwin.closed) {
+                    loguiblockerwaitcancel_event(event, 'opening confirm.htm')
                     var dialogstyle = getdialogstyle_sync(dialogstyle)
 
                     var question = 'Processing. Please wait.'
