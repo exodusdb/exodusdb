@@ -814,7 +814,7 @@ input[type=checkbox] {
     background-color: var(--bg-colorS);
     vertical-align: middle;
     /*border-radius: 20%;*/
-    border-radius: 5px;
+    border-radius: 2px;
 }
 
 input[type=checkbox]:checked {
