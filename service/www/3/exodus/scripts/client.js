@@ -5772,10 +5772,14 @@ function decide_onload(decide_args) {
 		}
 
 		var oCellxInput = oCellx.getElementsByTagName('input')[0]
-		if (event_handler)
-			//oCellxInput.onclick=event_handler
-			oCellxInput.onmousedown = event_handler
-		//addeventlistener(oCellxInput,'click',event_handler)
+		if (event_handler) {
+			// Checkbox: mouseup so row format/check state updates on release, not press.
+			// Radio: mousedown for immediate select+OK.
+			if (decide_returnmany)
+				oCellxInput.onmouseup = event_handler
+			else
+				oCellxInput.onmousedown = event_handler
+		}
 		oCellxInput.setAttribute('decide_optionno', optionno)
 
 		if (defaultreply && defaultreply.exoduslocate(returnvalue))
@@ -5969,7 +5973,7 @@ function decide_onload(decide_args) {
 		if (!element)
 			element = event.target
 
-		//dont click on checkbox since mousedown will have already done the job
+		// dont handle bubbled click on checkbox; mouseup on the input already did the job
 		if (event.type == 'click' && event.target.type == 'checkbox')
 			return false
 
@@ -6089,8 +6093,13 @@ function decide_onload(decide_args) {
 		return
 	}
 
-	function decide_document_onclick(event, dblclick) {
+	function decide_document_onclick(event, forceCheck) {
 		event = getevent(event)
+
+		// Checkbox input uses its own mouseup handler; ignore bubbled click (was
+		// passing false as 'checking' and undoing the selection).
+		if (event.target && event.target.type == 'checkbox')
+			return exoduscancelevent(event)
 
 		var trtag = getancestor(event.target, 'tr')
 		var element
@@ -6100,8 +6109,12 @@ function decide_onload(decide_args) {
 			return
 		}
 
-		if (decide_returnmany)
-			decide_checkbox_select(event, element, dblclick)
+		if (decide_returnmany) {
+			if (typeof forceCheck === 'boolean')
+				decide_checkbox_select(event, element, forceCheck)
+			else
+				decide_checkbox_select(event, element)
+		}
 		else
 			decide_radio_select(event, element)
 
