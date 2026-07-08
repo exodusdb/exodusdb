@@ -3455,47 +3455,9 @@ async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttonti
 
 	console.log(question)
 
-	var istextinput = typeof text != 'undefined' && text !== null
-
-	//use div to avoid opening a new window if possible
-	if (!istextinput) {
-
-		return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
-
-	} else {
-
-		var dialogargs = [question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image]
-
-		//var dialogstyle
-		//dialogstyle=(question.indexOf('\r')>=2)
-		//?'dialogHeight: 300px; dialogWidth: 600px;'
-		//:'dialogHeight: 220px; dialogWidth: 500px;'
-		//dialogstyle+=' center: Yes; help: No; resizable: No; status: No;'
-
-		//similar code in blockmodalui_sync and exodusconfirm
-		var newwidth = 200
-		var newheight = 150
-		var max=getmaxwindow_sync()
-		var newleft = 0 + (max.width - newwidth) / 2
-		var newtop = 0 + (max.height - newheight) / 2
-		var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
-		//sadly has no effect
-		dialogstyle +', menubar=no, scrollbars=no, status=no, titlebar=no, toolbar=no'
-
-		var response = await exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
-	}
-
-	//text input returns a string (may be zero length) or false if clicked cancel
-	if (istextinput) {
-		if (typeof response == 'string')
-			return response
-	}
-
-	//no response treated same as cancel button (0)
-	if (!response)
-		response = 0
-
-	return response
+	// In-window popup (exodusconfirm2) for questions and text/password input.
+	// confirm.htm is deprecated; exodusshowmodaldialog opened a full browser tab.
+	return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
 
 }
 
@@ -5258,7 +5220,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	div.id = 'exodusconfirmdiv'
 	div.classList.add('exodusconfirmdiv')
 	div.style.maxHeight = (window.innerHeight - 120) + 'px'
-	div.style.maxWidth = window.innerWidth + 'px'
+	div.style.maxWidth = Math.min(700, window.innerWidth - 40) + 'px'
 	div.style.overflow = 'auto'
 
 	//image
@@ -5434,17 +5396,17 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			</tr>'
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used starteventhandler()
-		html += `\
+		html += '\
 				<tr>\
 					<td>\
 						&nbsp;\
 					</td>\
 					<td>\
-						<input id="exodusconfirmdiv_textinput" size="60" style="display: block; margin-bottom: 15px;" value="${text}">\
-						<span id="yesnocancelbuttons">${buttonshtml}</span>\
+						<input id="exodusconfirmdiv_textinput" size="60" style="display: block; margin-bottom: 15px;">\
+						<span id="yesnocancelbuttons">'+ buttonshtml + '</span>\
 					</td>\
 				</tr>\
-				</table>`
+				</table>'
 
 	//OK/Cancel/Print buttons at the bottom
 	} else {
@@ -5474,8 +5436,14 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	//insert and centralise the div after it has autosized itself
 	document.body.insertBefore(div, null)
 
-	if (istextinput)
-		$$('exodusconfirmdiv_textinput').focus()
+	if (istextinput) {
+		var textinput = $$('exodusconfirmdiv_textinput')
+		if (texthidden)
+			textinput.type = 'password'
+		textinput.value = text
+		textinput.autocomplete = texthidden ? 'new-password' : 'off'
+		textinput.focus()
+	}
 
 	//build rows of decide popup
 	if (decide_args) {
