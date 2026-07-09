@@ -1298,6 +1298,24 @@ function theme_toggle_title(dark) {
 	return dark ? 'Switch to light mode' : 'Switch to dark mode'
 }
 
+function exodus_swap_tool_icons() {
+
+	// Swap static toolbar icons (e.g. reports.htm) that use add/delete/refresh svg/png
+	const filetype_rex = /(\.[a-zA-Z]+$)/
+	for (const base of ['add', 'delete', 'refresh']) {
+		document.querySelectorAll(`img[src*="/${base}.svg"], img[src*="/${base}.png"], img[src*="/${base}_darkmode.svg"], img[src*="/${base}_darkmode.png"]`).forEach(img => {
+			let src = img.getAttribute('src')
+			if (gisdarktheme) {
+				if (src.indexOf('_darkmode') < 0)
+					src = src.replace(filetype_rex, '_darkmode$1')
+			} else {
+				src = src.replace('_darkmode', '')
+			}
+			img.setAttribute('src', src)
+		})
+	}
+}
+
 function exodus_set_theme_icons() {
 
 	gmenuimage = gimagetheme + (gisdarktheme ? 'menu_burger_darkmode.svg' : 'menu_burger.svg')
@@ -1393,6 +1411,7 @@ function theme_toggle(theme = 'default') {
 					window[icon_varname] = img.getAttribute('src')
 			});
 		}
+		exodus_swap_tool_icons()
 	}
 
 	exodus_set_theme_icons()
@@ -1694,6 +1713,8 @@ async function clientfunctions_windowonload() {
 	if (gwindowonload)
 		try { gwindowonload() }
 		catch (e) { }
+
+	exodus_swap_tool_icons()
 
 	//logout('clientfunctions_windowonload')
 
