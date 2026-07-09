@@ -421,7 +421,7 @@ input[type=checkbox] {
     appearance: none;
     width: 14px;
     height: 14px;
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
     margin-right: 5px;
     margin-bottom: 1px;
