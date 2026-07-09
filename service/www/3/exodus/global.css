@@ -6,7 +6,9 @@ TABLE.exodusform
     border-collapse: collapse;
     /*background-color: #ffffc0; /*cellpadding: 1;*/*/
     background-color: #fdf5e6;
-    border: none;
+    border-color: #d0d0d0;
+    border-width: 1px 1px 1px 1px;
+    border-style:  solid; /* works in ie     border-right: thin;     border-left: thin;     border-bottom: thin;     border-top: thin;     */
     padding: 1px;
     text-align: left;
 }
@@ -14,22 +16,6 @@ TABLE.exodusform
 .exodusform > tbody > tr > td,.exodusform > tbody > tr > thead, .exodusform > thead > tr > th, .exodusform > thead > tr > td
 {
     border: 1px lightgrey solid;
-}
-
-/* Round outer corners only — not table overflow clip (square grid inside a round frame) */
-TABLE.exodusform > thead > tr:first-child > :first-child,
-TABLE.exodusform:not(:has(thead)) > tbody > tr:first-child > :first-child {
-    border-top-left-radius: 6px;
-}
-TABLE.exodusform > thead > tr:first-child > :last-child,
-TABLE.exodusform:not(:has(thead)) > tbody > tr:first-child > :last-child {
-    border-top-right-radius: 6px;
-}
-TABLE.exodusform > tbody > tr:last-child > :first-child {
-    border-bottom-left-radius: 6px;
-}
-TABLE.exodusform > tbody > tr:last-child > :last-child {
-    border-bottom-right-radius: 6px;
 }
 
 TABLE
@@ -501,6 +487,7 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 :root[data-theme="dark_mode"] TABLE.exodusform {
     /* Warm dark parchment — chromatic contrast vs neutral #181818 page (not grey-on-grey) */
     background-color: #544836 !important;
+    border-color: #7a6b58 !important;
 }
 
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,
