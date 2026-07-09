@@ -47,7 +47,7 @@ var glogsettimeout
 var gimagetheme = '../../exodus/images/theme2/'
 //var gmenuimage=gimagetheme+'menu.png'//'add.png'
 var gmenuimage = gimagetheme + 'menu_burger.svg'
-var glogoutimage = gimagetheme + 'disconnect.svg'
+var glogoutimage = gimagetheme + 'disconnect.png'
 var grefreshimage = gimagetheme + 'refresh.svg'
 var gthemeimage = gimagetheme + 'theme_button.svg'
 var gcompanyimage = gimagetheme + 'formpage_companies.svg'
@@ -1287,11 +1287,11 @@ function theme_toggle_title(dark) {
 function exodus_set_theme_icons() {
 
 	gmenuimage = gimagetheme + (gisdarktheme ? 'menu_burger_darkmode.svg' : 'menu_burger.svg')
-	glogoutimage = gimagetheme + (gisdarktheme ? 'disconnect_darkmode.svg' : 'disconnect.svg')
+	glogoutimage = gimagetheme + (gisdarktheme ? 'disconnect_darkmode.png' : 'disconnect.png')
 	grefreshimage = gimagetheme + (gisdarktheme ? 'refresh_darkmode.svg' : 'refresh.svg')
 	if (typeof gnewimage != 'undefined') {
-		gnewimage = gimagetheme + (gisdarktheme ? 'application_form_add_darkmode.svg' : 'application_form_add.svg')
-		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.svg' : 'open.svg')
+		gnewimage = gimagetheme + (gisdarktheme ? 'application_form_add_darkmode.png' : 'application_form_add.png')
+		gopenimage = gimagetheme + (gisdarktheme ? 'zoom_darkmode.png' : 'zoom.png')
 	}
 }
 

@@ -6,8 +6,8 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //var nbsp160 = String.fromCharCode(160)
 
 // set global image paths
-gnewimage = gimagetheme + 'application_form_add.svg'
-gopenimage = gimagetheme + 'open.svg'
+gnewimage = gimagetheme + 'application_form_add.png'
+gopenimage = gimagetheme + 'zoom.png'
 gfindimage = gimagetheme + 'zoom.svg'
 gcalendarimage = gimagetheme + 'calendar.svg'
 gsaveimage = gimagetheme + 'tick.png'
@@ -43,8 +43,8 @@ gcompanyimage = gimagetheme + 'formpage_companies_darkmode.svg'
 ginsertrowimage = gimagetheme + 'add_darkmode.svg'
 gdeleterowimage = gimagetheme + 'delete_darkmode.svg'
 gcalendarimage = gimagetheme + 'calendar_darkmode.svg'
-gnewimage = gimagetheme + 'application_form_add_darkmode.svg'
-gopenimage = gimagetheme + 'open_darkmode.svg'
+gnewimage = gimagetheme + 'application_form_add_darkmode.png'
+gopenimage = gimagetheme + 'zoom_darkmode.png'
 }
 
 // document.getElementsByTagName('BODY').onload=window_onload
