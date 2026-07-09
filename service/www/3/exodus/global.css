@@ -623,6 +623,17 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 {
     border-color: #7a6b58;
 }
+:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton {
+    border-width: 2px;
+    border-style: solid;
+    border-color: #7a6b58;
+    cursor: pointer;
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:hover,
+:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:focus {
+    border-color: #b8a99a;
+    background-color: #3a3530;
+}
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {
     background-color: #4a2828;
     border-color: #e06060;
