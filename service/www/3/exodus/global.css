@@ -69,9 +69,7 @@ BODY
     background-color: #F0F0F0;
     padding: 2px 3px;
     /*font-size: 90%;*/
-    border-color: #cccccc;
-    border-width: 2px;
-    border-style: outset;
+    border: 2px outset #cccccc;
     border-radius: 0.3rem;
 
     /*float: left;*/
@@ -220,7 +218,7 @@ Did not remove clsRequired class since it is used in few places like index.html 
 }
 
 /* EXPERIMENTAL: async-ui underline text entry */
-INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
 SELECT,
 TEXTAREA {
     background-color: transparent;
@@ -620,7 +618,7 @@ input:checked + .toggle_button .knob img {
     border-color: #7a6b58 !important;
 }
 
-:root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]),
+:root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
 :root[data-theme="dark_mode"] SELECT,
 :root[data-theme="dark_mode"] TEXTAREA {
     background-color: transparent;
@@ -665,7 +663,7 @@ input:checked + .toggle_button .knob img {
 :root[data-theme="dark_mode"] .exodusbutton,
 :root[data-theme="dark_mode"] BUTTON {
     background-color: #292929;
-    border-color: #343434;
+    border: 2px outset #343434;
     color: #ffffff;
 }
 
