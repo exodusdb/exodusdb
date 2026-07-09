@@ -1611,14 +1611,10 @@ async function clientfunctions_windowonload() {
 
 		//button to logout
 		var temp2 = document.createElement('span')
+		temp2.classList.add('logout_wrapper')
 		temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
 		//document.body.insertBefore(temp2, document.body.firstChild)
 		gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-		//temp2.style.float = 'left
-		temp2.style.float = 'right'
-		temp2.style.marginRight = '10px'
-		temp2.style.paddingLeft = '5px'
-		temp2.style.borderLeft = '0.2px solid lightgrey'
 
 		if (!gusername) {
 			var temp = $$('exoduslogoutbutton')
@@ -1632,11 +1628,8 @@ async function clientfunctions_windowonload() {
 		//button for menu
 		if (gmenucodes && gmenucodes != 'EXIT2') {
 			var menu_span = document.createElement('span')
-			menu_span.style.float = 'left'
-			menu_span.style.maxWidth = '65px'//stop first button flashing very wide initially
+			menu_span.classList.add('hamburger_menu')
 			menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. ' + ctrlalt + '+M', 'M')
-			menu_span.style.paddingLeft = '5px'
-			menu_span.style.borderRight = '0.2px solid lightgrey'
 			//document.body.insertBefore(menu_span, document.body.firstChild)
 			gexodus_menubar.insertBefore(menu_span, gexodus_menubar.firstChild)
 
