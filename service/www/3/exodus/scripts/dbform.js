@@ -2162,8 +2162,7 @@ async function document_onclick(event) {
         //simulating how document.onclick="funcx()" passes event into funcx()
         //exodusevaluate3 will then be able to arrange that
         // the noclick function can refer to the event variable
-        var evalgen = exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event);
-        result = (evalgen && evalgen.next) ? exodusneweventhandler(evalgen, 'onclickexpression').value : evalgen;
+        result = await exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event);
     }
 
     //logout('document_onclick ' + event.target.id)
