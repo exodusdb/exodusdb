@@ -2613,10 +2613,12 @@ async function document_onkeydown2(event) {
 
             value = getvalue(element)
 
-            //old value
-            gdefaultvalue = await getdefault(element)
-            if (gpreviousvalue == '' && gdefaultvalue)
-                gpreviousvalue = gdefaultvalue
+            //old value — only evaluate default if field was empty on focus (e.g. revert to default)
+            if (gpreviousvalue == '') {
+                gdefaultvalue = await getdefault(element)
+                if (gdefaultvalue)
+                    gpreviousvalue = gdefaultvalue
+            }
 
             if (value != gpreviousvalue) {
 
@@ -5805,8 +5807,8 @@ function getvalue(element, recn) {
             else recn = 0
             element = element[recn]
             if (!element) {
-                systemerror('getvalue()', exodusquote(element0) + ' does not exist')
-                return
+                // Grouped field row not in DOM (hidden column, row gap, etc.) — empty value
+                return ''
             }
         }
     }
