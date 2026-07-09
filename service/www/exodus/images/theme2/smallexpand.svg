@@ -1,0 +1,10 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- 14x14 expand icon centred in 16x16 canvas (matches delete.svg visual size) -->
+<rect x="2" y="2" width="12" height="12" fill="white"/>
+<rect x="1" y="1" width="14" height="1" fill="#4C4C4C"/>
+<rect x="1" y="14" width="14" height="1" fill="#4C4C4C"/>
+<rect x="1" y="1" width="1" height="14" fill="#4C4C4C"/>
+<rect x="14" y="1" width="1" height="14" fill="#4C4C4C"/>
+<rect x="4" y="7" width="8" height="2" fill="#4C4C4C"/>
+<rect x="7" y="4" width="2" height="8" fill="#4C4C4C"/>
+</svg>
