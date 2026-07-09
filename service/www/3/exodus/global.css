@@ -506,9 +506,9 @@ input[type="radio"],input[type="checkbox"]{
     height: 18px;
     top: 2px;
     left: 2px;
-    background: #fff;
+    background: transparent;
     border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    box-shadow: none;
     transition: transform 0.4s ease;
     display: flex;
     align-items: center;
@@ -516,13 +516,15 @@ input[type="radio"],input[type="checkbox"]{
     z-index: 2;
 }
 input:checked + .toggle_button { background: #3b3b3b; }
-input:checked + .toggle_button .knob {
-    transform: translateX(21px);
-    background: transparent;
-    box-shadow: none;
-}
+input:checked + .toggle_button .knob { transform: translateX(21px); }
 .toggle_button svg,
-.toggle_button img { width: 16px; height: 16px; }
+.toggle_button img { width: 18px; height: 18px; }
+input:not(:checked) + .toggle_button .knob img {
+    filter: drop-shadow(0 0 0.6px rgba(120, 80, 0, 0.55)) drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.18));
+}
+input:checked + .toggle_button .knob img {
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.2));
+}
 #theme_toggle { display: none; }
 .theme_button {
     float: right;

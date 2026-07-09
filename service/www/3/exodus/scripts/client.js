@@ -1328,8 +1328,8 @@ function add_theme_toggle_btn() {
 	const knob = document.createElement('div');
 	knob.className = 'knob';
 
-	const sun_svg = `<svg viewBox="0 0 24 24" fill="none" stroke="#ffc53b" stroke-linecap="round" stroke-width="1.5"><circle cx="12" cy="12" r="6" fill="#ffc53b" stroke="none"/><path d="M12 6v-3M12 18v3M3.5 12h3M17.5 12h3M5.64 5.64l2.12 2.12M16.36 16.36l2.12 2.12M5.64 18.36l2.12-2.12M16.36 7.64l2.12-2.12"/></svg>`;
-	const moon_svg = `<img src="${gimagetheme}toggle_moon.svg" alt="" width="17" height="17" style="display:block">`
+	const sun_svg = `<img src="${gimagetheme}toggle_sun.svg" alt="" width="18" height="18" style="display:block">`
+	const moon_svg = `<img src="${gimagetheme}toggle_moon.svg" alt="" width="18" height="18" style="display:block">`
 
 	knob.innerHTML = gisdarktheme ? moon_svg : sun_svg;
 
