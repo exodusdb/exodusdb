@@ -516,8 +516,13 @@ input[type="radio"],input[type="checkbox"]{
     z-index: 2;
 }
 input:checked + .toggle_button { background: #3b3b3b; }
-input:checked + .toggle_button .knob { transform: translateX(21px); }
-.toggle_button svg { width: 24px; height: 24px; }
+input:checked + .toggle_button .knob {
+    transform: translateX(21px);
+    background: transparent;
+    box-shadow: none;
+}
+.toggle_button svg,
+.toggle_button img { width: 16px; height: 16px; }
 #theme_toggle { display: none; }
 .theme_button {
     float: right;
