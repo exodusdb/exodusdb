@@ -340,12 +340,22 @@ span.clsReadOnly:empty
 #exodus_menu .exodus_recordnav_group {
     float: left;
     white-space: nowrap;
-    margin: 2px 4px 2px 2px;
 }
 
+/* Horizontal spacing only — leave top/bottom margin and padding as other menubuttons */
 #exodus_menu .exodus_recordnav_group .menubutton {
-    margin: 0 !important;
-    padding: 1px 2px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+}
+
+#exodus_menu .exodus_recordnav_group > span:first-child .menubutton {
+    margin-left: 2px !important;
+}
+
+#exodus_menu .exodus_recordnav_group > span:last-child .menubutton {
+    margin-right: 2px !important;
 }
 
 #exodus_menu .exodus_recordnav_group #selectrecordbutton {
