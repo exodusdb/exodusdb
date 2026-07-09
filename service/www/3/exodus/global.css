@@ -3,7 +3,10 @@ TABLE.exodusform
 {
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 6px;
+    overflow: hidden;
     /*background-color: #ffffc0; /*cellpadding: 1;*/*/
     background-color: #fdf5e6;
     border-color: #d0d0d0;
