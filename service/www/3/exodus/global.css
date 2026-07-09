@@ -533,7 +533,6 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
     --h-color: #ffffff;
     --text-color: #fdfdfd;
     --radio-color: rgba(36, 100, 173, 1);
-    --radio-ring-color: #fdfdfd;
 }
 
 :root[data-theme="dark_mode"] BODY {
