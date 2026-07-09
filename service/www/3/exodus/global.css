@@ -337,6 +337,11 @@ span.clsReadOnly:empty
     color: inherit;
 }
 
+#exodus_menu .exodus_recordnav_group {
+    float: left;
+    white-space: nowrap;
+}
+
 .hamburger_menu {
     float: left;
     max-width: 65px;

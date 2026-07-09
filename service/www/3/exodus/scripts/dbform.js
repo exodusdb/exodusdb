@@ -1419,12 +1419,14 @@ async function formfunctions_onload() {
         if (tt2)
             buttonhtml += menubuttonhtml2('listrecord', glistimage, '<u>L</u>ist', 'List the current file. ' + AltorCtrl + '+L', 'L', buttonalign)
 
-        //NAVIGATION multirecord
+        //NAVIGATION multirecord — one floated group so they wrap together, not one-by-one
+        buttonhtml += '<span class="exodus_recordnav_group">'
         buttonhtml += menubuttonhtml2('firstrecord', gfirstimage, ' ', 'Open the first document. ' + AltorCtrl + '+{', '{', buttonalign)
         buttonhtml += menubuttonhtml2('previousrecord', gpreviousimage, ' ', 'Open the previous document. ' + AltorCtrl + '+[', '[', buttonalign)
         buttonhtml += menubuttonhtml2('selectrecord', gspacerimage, ' ', 'Select document. ' + AltorCtrl + '+^', '^', buttonalign)
         buttonhtml += menubuttonhtml2('nextrecord', gnextimage, ' ', 'Open the next document. ' + AltorCtrl + '+]', ']', buttonalign)
         buttonhtml += menubuttonhtml2('lastrecord', glastimage, ' ', 'Open the last document. ' + AltorCtrl + '+}', '}', buttonalign)
+        buttonhtml += '</span>'
 
     }
 
