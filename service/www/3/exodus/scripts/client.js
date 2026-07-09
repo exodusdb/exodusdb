@@ -699,7 +699,9 @@ function blockmodalui_sync() {
 	blocker = document.createElement('div')
 	blocker.style.width = '100%'
 	blocker.style.height = '100%'
-	blocker.style.background = 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
+	blocker.style.background = gisdarktheme
+		? 'rgba(24, 24, 24, 0.08)'//near-transparent dark tint, matches #181818 page
+		: 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
 	blocker.style.position = 'fixed'
 	blocker.style.top = '0'
 	blocker.style.left = '0'
