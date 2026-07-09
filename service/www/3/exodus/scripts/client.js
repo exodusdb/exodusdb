@@ -6149,13 +6149,10 @@ function decide_onload(decide_args) {
 			return
 
 		// Highlight row in popup when hovering over it
-		if (mode == 'over') {
-			trtag.setAttribute('mousesave', trtag.style.backgroundColor)
-			trtag.style.backgroundColor = 'lightgrey'
-		} else {
-			trtag.style.backgroundColor = trtag.getAttribute('mousesave')
-			trtag.removeAttribute('mousesave')
-		}
+		if (mode == 'over')
+			trtag.classList.add('decide_row_hover')
+		else
+			trtag.classList.remove('decide_row_hover')
 
 		return
 	}
