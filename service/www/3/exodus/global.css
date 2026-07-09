@@ -1,125 +1,252 @@
-/*must be first in order to customise screen form color*/
-TABLE.exodusform
-{
+/*================================-================================*/
+/*============================ THEMES =============================*/
+/*=================================================================*/
+/* Define ALL theme variables in both root and dark */
+/* Missing vars break styles on theme switch.*/
+
+/*Default Light Theme*/
+:root {
+
+    /* ALL VARIABLES ARE SHARED */
+
+    --exodus-bkgcolor: #f9f9f9;
+    --exodus-cardcolor: linear-gradient(to bottom, #fdf5e6, #fefbf5); /*Oldlace*/
+    /*see exodus_set_style for what happens if custom user card colour.*/
+    --exodus-textcolor: #000000;
+    --exodus-menubkgcolor: linear-gradient(to bottom, #f0f0f0, #ffffff);
+    --exodus-bordercolor: #d3d3d3;
+    --exodus-dotcolor: #000000;
+    --exodus-smallerbordercolor: #d8d8d8;
+    --exodus-buttonbordercolor: #9a9a9a;
+    --exodus-inputbordercolor: #4c4c4c;
+    --exodus-inputbackground: #ffffff;
+    /* Opacity is set so the radio color looks uniform in different card colors in light mode*/
+    --exodus-radiocolor: rgba(0, 84, 187, 0.596);
+    --exodus-buttoncolor: #f5f5f5;
+    --exodus-inputdisabled: #d4d4d4;
+    --exodus-boxshadow: #d8d8d8 0px 1px 1px;
+    --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
+    --exodus-popupblur: blur(5px);
+    --exodus-popupshadow: #444444 0px 0px 15px;
+    --exodus-popupborderwidth: 2px;
+    --exodus-buttonboxshadow: none;
+    --exodus-calendarbordercolor: 1px solid rgb(255, 255, 255, 0.325);
+    --exodus-calendarborderbottom: 1px solid #afafaf;
+    --exodus-menuhighlight: #d3d3d3;
+
+    /* Glass Button*/
+    --exodus-glass-button-bkg: rgba(255, 255, 255, 0);
+    --exodus-glass-grain-image: radial-gradient(circle, rgba(255, 255, 255, 0.5));
+    --exodus-glass-button-border: 1px solid rgba(255, 255, 255, 1);
+    --exodus-glass-button-border-radius: 9999px;
+    --exodus-glass-box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.05),
+        0 1px 3px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7), /* 0.7 was 0.9 before, toned down the white top highlight */
+        inset 0 -1px 3px rgba(0, 0, 0, 0.25);
+    --exodus-glass-blur: blur(10px);
+
+    --exodus-glass-hover-bkg:rgba(50, 50, 55, 0.78);
+    --exodus-glass-hover-border-color: rgba(255, 255, 255, 0.3);
+    --exodus-glass-hover-box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.12),
+        0 2px 6px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/*Dark Theme*/
+:root[data-theme="dark_mode"] {
+
+    /* ALL VARIABLES ARE SHARED */
+
+    --exodus-bkgcolor: #181818;
+    --exodus-cardcolor: linear-gradient(to top, #1e1e1e, #272727);
+    --exodus-textcolor: #ffffff;
+    --exodus-menubkgcolor: linear-gradient(to top, #1e1e1e, #272727);
+    --exodus-bordercolor: #2b2b2b;
+    --exodus-dotcolor: #fdfdfd;
+    --exodus-smallerbordercolor: #2b2b2b;
+    --exodus-buttonbordercolor: #343434;
+    --exodus-inputbordercolor: #4c4c4c;
+    --exodus-inputbackground: #f9f9f9;
+    --exodus-radiocolor: rgba(36, 100, 173, 1);
+    --exodus-buttoncolor: #292929;
+    --exodus-inputdisabled: #1f1f1f;
+    --exodus-boxshadow: #000 0px 0px 6.5px;
+    --exodus-menuboxshadow: #000 0px 1px 10px;
+    --exodus-popupblur: blur(10px);
+    --exodus-popupshadow: #000000  0px 0px 100px;
+    --exodus-popupborderwidth: 1px;
+    --exodus-buttonboxshadow: 0 5px 32px rgba(0, 0, 0, 0.1);
+    --exodus-calendarbordercolor: 1px solid #303030;
+    --exodus-calendarborderbottom: 1px solid #303030;
+    --exodus-menuhighlight: #303030;
+
+    /* Glass Button*/
+    --exodus-glass-button-bkg: transparent;
+    --exodus-glass-grain-image: transparent;
+    --exodus-glass-button-border: 1px solid rgba(255, 255, 255, 0.18);
+    --exodus-glass-button-border-radius: 9999px;
+    --exodus-glass-box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1), /*0.1 was 0.18 before, changed to 0.1 makes the top highlight more subtle in darkmode */
+        inset 0 -2px 3px rgba(0, 0, 0, 0.3);
+    --exodus-glass-blur: blur(12px);
+
+    --exodus-glass-hover-bkg:rgba(50, 50, 55, 0.75);
+    --exodus-glass-hover-border-color: rgba(255, 255, 255, 0.28);
+    --exodus-glass-hover-box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+/*Experimental themes kept at bottom of file*/
+
+TABLE.exodusform {
+    /*
+    exodusform was given to the tables of a screen that were visibly separate.
+    For example, Job File had one, what can best be described as a visible card.
+    Schedule file had many, vehicle lines, materials, versions; with one exception
+    were the Note fields exodusform and %/tax/total exodusform live in one "card".
+    */
+
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
     border-collapse: collapse;
-    /*background-color: #ffffc0; /*cellpadding: 1;*/*/
-    background-color: #fdf5e6;
+    /*background-color: #ffffc0; /*cellpadding: 1;*/
     border-color: #d0d0d0;
-    border-width: 1px 1px 1px 1px;
-    border-style:  solid; /* works in ie     border-right: thin;     border-left: thin;     border-bottom: thin;     border-top: thin;     */
+    /*border-width: 1px 1px 1px 1px;*/
+    border-style: solid;
     padding: 1px;
     text-align: left;
 }
 
-.exodusform > tbody > tr > td,.exodusform > tbody > tr > thead, .exodusform > thead > tr > th, .exodusform > thead > tr > td
-{
+/* Styling below is added to schedules_calendar.htm*/
+/* As borders were removed for 2026 UI revamp*/
+/* Problem with this solution is the border color cant be changed */
+/* between light and dark mode since its in the htm file*/
+/* .exodusform > tbody > tr > td, .exodusform > thead > tr > td {
     border: 1px lightgrey solid;
 }
+commented out on - 2026 UI revamp - minimalist*/
 
-TABLE
-{
-    border-collapse: collapse;
-    border-width: 0px;
-}
+/*=====================================-=====================================*/
+/*============================ IN-WINDOW POPUPS =============================*/
+/*===========================================================================*/
+.exodusconfirmdiv {
 
-@media print
-{
-    TABLE.exodusform
-    {
-        display: block;
+	/* Centers popup dynamically even if page is resized*/
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    inset: 0;
+
+    z-index: 1000;
+    position: fixed; /*fixed to position this popup above elements on the screen*/
+    text-align: center;
+    border: 1px solid grey; /* Only affects .calendar*/
+    border-radius: 10px !important;
+    padding: 10px;
+    box-shadow: 0px 0px 7px purple; /*should be overwritten*/
+
+    background: transparent !important;
+    box-shadow: var(--exodus-popupshadow) !important;
+    backdrop-filter: var(--exodus-popupblur) !important;
+    border-width: var(--exodus-popupborderwidth) !important;
+
+    /*Shared between default and dark theme*/
+    &.exodusconfirm_critical {
+        /* Should be changed to a weaker red, since users assume its a software error in this vibrant red color*/
+        /* and make only actual software errors be vibrant red,*/
+        border: 1px solid #ff3434; /*vibrant red*/
+    }
+    &.exodusconfirm_warning {
+        border: 1px solid #ffff99; /*yellow*/
+    }
+    &.exodusconfirm_info {
+        border: 1px solid #ddffdd; /*vibrant blue*/
+    }
+    &.exodusconfirm_question1 {
+        border: 1px solid #6262ff; /*light blue*/
+    }
+    & .statementclass {
+        color: var(--exodus-textcolor);
+        text-align: left;
+    }
+    & #exodusconfirmdiv_textinput {
+        color: var(--exodus-textcolor);
+        background: var(--exodus-inputbackground);
+        border-bottom: 1.7px dotted var(--exodus-dotcolor);
+        border-bottom: 1.7px solid #ff6428;
     }
 }
 
-BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
-{
+/* Moved out of .exodusconfirm and instead took styling from there instead of */
+/* Adding .exodusconfirm class onto calendars because calendar has different */
+/* Positioning in the screen, and .exodusconfirm is now dynamically centered */
+.calendar {
+    border: var(--exodus-calendarbordercolor);
+    border-radius: 10px !important;
+    border-width: var(--exodus-popupborderwidth) !important;
+    outline: none;
+    padding: 10px;
+    background: transparent !important;
+    box-shadow: var(--exodus-popupshadow) !important;
+    backdrop-filter: var(--exodus-popupblur) !important;
+
+    /*Calendar popup*/
+    & .weekDayHead, & .calendarHeader {
+        border-bottom: var(--exodus-calendarborderbottom);
+    }
+
+}
+
+#uiblockerdiv {
+    background: transparent !important;
+    backdrop-filter: blur(0.7px);
+}
+
+/*=====================================-=====================================*/
+/*============================ GLOBAL HTML TAGS =============================*/
+/*===========================================================================*/
+
+TABLE {
+    border-collapse: collapse;
+    border-width: 0px !important;
+}
+
+BODY {
+    background: var(--exodus-bkgcolor);
+}
+
+BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG {
     /*all rules with font-family will have their font-size controlled*/
     font-family: verdana,sans-serif,arial,helvetica;
-    font-size: 8pt;
+    font-size: 8pt; /*NB .clsReadOnly (usually symbolic "fields") use slightly bigger & see schedule_grid2list()*/
+    color: var(--exodus-textcolor);
     min-height: 13px;
     border: 1px;
+
 }
 
-BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus
-{
-    /*box-shadow: 0px 0px 10px #666666;
-    border-color: #9393f3;
-    opacity: 1;*/
-    outline:thin solid;
+/* Fields denoted by dotted lines. Use card background for cleaner look*/
+td, td * {
+    background: transparent !important;
 }
 
-BODY
-{
-    /*background: #ffffff;*/
-    background: #f9f9f9;
-    color: #000000;
-}
-
-.exodusbutton
-{
-    
-    background-color: #F0F0F0;
-    padding: 2px 3px;
-    /*font-size: 90%;*/
-    border-color: #cccccc;
-    border-width: 2px;
-    border-style: outset;
-    border-radius: 0.3rem;
-
-    /*float: left;*/
-/*    font-size: inherit;
-    margin: 2px;
-    cursor: pointer;
-    background-color: #f0f0f0;
-    padding: 4px 2px 5px 2px;
-
-    border-color: #cccccc;
-    border-width: 2px;
-    border-style: outset;
-    border-radius: 0.3rem;
-*/
-}
-
-BUTTON
-{
-    cursor: pointer;
-    background-color: #F0F0F0;
-    border-radius:0.3rem;
-}
-
-TH
-{
+TH {
     font-weight: normal;
     text-align: left;
     /*deprecated in html5 - removed to fix alignment issue in schedules*/
     /*vertical-align: baseline;*/
 }
-A:link
-{
-    color: #003399;
-    text-decoration: none;
-}
-A:visited
-{
-    color: #6699cc;
-    text-decoration: none;
-}
-A:hover
-{
-    /*text-decoration: underline;*/
-}
 
-
-P
-{
+P {
     margin-top: 0.5em;
     margin-bottom: 1em;
     line-height: 1.5em;
 }
 
-PRE
-{
+PRE {
     padding-right: 5pt;
     margin-top: 1em;
     padding-left: 5pt;
@@ -130,181 +257,106 @@ PRE
     padding-top: 5pt;
 }
 
-H1
-{
-    margin: 0px 0px 5px;
-    font-weight: normal;
-    font-size: 165%;
+/* TODO  for GB check if we want these font colorings for links and such*/
+/* Currently inactive as it is being overwridden by other stylings with !important*/
+A {
+    &:link {
+        color: #003399;
+        text-decoration: none;
+    }
+    &:visited {
+        color: #6699cc;
+        text-decoration: none;
+    }
+    &:hover {
+        /*text-decoration: underline;*/
+    }
 }
-H2
-{
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-    font-weight: bold;
-    font-size: 125%;
+
+
+
+/*=====================================-=====================================*/
+/*============================== PDF/PRINT VIEW =============================*/
+/*===========================================================================*/
+@media print {
+    TABLE.exodusform {
+        display: block;
+    }
 }
 
 
-H3
-{
-    margin-bottom: 0.5em;
-    font-weight: bold;
-    font-size: 115%;
-}
-H4
-{
-    margin-bottom: 0.5em;
-    font-weight: bold;
-    font-size: 100%;
-}
-H5
-{
-    margin-bottom: 0.5em;
-    font-weight: bold;
-    font-size: 67%;
-}
-H6
-{
-    margin-bottom: 0.5em;
-    font-weight: bold;
-    font-size: 50%;
+/*=====================================-=====================================*/
+/*================================= BUTTONS =================================*/
+/*===========================================================================*/
+.exodusbutton {
+    /* Base Glass */
+    background: var(--exodus-glass-button-bkg) !important;
+    /* Fake Grain / Noise */
+    background-image: var(--exodus-glass-grain-image) !important;
+
+    border: var(--exodus-glass-button-border);
+    border-radius: var(--exodus-glass-button-border-radius);
+    box-shadow: var(--exodus-glass-box-shadow);
+    backdrop-filter: var(--exodus-glass-blur);
+    padding: 3px 10px;
+    transition: all 0.25s ease;
+    
+    &:hover {
+        border-color: var(--exodus-glass-hover-border-color);
+        box-shadow: var(--exodus-glass-hover-box-shadow);
+        transform: translateY(-1px);
+        cursor: pointer;
+    }
 }
 
-/*.clsNotRequired*/
-/*{*/
-/*    background-color: #ffffff;*/
-/*    border: solid 1px #E0E0E0;*/
-/*    margin: 0px;*/
-/*    padding: 0px;*/
-/*}*/
-/**/
-/*.clsRequired*/
-/*{*/
-/*    background-color: #FFFFFF;*/
-/*    border: solid 1px #333333;*/
-/*    margin: 0px;*/
-/*    padding: 0px;*/
-/*}*/
-/* Abandoned feature to differentiate between required/non-required fields (different border colors)
-1.For better aesthetics 2.Feature was unintuitive 3.UI anyway alerts users for empty required fields
-Considered marking required fields with red *, but it would clutter dense screens like schedules
-Did not remove clsRequired class since it is used in few places like index.html */
-.clsRequired, .clsNotRequired
-{
-    background-color: #F9F9F9;
-    border: solid 1px #CCCCCC;
-    border-radius: 5px;
-    margin: 0px;
-    padding: 0 1px;
+/* customization of show all button*/
+/* since it is a button that has 2 lines of text, it needs different styling*/
+.exodusid_exodusgroup1showall {
+    border-radius: 18px;
+    padding-top: 4px;
 }
 
-.clsReadOnly
-{
-    background-color: #F9F9F9;
-    border: solid 1px #F4F4F4;
-    border-radius: 5px;
-    margin: 0px;
-    /*padding: 0px;*/
-    padding: 0 1px;
-    /*filter: alpha(opacity=80);
-    opacity: 0.80;*/
-}
-
-/*Removes the vertical white lines produced due to empty read-only fields*/
-/*Apply to span only since input type read-only fields need to show white empty field*/
-span.clsReadOnly:empty
-{
-    background-color: transparent;
-    border: none;
-}
-
-.menu:focus 
-{
-    outline: 0;
-}
-
-.menu
-{
-    /*font-size: inherit;*/
-    font-size: 15px;
-    position: absolute;
-    /*background-color: #F4F4F4;*/
-    background-color: #EEEEEE;
-    opacity: 0.98;
-    /*color: black;*/
-    color: #b0b0b0;
-    /*border-width: 2px;*/
-    border-width: 0.5px;
-    /*border-style: outset;*/
-    border-style: solid;
-    border-radius: 0.3rem;
-    /*border-color: Menu;*/
-    /*z-index: 999;*/
-    padding-left: 3px;
-    padding: 5px;
-    box-shadow: 1.5px 1.5px 1px rgba(0, 0, 0, 0.125);
-}
-
-.menuitem
-{
-    /*border: thin;*/
-    border-radius: 0.3rem;
-    white-space: nowrap;
-    /*width: 100%;*/
-    box-sizing: border-box;
-    color: black;
-    /*padding-left: 5px;*/
-    padding: 5px; /*z-index: 999;*/ /*should be double the font-size programmatically*/
-    /*line-height: 16pt;*/
-    line-height: 18pt;
+BUTTON {
     cursor: pointer;
+    border-radius:0.3rem;
 }
 
-.menuitem:link
-{
-    color: black;
-}
-.menuitem:visited
-{
-    color: black;
+BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus {
+    /*box-shadow: 0px 0px 10px #666666;*/
+    /*border-color: #9393f3;*/
+    /*opacity: 1;*/
+    outline: none;
 }
 
-
-.menuitem:hover
-{
-    padding: 5px;
-    cursor: pointer;
-}
-
-.menu_hr
-{
-    /*border:1px dotted lightgrey*/
-    border:1px solid lightgrey
-}
-
-.graphicbutton:hover
-{
-    border-color: #aaaaaa;
+SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus {
+    border-bottom: 1.7px solid #ff6428;
 }
 
 /*eg. Ok/Cancel buttons*/
-.graphicbutton
-{
-    float: left;
-    font-size: inherit;
-    background-color: #f0f0f0;
-    border-color: #cccccc;
-    margin: 2px;
-    border-width: 2px;
-    border-style: outset;
-    cursor: pointer;
-    padding: 4px 2px 5px 2px;
-    border-radius: 0.3rem;
+.graphicbutton {
+    background: var(--exodus-glass-button-bkg) !important;
+    background-image: var(--exodus-glass-grain-image) !important;
+
+    border: var(--exodus-glass-button-border);
+    border-radius: var(--exodus-glass-button-border-radius);
+    box-shadow: var(--exodus-glass-box-shadow);
+
+    backdrop-filter: var(--exodus-glass-blur);
+    -webkit-backdrop-filter: var(--exodus-glass-blur);
+
+    padding: 3px 10px;
+    transition: all 0.25s ease;
+
+    &:hover {
+        border-color: var(--exodus-glass-hover-border-color);
+        box-shadow: var(--exodus-glass-hover-box-shadow);
+        transform: translateY(-1px);
+        cursor: pointer;
+    }
 }
 
 /*eg. Refresh/New buttons*/
-.menubutton
-{
+.menubutton {
     float: left;
     background-color: inherit;
     border-color: #cccccc;
@@ -312,30 +364,408 @@ span.clsReadOnly:empty
     cursor: pointer;
     padding: 4px 2px 5px 2px;
     border-radius: 0.3rem;
+    &:hover {
+        /*background-color: highlight;*/
+        /*color: highlighttext;*/
+        background-color: var(--exodus-bordercolor);
+    }
 }
 
-.menubutton:hover {
-    /*background-color: highlight;*/
-    /*color: highlighttext;*/
-    background-color: lightgrey;
+/*=====================================-=====================================*/
+/* ================================ HEADERS =================================*/
+/* ==========================================================================*/
+H1 {
+    margin: 0px 0px 5px;
+    font-weight: normal;
+    font-size: 165%;
+    text-align: center;
 }
 
-
-:root {
-    --bg-color: #fff;
-    --h-color: #000;
-    /*--text-color: black;*/
-    --text-color: #D4D4D4;
-    --link-color: #006;
-    --radio-color: rgba(0, 84, 187, 0.596);
-    --border-color: #bbb;
-    --thead-color: #ccc;
-    --tbody-color-odd: #ddd;
-    --tbody-color-even: #eee;
-    --ok-color: #a0ffa0;
-    --fail-color: #ffa0a0;
-    --warning-color: #FF3403;
+H2 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    font-size: 125%;
 }
+
+H3 {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    font-size: 115%;
+}
+
+H4 {
+    /*for class="card" titles*/
+    margin-top: 0.2em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    font-size: 100%;
+}
+H5 {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    font-size: 67%;
+}
+H6 {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    font-size: 50%;
+}
+
+/*=====================================-=====================================*/
+/*=============================== DATA FIELDS ===============================*/
+/*===========================================================================*/
+
+.clsRequired, .clsNotRequired {
+    /*background-color: #F9F9F9;
+    border: solid 1px #CCCCCC;
+    border-radius: 5px;
+    2026 UI revamp*/
+    border: none;
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
+    margin: 0px;
+    padding: 0 1px;
+}
+
+.clsReadOnly {
+    border-radius: 5px;
+    margin: 0px;
+    /*padding: 0px;*/
+    padding: 0 1px;
+    /*filter: alpha(opacity=80);
+    opacity: 0.80;*/
+    background: transparent !important;
+    font-size: 9pt;
+}
+
+/* New tab popups with text area input */
+.exodusid_textinput {
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
+}
+
+/*=====================================-=====================================*/
+/*================================ MENU BAR =================================*/
+/*===========================================================================*/
+.menu {
+    font-size: 15px;
+    position: absolute;
+    border: 0.5px solid var(--exodus-smallerbordercolor);
+    border-radius: 10px;
+    padding-left: 3px;
+    padding: 5px;
+    box-shadow: 1.5px 1.5px 1px rgba(0, 0, 0, 0.125);
+    &:focus {
+        outline: 0;
+    }
+    background: var(--exodus-menubkgcolor) !important;
+}
+
+#menubutton_label {
+    background: transparent !important;
+}
+
+.menuitem {
+    border-radius: 0.3rem;
+    white-space: nowrap;
+    box-sizing: border-box;
+    padding: 5px; /*z-index: 999;*/ /*should be double the font-size programmatically*/
+    line-height: 18pt;
+    cursor: pointer;
+    color: var(--exodus-textcolor) !important;
+
+    /* TODO add different colors for different states below    if wanted*/
+    /* Currently they are not getting applied because of color: !important  above*/
+    &:link {
+        color: black;
+    }
+    &:visited {
+        color: black;
+    }
+    &:hover {
+        padding: 5px;
+        cursor: pointer;
+    }
+}
+
+.menu_hr {
+    border:1px solid var(--exodus-bordercolor);
+}
+
+#exodus_menu {
+    outline: var(--exodus-smallerbordercolor) solid 1px !important;
+    background: var(--exodus-menubkgcolor) !important;
+    box-shadow: var(--exodus-menuboxshadow);
+    color: var(--exodus-textcolor) !important;
+    display: block;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    padding: 5px 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.hamburger_menu {
+    float: left;
+    max-width: 65px;
+    padding-left: 5px;
+    border-right: 0.2px solid var(--exodus-smallerbordercolor);
+}
+
+.logout_wrapper {
+    float: right;
+    margin-right: 10px;
+    padding-left: 5px;
+    border-left: 0.2px solid var(--exodus-smallerbordercolor);
+}
+
+/*======= Theme Toggle =======*/
+.toggle_button {
+    position: relative;
+/*    width: 48px;*/
+/*    height: 26px;*/
+    width: 44px;
+    height: 22px;
+    background: #e1e1e1;
+    border-radius: 50px;
+    overflow: hidden;
+    transition: background 0.4s;
+    cursor: pointer;
+}
+
+.knob {
+    position: absolute;
+/*    width: 22px;*/
+/*    height: 22px;*/
+    width: 18px;
+    height: 18px;
+    top: 2px;
+    left: 2px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: transform 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+input:checked + .toggle_button {
+    background: #3b3b3b;
+}
+
+input:checked + .toggle_button .knob {
+    transform: translateX(21px);
+}
+
+svg { width: 24px; height: 24px; }
+
+#theme_toggle {
+    /* Hides checkbox */
+    display: none;
+}
+
+.theme_button {
+    float: right;
+    margin-right: 10px;
+    padding-left: 5px;
+    margin-top: 4px;
+}
+
+/*=====================================-=====================================*/
+/*============================ SCREEN CONTAINERS ============================*/
+/*============================ & NEW CARD DESIGN ============================*/
+/*=====================================-=====================================*/
+
+/*
+ ==== NEW CARD LAYOUT ===
+ The tables that group sets of fields has remained unchanged. (.exodusform)
+ Instead of using table/tr/td to control the layout of those "inner" .exodusform
+ tables, we switched to converted the "outer" table/tr/td to divs with flexbox atttribute.
+ The mental model is practically the same, rows with cells.
+  The top most table is now a div with class .form-container + .form-container--medium,--large
+  The rows are divs with class .card-row, the cells, .card-cell and finally oddly .card
+  The diff between .card-cell and .card is merely formatting, may get consolidated later
+  Inside the .card div are the original unchanged .exodusform tables of labels/fields
+
+ The flexbox css allows for a more modern and dynamic control of layout, and allowed
+ us to move one step forward towards mobile friendly because now cards on rows, fold to new row
+ depending on the available width, means users can scroll downwards instead of sideways most of the time
+
+ The .form-container[--medium,--large] mainly control the width of card-rows within the screen
+  .form-container : List of XXXX/Media diary, is the most "relaxed" container
+  --large:  Schedule File for example, stretches cards (evenly) to use near full width of screen
+  --medium: Job File (one cell per row type screen) stretches cards evenly to match largest card width
+
+*/
+/*.formpage tr.heading th { TODO .heading only used in ratecard. Remove it and just do bolding there*/
+/*  font-weight: bold;*/
+/*    font-size: 12px;*/
+/*}*/
+.tightpadding td {
+    padding: 1px !important;
+}
+
+.form-container {
+    /* Base class. To be used with .form-container--medium .form-container--large*/
+    /*Container for screens with multi cards of different widths
+    but do not require max width of screen */
+    box-sizing: border-box;
+    & td {
+        padding: 5px;
+    }
+    & tr.heading th {
+        font-weight: bold;
+        font-size: 12px;
+    }
+}
+
+/*Extend .form-container with this*/
+.form-container--medium {
+    /*Container for screens where there is one card per row
+    and the card widths are uniform. e.g Job File, Company File*/
+    width: max-content;
+
+    /*Controls screen padding*/
+    /*padding-inline: 30px;*/
+    margin-left: auto;
+    margin-right: auto;
+
+    /*IDENTICAL CODE IN .form-container--medium AND .form-container--large*/
+    & .card-row {
+        /*justify-content overriden in journals.htm*/
+        justify-content: normal;
+        & .card-cell {
+            /*Override default .card-row
+            'flex: 0' to grow to max space*/
+            flex: 1 1 auto;
+        }
+    }
+}
+
+/*Extend .form-container with this*/
+.form-container--large {
+    /*To be used for forms that require as much width as possible*/
+    width: 100%;
+    box-sizing: border-box;
+
+    /*Controls screen padding*/
+    padding-inline: 30px;
+
+    /*IDENTICAL CODE IN .form-container--medium AND .form-container--large*/
+    & .card-row {
+        /*justify-content overriden in journals.htm*/
+        justify-content:normal;
+        & .card-cell {
+            /*Override default .card-row
+            'flex: 0' to grow to max space*/
+            flex: 1 1 auto;
+        }
+    }
+
+    /*Effectively the same idea as &nbsp but between cards
+    however could not work out how to fold cards in a group
+    when the view port was skinner than the group's miniumum width
+    & .card-row {
+        & .card-group {
+            flex-wrap: nowrap;
+        }
+    }
+    */
+}
+
+.card-row {
+    /*controls how and where cards appear in row + wrap*/
+    display: flex;        /*1 1 auto: enables default flexbox behavior in direct childen*/
+    flex-wrap: wrap;      /*allow flexbox childs to wrap*/
+    gap: 10px;            /*spacing flexbox childen and wrapped row*/
+    align-items: stretch; /*Match tallest ???, pointless? card-row parents are not flexbox containers*/
+    width: 100%;          /*obvs*/
+    box-sizing: border-box; /* Removed.. no noticable diff on sch file*/
+    margin-bottom: 8px;
+    justify-content: center; /*overridden in journals.htm to left*/
+    & + .card-row {
+        /*Vertical spacing between card rows*/
+        margin-top: 10px;
+    }
+    /*Used on auth file to force users/task cells to be
+    side by side for better usability*/
+    & .cell-group {
+        flex-wrap: nowrap;
+    }
+}
+
+.card-cell {
+    /*Spacing and internal layout of card*/
+    flex: 0 1 auto;
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.card {
+    /*Individual cards visual appearance*/
+    border: 1px solid var(--exodus-bordercolor);
+    border-radius: 10px;
+    padding: 5px;
+    box-sizing: border-box;
+    /* make the visual card fill the cell vertically */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1 1 auto;
+    box-shadow: var(--exodus-boxshadow);
+    background: var(--exodus-cardcolor) !important;
+}
+
+/*TODO: REPLACE .card and .card-cell with this new merged class*/
+/*      REMOVE the '& .card-cell {' in the medium and large form-containers too*/
+/*      REMOVE ALL DIVS with .card-cell in htm files*/
+/*.card {*/
+/*    /* Cell + Card combined */
+/*    flex: 1 1 auto;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    gap: 10px;*/
+/*    align-items: stretch;*/
+/*    height: 100%;*/
+/**/
+/*    /* Card visuals */
+/*    border: 1px solid var(--exodus-bordercolor);*/
+/*    border-radius: 10px;*/
+/*    padding: 5px;*/
+/*    box-sizing: border-box;*/
+/*    box-shadow: var(--exodus-boxshadow);*/
+/*    background: var(--exodus-cardcolor) !important;*/
+/*}*/
+
+/* Complicated to apply class="card-title" to schedules.htm as it breaks positioning*/
+/* Why does it have to be accessed like this, cant we just do .card-title directly*/
+/*.card > .card-title {*/
+.card-title {
+    margin-bottom: -4px;
+    display: block;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+/*Needed for Address File, img field grouping*/
+/*Address file is the only screen where joel's
+img to group fields has been preserved because it
+looks barren without now, after having gotton use to it..*/
+.section-title {
+    max-width: 50px; /*ensures fn labels of vertically consec cards align*/
+    min-width: 50px; /*ditto*/
+    width: 50px;     /*ditto*/
+    text-align: center;
+    font-weight: bold;
+}
+
+/*CARDS SECTION END*/
 
 input[type=radio] {
     /*how to override radio/checkbox style*/
@@ -346,33 +776,29 @@ input[type=radio] {
     appearance: none;
     width: 14px;
     height: 14px;
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--exodus-inputbordercolor);
+
     /*transition: 0.1s all linear;*/
     margin-right: 5px;
     margin-bottom: 2px;
     /*position: relative;*/
     /*top: 2px;*/
-    background-color: var(--bg-color);
     /*transition: 0.1s all linear;*/
     vertical-align: middle;
 
     /*radio only*/
     border-radius: 50%;
-    
 }
 
 input[type=radio]:checked {
-    border: 4px solid var(--radio-color);
+    border: 4px solid var(--exodus-radiocolor) !important;
+    background: var(--exodus-inputbackground) !important;
     /*transition: 0.1s all linear;*/
 }
 
 :checked+label {
     font-weight: bold;
-    color: var(--h-color);
-}
-
-select {
-    color: var(--h-color);
+    color: black;
 }
 
 input[type=checkbox] {
@@ -384,36 +810,82 @@ input[type=checkbox] {
     appearance: none;
     width: 14px;
     height: 14px;
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--exodus-inputbordercolor);
     /*transition: 0.1s all linear;*/
     margin-right: 5px;
     margin-bottom: 1px;
     /*position: relative;*/
     /*top: 2px;*/
-    background-color: var(--bg-color);
+    background-color: var(--bg-colorS);
     vertical-align: middle;
     /*border-radius: 20%;*/
     border-radius: 2px;
 }
 
 input[type=checkbox]:checked {
-    background-color:var(--radio-color);
+    background-color:var(--exodus-radiocolor) !important;
     border: 0px;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' fill='white' viewBox='-100 -100 1300 1300'> <path d='m7.7,404.6c0,0 115.2,129.7 138.2,182.68l99,0c41.5-126.7 202.7-429.1 340.92-535.1c28.6-36.8-43.3-52-101.35-27.62-87.5,36.7-252.5,317.2-283.3,384.64-43.7,11.5-89.8-73.7-89.84-73.7z'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' fill='white' viewBox='-100 -100 1300 1300'> <path d='m7.7,404.6c0,0 115.2,129.7 138.2,182.68l99,0c41.5-126.7 202.7-429.1 340.92-535.1c28.6-36.8-43.3-52-101.35-27.62-87.5,36.7-252.5,317.2-283.3,384.64-43.7,11.5-89.8-73.7-89.84-73.7z'/></svg>") !important;
 }
 
 input:disabled {
-    background-color:#eee !important;
-    border-color: lightgrey;
+    background-color: var(--exodus-inputdisabled) !important;
+    border-color: transparent !important;
 }
 
-input[type="radio"],input[type="checkbox"]{
+input[type="radio"],input[type="checkbox"] {
     cursor:pointer;
 }
 
 /*must be last*/
-
-.demotext
-{
+.demotext {
     display: none;
 }
+
+
+/*Experimental very dark theme
+:root[data-theme="dark_black"] {
+    --exodus-bkgcolor: #050505;
+    --exodus-cardcolor: linear-gradient(to top, #111111, #090909);
+    --exodus-textcolor: #ffffff;
+    --exodus-menubkgcolor: linear-gradient(to top, #111111, #090909);
+    --exodus-bordercolor: #2b2b2b;
+    --exodus-dotcolor: #fdfdfd;
+    --exodus-smallerbordercolor: #323232;
+    --exodus-buttonbordercolor: #343434;
+    --exodus-inputbordercolor: #4c4c4c;
+    --exodus-buttoncolor: #3b3b3b;
+    --exodus-accentcolor: #ff6f6f;
+    --exodus-inputdisabled: #1f1f1f;
+    --exodus-boxshadow: none;
+    --exodus-menuboxshadow: #000 0px 1px 10px;
+    --exodus-popupblur: blur(15px);
+    --exodus-popupshadow: #000000  0px 0px 100px;
+    --exodus-popupborderwidth: 1px;
+    --exodus-buttonboxshadow: 0 5px 32px rgba(0, 0, 0, 0.1);
+}*/
+
+/*
+Experimental: Shake the field related to the error popup message,
+to better grab user attention
+Highlight field that requires input, and used to shake to better focus users attention
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+HOW TO USE: add/remove class 'shake' on the element you want to shake
+            then add css below to existing element ruleset
+&.means if element has both classes (1. = '&',  2. = '.className')
+&.shake {
+    animation: shake 0.4s ease;
+}
+HOW IT WORKS: when the class 'shake is added' &.shake ruleset becomes live and performs animation 'shake'
+JS EXAMPLE:
+if (text_input_popup) {
+  text_input_popup.classList.remove('shake')
+    void text_input_popup.offsetWidth
+    text_input_popup.classList.add('shake')
+    text_input_popup.querySelector('#textinput').focus()
+}
+*/
