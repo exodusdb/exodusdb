@@ -340,6 +340,17 @@ span.clsReadOnly:empty
 #exodus_menu .exodus_recordnav_group {
     float: left;
     white-space: nowrap;
+    margin: 2px 4px 2px 2px;
+}
+
+#exodus_menu .exodus_recordnav_group .menubutton {
+    margin: 0 !important;
+    padding: 1px 2px !important;
+}
+
+#exodus_menu .exodus_recordnav_group #selectrecordbutton {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
 }
 
 .hamburger_menu {
