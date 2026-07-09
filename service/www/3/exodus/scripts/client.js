@@ -3818,7 +3818,6 @@ async function sorttable(event, order) {
 	var colid = event.target.sorttableelementid
 
 	if (typeof form_presort == 'function') {
-		await exodusevaluate('await form_presort(','form_presort');
 		if (!(await form_presort(colid)))
 			return await exodusinvalid()
 	}
@@ -3971,7 +3970,6 @@ async function sorttable(event, order) {
 	gds.data['group' + groupno] = newdatarows
 
 	if (typeof form_postsort == 'function') {
-		await exodusevaluate('await form_postsort(','form_postsort');
 		if (!(await form_postsort(colid)))
 			return await exodusinvalid()
 	}
