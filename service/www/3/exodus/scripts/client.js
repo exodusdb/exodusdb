@@ -1280,10 +1280,15 @@ async function exoduswarning(msg) {
 	return await exodusnote(msg, 'warning')
 }
 
+function theme_toggle_title(dark) {
+	return dark ? 'Switch to light mode' : 'Switch to dark mode'
+}
+
 function add_theme_toggle_btn() {
 
 	// Interactive theme toggle: hidden checkbox + styled label (with SVGs + CSS animation).
 	const label = document.createElement('label');
+	label.title = theme_toggle_title(gisdarktheme);
 
 	const input = document.createElement('input');
 	input.type = 'checkbox';
@@ -1309,6 +1314,7 @@ function add_theme_toggle_btn() {
 		knob.innerHTML = input.checked ? moon_svg : sun_svg;
 		theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
 		exodussetcookie(glogincode, 'theme', (gisdarktheme ? 1 : ''), 'dt', true)
+		label.title = theme_toggle_title(gisdarktheme)
 	});
 
 	return label;
