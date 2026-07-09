@@ -47,7 +47,7 @@ var glogsettimeout
 var gimagetheme = '../../exodus/images/theme2/'
 //var gmenuimage=gimagetheme+'menu.png'//'add.png'
 var gmenuimage = gimagetheme + 'menu_burger.svg'
-var glogoutimage = gimagetheme + 'disconnect.png' //'add.png'
+var glogoutimage = gimagetheme + 'disconnect.svg'
 var grefreshimage = gimagetheme + 'refresh.svg'
 var gthemeimage = gimagetheme + 'theme_button.svg'
 var gcompanyimage = gimagetheme + 'formpage_companies.svg'
@@ -1284,6 +1284,17 @@ function theme_toggle_title(dark) {
 	return dark ? 'Switch to light mode' : 'Switch to dark mode'
 }
 
+function exodus_set_theme_icons() {
+
+	gmenuimage = gimagetheme + (gisdarktheme ? 'menu_burger_darkmode.svg' : 'menu_burger.svg')
+	glogoutimage = gimagetheme + (gisdarktheme ? 'disconnect_darkmode.svg' : 'disconnect.svg')
+	grefreshimage = gimagetheme + (gisdarktheme ? 'refresh_darkmode.svg' : 'refresh.svg')
+	if (typeof gnewimage != 'undefined') {
+		gnewimage = gimagetheme + (gisdarktheme ? 'application_form_add_darkmode.svg' : 'application_form_add.svg')
+		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.svg' : 'open.svg')
+	}
+}
+
 function add_theme_toggle_btn() {
 
 	// Interactive theme toggle: hidden checkbox + styled label (with SVGs + CSS animation).
@@ -1346,12 +1357,14 @@ function theme_toggle(theme = 'default') {
 	// Switch colour of button icons after page load
 	const xform_postload = document.readyState === 'complete'
 	if (xform_postload) {
-		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage }
+		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage, 'gmenuimage': gmenuimage, 'glogoutimage': glogoutimage, 'grefreshimage': grefreshimage, 'gnewimage': gnewimage, 'gopenimage': gopenimage }
 		if (gdatafilename == 'ADDRESSES')
 			icon_paths['gcompanyimage'] = gcompanyimage
 		const filetype_rex = /(\.[a-zA-Z]+$)/
 
 		for (let [icon_varname, icon_path] of Object.entries(icon_paths)) {
+			if (!icon_path)
+				continue
 			document.querySelectorAll(`img[src*="${icon_path}"]`).forEach(img => {
 				if (gisdarktheme)
 					img.setAttribute('src', img.getAttribute('src').replace(filetype_rex, "_darkmode$1"))
@@ -1363,6 +1376,8 @@ function theme_toggle(theme = 'default') {
 			});
 		}
 	}
+
+	exodus_set_theme_icons()
 
 	return true
 }
