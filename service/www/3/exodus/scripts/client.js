@@ -4199,6 +4199,7 @@ function menuclose() {
 	if (gnmenus == 0) {
 		menuhide()
 		var xmenubutton = $$('menubutton')
+		xmenubutton.style.background = ''
 		xmenubutton.style.backgroundColor = ''
 		xmenubutton.style.color = ''
 		xmenubutton.tabIndex = 9999
@@ -4361,6 +4362,7 @@ function menuchangeoption(menu, newmenuoption) {
 	//clear old menu item to default colors
 	var menuoption = menu.highlightedelement
 	if (menuoption) {
+		menuoption.style.background = ''
 		menuoption.style.backgroundColor = ''
 		menuoption.style.color = ''
 	}
