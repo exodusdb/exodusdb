@@ -485,15 +485,16 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 }
 
 :root[data-theme="dark_mode"] TABLE.exodusform {
-    background-color: #272727 !important;
-    border-color: #2b2b2b !important;
+    /* Warm dark taupe — analogue of light-mode oldlace on grey page background */
+    background-color: #322e28 !important;
+    border-color: #4a443c !important;
 }
 
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > thead,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > th,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > td {
-    border-color: #2b2b2b !important;
+    border-color: #4a443c !important;
 }
 
 :root[data-theme="dark_mode"] .clsRequired,
