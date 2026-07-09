@@ -306,7 +306,8 @@ function exodus_client_init() {
 			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#544836!important}'
 			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]),'
 			+ ':root[data-theme=dark_mode] SELECT,:root[data-theme=dark_mode] TEXTAREA{'
-			+ 'background-color:#292929!important;color:#fff!important;border-color:#4c4c4c!important}'
+			+ 'background-color:transparent!important;color:#fff!important;border:none!important;'
+			+ 'border-bottom:1.7px dotted #fdfdfd!important}'
 			+ '</style>')
 	}
 

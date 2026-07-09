@@ -41,12 +41,19 @@ BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
     border: 1px;
 }
 
-BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus
+BUTTON:focus, SPAN:focus
 {
     /*box-shadow: 0px 0px 10px #666666;
     border-color: #9393f3;
     opacity: 1;*/
     outline:thin solid;
+}
+
+/* EXPERIMENTAL: async-ui underline text entry (not committed) */
+SELECT:focus, TEXTAREA:focus, INPUT:focus:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image])
+{
+    outline: none;
+    border-bottom: 1.7px solid #ff6428;
 }
 
 BODY
@@ -191,23 +198,39 @@ Considered marking required fields with red *, but it would clutter dense screen
 Did not remove clsRequired class since it is used in few places like index.html */
 .clsRequired, .clsNotRequired
 {
-    background-color: #F9F9F9;
-    border: solid 1px #CCCCCC;
-    border-radius: 5px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
+    border-radius: 0;
     margin: 0px;
     padding: 0 1px;
 }
 
 .clsReadOnly
 {
-    background-color: #F9F9F9;
-    border: solid 1px #F4F4F4;
-    border-radius: 5px;
+    background: transparent !important;
+    border: none;
+    border-radius: 0;
     margin: 0px;
     /*padding: 0px;*/
     padding: 0 1px;
+    font-size: 9pt;
     /*filter: alpha(opacity=80);
     opacity: 0.80;*/
+}
+
+/* EXPERIMENTAL: async-ui underline text entry */
+INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+SELECT,
+TEXTAREA {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
+    border-radius: 0;
+}
+
+.exodusid_textinput {
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
 }
 
 /*Removes the vertical white lines produced due to empty read-only fields*/
@@ -393,6 +416,7 @@ span.clsReadOnly:empty
     --exodus-smallerbordercolor: #d8d8d8;
     --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
     --exodus-menuhighlight: #d3d3d3;
+    --exodus-dotcolor: #000000;
     --radio-color: rgba(0, 84, 187, 0.596);
     --radio-ring-color: #999999;
     --border-color: #bbb;
@@ -570,6 +594,7 @@ input:checked + .toggle_button .knob img {
     --exodus-smallerbordercolor: #2b2b2b;
     --exodus-menuboxshadow: #000 0px 1px 10px;
     --exodus-menuhighlight: #666666;
+    --exodus-dotcolor: #fdfdfd;
     --bg-color: #1e1e1e;
     --h-color: #ffffff;
     --text-color: #fdfdfd;
@@ -598,21 +623,23 @@ input:checked + .toggle_button .knob img {
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]),
 :root[data-theme="dark_mode"] SELECT,
 :root[data-theme="dark_mode"] TEXTAREA {
-    background-color: #292929;
-    border-color: #4c4c4c;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
     color: #ffffff;
 }
 
 :root[data-theme="dark_mode"] .clsRequired,
 :root[data-theme="dark_mode"] .clsNotRequired {
-    background-color: #292929;
-    border-color: #4c4c4c;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
     color: #ffffff;
 }
 
 :root[data-theme="dark_mode"] .clsReadOnly {
-    background-color: #1f1f1f;
-    border-color: #343434;
+    background: transparent !important;
+    border: none;
     color: #ffffff;
 }
 
@@ -668,9 +695,10 @@ input:checked + .toggle_button .knob img {
     color: #ffffff;
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #exodusconfirmdiv_textinput {
-    color: #000000;
-    background: #f9f9f9;
-    border: 1px solid var(--exodusconfirm-border);
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    border-bottom: 1.7px dotted var(--exodus-dotcolor);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 {
     border-color: var(--exodusconfirm-border);
