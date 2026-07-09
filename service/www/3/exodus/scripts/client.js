@@ -1293,6 +1293,7 @@ function exodus_set_theme_icons() {
 	grefreshimage = gimagetheme + (gisdarktheme ? 'refresh_darkmode.svg' : 'refresh.svg')
 	if (typeof gnewimage != 'undefined') {
 		gnewimage = gimagetheme + (gisdarktheme ? 'application_form_add_darkmode.png' : 'application_form_add.png')
+		gdeleteimage = gimagetheme + (gisdarktheme ? 'application_form_delete_darkmode.png' : 'application_form_delete.png')
 		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.gif' : 'open.gif')
 		gsaveimage = gimagetheme + (gisdarktheme ? 'tick_darkmode.png' : 'tick.png')
 		gsavegreyimage = gimagetheme + (gisdarktheme ? 'tickgrey_darkmode.png' : 'tickgrey.png')
@@ -1361,7 +1362,7 @@ function theme_toggle(theme = 'default') {
 	// Switch colour of button icons after page load
 	const xform_postload = document.readyState === 'complete'
 	if (xform_postload) {
-		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage, 'gmenuimage': gmenuimage, 'glogoutimage': glogoutimage, 'grefreshimage': grefreshimage, 'gnewimage': gnewimage, 'gopenimage': gopenimage, 'gsaveimage': gsaveimage, 'gsavegreyimage': gsavegreyimage }
+		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage, 'gmenuimage': gmenuimage, 'glogoutimage': glogoutimage, 'grefreshimage': grefreshimage, 'gnewimage': gnewimage, 'gdeleteimage': gdeleteimage, 'gopenimage': gopenimage, 'gsaveimage': gsaveimage, 'gsavegreyimage': gsavegreyimage }
 		if (gdatafilename == 'ADDRESSES')
 			icon_paths['gcompanyimage'] = gcompanyimage
 		const filetype_rex = /(\.[a-zA-Z]+$)/
