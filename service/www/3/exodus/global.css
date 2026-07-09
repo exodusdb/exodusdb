@@ -630,7 +630,7 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
     border-color: var(--exodusconfirm-border);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
-    background-color: rgba(255, 255, 255, 0.07);
+    background-color: rgba(255, 255, 255, 0.18);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton {
     border-width: 2px;
