@@ -45,6 +45,8 @@ gdeleterowimage = gimagetheme + 'delete_darkmode.svg'
 gcalendarimage = gimagetheme + 'calendar_darkmode.svg'
 gnewimage = gimagetheme + 'application_form_add_darkmode.png'
 gopenimage = gimagetheme + 'open_darkmode.gif'
+gsaveimage = gimagetheme + 'tick_darkmode.png'
+gsavegreyimage = gimagetheme + 'tickgrey_darkmode.png'
 }
 
 // document.getElementsByTagName('BODY').onload=window_onload
