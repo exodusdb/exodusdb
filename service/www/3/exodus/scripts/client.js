@@ -299,6 +299,17 @@ function exodus_client_init() {
 	// default theme (light or user color) mode to dark theme if dark theme is active
 	theme_toggle(exodusgetcookie2('dt', 'theme') ? 'dark_mode' : 'default')
 
+	// Inline dark input colours before global.css loads — prevents white input flash
+	if (gisdarktheme) {
+		document.writeln('<style id="exodus_dm_flashguard">'
+			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#181818!important;color:#fff}'
+			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#544836!important}'
+			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]),'
+			+ ':root[data-theme=dark_mode] SELECT,:root[data-theme=dark_mode] TEXTAREA{'
+			+ 'background-color:#292929!important;color:#fff!important;border-color:#4c4c4c!important}'
+			+ '</style>')
+	}
+
 	//style sheet
 	document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
 

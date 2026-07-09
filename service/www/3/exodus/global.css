@@ -557,6 +557,14 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
     border-color: #7a6b58 !important;
 }
 
+:root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]),
+:root[data-theme="dark_mode"] SELECT,
+:root[data-theme="dark_mode"] TEXTAREA {
+    background-color: #292929;
+    border-color: #4c4c4c;
+    color: #ffffff;
+}
+
 :root[data-theme="dark_mode"] .clsRequired,
 :root[data-theme="dark_mode"] .clsNotRequired {
     background-color: #292929;
