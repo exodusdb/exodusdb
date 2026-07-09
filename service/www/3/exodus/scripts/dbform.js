@@ -9,7 +9,7 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 gnewimage = gimagetheme + 'application_form_add.png'
 gopenimage = gimagetheme + 'open.gif'
 gfindimage = gimagetheme + 'zoom.svg'
-gcalendarimage = gimagetheme + 'calendar.gif'
+gcalendarimage = gimagetheme + 'calendar.svg'
 gsaveimage = gimagetheme + 'tick.png'
 gsavegreyimage = gimagetheme + 'tickgrey.png'
 gcopyimage = gimagetheme + 'page_copy.png'
@@ -40,6 +40,9 @@ gthemeimage = gimagetheme + 'theme_button_darkmode.svg'
 gprintsendimage = gimagetheme + 'printer_darkmode.svg'
 glistimage = gimagetheme + 'table_darkmode.svg'
 gcompanyimage = gimagetheme + 'formpage_companies_darkmode.svg'
+ginsertrowimage = gimagetheme + 'add_darkmode.svg'
+gdeleterowimage = gimagetheme + 'delete_darkmode.svg'
+gcalendarimage = gimagetheme + 'calendar_darkmode.svg'
 }
 
 // document.getElementsByTagName('BODY').onload=window_onload

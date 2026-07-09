@@ -1346,7 +1346,7 @@ function theme_toggle(theme = 'default') {
 	// Switch colour of button icons after page load
 	const xform_postload = document.readyState === 'complete'
 	if (xform_postload) {
-		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage }
+		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage }
 		if (gdatafilename == 'ADDRESSES')
 			icon_paths['gcompanyimage'] = gcompanyimage
 		const filetype_rex = /(\.[a-zA-Z]+$)/
