@@ -645,6 +645,10 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
     border-color: #343434;
 }
 
+:root[data-theme="dark_mode"] #uiblockerdiv {
+    background: rgba(24, 24, 24, 0.08) !important;
+}
+
 /*must be last*/
 
 .demotext
