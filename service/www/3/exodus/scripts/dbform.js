@@ -4196,8 +4196,7 @@ async function closedoc(mode) {
 async function saveandunlockdoc() {
     if (!(await validateupdate()))
         return false
-    // isnewrecord: form_postread may populate data without setting gchangesmade
-    if ((gchangesmade || gds.isnewrecord) && !(await savedoc()))
+    if (gchangesmade && !(await savedoc()))
         return false
     if (!(await unlockdoc()))
         return false
