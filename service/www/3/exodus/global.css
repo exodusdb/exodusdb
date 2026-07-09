@@ -566,9 +566,11 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 }
 
 :root[data-theme="dark_mode"] .menu {
-    background-color: #272727 !important;
+    background-color: #544836 !important;
     color: #ffffff;
-    border-color: #2b2b2b;
+    opacity: 1;
+    border: 1px solid #7a6b58;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 :root[data-theme="dark_mode"] .menuitem,
@@ -578,7 +580,7 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 }
 
 :root[data-theme="dark_mode"] .menu_hr {
-    border-color: #2b2b2b;
+    border-color: #7a6b58;
 }
 
 :root[data-theme="dark_mode"] .graphicbutton,
