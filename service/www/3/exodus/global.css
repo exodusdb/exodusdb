@@ -421,17 +421,33 @@ input[type="radio"],input[type="checkbox"]{
     margin: auto;
     inset: 0;
     text-align: center;
-    background: lightgrey;
-    border: 1px solid grey;
+    background: #e8e8e8;
+    border: 2px solid #666666;
     border-radius: 10px;
     padding: 10px;
-    box-shadow: 0px 0px 7px #666666;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
     overflow: auto;
 }
-.exodusconfirmdiv.exodusconfirm_critical { background-color: #ffdddd; }
-.exodusconfirmdiv.exodusconfirm_warning { background-color: #ffff99; }
-.exodusconfirmdiv.exodusconfirm_info { background-color: #ddffdd; }
-.exodusconfirmdiv.exodusconfirm_question1 { background-color: #ddddff; }
+.exodusconfirmdiv .statementclass {
+    color: #000000;
+    text-align: left;
+}
+.exodusconfirmdiv.exodusconfirm_critical {
+    background-color: #ffdddd;
+    border-color: #cc3333;
+}
+.exodusconfirmdiv.exodusconfirm_warning {
+    background-color: #ffff99;
+    border-color: #b8a800;
+}
+.exodusconfirmdiv.exodusconfirm_info {
+    background-color: #ddffdd;
+    border-color: #339933;
+}
+.exodusconfirmdiv.exodusconfirm_question1 {
+    background-color: #ddddff;
+    border-color: #4444cc;
+}
 
 /* ========== Theme toggle (top-right menubar) ========== */
 .toggle_button {
@@ -542,15 +558,38 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 :root[data-theme="dark_mode"] A:visited { color: #9db4cc; }
 
 :root[data-theme="dark_mode"] .exodusconfirmdiv {
-    background: #272727;
-    border-color: #444444;
+    background: #3a3530;
+    border: 2px solid #b8a99a;
     color: #ffffff;
-    box-shadow: 0px 0px 15px #000000;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
-:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical { background-color: #3d2020; }
-:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_warning { background-color: #3d3d20; }
-:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_info { background-color: #203d20; }
-:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_question1 { background-color: #20203d; }
+:root[data-theme="dark_mode"] .exodusconfirmdiv .statementclass {
+    color: #ffffff;
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv #exodusconfirmdiv_textinput {
+    color: #000000;
+    background: #f9f9f9;
+    border: 1px solid #b8a99a;
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 {
+    border-color: #7a6b58;
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {
+    background-color: #4a2828;
+    border-color: #e06060;
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_warning {
+    background-color: #4a4428;
+    border-color: #d4c040;
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_info {
+    background-color: #284a28;
+    border-color: #60c060;
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_question1 {
+    background-color: #28304a;
+    border-color: #7070e0;
+}
 
 :root[data-theme="dark_mode"] input:disabled {
     background-color: #1f1f1f !important;
