@@ -1327,12 +1327,14 @@ function theme_toggle(theme = 'default') {
 
 	if (theme == 'default') {
 		gisdarktheme = false
-		exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
 		html.removeAttribute('data-theme')
+		html.style.removeProperty('--exodus-cardcolor')
+		if (document.querySelector("link[href='../exodus/global.css']"))
+			exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
 	} else {
 		gisdarktheme = true
 		html.setAttribute('data-theme', theme)
-		html.style.removeProperty('--exodus-cardcolor');
+		html.style.removeProperty('--exodus-cardcolor')
 	}
 
 	// Switch colour of button icons after page load
@@ -1361,44 +1363,38 @@ function theme_toggle(theme = 'default') {
 
 function exodus_set_style(mode, value, value2) {
 
-	// Purpose is to override the styles of screen card colour and (fonts in the future)
-	// of the currently active CSS theme
 	if (value.toUpperCase() == 'DEFAULT') value = ''
 
-	var oldvalue = ''
-
-	if (mode == 'screencolor') {
-		oldvalue = exodusgetcookie2('fc')
-		let gradient_endcolor = '#'
-
-		if (!value) value = '#fdf5e6' // oldlace
-
-		if (value.toUpperCase() == '#FDF5E6') {
-			gradient_endcolor = '#fefbf5'
-		} else {
-			let screencolour_hex = value.replace('#', '');
-			let strength = 12
-			gradient_endcolor = '#'
-			for (let hex_rgb_pos of ['0', '2', '4']) {
-				gradient_endcolor += Math.min(255, parseInt(screencolour_hex.substr(hex_rgb_pos, 2), 16) + strength).toString(16).padStart(2, '0')
-			}
-		}
-
-		try {
-			document.documentElement.style.setProperty('--exodus-cardcolor', 'linear-gradient(to bottom, ' + value + ', ' + gradient_endcolor);
-		}
-		catch (e) {
-			if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised color'); return }
-			return systemerror('exodus_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
-		}
-	}
+	//restore original value
+	if (!value && goriginalstyles[mode]) value = goriginalstyles[mode]
 
 	var link = document.querySelector("link[href='../exodus/global.css']")
 	if (!link) return
 	var ss = link.sheet
 	var rules = ss.cssRules || ss.rules
+	var oldvalue = ''
 
-	if (mode == 'screenfont' && rules) {
+	//screencolor - light mode only: user-customisable TABLE.exodusform background (first CSS rule)
+	if (mode == 'screencolor' && rules && !gisdarktheme) {
+
+		var style = rules[0].style
+		style.display = ''
+
+		if (!value) value = '#fdf5e6'
+
+		oldvalue = style.backgroundColor
+		try {
+			style.backgroundColor = value
+		}
+		catch (e) {
+			if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised color'); return }
+			return systemerror('exodus_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
+		}
+		document.documentElement.style.removeProperty('--exodus-cardcolor')
+	}
+
+	//screenfont
+	else if (mode == 'screenfont' && rules) {
 		if (!value) value = 'verdana,sans-serif,arial,helvetica'
 		if (!value2) value2 = 100
 		if (!(Number(value2))) {
@@ -1436,7 +1432,8 @@ function exodus_set_style(mode, value, value2) {
 async function clientfunctions_setstyle() {
 	//set font first since setting color changes style display from none to inline
 	exodus_set_style('screenfont', exodusgetcookie2('ff'), exodusgetcookie2('fs'))
-	// screencolour is handled by theme_toggle() earlier in client.js just before global.css linked in
+	if (!gisdarktheme)
+		exodus_set_style('screencolor', exodusgetcookie2('fc'))
 }
 
 async function clientfunctions_getglobals() {
