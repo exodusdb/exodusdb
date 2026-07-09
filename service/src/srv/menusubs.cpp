@@ -97,7 +97,8 @@ func main(in mode, io tx, in arg3, io arg4, in arg5) {
 
 	} else if (mode == "EXITMENUS") {
 
-		tx ^= FM ^ "<button tabindex=\"-1\" style=\"background-color: white; height: 1px; width: 1px; border-style: none; margin: 0; padding: 0\" accesskey=\"M\"";
+		tx ^= FM ^ "</div>";
+		tx ^= FM ^ "<button tabindex=\"-1\" style=\"display: none\" accesskey=\"M\"";
 		let onclickx = "javascript:if (typeof menuonmouseover!='undefined') menuonmouseover('click')";
 		tx ^= FM ^ " onclick=" ^ (onclickx.quote()) ^ ">";
 		tx ^= FM ^ "</button>";

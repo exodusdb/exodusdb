@@ -218,6 +218,10 @@ span.clsReadOnly:empty
     border: none;
 }
 
+#menudiv > button[accesskey="M"] {
+    display: none !important;
+}
+
 .menu:focus 
 {
     outline: 0;

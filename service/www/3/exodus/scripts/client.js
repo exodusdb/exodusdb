@@ -1755,6 +1755,12 @@ function menuonload() {
 	var target = menudiv.parentNode.parentNode
 	insertafter(target, menudiv)
 
+	// remove legacy Alt+M capture button (old menu.htm left it inside #menudiv)
+	var menuAccesskeyBtn = document.querySelector('#menudiv > button[accesskey="M"]')
+		|| ($$('menux') && $$('menux').querySelector('button[accesskey="M"]'))
+	if (menuAccesskeyBtn)
+		menuAccesskeyBtn.remove()
+
 	//enable the menu button events
 	var menubuttonx = $$('menubutton')
 	menubuttonx.onmouseover = menuonmouseover
