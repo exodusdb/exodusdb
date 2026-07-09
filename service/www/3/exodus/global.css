@@ -527,7 +527,7 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
     --exodus-menubkgcolor: linear-gradient(to top, #1e1e1e, #272727);
     --exodus-smallerbordercolor: #2b2b2b;
     --exodus-menuboxshadow: #000 0px 1px 10px;
-    --exodus-menuhighlight: #404040;
+    --exodus-menuhighlight: #666666;
     --bg-color: #1e1e1e;
     --h-color: #ffffff;
     --text-color: #fdfdfd;
@@ -598,7 +598,7 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 
 :root[data-theme="dark_mode"] #exodus_menu .graphicbutton:hover,
 :root[data-theme="dark_mode"] #exodus_menu .graphicbutton:focus {
-    border-color: #505050;
+    border-color: #888888;
 }
 
 :root[data-theme="dark_mode"] A:link { color: #8ab4f8; }
