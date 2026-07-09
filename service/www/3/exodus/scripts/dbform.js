@@ -3784,7 +3784,7 @@ async function deleterecord_onclick(event) {
 
     //custom postdelete function
     if (typeof form_postdelete == 'function') {
-        if (!(await exodusevaluateall('form_postdelete()')))
+        if (!(await exodusevaluateall('await form_postdelete()')))
             return false
     }
 
