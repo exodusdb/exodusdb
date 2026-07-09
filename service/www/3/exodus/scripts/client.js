@@ -3377,47 +3377,9 @@ async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttonti
 
 	console.log(question)
 
-	var istextinput = typeof text != 'undefined' && text !== null
-
-	//use div to avoid opening a new window if possible
-	if (!istextinput) {
-
-		return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
-
-	} else {
-
-		var dialogargs = [question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image]
-
-		//var dialogstyle
-		//dialogstyle=(question.indexOf('\r')>=2)
-		//?'dialogHeight: 300px; dialogWidth: 600px;'
-		//:'dialogHeight: 220px; dialogWidth: 500px;'
-		//dialogstyle+=' center: Yes; help: No; resizable: No; status: No;'
-
-		//similar code in blockmodalui_sync and exodusconfirm
-		var newwidth = 200
-		var newheight = 150
-		var max=getmaxwindow_sync()
-		var newleft = 0 + (max.width - newwidth) / 2
-		var newtop = 0 + (max.height - newheight) / 2
-		var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
-		//sadly has no effect
-		dialogstyle +', menubar=no, scrollbars=no, status=no, titlebar=no, toolbar=no'
-
-		var response = await exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
-	}
-
-	//text input returns a string (may be zero length) or false if clicked cancel
-	if (istextinput) {
-		if (typeof response == 'string')
-			return response
-	}
-
-	//no response treated same as cancel button (0)
-	if (!response)
-		response = 0
-
-	return response
+	// In-window popup (exodusconfirm2) for questions and text/password input.
+	// confirm.htm is deprecated; exodusshowmodaldialog opened a full browser tab.
+	return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
 
 }
 
@@ -4691,6 +4653,10 @@ function starteventhandler(eventfunctionname, functionx) {
 					if (event.ctrlKey && event.which == 67)
 						return true
 
+					// Allow keyboard typing for text popups
+					if ($$('exodusconfirmdiv_textinput'))
+						return true
+
 					var keycode = event.keyCode ? event.keyCode : event.which
 					var keyletter = String.fromCharCode(keycode).toUpperCase()
 
@@ -5257,13 +5223,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			await addbutton('cancel', 3, cancelbuttonx, 'Esc')
 
 		//make sure no button is default unless specified
-		if (!defaultbuttonn) {
-			if (istextinput) {
-				exodussettimeout('focusontext()', 10)
-			}
-			else {
-				//xxtry{gbuttons[0].blur()}catch(e){}
-			}
+		if (!defaultbuttonn && !istextinput) {
+			//xxtry{gbuttons[0].blur()}catch(e){}
 		}
 	}
 	var buttonshtml = html
@@ -5370,10 +5331,22 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				Cancel</button>\
 			</td>\
 			</tr>'
-	}
+	} else if (istextinput) {
+		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
+		html += '\
+				<tr>\
+					<td>\
+						&nbsp;\
+					</td>\
+					<td>\
+						<input id="exodusconfirmdiv_textinput" size="60" style="display: block; margin-bottom: 15px;">\
+						<span id="yesnocancelbuttons">'+ buttonshtml + '</span>\
+					</td>\
+				</tr>\
+				</table>'
 
 	//OK/Cancel/Print buttons at the bottom
-	else {
+	} else {
 		html += '\
 				<tr>\
 					<td>\
@@ -5399,6 +5372,15 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	//insert and centralise the div after it has autosized itself
 	document.body.insertBefore(div, null)
+
+	if (istextinput) {
+		var textinput = $$('exodusconfirmdiv_textinput')
+		if (texthidden)
+			textinput.type = 'password'
+		textinput.value = text
+		textinput.autocomplete = texthidden ? 'new-password' : 'off'
+		textinput.focus()
+	}
 
 	//build rows of decide popup
 	if (decide_args) {
@@ -5468,9 +5450,12 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	return response
 }
 
-//return 1
+//return 1 - Positive Button i.e. 'Ok' with optional text input
 function exodus_confirm_function1(event) {
-	return exodus_confirm_function(1, event)
+	var textinput
+	if ($$('exodusconfirmdiv_textinput'))
+		textinput = $$('exodusconfirmdiv_textinput').value
+	return exodus_confirm_function(textinput != undefined ? textinput : 1, event)
 }
 
 //return 2
