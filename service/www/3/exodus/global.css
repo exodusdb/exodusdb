@@ -568,9 +568,9 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
 :root[data-theme="dark_mode"] .menu {
     background-color: #544836 !important;
     color: #ffffff;
-    opacity: 1;
-    border: 1px solid rgba(186, 169, 154, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    opacity: 1 !important;
+    border: 1px solid #7a6b58 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 :root[data-theme="dark_mode"] .menuitem,
