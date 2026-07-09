@@ -364,6 +364,7 @@ span.clsReadOnly:empty
     --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
     --exodus-menuhighlight: #d3d3d3;
     --radio-color: rgba(0, 84, 187, 0.596);
+    --radio-ring-color: #999999;
     --border-color: #bbb;
     --thead-color: #ccc;
     --tbody-color-odd: #ddd;
@@ -382,7 +383,7 @@ input[type=radio] {
     appearance: none;
     width: 14px;
     height: 14px;
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
     margin-right: 5px;
     margin-bottom: 2px;
@@ -532,6 +533,7 @@ input:checked + .toggle_button .knob { transform: translateX(21px); }
     --h-color: #ffffff;
     --text-color: #fdfdfd;
     --radio-color: rgba(36, 100, 173, 1);
+    --radio-ring-color: #fdfdfd;
 }
 
 :root[data-theme="dark_mode"] BODY {
