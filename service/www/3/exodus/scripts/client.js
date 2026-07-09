@@ -1291,7 +1291,7 @@ function exodus_set_theme_icons() {
 	grefreshimage = gimagetheme + (gisdarktheme ? 'refresh_darkmode.svg' : 'refresh.svg')
 	if (typeof gnewimage != 'undefined') {
 		gnewimage = gimagetheme + (gisdarktheme ? 'application_form_add_darkmode.png' : 'application_form_add.png')
-		gopenimage = gimagetheme + (gisdarktheme ? 'zoom_darkmode.png' : 'zoom.png')
+		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.gif' : 'open.gif')
 	}
 }
 
