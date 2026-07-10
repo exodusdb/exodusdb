@@ -305,9 +305,12 @@ function exodus_client_init() {
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#181818!important;color:#fff}'
 			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#544836!important}'
 			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),'
-			+ ':root[data-theme=dark_mode] SELECT,:root[data-theme=dark_mode] TEXTAREA{'
+			+ ':root[data-theme=dark_mode] SELECT{'
 			+ 'background-color:transparent!important;color:#fff!important;border:none!important;'
 			+ 'border-bottom:1.7px dotted #fdfdfd!important}'
+			+ ':root[data-theme=dark_mode] TEXTAREA{'
+			+ 'background-color:transparent!important;color:#fff!important;'
+			+ 'border:1.7px dotted #a8957c!important}'
 			+ '</style>')
 	}
 

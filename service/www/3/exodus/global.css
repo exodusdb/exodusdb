@@ -50,10 +50,15 @@ BUTTON:focus, SPAN:focus
 }
 
 /* EXPERIMENTAL: async-ui underline text entry (not committed) */
-SELECT:focus, TEXTAREA:focus, INPUT:focus:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image])
+SELECT:focus, INPUT:focus:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton)
 {
     outline: none;
     border-bottom: 1.7px solid #ff6428;
+}
+
+TEXTAREA:focus {
+    outline: none;
+    border: 1.7px solid #ff6428;
 }
 
 BODY
@@ -190,7 +195,8 @@ H6
 1.For better aesthetics 2.Feature was unintuitive 3.UI anyway alerts users for empty required fields
 Considered marking required fields with red *, but it would clutter dense screens like schedules
 Did not remove clsRequired class since it is used in few places like index.html */
-.clsRequired, .clsNotRequired
+INPUT.clsRequired, INPUT.clsNotRequired,
+SELECT.clsRequired, SELECT.clsNotRequired
 {
     background-color: transparent;
     border: none;
@@ -198,6 +204,15 @@ Did not remove clsRequired class since it is used in few places like index.html 
     border-radius: 0;
     margin: 0px;
     padding: 0 1px;
+}
+
+TEXTAREA.clsRequired, TEXTAREA.clsNotRequired
+{
+    background-color: transparent;
+    border: 1.7px dotted var(--exodus-textarea-border);
+    border-radius: 0.3rem;
+    margin: 0px;
+    padding: 2px 4px;
 }
 
 .clsReadOnly
@@ -213,14 +228,22 @@ Did not remove clsRequired class since it is used in few places like index.html 
     opacity: 0.80;*/
 }
 
-/* EXPERIMENTAL: async-ui underline text entry */
+/* EXPERIMENTAL: async-ui underline text entry (single-line) */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
-SELECT,
-TEXTAREA {
+SELECT {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
     border-radius: 0;
+}
+
+/* Multiline: boxed; softer dotted border than single-line underline */
+TEXTAREA {
+    background-color: transparent;
+    border: 1.7px dotted var(--exodus-textarea-border);
+    border-radius: 0.3rem;
+    margin: 0;
+    padding: 2px 4px;
 }
 
 .exodusid_textinput {
@@ -411,6 +434,7 @@ span.clsReadOnly:empty
     --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
     --exodus-menuhighlight: #d3d3d3;
     --exodus-dotcolor: #000000;
+    --exodus-textarea-border: #8f8378;
     --radio-color: rgba(0, 84, 187, 0.596);
     --radio-ring-color: #999999;
     --border-color: #bbb;
@@ -649,6 +673,7 @@ input:checked + .toggle_button .knob img {
     --exodus-menuboxshadow: #000 0px 1px 10px;
     --exodus-menuhighlight: #666666;
     --exodus-dotcolor: #fdfdfd;
+    --exodus-textarea-border: #a8957c;
     /* In-form buttons: face lighter than form (#544836), border lighter than face */
     --exodus-informbutton-bg: #6a5e50;
     --exodus-informbutton-border: #a8957c;
@@ -680,16 +705,25 @@ input:checked + .toggle_button .knob img {
 }
 
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
-:root[data-theme="dark_mode"] SELECT,
-:root[data-theme="dark_mode"] TEXTAREA {
+:root[data-theme="dark_mode"] SELECT {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
     color: #ffffff;
 }
 
-:root[data-theme="dark_mode"] .clsRequired,
-:root[data-theme="dark_mode"] .clsNotRequired {
+:root[data-theme="dark_mode"] TEXTAREA,
+:root[data-theme="dark_mode"] TEXTAREA.clsRequired,
+:root[data-theme="dark_mode"] TEXTAREA.clsNotRequired {
+    background-color: transparent;
+    border: 1.7px dotted var(--exodus-textarea-border);
+    color: #ffffff;
+}
+
+:root[data-theme="dark_mode"] INPUT.clsRequired,
+:root[data-theme="dark_mode"] INPUT.clsNotRequired,
+:root[data-theme="dark_mode"] SELECT.clsRequired,
+:root[data-theme="dark_mode"] SELECT.clsNotRequired {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
