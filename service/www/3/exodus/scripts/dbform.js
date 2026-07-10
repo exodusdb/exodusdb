@@ -2222,7 +2222,7 @@ async function document_onkeypress(event) {
 var gonkeydown
 async function document_onkeydown(event) {
 
-    //document_onkeydown also occurs in non-form windows not using dbform.js - like confirm.htm/default.js etc
+    //document_onkeydown also occurs in non-form windows not using dbform.js - like upload.htm etc
 
     //prevent keys while child window is open or rapid concurrent keydown events
     if (gonkeydown || $$('uiblockerdiv')) {

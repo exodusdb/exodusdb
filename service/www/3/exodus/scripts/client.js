@@ -718,7 +718,7 @@ async function uiblocker_waitcancel_dialog() {
 	try {
 		var response = await exodusconfirm('Processing. Please wait.', 1, 'Wait', 'Cancel')
 
-		// Wait=1 keeps request running; Cancel/Esc/close aborts (confirm.htm used 0 and 2)
+		// Wait=1 keeps request running; Cancel/Esc/close aborts
 		if (response != 1) {
 			try {
 				xhttp.abort()
@@ -3511,7 +3511,6 @@ async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttonti
 	console.log(question)
 
 	// In-window popup (exodusconfirm2) for questions and text/password input.
-	// confirm.htm is deprecated; exodusshowmodaldialog opened a full browser tab.
 	return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
 
 }
