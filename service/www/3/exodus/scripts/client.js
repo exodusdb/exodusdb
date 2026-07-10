@@ -4791,19 +4791,16 @@ function starteventhandler(eventfunctionname, functionx) {
 					if (event.ctrlKey && event.which == 67)
 						return true
 
-					// Allow keyboard typing for text popups
-					if ($$('exodusconfirmdiv_textinput'))
-						return true
-
 					var keycode = event.keyCode ? event.keyCode : event.which
 					var keyletter = String.fromCharCode(keycode).toUpperCase()
+					var istextinput = !!$$('exodusconfirmdiv_textinput')
 
 					logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
 
 					//FIX detection of specific keys on buttons like Y N etc
 
-					//POSITIVE = F9 or Ctrl+Enter or SPACE some initial
-					if (keycode == 120 || (keycode == 13) || (keycode == 32) || keyletter == gexodusconfirmletters[1]) {
+					//POSITIVE = F9 or Enter or (Space if not text input) or some initial
+					if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
 						window.setTimeout('exodus_confirm_function1()', 1)
 						return exoduscancelevent(event)
 					}
@@ -4819,6 +4816,10 @@ function starteventhandler(eventfunctionname, functionx) {
 						window.setTimeout('exodus_confirm_function2()', 1)
 						return exoduscancelevent(event)
 					}
+
+					// Allow keyboard typing for text popups
+					if (istextinput)
+						return true
 				}
 			}
 
