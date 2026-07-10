@@ -688,6 +688,7 @@ input:checked + .toggle_button .knob img {
     --text-color: #fdfdfd;
     --radio-color: rgba(36, 100, 173, 1);
     --radio-checked-bg: #f0f0f0;
+    --radio-ring-color: #d4ccc0;
 }
 
 :root[data-theme="dark_mode"] BODY {
@@ -836,6 +837,11 @@ input:checked + .toggle_button .knob img {
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_question1 {
     --exodusconfirm-border: #7070e0;
     background-color: #28304a;
+}
+
+:root[data-theme="dark_mode"] input[type=radio]:not(:checked),
+:root[data-theme="dark_mode"] input[type=checkbox]:not(:checked) {
+    border-width: 1.5px;
 }
 
 :root[data-theme="dark_mode"] input[type=radio]:checked {
