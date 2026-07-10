@@ -50,7 +50,9 @@ BUTTON:focus, SPAN:focus
 }
 
 /* EXPERIMENTAL: async-ui underline text entry (not committed) */
-SELECT:focus, INPUT:focus:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton)
+SELECT:focus, INPUT:focus:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
+SPAN.clsRequired[contenteditable]:focus,
+SPAN.clsNotRequired[contenteditable]:focus
 {
     outline: none;
     border-bottom: 1.7px solid #ff6428;
@@ -196,7 +198,8 @@ H6
 Considered marking required fields with red *, but it would clutter dense screens like schedules
 Did not remove clsRequired class since it is used in few places like index.html */
 INPUT.clsRequired, INPUT.clsNotRequired,
-SELECT.clsRequired, SELECT.clsNotRequired
+SELECT.clsRequired, SELECT.clsNotRequired,
+SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable]
 {
     background-color: transparent;
     border: none;
@@ -230,7 +233,8 @@ TEXTAREA.clsRequired, TEXTAREA.clsNotRequired
 
 /* EXPERIMENTAL: async-ui underline text entry (single-line) */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
-SELECT {
+SELECT,
+SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
@@ -723,7 +727,9 @@ input:checked + .toggle_button .knob img {
 :root[data-theme="dark_mode"] INPUT.clsRequired,
 :root[data-theme="dark_mode"] INPUT.clsNotRequired,
 :root[data-theme="dark_mode"] SELECT.clsRequired,
-:root[data-theme="dark_mode"] SELECT.clsNotRequired {
+:root[data-theme="dark_mode"] SELECT.clsNotRequired,
+:root[data-theme="dark_mode"] SPAN.clsRequired[contenteditable],
+:root[data-theme="dark_mode"] SPAN.clsNotRequired[contenteditable] {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
