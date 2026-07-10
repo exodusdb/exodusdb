@@ -22,6 +22,14 @@ PS4='+ [./delete_site:$LINENO ${HOST_NAME:-${1-}} ${SECONDS}s] '
 
 	( apache2ctl configtest && apache2ctl restart ) || true
 
+: Remove links to certificates
+: ────────────────────────────
+: /etc/letsencrypt/live/hosts.neosys.com/fullchain.pem
+: /etc/ssl/private/test-key.pem
+
+    rm /etc/ssl/certs/${HOST_NAME}.pem       || true
+    rm /etc/ssl/private/${HOST_NAME}-key.pem || true
+
 : rm ~/hosts/$SITE_DIR -r || true
 :
 : ────────────────────────────────────────
