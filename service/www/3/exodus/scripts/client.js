@@ -5243,6 +5243,47 @@ function exodusconfirm_footerwrap(content) {
 		</table>'
 }
 
+var gexodusconfirm_scrollhint_resize
+
+function exodusconfirm_update_scroll_hints() {
+	var scrollpane = exodusconfirm_scrollpane()
+	var wrap = $$('exodusconfirm_scrollhint_wrap')
+	if (!scrollpane || !wrap)
+		return
+
+	var canDown = scrollpane.scrollHeight > scrollpane.clientHeight + 1
+		&& scrollpane.scrollTop + scrollpane.clientHeight < scrollpane.scrollHeight - 2
+
+	wrap.classList.toggle('can_scroll_down', canDown)
+	wrap.setAttribute('aria-hidden', canDown ? 'false' : 'true')
+
+	// Match decide table width so left-aligned dots sit under option numbers
+	var table = $$('decide_table1')
+	var hintBlock = $$('exodusconfirm_scrollhint_block')
+	if (table && hintBlock)
+		hintBlock.style.width = table.offsetWidth + 'px'
+}
+
+function exodusconfirm_bind_scroll_hints() {
+	exodusconfirm_unbind_scroll_hints()
+
+	var scrollpane = exodusconfirm_scrollpane()
+	if (!scrollpane || !$$('exodusconfirm_scrollhint_wrap'))
+		return
+
+	exodusconfirm_update_scroll_hints()
+	scrollpane.addEventListener('scroll', exodusconfirm_update_scroll_hints, { passive: true })
+	gexodusconfirm_scrollhint_resize = exodusconfirm_update_scroll_hints
+	window.addEventListener('resize', gexodusconfirm_scrollhint_resize, { passive: true })
+}
+
+function exodusconfirm_unbind_scroll_hints() {
+	if (gexodusconfirm_scrollhint_resize) {
+		window.removeEventListener('resize', gexodusconfirm_scrollhint_resize)
+		gexodusconfirm_scrollhint_resize = null
+	}
+}
+
 async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc) {
 
 	//performs "in-window" questions, selections and inputs
@@ -5297,6 +5338,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	div.classList.add('exodusconfirmdiv')
 	if (istextinput)
 		div.classList.add('exodusconfirm_textinput')
+	if (decide_args)
+		div.classList.add('exodusconfirm_decide')
 	div.style.maxHeight = (window.innerHeight - 120) + 'px'
 	div.style.maxWidth = Math.min(700, window.innerWidth - 40) + 'px'
 
@@ -5445,6 +5488,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		bodyhtml += '\
 			<tr>\
 			<td colspan=2 align="center">\
+			<div class="exodusconfirm_decideblock">\
 			<table id="decide_table1" xwidth=100% xclass="exodusform" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
 				<thead onclick="decide_sorttable2(event)" style="cursor: pointer">\
 					<tr id="decide_table1head1row1">\
@@ -5453,6 +5497,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				<tbody id="decide_table1body1">\
 				</tbody>\
 			</table>\
+			</div>\
 			</td>\
 			</tr>'
 		footerhtml = exodusconfirm_footerwrap('\
@@ -5500,8 +5545,18 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	bodyhtml += '</table>'
 
+	var scrollhinthtml = ''
+	if (decide_args)
+		scrollhinthtml = '\
+			<div class="exodusconfirm_scrollhint_wrap" id="exodusconfirm_scrollhint_wrap" aria-hidden="true">\
+				<div class="exodusconfirm_decideblock" id="exodusconfirm_scrollhint_block">\
+					<div class="exodusconfirm_scrollhint" id="exodusconfirm_scrollhint">&#9660;</div>\
+				</div>\
+			</div>'
+
 	var html = '\
 		<div class="exodusconfirm_body">'+ bodyhtml + '</div>\
+		'+ scrollhinthtml + '\
 		<div class="exodusconfirm_footer">'+ footerhtml + '</div>'
 
 	//finally create the div body
@@ -5532,6 +5587,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			exodusremovenode(div)
 			return response
 		}
+
+		exodusconfirm_bind_scroll_hints()
 
 	}
 
@@ -5566,6 +5623,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	var response = await confirmPromise
 
 	gpendingConfirmResolve = null
+	exodusconfirm_unbind_scroll_hints()
 	exodusremovenode(div)
 
 	//text input returns a string (may be zero length) or false if clicked cancel
