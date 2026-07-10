@@ -702,6 +702,34 @@ function loguiblockerwaitcancel_event(event, action) {
 
 }
 
+var gprocessing_waitcancel_active
+
+async function uiblocker_waitcancel_dialog() {
+
+	if ($$('exodusconfirmdiv') || gprocessing_waitcancel_active)
+		return
+
+	if (!gchildwin || !gchildwin.lazy || !gchildwin.xhttp)
+		return
+
+	gprocessing_waitcancel_active = true
+	var xhttp = gchildwin.xhttp
+
+	try {
+		var response = await exodusconfirm('Processing. Please wait.', 1, 'Wait', 'Cancel')
+
+		// Wait=1 keeps request running; Cancel/Esc/close aborts (confirm.htm used 0 and 2)
+		if (response != 1) {
+			try {
+				xhttp.abort()
+			} catch (e) { }
+			unblockmodalui_sync()
+		}
+	} finally {
+		gprocessing_waitcancel_active = false
+	}
+}
+
 function blockmodalui_sync() {
 
 	unblockmodalui_sync()
@@ -734,7 +762,6 @@ function blockmodalui_sync() {
 			//alert('Please wait for server response')
 		}
 		else if (gchildwin) {
-			var actualwin
 			if (gchildwin.lazy) {
 				//ignore spurious click events without a prior mousedown on this blocker
 				//eg when a child popup closes after selection and the click falls through
@@ -743,54 +770,19 @@ function blockmodalui_sync() {
 					return
 				}
 				guiblockermousedown = false
-				actualwin = gchildwin.actual
-				//open a 'please wait' window the first time that they click the blockerdiv or they close the 'please wait' window
-				if (!actualwin || actualwin.closed) {
-					loguiblockerwaitcancel_event(event, 'opening confirm.htm')
-					var dialogstyle = getdialogstyle_sync(dialogstyle)
+				loguiblockerwaitcancel_event(event, 'opening in-dom wait/cancel')
+				uiblocker_waitcancel_dialog()
+			} else {
+				var actualwin = gchildwin
 
-					var question = 'Processing. Please wait.'
-					var defaultbutton = 1
-					var dialogargs = [question, defaultbutton, 'Wait', 'Cancel']
-					//pass the xmlhttprequestobject so it can be aborted if user clicks Cancel
-					if (gchildwin.xhttp)
-						dialogargs.xhttp = gchildwin.xhttp
+				//focus on child window
+				window.setTimeout(function () { try { actualwin.focus() } catch (e) { } }, 10)
 
-					//similar code in blockmodalui_sync and exodusconfirm
-					var dialogstyle
-					var newwidth = 200
-					var newheight = 100
-					var max=getmaxwindow_sync()
-					var newleft = 0 + (max.width - newwidth) / 2
-					var newtop = 0 + (max.height - newheight) / 2
-					var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
-					//alert(dialogstyle)
-
-					//cant call exodusshowmodaldialog because that requires a global gcurrentevent variable/generator function
-					//and that global/generator is already in use handling some current event that is yielded for async xmlhttprequest
-					actualwin = window.open(EXODUSlocation + 'confirm.htm', '', dialogstyle)
-					gchildwin.actual = actualwin
-
-					if (!actualwin) {
-						alert('Unable to show popup window - please enable popups; disable your popup blocker.')
-						return
-					}
-
-					//pass arguments and callback/resume function to child window
-					actualwin.dialogArguments = dialogargs
-
-				}
-			} else
-				actualwin = gchildwin
-
-			//focus on child window
-			window.setTimeout(function () { try { actualwin.focus() } catch (e) { } }, 10)
-
-			//also focus on child's child recursively
-			var winuiblocker = actualwin.document.getElementById('uiblockerdiv')
-			if (winuiblocker)
-				winuiblocker.click()
-
+				//also focus on child's child recursively
+				var winuiblocker = actualwin.document.getElementById('uiblockerdiv')
+				if (winuiblocker)
+					winuiblocker.click()
+			}
 		}
 	}
 
@@ -799,9 +791,15 @@ function blockmodalui_sync() {
 var gchildwin
 
 function unblockmodalui_sync() {
-	//close 'please wait' window if present
-	if (gchildwin && !gchildwin.closed && gchildwin.actual && !gchildwin.actual.closed)
+	//close in-dom wait/cancel confirm if present
+	if ($$('exodusconfirmdiv') && gpendingConfirmResolve)
+		resolvePendingConfirm(1, 'unblockmodalui_sync')
+	//close legacy child 'please wait' window if present
+	if (gchildwin && gchildwin.actual && !gchildwin.actual.closed)
 		gchildwin.actual.close()
+	if (gchildwin && gchildwin.lazy)
+		gchildwin = false
+	gprocessing_waitcancel_active = false
 	var blocker = $$('uiblockerdiv')
 	if (blocker) {
 		//YIELD//console.log('UNBLOCKING UI')
@@ -987,7 +985,7 @@ function exodus_setchildwin_returnvalue(returnvalue) {
 function exodus_autoresume() {
 
 	//if child window still active then schedule another check later
-	if (gchildwin && !gchildwin.closed) {
+	if (gchildwin && !gchildwin.lazy && !gchildwin.closed) {
 		//console.log('exodus_autoresume - window still present and not closed')
 		window.setTimeout('exodus_autoresume()', 100)
 		return
@@ -2490,7 +2488,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 		if (gasynchronous) {
 
 			gchildwin = { lazy: true }
-			//a reference to xhttp so we can call abort on it if user chooses Cancel in the popup from blockui
+			//xhttp reference for in-dom Wait/Cancel on uiblockerdiv click (uiblocker_waitcancel_dialog)
 			gchildwin.xhttp = xhttp
 
 			//a reference to xhttp so we can call abort on it if user chooses to close the window
