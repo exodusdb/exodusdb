@@ -63,27 +63,23 @@ BODY
     color: #000000;
 }
 
-.exodusbutton
-{
-    
-    background-color: #F0F0F0;
+/* In-form buttons (exodusbutton etc.): one rule for LM/DM; themes override colours only */
+:root {
+    --exodus-informbutton-bg: #f0f0f0;
+    --exodus-informbutton-border: #cccccc;
+    --exodus-informbutton-border-style: outset;
+    --exodus-informbutton-color: inherit;
+}
+
+.exodusbutton,
+TABLE.exodusform button:not(.menubutton):not(.graphicbutton),
+TABLE.exodusform input.exodusbutton {
+    background-color: var(--exodus-informbutton-bg);
+    color: var(--exodus-informbutton-color);
     padding: 2px 3px;
-    /*font-size: 90%;*/
-    border: 2px outset #cccccc;
+    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
     border-radius: 0.3rem;
-
-    /*float: left;*/
-/*    font-size: inherit;
-    margin: 2px;
     cursor: pointer;
-    background-color: #f0f0f0;
-    padding: 4px 2px 5px 2px;
-
-    border-color: #cccccc;
-    border-width: 2px;
-    border-style: outset;
-    border-radius: 0.3rem;
-*/
 }
 
 BUTTON
@@ -653,6 +649,11 @@ input:checked + .toggle_button .knob img {
     --exodus-menuboxshadow: #000 0px 1px 10px;
     --exodus-menuhighlight: #666666;
     --exodus-dotcolor: #fdfdfd;
+    /* In-form buttons: face lighter than form (#544836), border lighter than face */
+    --exodus-informbutton-bg: #6a5e50;
+    --exodus-informbutton-border: #a8957c;
+    --exodus-informbutton-border-style: solid;
+    --exodus-informbutton-color: #ffffff;
     --bg-color: #1e1e1e;
     --h-color: #ffffff;
     --text-color: #fdfdfd;
@@ -720,19 +721,10 @@ input:checked + .toggle_button .knob img {
 }
 
 :root[data-theme="dark_mode"] .graphicbutton,
-:root[data-theme="dark_mode"] .exodusbutton,
-:root[data-theme="dark_mode"] BUTTON {
+:root[data-theme="dark_mode"] BUTTON:not(.exodusbutton) {
     background-color: #292929;
     border: 2px outset #343434;
     color: #ffffff;
-}
-
-/* In-form buttons only (not menubar): between form fill (#544836) and cell borders (#7a6b58) */
-:root[data-theme="dark_mode"] input.exodusbutton,
-:root[data-theme="dark_mode"] button.exodusbutton {
-    background-color: #6a5e50 !important;
-    border: 2px outset #7a6b58 !important;
-    color: #ffffff !important;
 }
 
 :root[data-theme="dark_mode"] #exodus_menu .menubutton:hover,
