@@ -5228,6 +5228,11 @@ function exodus_getinnertext(element) {
 	return text
 }
 
+function exodusconfirm_scrollpane() {
+	var div = $$('exodusconfirmdiv')
+	return div && (div.querySelector('.exodusconfirm_body') || div)
+}
+
 async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc) {
 
 	//performs "in-window" questions, selections and inputs
@@ -5280,9 +5285,10 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	// id name determines style, see global.css
 	div.id = 'exodusconfirmdiv'
 	div.classList.add('exodusconfirmdiv')
+	if (istextinput)
+		div.classList.add('exodusconfirm_textinput')
 	div.style.maxHeight = (window.innerHeight - 120) + 'px'
 	div.style.maxWidth = Math.min(700, window.innerWidth - 40) + 'px'
-	div.style.overflow = 'auto'
 
 	//image
 
@@ -5409,8 +5415,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	}//end of addbutton
 
-	//template for html framework
-	var html = '\
+	// Scrollable body + pinned footer (see global.css .exodusconfirm_body / .exodusconfirm_footer)
+	var bodyhtml = '\
 			<table cellspacing="1" cellpadding="1">\
 			<tr align="left" width="5%">\
 				<td style="vertical-align: middle;padding: 20px">\
@@ -5423,9 +5429,10 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				</td>\
 			</tr>'
 
-	//add an empty table for any decide options
+	var footerhtml = ''
+
 	if (decide_args) {
-		html += '\
+		bodyhtml += '\
 			<tr>\
 			<td colspan=2 align="center">\
 			<table id="decide_table1" xwidth=100% xclass="exodusform" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
@@ -5437,10 +5444,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				</tbody>\
 			</table>\
 			</td>\
-			</tr>\
-			<tr>\
-			<td></td>\
-			<td>\
+			</tr>'
+		footerhtml = '\
 			<button id="decide_okbutton" tabindex="0" class="graphicbutton"\
 				onmousedown="this.style.borderStyle="inset"\
 				onmouseup="this.style.borderStyle="outset"\
@@ -5452,26 +5457,21 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				onmouseup="this.style.borderStyle="outset"\
 				onmouseout="this.style.borderStyle="outset"\
 				title="Press Esc">\
-				Cancel</button>\
-			</td>\
-			</tr>'
+				Cancel</button>'
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
-		html += '\
+		bodyhtml += '\
 				<tr>\
 					<td>\
 						&nbsp;\
 					</td>\
 					<td>\
-						<input id="exodusconfirmdiv_textinput" size="60" style="display: block; margin-bottom: 15px;">\
-						<span id="yesnocancelbuttons">'+ buttonshtml + '</span>\
+						<input id="exodusconfirmdiv_textinput" size="60" style="display: block;">\
 					</td>\
-				</tr>\
-				</table>'
-
-	//OK/Cancel/Print buttons at the bottom
+				</tr>'
+		footerhtml = '<span id="yesnocancelbuttons">'+ buttonshtml + '</span>'
 	} else {
-		html += '\
+		bodyhtml += '\
 				<tr>\
 					<td>\
 						&nbsp;\
@@ -5483,13 +5483,16 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 						<p id="textinputphidden" style="display: none">\
 							<input type="password" size="60" id="textinputhidden" id="textinputhidden" />\
 						</p>\
-						<span id="yesnocancelbuttons">\
-							'+ buttonshtml + '\
-						</span>\
 					</td>\
-				</tr>\
-				</table>'
+				</tr>'
+		footerhtml = '<span id="yesnocancelbuttons">'+ buttonshtml + '</span>'
 	}
+
+	bodyhtml += '</table>'
+
+	var html = '\
+		<div class="exodusconfirm_body">'+ bodyhtml + '</div>\
+		<div class="exodusconfirm_footer">'+ footerhtml + '</div>'
 
 	//finally create the div body
 	div.innerHTML = html
@@ -5524,11 +5527,12 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	// centers exodusconfirmdiv popups via global.css (dynamic centering on resize)
 
-	//if case too much to fit vertically on the screen, use scrollbars
-	//for messages show the bottom of the message
+	//if case too much to fit vertically on the screen, use scrollbars on the body only
+	//for messages show the bottom of the message; footer buttons stay visible
 	//for popup lists, show the top of the list
+	var scrollpane = exodusconfirm_scrollpane()
 	if (!decide_args)
-		div.scrollTop = div.scrollHeight
+		scrollpane.scrollTop = scrollpane.scrollHeight
 
 	//div.onkeydown=function exodusconfirm_onkeydown(event) {
 	//	exoduscancelevent(event)
@@ -6321,13 +6325,14 @@ function decide_onload(decide_args) {
 
 		//home goto top if scrollbar
 		if (keycode == 36) {
-			exodusconfirmdiv.scrollTop = 0
+			exodusconfirm_scrollpane().scrollTop = 0
 			return exoduscancelevent(event)
 		}
 
 		//end goto bottom if scrollbar
 		if (keycode == 35) {
-			exodusconfirmdiv.scrollTop = exodusconfirmdiv.scrollHeight
+			var scrollpane = exodusconfirm_scrollpane()
+			scrollpane.scrollTop = scrollpane.scrollHeight
 			return exoduscancelevent(event)
 		}
 
@@ -6446,10 +6451,11 @@ function decide_onload(decide_args) {
 
 				//scroll to the top or bottom if on the first or last option
 				var newoptionno = newelement.getAttribute('decide_optionno')
+				var scrollpane = exodusconfirm_scrollpane()
 				if (n == 0 || newoptionno == 1)
-					exodusconfirmdiv.scrollTop = 0
+					scrollpane.scrollTop = 0
 				else if (n == (selections.length - 1))
-					exodusconfirmdiv.scrollTop = exodusconfirmdiv.scrollHeight
+					scrollpane.scrollTop = scrollpane.scrollHeight
 				break
 
 			}

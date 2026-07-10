@@ -514,7 +514,25 @@ input[type="radio"],input[type="checkbox"]{
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.exodusconfirm_body {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow: auto;
+    text-align: left;
+}
+.exodusconfirm_footer {
+    flex: 0 0 auto;
+    padding-top: 10px;
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+/* Text-input popups: extra gap between underlined field and footer rule */
+.exodusconfirmdiv.exodusconfirm_textinput .exodusconfirm_body {
+    padding-bottom: 18px;
 }
 .exodusconfirmdiv .statementclass {
     color: #000000;
@@ -696,6 +714,9 @@ input:checked + .toggle_button .knob img {
     border: 2px solid var(--exodusconfirm-border);
     color: #ffffff;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+:root[data-theme="dark_mode"] .exodusconfirm_footer {
+    border-top-color: var(--exodusconfirm-border);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv .statementclass {
     color: #ffffff;
