@@ -216,6 +216,10 @@ function download_submodules {
 	git submodule foreach 'git fetch origin && echo "Submodule: $name" && git branch -r | grep -q "origin/master" && echo "  - Has origin/master: Yes" || echo "  - Has origin/master: No"; git branch -r --contains $(git rev-parse HEAD) | grep -q "origin/master" && echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: Yes" || echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: No"'
 :	"Verification complete."
 
+
+	pushd ~/exodus/pgexodus
+	git checkout 3d50ecdb887aab574d9aa730adad092f8038bfe5
+	popd
 :
 : Verify submodules exist
 : -----------------------
