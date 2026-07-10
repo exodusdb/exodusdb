@@ -667,6 +667,14 @@ input:checked + .toggle_button .knob img {
     color: #ffffff;
 }
 
+/* In-form buttons only (not menubar): between form fill (#544836) and cell borders (#7a6b58) */
+:root[data-theme="dark_mode"] input.exodusbutton,
+:root[data-theme="dark_mode"] button.exodusbutton {
+    background-color: #6a5e50 !important;
+    border: 2px outset #7a6b58 !important;
+    color: #ffffff !important;
+}
+
 :root[data-theme="dark_mode"] #exodus_menu .menubutton:hover,
 :root[data-theme="dark_mode"] #exodus_menu .menubutton:focus,
 :root[data-theme="dark_mode"] #exodus_menu .graphicbutton:hover,
