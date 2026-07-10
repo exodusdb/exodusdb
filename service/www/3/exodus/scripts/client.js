@@ -5233,6 +5233,16 @@ function exodusconfirm_scrollpane() {
 	return div && (div.querySelector('.exodusconfirm_body') || div)
 }
 
+function exodusconfirm_footerwrap(content) {
+	return '\
+		<table class="exodusconfirm_layout" cellspacing="1" cellpadding="1">\
+			<tr>\
+				<td class="exodusconfirm_iconcol">&nbsp;</td>\
+				<td class="exodusconfirm_promptcol">'+ content + '</td>\
+			</tr>\
+		</table>'
+}
+
 async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc) {
 
 	//performs "in-window" questions, selections and inputs
@@ -5415,14 +5425,14 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	}//end of addbutton
 
-	// Scrollable body + pinned footer (see global.css .exodusconfirm_body / .exodusconfirm_footer)
+	// Scrollable body + pinned footer (see global.css .exodusconfirm_layout)
 	var bodyhtml = '\
-			<table cellspacing="1" cellpadding="1">\
-			<tr align="left" width="5%">\
-				<td style="vertical-align: middle;padding: 20px">\
+			<table class="exodusconfirm_layout" cellspacing="1" cellpadding="1">\
+			<tr>\
+				<td class="exodusconfirm_iconcol">\
 					'+ imagehtml + '\
 				</td>\
-				<td>\
+				<td class="exodusconfirm_promptcol">\
 					<div class="statementclass" id="question1">\
 					'+ questionhtml + '\
 					</div>\
@@ -5445,7 +5455,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			</table>\
 			</td>\
 			</tr>'
-		footerhtml = '\
+		footerhtml = exodusconfirm_footerwrap('\
 			<button id="decide_okbutton" tabindex="0" class="graphicbutton"\
 				onmousedown="this.style.borderStyle="inset"\
 				onmouseup="this.style.borderStyle="outset"\
@@ -5457,26 +5467,26 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				onmouseup="this.style.borderStyle="outset"\
 				onmouseout="this.style.borderStyle="outset"\
 				title="Press Esc">\
-				Cancel</button>'
+				Cancel</button>')
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
 		bodyhtml += '\
 				<tr>\
-					<td>\
+					<td class="exodusconfirm_iconcol">\
 						&nbsp;\
 					</td>\
-					<td>\
+					<td class="exodusconfirm_promptcol">\
 						<input id="exodusconfirmdiv_textinput" size="60" style="display: block;">\
 					</td>\
 				</tr>'
-		footerhtml = '<span id="yesnocancelbuttons">'+ buttonshtml + '</span>'
+		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	} else {
 		bodyhtml += '\
 				<tr>\
-					<td>\
+					<td class="exodusconfirm_iconcol">\
 						&nbsp;\
 					</td>\
-					<td>\
+					<td class="exodusconfirm_promptcol">\
 						<p id="textinputp" style="display: none">\
 							<input size="60" id="textinput" />\
 						</p>\
@@ -5485,7 +5495,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 						</p>\
 					</td>\
 				</tr>'
-		footerhtml = '<span id="yesnocancelbuttons">'+ buttonshtml + '</span>'
+		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	}
 
 	bodyhtml += '</table>'
