@@ -552,6 +552,7 @@ input[type="radio"],input[type="checkbox"]{
     z-index: 1000;
     position: fixed;
     width: fit-content;
+    max-width: min(700px, calc(100vw - 40px));
     height: fit-content;
     margin: auto;
     inset: 0;
@@ -572,9 +573,26 @@ input[type="radio"],input[type="checkbox"]{
     overflow: auto;
     text-align: left;
 }
+.exodusconfirmdiv.exodusconfirm_decide {
+    max-width: calc(100vw - 40px);
+}
+.exodusconfirmdiv.exodusconfirm_decide .exodusconfirm_body {
+    overflow-x: auto;
+}
 .exodusconfirm_decideblock {
     display: inline-block;
     text-align: left;
+    vertical-align: top;
+}
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 {
+    width: auto;
+    max-width: 100%;
+}
+/* data columns only — option/checkbox/rank cols stay narrow */
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 .decide_datacol {
+    max-width: 22em;
+    white-space: normal;
+    overflow-wrap: break-word;
     vertical-align: top;
 }
 .exodusconfirm_scrollhint_wrap {

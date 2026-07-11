@@ -5264,6 +5264,18 @@ function exodusconfirm_update_scroll_hints() {
 	var hintBlock = $$('exodusconfirm_scrollhint_block')
 	if (table && hintBlock)
 		hintBlock.style.width = table.offsetWidth + 'px'
+
+	exodusconfirm_fit_decide_popup()
+}
+
+function exodusconfirm_fit_decide_popup() {
+	var div = $$('exodusconfirmdiv')
+	var table = $$('decide_table1')
+	if (!div || !table || !div.classList.contains('exodusconfirm_decide'))
+		return
+	var maxw = window.innerWidth - 40
+	var want = table.offsetWidth + 24
+	div.style.width = Math.min(want, maxw) + 'px'
 }
 
 function exodusconfirm_bind_scroll_hints() {
@@ -5343,7 +5355,6 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	if (decide_args)
 		div.classList.add('exodusconfirm_decide')
 	div.style.maxHeight = (window.innerHeight - 120) + 'px'
-	div.style.maxWidth = Math.min(700, window.innerWidth - 40) + 'px'
 
 	//image
 
@@ -5849,6 +5860,7 @@ function decide_onload(decide_args) {
 			title = title.exoduscapitalise().replace(/_/gi, ' ')
 		}
 		oCell.innerHTML = title
+		oCell.className = 'decide_datacol'
 		oRow.appendChild(oCell)
 
 		if (!cols[ii][3] && cols[ii][2] && (cols[ii][2] == 'DATE' || cols[ii][2] == 'TIME'))
@@ -6028,6 +6040,7 @@ function decide_onload(decide_args) {
 				oCell.align = colinfo[3]
 			else
 				oCell.align = 'left'
+			oCell.className = 'decide_datacol'
 
 			if (defaultreply) {
 				if (typeof decide_returncolid === '') {
