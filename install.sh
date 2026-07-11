@@ -152,6 +152,24 @@ PS4='+ [${SECONDS}s] '
 	export EXODUS_DIR=$(pwd)
 	# Set by github action if chosen to rerun in debug mode?
 	#RUNNER_DEBUG=1
+:
+: Configure automatic apt-get
+: ────────────────────────────────────────
+	sudo tee /etc/apt/apt.conf.d/99unattended-noninteractive <<-'EOF'
+		# Automatic retries on transient network failures
+		Acquire::Retries "3";
+		Acquire::http::Timeout "120";
+		Acquire::https::Timeout "120";
+
+		# Always keep locally modified config files during upgrades/installs
+		Dpkg::Options {
+		   "--force-confdef";
+		   "--force-confold";
+		};
+
+		# Auto-answer "yes" to installation prompts
+		# APT::Get::Assume-Yes "true";
+	EOF
 
 :
 : Function to retry three times in case of timeout
