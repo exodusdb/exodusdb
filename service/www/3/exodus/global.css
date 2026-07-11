@@ -548,6 +548,7 @@ input[type="radio"],input[type="checkbox"]{
 
 /* ========== In-window confirm/decide popups ========== */
 .exodusconfirmdiv {
+    --exodusconfirm-face: #e8e8e8;
     z-index: 1000;
     position: fixed;
     width: fit-content;
@@ -555,7 +556,7 @@ input[type="radio"],input[type="checkbox"]{
     margin: auto;
     inset: 0;
     text-align: center;
-    background: #e8e8e8;
+    background: var(--exodusconfirm-face);
     border: 2px solid #666666;
     border-radius: 10px;
     padding: 10px;
@@ -627,20 +628,34 @@ input[type="radio"],input[type="checkbox"]{
     text-align: left;
 }
 .exodusconfirmdiv.exodusconfirm_critical {
+    --exodusconfirm-face: #ffdddd;
     background-color: #ffdddd;
     border-color: #cc3333;
 }
 .exodusconfirmdiv.exodusconfirm_warning {
+    --exodusconfirm-face: #ffff99;
     background-color: #ffff99;
     border-color: #b8a800;
 }
 .exodusconfirmdiv.exodusconfirm_info {
+    --exodusconfirm-face: #ddffdd;
     background-color: #ddffdd;
     border-color: #339933;
 }
 .exodusconfirmdiv.exodusconfirm_question1 {
+    --exodusconfirm-face: #ddddff;
     background-color: #ddddff;
     border-color: #4444cc;
+}
+
+.exodusconfirmdiv #decide_table1 > thead {
+    position: sticky;
+    top: 0;
+    z-index: 11;
+}
+.exodusconfirmdiv #decide_table1 > thead th,
+.exodusconfirmdiv #decide_table1 > thead td {
+    background-color: var(--exodusconfirm-face, #e8e8e8);
 }
 
 .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
@@ -816,6 +831,7 @@ input:checked + .toggle_button .knob img {
 
 :root[data-theme="dark_mode"] .exodusconfirmdiv {
     --exodusconfirm-border: #b8a99a;
+    --exodusconfirm-face: #3a3530;
     background: #3a3530;
     border: 2px solid var(--exodusconfirm-border);
     color: #ffffff;
@@ -855,18 +871,22 @@ input:checked + .toggle_button .knob img {
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {
     --exodusconfirm-border: #e06060;
+    --exodusconfirm-face: #4a2828;
     background-color: #4a2828;
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_warning {
     --exodusconfirm-border: #d4c040;
+    --exodusconfirm-face: #4a4428;
     background-color: #4a4428;
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_info {
     --exodusconfirm-border: #60c060;
+    --exodusconfirm-face: #284a28;
     background-color: #284a28;
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_question1 {
     --exodusconfirm-border: #7070e0;
+    --exodusconfirm-face: #28304a;
     background-color: #28304a;
 }
 
