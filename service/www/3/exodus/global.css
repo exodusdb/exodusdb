@@ -593,12 +593,16 @@ input[type="radio"],input[type="checkbox"]{
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 td {
     padding-left: 6px;
     padding-right: 6px;
+    vertical-align: top;
+}
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 input[type=radio],
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 input[type=checkbox] {
+    vertical-align: top;
 }
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 .decide_datacol {
     max-width: 22em;
     white-space: normal;
     overflow-wrap: break-word;
-    vertical-align: top;
 }
 .exodusconfirm_scrollhint_wrap {
     flex: 0 0 auto;
