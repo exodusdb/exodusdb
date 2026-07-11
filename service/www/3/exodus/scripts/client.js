@@ -1569,6 +1569,8 @@ function adjust_bodymargin() {
 	if (gexodus_menubar) {
 		var menuheight = gexodus_menubar.offsetHeight;
 		document.body.style.marginTop = (menuheight + 10) + 'px';
+		// stick flush under fixed menubar (body margin +10 is page spacing, not sticky offset)
+		document.documentElement.style.setProperty('--exodus-sticky-top', gexodus_menubar.getBoundingClientRect().bottom + 'px');
 	}
 }
 

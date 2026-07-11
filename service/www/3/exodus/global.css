@@ -18,6 +18,25 @@ TABLE.exodusform
     border: 1px lightgrey solid;
 }
 
+/* Multirow tables (exodusgroupno): sticky column headings while scrolling */
+TABLE.exodusform[exodusgroupno] {
+    padding-top: 0;
+}
+TABLE[exodusgroupno] > thead {
+    position: sticky;
+    top: var(--exodus-sticky-top, 0);
+    z-index: 11;
+}
+TABLE[exodusgroupno] > thead th,
+TABLE[exodusgroupno] > thead td {
+    background-color: #fdf5e6;
+}
+/* in-form exodustable header colour (e.g. clients brands) */
+TABLE.exodustable[exodusgroupno] > thead th,
+TABLE.exodustable[exodusgroupno] > thead td {
+    background-color: #ffff80;
+}
+
 TABLE
 {
     border-collapse: collapse;
@@ -29,6 +48,9 @@ TABLE
     TABLE.exodusform
     {
         display: block;
+    }
+    TABLE[exodusgroupno] > thead {
+        position: static;
     }
 }
 
@@ -700,6 +722,15 @@ input:checked + .toggle_button .knob img {
     /* Warm dark parchment — chromatic contrast vs neutral #181818 page (not grey-on-grey) */
     background-color: #544836 !important;
     border-color: #7a6b58 !important;
+}
+
+:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead th,
+:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead td {
+    background-color: #544836;
+}
+:root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead th,
+:root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead td {
+    background-color: #5c5638;
 }
 
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,
