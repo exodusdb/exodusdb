@@ -588,7 +588,12 @@ input[type="radio"],input[type="checkbox"]{
     width: auto;
     max-width: 100%;
 }
-/* data columns only — option/checkbox/rank cols stay narrow */
+/* 3× exodustable cell padding (2px → 6px) between columns */
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 th,
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 td {
+    padding-left: 6px;
+    padding-right: 6px;
+}
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 .decide_datacol {
     max-width: 22em;
     white-space: normal;
