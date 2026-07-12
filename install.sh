@@ -201,6 +201,10 @@ function init_apt() {
 		# APT::Get::Assume-Yes "true";
 	EOF
 :
+: Attempt to fix broken/interrupted apt-get
+: ────────────────────────────────────────
+	sudo dpkg --configure -a
+:
 : Update apt
 : ────────────────────────────────────────
 #	rm /var/lib/dpkg/lock-frontend || true
