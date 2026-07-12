@@ -192,7 +192,7 @@ function APT_RETRY {
 :
 		# /dev/null to stop timeout causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb -p 9999
-		if timeout 120s $* < /dev/null; then
+		if timeout 600s $* < /dev/null; then
 			break
 		fi
 	done
