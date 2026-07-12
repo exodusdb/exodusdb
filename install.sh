@@ -186,7 +186,7 @@ function init_apt() {
 : Configure automatic apt-get
 : ────────────────────────────────────────
 	sudo tee /etc/apt/apt.conf.d/99unattended-noninteractive <<-'EOF'
-		# Automatic retries on transient network failures
+		# Automatic retries on transient network failures - per package
 		Acquire::Retries "3";
 		Acquire::http::Timeout "120";
 		Acquire::https::Timeout "120";
