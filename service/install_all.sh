@@ -16,101 +16,95 @@ set -euxo pipefail
 :
 	SITE_NAME=${1:-exodus}
 	DOMAIN_PREFIX=${2:-}
-
 :
 : Config
-: ======
-:
+: ────────────────────────────────────────
 :	EXODUS_DIR provided by caller or default to the parent dir of the current working dir
 :
 #	EXODUS_DIR=~/exodus
 	EXODUS_DIR=${EXODUS_DIR:-$(realpath `pwd`/..)}
 
+function APT_INSTALL {
+: ────────────────────────────────────────
+: Function to call apt-get install three times in case of timeout
+: ────────────────────────────────────────
+: Set environment variables for non-interactive installation
 :
-: Function to call apt-get repeatedly in case of error
-: ----------------------------------------------------
+	sudo env \
+		NEEDRESTART_MODE="a"               \
+		DEBIAN_FRONTEND="noninteractive"   \
+		DEBCONF_NOWARNINGS="yes"           \
+		apt-get -y                         \
+		-o Dpkg::Options::=--force-confdef \
+		-o Dpkg::Options::=--force-confold \
+		-o Acquire::http::Timeout=120      \
+		-o Acquire::https::Timeout=120     \
+		-o Acquire::Retries=3              \
+		--no-install-recommends            \
+		install "$@" < /dev/null
 :
-function APT_GET {
+: Verify all packages are installed
 :
-	STARTED=$SECONDS
-	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
-:
-: Retry apt-get. $(($SECONDS-$STARTED)) secs.
-: -------------------
-:
-		# /dev/null to stop error causing random hang until timeout
-		# with apt process stuck on tcsetattr call. see gdb -p 9999
-		if timeout 120s $* < /dev/null; then
-			break
+	for pkg in "$@"; do
+		# Skip check for files with extension '.deb'
+		if [ ${pkg##*.} != "deb" ] && ! dpkg -s "$pkg" &>/dev/null; then
+			: "Error: Unable to locate package '$pkg'"
+			exit 1
 		fi
-		sleep 5
-	done;
+	done
+	: "All packages installed successfully."
 }
-
 :
 : Allow cd into subdirs of /root - but no read access of course
-: =============================================================
-:
+: ────────────────────────────────────────
 : 	Only if installing into /root/
 :
 	[ ${EXODUS_DIR:0:6} = /root/ ] && chmod o+x /root
 
-:
-: Install chromium to convert html to pdf
-: =======================================
-:
-:  Dont wait for it to complete. Install will be tested near the end of this script.
-:
-#	sudo snap refresh
-	sudo snap services chromium 2> /dev/null || sudo snap install chromium --no-wait
-
+#:
+#: Install chromium to convert html to pdf
+#: ────────────────────────────────────────
+#:
+#:  Dont wait for it to complete. Install will be tested near the end of this script.
+#:
+##	sudo snap refresh
+#	sudo snap services chromium 2> /dev/null || sudo snap install chromium --no-wait
 :
 : Install apache with php and configure a site
-: ============================================
-:
+: ────────────────────────────────────────
 	if [ $SITE_NAME != none ]; then
 		cd $EXODUS_DIR/service
 		./create_site $SITE_NAME '' '' $DOMAIN_PREFIX
+		[ -f ~/hosts/clients.cfg ] || echo "doone $SITE_NAME '' ''" > ~/hosts/clients.cfg
 	fi
-
 :
 : Disable default web sites
-: =========================
-:
+: ────────────────────────────────────────
 	sudo a2dissite 000-default default-ssl.conf || true
-
 :
 : Copy logo and ico into images and web root
-: ==========================================
+: ────────────────────────────────────────
 
 	cd $EXODUS_DIR/service
 	cp favicon.ico www
 	cp exodusm.png www/exodus/images/theme2
-
 :
 : Compile the service
-: ===================
-:
+: ────────────────────────────────────────
 	cd $EXODUS_DIR/service/src
 	./compall
-
 :
 : Copy all $EXODUS_DIR/bin,lib,dat to ~/live
-: ======================================
-:
+: ────────────────────────────────────────
 	cd $EXODUS_DIR/service
 	./copyall CONFIRM
-
 :
 : Create exodus_live db for live dictionaries if not already present
-: ==================================================================
-:
+: ────────────────────────────────────────
 	dblist|grep exodus_live > /dev/null || dbcreate exodus_live
-
 :
 : Import dat files into exodus and exodus_live
-: ===========================================
-:
+: ────────────────────────────────────────
 	cd /tmp
 	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_voc.sql
 	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_users.sql
@@ -126,40 +120,34 @@ function APT_GET {
 	EXO_DATA=exodus EXO_DICT=exodus syncdat
 	#EXO_DATA=exodus EXO_DICT=exodus_live sync_dat
 	EXO_DATA=exodus EXO_DICT=exodus_live syncdat
-
 :
 : Configure the exodus service
-: ============================
-:
+: ────────────────────────────────────────
 	if [ $SITE_NAME != none ]; then
 		cd $EXODUS_DIR/service
 		./create_service exo $SITE_NAME '' live
 	fi
-
 :
 : Start the service
-: =================
-:
+: ────────────────────────────────────────
 	if [ $SITE_NAME != none ]; then
 		cd $EXODUS_DIR/service
 		./service $SITE_NAME start live
 	fi
-
 :
 : Install required packages
-: =========================
-:
-:	whois		used in unknown ip no login notification emails
-:	bsd-mailx	provides "mail" which is required to send email?
+: ────────────────────────────────────────
+:	whois       used in unknown ip no login notification emails
+:	bsd-mailx   provides "mail" which is required to send email?
 :	postfix     email handler
-:	mailutils	NOT installed. like bsd-mailx but doesnt have identical options
-:	qrencode	used in htmllib2 for KSA invoices
+:	mailutils   NOT installed. like bsd-mailx but doesnt have identical options
+:	qrencode    used in htmllib2 for KSA invoices
+#:	jq          Only to display chromium snap versions available
 :
-	APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
+	APT_INSTALL whois postfix bsd-mailx
 :
 : Configure postfix
-: =================
-:
+: ────────────────────────────────────────
 	#JE: Postfix config done in install.neosys1 script
 	#postconf myhostname=$SITE_NAME
 	#postconf relayhost=?
@@ -167,7 +155,7 @@ function APT_GET {
 
 #:
 #: Install html2pdf
-#: ================
+#: ────────────────────────────────────────
 #:
 #: https://wkhtmltopdf.org/downloads.html
 #:
@@ -211,51 +199,68 @@ function APT_GET {
 #	printf "<html><body>Nothing Special</body></html>\n" > wkhtmltopdf.html
 #	/usr/local/bin/wkhtmltopdf --enable-local-file-access wkhtmltopdf.html wkhtmltopdf.pdf
 #	rm wkhtmltopdf.html wkhtmltopdf.pdf
-
 :
 : Install pdfgrep
-: ===============
-:
-	which pdfgrep || APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
+: ────────────────────────────────────────
+	which pdfgrep || APT_INSTALL pdfgrep
 
+#:
+#: Display chromium snap versions available
+#: ────────────────────────────────────────
+#:
+#	snapname="chromium"
+#	curl -s -H "Snap-Device-Series: 16" \
+#	     -H "Snap-Device-Architecture: $(uname -m)" \
+#	     "https://api.snapcraft.io/v2/snaps/info/$snapname" \
+#	| jq -r '.["channel-map"][] | "Version: \(.version), Rev: \(.revision), Channel: \(.channel.name)"' \
+#	| sort -rV || true  # sort by version descending. ignore failure.
+#
+#:
+#: Wait for chromium snap install to complete
+#: ────────────────────────────────────────
+#:
+#: Wait up to 5x2 mins for snap installation to complete. Can randomly fail. Just redo.
+#:
+#	for x in {1..5}; do
+#		snap changes | grep chromium || true
+#		timeout 120 bash -c 'while snap changes | grep chromium | grep -Pqw "Do|Doing"; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
+#	done
+#	snap changes | grep chromium || true
+#:
+#	which chromium
+#	snap refresh chromium
 :
-: Wait for chromium snap install to complete
-: ===========================================
+: Install google-chrome and alias chromium
+: ────────────────────────────────────────
+	if ! which google-chrome; then
+		wget --no-verbose -O "/tmp/google-chrome.deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+		APT_INSTALL "/tmp/google-chrome.deb"
+	:
+		ln -snf `which /usr/bin/google-chrome` /usr/bin/chromium
+	fi
 :
-: Wait up to 10 mins for snap installation to complete. Often randomly fails. Just redo.
-:
-	for x in 1 2; do
-		snap changes | grep chromium || true
-		timeout 600 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
-	done
-	snap changes | grep chromium || true
-:
-	which chromium
-	snap refresh chromium
-:
-: Check chromium converts html to pdf
-: ===================================
-: Ignore various chromium error messages
-:
+: Check html conversion to pdf
+: ────────────────────────────────────────
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
-	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep "dbus|dconf|touch|mkdir" -vP 1>&2
-:
-: Check pdf seems ok
+	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep -v 'ERR.R:dbus'
 :
 	pdfgrep "Nothing Special" chromium2pdf.pdf
 #	rm chromium2pdf.html chromium2pdf.pdf
-
+:
+: Remove snap chromium if installed
+: ────────────────────────────────────────
+	if which chromium; then
+		snap remove --purge chromium || true
+		rm /root/snap/chromium -rf
+	fi
 :
 : Determine local ip number for info
-: ==================================
-:
+: ────────────────────────────────────────
 	IPNO=`ip -4 address|grep -v 127.0.0.1|grep -P '\d+\.\d+\.\d+\.\d+' -o|head -n1`
-
 :
-: ==============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Finished $0 $* in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
-: ==============================================================
-:
+: ─────────────────────────────────────────────────────────────────────────────────
 :	Apache is now listening on https://$IPNO
 :
 :	cd ~/exodus/service
