@@ -153,6 +153,14 @@ PS4='+ [${SECONDS}s] '
 	# Set by github action if chosen to rerun in debug mode?
 	#RUNNER_DEBUG=1
 :
+: Disable unattended upgrades until next reboot if any stage b, d or W
+: ────────────────────────────────────────
+	if [[ "$REQ_STAGES" =~ [bdW] ]]; then
+		sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
+#	   sudo systemctl mask --runtime unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+		sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer || true
+	fi
+:
 : Configure automatic apt-get
 : ────────────────────────────────────────
 	sudo tee /etc/apt/apt.conf.d/99unattended-noninteractive <<-'EOF'
