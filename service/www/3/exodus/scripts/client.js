@@ -6199,7 +6199,8 @@ function decide_onload(decide_args) {
 
 		var doingall = true
 		if (typeof checkrown == 'undefined') {
-			checking = !element.checked
+			if (typeof checking == 'undefined')
+				checking = !element.checked
 			doingall = false
 		}
 
@@ -6315,7 +6316,8 @@ function decide_onload(decide_args) {
 
 		// Checkbox input uses its own mouseup handler; ignore bubbled click (was
 		// passing false as 'checking' and undoing the selection).
-		if (event.target && event.target.type == 'checkbox')
+		// Allow dblclick through with forceCheck so it matches row dblclick behaviour.
+		if (event.target && event.target.type == 'checkbox' && typeof forceCheck !== 'boolean')
 			return exoduscancelevent(event)
 
 		var trtag = getancestor(event.target, 'tr')
