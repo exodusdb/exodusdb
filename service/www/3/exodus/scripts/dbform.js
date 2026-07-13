@@ -1170,6 +1170,19 @@ async function formfunctions_onload() {
                     datasrcelements[datasrcelements.length] = tablex
                     tablex.setAttribute('exodusdependents', '')
 
+                    // Embedded group table inside an outer exodusform cell — drop host row/cell inline borders
+                    var hostcell = tablex.parentNode
+                    if (hostcell && hostcell.tagName == 'TD') {
+                        hostcell.className += (hostcell.className ? ' ' : '') + 'exodusembeddedtable'
+                        hostcell.style.removeProperty('border')
+                        var hostrow = hostcell.parentNode
+                        if (hostrow && hostrow.tagName == 'TR') {
+                            hostrow.style.removeProperty('border')
+                            hostrow.style.removeProperty('border-top')
+                            hostrow.style.removeProperty('border-bottom')
+                        }
+                    }
+
                     //unfortunately this can only be set on the first element in the row at the moment
                     //TODO process tables after processing all fields
                     //add insert/delete buttons at the end instead of on the first table element discovered
@@ -1224,8 +1237,8 @@ async function formfunctions_onload() {
                     t += ' </span>'
                     var insertdeletebuttons = document.createElement('td')
                     insertdeletebuttons.innerHTML = t
-                    //insertdeletebuttons.style.borderRightWidth='0px'
-                    //insertdeletebuttons.style.paddingRight='3px'
+                    insertdeletebuttons.style.borderRightWidth = '0px'
+                    insertdeletebuttons.style.paddingRight = '3px'
 
                     //locate the TR element in the parents
                     var trx = getancestor(element, 'tr')

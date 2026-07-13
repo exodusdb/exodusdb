@@ -1621,7 +1621,7 @@ function exodus_set_style(mode, value, value2) {
 		document.documentElement.style.removeProperty('--exodus-cardcolor')
 	}
 
-	//screenfont
+	//screenfont — family on body rule; size as % of browser default on <html>
 	else if (mode == 'screenfont' && rules) {
 		if (!value) value = 'verdana,sans-serif,arial,helvetica'
 		if (!value2) value2 = 100
@@ -1631,8 +1631,11 @@ function exodus_set_style(mode, value, value2) {
 		}
 		if (typeof gformfontscale != 'undefined' && gformfontscale)
 			value2 *= gformfontscale
-		var basefontsize = 8
-		value2 = (basefontsize * Number(value2) / 100) + 'pt'
+		value2 = Number(value2)
+		if (value2 == 100)
+			document.documentElement.style.removeProperty('font-size')
+		else
+			document.documentElement.style.fontSize = value2 + '%'
 
 		for (var rulen = 0; rulen < rules.length; rulen++) {
 			var style = rules[rulen].style
@@ -1641,11 +1644,11 @@ function exodus_set_style(mode, value, value2) {
 			oldvalue = style.fontFamily
 			try {
 				style.fontFamily = value
-				style.fontSize = value2
+				// rem/em/% hierarchy — scale via <html> font-size only
+				style.removeProperty('font-size')
 			}
 			catch (e) {
 				if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised font'); return }
-				if (e.number == -2147024809) { exodusinvalid(value2 + ' is not a recognised fontsize'); return }
 				return systemerror('exodus_set_style("' + mode + '","' + value + '","' + value2 + '")', e.number + ' ' + e.description)
 			}
 		}
@@ -4848,6 +4851,33 @@ function exoduswrapformpanes() {
 		parent.insertBefore(pane, tablex)
 		pane.appendChild(tablex)
 	}
+
+	exodusclear_embeddedtable_hostborders()
+}
+
+function exodusclear_embeddedtable_hostborders() {
+
+	// Static exodustable / embedded group tables: strip inline borders on the host row/cell
+	var tables = document.getElementsByTagName('TABLE')
+	for (var tablen = 0; tablen < tables.length; tablen++) {
+		var tablex = tables[tablen]
+		var isgroup = Number(tablex.getAttribute('exodusgroupno'))
+		var isexodustable = tablex.className && (' ' + tablex.className + ' ').indexOf(' exodustable ') >= 0
+		if (!isgroup && !isexodustable)
+			continue
+		var hostcell = tablex.parentNode
+		if (!hostcell || hostcell.tagName != 'TD')
+			continue
+		if ((' ' + hostcell.className + ' ').indexOf(' exodusembeddedtable ') < 0)
+			hostcell.className += (hostcell.className ? ' ' : '') + 'exodusembeddedtable'
+		hostcell.style.removeProperty('border')
+		var hostrow = hostcell.parentNode
+		if (hostrow && hostrow.tagName == 'TR') {
+			hostrow.style.removeProperty('border')
+			hostrow.style.removeProperty('border-top')
+			hostrow.style.removeProperty('border-bottom')
+		}
+	}
 }
 
 //allows dom scan without using IE document.all(ii)
@@ -5669,7 +5699,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			if (window.location.href.toString().indexOf('index.html') >= 0)
 				imagesrc = imagesrc.slice(3)
 		}
-		html += '<img src="' + imagesrc + '" alt="" xstyle="display: none" height="32" width="32" />'
+		html += '<img src="' + imagesrc + '" alt="" xstyle="display: none" />'
 	}
 	var imagehtml = html
 

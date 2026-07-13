@@ -61,8 +61,34 @@ div[align="center"] > .exodusformpane {
     margin-top: 6px;
 }
 /* Simple forms: clip cell backgrounds to the rounded shell */
-.exodusformpane:not(:has(> TABLE[exodusgroupno])) {
+.exodusformpane:not(:has(TABLE[exodusgroupno])):not(:has(TABLE.exodustable)) {
     overflow: hidden;
+}
+
+/* Embedded group/detail tables fill their host cell — no extra frame inside the grid */
+TABLE.exodusform > tbody > tr > td:has(> TABLE[exodusgroupno]),
+TABLE.exodusform > tbody > tr > td:has(> TABLE.exodustable),
+TABLE.exodusform > tbody > tr > th:has(> TABLE[exodusgroupno]),
+TABLE.exodusform > tbody > tr > th:has(> TABLE.exodustable),
+TABLE.exodusform > thead > tr > td:has(> TABLE[exodusgroupno]),
+TABLE.exodusform > thead > tr > td:has(> TABLE.exodustable),
+TABLE.exodusform > thead > tr > th:has(> TABLE[exodusgroupno]),
+TABLE.exodusform > thead > tr > th:has(> TABLE.exodustable),
+TABLE.exodusform > tr > td:has(> TABLE[exodusgroupno]),
+TABLE.exodusform > tr > td:has(> TABLE.exodustable),
+TABLE.exodusform > tr > th:has(> TABLE[exodusgroupno]),
+TABLE.exodusform > tr > th:has(> TABLE.exodustable) {
+    padding: 0;
+    border: none;
+}
+
+/* Group/exodustable cells keep their own spacing — not form row padding */
+TABLE.exodusform TABLE[exodusgroupno] td,
+TABLE.exodusform TABLE[exodusgroupno] th,
+TABLE.exodusform TABLE.exodustable td,
+TABLE.exodusform TABLE.exodustable th {
+    padding-top: 0;
+    padding-bottom: 0;
 }
 .exodusformpane > TABLE.exodusform {
     margin: 0;
@@ -130,13 +156,23 @@ TABLE
     }
 }
 
+/* Browser default (toolbar/system size); user SCREEN_FONT_SIZE is % on <html> via exodus_set_style */
+HTML {
+    font-size: 100%;
+}
+
 BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
 {
     /*all rules with font-family will have their font-size controlled*/
     font-family: verdana,sans-serif,arial,helvetica;
-    font-size: 8pt;
-    min-height: 13px;
-    border: 1px;
+    font-size: 1rem;
+}
+
+/* Not radio/checkbox — fixed square dimensions; min-height would squash them oval */
+BODY, BUTTON, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG,
+INPUT:not([type=radio]):not([type=checkbox])
+{
+    min-height: 1.3em;
 }
 
 BUTTON:focus, SPAN:focus
@@ -179,6 +215,10 @@ BODY
     --exodus-informbutton-border: #cccccc;
     --exodus-informbutton-border-style: outset;
     --exodus-informbutton-color: inherit;
+    /* Toolbar/field icons: ~16px beside former 8pt body text; slightly below 1.5× */
+    --exodus-ui-icon-size: 1.325em;
+    /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
+    --exodus-check-size: 1.3125em;
 }
 
 .exodusbutton,
@@ -329,7 +369,7 @@ TEXTAREA.clsRequired, TEXTAREA.clsNotRequired
     margin: 0px;
     /*padding: 0px;*/
     padding: 0 1px;
-    font-size: 9pt;
+    font-size: 1.125em;
     /*filter: alpha(opacity=80);
     opacity: 0.80;*/
 }
@@ -376,8 +416,7 @@ span.clsReadOnly:empty
 
 .menu
 {
-    /*font-size: inherit;*/
-    font-size: 15px;
+    font-size: 1rem;
     position: absolute;
     /*background-color: #F4F4F4;*/
     background-color: #EEEEEE;
@@ -406,8 +445,7 @@ span.clsReadOnly:empty
     color: black;
     /*padding-left: 5px;*/
     padding: 5px; /*z-index: 999;*/ /*should be double the font-size programmatically*/
-    /*line-height: 16pt;*/
-    line-height: 18pt;
+    line-height: 1.5;
     cursor: pointer;
 }
 
@@ -469,6 +507,19 @@ span.clsReadOnly:empty
     /*background-color: highlight;*/
     /*color: highlighttext;*/
     background-color: var(--exodus-menuhighlight);
+}
+
+/* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size) */
+.graphicbutton img,
+img[isexoduspopup="1"],
+img[isexoduslink="1"],
+img[exodustype="B"],
+img[exodusonclick],
+img[id^="sortbutton_"],
+img[id^="insertrowbutton"],
+img[id^="deleterowbutton"] {
+    height: var(--exodus-ui-icon-size);
+    width: auto;
 }
 
 #menubutton_label {
@@ -574,9 +625,11 @@ input[type=radio] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 14px;
-    height: 14px;
-    border: 1px solid var(--radio-ring-color);
+    box-sizing: border-box;
+    min-height: 0;
+    width: var(--exodus-check-size);
+    height: var(--exodus-check-size);
+    border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
     margin-right: 5px;
     margin-bottom: 2px;
@@ -592,7 +645,7 @@ input[type=radio] {
 }
 
 input[type=radio]:checked {
-    border: 4px solid var(--radio-color);
+    border: calc(var(--exodus-check-size) * 4 / 14) solid var(--radio-color);
     /*transition: 0.1s all linear;*/
 }
 
@@ -612,9 +665,11 @@ input[type=checkbox] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 14px;
-    height: 14px;
-    border: 1px solid var(--radio-ring-color);
+    box-sizing: border-box;
+    min-height: 0;
+    width: var(--exodus-check-size);
+    height: var(--exodus-check-size);
+    border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
     margin-right: 5px;
     margin-bottom: 1px;
@@ -623,13 +678,16 @@ input[type=checkbox] {
     background-color: var(--bg-color);
     vertical-align: middle;
     /*border-radius: 20%;*/
-    border-radius: 2px;
+    border-radius: calc(var(--exodus-check-size) * 2 / 14);
 }
 
 input[type=checkbox]:checked {
     background-color:var(--radio-color);
     border: 0px;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' fill='white' viewBox='-100 -100 1300 1300'> <path d='m7.7,404.6c0,0 115.2,129.7 138.2,182.68l99,0c41.5-126.7 202.7-429.1 340.92-535.1c28.6-36.8-43.3-52-101.35-27.62-87.5,36.7-252.5,317.2-283.3,384.64-43.7,11.5-89.8-73.7-89.84-73.7z'/></svg>");
+    background-size: 75%;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 input:disabled {
@@ -722,7 +780,7 @@ input[type="radio"],input[type="checkbox"]{
     padding: 0;
     border: none;
     line-height: 1;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: rgba(0, 0, 0, 0.4);
     vertical-align: middle;
 }
@@ -751,7 +809,7 @@ input[type="radio"],input[type="checkbox"]{
     vertical-align: middle;
 }
 .exodusconfirm_iconcol {
-    width: 46px;
+    width: 4.3em;
     vertical-align: middle;
     padding: 2px 12px 0 2px;
     white-space: nowrap;
@@ -762,6 +820,8 @@ input[type="radio"],input[type="checkbox"]{
 }
 .exodusconfirm_iconcol img {
     display: block;
+    height: calc(2 * var(--exodus-ui-icon-size));
+    width: auto;
 }
 /* Text-input popups: extra gap between underlined field and footer buttons */
 .exodusconfirmdiv.exodusconfirm_textinput .exodusconfirm_body {
@@ -1067,17 +1127,17 @@ SPAN.calendar-date-committed[contenteditable] {
 
 :root[data-theme="dark_mode"] input[type=radio]:not(:checked),
 :root[data-theme="dark_mode"] input[type=checkbox]:not(:checked) {
-    border-width: 1.5px;
+    border-width: calc(var(--exodus-check-size) * 1.5 / 14);
 }
 
 :root[data-theme="dark_mode"] input[type=radio]:checked,
 :root[data-theme="dark_mode"] input[type=checkbox]:checked {
-    border: 1.5px solid var(--radio-ring-color);
+    border: calc(var(--exodus-check-size) * 1.5 / 14) solid var(--radio-ring-color);
 }
 
 :root[data-theme="dark_mode"] input[type=radio]:checked {
     background-color: var(--radio-checked-bg);
-    box-shadow: inset 0 0 0 2px var(--radio-color);
+    box-shadow: inset 0 0 0 calc(var(--exodus-check-size) * 2 / 14) var(--radio-color);
 }
 
 :root[data-theme="dark_mode"] input:disabled {
