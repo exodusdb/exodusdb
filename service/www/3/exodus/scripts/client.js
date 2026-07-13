@@ -5264,12 +5264,10 @@ function exodusconfirm_scrollpane() {
 
 function exodusconfirm_footerwrap(content) {
 	return '\
-		<table class="exodusconfirm_layout" cellspacing="1" cellpadding="1">\
-			<tr>\
-				<td class="exodusconfirm_iconcol">&nbsp;</td>\
-				<td class="exodusconfirm_promptcol">'+ content + '</td>\
-			</tr>\
-		</table>'
+		<div class="exodusconfirm_footerrow">\
+			<div class="exodusconfirm_iconcol" aria-hidden="true">&nbsp;</div>\
+			<div class="exodusconfirm_promptcol">'+ content + '</div>\
+		</div>'
 }
 
 var gexodusconfirm_scrollhint_resize
@@ -5510,7 +5508,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	// Scrollable body + pinned footer (see global.css .exodusconfirm_layout)
 	var bodyhtml = '\
-			<table class="exodusconfirm_layout" cellspacing="1" cellpadding="1">\
+			<table class="exodusconfirm_layout">\
 			<tr>\
 				<td class="exodusconfirm_iconcol">\
 					'+ imagehtml + '\
@@ -5566,20 +5564,6 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				</tr>'
 		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	} else {
-		bodyhtml += '\
-				<tr>\
-					<td class="exodusconfirm_iconcol">\
-						&nbsp;\
-					</td>\
-					<td class="exodusconfirm_promptcol">\
-						<p id="textinputp" style="display: none">\
-							<input size="60" id="textinput" />\
-						</p>\
-						<p id="textinputphidden" style="display: none">\
-							<input type="password" size="60" id="textinputhidden" id="textinputhidden" />\
-						</p>\
-					</td>\
-				</tr>'
 		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	}
 

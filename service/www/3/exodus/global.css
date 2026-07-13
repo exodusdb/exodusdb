@@ -584,7 +584,8 @@ input[type="radio"],input[type="checkbox"]{
 .exodusconfirm_body {
     flex: 1 1 auto;
     min-height: 0;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     text-align: left;
 }
 .exodusconfirmdiv.exodusconfirm_decide {
@@ -642,10 +643,25 @@ input[type="radio"],input[type="checkbox"]{
     flex: 0 0 auto;
     align-self: stretch;
     padding-top: 10px;
-    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+.exodusconfirm_footerrow {
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 .exodusconfirm_layout {
     border-collapse: collapse;
+    border-spacing: 0;
+    border: none;
+}
+.exodusconfirm_layout td,
+.exodusconfirm_layout th {
+    border: none;
+}
+.exodusconfirm_footer .graphicbutton {
+    float: none;
+    display: inline-block;
+    vertical-align: middle;
 }
 .exodusconfirm_iconcol {
     width: 46px;
@@ -660,9 +676,9 @@ input[type="radio"],input[type="checkbox"]{
 .exodusconfirm_iconcol img {
     display: block;
 }
-/* Text-input popups: extra gap between underlined field and footer rule */
+/* Text-input popups: extra gap between underlined field and footer buttons */
 .exodusconfirmdiv.exodusconfirm_textinput .exodusconfirm_body {
-    padding-bottom: 18px;
+    padding-bottom: 8px;
 }
 .exodusconfirmdiv .statementclass {
     color: #000000;
@@ -892,9 +908,7 @@ input:checked + .toggle_button .knob img {
     color: #ffffff;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
-:root[data-theme="dark_mode"] .exodusconfirm_footer {
-    border-top-color: var(--exodusconfirm-border);
-}
+
 :root[data-theme="dark_mode"] .exodusconfirm_scrollhint {
     color: rgba(255, 255, 255, 0.45);
 }
