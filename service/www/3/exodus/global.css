@@ -18,6 +18,23 @@ TABLE.exodusform
     border: 1px lightgrey solid;
 }
 
+/* Inset direct form cells only — nested tables move with their parent cell */
+TABLE.exodusform > tbody > tr > td,
+TABLE.exodusform > tbody > tr > th,
+TABLE.exodusform > thead > tr > td,
+TABLE.exodusform > thead > tr > th,
+TABLE.exodusform > tr > td,
+TABLE.exodusform > tr > th {
+    padding-left: var(--exodus-form-cell-padding-left);
+}
+
+/* Vertical breathing room — all cells incl. nested label/value tables */
+TABLE.exodusform td,
+TABLE.exodusform th {
+    padding-top: var(--exodus-form-cell-padding-y);
+    padding-bottom: var(--exodus-form-cell-padding-y);
+}
+
 /* Rounded form shell — div wrapper inserted by exoduswrapformpanes() in client.js */
 .exodusformpane {
     display: inline-block;
@@ -156,6 +173,8 @@ BODY
     --exodus-form-face: #fdf5e6;
     --exodus-form-radius: 10px;
     --exodus-form-border: #d0d0d0;
+    --exodus-form-cell-padding-left: 6px;
+    --exodus-form-cell-padding-y: 2px;
     --exodus-informbutton-bg: #f0f0f0;
     --exodus-informbutton-border: #cccccc;
     --exodus-informbutton-border-style: outset;
