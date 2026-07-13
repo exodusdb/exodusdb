@@ -18,6 +18,52 @@ TABLE.exodusform
     border: 1px lightgrey solid;
 }
 
+/* Rounded form shell — div wrapper inserted by exoduswrapformpanes() in client.js */
+.exodusformpane {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+    text-align: left;
+    box-sizing: border-box;
+    background-color: var(--exodus-form-face);
+    border: 1px solid var(--exodus-form-border);
+    border-radius: var(--exodus-form-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+/* Simple forms: clip cell backgrounds to the rounded shell */
+.exodusformpane:not(:has(> TABLE[exodusgroupno])) {
+    overflow: hidden;
+}
+.exodusformpane > TABLE.exodusform {
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+/* Pane owns the outer edge; table cells draw internal grid lines only */
+.exodusformpane > TABLE.exodusform > thead > tr > :first-child,
+.exodusformpane > TABLE.exodusform > tbody > tr > :first-child,
+.exodusformpane > TABLE.exodusform > tr > :first-child {
+    border-left: none;
+}
+.exodusformpane > TABLE.exodusform > thead > tr > :last-child,
+.exodusformpane > TABLE.exodusform > tbody > tr > :last-child,
+.exodusformpane > TABLE.exodusform > tr > :last-child {
+    border-right: none;
+}
+.exodusformpane > TABLE.exodusform > thead > tr:first-child > *,
+.exodusformpane > TABLE.exodusform > tbody:first-child > tr:first-child > *,
+.exodusformpane > TABLE.exodusform > tr:first-child > * {
+    border-top: none;
+}
+.exodusformpane > TABLE.exodusform > tbody > tr:last-child > *,
+.exodusformpane > TABLE.exodusform:not(:has(> tbody)) > thead > tr:last-child > *,
+.exodusformpane > TABLE.exodusform:not(:has(> thead)):not(:has(> tbody)) > tr:last-child > * {
+    border-bottom: none;
+}
+
 /* Multirow tables (exodusgroupno): sticky column headings while scrolling */
 TABLE.exodusform[exodusgroupno] {
     padding-top: 0;
@@ -94,6 +140,9 @@ BODY
 
 /* In-form buttons (exodusbutton etc.): one rule for LM/DM; themes override colours only */
 :root {
+    --exodus-form-face: #fdf5e6;
+    --exodus-form-radius: 10px;
+    --exodus-form-border: #d0d0d0;
     --exodus-informbutton-bg: #f0f0f0;
     --exodus-informbutton-border: #cccccc;
     --exodus-informbutton-border-style: outset;
@@ -804,6 +853,11 @@ input:checked + .toggle_button .knob img {
     color: #ffffff;
 }
 
+:root[data-theme="dark_mode"] .exodusformpane {
+    --exodus-form-face: #544836;
+    --exodus-form-border: #7a6b58;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
 :root[data-theme="dark_mode"] TABLE.exodusform {
     /* Warm dark parchment — chromatic contrast vs neutral #181818 page (not grey-on-grey) */
     background-color: #544836 !important;

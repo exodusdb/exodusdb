@@ -169,7 +169,7 @@ async function showuploadtable() {
  if (!(await exodussecurity('UPLOAD CREATE')))
     return await exodusinvalid(gmsg)
 
- $table_upload.style.display=''
+ exodusformpaneof($table_upload).style.display=''
  $form1.filedata.focus()
  $button_showupload.style.display='none'
  $audiovisualextensionselement.innerText='('+gaudiovisualextensions.join(' ')+')'

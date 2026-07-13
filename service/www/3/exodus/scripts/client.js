@@ -1471,6 +1471,7 @@ function exodus_set_style(mode, value, value2) {
 		oldvalue = style.backgroundColor
 		try {
 			style.backgroundColor = value
+			document.documentElement.style.setProperty('--exodus-form-face', value)
 		}
 		catch (e) {
 			if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised color'); return }
@@ -1670,6 +1671,8 @@ async function clientfunctions_windowonload() {
 	//trigger formfunctions_onload
 	if (typeof formfunctions_onload == 'function')
 		await formfunctions_onload()
+
+	exoduswrapformpanes()
 
 	//add menu, logout and refresh buttons if not a popup, depending on gshowmenu, not /exodus/ location and no navbar elements
 	//if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
@@ -4659,6 +4662,51 @@ function getevent(event) {
 	gevent = event
 	return event
 
+}
+
+function exodusformpaneof(tablex) {
+
+	// Return the visible shell around a form table when exoduswrapformpanes() has wrapped it.
+	var parent = tablex && tablex.parentNode
+	if (!parent || !parent.className)
+		return tablex
+	if ((' ' + parent.className + ' ').indexOf(' exodusformpane ') >= 0)
+		return parent
+	return tablex
+}
+
+function exoduswrapformpanes() {
+
+	// Wrap each TABLE.exodusform in a rounded shell (see global.css .exodusformpane).
+	var tables = document.getElementsByTagName('TABLE')
+	for (var tablen = 0; tablen < tables.length; tablen++) {
+		var tablex = tables[tablen]
+		if (!tablex.className || (' ' + tablex.className + ' ').indexOf(' exodusform ') < 0)
+			continue
+		var parent = tablex.parentNode
+		if (!parent || parent.className && (' ' + parent.className + ' ').indexOf(' exodusformpane ') >= 0)
+			continue
+
+		var pane = document.createElement('div')
+		pane.className = 'exodusformpane'
+
+		var width = tablex.getAttribute('width')
+		if (width) {
+			pane.style.width = width
+			tablex.removeAttribute('width')
+		}
+		if (tablex.style && tablex.style.width) {
+			pane.style.width = tablex.style.width
+			tablex.style.width = '100%'
+		}
+		if (tablex.style && tablex.style.display) {
+			pane.style.display = tablex.style.display
+			tablex.style.display = ''
+		}
+
+		parent.insertBefore(pane, tablex)
+		pane.appendChild(tablex)
+	}
 }
 
 //allows dom scan without using IE document.all(ii)
