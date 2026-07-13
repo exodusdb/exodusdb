@@ -54,6 +54,30 @@ var gcompanyimage = gimagetheme + 'formpage_companies.svg'
 
 var gisdarktheme
 
+function exodus_sortimage(order) {
+
+	// order: '' (neutral), 'up', or 'down'
+	var name = 'smallsort' + (order || '')
+	if (gisdarktheme)
+		name += '_darkmode'
+	return gimagetheme + name + '.gif'
+}
+
+function exodus_refresh_sortimages() {
+
+	document.querySelectorAll('img[id^="sortbutton_"]').forEach(img => {
+		var order = ''
+		var src = img.getAttribute('src') || ''
+		if (src.indexOf('up') >= 0)
+			order = 'up'
+		else if (src.indexOf('down') >= 0)
+			order = 'down'
+		img.src = exodus_sortimage(order)
+		if (!order)
+			img.originalsrc = img.src
+	})
+}
+
 var gcache
 
 var glogincode
@@ -1330,6 +1354,8 @@ function exodus_set_theme_icons() {
 		gsaveimage = gimagetheme + (gisdarktheme ? 'tick_darkmode.png' : 'tick.png')
 		gsavegreyimage = gimagetheme + (gisdarktheme ? 'tickgrey_darkmode.png' : 'tickgrey.png')
 	}
+	if (typeof gsortimage != 'undefined')
+		gsortimage = exodus_sortimage()
 }
 
 function add_theme_toggle_btn() {
@@ -1413,6 +1439,7 @@ function theme_toggle(theme = 'default') {
 			});
 		}
 		exodus_swap_tool_icons()
+		exodus_refresh_sortimages()
 	}
 
 	exodus_set_theme_icons()
@@ -3980,7 +4007,7 @@ async function sorttable(event, order) {
 	//change the sort image now confirmed
 	try {
 		await resetsortimages(groupno)
-		clickedelement.src = gimagetheme + 'smallsort' + order + '.gif'
+		clickedelement.src = exodus_sortimage(order)
 	} catch (e) { }
 
 	//reorder data and table rows
