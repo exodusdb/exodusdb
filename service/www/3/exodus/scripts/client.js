@@ -1186,6 +1186,11 @@ function exodus_next(value, source) {
 	if (!gblockevents)
 		form_blockevents(true, source)
 
+	if (!geventhandler) {
+		logevent('  <== exodus_next: no geventhandler (ignored) from ' + source)
+		return { done: true, value: value }
+	}
+
 	var next = geventhandler.next(value)
 
 	logevent('  <== AFTER NEXT EVENTHANDLER from ' + source + ' ===')
@@ -1852,8 +1857,10 @@ async function clientfunctions_windowonload() {
 		gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
 
 		if (!gusername) {
+			var label = $$('exoduslogoutbutton_label')
+			if (label)
+				label.innerHTML = 'Login'
 			var temp = $$('exoduslogoutbutton')
-			temp.innerText = 'Login'
 			temp.title = 'Login. Alt+L'
 		}
 		//if no dbform
@@ -4650,11 +4657,11 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	//tx += ' onmouseout=this.style.borderStyle="outset"'
 
 	//there is no float:center?!
-	//var style = 'white-space:nowrap'
+	var style = ''
 	// logout button should not have a border on the right like the other buttons
 	if (id != 'exoduslogout' && align != 'center') {
 		//var style = 'white-space:nowrap; padding-right: 7.5px;';
-		var style = 'white-space:nowrap; padding: 5px;';
+		style = 'white-space:nowrap; padding: 5px;';
 	}
 
 	if (align == 'center') {
@@ -5988,9 +5995,9 @@ function resolvePendingConfirm(value, source) {
 		resolver(value);
 		return true;
 	}
-	// No pending confirm (should not happen in normal one-flow-at-a-time use).
-	// Fall back to direct resume to avoid breaking anything during transition.
-	exodus_resume(value, source);
+	// No pending confirm — ignore duplicate clicks after the dialog already resolved.
+	if (geventhandler)
+		exodus_resume(value, source);
 	return false;
 }
 
@@ -6006,7 +6013,8 @@ function resolvePendingDialog(value, source) {
 		return true;
 	}
 	// Fallback for safety during incremental conversion.
-	exodus_resume(value, source);
+	if (geventhandler)
+		exodus_resume(value, source);
 	return false;
 }
 

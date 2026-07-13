@@ -3906,7 +3906,12 @@ async function opendoc2(newkey0) {
     //detect if a new key is present and quit if not
     var newkey = ''
     if (newkey0) {
-        newkey = newkey0
+        if (typeof newkey0 == 'string')
+            newkey = newkey0
+        else if (newkey0 && typeof newkey0.join == 'function')
+            newkey = newkey0.join('*')
+        else
+            newkey = String(newkey0)
     }
     else {
         if (gKeyNodes) {
@@ -8166,6 +8171,14 @@ async function getkey(mode) {
 
 async function setkeyvalues(key) {
     //given a string updates the keyfield(s)
+    if (key == null || key === undefined)
+        key = ''
+    else if (typeof key != 'string') {
+        if (typeof key.join == 'function')
+            key = key.join('*')
+        else
+            key = String(key)
+    }
     for (var ii = 0; ii < gKeyNodes.length; ii++) {
         var temp = key.exodusfield('*', Number(gKeyNodes[ii].getAttribute('exoduskeypart')))
         //var conversion=gKeyNodes[ii].getAttribute('exodusconversion')
