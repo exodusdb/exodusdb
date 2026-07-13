@@ -326,7 +326,7 @@ function exodus_client_init() {
 	// Inline dark input colours before global.css loads — prevents white input flash
 	if (gisdarktheme) {
 		document.writeln('<style id="exodus_dm_flashguard">'
-			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#181818!important;color:#fff}'
+			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
 			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#544836!important}'
 			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),'
 			+ ':root[data-theme=dark_mode] SELECT{'
@@ -760,7 +760,7 @@ function blockmodalui_sync() {
 	blocker.style.width = '100%'
 	blocker.style.height = '100%'
 	blocker.style.background = gisdarktheme
-		? 'rgba(24, 24, 24, 0.08)'//near-transparent dark tint, matches #181818 page
+		? 'rgba(0, 0, 0, 0.08)'//near-transparent tint, matches --exodus-page-bg
 		: 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
 	blocker.style.position = 'fixed'
 	blocker.style.top = '0'

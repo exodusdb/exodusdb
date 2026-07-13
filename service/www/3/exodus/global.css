@@ -827,6 +827,7 @@ input:checked + .toggle_button .knob img {
 
 /* ========== Dark mode (light mode rules above stay unchanged) ========== */
 :root[data-theme="dark_mode"] {
+    --exodus-page-bg: #000000;
     --exodus-calendar-face: #3a3530;
     --exodus-calendar-header-face: #4a443c;
     --exodus-calendar-border: #b8a99a;
@@ -861,8 +862,9 @@ input:checked + .toggle_button .knob img {
     --radio-ring-color: #d4ccc0;
 }
 
+:root[data-theme="dark_mode"],
 :root[data-theme="dark_mode"] BODY {
-    background: #181818 !important;
+    background: var(--exodus-page-bg) !important;
     color: #ffffff;
 }
 
@@ -872,7 +874,7 @@ input:checked + .toggle_button .knob img {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform {
-    /* Warm dark parchment — chromatic contrast vs neutral #181818 page (not grey-on-grey) */
+    /* Warm dark parchment — stands off page bg (--exodus-page-bg) */
     background-color: #544836 !important;
     border-color: #7a6b58 !important;
     color: #ffffff;
