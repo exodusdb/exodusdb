@@ -101,9 +101,29 @@ function Calendar(date) {
 }
 
 /**
- *	CREATE the Calendar DOM element
+ *	Reset displayed month/selection when reopening the shared popup.
+ */
+Calendar.prototype.resetForOpen = function(date) {
+	if (date) {
+		this._currentDate = new Date(date);
+		this._selectedDate = new Date(date);
+	} else {
+		this._currentDate = new Date();
+		this._selectedDate = null;
+	}
+	if (this._calDiv) {
+		this._updateHeader();
+		this._update();
+	}
+}
+
+/**
+ *	CREATE the Calendar DOM element (once; reused on later opens)
  */
 Calendar.prototype.create = function() {
+	if (this._calDiv)
+		return this._calDiv;
+
 	var div;
 	var table;
 	var tbody;

@@ -8526,53 +8526,43 @@ async function form_pop_calendar() {
     return false
 }
 
+function calendar_checkInDatePicker_onchange() {
+
+    if (!calendar_checkInDatePicker)
+        return true
+
+    setvalue(gpreviouselement, calendar_checkInDatePicker.formatDate())
+
+    focusnext(gpreviouselement)
+    return true
+}
+
 async function form_popcalendar2() {
 
-    //remove any previous calendar
-    //if (calendar_checkInDatePicker) calendar_checkInDatePicker.hide()
-
     var datevalue = gvalue.toString().exodusiconv('[DATE]')
+    var msdate = null
     if (datevalue) {
-        var msdate = new Date()
+        msdate = new Date()
         msdate.setDate(Number(datevalue.exodusoconv('[DATE,DOM]')))
         msdate.setMonth(Number(datevalue.exodusoconv('[DATE,MONTH]') - 1))
         msdate.setFullYear(Number(datevalue.exodusoconv('[DATE,YEAR]')))
-        calendar_checkInDatePicker = new Calendar(msdate);
     }
-    else {
-        calendar_checkInDatePicker = new Calendar();
-    }
-    /*
-    calendar_checkInDatePicker.setMonthNames(new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"));
-    calendar_checkInDatePicker.setShortMonthNames(new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"));
-    calendar_checkInDatePicker.setWeekDayNames(new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"));
-    calendar_checkInDatePicker.setShortWeekDayNames(new Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"));
-    */
 
-    //calendar_checkInDatePicker.setFormat("d/M/yyyy");
-    //calendar_checkInDatePicker.setFirstDayOfWeek(6);
+    if (!calendar_checkInDatePicker) {
+        calendar_checkInDatePicker = msdate ? new Calendar(msdate) : new Calendar()
+        calendar_checkInDatePicker.create()
+        //dont use addeventlistener here because onchange is special to DatePicker
+        calendar_checkInDatePicker.onchange = calendar_checkInDatePicker_onchange
+    } else {
+        if (calendar_checkInDatePicker._showing)
+            calendar_checkInDatePicker.hide()
+        calendar_checkInDatePicker.resetForOpen(msdate)
+    }
+
     calendar_checkInDatePicker.setFormat(gdateformat);
     calendar_checkInDatePicker.setFirstDayOfWeek(Number(gfirstdayofweek));
     calendar_checkInDatePicker.setMinimalDaysInFirstWeek(1);
     calendar_checkInDatePicker.setIncludeWeek(false);
-
-    calendar_checkInDatePicker.create();
-
-    function calendar_checkInDatePicker_onchange() {
-
-        if (!calendar_checkInDatePicker)
-            return true
-
-        setvalue(gpreviouselement, calendar_checkInDatePicker.formatDate())
-
-        //clear the object
-        exodussettimeout('calendar_checkInDatePicker=null', 1)
-
-        focusnext(gpreviouselement)
-        return true
-    }
-    //dont use addeventlistener here because onchange is special to DatePicker
-    calendar_checkInDatePicker.onchange = calendar_checkInDatePicker_onchange
 
     calendar_checkInDatePicker.show(gpreviouselement)
     calendar_checkInDatePicker._calDiv.focus()
@@ -8589,7 +8579,7 @@ async function form_closepopups() {
 
     var anyclosed = false
 
-    if (calendar_checkInDatePicker) {
+    if (calendar_checkInDatePicker && calendar_checkInDatePicker._showing) {
         try {
             calendar_checkInDatePicker.hide()
         }
@@ -8597,7 +8587,6 @@ async function form_closepopups() {
             if (gusername == 'EXODUS')
                 await exodusnote('couldnt drop calendar\n' + e.description)
         }
-        calendar_checkInDatePicker = ''
         anyclosed = true
 
     }
