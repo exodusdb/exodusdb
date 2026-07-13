@@ -470,6 +470,20 @@ span.clsReadOnly:empty
     --ok-color: #a0ffa0;
     --fail-color: #ffa0a0;
     --warning-color: #FF3403;
+    --exodus-calendar-face: #fdf5e6;
+    --exodus-calendar-header-face: #e8e8e8;
+    --exodus-calendar-border: #666666;
+    --exodus-calendar-color: #000000;
+    --exodus-calendar-header-color: #000000;
+    --exodus-calendar-today-color: #c03030;
+    --exodus-calendar-select-bg: #ffffff;
+    --exodus-calendar-select-color: #000000;
+    --exodus-calendar-select-border: #999999;
+    --exodus-calendar-button-bg: #f0f0f0;
+    --exodus-calendar-button-color: #000000;
+    --exodus-calendar-button-border: #cccccc;
+    --exodus-calendar-current-border: #666666;
+    --exodus-calendar-selected-border: #333333;
 }
 
 input[type=radio] {
@@ -735,6 +749,20 @@ input:checked + .toggle_button .knob img {
 
 /* ========== Dark mode (light mode rules above stay unchanged) ========== */
 :root[data-theme="dark_mode"] {
+    --exodus-calendar-face: #3a3530;
+    --exodus-calendar-header-face: #4a443c;
+    --exodus-calendar-border: #b8a99a;
+    --exodus-calendar-color: #ffffff;
+    --exodus-calendar-header-color: #ffffff;
+    --exodus-calendar-today-color: #ff8a80;
+    --exodus-calendar-select-bg: #2a2622;
+    --exodus-calendar-select-color: #ffffff;
+    --exodus-calendar-select-border: #b8a99a;
+    --exodus-calendar-button-bg: #6a5e50;
+    --exodus-calendar-button-color: #ffffff;
+    --exodus-calendar-button-border: #a8957c;
+    --exodus-calendar-current-border: #d0c4b8;
+    --exodus-calendar-selected-border: #ffffff;
     --exodus-textcolor: #ffffff;
     --exodus-menubkgcolor: linear-gradient(to top, #1e1e1e, #272727);
     --exodus-smallerbordercolor: #2b2b2b;
@@ -933,6 +961,86 @@ input:checked + .toggle_button .knob img {
 
 :root[data-theme="dark_mode"] #uiblockerdiv {
     background: rgba(24, 24, 24, 0.08) !important;
+}
+
+/* ========== Date picker popup (calendar.js) ========== */
+.calendar {
+    text-align: center;
+    background: var(--exodus-calendar-face);
+    color: var(--exodus-calendar-color);
+    border: 1px solid var(--exodus-calendar-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+.calendarHeader {
+    background: var(--exodus-calendar-header-face);
+    color: var(--exodus-calendar-header-color);
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--exodus-calendar-border);
+}
+.calendarHeader select.calendarSelect {
+    background-color: var(--exodus-calendar-select-bg);
+    color: var(--exodus-calendar-select-color);
+    border: 1px solid var(--exodus-calendar-select-border);
+    border-radius: 3px;
+    font: inherit;
+    max-width: 9em;
+}
+.calendarHeader button {
+    background: var(--exodus-calendar-button-bg);
+    color: var(--exodus-calendar-button-color);
+    border: 1px solid var(--exodus-calendar-button-border);
+    border-radius: 3px;
+    cursor: pointer;
+    font: inherit;
+    padding: 1px 6px;
+}
+.calendarBody table.grid {
+    color: var(--exodus-calendar-color);
+    cursor: default;
+    text-align: center;
+}
+.calendarBody th.weekDayHead {
+    font-weight: bold;
+    border-bottom: 1px solid var(--exodus-calendar-border);
+}
+.calendarBody td.weekNumber {
+    border-right: 1px solid var(--exodus-calendar-border);
+}
+.calendarBody td.calendarDay {
+    cursor: pointer;
+    color: var(--exodus-calendar-color);
+    font-weight: normal;
+    border: none;
+}
+.calendarBody td.calendarDay.empty {
+    cursor: default;
+}
+.calendarBody td.calendarDay.today {
+    color: var(--exodus-calendar-today-color);
+    font-weight: bold;
+}
+.calendarBody td.calendarDay.current {
+    border: 1px dotted var(--exodus-calendar-current-border);
+    font-weight: bold;
+}
+.calendarBody td.calendarDay.selected {
+    border: 1px solid var(--exodus-calendar-selected-border);
+}
+.calendarFooter button {
+    background: var(--exodus-calendar-button-bg);
+    color: var(--exodus-calendar-button-color);
+    border: 1px solid var(--exodus-calendar-button-border);
+    border-radius: 3px;
+    cursor: pointer;
+    font: inherit;
+    margin: 4px 2px;
+    padding: 2px 8px;
+}
+:root[data-theme="dark_mode"] .calendarHeader select.calendarSelect option {
+    background-color: var(--exodus-calendar-select-bg);
+    color: var(--exodus-calendar-select-color);
 }
 
 /*must be last*/

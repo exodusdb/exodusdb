@@ -136,9 +136,6 @@ Calendar.prototype.create = function() {
 	this._calDiv.className = "calendar";
 	this._calDiv.style.position = "absolute";
 	this._calDiv.style.display = "none";
-	this._calDiv.style.border = "1px solid WindowText";
-	this._calDiv.style.textAlign = "center";
-	this._calDiv.style.background = "Window";
 	this._calDiv.style.zIndex = "400";
 	//exodus to allow focus so keyevents get triggered
 	this._calDiv.tabIndex=1
@@ -146,9 +143,6 @@ Calendar.prototype.create = function() {
 	// header div
 	div = document.createElement("div");
 	div.className = "calendarHeader";
-	div.style.background = "ActiveCaption";
-	div.style.padding = "3px";
-	div.style.borderBottom = "1px solid WindowText";
 	this._calDiv.appendChild(div);
 	
 	table = document.createElement("table");
@@ -179,6 +173,7 @@ Calendar.prototype.create = function() {
 	td.className = "labelContainer";
 	tr.appendChild(td);
 	this._monthSelect = document.createElement("select");
+	this._monthSelect.className = "calendarSelect";
     for (var i = 0 ; i < this._monthNames.length ; i++) {
         var opt = document.createElement("option");
         opt.innerHTML = this._monthNames[i];
@@ -198,6 +193,7 @@ Calendar.prototype.create = function() {
 	td.className = "labelContainer";
 	tr.appendChild(td);
 	this._yearSelect = document.createElement("select");
+	this._yearSelect.className = "calendarSelect";
 	for(var i=1920; i < 2050; ++i) {
 		var opt = document.createElement("option");
 		opt.innerHTML = i;
@@ -235,9 +231,6 @@ Calendar.prototype.create = function() {
 	//exodus table.style.textAalign	= "center";
 	//exodus
 	table.style.textAlign	= "center";
-	
-	table.style.color		= "WindowText";
-	table.style.cursor		= "default";
 	table.cellPadding		= "3";
 	table.cellSpacing		= "0";
 	
@@ -261,8 +254,6 @@ Calendar.prototype.create = function() {
 		text = document.createTextNode(this._shortWeekDayNames[(i+this._firstDayOfWeek)%7]);
 		td.appendChild(text);
 		td.className = "weekDayHead";
-		td.style.fontWeight = "bold";
-		td.style.borderBottom = "1px solid WindowText";
 		tr.appendChild(td);
 	}
 	
@@ -277,8 +268,6 @@ Calendar.prototype.create = function() {
 		if (this._includeWeek) {
 			td = document.createElement("td");
 			td.className = "weekNumber";
-			td.style.fontWeight = "normal";
-			td.style.borderRight = "1px solid WindowText";
 			td.style.textAlign = "left";
 			text = document.createTextNode(String.fromCharCode(160));
 			td.appendChild(text);
@@ -294,12 +283,11 @@ Calendar.prototype.create = function() {
 
 		for(day=0; day<7; ++day) {
 			td = document.createElement("td");
+			td.className = "calendarDay";
 			text = document.createTextNode(String.fromCharCode(160));
 			td.appendChild(text);
             setCursor(td);
             td.align="center";
-            td.style.fontWeight="normal";
-            
 			tr.appendChild(td);
 			var tmp = new Object();
 			tmp.tag = "DATE";
@@ -547,11 +535,7 @@ Calendar.prototype._update = function() {
 		ptr=ptr.data;//exodus
 		ptr.data = String.fromCharCode(160);
 		ptr=ptr.parentNode;//exodus
-		ptr.className = "";
-		ptr=ptr.style;//exodus
-		ptr.fontWeight = "normal";
-		ptr.border= "none";
-		ptr.color= 'black';
+		ptr.className = "calendarDay empty";
 		index++;
 	}
         
@@ -563,29 +547,14 @@ Calendar.prototype._update = function() {
 		ptr.data.data = i;
 		
 		ptr=ptr.data.parentNode;//exodus
-		ptr.className = "";
-		ptr.style.fontWeight = "normal";
-		ptr.style.color = "black";
-		ptr.style.border= "none";
-		if (toISODate(d1) == today) {
-			ptr.className = "today";
-			ptr.style.fontWeight = "bold";
-
-			//exodus
-			ptr.style.color = "red";
-		}
-		if (toISODate(d1) == current) {
-			ptr.className += " current";
-			ptr.style.border= "1px dotted WindowText";
-
-			//exodus
-			ptr.style.fontWeight = "bold";
-
-		}
-		if (toISODate(d1) == selected) {
-			ptr.className += " selected";
-			ptr.style.border= "1px solid WindowText";
-		}
+		var dayclass = "calendarDay";
+		if (toISODate(d1) == today)
+			dayclass += " today";
+		if (toISODate(d1) == current)
+			dayclass += " current";
+		if (toISODate(d1) == selected)
+			dayclass += " selected";
+		ptr.className = dayclass;
 		d1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate()+1);
 	}
 	
@@ -600,9 +569,7 @@ Calendar.prototype._update = function() {
 		ptr.data = String.fromCharCode(160);
 		
 		ptr=ptr.parentNode;//exodus
-		ptr.className = "";
-		ptr.style.fontWeight = "normal";
-		ptr.style.border= "none";
+		ptr.className = "calendarDay empty";
 		++index;
 	}
 	
