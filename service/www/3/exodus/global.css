@@ -4,7 +4,7 @@ TABLE.exodusform
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
     border-collapse: collapse;
-    /*background-color: #ffffc0; /*cellpadding: 1;*/*/
+    /* background-color: #ffffc0; cellpadding: 1; */
     background-color: #fdf5e6;
     border-color: #d0d0d0;
     border-width: 1px 1px 1px 1px;
@@ -535,8 +535,37 @@ img[id^="deleterowbutton"] {
 }
 
 #exodus_menu .menubutton,
+#exodus_menu .graphicbutton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+}
+
+#exodus_menu .menubutton,
 #exodus_menu [id$="_label"] {
     color: inherit;
+}
+
+#exodus_menu .menubutton img,
+#exodus_menu .graphicbutton img {
+    height: var(--exodus-ui-icon-size);
+    width: auto;
+    display: block;
+}
+
+/* Form toolbar (New/Open/Save/…) — slightly more air than default menubutton margin */
+#exodus_menu #formbuttonsdiv {
+    margin-left: 6px;
+}
+
+#exodus_menu #formbuttonsdiv .menubutton,
+#exodus_menu #formbuttonsdiv .graphicbutton {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+#exodus_menu #formbuttonsdiv .exodus_recordnav_group {
+    margin-left: 4px;
 }
 
 #exodus_menu .exodus_recordnav_group {
@@ -569,7 +598,13 @@ img[id^="deleterowbutton"] {
     float: left;
     max-width: 65px;
     padding-left: 5px;
+    padding-right: 10px;
     border-right: 0.2px solid var(--exodus-smallerbordercolor);
+}
+
+.refresh_wrapper {
+    float: left;
+    padding-left: 8px;
 }
 
 .logout_wrapper {
@@ -684,8 +719,9 @@ input[type=checkbox] {
 input[type=checkbox]:checked {
     background-color:var(--radio-color);
     border: 0px;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' fill='white' viewBox='-100 -100 1300 1300'> <path d='m7.7,404.6c0,0 115.2,129.7 138.2,182.68l99,0c41.5-126.7 202.7-429.1 340.92-535.1c28.6-36.8-43.3-52-101.35-27.62-87.5,36.7-252.5,317.2-283.3,384.64-43.7,11.5-89.8-73.7-89.84-73.7z'/></svg>");
-    background-size: 75%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1.8 8.4 L5.6 12.2 L14.2 2.6' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-size: 96%;
+    background-clip: padding-box;
     background-position: center;
     background-repeat: no-repeat;
 }

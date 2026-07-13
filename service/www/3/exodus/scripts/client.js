@@ -47,7 +47,8 @@ var glogsettimeout
 var gimagetheme = '../../exodus/images/theme2/'
 //var gmenuimage=gimagetheme+'menu.png'//'add.png'
 var gmenuimage = gimagetheme + 'menu_burger.svg'
-var glogoutimage = gimagetheme + 'disconnect.png'
+var glogoutimage = gimagetheme + 'logout.svg'
+var gloginimage = gimagetheme + 'login.svg'
 var grefreshimage = gimagetheme + 'refresh.svg'
 var gthemeimage = gimagetheme + 'theme_button.svg'
 var gcompanyimage = gimagetheme + 'formpage_companies.svg'
@@ -1440,21 +1441,53 @@ function exodus_swap_tool_icons() {
 	}
 }
 
+function exodus_update_auth_button() {
+
+	var btn = $$('exoduslogoutbutton')
+	if (!btn)
+		return
+	var img = btn.querySelector('img')
+	var label = $$('exoduslogoutbutton_label')
+	var ctrlalt = isMac ? 'Ctrl' : 'Alt'
+	if (!gusername) {
+		if (label)
+			label.innerHTML = 'Login'
+		btn.title = 'Login. ' + ctrlalt + '+L'
+		if (img)
+			img.src = gloginimage
+	} else {
+		if (label)
+			label.innerHTML = 'Lo<u>g</u>out'
+		btn.title = 'Logout. ' + ctrlalt + '+G'
+		if (img)
+			img.src = glogoutimage
+	}
+}
+
 function exodus_set_theme_icons() {
 
 	gmenuimage = gimagetheme + (gisdarktheme ? 'menu_burger_darkmode.svg' : 'menu_burger.svg')
-	glogoutimage = gimagetheme + (gisdarktheme ? 'disconnect_darkmode.png' : 'disconnect.png')
+	glogoutimage = gimagetheme + (gisdarktheme ? 'logout_darkmode.svg' : 'logout.svg')
+	gloginimage = gimagetheme + (gisdarktheme ? 'login_darkmode.svg' : 'login.svg')
 	grefreshimage = gimagetheme + (gisdarktheme ? 'refresh_darkmode.svg' : 'refresh.svg')
 	if (typeof gnewimage != 'undefined') {
-		gnewimage = gimagetheme + (gisdarktheme ? 'application_form_add_darkmode.png' : 'application_form_add.png')
-		gdeleteimage = gimagetheme + (gisdarktheme ? 'application_form_delete_darkmode.png' : 'application_form_delete.png')
-		geditimage = gimagetheme + (gisdarktheme ? 'pencil_edit_darkmode.png' : 'pencil_edit.png')
-		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.gif' : 'open.gif')
-		gsaveimage = gimagetheme + (gisdarktheme ? 'tick_darkmode.png' : 'tick.png')
-		gsavegreyimage = gimagetheme + (gisdarktheme ? 'tickgrey_darkmode.png' : 'tickgrey.png')
+		gnewimage = gimagetheme + (gisdarktheme ? 'form_add_darkmode.svg' : 'form_add.svg')
+		gdeleteimage = gimagetheme + (gisdarktheme ? 'form_delete_darkmode.svg' : 'form_delete.svg')
+		geditimage = gimagetheme + (gisdarktheme ? 'pencil_edit_darkmode.svg' : 'pencil_edit.svg')
+		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.svg' : 'open.svg')
+		gsaveimage = gimagetheme + (gisdarktheme ? 'tick_darkmode.svg' : 'tick.svg')
+		gsavegreyimage = gimagetheme + (gisdarktheme ? 'tickgrey_darkmode.svg' : 'tickgrey.svg')
+		gcopyimage = gimagetheme + (gisdarktheme ? 'copy_darkmode.svg' : 'copy.svg')
+		gcloseimage = gimagetheme + (gisdarktheme ? 'cross_darkmode.svg' : 'cross.svg')
+		greleaseimage = gimagetheme + (gisdarktheme ? 'lock_darkmode.svg' : 'lock.svg')
+		gfirstimage = gimagetheme + (gisdarktheme ? 'resultset_first_darkmode.svg' : 'resultset_first.svg')
+		gpreviousimage = gimagetheme + (gisdarktheme ? 'resultset_previous_darkmode.svg' : 'resultset_previous.svg')
+		gnextimage = gimagetheme + (gisdarktheme ? 'resultset_next_darkmode.svg' : 'resultset_next.svg')
+		glastimage = gimagetheme + (gisdarktheme ? 'resultset_last_darkmode.svg' : 'resultset_last.svg')
 	}
 	if (typeof gsortimage != 'undefined')
 		gsortimage = exodus_sortimage()
+	exodus_update_auth_button()
 }
 
 function add_theme_toggle_btn() {
@@ -1564,7 +1597,14 @@ function theme_toggle(theme = 'default') {
 	// Switch colour of button icons after page load
 	const xform_postload = document.readyState === 'complete'
 	if (xform_postload) {
-		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage, 'gmenuimage': gmenuimage, 'glogoutimage': glogoutimage, 'grefreshimage': grefreshimage, 'gnewimage': gnewimage, 'gdeleteimage': gdeleteimage, 'geditimage': geditimage, 'gopenimage': gopenimage, 'gsaveimage': gsaveimage, 'gsavegreyimage': gsavegreyimage }
+		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage, 'gmenuimage': gmenuimage, 'glogoutimage': glogoutimage, 'gloginimage': gloginimage, 'grefreshimage': grefreshimage, 'gnewimage': gnewimage, 'gdeleteimage': gdeleteimage, 'geditimage': geditimage, 'gopenimage': gopenimage, 'gsaveimage': gsaveimage, 'gsavegreyimage': gsavegreyimage }
+		if (typeof gcopyimage != 'undefined') icon_paths.gcopyimage = gcopyimage
+		if (typeof gcloseimage != 'undefined') icon_paths.gcloseimage = gcloseimage
+		if (typeof greleaseimage != 'undefined') icon_paths.greleaseimage = greleaseimage
+		if (typeof gfirstimage != 'undefined') icon_paths.gfirstimage = gfirstimage
+		if (typeof gpreviousimage != 'undefined') icon_paths.gpreviousimage = gpreviousimage
+		if (typeof gnextimage != 'undefined') icon_paths.gnextimage = gnextimage
+		if (typeof glastimage != 'undefined') icon_paths.glastimage = glastimage
 		if (gdatafilename == 'ADDRESSES')
 			icon_paths['gcompanyimage'] = gcompanyimage
 		const filetype_rex = /(\.[a-zA-Z]+$)/
@@ -1834,11 +1874,10 @@ async function clientfunctions_windowonload() {
 		//button to refresh (clear cache)
 		if (typeof gshowrefreshcachebutton == 'undefined' || gshowrefreshcachebutton) {
 			var temp2 = document.createElement('span')
+			temp2.classList.add('refresh_wrapper')
 			temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Database Cache. ' + ctrlalt + '+R', 'X')
 			//document.body.insertBefore(temp2, document.body.firstChild)
 			gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-			temp2.style.float = 'left'
-			temp2.style.paddingLeft = '5px'
 			//if no dbform
 			if (typeof gdictfilename == 'undefined')
 				addeventlistener(temp2, 'click', 'refreshcache_onclick')
@@ -1856,13 +1895,7 @@ async function clientfunctions_windowonload() {
 		//document.body.insertBefore(temp2, document.body.firstChild)
 		gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
 
-		if (!gusername) {
-			var label = $$('exoduslogoutbutton_label')
-			if (label)
-				label.innerHTML = 'Login'
-			var temp = $$('exoduslogoutbutton')
-			temp.title = 'Login. Alt+L'
-		}
+		exodus_update_auth_button()
 		//if no dbform
 		if (typeof gdictfilename == 'undefined')
 			addeventlistener(temp2, 'click', 'exoduslogout_onclick')
@@ -4696,15 +4729,13 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	//alert(id+' '+tx)
 	//image inside span button (any styling should also be edited into menu.htm menu <img>
 	if (imagesrc) {
-		//style="vertical-align:text-top"
-		tx += '<IMG src=' + imagesrc + ' style="vertical-align:top"'
-		tx += '>'
+		tx += '<IMG src=' + imagesrc + '>'
 	}
 
 	//tx+='<br />'
 
 	tx += '<span id=' + id + 'button' + '_label>'
-	tx += ' ' + name
+	tx += name
 	tx += '</span>'
 
 	tx += '</' + tagname + '>'
@@ -4731,7 +4762,7 @@ function setgraphicbutton(button, labeltext, src) {
 
 	if (labeltext) {
 		var label = $$(button.id + '_label')
-		label.innerHTML = labeltext
+		label.innerHTML = labeltext.replace(/^\s+/, '')
 	}
 	if (src)
 		button.getElementsByTagName('IMG')[0].src = src

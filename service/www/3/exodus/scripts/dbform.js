@@ -6,29 +6,29 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //var nbsp160 = String.fromCharCode(160)
 
 // set global image paths
-gnewimage = gimagetheme + 'application_form_add.png'
-gopenimage = gimagetheme + 'open.gif'
+gnewimage = gimagetheme + 'form_add.svg'
+gopenimage = gimagetheme + 'open.svg'
 gfindimage = gimagetheme + 'zoom.svg'
 gcalendarimage = gimagetheme + 'calendar.svg'
-gsaveimage = gimagetheme + 'tick.png'
-gsavegreyimage = gimagetheme + 'tickgrey.png'
-gcopyimage = gimagetheme + 'page_copy.png'
+gsaveimage = gimagetheme + 'tick.svg'
+gsavegreyimage = gimagetheme + 'tickgrey.svg'
+gcopyimage = gimagetheme + 'copy.svg'
 gcloseimage = gimagetheme + 'cross.svg'
 greleaseimage = gimagetheme + 'lock.svg'
-geditimage = gimagetheme + 'pencil_edit.png'
-gdeleteimage = gimagetheme + 'application_form_delete.png' //'delete.png'
+geditimage = gimagetheme + 'pencil_edit.svg'
+gdeleteimage = gimagetheme + 'form_delete.svg'
 glistimage = gimagetheme + 'table.svg'
-gprintsendimage = gimagetheme + 'printer.svg' //'application_form.png'
+gprintsendimage = gimagetheme + 'printer.svg'
 ginsertrowimage = gimagetheme + 'add.svg'
 gdeleterowimage = gimagetheme + 'delete.svg'
 gexpandrowimage = gimagetheme + 'smallexpand.svg'
 gsortimage = exodus_sortimage()
 glinkimage = gimagetheme + 'application_form.svg'
-gfirstimage = gimagetheme + 'resultset_first.png'
-glastimage = gimagetheme + 'resultset_last.png'
-gnextimage = gimagetheme + 'resultset_next.png'
-gpreviousimage = gimagetheme + 'resultset_previous.png'
-gspacerimage = gimagetheme + 'spacer.png'
+gfirstimage = gimagetheme + 'resultset_first.svg'
+glastimage = gimagetheme + 'resultset_last.svg'
+gnextimage = gimagetheme + 'resultset_next.svg'
+gpreviousimage = gimagetheme + 'resultset_previous.svg'
+gspacerimage = gimagetheme + 'spacer.svg'
 gblankimage = gimagetheme + 'blank.gif'
 
 // Mitigate icon flash between default (light) to dark versions
@@ -43,12 +43,19 @@ gcompanyimage = gimagetheme + 'formpage_companies_darkmode.svg'
 ginsertrowimage = gimagetheme + 'add_darkmode.svg'
 gdeleterowimage = gimagetheme + 'delete_darkmode.svg'
 gcalendarimage = gimagetheme + 'calendar_darkmode.svg'
-gnewimage = gimagetheme + 'application_form_add_darkmode.png'
-gdeleteimage = gimagetheme + 'application_form_delete_darkmode.png'
-geditimage = gimagetheme + 'pencil_edit_darkmode.png'
-gopenimage = gimagetheme + 'open_darkmode.gif'
-gsaveimage = gimagetheme + 'tick_darkmode.png'
-gsavegreyimage = gimagetheme + 'tickgrey_darkmode.png'
+gnewimage = gimagetheme + 'form_add_darkmode.svg'
+gdeleteimage = gimagetheme + 'form_delete_darkmode.svg'
+geditimage = gimagetheme + 'pencil_edit_darkmode.svg'
+gopenimage = gimagetheme + 'open_darkmode.svg'
+gsaveimage = gimagetheme + 'tick_darkmode.svg'
+gsavegreyimage = gimagetheme + 'tickgrey_darkmode.svg'
+gcopyimage = gimagetheme + 'copy_darkmode.svg'
+gcloseimage = gimagetheme + 'cross_darkmode.svg'
+greleaseimage = gimagetheme + 'lock_darkmode.svg'
+gfirstimage = gimagetheme + 'resultset_first_darkmode.svg'
+gpreviousimage = gimagetheme + 'resultset_previous_darkmode.svg'
+gnextimage = gimagetheme + 'resultset_next_darkmode.svg'
+glastimage = gimagetheme + 'resultset_last_darkmode.svg'
 }
 
 // document.getElementsByTagName('BODY').onload=window_onload
@@ -3601,7 +3608,7 @@ async function editreleaserecord_onclick() {
         return false
 
     //editreleaserecord.value=' Edit'
-    setgraphicbutton(editreleaserecord, ' <u>E</u>dit', geditimage)
+    setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
     setdisabledandhidden(editreleaserecord, false)
 
     return true
