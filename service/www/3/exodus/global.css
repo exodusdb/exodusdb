@@ -867,10 +867,12 @@ input:checked + .toggle_button .knob img {
     --exodus-menuboxshadow: #000 0px 1px 10px;
     --exodus-menuhighlight: #666666;
     --exodus-dotcolor: #fdfdfd;
-    --exodus-textarea-border: #a8957c;
-    /* In-form buttons: face lighter than form (#544836), border lighter than face */
-    --exodus-informbutton-bg: #6a5e50;
-    --exodus-informbutton-border: #a8957c;
+    --exodus-form-face: #28304a;
+    --exodus-form-border: #7070e0;
+    --exodus-textarea-border: #6070b8;
+    /* In-form buttons: aligned with question-mode popup chrome */
+    --exodus-informbutton-bg: #354060;
+    --exodus-informbutton-border: #7070e0;
     --exodus-informbutton-border-style: solid;
     --exodus-informbutton-color: #ffffff;
     --bg-color: #1e1e1e;
@@ -888,14 +890,12 @@ input:checked + .toggle_button .knob img {
 }
 
 :root[data-theme="dark_mode"] .exodusformpane {
-    --exodus-form-face: #544836;
-    --exodus-form-border: #7a6b58;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform {
-    /* Warm dark parchment — stands off page bg (--exodus-page-bg) */
-    background-color: #544836 !important;
-    border-color: #7a6b58 !important;
+    /* Bluish face like exodusconfirm_question1 popup */
+    background-color: var(--exodus-form-face) !important;
+    border-color: var(--exodus-form-border) !important;
     color: #ffffff;
 }
 
@@ -909,18 +909,18 @@ SPAN.calendar-date-committed[contenteditable] {
 
 :root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead th,
 :root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead td {
-    background-color: #544836;
+    background-color: var(--exodus-form-face);
 }
 :root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead th,
 :root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead td {
-    background-color: #5c5638;
+    background-color: #303a5a;
 }
 
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > thead,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > th,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > td {
-    border-color: #7a6b58 !important;
+    border-color: color-mix(in srgb, var(--exodus-form-border) 45%, var(--exodus-form-face) 55%) !important;
 }
 
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
