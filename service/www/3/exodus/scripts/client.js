@@ -750,25 +750,105 @@ async function uiblocker_waitcancel_dialog() {
 	}
 }
 
-function blockmodalui_sync() {
+var gmodalblockdepth = 0
+var gmodalblock_savedoverflow
+var gmodalblock_capturebound
 
-	unblockmodalui_sync()
+function modalblock_scrollpane_under(event) {
+
+	var confirm = $$('exodusconfirmdiv')
+	if (!confirm || !confirm.contains(event.target))
+		return null
+
+	var scrollpane = confirm.querySelector('.exodusconfirm_body')
+	if (!scrollpane || !(scrollpane === event.target || scrollpane.contains(event.target)))
+		return null
+
+	return scrollpane
+
+}
+
+function modalblock_onwheel(event) {
+
+	if (gmodalblockdepth <= 0)
+		return
+
+	var scrollpane = modalblock_scrollpane_under(event)
+	if (scrollpane) {
+		var delta = event.deltaY
+		if (!delta)
+			return
+		var atTop = scrollpane.scrollTop <= 0
+		var atBottom = scrollpane.scrollTop + scrollpane.clientHeight >= scrollpane.scrollHeight - 1
+		if ((delta < 0 && atTop) || (delta > 0 && atBottom))
+			event.preventDefault()
+		return
+	}
+
+	event.preventDefault()
+
+}
+
+function modalblock_ontouchmove(event) {
+
+	if (gmodalblockdepth <= 0)
+		return
+
+	if (modalblock_scrollpane_under(event))
+		return
+
+	event.preventDefault()
+
+}
+
+function modalblock_bind_capture() {
+
+	if (gmodalblock_capturebound)
+		return
+
+	document.addEventListener('wheel', modalblock_onwheel, { capture: true, passive: false })
+	document.addEventListener('touchmove', modalblock_ontouchmove, { capture: true, passive: false })
+	gmodalblock_capturebound = true
+
+}
+
+function modalblock_unbind_capture() {
+
+	if (!gmodalblock_capturebound)
+		return
+
+	document.removeEventListener('wheel', modalblock_onwheel, { capture: true })
+	document.removeEventListener('touchmove', modalblock_ontouchmove, { capture: true })
+	gmodalblock_capturebound = false
+
+}
+
+function modalblock_create() {
 
 	//YIELD//console.log('BLOCKING UI')
 
-	blocker = document.createElement('div')
-	blocker.style.width = '100%'
-	blocker.style.height = '100%'
+	var blocker = document.createElement('div')
+	blocker.style.width = '100vw'
+	blocker.style.height = '100vh'
 	blocker.style.background = gisdarktheme
 		? 'rgba(0, 0, 0, 0.08)'//near-transparent tint, matches --exodus-page-bg
 		: 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
 	blocker.style.position = 'fixed'
 	blocker.style.top = '0'
 	blocker.style.left = '0'
-	blocker.style.zIndex = '100'
+	blocker.style.zIndex = '1000'//above #exodus_menu (999), below .exodusconfirmdiv (1001)
+	blocker.style.pointerEvents = 'auto'
 	blocker.id = 'uiblockerdiv'
 
 	document.body.insertBefore(blocker, null)
+
+	gmodalblock_savedoverflow = {
+		body: document.body.style.overflow,
+		html: document.documentElement.style.overflow
+	}
+	document.body.style.overflow = 'hidden'
+	document.documentElement.style.overflow = 'hidden'
+	modalblock_bind_capture()
 
 	//keep focus off parent window and on child window or exodusdiv
 	var guiblockermousedown = false
@@ -808,24 +888,54 @@ function blockmodalui_sync() {
 
 }
 
-var gchildwin
+function modalblock_destroy() {
 
-function unblockmodalui_sync() {
-	//close in-dom wait/cancel confirm if present
+	//close in-dom confirm if still present when tearing down the last modal layer
 	if ($$('exodusconfirmdiv') && gpendingConfirmResolve)
 		resolvePendingConfirm(1, 'unblockmodalui_sync')
-	//close legacy child 'please wait' window if present
-	if (gchildwin && gchildwin.actual && !gchildwin.actual.closed)
-		gchildwin.actual.close()
-	if (gchildwin && gchildwin.lazy)
-		gchildwin = false
-	gprocessing_waitcancel_active = false
+
 	var blocker = $$('uiblockerdiv')
 	if (blocker) {
 		//YIELD//console.log('UNBLOCKING UI')
 		exodusremovenode(blocker)
 		//console.log('parent window ui unblocked')
 	}
+
+	if (gmodalblock_savedoverflow) {
+		document.body.style.overflow = gmodalblock_savedoverflow.body
+		document.documentElement.style.overflow = gmodalblock_savedoverflow.html
+		gmodalblock_savedoverflow = null
+	}
+
+	modalblock_unbind_capture()
+
+}
+
+function blockmodalui_sync() {
+
+	if (gmodalblockdepth === 0)
+		modalblock_create()
+	++gmodalblockdepth
+
+}
+
+var gchildwin
+
+function unblockmodalui_sync() {
+
+	//close legacy child 'please wait' window if present
+	if (gchildwin && gchildwin.actual && !gchildwin.actual.closed)
+		gchildwin.actual.close()
+	if (gchildwin && gchildwin.lazy)
+		gchildwin = false
+	gprocessing_waitcancel_active = false
+
+	if (gmodalblockdepth > 0)
+		--gmodalblockdepth
+
+	if (gmodalblockdepth === 0)
+		modalblock_destroy()
+
 }
 
 function getdialogstyle_sync(dialogstyle) {
@@ -5742,11 +5852,18 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	})
 	gpendingConfirmResolve = confirmResolve
 
-	var response = await confirmPromise
-
-	gpendingConfirmResolve = null
-	exodusconfirm_unbind_scroll_hints()
-	exodusremovenode(div)
+	blockmodalui_sync()
+	form_blockevents(true, 'exodusconfirm2')
+	var response
+	try {
+		response = await confirmPromise
+	} finally {
+		gpendingConfirmResolve = null
+		form_blockevents(false, 'exodusconfirm2')
+		unblockmodalui_sync()
+		exodusconfirm_unbind_scroll_hints()
+		exodusremovenode(div)
+	}
 
 	//text input returns a string (may be zero length) or false if clicked cancel
 	if (typeof text != 'undefined' || text === null) {

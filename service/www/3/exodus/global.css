@@ -644,7 +644,7 @@ input[type="radio"],input[type="checkbox"]{
 /* ========== In-window confirm/decide popups ========== */
 .exodusconfirmdiv {
     --exodusconfirm-face: #e8e8e8;
-    z-index: 1000;
+    z-index: 1001;
     position: fixed;
     width: fit-content;
     max-width: min(700px, calc(100vw - 40px));
@@ -667,7 +667,13 @@ input[type="radio"],input[type="checkbox"]{
     min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
     text-align: left;
+}
+#uiblockerdiv {
+    z-index: 1000;
+    pointer-events: auto;
+    overscroll-behavior: none;
 }
 .exodusconfirmdiv.exodusconfirm_decide {
     max-width: calc(100vw - 40px);
@@ -1077,7 +1083,7 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 
 :root[data-theme="dark_mode"] #uiblockerdiv {
-    background: rgba(24, 24, 24, 0.08) !important;
+    background: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* ========== Date picker popup (calendar.js) — aligned with exodusconfirmdiv ========== */

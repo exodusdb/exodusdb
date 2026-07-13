@@ -2220,11 +2220,15 @@ async function document_onkeydown(event) {
 
     //document_onkeydown also occurs in non-form windows not using dbform.js - like upload.htm etc
 
-    //prevent keys while child window is open or rapid concurrent keydown events
-    if (gonkeydown || $$('uiblockerdiv')) {
-        console.log('still responding to gonkeydown')
-        //ignore this until fix resuming after ok/cancel
-        //return exoduscancelevent(event)
+    //prevent concurrent keydown; block menu shortcuts while confirm popup is up
+    if (gonkeydown)
+        return exoduscancelevent(event)
+
+    if ($$('exodusconfirmdiv')) {
+        var confirmdiv = $$('exodusconfirmdiv')
+        if (confirmdiv && confirmdiv.contains(event.target))
+            return true
+        return exoduscancelevent(event)
     }
 
     gonkeydown = true
