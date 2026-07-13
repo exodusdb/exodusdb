@@ -875,6 +875,15 @@ input:checked + .toggle_button .knob img {
     /* Warm dark parchment — chromatic contrast vs neutral #181818 page (not grey-on-grey) */
     background-color: #544836 !important;
     border-color: #7a6b58 !important;
+    color: #ffffff;
+}
+
+/* schedules_calendar: booked/certified dates — red in light mode, warm accent in dark */
+SPAN.calendar-date-committed[contenteditable] {
+    color: #c00000;
+}
+:root[data-theme="dark_mode"] SPAN.calendar-date-committed[contenteditable] {
+    color: var(--exodus-calendar-today-color);
 }
 
 :root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead th,
