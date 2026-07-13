@@ -7788,6 +7788,24 @@ async function exoduslink(event, element) {
 
 }
 
+function exodusfieldpopupallowed(element) {
+
+    if (!element || !element.getAttribute)
+        return false
+
+    if (element.getAttribute('exodusreadonly'))
+        return false
+
+    if (element.disabled || element.getAttribute('disabled'))
+        return false
+
+    // skip fields made non-tabbable (incl. exodussetreadonly)
+    if (element.tabIndex === -1)
+        return false
+
+    return true
+}
+
 async function exoduspopup(event, element) {
 
     event = getevent(event)
@@ -7837,11 +7855,11 @@ async function exoduspopup(event, element) {
         return false //logout('exoduspopup - read only document')
     }
 
-    //quit if readonly
-    var readonly = element.getAttribute('exodusreadonly')
-    if (readonly) {
-        if (readonly != 'true')
-            await exodusinvalid(element.getAttribute('exodusreadonly'))
+    // quit if field is not editable (readonly, disabled, or non-tabbable)
+    if (!exodusfieldpopupallowed(element)) {
+        var readonly = element.getAttribute('exodusreadonly')
+        if (readonly && readonly != 'true')
+            await exodusinvalid(readonly)
         return false //logout('exoduspopup - read only')
     }
 
@@ -8539,6 +8557,9 @@ function calendar_checkInDatePicker_onchange() {
 }
 
 async function form_popcalendar2() {
+
+    if (!gpreviouselement || !exodusfieldpopupallowed(gpreviouselement))
+        return false
 
     var datevalue = gvalue.toString().exodusiconv('[DATE]')
     var msdate = null
