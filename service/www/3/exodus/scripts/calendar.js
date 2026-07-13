@@ -199,7 +199,7 @@ Calendar.prototype.create = function() {
 		opt.innerHTML = i;
 		opt.value = i;
 		if (i == this._currentDate.getFullYear()) {
-			opt.selected = false;
+			opt.selected = true;
 		}
 		this._yearSelect.appendChild(opt);
 	}
@@ -394,7 +394,10 @@ Calendar.prototype.create = function() {
 		if (isNaN(n) || n <= 0 || n == null)
 			return;
 		
-		if (el.className == "weekNumber")
+		if (el.className.indexOf("weekNumber") >= 0)
+			return;
+
+		if (el.className.indexOf("empty") >= 0)
 			return;
 			
 		d.setDate(n);
@@ -412,15 +415,23 @@ Calendar.prototype.create = function() {
 		if (e == null) e = document.parentWindow.event;
 		var kc = e.keyCode != null ? e.keyCode : e.charCode;
 
-		if(kc == 13) {
-			var d = new Date(dp._currentDate).valueOf();
-			dp.setSelectedDate(d);
+		if (kc == 13) {
+			dp.setSelectedDate(new Date(dp._currentDate));
 
 			if (!dp._alwaysVisible && dp._hideOnSelect) {
 				dp.hide();
 			}
 			return false;
 		}
+
+		if (kc == 27) {
+			dp.hide();
+			return exoduscancelevent(e);
+		}
+
+		// Tab between month/year controls and footer buttons
+		if (kc == 9)
+			return true;
 					
 		//exodus if (kc < 37 || kc > 40) return true;
 		//any other keys close popup and bubble up
@@ -429,8 +440,6 @@ Calendar.prototype.create = function() {
 			if (!dp._alwaysVisible && dp._hideOnSelect) {
 				dp.hide();
 			}
-		 if (kc==27)
-			return exoduscancelevent(e)
 
 		 return true;
 		}
@@ -484,6 +493,12 @@ Calendar.prototype.create = function() {
 		if (e == null) e = document.parentWindow.event;
 		e = getEventObject(e);
 		dp.setYear(e.value);
+	}
+
+	this._yearSelect.onclick = function(e) {
+		if (e == null) e = document.parentWindow.event;
+		e = getEventObject(e);
+		e.cancelBubble = true;
 	}
 
 
@@ -591,15 +606,18 @@ Calendar.prototype._update = function() {
 }
 
 Calendar.prototype.show = function(element) {
-	if(!this._showing) {
-	
-		//exodus
-		this._element=element
-		
-		var p = getPoint(element);
+	if (!element || !this._calDiv)
+		return;
+
+	//exodus — always re-anchor when reused across fields
+	this._element = element;
+
+	var p = getPoint(element);
+	this._calDiv.style.top = (p.y + element.offsetHeight + 1) + "px";
+	this._calDiv.style.left = p.x + "px";
+
+	if (!this._showing) {
 		this._calDiv.style.display = "block";
-		this._calDiv.style.top = (p.y + element.offsetHeight + 1) + "px";
-		this._calDiv.style.left = p.x + "px";
 		this._showing = true;
 		
 		/* -------- */
@@ -625,17 +643,18 @@ Calendar.prototype.show = function(element) {
 		     this._underDiv = underDiv;
 	   }
 		/* -------- */
-		this._calDiv.focus();
-		
 	}
+
+	this._calDiv.focus();
 };
 
 Calendar.prototype.hide = function() {   
 	if(this._showing) {
 		this._calDiv.style.display = "none";
 		
-		//exodus
-		this._element.focus()
+		//exodus — return focus without committing (onchange only from select/clear/today)
+		if (this._element && this._element.focus)
+			this._element.focus()
 		
 		this._showing = false;
 		if( this._bw.ie6 ) {

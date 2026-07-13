@@ -8528,7 +8528,8 @@ async function form_pop_calendar() {
 
 function calendar_checkInDatePicker_onchange() {
 
-    if (!calendar_checkInDatePicker)
+    // Commit path only: day click, Enter, Today, or Clear — not Escape/dismiss
+    if (!calendar_checkInDatePicker || !gpreviouselement)
         return true
 
     setvalue(gpreviouselement, calendar_checkInDatePicker.formatDate())
