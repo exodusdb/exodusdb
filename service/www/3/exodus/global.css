@@ -896,12 +896,15 @@ input:checked + .toggle_button .knob img {
 }
 
 :root[data-theme="dark_mode"] .exodusformpane {
+    /* Scoped vars override inline --exodus-form-face from LM screencolor on <html> */
+    --exodus-form-face: #28304a;
+    --exodus-form-border: #7070e0;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform {
-    /* Bluish face like exodusconfirm_question1 popup */
-    background-color: var(--exodus-form-face) !important;
-    border-color: var(--exodus-form-border) !important;
+    /* Hardcoded — must not use var(); inline LM screencolor on <html> would win */
+    background-color: #28304a !important;
+    border-color: #7070e0 !important;
     color: #ffffff;
 }
 
@@ -915,7 +918,7 @@ SPAN.calendar-date-committed[contenteditable] {
 
 :root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead th,
 :root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead td {
-    background-color: var(--exodus-form-face);
+    background-color: #28304a;
 }
 :root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead th,
 :root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead td {
@@ -926,7 +929,7 @@ SPAN.calendar-date-committed[contenteditable] {
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > thead,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > th,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > td {
-    border-color: color-mix(in srgb, var(--exodus-form-border) 45%, var(--exodus-form-face) 55%) !important;
+    border-color: #5a6090 !important;
 }
 
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
@@ -964,10 +967,10 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 
 :root[data-theme="dark_mode"] .menu {
-    background-color: var(--exodus-form-face) !important;
+    background-color: #28304a !important;
     color: #ffffff;
     opacity: 1 !important;
-    border: 1px solid var(--exodus-form-border) !important;
+    border: 1px solid #7070e0 !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
@@ -978,7 +981,7 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 
 :root[data-theme="dark_mode"] .menu_hr {
-    border-color: color-mix(in srgb, var(--exodus-form-border) 45%, var(--exodus-form-face) 55%);
+    border-color: #5a6090;
 }
 
 :root[data-theme="dark_mode"] .graphicbutton,

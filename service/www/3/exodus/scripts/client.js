@@ -1488,6 +1488,46 @@ function add_theme_toggle_btn() {
 	return label;
 }
 
+function exodus_global_css_link() {
+
+	return document.getElementById('exodus_global_css')
+		|| document.querySelector("link[href$='global.css']")
+
+}
+
+function exodus_exodusform_rule_style() {
+
+	var link = exodus_global_css_link()
+	if (!link || !link.sheet)
+		return null
+
+	var rules = link.sheet.cssRules || link.sheet.rules
+	if (!rules)
+		return null
+
+	for (var rulen = 0; rulen < rules.length; rulen++) {
+		var rule = rules[rulen]
+		if (rule.selectorText && rule.selectorText.toUpperCase() == 'TABLE.EXODUSFORM')
+			return rule.style
+	}
+
+	// fallback: first rule is still TABLE.exodusform in global.css
+	return rules[0] && rules[0].style
+
+}
+
+function exodus_clear_form_inline_theme() {
+
+	var tables = document.getElementsByTagName('TABLE')
+	for (var ii = 0; ii < tables.length; ii++) {
+		if ((' ' + tables[ii].className + ' ').indexOf(' exodusform ') >= 0) {
+			tables[ii].style.removeProperty('color')
+			tables[ii].style.removeProperty('background-color')
+		}
+	}
+
+}
+
 function theme_toggle(theme = 'default') {
 
 	// Switch between dark and light (color) modes using CSS themes
@@ -1503,12 +1543,17 @@ function theme_toggle(theme = 'default') {
 		gisdarktheme = false
 		html.removeAttribute('data-theme')
 		html.style.removeProperty('--exodus-cardcolor')
-		if (document.querySelector("link[href='../exodus/global.css']"))
+		// Restore LM screencolor on stylesheet rule + --exodus-form-face for .exodusformpane
+		if (exodus_global_css_link())
 			exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
+		exodus_clear_form_inline_theme()
 	} else {
 		gisdarktheme = true
 		html.setAttribute('data-theme', theme)
 		html.style.removeProperty('--exodus-cardcolor')
+		// Inline LM screencolor on <html> overrides :root[data-theme] custom properties
+		html.style.removeProperty('--exodus-form-face')
+		html.style.removeProperty('--exodus-form-border')
 	}
 
 	// Switch colour of button icons after page load
@@ -1548,16 +1593,17 @@ function exodus_set_style(mode, value, value2) {
 	//restore original value
 	if (!value && goriginalstyles[mode]) value = goriginalstyles[mode]
 
-	var link = document.querySelector("link[href='../exodus/global.css']")
-	if (!link) return
-	var ss = link.sheet
-	var rules = ss.cssRules || ss.rules
+	var link = exodus_global_css_link()
+	if (!link || !link.sheet) return
+	var rules = link.sheet.cssRules || link.sheet.rules
 	var oldvalue = ''
 
-	//screencolor - light mode only: user-customisable TABLE.exodusform background (first CSS rule)
+	//screencolor - light mode only: user-customisable TABLE.exodusform background
 	if (mode == 'screencolor' && rules && !gisdarktheme) {
 
-		var style = rules[0].style
+		var style = exodus_exodusform_rule_style()
+		if (!style) return
+
 		style.display = ''
 
 		if (!value) value = '#fdf5e6'
@@ -1566,6 +1612,7 @@ function exodus_set_style(mode, value, value2) {
 		try {
 			style.backgroundColor = value
 			document.documentElement.style.setProperty('--exodus-form-face', value)
+			document.documentElement.style.setProperty('--exodus-form-border', '#d0d0d0')
 		}
 		catch (e) {
 			if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised color'); return }
