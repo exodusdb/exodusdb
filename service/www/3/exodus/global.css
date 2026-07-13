@@ -30,6 +30,19 @@ TABLE.exodusform
     border-radius: var(--exodus-form-radius);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+/* Centered popup/dialog: form pane stacks above sibling buttons (e.g. schedules_calendar) */
+div[align="center"] > .exodusformpane {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.exodusformactions {
+    display: block;
+    text-align: center;
+    margin-top: 6px;
+}
 /* Simple forms: clip cell backgrounds to the rounded shell */
 .exodusformpane:not(:has(> TABLE[exodusgroupno])) {
     overflow: hidden;
