@@ -591,15 +591,8 @@ function exodussetexpression2b(expressionid, elements, style, attributename, exp
 		//build a closure containing all the elements to be updated
 		//and to be called at intervals
 		function anon_from_exodussetexpression2b() {
-			exodussetexpression2c(elements, style, attributename, expression).next()
-
-			//In yielding code, the above only creates a generator function which has to be
-			//spurred into action by calling its next() method - below
-			//We cannot simply prefix yield* in front of it to cause it to automatically execute (legacy)
-			//because it is in an anonymous function that will be called at intervals by window
-			//and if the anonymous function were to be marked function* (ie to be a yielding function
-			//known as a generator) the window call at intervals would only create a generator
-			// and not actually start the function by calling its next() method (legacy notes)
+			// exodussetexpression2c is async; setInterval does not await — fire each tick.
+			void exodussetexpression2c(elements, style, attributename, expression)
 		}
 		, 250)//every quarter second
 }
@@ -1100,9 +1093,7 @@ function exodus_next(value, source) {
 }
 
 function displayresponsedata_sync(request, data) {
-	var temp = window['displayresponsedata'](request, data)
-	if (temp.next)
-		exodusneweventhandler(temp, 'displayresponsedata')
+	exodusinvokesynctarget(displayresponsedata, [request, data], 'displayresponsedata')
 }
 
 async function displayresponsedata(request, data) {
@@ -1126,11 +1117,7 @@ async function displayresponsedata(request, data) {
 
 function openwindow_sync(request, data) {
 	//LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
-	var result = openwindow(request, data)
-	if (result.next) {
-		result = exodusneweventhandler(result, 'openwindow_sync ' + request).value
-	}
-	return result
+	return exodusinvokesynctargetreturn(openwindow, [request, data], 'openwindow_sync ' + request)
 }
 
 //function to simplify passing a db request (with optional data)
@@ -1165,10 +1152,7 @@ async function windowopenkey(url, key) {
 
 function windowopen_sync(url, parameters, style) {
 	//LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
-	var result = windowopen(url, parameters, style)
-	if (result.next)
-		return result.next()
-	return result
+	return exodusinvokesynctargetreturn(windowopen, [url, parameters, style], 'windowopen_sync')
 }
 
 var gwindowopenparameters
@@ -4957,20 +4941,86 @@ var gpendingConfirmResolve
 // For the child window / showmodaldialog leaf (next after confirm).
 var gpendingDialogResolve
 
+// --- async/generator bridge helpers (asyncjs migration) ---
+
+function exodusisasyncfunction(fn) {
+	return fn && fn.constructor && fn.constructor.name === 'AsyncFunction'
+}
+
+function exodusisgeneratoriterator(value) {
+	return value && typeof value.next === 'function' && typeof value.throw === 'function'
+		&& value.constructor && value.constructor.name === 'Generator'
+}
+
+function exodusispromise(value) {
+	return value && typeof value.then === 'function'
+}
+
+// Invoke from a legacy *_sync() bridge (inline onclick, setTimeout string, etc.).
+// Blocks UI/events for async targets; kicks generators via exodusneweventhandler.
+function exodusinvokesynctarget(target, args, location) {
+	args = args || []
+	if (exodusisasyncfunction(target)) {
+		void startAsyncFlow(function () { return target.apply(null, args) }, location)
+		return
+	}
+	var result = target.apply(null, args)
+	if (exodusisgeneratoriterator(result)) {
+		void exodusneweventhandler(result, location)
+		return result
+	}
+	if (exodusispromise(result)) {
+		void startAsyncFlow(function () { return result }, location)
+		return result
+	}
+	return result
+}
+
+// Invoke from a legacy *_sync() bridge that returns a value to its caller.
+function exodusinvokesynctargetreturn(target, args, location) {
+	args = args || []
+	if (exodusisasyncfunction(target))
+		return startAsyncFlow(function () { return target.apply(null, args) }, location)
+	var result = target.apply(null, args)
+	if (exodusisgeneratoriterator(result))
+		return exodusneweventhandler(result, location).value
+	if (exodusispromise(result))
+		return startAsyncFlow(function () { return result }, location)
+	return result
+}
+
+// Normalise a call result inside an async function (await promise or kick generator).
+async function exodusawaitresult(result, location) {
+	if (!result) return result
+	if (exodusispromise(result))
+		return await result
+	if (exodusisgeneratoriterator(result))
+		return exodusneweventhandler(result, location).value
+	return result
+}
+
+// Fire-and-forget for unload etc. — no UI blocking.
+function exodusfireandforget(result, location) {
+	if (!result) return
+	if (exodusispromise(result)) {
+		void result.catch(function (e) {
+			console.log('exodusfireandforget ' + location + ': ' + (e.description || e.message || e))
+		})
+		return
+	}
+	if (exodusisgeneratoriterator(result))
+		void exodusneweventhandler(result, location)
+}
+
 function exodusneweventhandler(eventhandler, location) {
 
 	++geventn
 	logevent(' ')
 	logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
 
-	// Support for async conversion: if we are passed an async function (or a function that returns a promise),
-	// run it as a top-level await flow instead of a generator.
-	// This is the central marker the user identified.
-	if (eventhandler && typeof eventhandler === 'function' &&
-		(eventhandler.constructor.name === 'AsyncFunction' ||
-		 (eventhandler() && typeof eventhandler().then === 'function'))) {
-		return startAsyncFlow(eventhandler, location);
-	}
+	// Async functions must not be pre-invoked; run via startAsyncFlow (never call eventhandler() to probe).
+	if (exodusisasyncfunction(eventhandler))
+		return startAsyncFlow(eventhandler, location)
 
 	geventhandler = eventhandler
 

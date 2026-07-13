@@ -2108,8 +2108,7 @@ function window_onunload_sync() {
     //save gdataset in case we are refreshing and the parent window isnt there to get it from
     exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
-    //unlock any document before unloading
-    //using .next() instead of yield* to call async code (legacy note)
+    //unlock any document before unloading (fire-and-forget async via exodusfireandforget)
     if (glocked) {
 
         //Save unlock request for following window to perform hopefully
@@ -2118,10 +2117,7 @@ function window_onunload_sync() {
         exodussetcookie(glogincode, 'EXODUSpending', pending)
 
         console.log('trying to unlock ' + gkey + ' immediately but async request doesnt seem to reach server reliably while unloading')
-        //await unlockdoc()
-        var result = unlockdoc()
-        if (result.next)
-            result.next()
+        exodusfireandforget(unlockdoc(), 'window_onunload_sync unlockdoc')
 
         //or cancel any pending request
     } else if (gxhttp && gxhttp.status != 200) {
@@ -9154,7 +9150,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     ////////
     var savegrecn = grecn
     var p = importdata_function(data);
-    var result = (p && typeof p.then === 'function' ? await p : (p && p.next ? exodusneweventhandler(p, 'importdata').value : p));
+    var result = await exodusawaitresult(p, 'importdata');
 
     await calcfields()
 

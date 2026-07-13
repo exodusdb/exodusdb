@@ -524,8 +524,7 @@ async function gds_setx2(cells, values, forced) {
         var afterupdate = this.dictitem(cells.dictid).afterupdate
         if (afterupdate) {
             try {
-                var result=afterupdate(cells, values)
-                if (result.next) result.next()  // legacy iterator check
+                await exodusawaitresult(afterupdate(cells, values), 'afterupdate in gds_setx')
             }
             catch (e) {
                 systemerror(e.description + ' ' + e.number, 'in afterupdate() in await gds_setx(' + cells.dictid + ')')
