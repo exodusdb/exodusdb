@@ -1281,8 +1281,11 @@ SPAN.calendar-date-committed[contenteditable] {
     font-weight: bold;
 }
 .calendarBody td.calendarDay.current {
-    border: 1px dotted var(--exodus-calendar-current-border);
     font-weight: bold;
+    box-shadow: inset 0 0 0 2px var(--exodus-calendar-border);
+}
+:root[data-theme="dark_mode"] .calendarBody td.calendarDay.current {
+    box-shadow: inset 0 0 0 2px #ffffff;
 }
 .calendarBody td.calendarDay.selected {
     border: 1px solid var(--exodus-calendar-selected-border);
