@@ -637,19 +637,20 @@ img[id^="deleterowbutton"] {
     --ok-color: #a0ffa0;
     --fail-color: #ffa0a0;
     --warning-color: #FF3403;
-    --exodus-calendar-face: #e8e8e8;
-    --exodus-calendar-header-face: #e8e8e8;
-    --exodus-calendar-border: #666666;
+    /* match .exodusconfirm_question1 */
+    --exodus-calendar-face: #ddddff;
+    --exodus-calendar-header-face: #ddddff;
+    --exodus-calendar-border: #4444cc;
     --exodus-calendar-color: #000000;
     --exodus-calendar-header-color: #000000;
     --exodus-calendar-today-color: #c03030;
     --exodus-calendar-select-bg: #ffffff;
     --exodus-calendar-select-color: #000000;
-    --exodus-calendar-select-border: #999999;
+    --exodus-calendar-select-border: #4444cc;
     --exodus-calendar-button-bg: #f0f0f0;
     --exodus-calendar-button-color: #000000;
     --exodus-calendar-button-border: #cccccc;
-    --exodus-calendar-current-border: #666666;
+    --exodus-calendar-current-border: #4444cc;
     --exodus-calendar-selected-border: #333333;
 }
 
@@ -949,19 +950,20 @@ input:checked + .toggle_button .knob img {
 /* ========== Dark mode (light mode rules above stay unchanged) ========== */
 :root[data-theme="dark_mode"] {
     --exodus-page-bg: #000000;
-    --exodus-calendar-face: #3a3530;
-    --exodus-calendar-header-face: #4a443c;
-    --exodus-calendar-border: #b8a99a;
+    /* match .exodusconfirm_question1 */
+    --exodus-calendar-face: #28304a;
+    --exodus-calendar-header-face: #28304a;
+    --exodus-calendar-border: #7070e0;
     --exodus-calendar-color: #ffffff;
     --exodus-calendar-header-color: #ffffff;
     --exodus-calendar-today-color: #ff8a80;
-    --exodus-calendar-select-bg: #2a2622;
+    --exodus-calendar-select-bg: #28304a;
     --exodus-calendar-select-color: #ffffff;
-    --exodus-calendar-select-border: #b8a99a;
+    --exodus-calendar-select-border: #7070e0;
     --exodus-calendar-button-bg: #6a5e50;
     --exodus-calendar-button-color: #ffffff;
     --exodus-calendar-button-border: #a8957c;
-    --exodus-calendar-current-border: #d0c4b8;
+    --exodus-calendar-current-border: #7070e0;
     --exodus-calendar-selected-border: #ffffff;
     --exodus-textcolor: #ffffff;
     --exodus-menubkgcolor: linear-gradient(to top, #303a5a, #1a2035);
@@ -1198,6 +1200,12 @@ SPAN.calendar-date-committed[contenteditable] {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+/* tabindex=1 + .focus() for keyboard nav — hide browser focus ring (was tan/red, not our border) */
+.calendar:focus,
+.calendar:focus-visible {
+    outline: none;
+    border-color: var(--exodus-calendar-border);
 }
 .calendarHeader {
     position: sticky;
