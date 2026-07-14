@@ -755,8 +755,9 @@ input[type=checkbox] {
 input[type=checkbox]:checked {
     background-color:var(--radio-color);
     border: 0px;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1.8 8.4 L5.6 12.2 L14.2 2.6' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
-    background-size: 96%;
+    /* U+2714 / &#10004; heavy check mark glyph (checkbox_tick.svg) */
+    background-image: url("../../exodus/images/theme2/checkbox_tick.svg");
+    background-size: 100%;
     background-clip: padding-box;
     background-position: center;
     background-repeat: no-repeat;
@@ -1215,6 +1216,12 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 :root[data-theme="dark_mode"] input[type=radio]:checked,
 :root[data-theme="dark_mode"] input[type=checkbox]:checked {
     border: calc(var(--exodus-check-size) * 1.5 / 14) solid var(--radio-ring-color);
+}
+
+:root[data-theme="dark_mode"] input[type=checkbox]:checked {
+    background-color: var(--radio-color);
+    background-image: url("../../exodus/images/theme2/checkbox_tick.svg");
+    background-size: 90%;
 }
 
 :root[data-theme="dark_mode"] input[type=radio]:checked {
