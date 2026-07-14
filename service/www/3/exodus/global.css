@@ -42,7 +42,6 @@ TABLE.exodusform th {
 /* Rounded form shell — div wrapper inserted by exoduswrapformpanes() in client.js */
 .exodusformpane {
     display: inline-block;
-    max-width: 100%;
     vertical-align: top;
     text-align: left;
     box-sizing: border-box;
@@ -55,7 +54,6 @@ TABLE.exodusform th {
 div[align="center"] > .exodusformpane {
     display: block;
     width: max-content;
-    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -73,7 +71,6 @@ div[align="center"] > .exodusformpane {
 TABLE.exodusform > tbody > tr > td > TABLE.exodustable:not([width]),
 TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]) {
     width: max-content;
-    max-width: 100%;
 }
 
 /* Embedded group/detail tables — no extra frame inside the grid */
