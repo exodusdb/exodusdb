@@ -395,6 +395,13 @@ TABLE.exodusform .clsReadOnly {
     font-style: var(--exodus-form-data-font-style);
 }
 
+/* UA forms.css shrinks controls after screenfont strips font-size from font-family rules */
+INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
+SELECT,
+TEXTAREA {
+    font-size: 1rem;
+}
+
 /* EXPERIMENTAL: async-ui underline text entry (single-line) */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
 SELECT,
