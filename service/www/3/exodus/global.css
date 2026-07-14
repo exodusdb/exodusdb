@@ -54,7 +54,6 @@ TABLE.exodusform th {
 /* Centered popup/dialog: form pane stacks above sibling buttons (e.g. schedules_calendar) */
 div[align="center"] > .exodusformpane {
     display: block;
-    width: max-content;
     margin-left: auto;
     margin-right: auto;
 }
@@ -99,7 +98,6 @@ TABLE.exodusform TABLE.exodustable th {
     padding: 0;
     border: none;
     border-radius: 0;
-    width: 100%;
     box-sizing: border-box;
 }
 /* Pane owns the outer edge; table cells draw internal grid lines only */

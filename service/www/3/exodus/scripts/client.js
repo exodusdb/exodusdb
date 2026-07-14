@@ -4880,35 +4880,6 @@ function exodusformpaneof(tablex) {
 	return tablex
 }
 
-function exodusformpane_is_pixel_width(widthx) {
-
-	return /^\s*\d+(\.\d+)?(px)?\s*$/i.test(String(widthx))
-}
-
-function exodusformpane_parse_pixels(widthx) {
-
-	var matchx = String(widthx).trim().match(/^(\d+(?:\.\d+)?)(?:px)?$/i)
-	return matchx ? parseFloat(matchx[1]) : 0
-}
-
-function exodusformpane_set_outer_width(pane, widthx) {
-
-	// box-sizing:border-box — expand explicit pixel widths by padding + border
-	if (!widthx || !exodusformpane_is_pixel_width(widthx)) {
-		pane.style.width = widthx
-		return
-	}
-	var computed = window.getComputedStyle ? getComputedStyle(pane) : null
-	var chrome = 10
-	if (computed) {
-		chrome = (parseFloat(computed.paddingLeft) || 0)
-			+ (parseFloat(computed.paddingRight) || 0)
-			+ (parseFloat(computed.borderLeftWidth) || 0)
-			+ (parseFloat(computed.borderRightWidth) || 0)
-	}
-	pane.style.width = (exodusformpane_parse_pixels(widthx) + chrome) + 'px'
-}
-
 function exoduswrapformpanes() {
 
 	// Wrap each TABLE.exodusform in a rounded shell (see global.css .exodusformpane).
@@ -4924,12 +4895,6 @@ function exoduswrapformpanes() {
 		var pane = document.createElement('div')
 		pane.className = 'exodusformpane'
 
-		var attrwidth = tablex.getAttribute('width')
-		var stylewidth = tablex.style && tablex.style.width
-		if (attrwidth)
-			tablex.removeAttribute('width')
-		if (stylewidth)
-			tablex.style.width = '100%'
 		if (tablex.style && tablex.style.display) {
 			pane.style.display = tablex.style.display
 			tablex.style.display = ''
@@ -4937,10 +4902,6 @@ function exoduswrapformpanes() {
 
 		parent.insertBefore(pane, tablex)
 		pane.appendChild(tablex)
-
-		var outerwidth = stylewidth || attrwidth
-		if (outerwidth)
-			exodusformpane_set_outer_width(pane, outerwidth)
 	}
 
 	exodusclear_embeddedtable_hostborders()
