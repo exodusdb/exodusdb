@@ -1059,6 +1059,14 @@ SPAN.calendar-date-committed[contenteditable] {
     background-color: #303a5a;
 }
 
+/* Sort icon: align with column title text (default img alignment sits too high) */
+TABLE[exodusgroupno] > thead th img[id^="sortbutton_"],
+TABLE[exodusgroupno] > thead td img[id^="sortbutton_"],
+TABLE.exodustable[exodusgroupno] > thead th img[id^="sortbutton_"],
+TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
+    vertical-align: text-bottom;
+}
+
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > thead,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > th,

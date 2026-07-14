@@ -61,7 +61,7 @@ function exodus_sortimage(order) {
 	var name = 'smallsort' + (order || '')
 	if (gisdarktheme)
 		name += '_darkmode'
-	return gimagetheme + name + '.gif'
+	return gimagetheme + name + '.svg'
 }
 
 function exodus_refresh_sortimages() {
