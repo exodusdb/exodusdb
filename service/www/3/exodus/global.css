@@ -69,7 +69,14 @@ div[align="center"] > .exodusformpane {
     overflow: hidden;
 }
 
-/* Embedded group/detail tables fill their host cell — no extra frame inside the grid */
+/* Embedded exodustable: content width (UA may stretch inputs to fill a wide host cell) */
+TABLE.exodusform > tbody > tr > td > TABLE.exodustable:not([width]),
+TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]) {
+    width: max-content;
+    max-width: 100%;
+}
+
+/* Embedded group/detail tables — no extra frame inside the grid */
 TABLE.exodusform > tbody > tr > td:has(> TABLE[exodusgroupno]),
 TABLE.exodusform > tbody > tr > td:has(> TABLE.exodustable),
 TABLE.exodusform > tbody > tr > th:has(> TABLE[exodusgroupno]),
