@@ -725,6 +725,23 @@ function loguiblockerwaitcancel_event(event, action) {
 
 var gprocessing_waitcancel_active
 
+// Release per-request modal wait state owned by db.send (not KEEPALIVE/RELOCK).
+function dbsend_release_modal(xhttp, dbmodalblocked) {
+
+	if (!dbmodalblocked)
+		return
+
+	if (gchildwin && gchildwin.lazy && gchildwin.xhttp === xhttp)
+		gchildwin = false
+
+	// Close Wait/Cancel confirm if user opened it for this request.
+	if ($$('exodusconfirmdiv') && gpendingConfirmResolve && gprocessing_waitcancel_active)
+		resolvePendingConfirm(1, 'db.send complete')
+
+	unblockmodalui_sync()
+
+}
+
 async function uiblocker_waitcancel_dialog() {
 
 	if ($$('exodusconfirmdiv') || gprocessing_waitcancel_active)
@@ -744,7 +761,7 @@ async function uiblocker_waitcancel_dialog() {
 			try {
 				xhttp.abort()
 			} catch (e) { }
-			unblockmodalui_sync()
+			// db.send releases modal state when the XHR abort completes.
 		}
 	} finally {
 		gprocessing_waitcancel_active = false
@@ -927,8 +944,7 @@ function unblockmodalui_sync() {
 	//close legacy child 'please wait' window if present
 	if (gchildwin && gchildwin.actual && !gchildwin.actual.closed)
 		gchildwin.actual.close()
-	if (gchildwin && gchildwin.lazy)
-		gchildwin = false
+	// lazy gchildwin is cleared by dbsend_release_modal when the owning XHR completes
 	gprocessing_waitcancel_active = false
 
 	if (gmodalblockdepth > 0)
@@ -2704,14 +2720,18 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 		// transport without touching geventhandler, gblockevents, (legacy yield), exodus_resume,
 		// starteventhandler, UI modals, or any business logic yield* call sites. (legacy notes)
 		var netPromise
+		var dbmodalblocked = false
 		if (gasynchronous) {
 
-			gchildwin = { lazy: true }
-			//xhttp reference for in-dom Wait/Cancel on uiblockerdiv click (uiblocker_waitcancel_dialog)
-			gchildwin.xhttp = xhttp
-
-			//a reference to xhttp so we can call abort on it if user chooses to close the window
-			gxhttp = xhttp
+			// KEEPALIVE/RELOCK must not touch modal state or overwrite an in-flight request.
+			if (!ignoreresult) {
+				gchildwin = { lazy: true }
+				//xhttp reference for in-dom Wait/Cancel on uiblockerdiv click (uiblocker_waitcancel_dialog)
+				gchildwin.xhttp = xhttp
+				gxhttp = xhttp
+				blockmodalui_sync()
+				dbmodalblocked = true
+			}
 
 			var self = this;  // for setting response/result from inside XHR callbacks
 			netPromise = new Promise((resolve) => {
@@ -2802,6 +2822,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 
 		}
 		catch (e) {
+			dbsend_release_modal(xhttp, dbmodalblocked)
 			this.data = ''
 			this.response = servererrormsg + e.number + ' ' + e.description + ' in .open()'
 			this.result = ''
@@ -2854,6 +2875,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 			}
 
 			//if (e.number==-2146697211) is "The system cannot locate the resource specified"
+			dbsend_release_modal(xhttp, dbmodalblocked)
 			this.data = ''
 			this.response = servererrormsg + ' in .send()\n\n' + (e.number ? (e.number + ' ' + e.description) : e.toString())
 			this.response = this.response.replace(/"/g, "'")
@@ -2876,7 +2898,8 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 			var result = await netPromise
 
 			//match master exodus_resume: close Wait/Cancel confirm and uiblocker when db access completes
-			unblockmodalui_sync()
+			dbsend_release_modal(xhttp, dbmodalblocked)
+			dbmodalblocked = false
 
 			// The transport signal (result) is 'ok' on success path or a descriptive
 			// string (e.g. "ERROR exodusdblink...") on network failure. We still largely
@@ -5427,6 +5450,8 @@ function exodussetinterval(command, milliseconds) {
 
 async function exodusinterval_async_sync(command) {
 	if (gblockevents) {
+		// defer like exodustimeout_async_sync so KEEPALIVE is not lost during slow requests
+		window.setTimeout('exodusinterval_async_sync("' + command + '")', 100)
 		return
 	}
 	const fn = new Function('return ' + command);
