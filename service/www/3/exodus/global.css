@@ -11,6 +11,8 @@ TABLE.exodusform
     border-style:  solid; /* works in ie     border-right: thin;     border-left: thin;     border-bottom: thin;     border-top: thin;     */
     padding: 1px;
     text-align: left;
+    /* prompts/labels — tune via --exodus-form-label-font-style */
+    font-style: var(--exodus-form-label-font-style);
 }
 
 .exodusform > tbody > tr > td,.exodusform > tbody > tr > thead, .exodusform > thead > tr > th, .exodusform > thead > tr > td
@@ -33,6 +35,8 @@ TABLE.exodusform td,
 TABLE.exodusform th {
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
+    /* prompts + column titles (incl. nested exodustable thead) */
+    font-style: var(--exodus-form-label-font-style);
 }
 
 /* Rounded form shell — div wrapper inserted by exoduswrapformpanes() in client.js */
@@ -211,6 +215,8 @@ BODY
     --exodus-form-border: #d0d0d0;
     --exodus-form-cell-padding-left: 6px;
     --exodus-form-cell-padding-y: 2px;
+    --exodus-form-label-font-style: italic;
+    --exodus-form-data-font-style: normal;
     --exodus-informbutton-bg: #f0f0f0;
     --exodus-informbutton-border: #cccccc;
     --exodus-informbutton-border-style: outset;
@@ -372,6 +378,21 @@ TEXTAREA.clsRequired, TEXTAREA.clsNotRequired
     font-size: 1.125em;
     /*filter: alpha(opacity=80);
     opacity: 0.80;*/
+}
+
+/* bound data — tune via --exodus-form-data-font-style */
+TABLE.exodusform INPUT.clsRequired,
+TABLE.exodusform INPUT.clsNotRequired,
+TABLE.exodusform SELECT.clsRequired,
+TABLE.exodusform SELECT.clsNotRequired,
+TABLE.exodusform TEXTAREA.clsRequired,
+TABLE.exodusform TEXTAREA.clsNotRequired,
+TABLE.exodusform SPAN.clsRequired,
+TABLE.exodusform SPAN.clsNotRequired,
+TABLE.exodusform SPAN.clsRequired[contenteditable],
+TABLE.exodusform SPAN.clsNotRequired[contenteditable],
+TABLE.exodusform .clsReadOnly {
+    font-style: var(--exodus-form-data-font-style);
 }
 
 /* EXPERIMENTAL: async-ui underline text entry (single-line) */
@@ -973,6 +994,8 @@ input:checked + .toggle_button .knob img {
     --exodus-dotcolor: #fdfdfd;
     --exodus-form-face: #28304a;
     --exodus-form-border: #7070e0;
+    --exodus-form-label-font-style: italic;
+    --exodus-form-data-font-style: normal;
     --exodus-textarea-border: #6070b8;
     /* In-form buttons: aligned with question-mode popup chrome */
     --exodus-informbutton-bg: #354060;
@@ -1003,7 +1026,6 @@ input:checked + .toggle_button .knob img {
     /* Hardcoded — must not use var(); inline LM screencolor on <html> would win */
     background-color: #28304a !important;
     border-color: #7070e0 !important;
-    color: #ffffff;
 }
 
 /* schedules_calendar: booked/certified dates — red in light mode, warm accent in dark */
