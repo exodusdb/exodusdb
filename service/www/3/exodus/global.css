@@ -48,6 +48,7 @@ TABLE.exodusform th {
     background-color: var(--exodus-form-face);
     border: 1px solid var(--exodus-form-border);
     border-radius: var(--exodus-form-radius);
+    padding: var(--exodus-form-pane-padding);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 /* Centered popup/dialog: form pane stacks above sibling buttons (e.g. schedules_calendar) */
@@ -62,11 +63,6 @@ div[align="center"] > .exodusformpane {
     text-align: center;
     margin-top: 6px;
 }
-/* Simple forms: clip cell backgrounds to the rounded shell */
-.exodusformpane:not(:has(TABLE[exodusgroupno])):not(:has(TABLE.exodustable)) {
-    overflow: hidden;
-}
-
 /* Embedded exodustable: content width (UA may stretch inputs to fill a wide host cell) */
 TABLE.exodusform > tbody > tr > td > TABLE.exodustable:not([width]),
 TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]) {
@@ -217,6 +213,7 @@ BODY
     --exodus-form-face: #fdf5e6;
     --exodus-form-radius: 10px;
     --exodus-form-border: #d0d0d0;
+    --exodus-form-pane-padding: 4px;
     --exodus-form-cell-padding-left: 6px;
     --exodus-form-cell-padding-y: 2px;
     --exodus-form-label-font-style: italic;
