@@ -4880,13 +4880,83 @@ function exodusformpaneof(tablex) {
 	return tablex
 }
 
+function exodusform_is_inside_exodusform(tablex) {
+
+	var el = tablex && tablex.parentNode
+	while (el) {
+		if (el.tagName == 'TABLE' && el.className && (' ' + el.className + ' ').indexOf(' exodusform ') >= 0)
+			return true
+		el = el.parentNode
+	}
+	return false
+}
+
+function exoduscoalesceformpanes() {
+
+	// Merge sibling .exodusformpane shells (only <br>/whitespace between) into one rounded frame.
+	var panes = document.getElementsByClassName('exodusformpane')
+	var parents = []
+	for (var panen = 0; panen < panes.length; panen++) {
+		var parentx = panes[panen].parentNode
+		if (parentx && parents.indexOf(parentx) < 0)
+			parents.push(parentx)
+	}
+	for (var parentn = 0; parentn < parents.length; parentn++) {
+		var parentx = parents[parentn]
+		var node = parentx.firstChild
+		var runpanes = []
+		var runseps = []
+		var seps = []
+
+		function flushrun() {
+			if (runpanes.length < 2)
+				return
+			var dest = runpanes[0]
+			for (var runn = 1; runn < runpanes.length; runn++) {
+				for (var sepn = 0; sepn < runseps[runn].length; sepn++)
+					dest.appendChild(runseps[runn][sepn])
+				while (runpanes[runn].firstChild)
+					dest.appendChild(runpanes[runn].firstChild)
+				parentx.removeChild(runpanes[runn])
+			}
+		}
+
+		function resetrun() {
+			runpanes = []
+			runseps = []
+		}
+
+		while (node) {
+			var next = node.nextSibling
+			if (node.nodeType == 1 && node.className && (' ' + node.className + ' ').indexOf(' exodusformpane ') >= 0) {
+				runpanes.push(node)
+				runseps.push(seps)
+				seps = []
+			}
+			else if (runpanes.length && (node.nodeType == 1 && node.tagName == 'BR'
+				|| node.nodeType == 3 && !String(node.nodeValue).replace(/\s/g, ''))) {
+				seps.push(node)
+			}
+			else {
+				flushrun()
+				resetrun()
+				seps = []
+			}
+			node = next
+		}
+		flushrun()
+	}
+}
+
 function exoduswrapformpanes() {
 
-	// Wrap each TABLE.exodusform in a rounded shell (see global.css .exodusformpane).
+	// Wrap top-level TABLE.exodusform in a rounded shell (see global.css .exodusformpane).
 	var tables = document.getElementsByTagName('TABLE')
 	for (var tablen = 0; tablen < tables.length; tablen++) {
 		var tablex = tables[tablen]
 		if (!tablex.className || (' ' + tablex.className + ' ').indexOf(' exodusform ') < 0)
+			continue
+		if (exodusform_is_inside_exodusform(tablex))
 			continue
 		var parent = tablex.parentNode
 		if (!parent || parent.className && (' ' + parent.className + ' ').indexOf(' exodusformpane ') >= 0)
@@ -4904,6 +4974,7 @@ function exoduswrapformpanes() {
 		pane.appendChild(tablex)
 	}
 
+	exoduscoalesceformpanes()
 	exodusclear_embeddedtable_hostborders()
 }
 
