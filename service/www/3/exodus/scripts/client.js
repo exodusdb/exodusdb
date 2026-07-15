@@ -4914,6 +4914,7 @@ function exodusform_is_inside_exodusform(tablex) {
 function exoduscoalesceformpanes() {
 
 	// Merge sibling .exodusformpane shells (only <br>/whitespace between) into one rounded frame.
+	// A plain <span></span> between panes keeps separate shells (schedules.htm).
 	var panes = document.getElementsByClassName('exodusformpane')
 	var parents = []
 	for (var panen = 0; panen < panes.length; panen++) {
