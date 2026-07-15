@@ -1111,6 +1111,10 @@ input:checked + .toggle_button .knob img {
     --exodus-smallerbordercolor: #5058a0;
     --exodus-menuboxshadow: #000 0px 1px 10px;
     --exodus-menuhighlight: #354060;
+    /* Burger dropdown / flyouts — slightly above form chrome */
+    --exodus-flyout-face: #303c5c;
+    --exodus-flyout-border: #8888f0;
+    --exodus-flyout-highlight: #4a5880;
     --exodus-dotcolor: #fdfdfd;
     --exodus-form-face: #28304a;
     --exodus-form-border: #7070e0;
@@ -1217,10 +1221,12 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 }
 
 :root[data-theme="dark_mode"] .menu {
-    background-color: #28304a !important;
+    /* menuchangeoption() uses var(--exodus-menuhighlight) — override per flyout */
+    --exodus-menuhighlight: var(--exodus-flyout-highlight);
+    background-color: var(--exodus-flyout-face) !important;
     color: #ffffff;
     opacity: 1 !important;
-    border: 1px solid #7070e0 !important;
+    border: 1px solid var(--exodus-flyout-border) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
@@ -1230,8 +1236,9 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     color: #ffffff !important;
 }
 
-:root[data-theme="dark_mode"] .menu_hr {
-    border-color: #5a6090;
+:root[data-theme="dark_mode"] .menu_hr,
+:root[data-theme="dark_mode"] .menu hr {
+    border-color: #646ca8;
 }
 
 :root[data-theme="dark_mode"] .graphicbutton,
