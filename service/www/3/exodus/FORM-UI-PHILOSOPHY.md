@@ -132,6 +132,8 @@ element.style.whiteSpace = 'pre-wrap';
 | `scripts/client.js` | `exoduswrapformpanes`, `exoduscoalesceformpanes`, `exodusclear_embeddedtable_hostborders` |
 | `template.htm` | Minimal form page pattern |
 
+**Group / exodustable column headings** — `global.css` sets `vertical-align: top` on `TABLE.exodusform > thead`, `TABLE[exodusgroupno]`, and `TABLE.exodustable` thead cells (multi-line labels). Simple label|value tbody rows keep browser default middle alignment.
+
 ---
 
 ## 8. Worked examples (from real fixes)
