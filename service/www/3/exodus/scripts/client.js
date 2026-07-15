@@ -728,8 +728,7 @@ var gprocessing_waitcancel_active
 // PHP-FPM: XHR abort is not reliably seen by xhttp.php — send an explicit CANCEL request too.
 function dbsend_cancel_xhttp(requestid) {
 
-	// Always send CANCEL — PHP can resolve the active request from session when
-	// X-Exodus-Request was not yet visible (PHP-FPM often buffers headers until flush).
+	// CANCEL with request id, or bare CANCEL (xhttp resolves id from session _active_xhttp).
 	var canceldb = new exodusdblink()
 	canceldb.request = requestid ? ('CANCEL\r' + requestid) : 'CANCEL'
 	exodusfireandforget(canceldb.send(), 'dbsend_cancel_xhttp')

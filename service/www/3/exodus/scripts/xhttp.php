@@ -385,12 +385,13 @@ while (1) {
 		$linkfilename = $gdatalocation . $databasedir . $linkfilename;
 	} while (glob($linkfilename . '.*'));
 
-	//publish request id and session cancel target as early as possible (before file I/O)
+	// Publish request id for client cancel (X-Exodus-Request / CANCEL / _active_xhttp).
 	if ($token)
 		$_SESSION[$token . '_active_xhttp'] = $linkfilename0;
 	header('X-Exodus-Request: ' . $linkfilename0);
-	echo "\n";
-	ob_flush();
+	// Flush headers only — body output before LOGIN session save would block session_start().
+	if (ob_get_level())
+		ob_flush();
 	flush();
 
 	debug("DATA_IN : $data_in");
@@ -472,8 +473,11 @@ while (1) {
 
 	debug("REQUEST_FILE : $linkfilename.1");
 
-	//release session lock before long poll (PHP-FPM)
-	session_write_close();
+	// Release session before long poll so CANCEL and other requests are not blocked.
+	// LOGIN keeps the session open: PHP-FPM flush() sends headers early and
+	// session_start() then fails, so credentials are written below before print().
+	if ($requests[0] != 'LOGIN')
+		session_write_close();
 
 	//wait briefly for 10 seconds for the request to disappear
 	//sleeping between checks every 10 ms
@@ -563,11 +567,13 @@ while (1) {
 		if ($nskips > 50) {
 			//debug("connection checking $linkfilename.3");
 			$nskips = 0;
-			//Echo chr(0);
-			echo "\n";
-			//after this, it is not possible to send any headers
-			ob_flush();
-			flush();
+			// Keepalive flush for connection_aborted(); skip on LOGIN (no body before session save).
+			if ($requests[0] != 'LOGIN') {
+				echo "\n";
+				if (ob_get_level())
+					ob_flush();
+				flush();
+			}
 		}
 
 		if (connection_aborted()) {
@@ -690,6 +696,16 @@ $xmltext .= "</root>";
 //if ob_flush done beforehand, then headers will be IGNORED ... which causes FAILURE IN THE CLIENT (not xml)
 //header ("Content-Type:text/xml; charset=utf-8");
 
+// Persist login session before any response body.
+
+if ($requests[0] == 'LOGIN' && $result == 1 && $token) {
+	$_SESSION[$token . '_username'] = $requests[1];
+	$_SESSION[$token . '_password'] = $login_password;
+	$_SESSION[$token . '_database'] = $requests[3];
+	$_SESSION[$token . '_system'] = $requests[5];
+	$_SESSION[$token . '_timeout'] = $login_timeout_ms;
+}
+
 //file_put_contents($linkfilename . '.xmltextout', $xmltext);
 //output the xml to the browser
 print($xmltext);
@@ -703,18 +719,6 @@ if ($gdebug_data && $data_out)
 //		debug("RESULT  :$result");
 if ($gdebug_xml)
 	debug("XMLOUT  :$xmltext");
-
-// And one more thing, create a login session.
-
-	if ($requests[0] == 'LOGIN' && $result == "1") {
-		if (session_status() != PHP_SESSION_ACTIVE)
-			session_start();
-		$_SESSION[$token . '_username'] = $requests[1];
-		$_SESSION[$token . '_password'] = $login_password;
-		$_SESSION[$token . '_database'] = $requests[3];
-		$_SESSION[$token . '_system'] = $requests[5];
-		$_SESSION[$token . '_timeout'] = $login_timeout_ms;
-	}
 
 /// finished
 
