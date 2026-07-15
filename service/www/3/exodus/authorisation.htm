@@ -13,13 +13,47 @@
     <script type="text/javascript" src="scripts/client.js"></script>
     <script type="text/javascript" src="../exodus/scripts/authorisation.js"></script>
     <script type="text/javascript" src="../exodus/scripts/authorisation2.js"></script>
+    <style type="text/css">
+        .exodustabs {
+            display: inline-block;
+            text-align: left;
+            vertical-align: top;
+        }
+        .exodustabs_bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+        .exodustab.exodustab_active {
+            font-weight: bold;
+            border-style: inset;
+        }
+        .exodustab_panel {
+            display: none;
+        }
+        .exodustab_panel.exodustab_active {
+            display: block;
+        }
+        .exodustab_panel > .exodusformpane {
+            display: block;
+            width: max-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 </head>
 <body>
     <div align="center">
         <h1>
             Authorisation File</h1>
-        <h2>
-            Users</h2>
+        <div class="exodustabs" id="authorisation_tabs">
+            <div class="exodustabs_bar" role="tablist">
+                <button type="button" role="tab" class="exodustab exodusbutton exodustab_active"
+                    id="authorisation_tabbtn_users" exodusonclick="authorisation_tabs_show('users')">Users</button>
+                <button type="button" role="tab" class="exodustab exodusbutton"
+                    id="authorisation_tabbtn_tasks" exodusonclick="authorisation_tabs_show('tasks')">Tasks</button>
+            </div>
+            <div class="exodustab_panel exodustab_active" id="authorisation_tabpanel_users" role="tabpanel">
         <input style="display: none" id="KEY" />
         <table class="exodusform" bordercolor="#d0d0d0" width="50%">
             <thead>
@@ -76,9 +110,8 @@
                 </tr>
             </tbody>
         </table>
-        <br />
-        <h2>
-            Tasks</h2>
+            </div>
+            <div class="exodustab_panel" id="authorisation_tabpanel_tasks" role="tabpanel">
         <table class="exodusform" bordercolor="#d0d0d0" width="50%">
             <thead>
                 <tr>
@@ -101,6 +134,8 @@
                 </tr>
             </tbody>
         </table>
+            </div>
+        </div>
     </div>
 </body>
 </html>

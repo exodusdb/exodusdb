@@ -50,6 +50,24 @@ async function form_preread() {
 
 }
 
+function authorisation_tabs_show(which) {
+
+    var userspanel = $$('authorisation_tabpanel_users')
+    var taskspanel = $$('authorisation_tabpanel_tasks')
+    var usersbtn = $$('authorisation_tabbtn_users')
+    var tasksbtn = $$('authorisation_tabbtn_tasks')
+    if (!userspanel || !taskspanel)
+        return
+
+    var showusers = which == 'users'
+    userspanel.className = showusers ? 'exodustab_panel exodustab_active' : 'exodustab_panel'
+    taskspanel.className = showusers ? 'exodustab_panel' : 'exodustab_panel exodustab_active'
+    if (usersbtn)
+        usersbtn.className = showusers ? 'exodustab exodusbutton exodustab_active' : 'exodustab exodusbutton'
+    if (tasksbtn)
+        tasksbtn.className = showusers ? 'exodustab exodusbutton' : 'exodustab exodusbutton exodustab_active'
+}
+
 async function user_showtasks(event) {
 
     //if (!(await validateupdate())) return false
@@ -70,6 +88,7 @@ async function user_showtasks(event) {
     if (recn < 0)
         return false
 
+    authorisation_tabs_show('tasks')
     focuson(document.getElementsByName('LOCKS')[recn])
 
     return true
