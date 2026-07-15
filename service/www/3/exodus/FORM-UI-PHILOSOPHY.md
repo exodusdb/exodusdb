@@ -136,6 +136,8 @@ element.style.whiteSpace = 'pre-wrap';
 
 **Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exodustable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
 
+**Label italic** — all `TABLE.exodusform td/th` use `--exodus-form-label-font-style` (default italic), including nested label tables. Bound data fields (`INPUT`/`SPAN.clsRequired` etc.) reset to `--exodus-form-data-font-style` (normal). Do not set `font-style: normal` on nested-table padding rules.
+
 ---
 
 ## 8. Worked examples (from real fixes)

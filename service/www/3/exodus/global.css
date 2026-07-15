@@ -30,6 +30,11 @@ TABLE.exodusform > tr > th {
     padding-left: var(--exodus-form-cell-padding-left);
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
+}
+
+/* Prompt/label text — all form cells; bound inputs/spans reset to normal below */
+TABLE.exodusform td,
+TABLE.exodusform th {
     font-style: var(--exodus-form-label-font-style);
 }
 
@@ -39,7 +44,6 @@ TABLE.exodusform TABLE:not([exodusgroupno]):not(.exodustable) th {
     padding-top: var(--exodus-form-nested-cell-padding-y);
     padding-bottom: var(--exodus-form-nested-cell-padding-y);
     padding-left: var(--exodus-form-nested-cell-padding-left);
-    font-style: var(--exodus-form-data-font-style);
 }
 /* Top alignment throughout forms and line grids (nested tables inherit) */
 TABLE.exodusform td,
@@ -109,7 +113,6 @@ TABLE.exodusform TABLE.exodustable th {
     padding-top: var(--exodus-form-nested-cell-padding-y);
     padding-bottom: var(--exodus-form-nested-cell-padding-y);
     padding-left: var(--exodus-form-nested-cell-padding-left);
-    font-style: var(--exodus-form-data-font-style);
 }
 .exodusformpane > TABLE.exodusform {
     margin: 0;
