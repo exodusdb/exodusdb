@@ -725,14 +725,26 @@ function loguiblockerwaitcancel_event(event, action) {
 
 var gprocessing_waitcancel_active
 
-// Release per-request modal wait state owned by db.send (not KEEPALIVE/RELOCK).
+// PHP-FPM: XHR abort is not reliably seen by xhttp.php — send an explicit CANCEL request too.
+function dbsend_cancel_xhttp(requestid) {
+
+	// Always send CANCEL — PHP can resolve the active request from session when
+	// X-Exodus-Request was not yet visible (PHP-FPM often buffers headers until flush).
+	var canceldb = new exodusdblink()
+	canceldb.request = requestid ? ('CANCEL\r' + requestid) : 'CANCEL'
+	exodusfireandforget(canceldb.send(), 'dbsend_cancel_xhttp')
+}
+
+// Release per-request modal wait state owned by db.send (not KEEPALIVE/RELOCK/CANCEL).
 function dbsend_release_modal(xhttp, dbmodalblocked) {
 
 	if (!dbmodalblocked)
 		return
 
-	if (gchildwin && gchildwin.lazy && gchildwin.xhttp === xhttp)
+	if (gchildwin && gchildwin.lazy && gchildwin.xhttp === xhttp) {
+		gchildwin.xhttprequestid = false
 		gchildwin = false
+	}
 
 	// Close Wait/Cancel confirm if user opened it for this request.
 	if ($$('exodusconfirmdiv') && gpendingConfirmResolve && gprocessing_waitcancel_active)
@@ -758,9 +770,11 @@ async function uiblocker_waitcancel_dialog() {
 
 		// Wait=1 keeps request running; Cancel/Esc/close aborts
 		if (response != 1) {
+			var requestid = gchildwin.xhttprequestid
 			try {
 				xhttp.abort()
 			} catch (e) { }
+			dbsend_cancel_xhttp(requestid)
 			// db.send releases modal state when the XHR abort completes.
 		}
 	} finally {
@@ -2605,7 +2619,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 
 	//log(this.request)
 
-	var ignoreresult = (typeof this.request == 'string') && (this.request.slice(0, 6) == 'RELOCK' || this.request.slice(0, 9) == 'KEEPALIVE')
+	var ignoreresult = (typeof this.request == 'string') && (this.request.slice(0, 6) == 'RELOCK' || this.request.slice(0, 9) == 'KEEPALIVE' || this.request.slice(0, 6) == 'CANCEL')
 	//indicate to refresher when last activity was
 	if (ignoreresult)
 		exodussetcookie('', 'EXODUSlc', new Date(), 'lc')
@@ -2727,6 +2741,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 				gchildwin = { lazy: true }
 				//xhttp reference for in-dom Wait/Cancel on uiblockerdiv click (uiblocker_waitcancel_dialog)
 				gchildwin.xhttp = xhttp
+				gchildwin.xhttprequestid = false
 				gxhttp = xhttp
 				blockmodalui_sync()
 				dbmodalblocked = true
@@ -2734,6 +2749,15 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 
 			var self = this;  // for setting response/result from inside XHR callbacks
 			netPromise = new Promise((resolve) => {
+				xhttp.onreadystatechange = function () {
+					if (xhttp.readyState >= 2 && gchildwin && gchildwin.xhttp === xhttp) {
+						try {
+							var requestid = xhttp.getResponseHeader('X-Exodus-Request')
+							if (requestid)
+								gchildwin.xhttprequestid = requestid
+						} catch (e) { }
+					}
+				}
 				xhttp.onload = function (e) {
 					if (xhttp.readyState === 4) {
 						if (xhttp.status === 200) {
@@ -2779,8 +2803,11 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 						self.response = detail;
 						self.result = '';
 					}
-					if (!gonunload)
+					if (!gonunload) {
+						if (gchildwin && gchildwin.xhttp === xhttp)
+							dbsend_cancel_xhttp(gchildwin.xhttprequestid)
 						resolve(detail);
+					}
 				};
 			});
 		}

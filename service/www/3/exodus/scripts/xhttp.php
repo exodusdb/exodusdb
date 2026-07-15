@@ -11,6 +11,10 @@ umask(0);
 
 ignore_user_abort(true);
 
+// PHP-FPM: allow flush/connection_aborted checks; session released before long poll
+ini_set('output_buffering', '0');
+ini_set('implicit_flush', '1');
+
 //debug in php like this
 
 //1. change $debugging date below to some date in the future
@@ -351,6 +355,28 @@ while (1) {
 		break;
 	}
 
+	//explicit cancel for PHP-FPM (browser XHR abort is not reliably seen by connection_aborted)
+	if ($requests[0] == 'CANCEL') {
+
+		$cancel_id = isset($requests[1]) ? trim($requests[1]) : '';
+		if (!$cancel_id && $token && array_key_exists($token . '_active_xhttp', $_SESSION))
+			$cancel_id = $_SESSION[$token . '_active_xhttp'];
+		if ($token)
+			unset($_SESSION[$token . '_active_xhttp']);
+		session_write_close();
+
+		if ($cancel_id && preg_match('/^~\d+$/', $cancel_id)) {
+			$cancel_path = $gdatalocation . $databasedir . $cancel_id;
+			xhttp_write_cancel_marker($cancel_path);
+		} else {
+			error_log('xhttp.php CANCEL: no valid cancel_id (token=' . $token . ' cancel_id=' . $cancel_id . ')');
+		}
+
+		$response = 'OK';
+		$result = 1;
+		break;
+	}
+
 	//make a random ~9999999.x file name for the request
 	do {
 		//~*.htm files are not backed up in FILEMAN
@@ -358,6 +384,14 @@ while (1) {
 		$linkfilename0 = $linkfilename;
 		$linkfilename = $gdatalocation . $databasedir . $linkfilename;
 	} while (glob($linkfilename . '.*'));
+
+	//publish request id and session cancel target as early as possible (before file I/O)
+	if ($token)
+		$_SESSION[$token . '_active_xhttp'] = $linkfilename0;
+	header('X-Exodus-Request: ' . $linkfilename0);
+	echo "\n";
+	ob_flush();
+	flush();
 
 	debug("DATA_IN : $data_in");
 
@@ -438,6 +472,9 @@ while (1) {
 
 	debug("REQUEST_FILE : $linkfilename.1");
 
+	//release session lock before long poll (PHP-FPM)
+	session_write_close();
+
 	//wait briefly for 10 seconds for the request to disappear
 	//sleeping between checks every 10 ms
 	$waituntil = time() + $gsecondstowaitforreceipt;
@@ -510,6 +547,17 @@ while (1) {
 	$sleep_us = 10000;
 	while (!is_file($linkfilename . '.3')) {
 
+		clearstatcache();
+
+		//explicit cancel from client CANCEL request (PHP-FPM)
+		if (is_file($linkfilename . '.5')) {
+			$response = ReadAll($linkfilename . '.5');
+			if (!$response)
+				$response = 'Error: Client cancelled request in EXODUS xhttp.php ' . $linkfilename;
+			debug("cancelled via .5");
+			break 2;
+		}
+
 		//check for disconnected only once every 2 seconds (50 loops) since sends something client?
 		$nskips++;
 		if ($nskips > 50) {
@@ -524,22 +572,8 @@ while (1) {
 
 		if (connection_aborted()) {
 			debug("connection aborted");
-			//var elapsedseconds = Math.floor((new Date() - timestarted)/10)/100
-			//this.response = 'Error: Client disconnected after ' + elapsedseconds + ' seconds in EXODUS xhttp.asp ' + linkfilename
-			//exodusoswrite(this.response,linkfilename + '.5',unicode)//just so we can see interrupted requests on the server more easily
-			//dbready(dbwaitingwindow)
-			//this.request = ''
-			//return (0)
-
-			$response = 'Error: Client disconnected after n seconds in EXODUS xhttp.php ' . $linkfilename . ".5";
-			error_log($response);
-
-			//file_put_contents($linkfilename . '.5', $response);
-			WriteAll($linkfilename . '.5', $response);
-
-			//ensure server can write it for returned data
-			//chmod($linkfilename . '.5', 0775);
-
+			xhttp_write_cancel_marker($linkfilename);
+			$response = ReadAll($linkfilename . '.5');
 			break 2;
 		}
 
@@ -673,6 +707,8 @@ if ($gdebug_xml)
 // And one more thing, create a login session.
 
 	if ($requests[0] == 'LOGIN' && $result == "1") {
+		if (session_status() != PHP_SESSION_ACTIVE)
+			session_start();
 		$_SESSION[$token . '_username'] = $requests[1];
 		$_SESSION[$token . '_password'] = $login_password;
 		$_SESSION[$token . '_database'] = $requests[3];
@@ -681,6 +717,13 @@ if ($gdebug_xml)
 	}
 
 /// finished
+
+function xhttp_write_cancel_marker($linkfilename)
+{
+	$response = 'Error: Client cancelled request in EXODUS xhttp.php ' . $linkfilename;
+	error_log($response);
+	WriteAll($linkfilename . '.5', $response);
+}
 
 function exodusrnd($max, $min)
 {
