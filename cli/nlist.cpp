@@ -1532,7 +1532,7 @@ nextrec:
 ////////
 
 	//TRACE(__PRETTY_FUNCTION__)
-	if (esctoexit()) {
+	if (not (recn % 100) && esctoexit()) {
 		tx = "";
 		if (html) {
 			tx ^= "</tbody></table>";

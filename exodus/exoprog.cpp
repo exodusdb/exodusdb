@@ -1348,6 +1348,10 @@ inp:
 // esctoexzit
 bool ExoProgram::esctoexit() const {
 
+	let interrupt_file = SYSTEM.f(6);
+	if (interrupt_file && interrupt_file.osinfo())
+		return true;
+
 //	if (not var().keypressed())
 	if (not var().hasinput())
 		return false;
