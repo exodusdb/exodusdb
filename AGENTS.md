@@ -19,6 +19,10 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 | Pane wrap | `service/www/3/exodus/scripts/client.js` (`exoduswrapformpanes`) |
 | Dev docs (HTML) | `service/www/exodus/doc/forms.htm` |
 
+## Git / commits
+
+Do **not** run `git commit` (or push) unless the user clearly asks — e.g. “commit”, “commit this”, “ok commit”. Approval of a **change** (“ok”, “looks good”, “go ahead”) is not commit approval. When work is done but unstated, report status and ask before committing.
+
 ## Principles (short)
 
 - HTM is a **seed**; dbform rewrites the DOM (e.g. `align='T'` → contenteditable `<span>` with `min-width = exoduslength × 7`).
