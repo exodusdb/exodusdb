@@ -41,9 +41,16 @@ TABLE.exodusform TABLE:not([exodusgroupno]):not(.exodustable) th {
     padding-left: var(--exodus-form-nested-cell-padding-left);
     font-style: var(--exodus-form-data-font-style);
 }
-/* Standalone grid headers (e.g. schedules.htm) — not simple label|value rows */
-TABLE.exodusform > thead > tr > th,
-TABLE.exodusform > thead > tr > td {
+/* Top alignment throughout forms and line grids (nested tables inherit) */
+TABLE.exodusform td,
+TABLE.exodusform th,
+TABLE.exodusform tr,
+TABLE.exodustable td,
+TABLE.exodustable th,
+TABLE.exodustable tr,
+TABLE[exodusgroupno] td,
+TABLE[exodusgroupno] th,
+TABLE[exodusgroupno] tr {
     vertical-align: top;
 }
 
@@ -145,13 +152,8 @@ TABLE[exodusgroupno] > thead {
 TABLE[exodusgroupno] > thead th,
 TABLE[exodusgroupno] > thead td {
     background-color: #fdf5e6;
-    vertical-align: top;
 }
 /* in-form exodustable header colour (e.g. clients brands) */
-TABLE.exodustable > thead th,
-TABLE.exodustable > thead td {
-    vertical-align: top;
-}
 TABLE.exodustable[exodusgroupno] > thead th,
 TABLE.exodustable[exodusgroupno] > thead td {
     background-color: #ffff80;

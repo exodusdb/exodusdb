@@ -132,7 +132,7 @@ element.style.whiteSpace = 'pre-wrap';
 | `scripts/client.js` | `exoduswrapformpanes`, `exoduscoalesceformpanes`, `exodusclear_embeddedtable_hostborders` |
 | `template.htm` | Minimal form page pattern |
 
-**Group / exodustable column headings** — `global.css` sets `vertical-align: top` on `TABLE.exodusform > thead`, `TABLE[exodusgroupno]`, and `TABLE.exodustable` thead cells (multi-line labels). Simple label|value tbody rows keep browser default middle alignment.
+**Vertical alignment** — `global.css` sets `vertical-align: top` on all `TABLE.exodusform`, `TABLE.exodustable`, and `TABLE[exodusgroupno]` cells and rows (including nested tables). Do not add inline `valign` or `vertical-align` in HTM unless a page needs a deliberate exception.
 
 **Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exodustable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
 
