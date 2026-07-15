@@ -40,6 +40,21 @@
             margin-left: auto;
             margin-right: auto;
         }
+        /* Cap Keys / IP Numbers column — td limit + span must not enforce dbform min-width */
+        .authorisation_users_table[exodusgroupno] {
+            table-layout: fixed;
+        }
+        .authorisation_users_table .authorisation_keys_col {
+            width: 12rem;
+            max-width: 12rem;
+            overflow-wrap: anywhere;
+        }
+        .authorisation_users_table .exodusid_KEYS,
+        .authorisation_users_table .exodusid_IP_NUMBERS {
+            min-width: 0 !important;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +70,7 @@
             </div>
             <div class="exodustab_panel exodustab_active" id="authorisation_tabpanel_users" role="tabpanel">
         <input style="display: none" id="KEY" />
-        <table class="exodusform" bordercolor="#d0d0d0" width="50%">
+        <table class="exodusform authorisation_users_table" bordercolor="#d0d0d0">
             <thead>
                 <tr>
                     <td>
@@ -76,7 +91,7 @@
                     <td>
                         Last Login
                     </td>
-                    <td>
+                    <td class="authorisation_keys_col">
                         Keys:<br />
                         Allowed IP Numbers:
                     </td>
@@ -103,7 +118,7 @@
                         <span id="LAST_LOGIN_DATE_TIME"></span>
                         <span id="LAST_LOGIN_LOCATION"></span>
                     </td>
-                    <td>
+                    <td class="authorisation_keys_col">
                         <input id="KEYS" />
                         <input id="IP_NUMBERS" />
                     </td>
