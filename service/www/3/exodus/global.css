@@ -543,6 +543,34 @@ span.clsReadOnly:empty
     box-shadow: 1.5px 1.5px 1px rgba(0, 0, 0, 0.125);
 }
 
+/* Flyout lists (menu.htm + client.js menuok): block rows, not inline+<br> line boxes */
+.menu a.menuitem {
+    display: block;
+    padding: 0.45em 0.65em;
+    line-height: 1.35;
+}
+
+/* Top-level module bar in #menudiv stays horizontal (menuonkeydown left/right) */
+#menudiv > a.menuitem {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 0.15em;
+}
+
+/* <br> after each leaf item is legacy from menu.htm; block .menuitem supplies the gap */
+.menu a.menuitem + br {
+    display: none;
+}
+
+/* <br> between submenu groups (after </div>, before next heading) */
+.menu br {
+    display: block;
+    height: 0.35em;
+    line-height: 0;
+    font-size: 0;
+    margin: 0;
+}
+
 .menuitem
 {
     /*border: thin;*/
@@ -551,8 +579,6 @@ span.clsReadOnly:empty
     /*width: 100%;*/
     box-sizing: border-box;
     color: black;
-    padding: 0.35em 0.65em;
-    line-height: 1.5;
     cursor: pointer;
 }
 
@@ -571,10 +597,12 @@ span.clsReadOnly:empty
     cursor: pointer;
 }
 
+.menu hr,
 .menu_hr
 {
     /*border:1px dotted lightgrey*/
-    border:1px solid lightgrey
+    border:1px solid lightgrey;
+    margin: 0.35em 0;
 }
 
 .graphicbutton:hover
