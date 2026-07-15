@@ -484,8 +484,8 @@ TEXTAREA {
 }
 
 /* EXPERIMENTAL: async-ui underline text entry (single-line) */
-INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
-SELECT,
+INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
+SELECT:not(.loginfield),
 SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
     background-color: transparent;
     border: none;
@@ -1186,8 +1186,8 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     border-color: #5a6090 !important;
 }
 
-:root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
-:root[data-theme="dark_mode"] SELECT {
+:root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
+:root[data-theme="dark_mode"] SELECT:not(.loginfield) {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);

@@ -324,15 +324,24 @@ function exodus_client_init() {
 
 	// Pre-emptively set CSS screen theme to avoid flash of switching from
 	// default theme (light or user color) mode to dark theme if dark theme is active
-	theme_toggle(exodusgetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
+	if (document.title.toUpperCase() == 'EXODUS LOGIN') {
+		var login_theme = function () {
+			return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark_mode' : 'default'
+		}
+		theme_toggle(login_theme())
+		if (window.matchMedia)
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { theme_toggle(login_theme()) })
+	} else {
+		theme_toggle(exodusgetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
+	}
 
 	// Inline dark input colours before global.css loads — prevents white input flash
 	if (gisdarktheme) {
 		document.writeln('<style id="exodus_dm_flashguard">'
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
 			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#28304a!important}'
-			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),'
-			+ ':root[data-theme=dark_mode] SELECT{'
+			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),'
+			+ ':root[data-theme=dark_mode] SELECT:not(.loginfield){'
 			+ 'background-color:transparent!important;color:#fff!important;border:none!important;'
 			+ 'border-bottom:1.7px dotted #fdfdfd!important}'
 			+ ':root[data-theme=dark_mode] TEXTAREA{'
@@ -1600,12 +1609,6 @@ function theme_toggle(theme = 'default') {
 
 	// Switch between dark and light (color) modes using CSS themes
 	const html = document.documentElement;
-
-	// No dark theme for login
-	if (document.title.toUpperCase() == 'EXODUS LOGIN') {
-		html.removeAttribute('data-theme');
-		return true;
-	}
 
 	if (theme == 'default') {
 		gisdarktheme = false
