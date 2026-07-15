@@ -77,10 +77,65 @@ div[align="center"] > .exodusformpane {
     width: max-content;
     margin: var(--exodus-form-pane-margin) auto;
 }
-.exodusformactions {
-    display: block;
-    text-align: center;
+/* Unbound form OK/List + Close bar (dbform.js #formbuttonsdiv) and inline action rows */
+.exodusformactions,
+body > #formbuttonsdiv.exodusformactions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
+    padding: 12px 0;
     margin-top: 6px;
+    clear: both;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.exodusformactions > span,
+body > #formbuttonsdiv.exodusformactions > span {
+    display: inline-flex;
+    align-items: center;
+}
+
+.exodusformactions .graphicbutton,
+body > #formbuttonsdiv .graphicbutton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25em;
+    float: none !important;
+    clear: none !important;
+    overflow: visible !important;
+    margin: 0.125em 4px;
+    padding: 0.35em 0.55em;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.exodusformactions .graphicbutton img,
+body > #formbuttonsdiv .graphicbutton img {
+    height: var(--exodus-ui-icon-size);
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+}
+
+.exodusformactions .graphicbutton [id$="_label"],
+body > #formbuttonsdiv .graphicbutton [id$="_label"] {
+    display: inline-block;
+    line-height: 1.2;
+}
+
+.exodusformactions .graphicbutton:hover,
+.exodusformactions .graphicbutton:focus,
+body > #formbuttonsdiv .graphicbutton:hover,
+body > #formbuttonsdiv .graphicbutton:focus {
+    background-color: var(--exodus-menuhighlight);
+}
+
+.exodusformactions .exodusbutton {
+    margin: 0.125em 4px;
 }
 /* Embedded exodustable: content width (UA may stretch inputs to fill a wide host cell) */
 TABLE.exodusform > tbody > tr > td > TABLE.exodustable:not([width]),
@@ -1157,6 +1212,14 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 
 :root[data-theme="dark_mode"] #exodus_menu .graphicbutton:hover,
 :root[data-theme="dark_mode"] #exodus_menu .graphicbutton:focus {
+    border-color: #888888;
+}
+
+:root[data-theme="dark_mode"] .exodusformactions .graphicbutton:hover,
+:root[data-theme="dark_mode"] .exodusformactions .graphicbutton:focus,
+:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:hover,
+:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:focus {
+    background-color: var(--exodus-menuhighlight);
     border-color: #888888;
 }
 

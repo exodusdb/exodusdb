@@ -4747,14 +4747,8 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	}
 
 	if (align == 'center') {
-		// eg. Ok, Cancel, List and Save buttons
+		// eg. Ok, Cancel, List and Save buttons — layout via .exodusformactions / #formbuttonsdiv
 		tx += ' class=graphicbutton'
-		//tx+=' style="float:'+align+'"'
-		//tx+=' style="margin:0 auto"'
-		//switch off the default from graphicbutton class?
-		style += ';float:none;clear:both;overflow:hidden'
-//	} else if (align) {
-//		style += ''//';float:' + align
 	} else {
 		// eg. Refresh, New etc.
 		tx += ' class=menubutton'

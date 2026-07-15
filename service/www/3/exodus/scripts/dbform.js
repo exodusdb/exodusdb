@@ -1471,10 +1471,6 @@ async function formfunctions_onload() {
     if (gKeyNodes)
         buttonhtml += loginhtml
 
-    //a span to keep the ok and cancel buttons side by side
-    if (!gKeyNodes)
-        buttonhtml = '<span style="white-space:nowrap">' + buttonhtml + '</span>'
-
     //a separator span to keep the ok and cancel buttons from overlapping a floating div
     //if (!gKeyNodes && $$('autofitwindowelement'))
     //    buttonhtml = '<div style="clear:both">&nbsp;</div>' + buttonhtml
@@ -1512,14 +1508,8 @@ async function formfunctions_onload() {
         //document.body.insertBefore(temp, document.body.firstChild)
         gexodus_menubar.insertBefore(temp, gexodus_menubar.firstChild)
 
-        //formbuttons.align='CENTER'
-        //NB there is no float "center"
-        //formbuttons.style.textAlign = 'center'
-        //style="margin-left: auto; margin-right: auto; float: left"
-        formbuttons.setAttribute('align', 'center')
-        //padding is required because graphic button has VERY LITTLE padding for some reason
-        formbuttons.style.paddingTop = '12px'
-        formbuttons.style.paddingBottom = '12px'
+        //form buttons (save/ok etc.) at the bottom — styled like top menubar (.exodusformactions)
+        formbuttons.className = 'exodusformactions'
 
         //form buttons (save/ok etc.) at the bottom
         document.body.insertBefore(formbuttons, null)//document.body.firstChild)
