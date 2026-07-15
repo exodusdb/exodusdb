@@ -63,9 +63,9 @@ function authorisation_tabs_show(which) {
     userspanel.className = showusers ? 'exodustab_panel exodustab_active' : 'exodustab_panel'
     taskspanel.className = showusers ? 'exodustab_panel' : 'exodustab_panel exodustab_active'
     if (usersbtn)
-        usersbtn.className = showusers ? 'exodustab exodusbutton exodustab_active' : 'exodustab exodusbutton'
+        usersbtn.className = showusers ? 'exodustab exodustab_active' : 'exodustab'
     if (tasksbtn)
-        tasksbtn.className = showusers ? 'exodustab exodusbutton' : 'exodustab exodusbutton exodustab_active'
+        tasksbtn.className = showusers ? 'exodustab' : 'exodustab exodustab_active'
 }
 
 async function user_showtasks(event) {

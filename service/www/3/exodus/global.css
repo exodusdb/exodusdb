@@ -297,6 +297,8 @@ BODY
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
     --exodus-informbutton-bg: #f0f0f0;
+    --exodus-informbutton-hover-bg: #ffffff;
+    --exodus-informbutton-hover-border: #aaaaaa;
     --exodus-informbutton-border: #cccccc;
     --exodus-informbutton-border-style: outset;
     --exodus-informbutton-color: inherit;
@@ -306,9 +308,9 @@ BODY
     --exodus-check-size: 1.3125em;
 }
 
+/* In-form actions: exodusbutton. Tab bar: exodustab only (authorisation.htm). */
 .exodusbutton,
-TABLE.exodusform button:not(.menubutton):not(.graphicbutton),
-TABLE.exodusform input.exodusbutton {
+.exodustab {
     background-color: var(--exodus-informbutton-bg);
     color: var(--exodus-informbutton-color);
     padding: 0.2em 0.45em;
@@ -611,6 +613,12 @@ span.clsReadOnly:empty
     /*background-color: highlight;*/
     /*color: highlighttext;*/
     background-color: var(--exodus-menuhighlight);
+}
+
+.exodusbutton:hover:enabled,
+.exodusbutton:focus:enabled {
+    background-color: var(--exodus-informbutton-hover-bg);
+    border-color: var(--exodus-informbutton-hover-border);
 }
 
 /* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size) */
@@ -1083,6 +1091,8 @@ input:checked + .toggle_button .knob img {
     --exodus-textarea-border: #6070b8;
     /* In-form buttons: aligned with question-mode popup chrome */
     --exodus-informbutton-bg: #354060;
+    --exodus-informbutton-hover-bg: #455880;
+    --exodus-informbutton-hover-border: #9898f8;
     --exodus-informbutton-border: #7070e0;
     --exodus-informbutton-border-style: solid;
     --exodus-informbutton-color: #ffffff;

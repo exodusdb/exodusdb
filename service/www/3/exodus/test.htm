@@ -190,7 +190,7 @@ function test_getvalue(id) {
             <tr>
                 <td>
                     Tests
-                    <input type="button" value="Run" onclick="test_run_sync('ALL')" /></td>
+                    <input class="exodusbutton" type="button" value="Run" onclick="test_run_sync('ALL')" /></td>
                 <td>
                     <table class="exodusform" width="100%">
                         <thead>
@@ -207,7 +207,7 @@ function test_getvalue(id) {
                         </thead>
                         <tr>
                             <td style="display: none">
-                                <input type="button" value="Run" onclick="test_run_sync('LOOPBACK')" /></td>
+                                <input class="exodusbutton" type="button" value="Run" onclick="test_run_sync('LOOPBACK')" /></td>
                             <td>
                                 <input id="check_LOOPBACK" checked type="checkbox" />
                                 Web server loopback</td>
@@ -218,7 +218,7 @@ function test_getvalue(id) {
                         </tr>
                         <tr>
                             <td style="display: none">
-                                <input type="button" value="Run" onclick="test_run_sync('TEST')" /></td>
+                                <input class="exodusbutton" type="button" value="Run" onclick="test_run_sync('TEST')" /></td>
                             <td>
                                 <input id="check_TEST" checked type="checkbox" />
                                 EXODUS server loopback</td>
@@ -229,7 +229,7 @@ function test_getvalue(id) {
                         </tr>
                         <tr>
                             <td style="display: none">
-                                <input type="button" value="Run" onclick="test_run_sync('SELECT')" /></td>
+                                <input class="exodusbutton" type="button" value="Run" onclick="test_run_sync('SELECT')" /></td>
                             <td>
                                 <input id="check_SELECT" checked type="checkbox" />
                                 EXODUS application loopback</td>
@@ -244,7 +244,7 @@ function test_getvalue(id) {
             <tr id="customcommandrow" style="display: none">
                 <td>
                     Custom Command
-                    <input type="button" value="Run" onclick="test_run_sync('CUSTOM')" /><br />
+                    <input class="exodusbutton" type="button" value="Run" onclick="test_run_sync('CUSTOM')" /><br />
                     <span style="font-size: 0.8em">EXODUS only</span></td>
                 <td>
                     <input id="customcommand" value="SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML"
