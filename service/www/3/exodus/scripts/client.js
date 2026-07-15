@@ -4370,6 +4370,26 @@ function menuhide(element) {
 var gnmenus = 0
 var gmenutimeout = ''
 
+function menufitviewport(submenu) {
+
+	// After menuonmouseover positions the flyout, clamp its viewport top edge
+	// between the menubar foot and the window foot (Media > Files etc.)
+	var pad = 6
+	var maxBottom = document.documentElement.clientHeight - pad
+	var minTop = pad
+	if (gexodus_menubar) {
+		var barBottom = gexodus_menubar.getBoundingClientRect().bottom + 2
+		if (barBottom > minTop)
+			minTop = barBottom
+	}
+
+	var rect = submenu.getBoundingClientRect()
+	var shift = Math.max(minTop, Math.min(rect.top, maxBottom - rect.height)) - rect.top
+
+	if (shift)
+		submenu.style.top = ((parseFloat(submenu.style.top) || 0) + shift) + 'px'
+}
+
 //menu_onclick=menuonclick
 async function menu_onclick(event) {
 
@@ -4472,6 +4492,7 @@ function menuonmouseover(event, menuoption) {
 		submenu.style.top = topoffset + 'px'
 	submenu.style.display = ''
 	submenu.noWrap = true
+	menufitviewport(submenu)
 	//alert(submenu.outerHTML)
 	//highlight first menu item if none highlighted
 	if (keyboarding || submenu.id == 'menudiv') {
