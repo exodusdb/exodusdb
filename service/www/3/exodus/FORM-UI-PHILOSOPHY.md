@@ -134,6 +134,8 @@ element.style.whiteSpace = 'pre-wrap';
 
 **Group / exodustable column headings** — `global.css` sets `vertical-align: top` on `TABLE.exodusform > thead`, `TABLE[exodusgroupno]`, and `TABLE.exodustable` thead cells (multi-line labels). Simple label|value tbody rows keep browser default middle alignment.
 
+**Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exodustable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
+
 ---
 
 ## 8. Worked examples (from real fixes)
