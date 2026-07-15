@@ -876,8 +876,7 @@ function modalblock_create() {
 	blocker.onclick = function uiblockerdiv_onclick(event) {
 
 		if ($$('exodusconfirmdiv')) {
-			window.setTimeout('exodus_confirm_function3()', 10)
-			//alert('Please wait for server response')
+			window.setTimeout('exodus_confirm_outside_click()', 10)
 		}
 		else if (gchildwin) {
 			if (gchildwin.lazy) {
@@ -5247,6 +5246,7 @@ var geventn = 0
 // handlers resolve a Promise instead of directly calling exodus_resume.
 // The fromPromise adapter then feeds the value into the normal geventhandler machinery.
 var gpendingConfirmResolve
+var gexodusconfirmdefaultbutton
 
 // For the child window / showmodaldialog leaf (next after confirm).
 var gpendingDialogResolve
@@ -6053,6 +6053,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		confirmResolve = resolve
 	})
 	gpendingConfirmResolve = confirmResolve
+	gexodusconfirmdefaultbutton = defaultbuttonn || 1
 
 	blockmodalui_sync()
 	form_blockevents(true, 'exodusconfirm2')
@@ -6061,6 +6062,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		response = await confirmPromise
 	} finally {
 		gpendingConfirmResolve = null
+		gexodusconfirmdefaultbutton = null
 		form_blockevents(false, 'exodusconfirm2')
 		unblockmodalui_sync()
 		exodusconfirm_unbind_scroll_hints()
@@ -6100,6 +6102,16 @@ function exodus_confirm_function2(event) {
 //return 0
 function exodus_confirm_function3(event) {
 	return exodus_confirm_function(0, event)
+}
+
+//click on modal blocker outside confirm dialog — same as default button (Enter/F9)
+function exodus_confirm_outside_click(event) {
+	var defaultbutton = gexodusconfirmdefaultbutton || 1
+	if (defaultbutton == 2)
+		return exodus_confirm_function2(event)
+	if (defaultbutton == 3)
+		return exodus_confirm_function3(event)
+	return exodus_confirm_function1(event)
 }
 
 function resolvePendingConfirm(value, source) {
