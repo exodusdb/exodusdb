@@ -54,6 +54,8 @@ var gthemeimage = gimagetheme + 'theme_button.svg'
 var gcompanyimage = gimagetheme + 'formpage_companies.svg'
 
 var gisdarktheme
+// LM/DM preference cookie — global per browser (not glogincode / dataset / user)
+var gthemecookiekey = 'EXODUStheme'
 
 function exodus_sortimage(order) {
 
@@ -322,7 +324,7 @@ function exodus_client_init() {
 
 	// Pre-emptively set CSS screen theme to avoid flash of switching from
 	// default theme (light or user color) mode to dark theme if dark theme is active
-	theme_toggle(exodusgetcookie2('dt', 'theme') ? 'dark_mode' : 'default')
+	theme_toggle(exodusgetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
 
 	// Inline dark input colours before global.css loads — prevents white input flash
 	if (gisdarktheme) {
@@ -1547,7 +1549,7 @@ function add_theme_toggle_btn() {
 	input.addEventListener('change', () => {
 		knob.innerHTML = input.checked ? moon_svg : sun_svg;
 		theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
-		exodussetcookie(glogincode, 'theme', (gisdarktheme ? 1 : ''), 'dt', true)
+		exodussetcookie('', gthemecookiekey, (gisdarktheme ? 1 : ''), 'dt', true)
 		label.title = theme_toggle_title(gisdarktheme)
 	});
 
