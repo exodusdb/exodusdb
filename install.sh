@@ -874,6 +874,11 @@ function install_database {
 :
 	dict2sql
 :
+: Run cli/testsort once to generate some test files like xo_clients
+: used in testing_var.h.cpp
+: ────────────────────────────────────────
+	testsort > /dev/null
+:
 } # function install_database stage D
 
 function test_exodus_and_database {
@@ -886,11 +891,6 @@ function test_exodus_and_database {
 :
 	sudo systemctl start postgresql
 	pg_isready --timeout=30
-:
-: Run cli/testsort once to generate some test files like xo_clients
-: used in testing_var.h.cpp
-: ────────────────────────────────────────
-	testsort > /dev/null
 :
 : Many tests using ctest - In parallel. Output only on err
 : ────────────────────────────────────────
