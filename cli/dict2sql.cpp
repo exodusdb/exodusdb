@@ -11,12 +11,11 @@
 
 		"exodus"   Just add collations and unaccent. Assume pgexodus installed during installation
 
-		"pgexodus" c extension - requires postgres SUPERUSER permissions.
-		           Inconvenient due to requirement to install extension in server
-		           30% FASTER than using pgsql postgres script functions
+		"pgexodus" Refresh core pgexodus functions (extract_*, count, tobool)
+		           into the current database from the exodus database.
+		           Does not require superuser. Used on service startup via syncdat.
 
-		"pgsql"    postgresql script - very easy to install.
-		           25% SLOWER than using pgexodus.so c function  extension
+		"pgsql"    Obsolete. Was postgresql script versions of pgexodus functions.
 
 	FILENAME
 
@@ -40,6 +39,10 @@
 
 */
 
+#if EXO_MODULE
+	import std;
+#endif
+
 #include <exodus/program.h>
 programinit()
 
@@ -51,6 +54,9 @@ var dictrec;
 var errors = "";
 
 var install_exodus_extensions = "";
+
+let pgexodus_source_db = "exodus";
+let pgexodus_fns       = "extract_text^extract_number^extract_date^extract_time^extract_datetime^tobool^count"_var;
 
 func main() {
 
@@ -107,12 +113,21 @@ func main() {
 	force = OPTIONS.contains("F");
 	var doall = true;
 
+	// Option to install standard exodus functions
+	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
+		install_exodus_extensions = filenames.f(1);
+		filenames.remover(1);
+		doall = false;
+	}
+
+	let pgexodus_only = (install_exodus_extensions == "pgexodus" and not filenames and not dictids);
+
 	if (verbose)
 		"begintrans()"_var.outputl();
 	if (not begintrans())
 		abort(lasterror());
 
-	if (not sqlexec(R"(
+	if (not pgexodus_only and not sqlexec(R"(
 		DO $$
 		DECLARE
 			rec RECORD;
@@ -133,11 +148,17 @@ func main() {
 		logput(DATA);
 	//NOTICE:  drop cascades to index ads__brand_and_date
 
-	// Option to install standard exodus functions
-	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
-		install_exodus_extensions = filenames.f(1);
-		filenames.remover(1);
-		doall = false;
+	if (install_exodus_extensions == "pgexodus") {
+		install_pgexodus_functions();
+		if (pgexodus_only) {
+			if (verbose)
+				"committrans()"_var.outputl();
+			if (not committrans())
+				errors(-1) = lasterror();
+			if (errors)
+				errors.errputl("\ndict2sql: errors: ");
+			return errors != "";
+		}
 	}
 
 	if (filenames) {
@@ -180,22 +201,15 @@ COST 10;
 	// Drop obsolete functions - ignore errors
 	//var().sqlexec("DROP FUNCTION IF EXISTS exodus.extract_text2(text, int4, int4, int4);");
 
-	// Install general exodus requirements
-	if (install_exodus_extensions) {
+	// Install general exodus requirements (collation and unaccent only)
+	if (install_exodus_extensions == "exodus") {
 
 		// Create Natural Order Collation
 		rawsqlexec("DROP COLLATION IF EXISTS exodus_natural;");
 		rawsqlexec("CREATE COLLATION exodus_natural (provider = icu, locale = 'en@colNumeric=yes', DETERMINISTIC = false);");
 
-		// Clearing unaccent extension and functions (and full text indexes)
-		//drop extension unaccent;
-		//drop function immutable_unaccent(text) cascade;
-
 		// Add the unaccent extension and functions
-		// Maybe better to use the last option "mydict" in the following link
-		// https://dba.stackexchange.com/questions/177020/creating-a-case-insensitive-and-accent-diacritics-insensitive-search-on-a-field
 		rawsqlexec("CREATE EXTENSION IF NOT EXISTS unaccent");
-		//
 		rawsqlexec(
 			"CREATE OR REPLACE FUNCTION public.immutable_unaccent(text) RETURNS text\n"
 			"AS\n"
@@ -203,7 +217,6 @@ COST 10;
 			"SELECT public.unaccent('public.unaccent', $1)\n"
 			"  -- schema-qualify function and dictionary\n"
 			"$func$  LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT");
-		//
 		rawsqlexec("ALTER FUNCTION public.immutable_unaccent(text) OWNER TO exodus");
 
 	}
@@ -1768,6 +1781,76 @@ END;
 //
 //END;
 //)V0G0N";
+
+subr install_pgexodus_functions() {
+
+	var exodusdb;
+	if (not exodusdb.connect(pgexodus_source_db)) {
+		errors ^= "\ndict2sql: cannot connect to " ^ pgexodus_source_db ^ " database: " ^ lasterror();
+		return;
+	}
+
+	pgexodus_source_db.logputl("dict2sql: installing pgexodus functions from ");
+
+	rawsqlexec("CREATE SCHEMA IF NOT EXISTS exodus");
+	rawsqlexec("CREATE EXTENSION IF NOT EXISTS plperl");
+
+	var fn_quoted = "";
+	for (const var fn : pgexodus_fns)
+		fn_quoted(-1) = squote(fn);
+	var fn_in = fn_quoted;
+	fn_in.converter(FM, ",");
+
+	let sql =
+		"SELECT p.oid::text, p.proname, pg_get_function_identity_arguments(p.oid) "
+		"FROM pg_proc p "
+		"JOIN pg_namespace n ON p.pronamespace = n.oid "
+		"WHERE n.nspname = 'exodus' "
+		"AND p.proname IN (" ^ fn_in ^ ") "
+		"ORDER BY p.proname, pg_get_function_identity_arguments(p.oid)";
+
+	var response;
+	if (not exodusdb.sqlexec(sql, response)) {
+		errors ^= "\ndict2sql: " ^ response;
+		exodusdb.disconnect();
+		return;
+	}
+
+	let fns = response.field(RM, 2, 999999);
+	if (not fns) {
+		errors ^= "\ndict2sql: no pgexodus functions found in " ^ pgexodus_source_db ^ " database";
+		exodusdb.disconnect();
+		return;
+	}
+
+	dim fn_rows = fns.split(RM);
+
+	// pg_get_functiondef can return text containing field marks - fetch one oid at a time
+	for (const var row : fn_rows) {
+		let oid     = row.f(1).trim();
+		let proname = row.f(2);
+		let args    = row.f(3);
+
+		var def_response;
+		if (not exodusdb.sqlexec("SELECT pg_get_functiondef(" ^ oid ^ "::oid)", def_response)) {
+			errors ^= "\ndict2sql: " ^ def_response;
+			continue;
+		}
+
+		def_response.fieldstorer(RM, 1, -1, "");
+		let funcsql = def_response.field(RM, 2);
+		if (not funcsql) {
+			errors ^= "\ndict2sql: empty definition for exodus." ^ proname ^ "(" ^ args ^ ")";
+			continue;
+		}
+
+		if (verbose)
+			("exodus." ^ proname ^ "(" ^ args ^ ")").logputl("dict2sql: updating ");
+		rawsqlexec(funcsql);
+	}
+
+	exodusdb.disconnect();
+}
 
 subr rawsqlexec(in sql) {
 	if (verbose)

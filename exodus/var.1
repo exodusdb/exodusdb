@@ -5194,18 +5194,27 @@ Execute an SQL command and capture the response.
 .PD 0 \"<dl>
 .TP 10\"<dt>
 \fBTrue\fR \"</dt>
-Successfully executed.
+Successfully executed, including SELECT statements that return zero rows.
 .\"</dd>
 .TP 10\"<dt>
 \fBFalse\fR \"</dt>
-DB refused. See lasterror() for info.
+DB refused. response contains an error message. See lasterror() for info.
 .\"</dd>
 .PD \"</dl>
 .PP
-\fBresponse:\fR Any rows and columns returned are separated by RM and FM respectively. The first row is the column names.
+response [out]: Any rows and columns returned are separated by RM and FM respectively.
 .sp 0
 .PP
-It is *ecommended* that you do not use sql directly unless you must, perhaps to manage or configure a database.
+The first RM field is the column names.
+.sp 0
+.PP
+Zero-row SELECT: returns true and response is set to "". That is not a failure; test response
+.sp 0
+.PP
+(or e.g. response.field(RM, 2)) to detect no data rows after a successful sqlexec.
+.sp 0
+.PP
+It is *recommended* that you do not use sql directly unless you must, perhaps to manage or configure a database.
 .sp 0
 .PP
 .PP

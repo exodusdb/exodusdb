@@ -119,6 +119,20 @@ func main() {
 		}
 	}
 
+	// Refresh pgexodus functions when syncdat is forcing a sync (e.g. newer dict2sql)
+	if (not generate and force) {
+		printl(THREADNO ^ ":", "syncdat: refreshing pgexodus functions");
+		var cmd = "dict2sql pgexodus";
+		if (verbose)
+			cmd ^= " {V}";
+		if (verbose)
+			cmd.logputl();
+		if (not osshell(cmd)) {
+			errors(-1) = lasterror();
+			loglasterror();
+		}
+	}
+
 	// Skip if nothing new
 //	let datinfo = osdir(datpath);
 	// Mode 6 - scan and update all dir's time modified
@@ -469,18 +483,23 @@ func main() {
 
 }
 
+func is_newer_than(in fsinfo, in syncrec) {
+
+	int fsinfo_date = fsinfo.f(2);
+	int sync_date = syncrec.f(1);
+
+	if (fsinfo_date > sync_date)
+		return true;
+
+	if (fsinfo_date < sync_date)
+		return false;
+
+	return fsinfo.f(3) > syncrec.f(2);
+}
+
 func is_newer_than_last_sync(in fsinfo) {
 
-    int fsinfo_date = fsinfo.f(2);
-
-    if (fsinfo_date > last_sync_date)
-        return true;
-
-    if (fsinfo_date < last_sync_date)
-        return false;
-
-    return fsinfo.f(3) > last_sync_time;
-
+	return is_newer_than(fsinfo, last_sync_date ^ FM ^ last_sync_time);
 }
 
 }; // programexit()

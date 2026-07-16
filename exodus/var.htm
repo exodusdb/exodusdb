@@ -4937,13 +4937,15 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<em>return:</em> </p>
 			<dl>
 				<dt>True</dt>
-				<dd>Successfully executed.</dd>
+				<dd>Successfully executed, including SELECT statements that return zero rows.</dd>
 				<dt>False</dt>
-				<dd>DB refused. See lasterror() for info.</dd>
+				<dd>DB refused. response contains an error message. See lasterror() for info.</dd>
 			</dl>
-			<p>
-				<em>response:</em> Any rows and columns returned are separated by RM and FM respectively. The first row is the column names.</p>
-			<p>It is *ecommended* that you do not use sql directly unless you must, perhaps to manage or configure a database.</p>
+			<p>response [out]: Any rows and columns returned are separated by RM and FM respectively.</p>
+			<p>The first RM field is the column names.</p>
+			<p>Zero-row SELECT: returns true and response is set to "". That is not a failure; test response</p>
+			<p>(or e.g. response.field(RM, 2)) to detect no data rows after a successful sqlexec.</p>
+			<p>It is *recommended* that you do not use sql directly unless you must, perhaps to manage or configure a database.</p>
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">dbconn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;exodus&quot;</span><span class="p">;</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">sqlcmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;select &#39;xxx&#39; as col1, &#39;yyy&#39; as col2&quot;</span><span class="p">;</span>

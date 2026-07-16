@@ -150,10 +150,13 @@ public:
 
 	// Execute an SQL command and capture the response.
 	// return:
-	// * True  * Successfully executed.
-	// * False * DB refused. See lasterror() for info.
-	// response: Any rows and columns returned are separated by RM and FM respectively. The first row is the column names.
-	// It is *ecommended* that you do not use sql directly unless you must, perhaps to manage or configure a database.
+	// * True  * Successfully executed, including SELECT statements that return zero rows.
+	// * False * DB refused. response contains an error message. See lasterror() for info.
+	// response [out]: Any rows and columns returned are separated by RM and FM respectively.
+	// The first RM field is the column names.
+	// Zero-row SELECT: returns true and response is set to "". That is not a failure; test response
+	// (or e.g. response.field(RM, 2)) to detect no data rows after a successful sqlexec.
+	// It is *recommended* that you do not use sql directly unless you must, perhaps to manage or configure a database.
 	//
 	// `var dbconn = "exodus";
 	//  let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
