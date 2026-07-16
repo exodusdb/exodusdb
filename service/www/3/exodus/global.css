@@ -927,6 +927,12 @@ input[type="radio"],input[type="checkbox"]{
 }
 .exodusconfirmdiv.exodusconfirm_decide .exodusconfirm_body {
     overflow-x: auto;
+    align-self: stretch;
+    text-align: center;
+}
+.exodusconfirmdiv.exodusconfirm_decide .exodusconfirm_layout {
+    margin-left: auto;
+    margin-right: auto;
 }
 .exodusconfirm_decideblock {
     display: inline-block;

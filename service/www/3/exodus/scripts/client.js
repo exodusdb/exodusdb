@@ -5239,6 +5239,14 @@ function starteventhandler(eventfunctionname, functionx) {
 						return exoduscancelevent(event)
 					}
 
+					// Home/End: first/last focusable (decide lists use decide_document_onkeydown)
+					else if (keycode == 36 || keycode == 35) {
+						if (!$$('decide_table1')) {
+							exodusconfirm_focus_endpoint(keycode == 36)
+							return exoduscancelevent(event)
+						}
+					}
+
 					// Allow keyboard typing for text popups
 					if (istextinput)
 						return true
@@ -5732,6 +5740,33 @@ function exodusconfirm_footerwrap(content) {
 		</div>'
 }
 
+function exodusconfirm_focusable_elements() {
+
+	var confirm=$$('exodusconfirmdiv')
+	if (!confirm)
+		return []
+	var nodes=confirm.querySelectorAll('input:not([type=hidden]), textarea, select, button, [tabindex], .graphicbutton')
+	var list=[]
+	for (var i=0;i<nodes.length;++i) {
+		var el=nodes[i]
+		if (el.disabled||el.getAttribute('tabindex')=='-1')
+			continue
+		if (el.offsetParent===null&&el.style.display!='fixed')
+			continue
+		list[list.length]=el
+	}
+	return list
+}
+
+function exodusconfirm_focus_endpoint(first) {
+
+	var list=exodusconfirm_focusable_elements()
+	if (!list.length)
+		return false
+	client_focuson(first?list[0]:list[list.length-1])
+	return true
+}
+
 var gexodusconfirm_scrollhint_resize
 
 function exodusconfirm_update_scroll_hints() {
@@ -5745,27 +5780,32 @@ function exodusconfirm_update_scroll_hints() {
 
 	wrap.classList.toggle('can_scroll_down', canDown)
 	wrap.setAttribute('aria-hidden', canDown ? 'false' : 'true')
-
-	// Match decide table width so left-aligned dots sit under option numbers
-	var table = $$('decide_table1')
-	var hintBlock = $$('exodusconfirm_scrollhint_block')
-	if (table && hintBlock)
-		hintBlock.style.width = table.offsetWidth + 'px'
-
-	exodusconfirm_fit_decide_popup()
 }
 
-function exodusconfirm_fit_decide_popup() {
-	var div = $$('exodusconfirmdiv')
-	var table = $$('decide_table1')
-	if (!div || !table || !div.classList.contains('exodusconfirm_decide'))
+function exodusconfirm_sync_decide_scrollhint_width() {
+
+	var table=$$('decide_table1')
+	var hintBlock=$$('exodusconfirm_scrollhint_block')
+	if (table&&hintBlock)
+		hintBlock.style.width=table.offsetWidth+'px'
+}
+
+function exodusconfirm_fit_decide_popup(force) {
+
+	var div=$$('exodusconfirmdiv')
+	var table=$$('decide_table1')
+	if (!div||!table||!div.classList.contains('exodusconfirm_decide'))
 		return
-	var maxw = window.innerWidth - 40
-	var want = table.offsetWidth + 24
-	var footer = div.querySelector('.exodusconfirm_footer')
+	if (div.getAttribute('exodusconfirm_fitted')&&!force)
+		return
+	var maxw=window.innerWidth-40
+	var want=table.offsetWidth+24
+	var footer=div.querySelector('.exodusconfirm_footer')
 	if (footer)
-		want = Math.max(want, footer.scrollWidth + 24)
-	div.style.width = Math.min(want, maxw) + 'px'
+		want=Math.max(want,footer.scrollWidth+24)
+	div.style.width=Math.min(want,maxw)+'px'
+	div.setAttribute('exodusconfirm_fitted','1')
+	exodusconfirm_sync_decide_scrollhint_width()
 }
 
 function exodusconfirm_bind_scroll_hints() {
@@ -5775,9 +5815,13 @@ function exodusconfirm_bind_scroll_hints() {
 	if (!scrollpane || !$$('exodusconfirm_scrollhint_wrap'))
 		return
 
+	exodusconfirm_fit_decide_popup()
 	exodusconfirm_update_scroll_hints()
 	scrollpane.addEventListener('scroll', exodusconfirm_update_scroll_hints, { passive: true })
-	gexodusconfirm_scrollhint_resize = exodusconfirm_update_scroll_hints
+	gexodusconfirm_scrollhint_resize=function() {
+		exodusconfirm_fit_decide_popup(true)
+		exodusconfirm_update_scroll_hints()
+	}
 	window.addEventListener('resize', gexodusconfirm_scrollhint_resize, { passive: true })
 }
 
@@ -6875,6 +6919,42 @@ function decide_onload(decide_args) {
 		return exoduscancelevent(event)
 	}
 
+	function decide_focus_option_endpoint(first) {
+
+		var selection2=document.getElementsByName('decide_selection')
+		if (!selection2.length)
+			return false
+		var newelement
+		var idx
+		if (first) {
+			for (idx=0;idx<selection2.length;++idx) {
+				if (selection2[idx].style.visibility!='hidden') {
+					newelement=selection2[idx]
+					break
+				}
+			}
+		}
+		else {
+			for (idx=selection2.length-1;idx>=0;--idx) {
+				if (selection2[idx].style.visibility!='hidden') {
+					newelement=selection2[idx]
+					break
+				}
+			}
+		}
+		if (!newelement)
+			return false
+		idx=Array.prototype.indexOf.call(selection2,newelement)
+		var scrollpane=exodusconfirm_scrollpane()
+		if (idx==0||newelement.getAttribute('decide_optionno')==1)
+			scrollpane.scrollTop=0
+		else if (idx==selection2.length-1)
+			scrollpane.scrollTop=scrollpane.scrollHeight
+		newelement.focus()
+		newelement.select()
+		return true
+	}
+
 	function decide_document_onkeydown(event) {
 
 		event = getevent(event)
@@ -6904,16 +6984,13 @@ function decide_onload(decide_args) {
 			return exoduscancelevent(event)
 		}
 
-		//home goto top if scrollbar
+		// Home/End: first/last option (like Ctrl+PgUp/Ctrl+PgDn focus)
 		if (keycode == 36) {
-			exodusconfirm_scrollpane().scrollTop = 0
+			decide_focus_option_endpoint(true)
 			return exoduscancelevent(event)
 		}
-
-		//end goto bottom if scrollbar
 		if (keycode == 35) {
-			var scrollpane = exodusconfirm_scrollpane()
-			scrollpane.scrollTop = scrollpane.scrollHeight
+			decide_focus_option_endpoint(false)
 			return exoduscancelevent(event)
 		}
 
