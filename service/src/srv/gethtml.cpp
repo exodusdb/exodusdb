@@ -311,6 +311,7 @@ subr getcompanyconfig(out letterhead, io mode) {
 	if (usetable) {
 		//tab(-1) = "<table width=100% cellspacing=0 cellpadding=0 borderpadding=0";
 		// id="letterhead" used in xmlinvs.cpp/submitxml()
+		 /*RELATED htmllib2.cpp gethtml.cpp*/
 		tab(-1) = "<table id=\"letterhead\" width=100% cellspacing=0 cellpadding=0 borderpadding=0";
 		tab ^= " style=\"border-collapse:collapse\"";
 		tab ^= ">";
