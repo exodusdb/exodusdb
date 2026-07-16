@@ -2450,31 +2450,31 @@ async function document_onkeydown2(event) {
 
     //alt+{ is first record
     if (keycode == 219 && event.altKey && event.shiftKey) {
-        exodussettimeout('await firstrecord_onclick()', 1)
+        await firstrecord_onclick(event)
         return exoduscancelevent(event)
     }
 
     //alt+} is last record
     if (keycode == 221 && event.altKey && event.shiftKey) {
-        exodussettimeout('await lastrecord_onclick()', 1)
+        await lastrecord_onclick(event)
         return exoduscancelevent(event)
     }
 
     //alt+[ is previous record
     if (keycode == 219 && event.altKey) {
-        exodussettimeout('await previousrecord_onclick()', 1)
+        await previousrecord_onclick(event)
         return exoduscancelevent(event)
     }
 
     //alt+] is next record
     if (keycode == 221 && event.altKey) {
-        exodussettimeout('await nextrecord_onclick()', 1)
+        await nextrecord_onclick(event)
         return exoduscancelevent(event)
     }
 
     //alt+^ is select record
     if (keycode == 54 && event.altKey && event.shiftKey) {
-        exodussettimeout('await selectrecord_onclick()', 1)
+        await selectrecord_onclick(event)
         return exoduscancelevent(event)
     }
 
@@ -3828,6 +3828,8 @@ async function changepage(pagen) {
 //'''''''''
 
 var gopening = false
+var grecordnav_busy = false
+var grecordnav_pending = null
 
 async function opendoc(newkey) {
 
@@ -3859,11 +3861,13 @@ async function opendoc_body(newkey) {
         }
     }
 
-    //gopening = true
-    //login('pre opendoc2')
-    var opened = await opendoc2(newkey)
-    //logout('pre opendoc2 opened='+opened)
-    gopening = false
+    gopening = true
+    var opened = false
+    try {
+        opened = await opendoc2(newkey)
+    } finally {
+        gopening = false
+    }
 
     //add key into gkeys
     if (opened && gKeyNodes) {
@@ -7703,9 +7707,52 @@ async function lastrecord_onclick(event) {
     return await nextrecord2(event, 'last')
 }
 
+function recordnav_merge(direction) {
+
+    // Coalesce rapid prev/next into one step after the current READU finishes
+    if (direction === 'first' || direction === 'last' || direction === 0) {
+        grecordnav_pending = direction
+        return
+    }
+    if (typeof direction != 'number')
+        return
+    if (typeof grecordnav_pending == 'number')
+        grecordnav_pending += direction
+    else
+        grecordnav_pending = direction
+}
+
+async function recordnav_wait_for_db() {
+
+    while (db.requesting)
+        await new Promise(function (resolve) { window.setTimeout(resolve, 25) })
+}
+
 async function nextrecord2(event, direction) {
 
     //direction is 'first', -1, 0, 1, 'last'
+    recordnav_merge(direction)
+    if (grecordnav_busy)
+        return false
+
+    grecordnav_busy = true
+    var result = false
+    try {
+        while (grecordnav_pending != null) {
+            await recordnav_wait_for_db()
+            var dir = grecordnav_pending
+            grecordnav_pending = null
+            if (typeof dir == 'number' && dir == 0)
+                continue
+            result = await nextrecord2_step(event, dir)
+        }
+        return result
+    } finally {
+        grecordnav_busy = false
+    }
+}
+
+async function nextrecord2_step(event, direction) {
 
     var nextkeys = gkeys
     var nextkeyn = gkeyn
