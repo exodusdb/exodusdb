@@ -597,13 +597,13 @@ async function formfunctions_onload() {
 
             //allow for data entry in SPAN elements (unless hidden)
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
-                var minwidth = element.getAttribute('exoduslength') * 7
+                var minwidth = element.getAttribute('exoduslength') + 'ch'
                 //buggy and not necessary on msie7
                 //dont set display block if there is a link or popup so that the image stays to the left of the field
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
                     //    element.style.width=(element.getAttribute('exoduslength')*7)+'px'
-                    element.style.minWidth = minwidth + 'px'
+                    element.style.minWidth = minwidth
                     //moved to css_old.css as SPAN min-width:13px;
                     //element.style.minHeight = '13px'
                     //element.style.minHeight='12px'
@@ -628,8 +628,8 @@ async function formfunctions_onload() {
                     if (isMSIE) {
                         //setting minWidth only causes problem in plan/schedule dates and extras entry
                         //setting width only causes problem almost everywhere that span data entry has no size initially
-                        element.style.minWidth = minwidth + 'px'
-                        element.style.Width = minwidth + 'px'
+                        element.style.minWidth = minwidth
+                        element.style.Width = minwidth
                     }
                     if (!(element.getAttribute('tabindex')))
                         element.setAttribute('tabindex', 999)
@@ -828,8 +828,12 @@ async function formfunctions_onload() {
                         systemerror('formfunctions_onload()', element.id + '.getAttribute("exoduslength")=' + element.getAttribute('exoduslength') + ' is invalid. 10 used.')
                         element.setAttribute('exoduslength', 10)
                     }
-                    element.size = parseInt(element.getAttribute('exoduslength'), 10)
-                    if (element.size > 2)
+                    var fieldlen = parseInt(element.getAttribute('exoduslength'), 10)
+                    element.size = fieldlen
+                    // INPUT width in ch tracks font size; legacy +2 size was for 8pt text
+                    if (element.tagName == 'INPUT' && fieldlen > 2)
+                        element.style.width = fieldlen + 'ch'
+                    else if (fieldlen > 2)
                         element.size += 2
                 }
                 if (element.tagName == 'TEXTAREA') {
