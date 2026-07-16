@@ -567,18 +567,9 @@ span.clsReadOnly:empty
     margin-right: 0.15em;
 }
 
-/* <br> after each leaf item is legacy from menu.htm; block .menuitem supplies the gap */
-.menu a.menuitem + br {
-    display: none;
-}
-
-/* <br> between submenu groups (after </div>, before next heading) */
+/* Legacy <br> from menu.htm (ADDITEM and ENDSUBMENU); block .menuitem padding supplies row gap */
 .menu br {
-    display: block;
-    height: 0.35em;
-    line-height: 0;
-    font-size: 0;
-    margin: 0;
+    display: none;
 }
 
 .menuitem
