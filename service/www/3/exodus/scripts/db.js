@@ -42,6 +42,7 @@ function exodus_field_width_px(element,chars,widthChar) {
 function exodus_apply_field_width(element,chars,widthChar) {
 
  if (!chars||!element||!element.getAttribute('exoduslength')) return
+ if (element.type=='radio'||element.type=='checkbox') return
  if (!widthChar) widthChar=exodus_field_width_char(element)
  var width=exodus_field_width_px(element,chars,widthChar)+'px'
  element.removeAttribute('size')

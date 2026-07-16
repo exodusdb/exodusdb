@@ -997,7 +997,8 @@ async function formfunctions_onload() {
                     element.className = elementclassname
             }
 
-            if (element.tagName.match(gtexttagnames) && element.size != 1 && element.getAttribute('exoduslength'))
+            if (element.tagName.match(gtexttagnames) && element.size != 1 && element.getAttribute('exoduslength')
+                && element.type != 'radio' && element.type != 'checkbox')
                 exodus_apply_field_width(element, parseInt(element.getAttribute('exoduslength'), 10), exodus_field_width_char(element))
 
             //handle groups

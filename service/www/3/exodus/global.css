@@ -816,7 +816,9 @@ input[type=radio] {
     appearance: none;
     box-sizing: border-box;
     min-height: 0;
-    width: var(--exodus-check-size);
+    width: var(--exodus-check-size) !important;
+    min-width: var(--exodus-check-size) !important;
+    max-width: var(--exodus-check-size) !important;
     height: var(--exodus-check-size);
     border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
@@ -856,7 +858,9 @@ input[type=checkbox] {
     appearance: none;
     box-sizing: border-box;
     min-height: 0;
-    width: var(--exodus-check-size);
+    width: var(--exodus-check-size) !important;
+    min-width: var(--exodus-check-size) !important;
+    max-width: var(--exodus-check-size) !important;
     height: var(--exodus-check-size);
     border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
