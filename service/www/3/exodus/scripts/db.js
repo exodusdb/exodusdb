@@ -263,7 +263,7 @@ function exodus_dict_period(di,mode,otherperiodid,conversion) {
  //di.align='R'
  // see exodus_dict_date() why switch to L
  di.align='L'
- di.length=5
+ di.length=7
  if (di.type=='F') di.validation='await exodus_val_period("'+mode+'","'+otherperiodid+'")'
 }
 
@@ -275,7 +275,7 @@ function exodus_dict_year_period(di,mode) {
  //di.align='R'
  // see exodus_dict_date() why switch to L
  di.align='L'
- di.length=5
+ di.length=7
 }
 
 async function exodus_val_period(mode,otherperiodid) {
