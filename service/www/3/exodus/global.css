@@ -893,6 +893,7 @@ input[type="radio"],input[type="checkbox"]{
     z-index: 1001;
     position: fixed;
     width: fit-content;
+    min-width: min-content;
     max-width: min(700px, calc(100vw - 40px));
     height: fit-content;
     margin: auto;
@@ -976,11 +977,14 @@ input[type="radio"],input[type="checkbox"]{
     flex: 0 0 auto;
     align-self: stretch;
     padding-top: 10px;
+    min-width: min-content;
 }
 .exodusconfirm_footerrow {
     display: flex;
     align-items: center;
     width: 100%;
+    flex-wrap: nowrap;
+    min-width: min-content;
 }
 .exodusconfirm_layout {
     border-collapse: collapse;
@@ -991,10 +995,21 @@ input[type="radio"],input[type="checkbox"]{
 .exodusconfirm_layout th {
     border: none;
 }
+.exodusconfirm_footer .exodusconfirm_promptcol,
+#yesnocancelbuttons {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.25em;
+    white-space: nowrap;
+    min-width: min-content;
+}
 .exodusconfirm_footer .graphicbutton {
     float: none;
     display: inline-block;
+    flex: 0 0 auto;
     vertical-align: middle;
+    white-space: nowrap;
 }
 .exodusconfirm_iconcol {
     width: 4.3em;
@@ -1478,9 +1493,23 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     padding-top: 8px;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
 }
+.calendarFooter .footerTable {
+    width: auto;
+    margin: 0 auto;
+}
+.calendarFooter .footerTable tr {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 0.25em;
+}
+.calendarFooter .footerTable td {
+    display: block;
+}
 .calendarFooter button {
     margin: 2px 4px;
     padding: 4px 10px;
+    white-space: nowrap;
 }
 :root[data-theme="dark_mode"] .calendar {
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);

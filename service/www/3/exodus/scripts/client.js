@@ -5762,6 +5762,9 @@ function exodusconfirm_fit_decide_popup() {
 		return
 	var maxw = window.innerWidth - 40
 	var want = table.offsetWidth + 24
+	var footer = div.querySelector('.exodusconfirm_footer')
+	if (footer)
+		want = Math.max(want, footer.scrollWidth + 24)
 	div.style.width = Math.min(want, maxw) + 'px'
 }
 
