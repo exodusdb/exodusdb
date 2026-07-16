@@ -911,6 +911,9 @@ td.nx {border-top:none;border-bottom:none}
 .exodustable {background-color:#fdf5e6; border-width:2px; border-collapse:collapse; padding:1px}
 .hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
 .pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
+#letterhead > tbody {border:0px solid black} /*RELATED htmllib2.cpp gethtml.cpp*/
+tbody {border:1px solid black}
+th {border:1px solid black}
 </style>
 
 <style type="text/css" media="print">
