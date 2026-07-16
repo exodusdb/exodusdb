@@ -4113,6 +4113,11 @@ async function sorttable(event, order) {
 
 	event = getevent(event)
 
+	if (gKeyNodes && !glocked) {
+		await readonlydocmsg()
+		return false
+	}
+
 	var colid = event.target.sorttableelementid
 
 	if (typeof form_presort == 'function') {
