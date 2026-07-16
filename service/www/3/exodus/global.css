@@ -495,12 +495,24 @@ TEXTAREA {
 
 /* EXPERIMENTAL: async-ui underline text entry (single-line) */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
-SELECT:not(.loginfield),
+SELECT:not(.loginfield):not(.calendarSelect),
 SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
     border-radius: 0;
+}
+
+/* UA paints a light native select face over transparent; strip chrome like underline inputs */
+SELECT:not(.loginfield):not(.calendarSelect) {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 0 center;
+    background-size: 0.55em 0.35em;
+    padding-right: 1.1em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
 }
 
 /* Multiline: boxed; softer dotted border than single-line underline */
@@ -1112,6 +1124,7 @@ input:checked + .toggle_button .knob img {
 
 /* ========== Dark mode (light mode rules above stay unchanged) ========== */
 :root[data-theme="dark_mode"] {
+    color-scheme: dark;
     --exodus-page-bg: #000000;
     /* match .exodusconfirm_question1 */
     --exodus-calendar-face: #28304a;
@@ -1209,10 +1222,19 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 }
 
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
-:root[data-theme="dark_mode"] SELECT:not(.loginfield) {
+:root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect) {
     background-color: transparent;
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
+    color: #ffffff;
+}
+
+:root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23fdfdfd' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect) option {
+    background-color: #28304a;
     color: #ffffff;
 }
 
@@ -1226,8 +1248,8 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 
 :root[data-theme="dark_mode"] INPUT.clsRequired,
 :root[data-theme="dark_mode"] INPUT.clsNotRequired,
-:root[data-theme="dark_mode"] SELECT.clsRequired,
-:root[data-theme="dark_mode"] SELECT.clsNotRequired,
+:root[data-theme="dark_mode"] SELECT.clsRequired:not(.calendarSelect),
+:root[data-theme="dark_mode"] SELECT.clsNotRequired:not(.calendarSelect),
 :root[data-theme="dark_mode"] SPAN.clsRequired[contenteditable],
 :root[data-theme="dark_mode"] SPAN.clsNotRequired[contenteditable] {
     background-color: transparent;
