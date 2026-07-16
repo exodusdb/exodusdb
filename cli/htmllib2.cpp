@@ -728,248 +728,214 @@ func getcss(io css, in version = "", in stationery = "") {
 
 func getvogonpoetry_css(in version) {
 
+	// Joins shared CSS, doc or report specific CSS and shared JS
+	// documents e.g Invoices       (version 1)
+	// reports e.g List of Invoices (version 2)
+
+	// if version is unassigned, empty str or !eq to "2" then Ver1 used
+	// if version is "2", Ver2 is used
+
+	// Shared between Version 1 and 2
+	var cssjs = R"V0G0N(
+		<style type="text/css">
+			/*Shared CSS/JS between ver1 (for documents) and ver2 (for reports)*/
+			.BHEAD {display:none}
+			.BHEAD2 {}
+			body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
+			table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
+			a {color:blue;}
+			a:visited {color:purple;}
+			a:hover {color:red;}
+			tt {font-family:courier new,courier;font-size:80%}
+			thead {display:table-header-group}
+			td.nb {border-bottom:none}
+			td.nt {border-top:none}
+			td.nx {border-top:none;border-bottom:none}
+			.aright {text-align:right}
+			.aleft {text-align:left}
+			.acenter {text-align:center}
+			.nobr {white-space:nowrap;}
+			.pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
+			@media print {.noprint {display:none}}
+
+	)V0G0N";
+
 	if (version.assigned() and version == 2) {
 
-		return
-R"V0G0N(
-<style type="text/css">
-/*ver2 for reports e.g list of invoices*/
-.BHEAD {display:none}
-.BHEAD2 {}
-body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
-table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
-a {color:blue;}
-a:visited {color:purple;}
-a:hover {color:red;}
-tt {font-family:courier new,courier;font-size:80%}
-//xth {background-color:#ffff80;}
-xth {background-color:#fff099;}
-thead {display:table-header-group}
-tfoot {page-break-inside:avoid}
-td.nb {border-bottom:none}
-td.nt {border-top:none}
-td.nx {border-top:none;border-bottom:none}
-.arightnowrap {text-align:right;white-space:nowrap}
-.aright {text-align:right}
-.aleft {text-align:left}
-.acenter {text-align:center}
-.nobr {white-space:nowrap;}
-.bold {font-weight:bold;}
-.vbottom {vertical-align:bottom}
-.num {text-align:right;mso-number-format:General;white-space:nowrap;}
+		// Version 2 CSS - Reports
+		cssjs ^= R"V0G0N(
+			/*ver2 CSS for reports e.g list of invoices*/
+			xth {background-color:#fff099;}
+			tfoot {page-break-inside:avoid}
+			.arightnowrap {text-align:right;white-space:nowrap}
+			.bold {font-weight:bold;}
+			.vbottom {vertical-align:bottom}
+			.num {text-align:right;mso-number-format:General;white-space:nowrap;}
 
-table.exodustable {
- margin:0px;
- padding:0px;
- //border-spacing:0px;
- border-collapse:collapse;}
+			table.exodustable {
+				margin:0px;
+				padding:0px;
+				/*border-spacing:0px;*/
+				border-collapse:collapse;}
 
-table.exodustable th {
- //background-color:#ffff80;
- background-color:#fff099;
- padding:2px;
- border:1px solid #808080;}
+			table.exodustable th {
+				/*background-color:#ffff80;*/
+				background-color:#fff099;
+				padding:2px;
+				border:1px solid #808080;}
 
-@media screen{
- table.exodustable > thead th {
-  top: 0;
-  z-index: 2;
-  position: sticky;
-  outline: 1px solid #808080;
-  outline-offset: -0.5px;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);}}
+			@media screen{
+				table.exodustable > thead th {
+					top: 0;
+					z-index: 2;
+					position: sticky;
+					outline: 1px solid #808080;
+					outline-offset: -0.5px;
+					box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);}}
 
-table.exodustable > tbody > tr > td {
- //background-color:#ffffc0;
- background-color:#fdf5e6;
- padding:2px;
- border:1px solid #d3d3d3;}
+			table.exodustable > tbody > tr > td {
+				/*background-color:#ffffc0;*/
+				background-color:#fdf5e6;
+				padding:2px;
+				border:1px solid #d3d3d3;}
 
-table.exodustable > tbody > tr > td:first-child {
- border-left:1px solid #808080}
+			table.exodustable > tbody > tr > td:first-child {
+				border-left:1px solid #808080}
 
-table.exodustable > tbody > tr > td:last-child {
- border-right:1px solid #808080}
+			table.exodustable > tbody > tr > td:last-child {
+				border-right:1px solid #808080}
 
-table.exodustable hr {height:0px; border:0px; border-top:1px solid #d3d3d3}
+			table.exodustable hr {
+				height:0px;
+				border:0px;
+				border-top:1px solid #d3d3d3}
 
-table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top; border-collapse:collapse; border:0px;}
+			table.hashtable td {
+				padding:0px;
+				margin:0px;
+				text-align:left;
+				vertical-align:top;
+				border-collapse:collapse;
+				border:0px;}
 
-.pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
-
-</style>
-
-<style type="text/css" media="print">
- /*.exodustable {}*/
- /* #Header, #Footer { display: none !important; } */
- .noprint {display:none}
-</style>
-
-<script type="text/javascript">
-var togglendisplayed=0
-function toggle(t, mode) {
-
-	if (typeof t == 'string') {
-		if (document.getElementsByClassName)
-			t = document.getElementsByClassName(t)
-		else
-			t = document.getElementsByName(t)
-	}
-
-	if (t.tagName) t=[t]
-	if (!t.length) return
-
-	var display = "none"
-	for (var ii = t.length - 1; ii>=0; ii--) {
-		if (t[ii].style.display == "") {
-			t[ii].style.display = "none"
-		} else {
-			t[ii].style.display = ""
-			display = ""
-		}
-	}
-
-	if (!mode)  {
-		var toggleheading=false
-		if (display == '') {
-			togglendisplayed++
-			if (togglendisplayed == 1)
-				toggleheading = true
-
-		} else {
-			togglendisplayed--
-			if (togglendisplayed == 0)
-				toggleheading = true
-		}
-		if (toggleheading) {
-			//toggle(document.getElementsByName('BHEAD'),true)
-			var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
-			var bheads=[rules[0],rules[1]]
-			toggle(bheads,true)
-		}
-	}
-}
-
-window.onload=function (){
- if (!window.opener)
-  return
- //ctrl+click doesnt provide window.opener
- //glogincode="DEVDTEST*EXODUS*"
- //gwindowopenparameters={}
- //glogincode=window.opener.glogincode
- //gwindowopenparameters.readonlymode=true
- var links=document.getElementsByTagName('a')
- var vhtm
- for ( var ii=0;ii<links.length;++ii){
-  var href=links[ii].href.toString()
-  if (href.indexOf('nwin')<0)
-   continue
-  href=href.toString().split("'")
-  if (href[3]=='V')
-   href[3]='finance/vouchers.htm'
-  if (!vhtm) {
-   vhtm=window.opener.location.toString().split("/")
-   vhtm.pop()
-   if (href[3].indexOf('/')>=0)
-    vhtm.pop()
-   vhtm=vhtm.join('/')
-  }
-  links[ii].href=vhtm+'/'+href[3]+'?key='+href[1]+'&openreadonly=true'
-  links[ii].target='_blank'
- }
-}
-</script>
-)V0G0N";
-
+			.noprint {display:none}
+		</style>
+		)V0G0N";
 
 	} else {
+		// Version 1 CSS - Documents
+		cssjs ^= R"V0G0N(
+			/*ver1 CSS for documents like invoices*/
+			th {background-color:#fff099;}
+			.exodustable {
+				/*background-color:#ffffc0*/
+				background-color:#fdf5e6;
+				border-width:2px;
+				border-collapse:collapse;
+				padding:1px}
+			.hashtable td {
+				padding:0px;
+				margin:0px;
+				vertical-align:top;
+				border-collapse:collapse;
+				border:0px solid lightgrey;}
+			.num {
+				text-align:right;
+				mso-number-format:General}
+			/* Force invoice body cells to always black*/
+			/* Firefox defaults to black but chromium defaults to light gray (hard to see against yellow)*/
+			#letterhead > tbody {border:0px solid black} /*RELATED htmllib2.cpp gethtml.cpp*/
+			tbody {border:1px solid black}
+			th {border:1px solid black}
 
-		return
-R"V0G0N(
-<style type="text/css">
-/*ver1 for documents like invoices*/
-.BHEAD {display:none}
-.BHEAD2 {}
-body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
-table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
-a {color:blue;}
-a:visited {color:purple;}
-a:hover {color:red;}
-tt {font-family:courier new,courier;font-size:80%}
-//th {background-color:#ffff80;}
-th {background-color:#fff099;}
-thead {display:table-header-group}
-td.nb {border-bottom:none}
-td.nt {border-top:none}
-td.nx {border-top:none;border-bottom:none}
-.aright {text-align:right}
-.aleft {text-align:left}
-.acenter {text-align:center}
-.nobr {white-space:nowrap;}
-.num {text-align:right;mso-number-format:General}
-//.exodustable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
-.exodustable {background-color:#fdf5e6; border-width:2px; border-collapse:collapse; padding:1px}
-.hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
-.pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
-#letterhead > tbody {border:0px solid black} /*RELATED htmllib2.cpp gethtml.cpp*/
-tbody {border:1px solid black}
-th {border:1px solid black}
-</style>
-
-<style type="text/css" media="print">
-.exodustable {}
-.noprint {display:none}
-</style>
-
-<script type="text/javascript">
-var togglendisplayed=0
-function toggle(t, mode) {
-
-    if (typeof t == 'string') {
-        if (document.getElementsByClassName)
-            t = document.getElementsByClassName(t)
-        else
-            t = document.getElementsByName(t)
-    }
-
-    if (t.tagName) t=[t]
-    if (!t.length) return
-
-    var display = "none"
-    for (var ii = t.length - 1; ii>=0; ii--) {
-        if (t[ii].style.display == "") {
-            t[ii].style.display = "none"
-        } else {
-            t[ii].style.display = ""
-            display = ""
-        }
-    }
-
-    if (!mode)  {
-        var toggleheading=false
-        if (display == '') {
-            togglendisplayed++
-            if (togglendisplayed == 1)
-                toggleheading = true
-
-        } else {
-            togglendisplayed--
-            if (togglendisplayed == 0)
-                toggleheading = true
-        }
-        if (toggleheading) {
-            //toggle(document.getElementsByName('BHEAD'),true)
-            var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
-            var bheads=[rules[0],rules[1]]
-            toggle(bheads,true)
-        }
-    }
-}
-</script>
-)V0G0N";
-
+			/*@media print {
+			.exodustable {}}*/
+		</style>
+		)V0G0N";
 	}
-}
+
+	// Add shared JS
+	cssjs ^= R"V0G0N(
+		<script type="text/javascript">
+			var togglendisplayed=0
+			/*Show/Hide rows*/
+			function toggle(t, mode) {
+
+				if (typeof t == 'string') {
+					if (document.getElementsByClassName)
+						t = document.getElementsByClassName(t)
+					else
+						t = document.getElementsByName(t)
+				}
+
+				if (t.tagName) t=[t]
+				if (!t.length) return
+
+				var display = "none"
+				for (var ii = t.length - 1; ii>=0; ii--) {
+					if (t[ii].style.display == "") {
+						t[ii].style.display = "none"
+					} else {
+						t[ii].style.display = ""
+						display = ""
+					}
+				}
+
+				if (!mode)  {
+					var toggleheading=false
+					if (display == '') {
+						togglendisplayed++
+						if (togglendisplayed == 1)
+							toggleheading = true
+
+					} else {
+						togglendisplayed--
+						if (togglendisplayed == 0)
+							toggleheading = true
+					}
+					if (toggleheading) {
+						//toggle(document.getElementsByName('BHEAD'),true)
+						var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
+						var bheads=[rules[0],rules[1]]
+						toggle(bheads,true)
+					}
+				}
+			}
+
+			window.onload=function (){
+				if (!window.opener) { return }
+				//ctrl+click doesnt provide window.opener
+				//glogincode="DEVDTEST*EXODUS*"
+				//gwindowopenparameters={}
+				//glogincode=window.opener.glogincode
+				//gwindowopenparameters.readonlymode=true
+				var links=document.getElementsByTagName('a')
+				var vhtm
+				for (var ii=0;ii<links.length;++ii){
+					var href=links[ii].href.toString()
+					if (href.indexOf('nwin')<0)
+					continue
+					href=href.toString().split("'")
+					if (href[3]=='V')
+						href[3]='finance/vouchers.htm'
+					if (!vhtm) {
+						vhtm=window.opener.location.toString().split("/")
+						vhtm.pop()
+						if (href[3].indexOf('/')>=0)
+							vhtm.pop()
+						vhtm=vhtm.join('/')
+					}
+					links[ii].href=vhtm+'/'+href[3]+'?key='+href[1]+'&openreadonly=true'
+					links[ii].target='_blank'
+				}
+			}
+		</script>
+	)V0G0N";
+
+	// Remove tabbing added for readability in cpp
+	return cssjs.replace("\n\t\t\t", "\n");
+
+} // end of getvogonpoetry_css()
 
 subr colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 
