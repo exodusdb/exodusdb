@@ -476,6 +476,16 @@ TABLE.exodusform .clsReadOnly {
     font-style: var(--exodus-form-data-font-style);
 }
 
+/* field width: exodus_apply_field_width() in db.js (exoduslength x 8|M, content-box) */
+TABLE.exodusform INPUT.clsRequired,
+TABLE.exodusform INPUT.clsNotRequired,
+TABLE.exodustable INPUT.clsRequired,
+TABLE.exodustable INPUT.clsNotRequired,
+TABLE.exodustable SPAN.clsRequired[contenteditable],
+TABLE.exodustable SPAN.clsNotRequired[contenteditable] {
+    box-sizing: content-box;
+}
+
 /* UA forms.css shrinks controls after screenfont strips font-size from font-family rules */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
 SELECT,

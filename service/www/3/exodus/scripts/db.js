@@ -2,6 +2,56 @@
 
 var glocktimeoutinmins=5
 var trailingspaces=/\s*$/g
+var gexodus_field_width_cache={}
+var gexodus_field_width_digitconv=/^\[(DATE|NUMBER|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD)/
+var gexodus_field_width_dateconv=/\[[^\]]*DATE[^\]]*\]/
+
+// "8" for date/period/number fields, "M" for general text
+function exodus_field_width_char(element) {
+
+ var conv=(element.getAttribute('exodusconversion')||'').toUpperCase()
+ if (gexodus_field_width_digitconv.test(conv))
+  return '8'
+ // exodus_dict_date fields: calendar popup, or custom routines e.g. [schedule_start_stop_date]
+ if ((element.getAttribute('exoduspopup')||'').indexOf('form_pop_calendar')>=0)
+  return '8'
+ if (gexodus_field_width_dateconv.test(conv))
+  return '8'
+ return 'M'
+}
+
+// width of chars x widthChar in the element's computed font (after dbform styling)
+function exodus_field_width_px(element,chars,widthChar) {
+
+ if (!widthChar) widthChar='M'
+ var sample=widthChar.repeat(chars)
+ var cs=getComputedStyle(element)
+ var font=[cs.fontStyle,cs.fontVariant,cs.fontWeight,cs.fontSize,cs.fontFamily].join(' ').replace(/\s+/g,' ').trim()
+ var key=font+'\t'+widthChar+'\t'+chars
+ if (gexodus_field_width_cache[key])
+  return gexodus_field_width_cache[key]
+ var canvas=document.createElement('canvas')
+ var ctx=canvas.getContext('2d')
+ ctx.font=font
+ var width=Math.ceil(ctx.measureText(sample).width)
+ gexodus_field_width_cache[key]=width
+ return width
+}
+
+// sole entry point: dbform calls this once per field after clsRequired/clsNotRequired
+function exodus_apply_field_width(element,chars,widthChar) {
+
+ if (!chars||!element||!element.getAttribute('exoduslength')) return
+ if (!widthChar) widthChar=exodus_field_width_char(element)
+ var width=exodus_field_width_px(element,chars,widthChar)+'px'
+ element.removeAttribute('size')
+ element.style.boxSizing='content-box'
+ element.style.width=width
+ element.style.maxWidth=width
+ element.style.minWidth=width
+ if (element.tagName=='TEXTAREA')
+  element.cols=chars
+}
 
 function exodus_dict_dow(di,many) {
 
