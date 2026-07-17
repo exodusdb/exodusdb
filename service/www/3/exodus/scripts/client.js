@@ -802,7 +802,7 @@ function dbsend_release_modal(xhttp, dbmodalblocked) {
 }
 
 // Gate B entry — only from uiblocker while a lazy db.send wait is active.
-// Does not go through exodus_begin (would queue behind Gate A and never show during the wait).
+// Does not go through exodus_begin (Gate A is airborne during db.send; Gate B must run now).
 function exodus_begin_waitcancel(source) {
 
 	source = source || 'uiblocker'
@@ -5432,12 +5432,30 @@ function exodusispromise(value) {
 	return value && typeof value.then === 'function'
 }
 
-// Gate A — exclusive main event flow (one plane). Slice 1: all startAsyncFlow / event
-// commencements enter here. Nested await inside the flight is fine; a second takeoff
-// while airborne is queued until landing.
+// Gate A — exclusive main event flow (one plane). All startAsyncFlow / event
+// commencements enter here. Nested await inside the flight is fine.
+//
+// Model today: at most ONE active flight (g_exodus_flow). A separate wait list
+// (g_exodus_flow_queue) may hold jobs that start only after that flight lands.
+// The active job is not counted in the wait list.
+//
+// g_exodus_flow_queue_max = wait-list capacity only:
+//   0 = no queuing — second start while airborne is SKIPPED (legacy / current)
+//   1 = at most one deferred takeoff, drained after land
+//   N = deeper FIFO
+//
+// Not implemented (bridge too far for now): a pool where "size" means active +
+// waiting together, and size > 1 could mean several flights airborne at once.
+// That needs safe multi-active rules; today xhttp/session largely serializes or
+// rejects parallel dbio (db.requesting). Until then: exclusive active + optional
+// wait list. Intentional "run after this flight" can also use feature-local
+// setTimeout → exodus_begin (does not need the wait list).
+//
 // Gate B (wait/cancel) is a separate concurrent stack — see exodus_begin_waitcancel.
 var g_exodus_flow = null
 var g_exodus_flow_queue = []
+// FUTURE: set to 1+ to allow deferred takeoffs while a flight is airborne.
+var g_exodus_flow_queue_max = 0
 var g_exodus_flight_n = 0
 
 function exodus_flight_log(msg) {
@@ -5448,13 +5466,23 @@ function exodus_flight_log(msg) {
 }
 
 // Single commencement point for Gate A business async. Returns a Promise of
-// { value, done: true } (same shape as legacy startAsyncFlow).
+// { value, done: true } (same shape as legacy startAsyncFlow), or null if skipped.
 function exodus_begin(asyncHandler, location, event) {
 	location = location || 'unknown'
 	if (g_exodus_flow) {
+		// Only the wait list is size-limited; airborne is tracked in g_exodus_flow.
+		if (g_exodus_flow_queue.length >= g_exodus_flow_queue_max) {
+			exodus_flight_log(
+				'SKIP "' + location + '" (airborne #' + g_exodus_flow.n
+				+ ' "' + g_exodus_flow.location + '", queue_max='
+				+ g_exodus_flow_queue_max + ')'
+			)
+			return Promise.resolve(null)
+		}
 		exodus_flight_log(
 			'QUEUED "' + location + '" (airborne #' + g_exodus_flow.n
-			+ ' "' + g_exodus_flow.location + '", queue=' + (g_exodus_flow_queue.length + 1) + ')'
+			+ ' "' + g_exodus_flow.location + '", queue='
+			+ (g_exodus_flow_queue.length + 1) + '/' + g_exodus_flow_queue_max + ')'
 		)
 		return new Promise(function (resolve, reject) {
 			g_exodus_flow_queue.push({
@@ -5500,7 +5528,8 @@ function exodus_begin_drain() {
 		return
 	var job = g_exodus_flow_queue.shift()
 	exodus_flight_log(
-		'DEQUEUE "' + job.location + '" (remaining queue=' + g_exodus_flow_queue.length + ')'
+		'DEQUEUE "' + job.location + '" (remaining queue='
+		+ g_exodus_flow_queue.length + '/' + g_exodus_flow_queue_max + ')'
 	)
 	exodus_begin_run(job.asyncHandler, job.location, job.event).then(job.resolve, job.reject)
 }
@@ -5511,8 +5540,7 @@ function startAsyncFlow(asyncHandler, location, event) {
 }
 
 // Optional background work (keepalive, relock): run via Gate A only when idle.
-// Never queue — by the time a deferred tick ran, form/lock state may be wrong;
-// missing a keepalive/relock tick is fine.
+// Skip if busy — form/lock state may be wrong later; missing a tick is fine.
 function exodus_begin_if_idle(asyncHandler, location) {
 	location = location || 'background'
 	if (g_exodus_flow) {
@@ -5726,7 +5754,7 @@ function exodusint2date(exodusdate) {
 
 // Thin timeout wrapper. Prefer await inside the current Gate A flight.
 // If you must defer async work: exodussettimeout schedules it, then
-// exodustimeout_async_sync enters Gate A (queues if airborne — never free-runs).
+// exodustimeout_async_sync enters Gate A (skip when queue_max is 0).
 function exodussettimeout(command, milliseconds) {
 	if (glogsettimeout)
 		console.log('exodussetimeout(' + command + ')')
@@ -5737,7 +5765,7 @@ function exodussettimeout(command, milliseconds) {
 		return window.setTimeout(command, milliseconds)
 }
 
-// Async timeout work always enters exclusive Gate A (queue if busy).
+// Async timeout work always enters exclusive Gate A (queue only if queue_max > 0).
 async function exodustimeout_async_sync(command) {
 	await exodus_begin(async function () {
 		const fn = new Function('return ' + command)
@@ -7676,12 +7704,14 @@ function DATE(mode, value, params) {
 			//update the otherdate
 			if (otherdate !== otherdate0) {
 
-				// DATE oconv is sync — cannot await here. Queue/run setx via Gate A.
-				// Nested flight while validating: queues until current flight lands.
+				// DATE oconv is sync — cannot await here. queue_max is 0 so a nested
+				// exodus_begin would SKIP; defer peer setx until after this turn.
 				;(function (id, recn, val) {
-					void exodus_begin(function () {
-						return gds.setx(id, recn, val)
-					}, 'date-fromto setx ' + id)
+					window.setTimeout(function () {
+						void exodus_begin(function () {
+							return gds.setx(id, recn, val)
+						}, 'date-fromto setx ' + id)
+					}, 1)
 				})(otherdateid, grecn, otherdate)
 			}
 

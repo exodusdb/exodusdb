@@ -18,7 +18,7 @@ The framework originated in an era of older browsers and cooperative generators;
 - **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodusdblink`, `exodusshowmodaldialog`, security, cookies, utilities, string/array prototypes.
 - **Form automation:** `dbform.js` + helpers in `db.js` — Dictionary-driven (`dict_*`) CRUD forms, MV groups, validation, buttons.
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
-- **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; second starts **queue** until the first lands). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work.
+- **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is **skipped**). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work.
 - **Wait/Cancel (Gate B):** Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on `db.send` XHR. No main-line form dbio from Gate B.
 - **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
@@ -115,9 +115,9 @@ async function myFunction() {
 }
 ```
 
-DOM events, HTM `*_sync` bridges, and deferred async timeouts all enter **Gate A** (`exodus_begin`). Nested `await` (confirm, `db.send`, form hooks) stays on that one flight. A second commencement while Gate A is airborne is **queued**, not run in parallel.
+DOM events, HTM `*_sync` bridges, and deferred async timeouts all enter **Gate A** (`exodus_begin`). Nested `await` (confirm, `db.send`, form hooks) stays on that one flight. The airborne flight is not “in the queue”; `g_exodus_flow_queue_max` is how many jobs may **wait** to start after land: **0 = no queuing** (skip when busy, current); **1** = one deferred job; **N** = deeper FIFO. Raise later if multi-flight activity is wanted; today xhttp/session still largely serializes dbio.
 
-Optional background work (session keepalive, relock) uses `exodus_begin_if_idle` — **skip** if busy, never queue stale work.
+Optional background work (session keepalive, relock) uses `exodus_begin_if_idle` — **skip** if busy (never uses the queue).
 
 **Do not** use free-running `setTimeout(async () => …)` or rely on `exodussettimeout('await myfunc()')` as a second event system. Prefer `await myfunc()` inside the current handler. If you must defer after the current flight (e.g. non-modal UI that must outlive the click), schedule with a short timeout that calls `exodus_begin(myfunc, 'label')`.
 
@@ -286,7 +286,7 @@ Other frequent utilities:
 - `await exodusokcancel(msg, default)`
 - `await exodusdecide(question, data, ...)`
 - `exoduswindowclose(value)`
-- `exodus_begin(asyncFn, 'label')` — start/queue Gate A work
+- `exodus_begin(asyncFn, 'label')` — start Gate A work (skip if airborne when `queue_max` is 0; else may queue)
 - `exodus_begin_if_idle(asyncFn, 'label')` — optional background; skip if busy
 - `$$('id')` or `$$('classname')` — element lookup
 
