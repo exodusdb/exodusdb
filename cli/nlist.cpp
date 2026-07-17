@@ -1405,6 +1405,8 @@ x1exit:
 
 		// Supertable to ensure any heading is as wide as the body of the report
 		if (showborder) {
+			// Legacy border=N ≈ border: Npx <style> currentColor (inherits parent, else browser default)
+			// PATCHED: JS in htmllib2 injects CSS that overrides this.
 			head(-1) = "<table{%20}border=1{%20}style=\"border-width:3px\"{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>";
 		} else {
 			head(-1) = "<table{%20}align=center><tr><td>";

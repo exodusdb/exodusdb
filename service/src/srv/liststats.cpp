@@ -148,6 +148,8 @@ func main() {
 		tx = "<H1 align=center>EXODUS USAGE STATISTICS</H1>";
 		gosub printtx();
 
+		// Legacy border=N ≈ border: Npx <style> currentColor (inherits parent, else browser default)
+		// PATCHED: JS in htmllib2 injects CSS that overrides this.
 		tx = "<table border=1 class=exodustable";
 		tx ^= " CELLSPACING=0 CELLPADDING=2 ALIGN=CENTER";
 		tx ^= " STYLE=\"font-size:66%\"";
