@@ -20,6 +20,7 @@ The framework originated in an era of older browsers and cooperative generators;
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
 - **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is **skipped**). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work.
 - **Wait/Cancel (Gate B):** Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on `db.send` XHR. No main-line form dbio from Gate B.
+- **Legacy generators:** Framework scripts have **no** live `function*` / `yield*`. A generator resume path (`geventhandler`, `exodus_resume`, `exodusneweventhandler` non-async branch) remains for app modules and dict `functioncode` still on generators. Console: `[exodus flight] LEGACY GENERATOR …`. Remove after apps are fully async.
 - **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
 - **Security model:** PHP sessions (the real auth) + namespaced tokens. `exodussecurity('TASK')`. Once a valid session exists, the web layer trusts it.
@@ -118,6 +119,16 @@ async function myFunction() {
 DOM events, HTM `*_sync` bridges, and deferred async timeouts all enter **Gate A** (`exodus_begin`). Nested `await` (confirm, `db.send`, form hooks) stays on that one flight. The airborne flight is not “in the queue”; `g_exodus_flow_queue_max` is how many jobs may **wait** to start after land: **0 = no queuing** (skip when busy, current); **1** = one deferred job; **N** = deeper FIFO. Raise later if multi-flight activity is wanted; today xhttp/session still largely serializes dbio.
 
 Optional background work (session keepalive, relock) uses `exodus_begin_if_idle` — **skip** if busy (never uses the queue).
+
+### Legacy `function*` / `yield*` (temporary)
+
+| Layer | Status |
+|-------|--------|
+| Exodus `scripts/*.js` | **No** live generators (async only) |
+| App modules (e.g. Neosys) | Some `function*` remain — still use the legacy resume path |
+| Dict `functioncode` | May still be a generator; framework detects `.next` and runs via `exodusneweventhandler` |
+
+Do **not** add new generators. Convert leftovers to `async`/`await` so the legacy path can be deleted.
 
 **Do not** use free-running `setTimeout(async () => …)` or rely on `exodussettimeout('await myfunc()')` as a second event system. Prefer `await myfunc()` inside the current handler. If you must defer after the current flight (e.g. non-modal UI that must outlive the click), schedule with a short timeout that calls `exodus_begin(myfunc, 'label')`.
 

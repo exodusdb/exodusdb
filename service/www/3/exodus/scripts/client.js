@@ -1285,12 +1285,18 @@ function exodus_autoresume() {
 
 }
 
-//given a result from some event, resume a yielded geventhandler function, passing it a result
-// after closing the modaluiblocker
-// (via direct call or via fromPromise adapter after a leaf's promise resolves)
-//1. a child window is closed (via autoresume -> resolvePendingDialog -> fromPromise)
-//2. an xmlhttp action completes (ok/error/timeout/abort) (via XHR promise)
-//3. user clicks various keys while a exodusconfirmdiv is present (via resolvePendingConfirm)
+// LEGACY GENERATOR RUNTIME (stage 1 audit 2026-07-17)
+// =====================================================
+// Exodus framework scripts have ZERO live function*/yield* (async/await only).
+// This path is retained solely for app modules (e.g. Neosys) and dynamic dict
+// functioncode that still return generators. Remove after those are converted
+// (rationalisation stage 6). Until then: geventhandler + exodus_resume/next +
+// the generator branch of exodusneweventhandler stay live.
+//
+// Resume a yielded geventhandler, after closing the modal uiblocker.
+// Callers historically: child window close, XHR complete, confirm buttons.
+// Modern async flights use Promise resolvers (gpendingConfirm/DialogResolve);
+// these resume helpers are only needed while a generator is the owner.
 function exodus_resume(value, source) {
 
 	logevent(' ')
@@ -5368,34 +5374,22 @@ function starteventhandler(eventfunctionname, functionx) {
 			return startAsyncFlow(functionx, eventdescription + ' (async) in starteventhandler', event);
 		}
 
-		// old generator path
-		//make the global generator function (that can yield) and can be resumed by calling .next()
+		// LEGACY: non-async handler may be a generator factory (app modules).
+		// Framework code is async; this branch exists for remaining function* apps.
 		var eventhandler = functionx(event)
 		if (!eventhandler) {
 			var msg1 = 'exodus_anon_sync_event_handler ' + eventfunctionname + ' ' + event.target
 			var msg2 = 'cant create functionx ' + functionx.name
 			logevent(msg1 + ' : ' + msg2)
-			//systemerror(msg1,msg2)
-
 		} else {
-
-			//start the event, result will be that provided by the FIRST yield
-			//we cant run the event to completion if there is more than one yield
-			//var next=exodus_next('exodus_anon_sync_event_handler for '+eventdescription)
 			var next = exodusneweventhandler(eventhandler, eventdescription + ' in exodus_anon_sync_event_handler')
 			var result = next.value
-
-			//onbeforeunload may return text immediately so return that
+			// onbeforeunload may return text immediately
 			if (result)
-				event.returnValue = result//what exactly does this do?
+				event.returnValue = result
 			else
 				result = false
-
-			//			logevent('<<<<<<<<<< '+eventdescription + ' NEW EVENT HANDLER in exodus_anon_sync_event_handler')
-			//			logevent('		   done:'+next.done+ ' result:'+result)
-
 			return result
-
 		}
 	}
 }
@@ -5619,18 +5613,29 @@ function exodusneweventhandler(eventhandler, location) {
 	logevent(' ')
 	logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
 
-	// Async functions must not be pre-invoked; run via exodus_begin (never call eventhandler() to probe).
+	// Preferred path: async function → exclusive Gate A.
 	if (exodusisasyncfunction(eventhandler))
 		return exodus_begin(eventhandler, location)
 
+	// LEGACY generator path (see block above exodus_resume). Log so remaining
+	// app function* show up in the flight console during soak.
+	if (exodusisgeneratoriterator(eventhandler)) {
+		exodus_flight_log(
+			'LEGACY GENERATOR #' + geventn + ' "' + location + '"'
+			+ (eventhandler.constructor && eventhandler.constructor.name
+				? ' (' + eventhandler.constructor.name + ')' : '')
+		)
+	} else {
+		exodus_flight_log(
+			'LEGACY HANDLER #' + geventn + ' "' + location
+			+ '" (not AsyncFunction; treating as generator/iterator)'
+		)
+	}
+
 	geventhandler = eventhandler
 
-	//run the generator function to first yield or completion if no yielding
+	// Run to first yield or completion.
 	var next = exodus_next('', 'exodusneweventhandler from ' + location)
-
-	//code will continue immediately here after completion or yielding of the function
-	//IF the function yielded to window.open for example
-	//temp.value will be 1 and temp.done will be false
 	return next
 }
 
