@@ -3487,38 +3487,44 @@ function scrollintoview(element) {
     if (!tagname.match(gdatatagnames)) return
     if (!element.name) return
 
-    //get total left offset
-    var offsetleft = 0
-    var element2 = element
-    do {
-        offsetleft += element2.offsetLeft
-        element2 = element2.offsetParent
-    }
-    while (element2)
-
-    leftextra = 100
-    rightextra = 100
-
-    if (offsetleft < leftextra) {
-        window.scrollBy(-99999, 0)
+    // Bring focused field into view with the smallest scroll needed (both axes).
+    // Do not home the page — that used to happen via body.scrollLeft (always 0 in
+    // standards mode) and aggressive scrollBy(-99999,0) on left-aligned fields.
+    var rect
+    try {
+        rect = element.getBoundingClientRect()
+    } catch (e) {
         return
     }
+    if (!rect)
+        return
 
-    //scroll left
-    var scrollleft = document.body.scrollLeft - offsetleft
-    if (scrollleft > 0) {
-        window.scrollBy(-scrollleft - leftextra, 0)
-    }
+    // Keep clear of fixed menubar / sticky table heads when present
+    var topmargin = 8
+    try {
+        var sticky = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--exodus-sticky-top'))
+        if (sticky > 0)
+            topmargin = sticky + 8
+    } catch (e) { }
 
-    //scroll right
-    else {
-        var scrollright = offsetleft + element.offsetWidth - document.body.clientWidth - document.body.scrollLeft
-        if (scrollright > 0) {
-            window.scrollBy(scrollright + rightextra, 0)
-        }
-    }
+    var leftmargin = 16
+    var rightmargin = 16
+    var bottommargin = 16
+    var dx = 0
+    var dy = 0
 
-    return
+    if (rect.top < topmargin)
+        dy = rect.top - topmargin
+    else if (rect.bottom > window.innerHeight - bottommargin)
+        dy = rect.bottom - (window.innerHeight - bottommargin)
+
+    if (rect.left < leftmargin)
+        dx = rect.left - leftmargin
+    else if (rect.right > window.innerWidth - rightmargin)
+        dx = rect.right - (window.innerWidth - rightmargin)
+
+    if (dx || dy)
+        window.scrollBy(dx, dy)
 
 }
 
@@ -5317,14 +5323,13 @@ async function document_onfocus(event) {
     }
     ///log('there is no new record so setup current element')
 
-    ///log('scroll to top left if the key field')
-    if (element == gstartelement || element.getAttribute('exodusfieldno') == 0)
+    ///log('scroll to top left only for the true key/start field')
+    // Strict === '0': loose == 0 also matches null/'' (missing attribute) and was
+    // homing the viewport on ordinary field focus after async document_onfocus.
+    if (element == gstartelement || element.getAttribute('exodusfieldno') === '0')
         window.scrollTo(0, 0)
-
-    //if (element.tagName.match(gtexttagnames))  if (element.tagName!='TEXTAREA') element.select()
-
-    ///log('scroll into view')
-    scrollintoview(element)
+    else
+        scrollintoview(element)
 
     ///log('remove blanks used to force formatting of spans')
     if (element.tagName == 'SPAN' && element.innerText == ' ')
