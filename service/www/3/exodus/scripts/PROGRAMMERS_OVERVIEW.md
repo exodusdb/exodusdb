@@ -117,7 +117,34 @@ async function myFunction() {
 }
 ```
 
-DOM events, HTM `*_sync` bridges, and deferred async timeouts all enter **Gate A** (`exodus_begin`). Nested `await` (confirm, `db.send`, form hooks) stays on that one flight. The airborne flight is not “in the queue”; `g_exodus_flow_queue_max` is how many jobs may **wait** to start after land: **0 = no queuing** (skip when busy, current); **1** = one deferred job; **N** = deeper FIFO. Raise later if multi-flight activity is wanted; today xhttp/session still largely serializes dbio.
+### Sync shell vs async flight (house rules)
+
+Two kinds of functions — do not mix their jobs:
+
+| Kind | Naming | May do | Must not do |
+|------|--------|--------|-------------|
+| **Sync shell** | Prefer `*_sync` for DOM attribute targets (`onclick=`, `onload=`, `onblur=`) | Pure DOM paint, `exodus_begin…` kickoff, cancel event | `await`, `db.send`, dialogs, `gds.setx`, any real work |
+| **Async flight** | `async function …` (entered only via Gate A) | `await` confirm / `db.send` / `gds.setx` / form hooks | Free-run outside Gate A; start a second flight without `exodus_begin` |
+
+```js
+// Sync shell — HTML may call this; only kicks Gate A
+function save_onclick_sync() {
+  void exodus_begin(save_onclick, 'save_onclick')
+}
+
+// Async flight — all real work lives here
+async function save_onclick() {
+  if (!(await savedoc())) return false
+  return true
+}
+```
+
+- **`setvalue(el, v)`** — sync DOM paint only (no conversion/validation).
+- **`await gds.setx(id, recn, v)`** — data store + conversion + validation (async; must `await` inside a flight).
+- Bare call of an async function **without** `await` is a bug (you get a Promise, not a result).
+- Nested `await` inside one flight is correct; a second *commencement* while busy is skipped (`queue_max = 0`).
+
+DOM events, HTM `*_sync` bridges, and deferred work all enter **Gate A** (`exodus_begin`). Nested `await` stays on that one flight. `g_exodus_flow_queue_max` is wait-list capacity only: **0 = no queuing** (current); raise later if multi-flight wait is wanted.
 
 Optional background work (session keepalive, relock) uses `exodus_begin_if_idle` — **skip** if busy (never uses the queue).
 

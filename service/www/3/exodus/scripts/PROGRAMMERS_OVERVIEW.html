@@ -189,7 +189,31 @@
 }
 </code></pre>
 
-<p>DOM events, HTM <code>*_sync</code> bridges, and deferred async timeouts all enter <strong>Gate A</strong> (<code>exodus_begin</code>). Nested <code>await</code> (confirm, <code>db.send</code>, form hooks) stays on that one flight. The airborne flight is not “in the queue”; <code>g_exodus_flow_queue_max</code> is how many jobs may <strong>wait</strong> to start after land: <strong>0 = no queuing</strong> (skip when busy, current); <strong>1</strong> = one deferred job; <strong>N</strong> = deeper FIFO. Raise later if multi-flight activity is wanted; today xhttp/session still largely serializes dbio.</p>
+<h3>Sync shell vs async flight (house rules)</h3>
+<p>Two kinds of functions — do not mix their jobs:</p>
+<table>
+<tr><th>Kind</th><th>Naming</th><th>May do</th><th>Must not do</th></tr>
+<tr><td><strong>Sync shell</strong></td><td>Prefer <code>*_sync</code> for DOM attribute targets</td><td>Pure DOM paint, <code>exodus_begin…</code> kickoff, cancel event</td><td><code>await</code>, <code>db.send</code>, dialogs, <code>gds.setx</code></td></tr>
+<tr><td><strong>Async flight</strong></td><td><code>async function …</code> (via Gate A only)</td><td><code>await</code> confirm / <code>db.send</code> / <code>gds.setx</code> / form hooks</td><td>Free-run outside Gate A</td></tr>
+</table>
+<pre><code>// Sync shell — HTML may call this; only kicks Gate A
+function save_onclick_sync() {
+  void exodus_begin(save_onclick, 'save_onclick')
+}
+
+// Async flight — all real work lives here
+async function save_onclick() {
+  if (!(await savedoc())) return false
+  return true
+}
+</code></pre>
+<ul>
+<li><code>setvalue(el, v)</code> — sync DOM paint only.</li>
+<li><code>await gds.setx(id, recn, v)</code> — data + conversion + validation (must await inside a flight).</li>
+<li>Bare call of an async function without <code>await</code> is a bug.</li>
+</ul>
+
+<p>DOM events, HTM <code>*_sync</code> bridges, and deferred work all enter <strong>Gate A</strong> (<code>exodus_begin</code>). Nested <code>await</code> stays on that one flight. <code>g_exodus_flow_queue_max</code> is wait-list capacity only: <strong>0 = no queuing</strong> (current).</p>
 
 <p>Optional background work (session keepalive, relock) uses <code>exodus_begin_if_idle</code> — <strong>skip</strong> if busy (never uses the queue).</p>
 
