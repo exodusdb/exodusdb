@@ -999,7 +999,7 @@ function modalblock_create() {
 	blocker.onclick = function uiblockerdiv_onclick_sync(event) {
 
 		if ($$('exodusconfirmdiv')) {
-			window.setTimeout('exodus_confirm_outside_click_sync()', 10)
+			window.setTimeout(exodus_confirm_outside_click_sync, 10)
 		}
 		else if (gchildwin) {
 			if (gchildwin.lazy) {
@@ -1191,9 +1191,8 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 		//pass arguments and callback/resume function to child window
 		gchildwin.dialogArguments = dialogargs
 
-		//auto resume if the child window disappears - every poll every n ms
-		//this will stop when it goes out of scope when this function terminates
-		window.setTimeout('exodus_autoresume()', 100)
+		// auto resume if the child window disappears — poll every n ms
+		window.setTimeout(exodus_autoresume, 100)
 
 		//wait here until exodus_autoresume detects that the child window is closed
 		// and passes its return value here
@@ -1264,10 +1263,9 @@ function exodus_setchildwin_returnvalue(returnvalue) {
 
 function exodus_autoresume() {
 
-	//if child window still active then schedule another check later
+	// if child window still active then schedule another check later
 	if (gchildwin && !gchildwin.lazy && !gchildwin.closed) {
-		//console.log('exodus_autoresume - window still present and not closed')
-		window.setTimeout('exodus_autoresume()', 100)
+		window.setTimeout(exodus_autoresume, 100)
 		return
 	}
 
@@ -5339,19 +5337,19 @@ function starteventhandler(eventfunctionname, functionx) {
 
 					//POSITIVE = F9 or Enter or (Space if not text input) or some initial
 					if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
-						window.setTimeout('exodus_confirm_function1_sync()', 1)
+						window.setTimeout(exodus_confirm_function1_sync, 1)
 						return exoduscancelevent(event)
 					}
 
 					//CANCEL = Esc or some initial
 					else if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
-						window.setTimeout('exodus_confirm_function3_sync()', 1)
+						window.setTimeout(exodus_confirm_function3_sync, 1)
 						return exoduscancelevent(event)
 					}
 
 					//NEGATIVE = F8 or some initial
 					else if (keycode == 119 || keyletter == gexodusconfirmletters[2]) {
-						window.setTimeout('exodus_confirm_function2_sync()', 1)
+						window.setTimeout(exodus_confirm_function2_sync, 1)
 						return exoduscancelevent(event)
 					}
 
@@ -5767,37 +5765,63 @@ function exodusint2date(exodusdate) {
 }
 
 // Thin timeout wrapper. Prefer await inside the current Gate A flight.
-// If you must defer async work: exodussettimeout schedules it, then
-// exodustimeout_async_sync enters Gate A (skip when queue_max is 0).
+// Preferred deferral of async work (stage 3):
+//   window.setTimeout(function () { void exodus_begin(myfunc, 'label') }, ms)
+//   or exodussettimeout(myAsyncFn, ms)  — AsyncFunction → delayed exodus_begin
+// String 'await …' / 'yield* …' is legacy (eval via new Function); do not add more.
 function exodussettimeout(command, milliseconds) {
 	if (glogsettimeout)
 		console.log('exodussetimeout(' + command + ')')
-	if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
-		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
-		return window.setTimeout('exodustimeout_async_sync("' + command + '")', milliseconds)
-	} else
+	if (typeof command == 'function') {
+		if (exodusisasyncfunction(command)) {
+			var label = 'timeout ' + (command.name || 'fn')
+			return window.setTimeout(function () {
+				void exodus_begin(command, label)
+			}, milliseconds)
+		}
 		return window.setTimeout(command, milliseconds)
+	}
+	if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
+		exodus_flight_log('LEGACY STRING TIMEOUT "' + command + '"')
+		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
+		return window.setTimeout(function () {
+			void exodustimeout_async_sync(command)
+		}, milliseconds)
+	}
+	return window.setTimeout(command, milliseconds)
 }
 
-// Async timeout work always enters exclusive Gate A (queue only if queue_max > 0).
+// LEGACY: run a string expression under Gate A (only via exodussettimeout string path).
 async function exodustimeout_async_sync(command) {
 	await exodus_begin(async function () {
-		const fn = new Function('return ' + command)
+		var fn = new Function('return ' + command)
 		return await fn()
 	}, 'timeout ' + command)
 }
 
-//thin wrapper to handle intervals. Prefer 'await myfunc()'.
+// Interval wrapper. Prefer function callbacks; AsyncFunction → exodus_begin_if_idle each tick.
 function exodussetinterval(command, milliseconds) {
-	if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
-		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
-		return window.setInterval('exodusinterval_async_sync("' + command + '")', milliseconds)
-	} else
+	if (typeof command == 'function') {
+		if (exodusisasyncfunction(command)) {
+			var label = 'interval ' + (command.name || 'fn')
+			return window.setInterval(function () {
+				void exodus_begin_if_idle(command, label)
+			}, milliseconds)
+		}
 		return window.setInterval(command, milliseconds)
+	}
+	if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
+		exodus_flight_log('LEGACY STRING INTERVAL "' + command + '"')
+		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
+		return window.setInterval(function () {
+			void exodusinterval_async_sync(command)
+		}, milliseconds)
+	}
+	return window.setInterval(command, milliseconds)
 }
 
+// LEGACY: string expression under Gate A when idle (relock/keepalive style).
 async function exodusinterval_async_sync(command) {
-	// Optional interval work: skip if busy — never reschedule/queue (stale relock is wrong).
 	if (g_exodus_flow || gblockevents) {
 		exodus_flight_log('SKIP interval "' + command + '" (busy)')
 		return
@@ -5807,7 +5831,7 @@ async function exodusinterval_async_sync(command) {
 		return
 	}
 	await exodus_begin(async function () {
-		const fn = new Function('return ' + command)
+		var fn = new Function('return ' + command)
 		return await fn()
 	}, 'interval ' + command)
 }
