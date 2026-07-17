@@ -262,38 +262,7 @@ BUTTON:focus, SPAN:focus
     outline:thin solid;
 }
 
-/* EXPERIMENTAL: async-ui underline text entry (not committed) */
-SELECT:focus, INPUT:focus:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),
-SPAN.clsRequired[contenteditable]:focus,
-SPAN.clsNotRequired[contenteditable]:focus
-{
-    outline: none;
-    border-bottom: 1.7px solid #ff6428;
-}
-
-TEXTAREA:focus {
-    outline: none;
-    border: 1.7px solid #ff6428;
-}
-
-/*
- * Empty focused data field: fill the data width with the system selection
- * colour (Highlight), like selecting a run of spaces — not a focus box.
- * Class is toggled in dbform (exodus_update_empty_focus_fill); more reliable
- * than :placeholder-shown, which misses some multirow / bound inputs.
- * !important beats the general transparent field face rules later in this file.
- */
-INPUT.clsRequired.exodus-empty-focus,
-INPUT.clsNotRequired.exodus-empty-focus,
-TEXTAREA.clsRequired.exodus-empty-focus,
-TEXTAREA.clsNotRequired.exodus-empty-focus,
-SPAN.clsRequired.exodus-empty-focus,
-SPAN.clsNotRequired.exodus-empty-focus
-{
-    background-color: Highlight !important;
-    color: HighlightText !important;
-    caret-color: HighlightText;
-}
+/* Data-field focus underline: single block after resting rules (end of field chrome). */
 
 BODY
 {
@@ -442,29 +411,15 @@ H6
 /*    margin: 0px;*/
 /*    padding: 0px;*/
 /*}*/
-/* Abandoned feature to differentiate between required/non-required fields (different border colors)
-1.For better aesthetics 2.Feature was unintuitive 3.UI anyway alerts users for empty required fields
-Considered marking required fields with red *, but it would clutter dense screens like schedules
-Did not remove clsRequired class since it is used in few places like index.html */
+/*
+ * clsRequired / clsNotRequired: still used by framework logic (and index.html).
+ * Visual chrome is the single underline block below — not separate box borders.
+ */
 INPUT.clsRequired, INPUT.clsNotRequired,
 SELECT.clsRequired, SELECT.clsNotRequired,
-SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable]
-{
-    background-color: transparent;
-    border: none;
-    border-bottom: 1.7px dotted var(--exodus-dotcolor);
-    border-radius: 0;
-    margin: 0px;
+SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
+    margin: 0;
     padding: 0 0.125em;
-}
-
-TEXTAREA.clsRequired, TEXTAREA.clsNotRequired
-{
-    background-color: transparent;
-    border: 1.7px dotted var(--exodus-textarea-border);
-    border-radius: 0.3rem;
-    margin: 0px;
-    padding: 0.15em 0.3em;
 }
 
 .clsReadOnly
@@ -512,13 +467,18 @@ TEXTAREA {
     font-size: 1rem;
 }
 
-/* EXPERIMENTAL: async-ui underline text entry (single-line) */
-INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
-SELECT:not(.loginfield):not(.calendarSelect),
-SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
+/*
+ * Single resting style: dotted underline (async-ui). Theme via --exodus-field-underline.
+ * :not(:focus) so resting never competes with the solid focus underline.
+ */
+INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield):not(:focus),
+SELECT:not(.loginfield):not(.calendarSelect):not(:focus),
+SPAN.clsRequired[contenteditable]:not(:focus),
+SPAN.clsNotRequired[contenteditable]:not(:focus),
+.exodusid_textinput:not(:focus) {
     background-color: transparent;
     border: none;
-    border-bottom: 1.7px dotted var(--exodus-dotcolor);
+    border-bottom: var(--exodus-field-underline);
     border-radius: 0;
 }
 
@@ -535,7 +495,9 @@ SELECT:not(.loginfield):not(.calendarSelect) {
 }
 
 /* Multiline: boxed; softer dotted border than single-line underline */
-TEXTAREA {
+TEXTAREA:not(:focus),
+TEXTAREA.clsRequired:not(:focus),
+TEXTAREA.clsNotRequired:not(:focus) {
     background-color: transparent;
     border: 1.7px dotted var(--exodus-textarea-border);
     border-radius: 0.3rem;
@@ -543,8 +505,27 @@ TEXTAREA {
     padding: 0.15em 0.3em;
 }
 
-.exodusid_textinput {
-    border-bottom: 1.7px dotted var(--exodus-dotcolor);
+/* Focus solid underline — same set as resting; wins because resting uses :not(:focus) */
+INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield):focus,
+SELECT:not(.loginfield):not(.calendarSelect):focus,
+SPAN.clsRequired[contenteditable]:focus,
+SPAN.clsNotRequired[contenteditable]:focus,
+.exodusid_textinput:focus,
+.exodusconfirmdiv #exodusconfirmdiv_textinput:focus {
+    outline: none;
+    background-color: transparent;
+    border: none;
+    border-bottom: var(--exodus-field-focus-underline);
+    border-radius: 0;
+}
+
+TEXTAREA:focus {
+    outline: none;
+    background-color: transparent;
+    border: var(--exodus-field-focus-border);
+    border-radius: 0.3rem;
+    margin: 0;
+    padding: 0.15em 0.3em;
 }
 
 /*Removes the vertical white lines produced due to empty read-only fields*/
@@ -798,7 +779,12 @@ img[id^="deleterowbutton"] {
     --exodus-smallerbordercolor: #d8d8d8;
     --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
     --exodus-menuhighlight: #d3d3d3;
-    --exodus-dotcolor: #000000;
+    /* Field underlines: resting dotted + focus solid (empty fields rely on focus line) */
+    --exodus-dotcolor: #5a4a3a;
+    --exodus-field-underline: 2.5px dotted var(--exodus-dotcolor);
+    --exodus-field-focus-color: #e04510;
+    --exodus-field-focus-underline: 3px solid var(--exodus-field-focus-color);
+    --exodus-field-focus-border: 3px solid var(--exodus-field-focus-color);
     --exodus-textarea-border: #8f8378;
     --radio-color: rgba(0, 84, 187, 0.596);
     --radio-ring-color: #999999;
@@ -822,8 +808,6 @@ img[id^="deleterowbutton"] {
     --exodus-calendar-button-bg: #f0f0f0;
     --exodus-calendar-button-color: #000000;
     --exodus-calendar-button-border: #cccccc;
-    --exodus-calendar-current-border: #4444cc;
-    --exodus-calendar-selected-border: #333333;
 }
 
 input[type=radio] {
@@ -1162,8 +1146,6 @@ input:checked + .toggle_button .knob img {
     --exodus-calendar-button-bg: #6a5e50;
     --exodus-calendar-button-color: #ffffff;
     --exodus-calendar-button-border: #a8957c;
-    --exodus-calendar-current-border: #7070e0;
-    --exodus-calendar-selected-border: #ffffff;
     --exodus-textcolor: #ffffff;
     --exodus-menubkgcolor: linear-gradient(to top, #303a5a, #1a2035);
     --exodus-smallerbordercolor: #5058a0;
@@ -1173,7 +1155,11 @@ input:checked + .toggle_button .knob img {
     --exodus-flyout-face: #303c5c;
     --exodus-flyout-border: #8888f0;
     --exodus-flyout-highlight: #4a5880;
-    --exodus-dotcolor: #fdfdfd;
+    --exodus-dotcolor: #c8c0b0;
+    --exodus-field-underline: 2.5px dotted var(--exodus-dotcolor);
+    --exodus-field-focus-color: #ff7a40;
+    --exodus-field-focus-underline: 3px solid var(--exodus-field-focus-color);
+    --exodus-field-focus-border: 3px solid var(--exodus-field-focus-color);
     --exodus-form-face: #28304a;
     --exodus-form-border: #7070e0;
     --exodus-form-label-font-style: italic;
@@ -1244,11 +1230,13 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     border-color: #5a6090 !important;
 }
 
+/* Dark mode: colour only — underline/border come from resting rules + theme vars above */
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
-:root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect) {
+:root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect),
+:root[data-theme="dark_mode"] SPAN.clsRequired[contenteditable],
+:root[data-theme="dark_mode"] SPAN.clsNotRequired[contenteditable],
+:root[data-theme="dark_mode"] TEXTAREA {
     background-color: transparent;
-    border: none;
-    border-bottom: 1.7px dotted var(--exodus-dotcolor);
     color: #ffffff;
 }
 
@@ -1260,28 +1248,6 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     background-color: #28304a;
     color: #ffffff;
 }
-
-:root[data-theme="dark_mode"] TEXTAREA,
-:root[data-theme="dark_mode"] TEXTAREA.clsRequired,
-:root[data-theme="dark_mode"] TEXTAREA.clsNotRequired {
-    background-color: transparent;
-    border: 1.7px dotted var(--exodus-textarea-border);
-    color: #ffffff;
-}
-
-:root[data-theme="dark_mode"] INPUT.clsRequired,
-:root[data-theme="dark_mode"] INPUT.clsNotRequired,
-:root[data-theme="dark_mode"] SELECT.clsRequired:not(.calendarSelect),
-:root[data-theme="dark_mode"] SELECT.clsNotRequired:not(.calendarSelect),
-:root[data-theme="dark_mode"] SPAN.clsRequired[contenteditable],
-:root[data-theme="dark_mode"] SPAN.clsNotRequired[contenteditable] {
-    background-color: transparent;
-    border: none;
-    border-bottom: 1.7px dotted var(--exodus-dotcolor);
-    color: #ffffff;
-}
-
-
 
 :root[data-theme="dark_mode"] .clsReadOnly {
     background: transparent !important;
@@ -1355,11 +1321,11 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 :root[data-theme="dark_mode"] .exodusconfirmdiv .statementclass {
     color: #ffffff;
 }
-:root[data-theme="dark_mode"] .exodusconfirmdiv #exodusconfirmdiv_textinput {
+:root[data-theme="dark_mode"] .exodusconfirmdiv #exodusconfirmdiv_textinput:not(:focus) {
     color: #ffffff;
     background: transparent;
     border: none;
-    border-bottom: 1.7px dotted var(--exodus-dotcolor);
+    border-bottom: var(--exodus-field-underline);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 {
     border-color: var(--exodusconfirm-border);
@@ -1522,15 +1488,10 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     color: var(--exodus-calendar-today-color);
     font-weight: bold;
 }
+/* Cursor (.current): keyboard / wheel / hover — outline uses system selection colour */
 .calendarBody td.calendarDay.current {
     font-weight: bold;
-    box-shadow: inset 0 0 0 2px var(--exodus-calendar-border);
-}
-:root[data-theme="dark_mode"] .calendarBody td.calendarDay.current {
-    box-shadow: inset 0 0 0 2px #ffffff;
-}
-.calendarBody td.calendarDay.selected {
-    border: 1px solid var(--exodus-calendar-selected-border);
+    box-shadow: inset 0 0 0 3px Highlight;
 }
 .calendarFooter {
     flex: 0 0 auto;

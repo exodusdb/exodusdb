@@ -373,109 +373,128 @@ Calendar.prototype.create = function() {
 	this._calDiv.onselectstart = function () {
 		return false;
 	};
-	
-	this._table.onclick = function (e) {
-		// find event
+
+	// Cursor box (.current) = keyboard / wheel / hover.
+	// Commit (setSelectedDate → field) = click / Enter / Today only.
+
+	// Date for the day cell under the mouse, or null
+	function dayUnderPointer(e) {
 		if (e == null) e = document.parentWindow.event;
-		
-		// find td
 		var el = e.target != null ? e.target : e.srcElement;
-		while (el.nodeType != 1)
+		while (el && el.nodeType != 1)
 			el = el.parentNode;
-		while (el != null && el.tagName && el.tagName.toLowerCase() != "td")
+		while (el && el.tagName && el.tagName.toLowerCase() != 'td')
 			el = el.parentNode;
-		
-		// if no td found, return
-		if (el == null || el.tagName == null || el.tagName.toLowerCase() != "td")
-			return;
-		
-		var d = new Date(dp._currentDate);
-		var n = Number(el.firstChild.data);
-		if (isNaN(n) || n <= 0 || n == null)
-			return;
-		
-		if (el.className.indexOf("weekNumber") >= 0)
-			return;
+		if (!el || el.tagName.toLowerCase() != 'td')
+			return null;
+		if (el.className.indexOf('weekNumber') >= 0 || el.className.indexOf('empty') >= 0)
+			return null;
+		var n = Number(el.firstChild && el.firstChild.data);
+		if (!(n > 0))
+			return null;
+		return new Date(dp._currentDate.getFullYear(), dp._currentDate.getMonth(), n);
+	}
 
-		if (el.className.indexOf("empty") >= 0)
+	this._table.onclick = function (e) {
+		var d = dayUnderPointer(e);
+		if (!d)
 			return;
-			
-		d.setDate(n);
 		dp.setSelectedDate(d);
-
-		if (!dp._alwaysVisible && dp._hideOnSelect) {
+		if (!dp._alwaysVisible && dp._hideOnSelect)
 			dp.hide();
-		}
-		
 	};
-	
-	
+
+	this._table.onmouseover = function (e) {
+		var d = dayUnderPointer(e);
+		if (d)
+			dp.setCurrentDate(d);
+	};
+
 	this._calDiv.onkeydown = function (e) {
-	
 		if (e == null) e = document.parentWindow.event;
 		var kc = e.keyCode != null ? e.keyCode : e.charCode;
 
 		if (kc == 13) {
+			// Enter — commit current day
 			dp.setSelectedDate(new Date(dp._currentDate));
-
-			if (!dp._alwaysVisible && dp._hideOnSelect) {
+			if (!dp._alwaysVisible && dp._hideOnSelect)
 				dp.hide();
-			}
 			return false;
 		}
-
 		if (kc == 27) {
 			dp.hide();
 			return exoduscancelevent(e);
 		}
-
-		// Tab between month/year controls and footer buttons
 		if (kc == 9)
-			return true;
-					
-		//exodus if (kc < 37 || kc > 40) return true;
-		//any other keys close popup and bubble up
-		if (kc < 37 || kc > 40) {
+			return true; // Tab through month/year/buttons
 
-			if (!dp._alwaysVisible && dp._hideOnSelect) {
+		// Move cursor: ←→ day, ↑↓ week, PgUp/PgDn 4 weeks
+		var step = 0;
+		if (kc == 37) step = -1;
+		else if (kc == 39) step = 1;
+		else if (kc == 38) step = -7;
+		else if (kc == 40) step = 7;
+		else if (kc == 33) step = -28;
+		else if (kc == 34) step = 28;
+		else {
+			if (!dp._alwaysVisible && dp._hideOnSelect)
 				dp.hide();
-			}
-
-		 return true;
+			return true;
 		}
-		
-		//exodus
-		//window.event.cancelBubble=true
-		//window.event.returnValue=false
-	    exoduscancelevent(e)
-		
-		var d = new Date(dp._currentDate).valueOf();
-		if (kc == 37) // left
-			d -= 24 * 60 * 60 * 1000;
-		else if (kc == 39) // right
-			d += 24 * 60 * 60 * 1000;
-		else if (kc == 38) // up
-			d -= 7 * 24 * 60 * 60 * 1000;
-		else if (kc == 40) // down
-			d += 7 * 24 * 60 * 60 * 1000;
 
-		dp.setCurrentDate(new Date(d));
-		return false;
-	}
-	
-	// ie6 extension
-	this._calDiv.onmousewheel = function (e) {
-		if (e == null) e = document.parentWindow.event;
-		var n = - e.wheelDelta / 120;
+		exoduscancelevent(e);
 		var d = new Date(dp._currentDate);
-		var m = d.getMonth() + n;
-		d.setMonth(m);
-		
-		
+		d.setDate(d.getDate() + step);
 		dp.setCurrentDate(d);
-		
+		return false;
+	};
+
+	// Wheel = ↑↓ (one week per notch). Skip double-fired events; batch fast scroll in rAF.
+	function onWheel(e) {
+		if (e == null) e = document.parentWindow.event;
+		var t = e.target || e.srcElement;
+		while (t && t != dp._calDiv) {
+			if (t.tagName == 'SELECT' || t.tagName == 'OPTION' || t.tagName == 'BUTTON')
+				return true;
+			t = t.parentNode;
+		}
+		var dy = typeof e.deltaY == 'number' ? e.deltaY
+			: (typeof e.wheelDelta == 'number' ? -e.wheelDelta : 0);
+		if (!dy)
+			return true;
+
+		if (e.preventDefault) e.preventDefault();
+		if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+		else if (e.stopPropagation) e.stopPropagation();
+		e.cancelBubble = true;
+		e.returnValue = false;
+
+		var now = e.timeStamp || (new Date()).getTime();
+		if (dp._wheelLastTs && (now - dp._wheelLastTs) < 10)
+			return false; // second half of a double-fired notch
+		dp._wheelLastTs = now;
+
+		dp._wheelPending = (dp._wheelPending || 0) + (dy > 0 ? 1 : -1);
+		if (dp._wheelRaf)
+			return false;
+		dp._wheelRaf = 1;
+		var raf = window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); };
+		raf(function () {
+			dp._wheelRaf = 0;
+			var weeks = dp._wheelPending || 0;
+			dp._wheelPending = 0;
+			if (!weeks)
+				return;
+			var d = new Date(dp._currentDate);
+			d.setDate(d.getDate() + weeks * 7);
+			dp.setCurrentDate(d);
+		});
 		return false;
 	}
+	if (this._calDiv.addEventListener)
+		this._calDiv.addEventListener('wheel', onWheel, { passive: false, capture: true });
+	else
+		this._calDiv.onmousewheel = onWheel;
 
 	this._monthSelect.onchange = function(e) {
 		if (e == null) e = document.parentWindow.event;

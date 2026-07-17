@@ -4659,9 +4659,6 @@ async function deletedoc() {
 
 async function form_oninput(event) {
     event = getevent(event)
-    // Drop empty-focus fill as soon as the user types
-    if (event && event.target)
-        exodus_update_empty_focus_fill(event.target)
 
     if (gchangesmade)
         return true
@@ -5127,45 +5124,8 @@ function focuson2() {
         if (focusonelement.select)
             focusonelement.select()
 
-        exodus_update_empty_focus_fill(focusonelement)
-
     }
     catch (e) { }
-
-}
-
-// Selection-like fill for empty focused fields (see .exodus-empty-focus in global.css).
-function exodus_update_empty_focus_fill(element) {
-
-    var stale = document.getElementsByClassName('exodus-empty-focus')
-    for (var i = stale.length - 1; i >= 0; i--) {
-        if (stale[i] !== element)
-            stale[i].classList.remove('exodus-empty-focus')
-    }
-
-    if (!element || !element.classList)
-        return
-
-    if (!element.classList.contains('clsRequired') && !element.classList.contains('clsNotRequired'))
-        return
-
-    var empty = false
-    if (element.tagName == 'INPUT' || element.tagName == 'TEXTAREA') {
-        if (element.type == 'radio' || element.type == 'checkbox'
-            || element.type == 'button' || element.type == 'submit' || element.type == 'image')
-            return
-        empty = !String(element.value == null ? '' : element.value).length
-    }
-    else if (element.isContentEditable || element.contentEditable == 'true') {
-        empty = !String(element.innerText || element.textContent || '').replace(/\u00a0/g, '').length
-    }
-    else
-        return
-
-    if (document.activeElement === element && empty)
-        element.classList.add('exodus-empty-focus')
-    else
-        element.classList.remove('exodus-empty-focus')
 
 }
 
@@ -5422,9 +5382,6 @@ async function document_onfocus(event) {
             }
 
         } catch (e) { }
-
-    // After setdefault/select — empty multirow fields often missed :placeholder-shown
-    exodus_update_empty_focus_fill(element)
 
     //log('focus on current or next element')
     //this is not necessary unless .select() is used above

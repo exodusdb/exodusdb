@@ -338,18 +338,17 @@ function exodus_client_init() {
 		theme_toggle(exodusgetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
 	}
 
-	// Inline dark input colours before global.css loads — prevents white input flash
+	// Inline dark colours before global.css loads — prevents white face flash only.
+	// Do NOT !important borders here: that permanently blocks focus underline in global.css
+	// (SPANs were fine; INPUT/SELECT stuck on dotted rest style).
 	if (gisdarktheme) {
 		document.writeln('<style id="exodus_dm_flashguard">'
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
 			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#28304a!important}'
 			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),'
-			+ ':root[data-theme=dark_mode] SELECT:not(.loginfield){'
-			+ 'background-color:transparent!important;color:#fff!important;border:none!important;'
-			+ 'border-bottom:1.7px dotted #fdfdfd!important}'
+			+ ':root[data-theme=dark_mode] SELECT:not(.loginfield),'
 			+ ':root[data-theme=dark_mode] TEXTAREA{'
-			+ 'background-color:transparent!important;color:#fff!important;'
-			+ 'border:1.7px dotted #a8957c!important}'
+			+ 'background-color:transparent!important;color:#fff!important}'
 			+ '</style>')
 	}
 
