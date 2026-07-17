@@ -42,6 +42,8 @@ var glogging, gstepping
 var glogevents//related to yield
 var glogcookie
 var glogsettimeout
+// Gate A/B flight console: set true (or ?logflights=1) to trace TAKEOFF/LANDING/SKIP.
+var glogflights
 
 //various images
 var gimagetheme = '../../exodus/images/theme2/'
@@ -388,6 +390,14 @@ function exodus_client_init() {
 
 	glogging = false
 	gstepping = 0
+	// Flight console off by default; enable with ?logflights=1 or glogflights=true in console.
+	if (typeof glogflights == 'undefined' || glogflights == null) {
+		glogflights = false
+		try {
+			if (location.search && location.search.indexOf('logflights=1') >= 0)
+				glogflights = true
+		} catch (e) { }
+	}
 
 	//ensure http session is kept alive (optional — skip if Gate A busy; never queue)
 	exodus_start_keepalive()
@@ -5459,10 +5469,11 @@ var g_exodus_flow_queue_max = 0
 var g_exodus_flight_n = 0
 
 function exodus_flight_log(msg) {
-	// Always-on light log for Gate A takeoff/landing and Gate B wait/cancel.
-	if (typeof console != 'undefined' && console.log)
+	// Quiet by default (stage 5). Enable: glogflights=true or ?logflights=1
+	if (glogflights && typeof console != 'undefined' && console.log)
 		console.log('[exodus flight] ' + msg)
-	logevent('[exodus flight] ' + msg)
+	if (glogevents || glogflights)
+		logevent('[exodus flight] ' + msg)
 }
 
 // Public API #1 of 3 — exclusive Gate A business async.
@@ -7742,8 +7753,9 @@ function DATE(mode, value, params) {
 			//update the otherdate
 			if (otherdate !== otherdate0) {
 
-				// DATE oconv is sync — cannot await here. queue_max is 0 so a nested
-				// exodus_begin would SKIP; defer peer setx until after this turn.
+				// Allowed deferral (sync oconv cannot await; queue_max is 0).
+				// Feature-local: after this turn, Gate A is usually free for peer setx.
+				// Longer-term: async date conversion end-to-end would avoid this hop.
 				;(function (id, recn, val) {
 					window.setTimeout(function () {
 						void exodus_begin(function () {
