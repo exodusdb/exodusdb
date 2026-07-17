@@ -21,6 +21,12 @@ function exodus_field_width_char(element) {
 }
 
 // width of chars x widthChar in the element's computed font (after dbform styling)
+//
+// Text fields use widthChar 'M'. Dictionary lengths (e.g. 30) were tuned when
+// field width looked closer to digit-wide; full M width makes them look far too
+// long. Scale M-based widths by (digit width / M width) so length 30 is roughly
+// 30 × digit width. Approximate is fine — text need not be exact.
+// Date/number fields keep widthChar '8' and are not scaled.
 function exodus_field_width_px(element,chars,widthChar) {
 
  if (!widthChar) widthChar='M'
@@ -34,6 +40,12 @@ function exodus_field_width_px(element,chars,widthChar) {
  var ctx=canvas.getContext('2d')
  ctx.font=font
  var width=Math.ceil(ctx.measureText(sample).width)
+ if (widthChar==='M' && width>0) {
+  var mW=ctx.measureText('M').width
+  var digitW=ctx.measureText('0').width
+  if (mW>0 && digitW>0 && digitW<mW)
+   width=Math.max(1,Math.round(width*(digitW/mW)))
+ }
  gexodus_field_width_cache[key]=width
  return width
 }
