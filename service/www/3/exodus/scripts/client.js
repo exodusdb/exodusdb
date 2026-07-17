@@ -801,6 +801,15 @@ function dbsend_release_modal(xhttp, dbmodalblocked) {
 
 }
 
+// PUBLIC ASYNC COMMENCEMENT API (frozen — stage 2)
+// =================================================
+// Only these three start concurrent async work from the framework:
+//   exodus_begin(asyncFn, label[, event])     — Gate A business (exclusive)
+//   exodus_begin_if_idle(asyncFn, label)      — optional background; skip if busy
+//   exodus_begin_waitcancel(source)           — Gate B Wait/Cancel only
+// Everything else (starteventhandler, *_sync bridges, timeouts) must funnel
+// into one of these. Do not add a fourth commencement path.
+//
 // Gate B entry — only from uiblocker while a lazy db.send wait is active.
 // Does not go through exodus_begin (Gate A is airborne during db.send; Gate B must run now).
 function exodus_begin_waitcancel(source) {
@@ -5369,9 +5378,8 @@ function starteventhandler(eventfunctionname, functionx) {
 		//events are not blocked - create a new event handler
 
 		if (isAsyncTarget) {
-			// For async targets (after bulk conversion), start the async flow directly using the marker logic.
-			// This bypasses generator creation.
-			return startAsyncFlow(functionx, eventdescription + ' (async) in starteventhandler', event);
+			// Async DOM handlers → Gate A only (public API: exodus_begin).
+			return exodus_begin(functionx, eventdescription + ' (async) in starteventhandler', event)
 		}
 
 		// LEGACY: non-async handler may be a generator factory (app modules).
@@ -5426,8 +5434,8 @@ function exodusispromise(value) {
 	return value && typeof value.then === 'function'
 }
 
-// Gate A — exclusive main event flow (one plane). All startAsyncFlow / event
-// commencements enter here. Nested await inside the flight is fine.
+// Gate A — exclusive main event flow (one plane). All business async
+// commencements enter here via exodus_begin. Nested await inside the flight is fine.
 //
 // Model today: at most ONE active flight (g_exodus_flow). A separate wait list
 // (g_exodus_flow_queue) may hold jobs that start only after that flight lands.
@@ -5459,8 +5467,8 @@ function exodus_flight_log(msg) {
 	logevent('[exodus flight] ' + msg)
 }
 
-// Single commencement point for Gate A business async. Returns a Promise of
-// { value, done: true } (same shape as legacy startAsyncFlow), or null if skipped.
+// Public API #1 of 3 — exclusive Gate A business async.
+// Returns Promise of { value, done: true }, or null if skipped (busy + full wait list).
 function exodus_begin(asyncHandler, location, event) {
 	location = location || 'unknown'
 	if (g_exodus_flow) {
@@ -5528,13 +5536,14 @@ function exodus_begin_drain() {
 	exodus_begin_run(job.asyncHandler, job.location, job.event).then(job.resolve, job.reject)
 }
 
-// Legacy name — all async takeoffs go through exclusive exodus_begin.
+// Deprecated alias for exodus_begin (pre-gate name). Prefer exodus_begin.
 function startAsyncFlow(asyncHandler, location, event) {
 	return exodus_begin(asyncHandler, location, event)
 }
 
-// Optional background work (keepalive, relock): run via Gate A only when idle.
+// Optional background work (keepalive, relock): Gate A only when idle.
 // Skip if busy — form/lock state may be wrong later; missing a tick is fine.
+// Public API #2 of 3 (see block above exodus_begin_waitcancel).
 function exodus_begin_if_idle(asyncHandler, location) {
 	location = location || 'background'
 	if (g_exodus_flow) {
@@ -5551,8 +5560,8 @@ function exodus_begin_if_idle(asyncHandler, location) {
 	return exodus_begin(asyncHandler, location)
 }
 
-// Invoke from a legacy *_sync() bridge (inline onclick, setTimeout string, etc.).
-// Blocks UI/events for async targets; kicks generators via exodusneweventhandler.
+// Internal bridge from *_sync / HTML attribute handlers — not a fourth gate.
+// Async → exodus_begin; generator → legacy exodusneweventhandler; else sync.
 function exodusinvokesynctarget(target, args, location) {
 	args = args || []
 	if (exodusisasyncfunction(target)) {

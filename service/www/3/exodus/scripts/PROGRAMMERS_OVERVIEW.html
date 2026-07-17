@@ -89,6 +89,7 @@
     <li><strong>Communication bridge:</strong> <code>xhttp.php</code> (and .asp variants). Client sends XML (<code>&lt;token&gt;</code>, <code>&lt;request&gt;</code>, <code>&lt;data&gt;</code>); bridge writes temp files; backend processes and responds via <code>.1</code>/<code>.2</code>/<code>.3</code> files.</li>
     <li><strong>Async model (Gate A):</strong> Event handlers and deferred async work enter via <code>exodus_begin</code> (exclusive owner; <code>g_exodus_flow_queue_max = 0</code> means <strong>no queuing</strong> — second start while airborne is <strong>skipped</strong>). Prefer <code>async function myfunc() { ... await someOperation() ... }</code> and <code>await</code> inside the same flight. Do <strong>not</strong> start free-floating async that does DB/UI work.</li>
     <li><strong>Wait/Cancel (Gate B):</strong> Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on <code>db.send</code> XHR. No main-line form dbio from Gate B.</li>
+    <li><strong>Public commencement API (only three):</strong> <code>exodus_begin</code> (business), <code>exodus_begin_if_idle</code> (background), <code>exodus_begin_waitcancel</code> (Wait/Cancel). <code>startAsyncFlow</code> is a deprecated alias of <code>exodus_begin</code>.</li>
     <li><strong>Legacy generators:</strong> Framework scripts have <strong>no</strong> live <code>function*</code> / <code>yield*</code>. Resume path kept for app modules still on generators. Console: <code>[exodus flight] LEGACY GENERATOR …</code>.</li>
     <li><strong>UI conventions:</strong> Modal dialogs, <code>class="exodusform"</code> tables, input <code>id</code>s matching dictionary codes, heavy use of <code>gparameters</code>.</li>
     <li><strong>Data delimiters:</strong> <code>rm</code>, <code>fm</code>, <code>vm</code>, <code>sm</code>, <code>tm</code>, <code>stm</code> (and their regex versions).</li>
@@ -370,8 +371,9 @@ arr.exodustrim()
     <li><code>await exodusokcancel(msg, default)</code></li>
     <li><code>await exodusdecide(question, data, ...)</code></li>
     <li><code>exoduswindowclose(value)</code></li>
-    <li><code>exodus_begin(asyncFn, 'label')</code> — start Gate A work (skip if airborne when <code>queue_max</code> is 0; else may queue)</li>
-    <li><code>exodus_begin_if_idle(asyncFn, 'label')</code> — optional background; skip if busy</li>
+    <li><code>exodus_begin(asyncFn, 'label')</code> — <strong>public #1</strong> Gate A business</li>
+    <li><code>exodus_begin_if_idle(asyncFn, 'label')</code> — <strong>public #2</strong> optional background; skip if busy</li>
+    <li><code>exodus_begin_waitcancel(source)</code> — <strong>public #3</strong> Gate B Wait/Cancel only</li>
     <li><code>$$('id')</code> or <code>$$('classname')</code> — element lookup</li>
 </ul>
 

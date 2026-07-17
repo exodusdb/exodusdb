@@ -20,6 +20,7 @@ The framework originated in an era of older browsers and cooperative generators;
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
 - **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is **skipped**). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work.
 - **Wait/Cancel (Gate B):** Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on `db.send` XHR. No main-line form dbio from Gate B.
+- **Public commencement API (only three):** `exodus_begin` (business), `exodus_begin_if_idle` (background), `exodus_begin_waitcancel` (Wait/Cancel). No fourth entry path. `startAsyncFlow` is a deprecated alias of `exodus_begin`.
 - **Legacy generators:** Framework scripts have **no** live `function*` / `yield*`. A generator resume path (`geventhandler`, `exodus_resume`, `exodusneweventhandler` non-async branch) remains for app modules and dict `functioncode` still on generators. Console: `[exodus flight] LEGACY GENERATOR …`. Remove after apps are fully async.
 - **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
@@ -297,8 +298,9 @@ Other frequent utilities:
 - `await exodusokcancel(msg, default)`
 - `await exodusdecide(question, data, ...)`
 - `exoduswindowclose(value)`
-- `exodus_begin(asyncFn, 'label')` — start Gate A work (skip if airborne when `queue_max` is 0; else may queue)
-- `exodus_begin_if_idle(asyncFn, 'label')` — optional background; skip if busy
+- `exodus_begin(asyncFn, 'label')` — **public #1** Gate A business (skip if busy when `queue_max` is 0)
+- `exodus_begin_if_idle(asyncFn, 'label')` — **public #2** optional background; skip if busy
+- `exodus_begin_waitcancel(source)` — **public #3** Gate B Wait/Cancel only (from uiblocker)
 - `$$('id')` or `$$('classname')` — element lookup
 
 ## 9. Sessions, Login, and the Token Model
