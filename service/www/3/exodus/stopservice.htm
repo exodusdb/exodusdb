@@ -11,8 +11,8 @@
 
 var gnosavelocation=true
 
-async function stopservice_sync() {
-    exodussettimeout('await  stopservice()')
+function stopservice_sync() {
+    void exodus_begin(stopservice, 'stopservice')
 }
 
 async function stopservice() {

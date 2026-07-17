@@ -11,8 +11,8 @@
 
 var gnosavelocation=true
 
-async function backup_start_sync() {
-    exodussettimeout('await  backup_start()')
+function backup_start_sync() {
+    void exodus_begin(backup_start, 'backup_start')
 }
 
 async function backup_start() {

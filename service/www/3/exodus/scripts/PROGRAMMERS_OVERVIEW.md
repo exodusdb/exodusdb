@@ -2,9 +2,9 @@
 
 **Location:** `exodus/service/www/3/exodus/scripts/`
 
-This document describes how to use the client-side JavaScript web framework in the Exodus system (version 3 UI). The framework provides modal dialogs, a generator-based asynchronous model (`await`), database access, dictionary-driven forms, security, uploads, and more. It is designed to work with the Exodus backend via the `xhttp.php` bridge (or file mode for local testing).
+This document describes how to use the client-side JavaScript web framework in the Exodus system (version 3 UI). The framework provides modal dialogs, an `async`/`await` cooperative event model, database access, dictionary-driven forms, security, uploads, and more. It is designed to work with the Exodus backend via the `xhttp.php` bridge (or file mode for local testing).
 
-The framework originated in an era of older browsers (IE6+, etc.) and uses cooperative multitasking via JavaScript generators (pre-dating native async/await). It follows Revelation/Pick multivalue conventions with special delimiter characters.
+The framework originated in an era of older browsers and cooperative generators; it now uses native `async`/`await` with a single exclusive event gate. It follows Revelation/Pick multivalue conventions with special delimiter characters.
 
 **Important design principles (per current implementation):**
 - Security ultimately rests on the backend + a valid PHP session once established.
@@ -15,10 +15,11 @@ The framework originated in an era of older browsers (IE6+, etc.) and uses coope
 
 ## 1. Overview and Architecture
 
-- **Core file:** `client.js` — Must be included **first**. Core globals, yield infrastructure, `exodusdblink`, `exodusshowmodaldialog`, security, cookies, utilities, string/array prototypes.
+- **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodusdblink`, `exodusshowmodaldialog`, security, cookies, utilities, string/array prototypes.
 - **Form automation:** `dbform.js` + helpers in `db.js` — Dictionary-driven (`dict_*`) CRUD forms, MV groups, validation, buttons.
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
-- **Async model:** `function* myfunc() { ... await someOperation() ... }`. `await` pauses execution until the operation (dialog close, DB response) resumes it via the internal event/yield machinery (`exodus_yield`, `exodus_resume`, etc.).
+- **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; second starts **queue** until the first lands). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work.
+- **Wait/Cancel (Gate B):** Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on `db.send` XHR. No main-line form dbio from Gate B.
 - **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
 - **Security model:** PHP sessions (the real auth) + namespaced tokens. `exodussecurity('TASK')`. Once a valid session exists, the web layer trusts it.
@@ -56,7 +57,7 @@ The scripts support both browser HTTP mode and `file://` local mode (for develop
 
   <!-- 5. Dictionary definition (MUST come after client.js) -->
   <script type="text/javascript">
-    function* dict_YOURDICTNAME() {
+    function dict_YOURDICTNAME() {
       var dict = [];
       var din = -1;
       var di;
@@ -97,12 +98,12 @@ Common additional includes (from examples):
 - `../general/scripts/general.js`
 - Various `_dict.js` files for specific modules.
 
-## 3. The Yield* Pattern and Dialogs
+## 3. Async/await, Gate A, and Dialogs
 
 ### Basic usage
 
 ```js
-function* myFunction() {
+async function myFunction() {
   var ok = await exodusokcancel('Are you sure?', 1);
   if (!ok) return;
 
@@ -114,7 +115,11 @@ function* myFunction() {
 }
 ```
 
-`await` pauses the generator. The framework resumes it when the operation completes (dialog closes, DB response arrives, etc.).
+DOM events, HTM `*_sync` bridges, and deferred async timeouts all enter **Gate A** (`exodus_begin`). Nested `await` (confirm, `db.send`, form hooks) stays on that one flight. A second commencement while Gate A is airborne is **queued**, not run in parallel.
+
+Optional background work (session keepalive, relock) uses `exodus_begin_if_idle` — **skip** if busy, never queue stale work.
+
+**Do not** use free-running `setTimeout(async () => …)` or rely on `exodussettimeout('await myfunc()')` as a second event system. Prefer `await myfunc()` inside the current handler. If you must defer after the current flight (e.g. non-modal UI that must outlive the click), schedule with a short timeout that calls `exodus_begin(myfunc, 'label')`.
 
 ### Modal Dialogs
 
@@ -173,7 +178,7 @@ Cookies are used heavily for dataset, username, globals (`exodusgetcookie2`, `ex
 Return an array of `dictrec` objects. Field IDs in HTML must match the codes.
 
 ```js
-function* dict_MYFILE() {
+function dict_MYFILE() {
   var dict = [];
   var din = -1;
   var di;
@@ -281,7 +286,8 @@ Other frequent utilities:
 - `await exodusokcancel(msg, default)`
 - `await exodusdecide(question, data, ...)`
 - `exoduswindowclose(value)`
-- `exodussettimeout('await myfunc()', ms)`
+- `exodus_begin(asyncFn, 'label')` — start/queue Gate A work
+- `exodus_begin_if_idle(asyncFn, 'label')` — optional background; skip if busy
 - `$$('id')` or `$$('classname')` — element lookup
 
 ## 9. Sessions, Login, and the Token Model
@@ -311,7 +317,7 @@ Helpers:
 ## 11. Best Practices & Gotchas
 
 - **Order matters** — config → client.js → dict definition → HTML.
-- Use `await` for anything that yields.
+- Use `await` for anything that waits (dialogs, `db.send`, form hooks) **inside** Gate A.
 - Prefer `gparameters` over URL query strings when opening dialogs.
 - Match input `id`s exactly to dictionary codes.
 - Field 0 is special (key).
@@ -327,7 +333,7 @@ Helpers:
 
 | File                  | Purpose                                      |
 |-----------------------|----------------------------------------------|
-| `client.js`           | Core framework, dblink, dialogs, yield, security, utilities |
+| `client.js`           | Core framework, Gate A/B, dblink, dialogs, security, utilities |
 | `dbform.js`           | Form lifecycle, MV handling, save/load, buttons |
 | `db.js`               | dictrec() + many dict_ and val_ helpers     |
 | `exodus.js`           | Dates, amounts, string/array prototypes     |

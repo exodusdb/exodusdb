@@ -14,7 +14,7 @@ var data
 
 async function window_onload() {
 
- demoexodusdblink()
+ await demoexodusdblink()
 }
 
 async function demoexodusdblink() {
@@ -33,12 +33,16 @@ async function demoexodusdblink() {
  }
 }
 
+function window_onload_sync() {
+ void exodus_begin(window_onload, 'stopservice0 window_onload')
+}
+
 //-->
 
     </script>
 
 </head>
-<body onload="exodussettimeout('await window_onload()',1)">
+<body onload="window_onload_sync()">
     <p>
         &nbsp;</p>
 </body>

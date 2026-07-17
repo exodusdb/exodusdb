@@ -16,7 +16,10 @@ async function form_postinit() {
         }
         exodussetcookie(glogincode, 'EXODUS2', '', 'wn')
         exodussetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
-        exodussettimeout('await windowopen(gwhatsnew)', 1000)
+        // Defer open so form finishes init; takeoff via Gate A when free (never ungated await timeout)
+        window.setTimeout(function () {
+            void exodus_begin(function () { return windowopen(gwhatsnew) }, 'users whatsnew')
+        }, 1000)
     }
 
     return true
@@ -127,7 +130,7 @@ async function users_postdisplay() {
 }
 
 async function form_postread() {
-    exodussettimeout('await users_postdisplay()', 10)
+    await users_postdisplay()
     return true
 }
 
@@ -157,7 +160,7 @@ async function users_upload_signature() {
 
     var targetfilename = await exodusshowmodaldialog('../exodus/upload.htm', params)
     if (gkey)
-        exodussettimeout('await users_postdisplay()', 1)
+        await users_postdisplay()
     if (!targetfilename)
         return false
 

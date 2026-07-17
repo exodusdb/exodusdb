@@ -171,10 +171,9 @@ async function document_onkeydown(event) {
     //keycode=event.keyCode?event.keyCode:event.which
     gkeycode = event.keyCode
 
-    //Enter or F9 moves on or clicks login
+    //Enter or F9 moves on or clicks login — stay in Gate A (do not timeout-spawn)
     if (gkeycode == 13 || gkeycode == 120) {
-        exodussettimeout('await dblogin()', 10)
-        //await dblogin()
+        await dblogin()
         return exoduscancelevent(event)
     }
 
@@ -185,10 +184,8 @@ async function dblogin() {
     //force selection of current selection in drop down if dropped down
     glogin_button.focus()
 
-    //simulate enter means submit
-    //do not use proper form submit though
-    //glogin_button.click()
-    exodussettimeout('glogin_button.click()',100)
+    // Same flight as keydown — do not .click() (would re-enter Gate A / be blocked)
+    await login_onclick()
 
 }
 

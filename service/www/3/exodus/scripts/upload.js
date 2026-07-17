@@ -62,14 +62,14 @@ function previewimage_sync(fileInput) {
     show_dropbox_msg('Ready to upload ' + filename, '&#10004;', 'green')
 }
 
-function highlight_dropbox(event) {
+function highlight_dropbox_sync(event) {
 	//necessary to allow dropping
 	event.preventDefault()
 	event.dataTransfer.dropEffect = 'copy'
 	document.getElementById("dropbox").classList.add("dragover")
 }
 
-function unhighlight_dropbox() {
+function unhighlight_dropbox_sync() {
 	document.getElementById("dropbox").classList.remove("dragover")
 }
 
@@ -83,7 +83,7 @@ function show_dropbox_msg(msg, symbol, color) {
 		'</span>'
 }
 
-function upload_ondrop(event) {
+function upload_ondrop_sync(event) {
 	//purpose to capture single file if multiple have been dropped
 
 	//prevent default browser behavior of opening file in the tab

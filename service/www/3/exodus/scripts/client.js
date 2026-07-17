@@ -127,6 +127,7 @@ var goriginalstyles = {}
 
 var gkeepalivemins = 10
 //gkeepalivemins=1
+var gkeepalive_timer = null
 
 //check browser capabilities
 
@@ -388,12 +389,8 @@ function exodus_client_init() {
 	glogging = false
 	gstepping = 0
 
-	//ensure http session is kept alive
-	if (document.protocolcode != 'file') {
-		if (gkeepalivemins)
-			// use direct for async now
-			setInterval(async () => { await sessionkeepalive(); }, gkeepalivemins * 60 * 1000);
-	}
+	//ensure http session is kept alive (optional — skip if Gate A busy; never queue)
+	exodus_start_keepalive()
 
 	loadcache()
 
@@ -472,9 +469,35 @@ async function exodussecurity(task) {
 
 }
 
+// Start/restart keepalive interval from current gkeepalivemins.
+// Call after changing gkeepalivemins in the console: gkeepalivemins=0.1; exodus_start_keepalive()
+function exodus_start_keepalive() {
+
+	if (gkeepalive_timer) {
+		window.clearInterval(gkeepalive_timer)
+		gkeepalive_timer = null
+	}
+
+	if (document.protocolcode == 'file' || !gkeepalivemins)
+		return
+
+	var ms = gkeepalivemins * 60 * 1000
+	if (ms < 1000)
+		ms = 1000
+
+	exodus_flight_log(
+		'keepalive interval ' + ms + 'ms (gkeepalivemins=' + gkeepalivemins + ')'
+	)
+
+	gkeepalive_timer = window.setInterval(function () {
+		void exodus_begin_if_idle(sessionkeepalive, 'sessionkeepalive')
+	}, ms)
+
+}
+
 async function sessionkeepalive() {
 
-	//last connection
+	//last connection (updated on every db.send — so active forms rarely need a pure KEEPALIVE)
 	var lastconnection = exodusgetcookie2('lc', 'EXODUSlc', '')
 	if (lastconnection == 'undefined')
 		lastconnection = ''
@@ -491,7 +514,13 @@ async function sessionkeepalive() {
 		var tempdb = new exodusdblink()
 		tempdb.request = 'KEEPALIVE'
 		await tempdb.send()
-		console.log(time + ' Keep Alive');
+		exodus_flight_log('keepalive SEND')
+		console.log(time + ' Keep Alive')
+	} else {
+		exodus_flight_log(
+			'keepalive tick not due yet (next '
+			+ nextconnection.toISOString() + ', gkeepalivemins=' + gkeepalivemins + ')'
+		)
 	}
 
 }
@@ -736,10 +765,17 @@ function loguiblockerwaitcancel_event(event, action) {
 
 var gprocessing_waitcancel_active
 
+// Gate B — in-DOM Wait/Cancel while Gate A (or any owner) is in db.send lazy XHR wait.
+// Concurrent with Gate A by design. Must NEVER call exodus_begin or main-line dbio.
+// Allowed: exodusconfirm UI, xhttp.abort(), fire-and-forget CANCEL on a separate link.
+var g_exodus_waitcancel = null
+var g_exodus_waitcancel_n = 0
+
 // PHP-FPM: XHR abort is not reliably seen by xhttp.php — send an explicit CANCEL request too.
 function dbsend_cancel_xhttp(requestid) {
 
 	// CANCEL with request id, or bare CANCEL (xhttp resolves id from session _active_xhttp).
+	// Separate exodusdblink + fire-and-forget: must not use main db or enter Gate A.
 	var canceldb = new exodusdblink()
 	canceldb.request = requestid ? ('CANCEL\r' + requestid) : 'CANCEL'
 	exodusfireandforget(canceldb.send(), 'dbsend_cancel_xhttp')
@@ -756,40 +792,94 @@ function dbsend_release_modal(xhttp, dbmodalblocked) {
 		gchildwin = false
 	}
 
-	// Close Wait/Cancel confirm if user opened it for this request.
-	if ($$('exodusconfirmdiv') && gpendingConfirmResolve && gprocessing_waitcancel_active)
-		resolvePendingConfirm(1, 'db.send complete')
+	// Close Wait/Cancel confirm only if it owns the pending resolver (Gate B).
+	// Never resolve a Gate A business confirm from db.send completion.
+	if ($$('exodusconfirmdiv') && gpendingConfirmResolve)
+		resolvePendingConfirm(1, 'db.send complete', 'B')
 
 	unblockmodalui_sync()
 
 }
 
-async function uiblocker_waitcancel_dialog() {
+// Gate B entry — only from uiblocker while a lazy db.send wait is active.
+// Does not go through exodus_begin (would queue behind Gate A and never show during the wait).
+function exodus_begin_waitcancel(source) {
 
-	if ($$('exodusconfirmdiv') || gprocessing_waitcancel_active)
+	source = source || 'uiblocker'
+
+	if (g_exodus_waitcancel || gprocessing_waitcancel_active) {
+		exodus_flight_log(
+			'WAITCANCEL ignored (already open'
+			+ (g_exodus_waitcancel ? ' B#' + g_exodus_waitcancel.n : '') + ')'
+		)
 		return
+	}
 
-	if (!gchildwin || !gchildwin.lazy || !gchildwin.xhttp)
+	if ($$('exodusconfirmdiv')) {
+		exodus_flight_log('WAITCANCEL ignored (other confirm up)')
 		return
+	}
 
+	// Operational condition: modal db.send wait (gchildwin.lazy), not "Gate A only".
+	// Prefer A airborne; if idle, still allow (db.send may still bypass A via timeouts).
+	if (!gchildwin || !gchildwin.lazy || !gchildwin.xhttp) {
+		exodus_flight_log('WAITCANCEL ignored (no lazy db.send wait)')
+		return
+	}
+
+	if (!g_exodus_flow)
+		exodus_flight_log('WAITCANCEL while Gate A idle (db.send outside exodus_begin?)')
+
+	// Fire-and-forget second stack — intentional dual-stack with Gate A.
+	void exodus_run_waitcancel(source)
+}
+
+async function exodus_run_waitcancel(source) {
+
+	var n = ++g_exodus_waitcancel_n
+	g_exodus_waitcancel = { n: n, source: source }
 	gprocessing_waitcancel_active = true
+
+	var ainfo = g_exodus_flow
+		? ('A#' + g_exodus_flow.n + ' "' + g_exodus_flow.location + '"')
+		: 'A idle'
+	exodus_flight_log('WAITCANCEL OPEN B#' + n + ' (' + ainfo + ', via ' + source + ')')
+
+	// Snapshot XHR for this wait — gchildwin may clear when the request completes.
 	var xhttp = gchildwin.xhttp
+	var requestid = gchildwin.xhttprequestid
 
 	try {
 		var response = await exodusconfirm('Processing. Please wait.', 1, 'Wait', 'Cancel')
 
-		// Wait=1 keeps request running; Cancel/Esc/close aborts
+		// Wait=1: keep request running (also when dbsend_release_modal force-resolves on complete)
 		if (response != 1) {
-			var requestid = gchildwin.xhttprequestid
+			if (gchildwin && gchildwin.xhttprequestid)
+				requestid = gchildwin.xhttprequestid
+			exodus_flight_log('WAITCANCEL CANCEL B#' + n)
 			try {
 				xhttp.abort()
 			} catch (e) { }
 			dbsend_cancel_xhttp(requestid)
 			// db.send releases modal state when the XHR abort completes.
+		} else {
+			exodus_flight_log('WAITCANCEL WAIT/COMPLETE B#' + n)
 		}
+	} catch (e) {
+		exodus_flight_log(
+			'WAITCANCEL error B#' + n + ': ' + (e && (e.message || e.description || e))
+		)
+		throw e
 	} finally {
 		gprocessing_waitcancel_active = false
+		g_exodus_waitcancel = null
+		exodus_flight_log('WAITCANCEL CLOSE B#' + n)
 	}
+}
+
+// Legacy name — blocker and any old callers enter Gate B only.
+function uiblocker_waitcancel_dialog() {
+	exodus_begin_waitcancel('uiblocker_waitcancel_dialog')
 }
 
 var gmodalblockdepth = 0
@@ -897,10 +987,10 @@ function modalblock_create() {
 	blocker.onmousedown = function uiblockerdiv_onmousedown() {
 		guiblockermousedown = true
 	}
-	blocker.onclick = function uiblockerdiv_onclick(event) {
+	blocker.onclick = function uiblockerdiv_onclick_sync(event) {
 
 		if ($$('exodusconfirmdiv')) {
-			window.setTimeout('exodus_confirm_outside_click()', 10)
+			window.setTimeout('exodus_confirm_outside_click_sync()', 10)
 		}
 		else if (gchildwin) {
 			if (gchildwin.lazy) {
@@ -912,7 +1002,7 @@ function modalblock_create() {
 				}
 				guiblockermousedown = false
 				loguiblockerwaitcancel_event(event, 'opening in-dom wait/cancel')
-				uiblocker_waitcancel_dialog()
+				exodus_begin_waitcancel('uiblockerdiv')
 			} else {
 				var actualwin = gchildwin
 
@@ -931,9 +1021,17 @@ function modalblock_create() {
 
 function modalblock_destroy() {
 
-	//close in-dom confirm if still present when tearing down the last modal layer
-	if ($$('exodusconfirmdiv') && gpendingConfirmResolve)
-		resolvePendingConfirm(1, 'unblockmodalui_sync')
+	// Orphaned confirm while last modal layer tears down — resolve by owner only.
+	// Gate B Wait/Cancel → Wait/complete (1). Gate A business → Cancel (0), never auto-OK.
+	if ($$('exodusconfirmdiv') && gpendingConfirmResolve) {
+		if (gpendingConfirmOwner === 'B')
+			resolvePendingConfirm(1, 'modalblock_destroy', 'B')
+		else if (gpendingConfirmOwner === 'A') {
+			exodus_flight_log('CONFIRM orphan A force-cancel on modal destroy')
+			resolvePendingConfirm(0, 'modalblock_destroy', 'A')
+		} else
+			resolvePendingConfirm(0, 'modalblock_destroy')
+	}
 
 	var blocker = $$('uiblockerdiv')
 	if (blocker) {
@@ -967,8 +1065,9 @@ function unblockmodalui_sync() {
 	//close legacy child 'please wait' window if present
 	if (gchildwin && gchildwin.actual && !gchildwin.actual.closed)
 		gchildwin.actual.close()
-	// lazy gchildwin is cleared by dbsend_release_modal when the owning XHR completes
-	gprocessing_waitcancel_active = false
+	// Do NOT clear gprocessing_waitcancel_active here — nested unblocks (confirm depth,
+	// Gate A finally) must not strip Gate B ownership mid-wait. Cleared only in
+	// exodus_run_waitcancel finally / resolve of owner B.
 
 	if (gmodalblockdepth > 0)
 		--gmodalblockdepth
@@ -1094,9 +1193,11 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 			dialogResolve = resolve
 		})
 		gpendingDialogResolve = dialogResolve
+		gpendingDialogOwner = 'A'
 
 		var result = await dialogPromise
 		gpendingDialogResolve = null
+		gpendingDialogOwner = null
 		console.log('exodusshowmodaldialog result is ' + result)
 
 		//Safari doesnt return an error and looks like a Window [x] close unfortunately
@@ -1180,7 +1281,7 @@ function exodus_autoresume() {
 	}
 
 	//exodus_resume(returnvalue, 'exodus_autoresume')
-	resolvePendingDialog(returnvalue, 'exodus_autoresume')
+	resolvePendingDialog(returnvalue, 'exodus_autoresume', 'A')
 
 }
 
@@ -4820,10 +4921,10 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	if (accesskey) {
 		//tx += '<button xtabindex=-1 style="background-color:white; height:1px; width:1px; border-style:none; margin:0px ;padding:0px"'
 		// hide access keys on screen
+		// Same Gate A entry as visible menubutton: await inside exodusonclick (not raw markup).
 		tx += '<button xtabindex=-1 style="display:none;"'
 		tx += ' accesskey="' + accesskey + '"'
-		tx += 'await '
-		tx += ' exodusonclick="' + id + '_onclick(event)"'
+		tx += ' exodusonclick="await ' + id + '_onclick(event)"'
 		tx += '></button>'
 	}
 
@@ -5223,19 +5324,19 @@ function starteventhandler(eventfunctionname, functionx) {
 
 					//POSITIVE = F9 or Enter or (Space if not text input) or some initial
 					if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
-						window.setTimeout('exodus_confirm_function1()', 1)
+						window.setTimeout('exodus_confirm_function1_sync()', 1)
 						return exoduscancelevent(event)
 					}
 
 					//CANCEL = Esc or some initial
 					else if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
-						window.setTimeout('exodus_confirm_function3()', 1)
+						window.setTimeout('exodus_confirm_function3_sync()', 1)
 						return exoduscancelevent(event)
 					}
 
 					//NEGATIVE = F8 or some initial
 					else if (keycode == 119 || keyletter == gexodusconfirmletters[2]) {
-						window.setTimeout('exodus_confirm_function2()', 1)
+						window.setTimeout('exodus_confirm_function2_sync()', 1)
 						return exoduscancelevent(event)
 					}
 
@@ -5306,10 +5407,15 @@ var geventn = 0
 // handlers resolve a Promise instead of directly calling exodus_resume.
 // The fromPromise adapter then feeds the value into the normal geventhandler machinery.
 var gpendingConfirmResolve
+// Owner of gpendingConfirmResolve: 'A' (Gate A business), 'B' (Gate B wait/cancel), or null.
+// Force-close paths must pass expectedOwner so A and B cannot cross-wire.
+var gpendingConfirmOwner
 var gexodusconfirmdefaultbutton
 
 // For the child window / showmodaldialog leaf (next after confirm).
 var gpendingDialogResolve
+// Child-window dialogs are always Gate A business (never wait/cancel).
+var gpendingDialogOwner
 
 // --- async/generator bridge helpers (asyncjs migration) ---
 
@@ -5326,12 +5432,109 @@ function exodusispromise(value) {
 	return value && typeof value.then === 'function'
 }
 
+// Gate A — exclusive main event flow (one plane). Slice 1: all startAsyncFlow / event
+// commencements enter here. Nested await inside the flight is fine; a second takeoff
+// while airborne is queued until landing.
+// Gate B (wait/cancel) is a separate concurrent stack — see exodus_begin_waitcancel.
+var g_exodus_flow = null
+var g_exodus_flow_queue = []
+var g_exodus_flight_n = 0
+
+function exodus_flight_log(msg) {
+	// Always-on light log for Gate A takeoff/landing and Gate B wait/cancel.
+	if (typeof console != 'undefined' && console.log)
+		console.log('[exodus flight] ' + msg)
+	logevent('[exodus flight] ' + msg)
+}
+
+// Single commencement point for Gate A business async. Returns a Promise of
+// { value, done: true } (same shape as legacy startAsyncFlow).
+function exodus_begin(asyncHandler, location, event) {
+	location = location || 'unknown'
+	if (g_exodus_flow) {
+		exodus_flight_log(
+			'QUEUED "' + location + '" (airborne #' + g_exodus_flow.n
+			+ ' "' + g_exodus_flow.location + '", queue=' + (g_exodus_flow_queue.length + 1) + ')'
+		)
+		return new Promise(function (resolve, reject) {
+			g_exodus_flow_queue.push({
+				asyncHandler: asyncHandler,
+				location: location,
+				event: event,
+				resolve: resolve,
+				reject: reject
+			})
+		})
+	}
+	return exodus_begin_run(asyncHandler, location, event)
+}
+
+async function exodus_begin_run(asyncHandler, location, event) {
+	var n = ++g_exodus_flight_n
+	g_exodus_flow = { n: n, location: location }
+	exodus_flight_log('TAKEOFF #' + n + ' "' + location + '"')
+
+	form_blockevents(true, location)
+	blockmodalui_sync()
+
+	try {
+		var result = await asyncHandler(event)
+		exodus_flight_log('LANDING #' + n + ' "' + location + '" ok')
+		return { value: result, done: true }
+	} catch (e) {
+		exodus_flight_log(
+			'LANDING #' + n + ' "' + location + '" error: '
+			+ (e && (e.message || e.description || e))
+		)
+		throw e
+	} finally {
+		form_blockevents(false, location)
+		unblockmodalui_sync()
+		g_exodus_flow = null
+		exodus_begin_drain()
+	}
+}
+
+function exodus_begin_drain() {
+	if (g_exodus_flow || !g_exodus_flow_queue.length)
+		return
+	var job = g_exodus_flow_queue.shift()
+	exodus_flight_log(
+		'DEQUEUE "' + job.location + '" (remaining queue=' + g_exodus_flow_queue.length + ')'
+	)
+	exodus_begin_run(job.asyncHandler, job.location, job.event).then(job.resolve, job.reject)
+}
+
+// Legacy name — all async takeoffs go through exclusive exodus_begin.
+function startAsyncFlow(asyncHandler, location, event) {
+	return exodus_begin(asyncHandler, location, event)
+}
+
+// Optional background work (keepalive, relock): run via Gate A only when idle.
+// Never queue — by the time a deferred tick ran, form/lock state may be wrong;
+// missing a keepalive/relock tick is fine.
+function exodus_begin_if_idle(asyncHandler, location) {
+	location = location || 'background'
+	if (g_exodus_flow) {
+		exodus_flight_log(
+			'SKIP "' + location + '" (A#' + g_exodus_flow.n
+			+ ' "' + g_exodus_flow.location + '" airborne)'
+		)
+		return Promise.resolve(null)
+	}
+	if (typeof db != 'undefined' && db.requesting) {
+		exodus_flight_log('SKIP "' + location + '" (db.requesting)')
+		return Promise.resolve(null)
+	}
+	return exodus_begin(asyncHandler, location)
+}
+
 // Invoke from a legacy *_sync() bridge (inline onclick, setTimeout string, etc.).
 // Blocks UI/events for async targets; kicks generators via exodusneweventhandler.
 function exodusinvokesynctarget(target, args, location) {
 	args = args || []
 	if (exodusisasyncfunction(target)) {
-		void startAsyncFlow(function () { return target.apply(null, args) }, location)
+		void exodus_begin(function () { return target.apply(null, args) }, location)
 		return
 	}
 	var result = target.apply(null, args)
@@ -5340,7 +5543,7 @@ function exodusinvokesynctarget(target, args, location) {
 		return result
 	}
 	if (exodusispromise(result)) {
-		void startAsyncFlow(function () { return result }, location)
+		void exodus_begin(function () { return result }, location)
 		return result
 	}
 	return result
@@ -5350,12 +5553,12 @@ function exodusinvokesynctarget(target, args, location) {
 function exodusinvokesynctargetreturn(target, args, location) {
 	args = args || []
 	if (exodusisasyncfunction(target))
-		return startAsyncFlow(function () { return target.apply(null, args) }, location)
+		return exodus_begin(function () { return target.apply(null, args) }, location)
 	var result = target.apply(null, args)
 	if (exodusisgeneratoriterator(result))
 		return exodusneweventhandler(result, location).value
 	if (exodusispromise(result))
-		return startAsyncFlow(function () { return result }, location)
+		return exodus_begin(function () { return result }, location)
 	return result
 }
 
@@ -5388,9 +5591,9 @@ function exodusneweventhandler(eventhandler, location) {
 	logevent(' ')
 	logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
 
-	// Async functions must not be pre-invoked; run via startAsyncFlow (never call eventhandler() to probe).
+	// Async functions must not be pre-invoked; run via exodus_begin (never call eventhandler() to probe).
 	if (exodusisasyncfunction(eventhandler))
-		return startAsyncFlow(eventhandler, location)
+		return exodus_begin(eventhandler, location)
 
 	geventhandler = eventhandler
 
@@ -5401,23 +5604,6 @@ function exodusneweventhandler(eventhandler, location) {
 	//IF the function yielded to window.open for example
 	//temp.value will be 1 and temp.done will be false
 	return next
-}
-
-async function startAsyncFlow(asyncHandler, location, event) {
-	logevent('=== STARTING ASYNC FLOW (no generator) for ' + location + '===');
-
-	form_blockevents(true, location);
-	blockmodalui_sync();
-
-	try {
-		// For top level, we call the async function (it may expect event or not).
-		// The blocking stays active for the duration of the await, matching old semantics.
-		const result = await asyncHandler(event);
-		return { value: result, done: true };
-	} finally {
-		form_blockevents(false, location);
-		unblockmodalui_sync();
-	}
 }
 
 function addeventlistener(element, eventname, functionx) {
@@ -5538,7 +5724,9 @@ function exodusint2date(exodusdate) {
 
 }
 
-//thin wrapper to handle timeouts. Prefer 'await myfunc()' in the command string.
+// Thin timeout wrapper. Prefer await inside the current Gate A flight.
+// If you must defer async work: exodussettimeout schedules it, then
+// exodustimeout_async_sync enters Gate A (queues if airborne — never free-runs).
 function exodussettimeout(command, milliseconds) {
 	if (glogsettimeout)
 		console.log('exodussetimeout(' + command + ')')
@@ -5549,16 +5737,12 @@ function exodussettimeout(command, milliseconds) {
 		return window.setTimeout(command, milliseconds)
 }
 
-// support for async commands
+// Async timeout work always enters exclusive Gate A (queue if busy).
 async function exodustimeout_async_sync(command) {
-	if (gblockevents) {
-		window.setTimeout('exodustimeout_async_sync("' + command + '")', 100)
-		return
-	}
-	// eval the command which should be like 'foo()'
-	// wrap in async if needed
-	const fn = new Function('return ' + command);
-	await fn();
+	await exodus_begin(async function () {
+		const fn = new Function('return ' + command)
+		return await fn()
+	}, 'timeout ' + command)
 }
 
 //thin wrapper to handle intervals. Prefer 'await myfunc()'.
@@ -5571,13 +5755,19 @@ function exodussetinterval(command, milliseconds) {
 }
 
 async function exodusinterval_async_sync(command) {
-	if (gblockevents) {
-		// defer like exodustimeout_async_sync so KEEPALIVE is not lost during slow requests
-		window.setTimeout('exodusinterval_async_sync("' + command + '")', 100)
+	// Optional interval work: skip if busy — never reschedule/queue (stale relock is wrong).
+	if (g_exodus_flow || gblockevents) {
+		exodus_flight_log('SKIP interval "' + command + '" (busy)')
 		return
 	}
-	const fn = new Function('return ' + command);
-	await fn();
+	if (typeof db != 'undefined' && db.requesting) {
+		exodus_flight_log('SKIP interval "' + command + '" (db.requesting)')
+		return
+	}
+	await exodus_begin(async function () {
+		const fn = new Function('return ' + command)
+		return await fn()
+	}, 'interval ' + command)
 }
 
 function systemerror(functionname, e) {
@@ -5977,7 +6167,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' onmousedown="this.style.borderStyle=\'solid\'"'
 		html += ' onmouseup="this.style.borderStyle=\'solid\'"'
 		html += ' onmouseout="this.style.borderStyle=\'solid\'"'
-		html += ' onclick="exodus_confirm_function' + buttonn + '()"'
+		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
 
 
 		//letter
@@ -6037,7 +6227,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			<td colspan=2 align="center">\
 			<div class="exodusconfirm_decideblock">\
 			<table id="decide_table1" xwidth=100% xclass="exodusform" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
-				<thead onclick="decide_sorttable2(event)" style="cursor: pointer">\
+				<thead onclick="decide_sorttable2_sync(event)" style="cursor: pointer">\
 					<tr id="decide_table1head1row1">\
 					</tr>\
 				</thead>\
@@ -6152,6 +6342,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		confirmResolve = resolve
 	})
 	gpendingConfirmResolve = confirmResolve
+	// Gate B wait/cancel owns this confirm when B is open; otherwise Gate A business.
+	gpendingConfirmOwner = (g_exodus_waitcancel || gprocessing_waitcancel_active) ? 'B' : 'A'
 	gexodusconfirmdefaultbutton = defaultbuttonn || 1
 
 	blockmodalui_sync()
@@ -6161,6 +6353,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		response = await confirmPromise
 	} finally {
 		gpendingConfirmResolve = null
+		gpendingConfirmOwner = null
 		gexodusconfirmdefaultbutton = null
 		form_blockevents(false, 'exodusconfirm2')
 		unblockmodalui_sync()
@@ -6186,7 +6379,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 }
 
 //return 1 - Positive Button i.e. 'Ok' with optional text input
-function exodus_confirm_function1(event) {
+// DOM/HTML entry points — *_sync (resolve confirm leaf; not Gate A takeoff)
+function exodus_confirm_function1_sync(event) {
 	var textinput
 	if ($$('exodusconfirmdiv_textinput'))
 		textinput = $$('exodusconfirmdiv_textinput').value
@@ -6194,57 +6388,78 @@ function exodus_confirm_function1(event) {
 }
 
 //return 2
-function exodus_confirm_function2(event) {
+function exodus_confirm_function2_sync(event) {
 	return exodus_confirm_function(2, event)
 }
 
 //return 0
-function exodus_confirm_function3(event) {
+function exodus_confirm_function3_sync(event) {
 	return exodus_confirm_function(0, event)
 }
 
 //click on modal blocker outside confirm dialog — same as default button (Enter/F9)
-function exodus_confirm_outside_click(event) {
+function exodus_confirm_outside_click_sync(event) {
 	var defaultbutton = gexodusconfirmdefaultbutton || 1
 	if (defaultbutton == 2)
-		return exodus_confirm_function2(event)
+		return exodus_confirm_function2_sync(event)
 	if (defaultbutton == 3)
-		return exodus_confirm_function3(event)
-	return exodus_confirm_function1(event)
+		return exodus_confirm_function3_sync(event)
+	return exodus_confirm_function1_sync(event)
 }
 
-function resolvePendingConfirm(value, source) {
-	// Phase 1.2 microstep: route confirm/decide resumption through a Promise
-	// so the leaf can be driven by native async while existing yield* callers
-	// continue to work via adapters (legacy hybrid support)
+// expectedOwner: optional 'A' | 'B' — when set, only resolve if gpendingConfirmOwner matches
+// (force-close paths). User button/key paths omit it and always answer the open confirm.
+function resolvePendingConfirm(value, source, expectedOwner) {
 	if (gpendingConfirmResolve) {
-		var resolver = gpendingConfirmResolve;
-		gpendingConfirmResolve = null;
-		logevent('resolvePendingConfirm value=' + value + ' from ' + source);
-		resolver(value);
-		return true;
+		if (expectedOwner && gpendingConfirmOwner && gpendingConfirmOwner !== expectedOwner) {
+			exodus_flight_log(
+				'CONFIRM resolve blocked (want ' + expectedOwner
+				+ ' have ' + gpendingConfirmOwner + ' from ' + source + ')'
+			)
+			return false
+		}
+		var resolver = gpendingConfirmResolve
+		var owner = gpendingConfirmOwner
+		gpendingConfirmResolve = null
+		gpendingConfirmOwner = null
+		logevent(
+			'resolvePendingConfirm value=' + value
+			+ ' owner=' + (owner || '?') + ' from ' + source
+		)
+		resolver(value)
+		return true
 	}
 	// No pending confirm — ignore duplicate clicks after the dialog already resolved.
 	if (geventhandler)
-		exodus_resume(value, source);
-	return false;
+		exodus_resume(value, source)
+	return false
 }
 
-function resolvePendingDialog(value, source) {
-	// Phase 1.3: child window / showmodaldialog leaf conversion.
-	// autoresume (polling) and setchildwin_returnvalue path now resolve promise.
-	// fromPromise then drives the normal resume path.
+// expectedOwner: optional 'A' — child-window dialogs are always Gate A.
+function resolvePendingDialog(value, source, expectedOwner) {
 	if (gpendingDialogResolve) {
-		var resolver = gpendingDialogResolve;
-		gpendingDialogResolve = null;
-		logevent('resolvePendingDialog value=' + value + ' from ' + source);
-		resolver(value);
-		return true;
+		if (expectedOwner && gpendingDialogOwner && gpendingDialogOwner !== expectedOwner) {
+			exodus_flight_log(
+				'DIALOG resolve blocked (want ' + expectedOwner
+				+ ' have ' + gpendingDialogOwner + ' from ' + source + ')'
+			)
+			return false
+		}
+		var resolver = gpendingDialogResolve
+		var owner = gpendingDialogOwner
+		gpendingDialogResolve = null
+		gpendingDialogOwner = null
+		logevent(
+			'resolvePendingDialog value=' + value
+			+ ' owner=' + (owner || '?') + ' from ' + source
+		)
+		resolver(value)
+		return true
 	}
 	// Fallback for safety during incremental conversion.
 	if (geventhandler)
-		exodus_resume(value, source);
-	return false;
+		exodus_resume(value, source)
+	return false
 }
 
 function exodus_confirm_function(buttonno, event) {
@@ -6367,7 +6582,7 @@ function decide_onload(decide_args) {
 	if (decide_returnmany)
 		var tt = '<button'
 			+ ' title="Press A for All"'
-			//+ ' onclick="decide_all_onclick()"'
+			//+ ' onclick="decide_all_onclick_sync()"'
 			+ ' style="font-size:80%" class="exodusbutton"'
 			+ '>All</button>'
 	else
@@ -6376,7 +6591,7 @@ function decide_onload(decide_args) {
 	oRow.appendChild(oCell)
 
 	if (decide_returnmany)
-		oCell.getElementsByTagName('button')[0].onclick = decide_all_onclick
+		oCell.getElementsByTagName('button')[0].onclick = decide_all_onclick_sync
 
 	//add a column to show the order of selections
 	if (decide_returnmany) {
@@ -6606,10 +6821,10 @@ function decide_onload(decide_args) {
 	}
 
 	var okbutton = $$('decide_okbutton')
-	okbutton.onclick = decide_ok_onclick
+	okbutton.onclick = decide_ok_onclick_sync
 
 	var cancelbutton = $$('decide_cancelbutton')
-	cancelbutton.onclick = decide_cancel_onclick
+	cancelbutton.onclick = decide_cancel_onclick_sync
 
 	//autoselect only one option
 	if (singlereturnvalue) {
@@ -6648,14 +6863,14 @@ function decide_onload(decide_args) {
 	addeventlistener(exodusconfirmdiv, 'mouseover', decide_document_onmouseover)
 	addeventlistener(exodusconfirmdiv, 'mouseout', decide_document_onmouseout)
 
-	//returning undefined indicates that we need to yield and wait for decide_ok_onclick etc to resume
+	//returning undefined indicates that we need to yield and wait for decide_ok_onclick_sync etc to resume
 	//returning false indicates some problem
 	//returning anything else indicates that there is only one option
 	return undefined
 
 	//remainder of functions is event handlers
 
-	function decide_all_onclick(event) {
+	function decide_all_onclick_sync(event) {
 
 		selections = document.getElementsByName('decide_selection')
 		var truefalse = !selections[0].checked
@@ -6788,7 +7003,7 @@ function decide_onload(decide_args) {
 		if (!element)
 			element = event.target
 		element.checked = true
-		decide_ok_onclick()
+		decide_ok_onclick_sync()
 		return exoduscancelevent(event)
 	}
 
@@ -6857,7 +7072,7 @@ function decide_onload(decide_args) {
 
 	function decide_document_ondblclick(event) {
 		decide_document_onclick(event, true)
-		decide_ok_onclick()
+		decide_ok_onclick_sync()
 		return exoduscancelevent(event)
 	}
 
@@ -6894,20 +7109,20 @@ function decide_onload(decide_args) {
 
 	}
 
-	function decide_ok_onclick() {
+	function decide_ok_onclick_sync() {
 
 		var returnvalues = decide_getreturnvalues()
 
 		//return exoduswindowclose(returnvalues)
-		//exodus_resume(returnvalues, 'decide_ok_onclick')
-		resolvePendingConfirm(returnvalues, 'decide_ok_onclick')
+		//exodus_resume(returnvalues, 'decide_ok_onclick_sync')
+		resolvePendingConfirm(returnvalues, 'decide_ok_onclick_sync')
 
 	}
 
-	function decide_cancel_onclick() {
+	function decide_cancel_onclick_sync() {
 		//return exoduswindowclose('')
-		//exodus_resume('', 'decide_ok_onclick')
-		resolvePendingConfirm('', 'decide_ok_onclick')
+		//exodus_resume('', 'decide_ok_onclick_sync')
+		resolvePendingConfirm('', 'decide_ok_onclick_sync')
 	}
 
 	//purely to suppress any automatic checkbox ticking by the browser
@@ -6968,19 +7183,19 @@ function decide_onload(decide_args) {
 
 		//ctrl+Enter or single select
 		if (keycode == 13 && event.ctrlKey) {
-			decide_ok_onclick()
+			decide_ok_onclick_sync()
 			return exoduscancelevent(event)
 		}
 
 		//F9 is old save
 		if (keycode == 120) {
-			decide_ok_onclick()
+			decide_ok_onclick_sync()
 			return exoduscancelevent(event)
 		}
 
 		//Esc is cancel
 		if (keycode == 27) {
-			decide_cancel_onclick()
+			decide_cancel_onclick_sync()
 			return exoduscancelevent(event)
 		}
 
@@ -7001,7 +7216,7 @@ function decide_onload(decide_args) {
 
 		//ctrl+enter and f9 is ok ... so is space if not !returnmany
 		if (keycode == 120 || (keycode == 13 && event.ctrlKey) || (keycode == 32 && !decide_returnmany)) {
-			decide_ok_onclick()
+			decide_ok_onclick_sync()
 			return exoduscancelevent(event)
 		}
 
@@ -7014,7 +7229,7 @@ function decide_onload(decide_args) {
 			for (var rown = 0; rown < options.length; ++rown) {
 				if (options[rown].getAttribute('decide_optionno') == optionn) {
 					if (!decide_returnmany || selections.length == 1) {
-						//decide_ok_onclick()
+						//decide_ok_onclick_sync()
 						decide_radio_select(event, selections[rown])
 						break
 					}
@@ -7137,7 +7352,7 @@ function decide_onload(decide_args) {
 		//all following refers to many selections
 		if (!decide_returnmany) {
 			if (keycode == 13) {
-				decide_ok_onclick()
+				decide_ok_onclick_sync()
 				return exoduscancelevent(event)
 			}
 			return
@@ -7145,7 +7360,7 @@ function decide_onload(decide_args) {
 
 		//A=all or none
 		if (keycode == 65) {
-			decide_all_onclick()
+			decide_all_onclick_sync()
 			return exoduscancelevent(event)
 		}
 
@@ -7161,7 +7376,7 @@ function decide_onload(decide_args) {
 
 var gsorttable2offset = 1//decide
 //var gsorttable2offset=0//decide2
-function decide_sorttable2(event) {
+function decide_sorttable2_sync(event) {
 
 	//locate the current element
 	event = getevent(event)
@@ -7231,7 +7446,7 @@ function decide_sorttable2(event) {
 			tablerows[newrown].swapNode(oldrows[oldrown])
 	}
 
-}//decide_sorttable2
+}//decide_sorttable2_sync
 
 //these functions should be removed after a while if never called
 function login() {
@@ -7461,10 +7676,13 @@ function DATE(mode, value, params) {
 			//update the otherdate
 			if (otherdate !== otherdate0) {
 
-				//cant call async gds.setx while oconv is not async so do it by timeout
-				//cant call setvalue either since that only updates the screen and not gds
-				//await gds.setx(otherdateid, grecn, otherdate)
-				exodussettimeout('await gds.setx("' + otherdateid + '", ' + grecn + ', ' + otherdate + ')', 1)
+				// DATE oconv is sync — cannot await here. Queue/run setx via Gate A.
+				// Nested flight while validating: queues until current flight lands.
+				;(function (id, recn, val) {
+					void exodus_begin(function () {
+						return gds.setx(id, recn, val)
+					}, 'date-fromto setx ' + id)
+				})(otherdateid, grecn, otherdate)
 			}
 
 		}

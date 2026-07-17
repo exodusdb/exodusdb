@@ -86,7 +86,7 @@
 						<!--Hidden old browse button-->
 						<input id="filedata" name="filedata" type="file" onchange="previewimage_sync(this)" style="display:none;" />
 
-						<div id="dropbox" onclick="document.getElementById('filedata').click()" ondragover="highlight_dropbox(event)" ondragleave="unhighlight_dropbox()" ondrop="upload_ondrop(event)">
+						<div id="dropbox" onclick="document.getElementById('filedata').click()" ondragover="highlight_dropbox_sync(event)" ondragleave="unhighlight_dropbox_sync()" ondrop="upload_ondrop_sync(event)">
 							<span style="color: #999; font-family: monospace; font-size: 12px; font-style: italic;">Click to browse for a file<br>Or drag & drop it here<br><br><br></span>
 						</div>
 						<span style="font-family: monospace; font-size: 10px; color: #555; margin-top: 5px; display: block;">

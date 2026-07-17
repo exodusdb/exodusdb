@@ -1263,8 +1263,8 @@ async function formfunctions_onload() {
                     if (groupno == 1 && typeof gallowfilter != 'undefined' && gallowfilter) {
                         t += '<input id="exodusgroup' + groupno + 'filter"'
                         t += ' class="clsNotRequired"'
-                        t += ' onblur="await form_filter(\'filterall\',' + groupno + ',null,null,this)"'
-                        t += ' onfocus="await form_filter(\'filterfocus\',' + groupno + ',null,null,this)"'
+                        t += ' onblur="form_filter_onblur_sync(' + groupno + ',this)"'
+                        t += ' onfocus="form_filter_onfocus_sync(' + groupno + ',this)"'
                         t += ' contenteditable="true"'
                         t += ' size="3"'
                         t += ' tabIndex="-1"'
@@ -2222,15 +2222,12 @@ async function document_onkeypress(event) {
 */
 //DOCUMENT ON KEY DOWN
 //////////////////////
-var gonkeydown
+// Gate A (exodus_begin / gblockevents) already serializes keydown flights — no local mutex.
 async function document_onkeydown(event) {
 
     //document_onkeydown also occurs in non-form windows not using dbform.js - like upload.htm etc
 
-    //prevent concurrent keydown; block menu shortcuts while confirm popup is up
-    if (gonkeydown)
-        return exoduscancelevent(event)
-
+    // Block form shortcuts while a confirm is up (defense if this path is reached)
     if ($$('exodusconfirmdiv')) {
         var confirmdiv = $$('exodusconfirmdiv')
         if (confirmdiv && confirmdiv.contains(event.target))
@@ -2238,11 +2235,7 @@ async function document_onkeydown(event) {
         return exoduscancelevent(event)
     }
 
-    gonkeydown = true
-    var result = await document_onkeydown2(event)
-    gonkeydown = false
-
-    return result
+    return await document_onkeydown2(event)
 }
 
 async function document_onkeydown2(event) {
@@ -3827,9 +3820,9 @@ async function changepage(pagen) {
 //'OPENDOC
 //'''''''''
 
+// True while opendoc body runs — focus handlers skip validation races during load.
+// Not a Gate A mutex (Gate A already serializes); product guard only.
 var gopening = false
-var grecordnav_busy = false
-var grecordnav_pending = null
 
 async function opendoc(newkey) {
 
@@ -4923,7 +4916,10 @@ async function writedoc(unlock) {
 
 function startrelocker() {
     //2.2 ie try at least two relocks within the locktimeout period
-    grelocker = exodussetinterval('await relockdoc()', glocktimeoutinmins / 2.2 * 60 * 1000)
+    // Optional: skip if Gate A busy — never queue (form/lock state may have changed).
+    grelocker = window.setInterval(function () {
+        void exodus_begin_if_idle(relockdoc, 'relockdoc')
+    }, glocktimeoutinmins / 2.2 * 60 * 1000)
 }
 
 function stoprelocker() {
@@ -7707,49 +7703,20 @@ async function lastrecord_onclick(event) {
     return await nextrecord2(event, 'last')
 }
 
-function recordnav_merge(direction) {
-
-    // Coalesce rapid prev/next into one step after the current READU finishes
-    if (direction === 'first' || direction === 'last' || direction === 0) {
-        grecordnav_pending = direction
-        return
-    }
-    if (typeof direction != 'number')
-        return
-    if (typeof grecordnav_pending == 'number')
-        grecordnav_pending += direction
-    else
-        grecordnav_pending = direction
-}
-
 async function recordnav_wait_for_db() {
 
+    // Defensive: wait if main db is still mid-request (should be rare under Gate A).
     while (db.requesting)
         await new Promise(function (resolve) { window.setTimeout(resolve, 25) })
 }
 
 async function nextrecord2(event, direction) {
 
-    //direction is 'first', -1, 0, 1, 'last'
-    recordnav_merge(direction)
-    if (grecordnav_busy)
-        return false
-
-    grecordnav_busy = true
-    var result = false
-    try {
-        while (grecordnav_pending != null) {
-            await recordnav_wait_for_db()
-            var dir = grecordnav_pending
-            grecordnav_pending = null
-            if (typeof dir == 'number' && dir == 0)
-                continue
-            result = await nextrecord2_step(event, dir)
-        }
-        return result
-    } finally {
-        grecordnav_busy = false
-    }
+    // direction is 'first', -1, 0, 1, 'last'
+    // Gate A serializes entry (second key/click while airborne is cancelled, not merged).
+    // Former grecordnav_busy / pending-merge was a pre-gate concurrent-entry patch.
+    await recordnav_wait_for_db()
+    return await nextrecord2_step(event, direction)
 }
 
 async function nextrecord2_step(event, direction) {
@@ -8374,6 +8341,19 @@ async function form_onrightclick(event) {
     return true
 }
 
+// Raw onblur/onfocus from DOM filter input — enter Gate A (form_filter is async).
+function form_filter_onblur_sync(groupno, elem) {
+    void exodus_begin(function () {
+        return form_filter('filterall', groupno, null, null, elem)
+    }, 'form_filter filterall')
+}
+
+function form_filter_onfocus_sync(groupno, elem) {
+    void exodus_begin(function () {
+        return form_filter('filterfocus', groupno, null, null, elem)
+    }, 'form_filter filterfocus')
+}
+
 async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     //NB regexp to be filtered OUT not IN
@@ -8606,14 +8586,20 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 var calendar_checkInDatePicker
 
 async function form_pop_calendar() {
-    //do this so that it pops up after focussing on the entry element
-    exodussettimeout('await form_popcalendar2()', 100)
-    return false
+    // Non-modal UI that must outlive this click flight. Opening inside the same
+    // flight flashes: LANDING → exoduspopup focuson(date) → form_closepopups hides it.
+    // Contract: return null so exoduspopup refocuses the date field first; open after
+    // that focus chain settles (same timing as the old setTimeout open).
+    window.setTimeout(function () {
+        void exodus_begin(form_popcalendar2, 'form_popcalendar2')
+    }, 100)
+    return null
 }
 
-function calendar_checkInDatePicker_onchange() {
+function calendar_checkInDatePicker_onchange_sync() {
 
     // Commit path only: day click, Enter, Today, or Clear — not Escape/dismiss
+    // Sync DOM handler (Calendar.onchange) — name ends _sync by convention.
     if (!calendar_checkInDatePicker || !gpreviouselement)
         return true
 
@@ -8641,7 +8627,7 @@ async function form_popcalendar2() {
         calendar_checkInDatePicker = msdate ? new Calendar(msdate) : new Calendar()
         calendar_checkInDatePicker.create()
         //dont use addeventlistener here because onchange is special to DatePicker
-        calendar_checkInDatePicker.onchange = calendar_checkInDatePicker_onchange
+        calendar_checkInDatePicker.onchange = calendar_checkInDatePicker_onchange_sync
     } else {
         if (calendar_checkInDatePicker._showing)
             calendar_checkInDatePicker.hide()

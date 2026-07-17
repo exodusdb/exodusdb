@@ -50,7 +50,7 @@ async function form_preread() {
 
 }
 
-function authorisation_tabs_show(which) {
+function authorisation_tabs_show_sync(which) {
 
     var userspanel = $$('authorisation_tabpanel_users')
     var taskspanel = $$('authorisation_tabpanel_tasks')
@@ -88,7 +88,7 @@ async function user_showtasks(event) {
     if (recn < 0)
         return false
 
-    authorisation_tabs_show('tasks')
+    authorisation_tabs_show_sync('tasks')
     focuson(document.getElementsByName('LOCKS')[recn])
 
     return true
@@ -215,7 +215,7 @@ async function form_postread() {
 
     gtasks_updatehighergroups = await exodussecurity('AUTHORISATION UPDATE HIGHER GROUPS')
 
-    exodussettimeout('await authorisation_postdisplay()', 10)
+    await authorisation_postdisplay()
 
     return true
 
