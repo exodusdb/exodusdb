@@ -997,6 +997,14 @@ async function formfunctions_onload() {
                     element.className = elementclassname
             }
 
+            // Invisible nbsp placeholder: enables :placeholder-shown when empty so
+            // focus can fill the data width like a full text selection (global.css).
+            if ((element.tagName == 'INPUT' || element.tagName == 'TEXTAREA')
+                && element.type != 'radio' && element.type != 'checkbox'
+                && element.type != 'button' && element.type != 'submit' && element.type != 'image'
+                && !element.getAttribute('placeholder'))
+                element.setAttribute('placeholder', '\u00a0')
+
             if (element.tagName.match(gtexttagnames) && element.size != 1 && element.getAttribute('exoduslength')
                 && element.type != 'radio' && element.type != 'checkbox')
                 exodus_apply_field_width(element, parseInt(element.getAttribute('exoduslength'), 10), exodus_field_width_char(element))

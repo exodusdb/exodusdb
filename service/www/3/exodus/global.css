@@ -276,6 +276,40 @@ TEXTAREA:focus {
     border: 1.7px solid #ff6428;
 }
 
+/*
+ * Empty focused data field: fill the data width with the same system colour as
+ * selected text (Highlight), so the caret is not a lonely skinny mark. Not a
+ * focus ring/box — matches the look of selecting a run of spaces.
+ * :placeholder-shown needs a placeholder attribute (set in dbform when missing).
+ */
+TABLE.exodusform INPUT.clsRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+TABLE.exodusform INPUT.clsNotRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+TABLE.exodustable INPUT.clsRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+TABLE.exodustable INPUT.clsNotRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+TABLE.exodusform TEXTAREA.clsRequired:focus:placeholder-shown,
+TABLE.exodusform TEXTAREA.clsNotRequired:focus:placeholder-shown,
+TABLE.exodusform SPAN.clsRequired[contenteditable]:focus:empty,
+TABLE.exodusform SPAN.clsNotRequired[contenteditable]:focus:empty,
+TABLE.exodustable SPAN.clsRequired[contenteditable]:focus:empty,
+TABLE.exodustable SPAN.clsNotRequired[contenteditable]:focus:empty
+{
+    background-color: Highlight;
+    color: HighlightText;
+    caret-color: HighlightText;
+}
+
+/* Keep the enablement placeholder invisible (nbsp only) */
+TABLE.exodusform INPUT.clsRequired::placeholder,
+TABLE.exodusform INPUT.clsNotRequired::placeholder,
+TABLE.exodustable INPUT.clsRequired::placeholder,
+TABLE.exodustable INPUT.clsNotRequired::placeholder,
+TABLE.exodusform TEXTAREA.clsRequired::placeholder,
+TABLE.exodusform TEXTAREA.clsNotRequired::placeholder
+{
+    color: transparent;
+    opacity: 0;
+}
+
 BODY
 {
     /*background: #ffffff;*/
@@ -1260,6 +1294,23 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     border: none;
     border-bottom: 1.7px dotted var(--exodus-dotcolor);
     color: #ffffff;
+}
+
+/* Empty focus fill must win over transparent dark-mode field faces */
+:root[data-theme="dark_mode"] TABLE.exodusform INPUT.clsRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+:root[data-theme="dark_mode"] TABLE.exodusform INPUT.clsNotRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+:root[data-theme="dark_mode"] TABLE.exodustable INPUT.clsRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+:root[data-theme="dark_mode"] TABLE.exodustable INPUT.clsNotRequired:focus:placeholder-shown:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]),
+:root[data-theme="dark_mode"] TABLE.exodusform TEXTAREA.clsRequired:focus:placeholder-shown,
+:root[data-theme="dark_mode"] TABLE.exodusform TEXTAREA.clsNotRequired:focus:placeholder-shown,
+:root[data-theme="dark_mode"] TABLE.exodusform SPAN.clsRequired[contenteditable]:focus:empty,
+:root[data-theme="dark_mode"] TABLE.exodusform SPAN.clsNotRequired[contenteditable]:focus:empty,
+:root[data-theme="dark_mode"] TABLE.exodustable SPAN.clsRequired[contenteditable]:focus:empty,
+:root[data-theme="dark_mode"] TABLE.exodustable SPAN.clsNotRequired[contenteditable]:focus:empty
+{
+    background-color: Highlight;
+    color: HighlightText;
+    caret-color: HighlightText;
 }
 
 :root[data-theme="dark_mode"] .clsReadOnly {
