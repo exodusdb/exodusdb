@@ -91,7 +91,7 @@
     <li><strong>Wait/Cancel (Gate B):</strong> Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on <code>db.send</code> XHR. No main-line form dbio from Gate B.</li>
     <li><strong>Public commencement API (only three):</strong> <code>exodus_begin</code> (business), <code>exodus_begin_if_idle</code> (background), <code>exodus_begin_waitcancel</code> (Wait/Cancel). <code>startAsyncFlow</code> is a deprecated alias of <code>exodus_begin</code>.</li>
     <li><strong>Flight log:</strong> Quiet by default. Enable with <code>?logflights=1</code> or <code>glogflights=true</code>.</li>
-    <li><strong>Legacy generators:</strong> Framework scripts have <strong>no</strong> live <code>function*</code> / <code>yield*</code>. Resume path kept for app modules still on generators.</li>
+    <li><strong>No generators:</strong> <code>function*</code> / <code>yield*</code> are not supported — use <code>async</code>/<code>await</code> only (stage 6).</li>
     <li><strong>UI conventions:</strong> Modal dialogs, <code>class="exodusform"</code> tables, input <code>id</code>s matching dictionary codes, heavy use of <code>gparameters</code>.</li>
     <li><strong>Data delimiters:</strong> <code>rm</code>, <code>fm</code>, <code>vm</code>, <code>sm</code>, <code>tm</code>, <code>stm</code> (and their regex versions).</li>
     <li><strong>Security model:</strong> PHP sessions (the real auth) + namespaced tokens. <code>exodussecurity('TASK')</code>. Once a valid session exists, the web layer trusts it.</li>
@@ -218,10 +218,11 @@ async function save_onclick() {
 
 <p>Optional background work (session keepalive, relock) uses <code>exodus_begin_if_idle</code> — <strong>skip</strong> if busy (never uses the queue).</p>
 
-<p><strong>Legacy <code>function*</code> / <code>yield*</code> (temporary):</strong> Exodus framework scripts are async-only. App modules and dict <code>functioncode</code> may still be generators and use <code>exodusneweventhandler</code> / <code>exodus_resume</code>. Do not add new generators; convert leftovers so that path can be deleted.</p>
+<p><strong>No <code>function*</code> / <code>yield*</code>:</strong> Generators are removed (stage 6). Use <code>async</code>/<code>await</code> only. Form hooks and dict <code>functioncode</code> must not be generators.</p>
 
 <div class="note">
-<strong>Do not</strong> use free-running <code>setTimeout(async () =&gt; …)</code> or rely on <code>exodussettimeout('await myfunc()')</code> as a second event system. Prefer <code>await myfunc()</code> inside the current handler. If you must defer after the current flight (e.g. non-modal UI that must outlive the click), schedule with a short timeout that calls <code>exodus_begin(myfunc, 'label')</code>.
+<strong>Do not</strong> use free-running <code>setTimeout(async () =&gt; …)</code> or rely on <code>exodussettimeout('await myfunc()')</code> as a second event system. Prefer <code>await myfunc()</code> inside the current handler. Defer after the current flight with <code>exodus_begin_when_idle(myfunc, 'label', { delay_ms: 10 })</code> — retries until free, then <strong>systemerror</strong> if still busy (never silent skip). Required <code>exodus_begin</code> while busy also systemerrors; only <code>exodus_begin_if_idle</code> may skip quietly.
+<p><strong>form_postread vs form_postdisplay:</strong> <code>opendoc2</code> runs <code>form_postread</code> → <code>gds.load</code> → <code>form_postdisplay</code>. Anything that needs bound DOM rows (<code>form_filter</code>, per-row readonly, images) belongs in <code>form_postdisplay</code>, not same-flight <code>await</code> from <code>form_postread</code>. Historical timeouts around postpostread meant “after open finishes,” not “nested await before load.”
 </div>
 
 <h3>Modal Dialogs</h3>

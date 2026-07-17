@@ -2493,7 +2493,10 @@ async function document_onkeydown2(event) {
         if (event.shiftKey && event.ctrlKey) {
             gstepping = true
             var _b = exodusbreak('', 'F12', '');
-            if (_b && _b.next) exodusneweventhandler(_b, 'F12');
+            if (exodusisasyncfunction(_b))
+                exodus_begin_when_idle(_b, 'F12', { delay_ms: 0 })
+            else if (_b && typeof _b.next === 'function')
+                systemerror('document_onkeydown', 'function* break handler removed (stage 6)')
             return exoduscancelevent(event)
         }
 
@@ -7216,7 +7219,8 @@ async function form_deleterow(event, element) {
         if (p && typeof p.then === 'function') {
             p = await p;
         } else if (p && typeof p.next === 'function') {
-            p = exodusneweventhandler(p, 'predeleterow').value;
+            systemerror('deleterow', 'form_predeleterow must be async (generators removed stage 6)')
+            return false
         }
         if (!p)
             return false //logout('deleterow - predelete false')
@@ -7265,7 +7269,7 @@ async function form_deleterow(event, element) {
         if (p && typeof p.then === 'function') {
             await p;
         } else if (p && typeof p.next === 'function') {
-            exodusneweventhandler(p, 'postdeleterow');
+            systemerror('deleterow', 'form_postdeleterow must be async (generators removed stage 6)')
         }
     }
 
@@ -7576,7 +7580,8 @@ async function form_insertrow(event, append) {
         if (p && typeof p.then === 'function') {
             p = await p;
         } else if (p && typeof p.next === 'function') {
-            p = exodusneweventhandler(p, 'preinsertrow').value;
+            systemerror('insertrow', 'form_preinsertrow must be async (generators removed stage 6)')
+            return false
         }
         if (!p)
             return false //logout('insertrow - preinsert false')
@@ -7610,11 +7615,11 @@ async function form_insertrow(event, append) {
         if (p && typeof p.then === 'function') {
             await p;
         } else if (p && typeof p.next === 'function') {
-            exodusneweventhandler(p, 'postinsertrow');
+            systemerror('insertrow', 'form_postinsertrow must be async (generators removed stage 6)')
         }
     }
 
-    //focus on first column of new row (after running postinsert routine to avoid event within event - if postinsert yields for some user input for example)
+    //focus on first column of new row (after running postinsert routine)
     if (!append) {
         if (document.getElementsByClassName)
             focuson(row.getElementsByClassName('exodusid_' + id)[0])
@@ -8139,7 +8144,10 @@ async function getkeyexternal() {
 async function debug(v) {
     if (!(confirm(v))) {
         var _b = exodusbreak();
-        if (_b && _b.next) exodusneweventhandler(_b, 'break');
+        if (exodusisasyncfunction(_b))
+            await exodus_begin(_b, 'break')
+        else if (_b && typeof _b.next === 'function')
+            systemerror('debug', 'function* break handler removed (stage 6)')
     }
 }
 
@@ -8342,16 +8350,18 @@ async function form_onrightclick(event) {
 }
 
 // Raw onblur/onfocus from DOM filter input — enter Gate A (form_filter is async).
+// when_idle: these handlers bypass starteventhandler/gblockevents, so a one-shot
+// begin during an open flight would systemerror; wait for land instead.
 function form_filter_onblur_sync(groupno, elem) {
-    void exodus_begin(function () {
+    exodus_begin_when_idle(function () {
         return form_filter('filterall', groupno, null, null, elem)
-    }, 'form_filter filterall')
+    }, 'form_filter filterall', { delay_ms: 0 })
 }
 
 function form_filter_onfocus_sync(groupno, elem) {
-    void exodus_begin(function () {
+    exodus_begin_when_idle(function () {
         return form_filter('filterfocus', groupno, null, null, elem)
-    }, 'form_filter filterfocus')
+    }, 'form_filter filterfocus', { delay_ms: 0 })
 }
 
 async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
@@ -8590,9 +8600,7 @@ async function form_pop_calendar() {
     // flight flashes: LANDING → exoduspopup focuson(date) → form_closepopups hides it.
     // Contract: return null so exoduspopup refocuses the date field first; open after
     // that focus chain settles (same timing as the old setTimeout open).
-    window.setTimeout(function () {
-        void exodus_begin(form_popcalendar2, 'form_popcalendar2')
-    }, 100)
+    exodus_begin_when_idle(form_popcalendar2, 'form_popcalendar2', { delay_ms: 100 })
     return null
 }
 

@@ -215,22 +215,33 @@ async function form_postread() {
 
     gtasks_updatehighergroups = await exodussecurity('AUTHORISATION UPDATE HIGHER GROUPS')
 
-    await authorisation_postdisplay()
+    // authorisation_postdisplay (form_filter / per-row readonly) runs in form_postdisplay
+    // after gds.load — was historically setTimeout, not same-flight postread await.
 
     return true
 
 }
 
+// After gds.load — form_filter needs bound table rows.
+async function form_postdisplay() {
+    await authorisation_postdisplay()
+    return true
+}
+
 async function authorisation_postdisplay() {
 
-    //hide expired users
-    await form_filter('filter', 'EXPIRY_DATE', /[0123456789]/)
-    
-    //hide similar tasks
-    await form_filter('filter', 'HIDDEN_LINES', /1/)
+    // Shared with hourlyrates (subset dict) — only filter columns that exist.
+    if (gds.dictitem('EXPIRY_DATE'))
+        //hide expired users
+        await form_filter('filter', 'EXPIRY_DATE', /[0123456789]/)
+
+    if (gds.dictitem('HIDDEN_LINES'))
+        //hide similar tasks
+        await form_filter('filter', 'HIDDEN_LINES', /1/)
 
     //prevent changing username of groups ("users" with keys) or group separator lines (blank lines)
-    if (!(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) {
+    if (gds.dictitem('USER_ID') && gds.dictitem('KEYS')
+        && !(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) {
         var userids = await gds.getall('USER_ID')
         var keys = await gds.getall('KEYS')
         for (var ln = keys.length - 1; ln >= 0; --ln) {

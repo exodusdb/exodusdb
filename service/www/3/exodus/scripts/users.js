@@ -16,10 +16,10 @@ async function form_postinit() {
         }
         exodussetcookie(glogincode, 'EXODUS2', '', 'wn')
         exodussetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
-        // Defer open so form finishes init; takeoff via Gate A when free (never ungated await timeout)
-        window.setTimeout(function () {
-            void exodus_begin(function () { return windowopen(gwhatsnew) }, 'users whatsnew')
-        }, 1000)
+        // Defer open so form finishes init; takeoff when Gate A free (fail loud if not)
+        exodus_begin_when_idle(function () { return windowopen(gwhatsnew) }, 'users whatsnew', {
+            delay_ms: 1000
+        })
     }
 
     return true
@@ -45,6 +45,9 @@ async function form_postdisplay() {
         //if (true||!loginstatus.exoduslocate('OK'))
         //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
     }
+
+    // After gds.load (not form_postread): form_filter and signature img need bound rows.
+    await users_postdisplay()
 
     return true
 }
@@ -126,11 +129,6 @@ async function users_postdisplay() {
                 $expiryelement.innerHTML = '<font color=red>&nbsp;&nbsp;&nbsp;'+text+'</font>'
         }
     }
-    return true
-}
-
-async function form_postread() {
-    await users_postdisplay()
     return true
 }
 

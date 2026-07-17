@@ -820,6 +820,18 @@ function dbsend_release_modal(xhttp, dbmodalblocked) {
 // Everything else (starteventhandler, *_sync bridges, timeouts) must funnel
 // into one of these. Do not add a fourth commencement path.
 //
+// Deferral helper (not a fourth gate — always ends in exodus_begin):
+//   exodus_begin_when_idle(fn, label[, { delay_ms, max_wait_ms }])
+// Use for post-land work (opendoc next key, popup → openrecord, DATE peer setx).
+// Retries until Gate A is free; systemerror if still busy after max_wait_ms.
+// Prefer this over one-shot setTimeout→exodus_begin (silent SKIP with queue_max 0).
+//
+// Do NOT convert historical setTimeout post-open hooks into same-flight await
+// from form_postread — that runs before gds.load. Prefer form_postdisplay.
+//
+// Fail loud: required Gate A takeoff that cannot run (busy + full wait list)
+// calls systemerror. Optional work uses exodus_begin_if_idle (silent skip OK).
+//
 // Gate B entry — only from uiblocker while a lazy db.send wait is active.
 // Does not go through exodus_begin (Gate A is airborne during db.send; Gate B must run now).
 function exodus_begin_waitcancel(source) {
@@ -1302,73 +1314,24 @@ function exodus_autoresume() {
 
 }
 
-// LEGACY GENERATOR RUNTIME (stage 1 audit 2026-07-17)
-// =====================================================
-// Exodus framework scripts have ZERO live function*/yield* (async/await only).
-// This path is retained solely for app modules (e.g. Neosys) and dynamic dict
-// functioncode that still return generators. Remove after those are converted
-// (rationalisation stage 6). Until then: geventhandler + exodus_resume/next +
-// the generator branch of exodusneweventhandler stay live.
-//
-// Resume a yielded geventhandler, after closing the modal uiblocker.
-// Callers historically: child window close, XHR complete, confirm buttons.
-// Modern async flights use Promise resolvers (gpendingConfirm/DialogResolve);
-// these resume helpers are only needed while a generator is the owner.
+// Generator resume path removed (rationalisation stage 6, 2026-07-17).
+// Framework and app modules are async/await only. Stubs remain so accidental
+// calls fail loudly instead of silently no-op.
 function exodus_resume(value, source) {
-
-	logevent(' ')
-	logevent('exodus_resume  <in ' + value + ' from ' + source + ')')
-
-	//clear ui and stop resumer before resuming
-	//because .next() will run to the next async/ui occurrence in the current event process
-	unblockmodalui_sync()
-
-	//give the result (value) to the yielded and now resuming code
-	//result = yield 'xxxxxxxxxxxxx'
-	var next = exodus_next(value, 'exodus_resume from ' + source)
-
-	logevent('exodus_resumed out> ' + next.value + ') from ' + source + ')')
-
-	//probably no purpose in returning this since we are not using generator functions to acquire values,
-	//only to act as suspended functions until some data they need is acquired asynchronously from exodusdiv, child window, xmlhttp
-	return next.value
-
+	systemerror(
+		'exodus_resume',
+		'Generator resume removed (stage 6). Source: ' + source
+		+ '. Convert remaining function* to async/await.'
+	)
+	return value
 }
 
 function exodus_next(value, source) {
-
-	logevent('  ==> BEFORE NEXT EVENTHANDLER from ' + source + ' - value in:' + value + ' ===')
-
-	///////////////////////////////////////////////////////////////
-	//very important code either a) starts a "suspendable" function
-	//or b) resumes a suspended function passing a value into it
-	///////////////////////////////////////////////////////////////
-
-	//all new events are blocked while our event handler (generator function) is not "done"
-	//"done" means that the function has returned (not yielded)
-	//this is because it is a global variable so our exodus_resume function knows what to resume
-	if (!gblockevents)
-		form_blockevents(true, source)
-
-	if (!geventhandler) {
-		logevent('  <== exodus_next: no geventhandler (ignored) from ' + source)
-		return { done: true, value: value }
-	}
-
-	var next = geventhandler.next(value)
-
-	logevent('  <== AFTER NEXT EVENTHANDLER from ' + source + ' ===')
-	logevent('	  done:' + next.done + ' value out:' + next.value)
-
-	if (next.done) {
-		form_blockevents(false, source)
-		//following should not be necessary since
-		//if our event handler does not yield anywhere then it will not be created
-		//and if our event handle DOES yield then it will be cleared in exodus_resume
-		unblockmodalui_sync()
-	}
-
-	return next
+	systemerror(
+		'exodus_next',
+		'Generator step removed (stage 6). Source: ' + source
+	)
+	return { done: true, value: value }
 }
 
 function displayresponsedata_sync(request, data) {
@@ -5390,32 +5353,29 @@ function starteventhandler(eventfunctionname, functionx) {
 			return exodus_begin(functionx, eventdescription + ' (async) in starteventhandler', event)
 		}
 
-		// LEGACY: non-async handler may be a generator factory (app modules).
-		// Framework code is async; this branch exists for remaining function* apps.
-		var eventhandler = functionx(event)
-		if (!eventhandler) {
-			var msg1 = 'exodus_anon_sync_event_handler ' + eventfunctionname + ' ' + event.target
-			var msg2 = 'cant create functionx ' + functionx.name
-			logevent(msg1 + ' : ' + msg2)
-		} else {
-			var next = exodusneweventhandler(eventhandler, eventdescription + ' in exodus_anon_sync_event_handler')
-			var result = next.value
-			// onbeforeunload may return text immediately
-			if (result)
-				event.returnValue = result
-			else
-				result = false
-			return result
+		// Sync handler (e.g. onbeforeunload text): run to completion, no gate.
+		var result = functionx(event)
+		if (exodusisgeneratoriterator(result)) {
+			systemerror(
+				'starteventhandler',
+				'function* handlers are no longer supported (' + eventdescription
+				+ '). Convert to async function.'
+			)
+			return exoduscancelevent(event)
 		}
+		if (result)
+			event.returnValue = result
+		else
+			result = false
+		return result
 	}
 }
 
-var geventhandler
+// geventhandler was the global generator owner; kept null for any leftover reads.
+var geventhandler = null
 var geventn = 0
 
-// Used during conversion of the confirm/decide leaf (Phase 1) so that button/key/click
-// handlers resolve a Promise instead of directly calling exodus_resume.
-// The fromPromise adapter then feeds the value into the normal geventhandler machinery.
+// Confirm/decide leaf: button/key/click handlers resolve a Promise (Gate A or B).
 var gpendingConfirmResolve
 // Owner of gpendingConfirmResolve: 'A' (Gate A business), 'B' (Gate B wait/cancel), or null.
 // Force-close paths must pass expectedOwner so A and B cannot cross-wire.
@@ -5476,17 +5436,30 @@ function exodus_flight_log(msg) {
 		logevent('[exodus flight] ' + msg)
 }
 
+// Visible failure when required work cannot start (prefer this over silent no-op).
+function exodus_flight_skip_error(location, reason) {
+	var msg = 'Action not started: "' + (location || 'unknown') + '". ' + reason
+		+ '\n\nThis is a Gate A conflict (exclusive async). Fix: await inside the'
+		+ ' current flight, or schedule with exodus_begin_when_idle after land.'
+	exodus_flight_log('SKIP ERROR "' + location + '": ' + reason)
+	if (typeof console != 'undefined' && console.error)
+		console.error('[exodus flight] ' + msg)
+	systemerror('exodus_begin', msg)
+}
+
 // Public API #1 of 3 — exclusive Gate A business async.
 // Returns Promise of { value, done: true }, or null if skipped (busy + full wait list).
+// Skip is a hard visible error — required work must not vanish.
 function exodus_begin(asyncHandler, location, event) {
 	location = location || 'unknown'
 	if (g_exodus_flow) {
 		// Only the wait list is size-limited; airborne is tracked in g_exodus_flow.
 		if (g_exodus_flow_queue.length >= g_exodus_flow_queue_max) {
-			exodus_flight_log(
-				'SKIP "' + location + '" (airborne #' + g_exodus_flow.n
-				+ ' "' + g_exodus_flow.location + '", queue_max='
-				+ g_exodus_flow_queue_max + ')'
+			exodus_flight_skip_error(
+				location,
+				'Already busy with flight #' + g_exodus_flow.n
+				+ ' "' + g_exodus_flow.location + '" (queue_max='
+				+ g_exodus_flow_queue_max + ').'
 			)
 			return Promise.resolve(null)
 		}
@@ -5506,6 +5479,37 @@ function exodus_begin(asyncHandler, location, event) {
 		})
 	}
 	return exodus_begin_run(asyncHandler, location, event)
+}
+
+// Schedule required work after the current flight lands. Not a fourth gate —
+// only retries until exodus_begin can take off. systemerror if still busy after
+// max_wait_ms (default 30s). Prefer over one-shot setTimeout→exodus_begin.
+function exodus_begin_when_idle(asyncHandler, location, options) {
+	options = options || {}
+	var delay_ms = typeof options.delay_ms == 'number' ? options.delay_ms : 1
+	var max_wait_ms = typeof options.max_wait_ms == 'number' ? options.max_wait_ms : 30000
+	var retry_ms = typeof options.retry_ms == 'number' ? options.retry_ms : 10
+	location = location || 'when_idle'
+	var t0 = Date.now()
+
+	function try_start() {
+		if (g_exodus_flow) {
+			if (Date.now() - t0 > max_wait_ms) {
+				exodus_flight_skip_error(
+					location,
+					'Still busy after ' + max_wait_ms + 'ms with flight #'
+					+ g_exodus_flow.n + ' "' + g_exodus_flow.location + '".'
+				)
+				return
+			}
+			window.setTimeout(try_start, retry_ms)
+			return
+		}
+		// Race: another takeoff between check and begin — begin will systemerror.
+		void exodus_begin(asyncHandler, location)
+	}
+
+	window.setTimeout(try_start, delay_ms)
 }
 
 async function exodus_begin_run(asyncHandler, location, event) {
@@ -5570,7 +5574,7 @@ function exodus_begin_if_idle(asyncHandler, location) {
 }
 
 // Internal bridge from *_sync / HTML attribute handlers — not a fourth gate.
-// Async → exodus_begin; generator → legacy exodusneweventhandler; else sync.
+// Async → exodus_begin; else sync (generators rejected stage 6).
 function exodusinvokesynctarget(target, args, location) {
 	args = args || []
 	if (exodusisasyncfunction(target)) {
@@ -5579,8 +5583,8 @@ function exodusinvokesynctarget(target, args, location) {
 	}
 	var result = target.apply(null, args)
 	if (exodusisgeneratoriterator(result)) {
-		void exodusneweventhandler(result, location)
-		return result
+		systemerror('exodusinvokesynctarget', 'function* removed (stage 6) at ' + location)
+		return
 	}
 	if (exodusispromise(result)) {
 		void exodus_begin(function () { return result }, location)
@@ -5595,20 +5599,24 @@ function exodusinvokesynctargetreturn(target, args, location) {
 	if (exodusisasyncfunction(target))
 		return exodus_begin(function () { return target.apply(null, args) }, location)
 	var result = target.apply(null, args)
-	if (exodusisgeneratoriterator(result))
-		return exodusneweventhandler(result, location).value
+	if (exodusisgeneratoriterator(result)) {
+		systemerror('exodusinvokesynctargetreturn', 'function* removed (stage 6) at ' + location)
+		return false
+	}
 	if (exodusispromise(result))
 		return exodus_begin(function () { return result }, location)
 	return result
 }
 
-// Normalise a call result inside an async function (await promise or kick generator).
+// Normalise a call result inside an async function (await promise only).
 async function exodusawaitresult(result, location) {
 	if (!result) return result
 	if (exodusispromise(result))
 		return await result
-	if (exodusisgeneratoriterator(result))
-		return exodusneweventhandler(result, location).value
+	if (exodusisgeneratoriterator(result)) {
+		systemerror('exodusawaitresult', 'function* removed (stage 6) at ' + location)
+		return false
+	}
 	return result
 }
 
@@ -5622,39 +5630,26 @@ function exodusfireandforget(result, location) {
 		return
 	}
 	if (exodusisgeneratoriterator(result))
-		void exodusneweventhandler(result, location)
+		systemerror('exodusfireandforget', 'function* removed (stage 6) at ' + location)
 }
 
+// Historical name: async → Gate A. Generators no longer accepted (stage 6).
 function exodusneweventhandler(eventhandler, location) {
-
 	++geventn
 	logevent(' ')
 	logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
-
-	// Preferred path: async function → exclusive Gate A.
 	if (exodusisasyncfunction(eventhandler))
 		return exodus_begin(eventhandler, location)
-
-	// LEGACY generator path (see block above exodus_resume). Log so remaining
-	// app function* show up in the flight console during soak.
 	if (exodusisgeneratoriterator(eventhandler)) {
-		exodus_flight_log(
-			'LEGACY GENERATOR #' + geventn + ' "' + location + '"'
-			+ (eventhandler.constructor && eventhandler.constructor.name
-				? ' (' + eventhandler.constructor.name + ')' : '')
+		systemerror(
+			'exodusneweventhandler',
+			'function* / generators removed (stage 6) at ' + location
+			+ '. Convert to async function.'
 		)
-	} else {
-		exodus_flight_log(
-			'LEGACY HANDLER #' + geventn + ' "' + location
-			+ '" (not AsyncFunction; treating as generator/iterator)'
-		)
+		return { done: true, value: false }
 	}
-
-	geventhandler = eventhandler
-
-	// Run to first yield or completion.
-	var next = exodus_next('', 'exodusneweventhandler from ' + location)
-	return next
+	// Sync result already produced by a pre-invoked non-async handler.
+	return { done: true, value: eventhandler }
 }
 
 function addeventlistener(element, eventname, functionx) {
@@ -5777,8 +5772,8 @@ function exodusint2date(exodusdate) {
 
 // Thin timeout wrapper. Prefer await inside the current Gate A flight.
 // Preferred deferral of async work (stage 3):
-//   window.setTimeout(function () { void exodus_begin(myfunc, 'label') }, ms)
-//   or exodussettimeout(myAsyncFn, ms)  — AsyncFunction → delayed exodus_begin
+//   exodus_begin_when_idle(myfunc, 'label', { delay_ms: ms })
+//   or exodussettimeout(myAsyncFn, ms)  — AsyncFunction → when_idle then begin
 // String 'await …' / 'yield* …' is legacy (eval via new Function); do not add more.
 function exodussettimeout(command, milliseconds) {
 	if (glogsettimeout)
@@ -5786,8 +5781,9 @@ function exodussettimeout(command, milliseconds) {
 	if (typeof command == 'function') {
 		if (exodusisasyncfunction(command)) {
 			var label = 'timeout ' + (command.name || 'fn')
+			// Must not one-shot begin while still airborne (silent miss → when_idle).
 			return window.setTimeout(function () {
-				void exodus_begin(command, label)
+				exodus_begin_when_idle(command, label, { delay_ms: 0 })
 			}, milliseconds)
 		}
 		return window.setTimeout(command, milliseconds)
@@ -5796,18 +5792,18 @@ function exodussettimeout(command, milliseconds) {
 		exodus_flight_log('LEGACY STRING TIMEOUT "' + command + '"')
 		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
 		return window.setTimeout(function () {
-			void exodustimeout_async_sync(command)
+			exodus_begin_when_idle(function () {
+				return exodustimeout_async_run(command)
+			}, 'timeout ' + command, { delay_ms: 0 })
 		}, milliseconds)
 	}
 	return window.setTimeout(command, milliseconds)
 }
 
-// LEGACY: run a string expression under Gate A (only via exodussettimeout string path).
-async function exodustimeout_async_sync(command) {
-	await exodus_begin(async function () {
-		var fn = new Function('return ' + command)
-		return await fn()
-	}, 'timeout ' + command)
+// LEGACY: evaluate a string expression under Gate A (via exodussettimeout string path).
+async function exodustimeout_async_run(command) {
+	var fn = new Function('return ' + command)
+	return await fn()
 }
 
 // Interval wrapper. Prefer function callbacks; AsyncFunction → exodus_begin_if_idle each tick.
@@ -6507,8 +6503,6 @@ function resolvePendingConfirm(value, source, expectedOwner) {
 		return true
 	}
 	// No pending confirm — ignore duplicate clicks after the dialog already resolved.
-	if (geventhandler)
-		exodus_resume(value, source)
 	return false
 }
 
@@ -6533,9 +6527,6 @@ function resolvePendingDialog(value, source, expectedOwner) {
 		resolver(value)
 		return true
 	}
-	// Fallback for safety during incremental conversion.
-	if (geventhandler)
-		exodus_resume(value, source)
 	return false
 }
 
@@ -7753,15 +7744,12 @@ function DATE(mode, value, params) {
 			//update the otherdate
 			if (otherdate !== otherdate0) {
 
-				// Allowed deferral (sync oconv cannot await; queue_max is 0).
-				// Feature-local: after this turn, Gate A is usually free for peer setx.
-				// Longer-term: async date conversion end-to-end would avoid this hop.
+				// Sync DATE iconv cannot await. Peer setx after current flight lands.
+				// when_idle retries; systemerror if still busy (never silent drop).
 				;(function (id, recn, val) {
-					window.setTimeout(function () {
-						void exodus_begin(function () {
-							return gds.setx(id, recn, val)
-						}, 'date-fromto setx ' + id)
-					}, 1)
+					exodus_begin_when_idle(function () {
+						return gds.setx(id, recn, val)
+					}, 'date-fromto setx ' + id, { delay_ms: 1 })
 				})(otherdateid, grecn, otherdate)
 			}
 

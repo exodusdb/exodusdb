@@ -22,7 +22,7 @@ The framework originated in an era of older browsers and cooperative generators;
 - **Wait/Cancel (Gate B):** Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on `db.send` XHR. No main-line form dbio from Gate B.
 - **Public commencement API (only three):** `exodus_begin` (business), `exodus_begin_if_idle` (background), `exodus_begin_waitcancel` (Wait/Cancel). No fourth entry path. `startAsyncFlow` is a deprecated alias of `exodus_begin`.
 - **Flight log:** Quiet by default. Enable with `?logflights=1` or `glogflights=true` in the console (`[exodus flight] TAKEOFF|LANDING|SKIP|…`).
-- **Legacy generators:** Framework scripts have **no** live `function*` / `yield*`. A generator resume path (`geventhandler`, `exodus_resume`, `exodusneweventhandler` non-async branch) remains for app modules and dict `functioncode` still on generators. Remove after apps are fully async.
+- **No generators:** `function*` / `yield*` are not supported. Use `async`/`await` only. Accidental generators fail with `systemerror` (stage 6).
 - **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
 - **Security model:** PHP sessions (the real auth) + namespaced tokens. `exodussecurity('TASK')`. Once a valid session exists, the web layer trusts it.
@@ -149,17 +149,21 @@ DOM events, HTM `*_sync` bridges, and deferred work all enter **Gate A** (`exodu
 
 Optional background work (session keepalive, relock) uses `exodus_begin_if_idle` — **skip** if busy (never uses the queue).
 
-### Legacy `function*` / `yield*` (temporary)
+### No `function*` / `yield*`
 
-| Layer | Status |
-|-------|--------|
-| Exodus `scripts/*.js` | **No** live generators (async only) |
-| App modules (e.g. Neosys) | Some `function*` remain — still use the legacy resume path |
-| Dict `functioncode` | May still be a generator; framework detects `.next` and runs via `exodusneweventhandler` |
+Generators are **removed** (stage 6). Framework and app modules use `async`/`await` only. Form hooks (`form_predeleterow`, etc.) and dict `functioncode` must be async or sync — not generators.
 
-Do **not** add new generators. Convert leftovers to `async`/`await` so the legacy path can be deleted.
+**Do not** use free-running `setTimeout(async () => …)` or rely on `exodussettimeout('await myfunc()')` as a second event system. Prefer `await myfunc()` inside the current handler. If you must defer after the current flight (e.g. next `opendoc`, popup → openrecord), use:
 
-**Do not** use free-running `setTimeout(async () => …)` or rely on `exodussettimeout('await myfunc()')` as a second event system. Prefer `await myfunc()` inside the current handler. If you must defer after the current flight (e.g. non-modal UI that must outlive the click), schedule with a short timeout that calls `exodus_begin(myfunc, 'label')`.
+```js
+exodus_begin_when_idle(myfunc, 'label', { delay_ms: 10 })
+```
+
+That retries until Gate A is free, then `exodus_begin`. If still busy after 30s → **systemerror** (visible). Do not one-shot `setTimeout` → `exodus_begin` (with `queue_max = 0` that used to **silently skip**).
+
+Required `exodus_begin` while another flight is airborne (and the wait list is full) also **systemerror**s. Optional background work uses `exodus_begin_if_idle` (silent skip is intentional).
+
+**`form_postread` vs `form_postdisplay`:** `opendoc2` runs `form_postread` → `gds.load` → `form_postdisplay`. Anything that needs bound DOM rows (`form_filter`, per-row `exodussetreadonly`, signature/logo images) belongs in `form_postdisplay`, not same-flight `await` from `form_postread`. Historical `setTimeout('…postpostread…')` meant “after open finishes,” not “nested await before load.”
 
 ### Modal Dialogs
 
