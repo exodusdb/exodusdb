@@ -1005,12 +1005,19 @@ function modalblock_create() {
 
 	document.body.insertBefore(blocker, null)
 
+	// Gate A calls blockmodalui on every flight (including document_onfocus while
+	// tabbing fields). overflow:hidden on html/body often clamps the viewport to
+	// the top — save and restore scroll so field focus does not "home" the form.
+	// Scroll lock itself is still needed so the page cannot move under confirms.
 	gmodalblock_savedoverflow = {
 		body: document.body.style.overflow,
-		html: document.documentElement.style.overflow
+		html: document.documentElement.style.overflow,
+		x: window.pageXOffset || 0,
+		y: window.pageYOffset || 0
 	}
 	document.body.style.overflow = 'hidden'
 	document.documentElement.style.overflow = 'hidden'
+	window.scrollTo(gmodalblock_savedoverflow.x, gmodalblock_savedoverflow.y)
 	modalblock_bind_capture()
 
 	//keep focus off parent window and on child window or exodusdiv
@@ -1072,9 +1079,12 @@ function modalblock_destroy() {
 	}
 
 	if (gmodalblock_savedoverflow) {
+		var sx = gmodalblock_savedoverflow.x || 0
+		var sy = gmodalblock_savedoverflow.y || 0
 		document.body.style.overflow = gmodalblock_savedoverflow.body
 		document.documentElement.style.overflow = gmodalblock_savedoverflow.html
 		gmodalblock_savedoverflow = null
+		window.scrollTo(sx, sy)
 	}
 
 	modalblock_unbind_capture()
