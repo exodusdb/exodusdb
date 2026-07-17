@@ -997,14 +997,6 @@ async function formfunctions_onload() {
                     element.className = elementclassname
             }
 
-            // Invisible nbsp placeholder: enables :placeholder-shown when empty so
-            // focus can fill the data width like a full text selection (global.css).
-            if ((element.tagName == 'INPUT' || element.tagName == 'TEXTAREA')
-                && element.type != 'radio' && element.type != 'checkbox'
-                && element.type != 'button' && element.type != 'submit' && element.type != 'image'
-                && !element.getAttribute('placeholder'))
-                element.setAttribute('placeholder', '\u00a0')
-
             if (element.tagName.match(gtexttagnames) && element.size != 1 && element.getAttribute('exoduslength')
                 && element.type != 'radio' && element.type != 'checkbox')
                 exodus_apply_field_width(element, parseInt(element.getAttribute('exoduslength'), 10), exodus_field_width_char(element))
@@ -4666,9 +4658,13 @@ async function deletedoc() {
 }
 
 async function form_oninput(event) {
+    event = getevent(event)
+    // Drop empty-focus fill as soon as the user types
+    if (event && event.target)
+        exodus_update_empty_focus_fill(event.target)
+
     if (gchangesmade)
         return true
-    event = getevent(event)
 
     //changing key fields does not cause gchangesmade
     var fn = Number(event.target.getAttribute('exodusfieldno'))
@@ -5131,8 +5127,45 @@ function focuson2() {
         if (focusonelement.select)
             focusonelement.select()
 
+        exodus_update_empty_focus_fill(focusonelement)
+
     }
     catch (e) { }
+
+}
+
+// Selection-like fill for empty focused fields (see .exodus-empty-focus in global.css).
+function exodus_update_empty_focus_fill(element) {
+
+    var stale = document.getElementsByClassName('exodus-empty-focus')
+    for (var i = stale.length - 1; i >= 0; i--) {
+        if (stale[i] !== element)
+            stale[i].classList.remove('exodus-empty-focus')
+    }
+
+    if (!element || !element.classList)
+        return
+
+    if (!element.classList.contains('clsRequired') && !element.classList.contains('clsNotRequired'))
+        return
+
+    var empty = false
+    if (element.tagName == 'INPUT' || element.tagName == 'TEXTAREA') {
+        if (element.type == 'radio' || element.type == 'checkbox'
+            || element.type == 'button' || element.type == 'submit' || element.type == 'image')
+            return
+        empty = !String(element.value == null ? '' : element.value).length
+    }
+    else if (element.isContentEditable || element.contentEditable == 'true') {
+        empty = !String(element.innerText || element.textContent || '').replace(/\u00a0/g, '').length
+    }
+    else
+        return
+
+    if (document.activeElement === element && empty)
+        element.classList.add('exodus-empty-focus')
+    else
+        element.classList.remove('exodus-empty-focus')
 
 }
 
@@ -5389,6 +5422,9 @@ async function document_onfocus(event) {
             }
 
         } catch (e) { }
+
+    // After setdefault/select — empty multirow fields often missed :placeholder-shown
+    exodus_update_empty_focus_fill(element)
 
     //log('focus on current or next element')
     //this is not necessary unless .select() is used above
