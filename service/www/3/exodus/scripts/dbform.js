@@ -4143,8 +4143,7 @@ async function opendoc2(newkey0) {
     //hide the enter button
     //setdisabledandhidden(enter,true)
 
-    //postdisplay (in opendoc2 and )
-    //TODO convert all postpostread( to use this new hook function instead of timeout
+    //postdisplay (in opendoc2 and cleardoc) — after gds.load; use for bound-DOM / per-row work
     if (typeof form_postdisplay == 'function') {
         grecn = null
         if (!(await exodusevaluateall('await form_postdisplay()', 'await opendoc2()'))) {
@@ -4553,8 +4552,7 @@ async function cleardoc() {
     //force any updates to be validated
     await validateupdate()
 
-    //postdisplay in cleardoc and postinit
-    //TODO convert all postpostread( to use this new hook function instead of timeout
+    //postdisplay in cleardoc and postinit — after gds.load; use for bound-DOM / per-row work
     if (typeof form_postdisplay == 'function') {
         grecn = null
         await exodusevaluateall('await form_postdisplay()', 'await formfunctions_onload()');

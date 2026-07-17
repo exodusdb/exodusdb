@@ -163,7 +163,7 @@ That retries until Gate A is free, then `exodus_begin`. If still busy after 30s 
 
 Required `exodus_begin` while another flight is airborne (and the wait list is full) also **systemerror**s. Optional background work uses `exodus_begin_if_idle` (silent skip is intentional).
 
-**`form_postread` vs `form_postdisplay`:** `opendoc2` runs `form_postread` → `gds.load` → `form_postdisplay`. Anything that needs bound DOM rows (`form_filter`, per-row `exodussetreadonly`, signature/logo images) belongs in `form_postdisplay`, not same-flight `await` from `form_postread`. Historical `setTimeout('…postpostread…')` meant “after open finishes,” not “nested await before load.”
+**`form_postread` vs `form_postdisplay`:** `opendoc2` runs `form_postread` → `gds.load` → `form_postdisplay`. Anything that needs bound DOM rows (`form_filter`, per-row `exodussetreadonly`, signature/logo images) belongs in `form_postdisplay`, not same-flight `await` from `form_postread`. Module helpers named `*_postpostdisplay` are ordinary functions called from `form_postdisplay`, not framework hooks.
 
 ### Modal Dialogs
 
