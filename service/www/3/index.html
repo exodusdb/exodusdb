@@ -76,9 +76,13 @@
 			font-size: 9pt;
 		}
 
+		/* Keep square: global.css sets width/min/max with !important; a lone
+		   height:14px left Remember me wider than tall. Reassert full box. */
 		#logindiv .login-options-row input[type=checkbox] {
-			width: 14px;
-			height: 14px;
+			width: var(--exodus-check-size) !important;
+			min-width: var(--exodus-check-size) !important;
+			max-width: var(--exodus-check-size) !important;
+			height: var(--exodus-check-size) !important;
 			min-height: 0;
 		}
 
