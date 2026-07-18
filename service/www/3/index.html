@@ -126,6 +126,12 @@
 			cursor: pointer;
 		}
 
+		/* Autofill: match normal field colours (override browser yellow wash) */
+		#logindiv input.loginfield:-webkit-autofill {
+			-webkit-box-shadow: 0 0 0 1000px #fff inset;
+			-webkit-text-fill-color: #222;
+		}
+
 		.login-footer {
 			position: fixed;
 			bottom: 0;
@@ -171,6 +177,7 @@
 			padding-right: 2em;
 		}
 
+		/* same idea as light: field bg + text, not browser autofill chrome */
 		:root[data-theme="dark_mode"] #logindiv input.loginfield:-webkit-autofill {
 			-webkit-box-shadow: 0 0 0 1000px #353b52 inset;
 			-webkit-text-fill-color: #d0d3dc;

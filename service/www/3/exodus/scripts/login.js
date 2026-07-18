@@ -121,8 +121,14 @@ async function formfunctions_onload() {
     //document.onkeydown = document_onkeydown
     addeventlistener(document,'keydown','document_onkeydown')
 
-    //autologin (except if shift key is pressed - MSIE only)
-    if ((!window.event || !window.event.shiftKey) && gautologin_element.value == 'on')
+    // Auto-login when credentials are already present — e.g. browser password
+    // manager autofill, or Remember-me cookie path that prefilled u/p.
+    // (Old test was checkbox .value == 'on', which is always true for a checkbox
+    // and was never a real "Remember me checked" check.) Skip if no password yet;
+    // dblogin would no-op anyway. Hold Shift to skip (legacy MSIE window.event).
+    if ((!window.event || !window.event.shiftKey)
+        && gusername_element.value
+        && gpassword_element.value)
         await dblogin()
 
 }
