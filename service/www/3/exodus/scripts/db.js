@@ -22,25 +22,27 @@ function exodus_field_width_char(element) {
 
 // width of chars x widthChar in the element's computed font (after dbform styling)
 //
-// Text fields use widthChar 'M'. Dictionary lengths (e.g. 30) were tuned when
-// field width looked closer to digit-wide; full M width makes them look far too
-// long. Scale M-based widths by (digit width / M width) so length 30 is roughly
-// 30 × digit width. Approximate is fine — text need not be exact.
-// Date/number fields keep widthChar '8' and are not scaled.
+// Date/number: widthChar '8', no scale.
+// Code-like fields (default align, not T): full N × 'M' so codes like ACTIONHA fit.
+// Text fields (exodusalign T / exodus_dict_text): lengths were tuned for digit-ish
+// width; scale M-based widths by (digit width / M width) so length 30 is roughly
+// 30 × digit width. Approximate is fine — free text need not be exact.
 function exodus_field_width_px(element,chars,widthChar) {
 
  if (!widthChar) widthChar='M'
  var sample=widthChar.repeat(chars)
  var cs=getComputedStyle(element)
  var font=[cs.fontStyle,cs.fontVariant,cs.fontWeight,cs.fontSize,cs.fontFamily].join(' ').replace(/\s+/g,' ').trim()
- var key=font+'\t'+widthChar+'\t'+chars
+ // Only align T text is digit-scaled; keep that in the cache key
+ var scaleText=widthChar==='M' && (element.getAttribute('exodusalign')||'')==='T'
+ var key=font+'\t'+widthChar+'\t'+chars+'\t'+(scaleText?'t':'')
  if (gexodus_field_width_cache[key])
   return gexodus_field_width_cache[key]
  var canvas=document.createElement('canvas')
  var ctx=canvas.getContext('2d')
  ctx.font=font
  var width=Math.ceil(ctx.measureText(sample).width)
- if (widthChar==='M' && width>0) {
+ if (scaleText && width>0) {
   var mW=ctx.measureText('M').width
   var digitW=ctx.measureText('0').width
   if (mW>0 && digitW>0 && digitW<mW)
