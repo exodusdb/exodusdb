@@ -6398,12 +6398,13 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			</div>\
 			</td>\
 			</tr>'
-		// Icon+label graphicbuttons like form Save/Close (tick / cross)
+		// Icon+label graphicbuttons like form Save/Close (tick / cross).
+		// "Select" not "OK" — avoids confusion when an option is itself named Cancel.
 		footerhtml = exodusconfirm_footerwrap(
 			'<span id="decide_okbutton" tabindex="0" class="graphicbutton"'
-			+ ' title="Press Ctrl+Enter or F9">'
+			+ ' title="Press S, Ctrl+Enter or F9">'
 			+ '<img src="' + exodusconfirm_ok_image() + '" alt="">'
-			+ '<span id="decide_okbutton_label">OK</span>'
+			+ '<span id="decide_okbutton_label"><u>S</u>elect</span>'
 			+ '</span>'
 			+ '<span id="decide_cancelbutton" tabindex="0" class="graphicbutton"'
 			+ ' title="Press Esc">'
@@ -7003,7 +7004,7 @@ function decide_onload(decide_args) {
 	var selections = document.getElementsByName('decide_selection')
 
 	//focus on the first checked item or the first rown
-	// Tab cycles options (as one stop) -> OK -> Cancel -> same option (see decide_document_onkeydown)
+	// Tab cycles options (as one stop) -> Select -> Cancel -> same option (see decide_document_onkeydown)
 	var decide_last_option_element = null
 	for (var ii = 0; ii < selections.length; ++ii)
 		if (selections[ii].checked)
@@ -7392,7 +7393,7 @@ function decide_onload(decide_args) {
 
 		console.log('decide_document_onkeydown ' + keycode)
 
-		// Tab: list (one stop) -> OK -> Cancel -> list (Shift reverses).
+		// Tab: list (one stop) -> Select -> Cancel -> list (Shift reverses).
 		// Multi-select also includes the All button before the list.
 		// Arrows still move among options; Tab leaves the list like a radio group.
 		if (keycode == 9) {
@@ -7446,8 +7447,8 @@ function decide_onload(decide_args) {
 			return exoduscancelevent(event)
 		}
 
-		//F9 is old save
-		if (keycode == 120) {
+		//F9 is old save; S = Select hotkey
+		if (keycode == 120 || keycode == 83) {
 			decide_ok_onclick_sync()
 			return exoduscancelevent(event)
 		}
