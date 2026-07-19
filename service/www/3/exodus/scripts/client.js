@@ -6417,9 +6417,9 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			+ '<span id="decide_okbutton_label"><u>S</u>elect</span>'
 			+ '</span>'
 			+ '<span id="decide_cancelbutton" tabindex="0" class="graphicbutton"'
-			+ ' title="Press Esc">'
+			+ ' title="Press C or Esc">'
 			+ '<img src="' + exodusconfirm_cancel_image() + '" alt="">'
-			+ '<span id="decide_cancelbutton_label">Cancel</span>'
+			+ '<span id="decide_cancelbutton_label"><u>C</u>ancel</span>'
 			+ '</span>')
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
@@ -7463,8 +7463,8 @@ function decide_onload(decide_args) {
 			return exoduscancelevent(event)
 		}
 
-		//Esc is cancel
-		if (keycode == 27) {
+		//Esc or C = Cancel
+		if (keycode == 27 || keycode == 67) {
 			decide_cancel_onclick_sync()
 			return exoduscancelevent(event)
 		}
