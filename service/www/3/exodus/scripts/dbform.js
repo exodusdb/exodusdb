@@ -5464,13 +5464,19 @@ async function document_onfocus(event) {
     ///log('there is no new record so setup current element')
 
     ///log('scroll to top left if the key field')
-    if (element == gstartelement || element.getAttribute('exodusfieldno') == 0)
+    // Strict === '0': loose == 0 also matches missing attribute (null).
+    // Update gmodalblock_savedoverflow so Gate A unblock does not restore the
+    // pre-focus scroll and undo this home (blockmodalui save/restore on every flight).
+    if (element == gstartelement || element.getAttribute('exodusfieldno') === '0') {
         window.scrollTo(0, 0)
-
-    //if (element.tagName.match(gtexttagnames))  if (element.tagName!='TEXTAREA') element.select()
-
-    ///log('scroll into view')
-    scrollintoview(element)
+        if (typeof gmodalblock_savedoverflow != 'undefined' && gmodalblock_savedoverflow) {
+            gmodalblock_savedoverflow.x = 0
+            gmodalblock_savedoverflow.y = 0
+        }
+    } else {
+        ///log('scroll into view')
+        scrollintoview(element)
+    }
 
     ///log('remove blanks used to force formatting of spans')
     if (element.tagName == 'SPAN' && element.innerText == ' ')
