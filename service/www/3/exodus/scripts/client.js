@@ -6498,12 +6498,14 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 		//build rows, or if only one option, then obtain the response
 		/////////////////////////////////////////////////////////////
-		var response = decide_onload(decide_args)
+		var response = await decide_onload(decide_args)
 
 		//return only option
 		// quit if false ie failed to load eg no options
+		// (decide_fail_no_options may already have removed the shell before invalid)
 		if (typeof response != 'undefined') {
-			exodusremovenode(div)
+			if (div && div.parentNode)
+				exodusremovenode(div)
 			return response
 		}
 
@@ -6687,7 +6689,16 @@ function cancel_backpage_event(event) {
 	return
 }
 
-function decide_onload(decide_args) {
+// Decide shell is mounted before rows are built; remove it before exodusinvalid
+// so the pale list popup does not sit behind the invalid dialog.
+async function decide_fail_no_options() {
+	var shell = $$('exodusconfirmdiv')
+	if (shell)
+		exodusremovenode(shell)
+	return await exodusinvalid('No records found.')
+}
+
+async function decide_onload(decide_args) {
 
 	//var question = decide_args[0]
 	var data = decide_args[1]
@@ -6713,11 +6724,9 @@ function decide_onload(decide_args) {
 			data[ii] = [data[ii]]
 	}
 
-	//quit if no data
-	if (!data.length) {
-		alert('No data, no options available')
-		return false
-	}
+	//quit if no data (drop decide shell first — it is already in the DOM)
+	if (!data.length)
+		return await decide_fail_no_options()
 
 	//columns
 	//[[dictid,title],etc. or
@@ -7023,8 +7032,7 @@ function decide_onload(decide_args) {
 			singlereturnvalue = [singlereturnvalue]
 		return singlereturnvalue
 	} else if (typeof singlereturnvalue == 'undefined') {
-		alert('No data, no options available')
-		return false
+		return await decide_fail_no_options()
 	}
 
 	//exodussettimeout('exodusautofitwindow()', 10)
