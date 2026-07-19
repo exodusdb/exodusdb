@@ -597,10 +597,14 @@ async function formfunctions_onload() {
 
             //allow for data entry in SPAN elements (unless hidden)
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
+                // ch tracks font size; length*7px was for 8pt and over-widths at 1rem
+                var minwidth = element.getAttribute('exoduslength') + 'ch'
                 //buggy and not necessary on msie7
                 //dont set display block if there is a link or popup so that the image stays to the left of the field
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
+                    //    element.style.width=(element.getAttribute('exoduslength')*7)+'px'
+                    element.style.minWidth = minwidth
                     //moved to css_old.css as SPAN min-width:13px;
                     //element.style.minHeight = '13px'
                     //element.style.minHeight='12px'
@@ -625,8 +629,8 @@ async function formfunctions_onload() {
                     if (isMSIE) {
                         //setting minWidth only causes problem in plan/schedule dates and extras entry
                         //setting width only causes problem almost everywhere that span data entry has no size initially
-                        if (element.style.minWidth)
-                            element.style.Width = element.style.minWidth
+                        element.style.minWidth = minwidth
+                        element.style.Width = minwidth
                     }
                     if (!(element.getAttribute('tabindex')))
                         element.setAttribute('tabindex', 999)
@@ -819,11 +823,26 @@ async function formfunctions_onload() {
 			}
 
             //length and maxlength
+            //
+            // Table column width for a cell is not "this td's padding" — it is the
+            // column's max preferred width. For text INPUTs that preferred width is
+            // driven by the HTML size attribute (default 20 if omitted). CSS width
+            // only paints the control; it does not shrink the column. So size must
+            // equal exoduslength (no +2, and never remove size or the default 20
+            // holds the column open while a smaller style.width makes the field look
+            // short inside a wide td).
             if (element.tagName.match(gtexttagnames)) {
                 if (element.size != 1 && element.getAttribute('exoduslength')) {
                     if (!(parseInt(element.getAttribute('exoduslength')))) {
                         systemerror('formfunctions_onload()', element.id + '.getAttribute("exoduslength")=' + element.getAttribute('exoduslength') + ' is invalid. 10 used.')
                         element.setAttribute('exoduslength', 10)
+                    }
+                    var fieldlen = parseInt(element.getAttribute('exoduslength'), 10)
+                    if (element.tagName == 'INPUT'
+                        && (element.type == 'text' || element.type == '' || !element.type || element.type == 'password')) {
+                        element.size = fieldlen
+                    } else if (element.tagName != 'INPUT') {
+                        element.size = fieldlen
                     }
                 }
                 if (element.tagName == 'TEXTAREA') {
@@ -866,6 +885,7 @@ async function formfunctions_onload() {
                     }
                     else {
 
+                        element.cols = element.size ? element.size : 30
                         var exodusrows = element.getAttribute('exodusrows')
                         if (exodusrows && exodusrows > 1)
                             element.rows = exodusrows
