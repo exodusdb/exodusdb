@@ -128,10 +128,16 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
 }
 
 .exodusformactions .graphicbutton:hover,
-.exodusformactions .graphicbutton:focus,
-body > #formbuttonsdiv .graphicbutton:hover,
-body > #formbuttonsdiv .graphicbutton:focus {
+body > #formbuttonsdiv .graphicbutton:hover {
     background-color: var(--exodus-menuhighlight);
+}
+
+/* Same orange focus ring as data fields (--exodus-field-focus-color) */
+.exodusformactions .graphicbutton:focus,
+body > #formbuttonsdiv .graphicbutton:focus {
+    outline: none;
+    background-color: var(--exodus-menuhighlight);
+    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 
 .exodusformactions .exodusbutton {
@@ -656,10 +662,17 @@ span.clsReadOnly:empty
     background-color: var(--exodus-menuhighlight);
 }
 
-.exodusbutton:hover:enabled,
-.exodusbutton:focus:enabled {
+.exodusbutton:hover:enabled {
     background-color: var(--exodus-informbutton-hover-bg);
     border-color: var(--exodus-informbutton-hover-border);
+}
+
+/* Same orange focus ring as data fields (--exodus-field-focus-color; LM/DM) */
+.exodusbutton:focus:enabled {
+    outline: none;
+    background-color: var(--exodus-informbutton-hover-bg);
+    border-color: var(--exodus-field-focus-color);
+    box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
 }
 
 /* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size) */
@@ -1296,11 +1309,16 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 }
 
 :root[data-theme="dark_mode"] .exodusformactions .graphicbutton:hover,
+:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:hover {
+    background-color: var(--exodus-menuhighlight);
+    border-color: #888888;
+}
+
 :root[data-theme="dark_mode"] .exodusformactions .graphicbutton:focus,
-:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:hover,
 :root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:focus {
     background-color: var(--exodus-menuhighlight);
     border-color: #888888;
+    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 
 :root[data-theme="dark_mode"] A:link { color: #8ab4f8; }
