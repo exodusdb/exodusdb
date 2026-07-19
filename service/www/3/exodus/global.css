@@ -926,6 +926,19 @@ input[type="radio"],input[type="checkbox"]{
     cursor:pointer;
 }
 
+/* Focus: thin white ring, then fairly thick orange (field focus colour).
+   Suppresses the browser multi-outline (white/orange/white) on custom appearance. */
+input[type=radio]:focus,
+input[type=checkbox]:focus,
+input[type=radio]:focus-visible,
+input[type=checkbox]:focus-visible {
+    outline: none;
+    /* Inner white (0–2px), outer orange visible beyond that (2–5px ≈ 3px thick) */
+    box-shadow:
+        0 0 0 2px #ffffff,
+        0 0 0 5px var(--exodus-field-focus-color);
+}
+
 /* ========== In-window confirm/decide popups ========== */
 .exodusconfirmdiv {
     --exodusconfirm-face: #e8e8e8;
@@ -1480,6 +1493,15 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 :root[data-theme="dark_mode"] input[type=radio]:checked {
     background-color: var(--radio-checked-bg);
     box-shadow: inset 0 0 0 calc(var(--exodus-check-size) * 2 / 14) var(--radio-color);
+}
+
+/* Keep DM checked-radio inset when focused; add white + orange focus rings outside */
+:root[data-theme="dark_mode"] input[type=radio]:checked:focus,
+:root[data-theme="dark_mode"] input[type=radio]:checked:focus-visible {
+    box-shadow:
+        inset 0 0 0 calc(var(--exodus-check-size) * 2 / 14) var(--radio-color),
+        0 0 0 2px #ffffff,
+        0 0 0 5px var(--exodus-field-focus-color);
 }
 
 :root[data-theme="dark_mode"] input:disabled {
