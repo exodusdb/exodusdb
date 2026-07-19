@@ -6514,10 +6514,28 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	if (istextinput) {
 		var textinput = $$('exodusconfirmdiv_textinput')
+		// $$ may return a NodeList if multiple matches — use the real input element
+		if (textinput && !textinput.tagName && textinput.length)
+			textinput = textinput[0]
 		if (texthidden)
 			textinput.type = 'password'
-		textinput.value = text
+		textinput.value = text == null ? '' : String(text)
 		textinput.autocomplete = texthidden ? 'new-password' : 'off'
+		// Enter in the field = OK (including empty string — historical confirm.htm behaviour).
+		// Esc = Cancel. Document-level handler also covers this while gblockevents is set.
+		textinput.onkeydown = function exodusconfirm_textinput_onkeydown(event) {
+			event = getevent(event)
+			var keycode = event.keyCode ? event.keyCode : event.which
+			if (keycode == 13) {
+				window.setTimeout(exodus_confirm_function1_sync, 1)
+				return exoduscancelevent(event)
+			}
+			if (keycode == 27) {
+				window.setTimeout(exodus_confirm_function3_sync, 1)
+				return exoduscancelevent(event)
+			}
+			return true
+		}
 		// Text-input mode: always start in the field (Tab among field/buttons is separate)
 		textinput.focus()
 	} else if (!decide_args) {
@@ -6594,10 +6612,12 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		exodusremovenode(div)
 	}
 
-	//text input returns a string (may be zero length) or false if clicked cancel
-	if (typeof text != 'undefined' || text === null) {
+	// Text input (exodusinput): string for OK — including empty '' — false for Cancel.
+	// Do not use if (!response): empty string is a valid OK (e.g. "press enter for all").
+	if (istextinput) {
 		if (typeof response == 'string')
 			return response
+		return false
 	}
 
 	//no response treated same as cancel button (0) or '' if popup list
@@ -6614,10 +6634,13 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 //return 1 - Positive Button i.e. 'Ok' with optional text input
 // DOM/HTML entry points — *_sync (resolve confirm leaf; not Gate A takeoff)
 function exodus_confirm_function1_sync(event) {
-	var textinput
-	if ($$('exodusconfirmdiv_textinput'))
-		textinput = $$('exodusconfirmdiv_textinput').value
-	return exodus_confirm_function(textinput != undefined ? textinput : 1, event)
+	var el = $$('exodusconfirmdiv_textinput')
+	if (el && !el.tagName && el.length)
+		el = el[0]
+	// Always pass a string when the text field is present so empty OK is '' not 1/0/false
+	if (el && el.tagName)
+		return exodus_confirm_function(String(el.value), event)
+	return exodus_confirm_function(1, event)
 }
 
 //return 2
