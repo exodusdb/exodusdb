@@ -105,7 +105,7 @@ gtz[0] = new Date().getTimezoneOffset() * -60
 
 var gnpendingscripts = 0
 
-//load gparameters from gDialogArguments if present
+// Filled in exodus_client_init from modal bag (and URL query). Prefer this over dialogArguments.
 var gparameters
 
 //var grecn should only be used in dbform.js. used here in ICONV special case
@@ -269,21 +269,18 @@ function exodus_client_init() {
 	tm = FMs[4]
 	stm = FMs[5]
 
-	//get alternative global dialog arguments - see dialogArgumentsForChild in function exodusshowmodaldialog
-	gDialogArguments = window.dialogArguments
-	if (!gDialogArguments && window.opener) {
-		try {
-			//window.opener may have been closed and refreshing the page might cause an error
-			gDialogArguments = window.opener.dialogArgumentsForChild
-		}
-		catch (e) { }
-	}
+	// Modal dialog args (if this window is a modal child). See
+	// exodus_acquire_modal_dialog_arguments / exodusshowmodaldialog.
+	// Page code should read gparameters; window.dialogArguments is rebound for legacy.
+	gDialogArguments = exodus_acquire_modal_dialog_arguments()
+	if (gDialogArguments)
+		window.dialogArguments = gDialogArguments
 
-	gisdialog = typeof window.dialogArguments != 'undefined'
+	gisdialog = !!gDialogArguments
 
-	if (window.dialogArguments && window.dialogArguments.logincode) {
-		glogincode = window.dialogArguments.logincode
-		//alert('debug client.js glogincode=window.dialogArguments.logincode '+window.dialogArguments.logincode)
+	if (gDialogArguments && gDialogArguments.logincode) {
+		glogincode = gDialogArguments.logincode
+		//alert('debug client.js glogincode=gDialogArguments.logincode '+gDialogArguments.logincode)
 	}
 
 	//can extract cookied immediately
@@ -302,9 +299,9 @@ function exodus_client_init() {
 
 	if (typeof gparameters == 'undefined')
 		gparameters = new Object
-	if (typeof window.dialogArguments != 'undefined') {
-		for (var param in window.dialogArguments)
-			gparameters[param] = window.dialogArguments[param]
+	if (gDialogArguments) {
+		for (var param in gDialogArguments)
+			gparameters[param] = gDialogArguments[param]
 	}
 	if (gparameters.gtasks && !gtasks)
 		gtasks = gparameters.gtasks
@@ -1182,6 +1179,47 @@ function getdialogstyle_sync(dialogstyle) {
 	return dialogstyle
 }
 
+// ---------------------------------------------------------------------------
+// Modal dialog arguments — one bag, one live child at a time.
+//
+// Parent (exodusshowmodaldialog):
+//   dialogArgumentsForChild = bag   // primary; child can re-pull after hard refresh
+//   gchildwin = window.open(...)
+//   gchildwin.dialogArguments = bag // secondary; can race first load; lost on refresh
+//   finally: dialogArgumentsForChild = null
+//
+// Child (exodus_client_init via exodus_acquire_modal_dialog_arguments):
+//   1. If opener.gchildwin === this window and not the lazy Wait/Cancel stub
+//      → use opener.dialogArgumentsForChild
+//   2. Else → window.dialogArguments (secondary inject)
+//   Then: rebind window.dialogArguments and copy properties into gparameters.
+//
+// Page code: prefer gparameters. Do not invent page-local acquire helpers.
+// Non-modal opens use gwindowopenparameters (dbform), not this bag.
+// Nested modals: each child reads only its own opener’s bag.
+// ---------------------------------------------------------------------------
+function exodus_acquire_modal_dialog_arguments() {
+
+	var bag = null
+
+	if (window.opener) {
+		try {
+			// opener may be closed or cross-origin; access can throw
+			if (!window.opener.closed
+				&& window.opener.gchildwin === window
+				&& !window.opener.gchildwin.lazy
+				&& window.opener.dialogArgumentsForChild)
+				bag = window.opener.dialogArgumentsForChild
+		}
+		catch (e) { }
+	}
+
+	if (!bag && window.dialogArguments)
+		bag = window.dialogArguments
+
+	return bag
+}
+
 async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 
 	if (!dialogargs)
@@ -1193,15 +1231,11 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 
 	//always send login code
 	dialogargs.logincode = glogincode
+
+	// Publish before open so a fast-loading or hard-refreshed child can pull.
+	// Cleared in finally so a finished modal cannot leak args to later pages.
+	dialogArgumentsForChild = dialogargs
 	try {
-
-		//provide an alternative location for the child dialogWindow to get dialogArguments
-		//gDialogArguments=window.opener.dialogArgumentsForChild
-		//to avoid bug? in firefox where dialogArguments is always set to null when calling a modal dialog immediately on opening firefox
-		//currently only used in index.html when being used as a modal dialog to do a login on the fly
-		//eg when accessing pages via favourites without going through index.html first
-
-		dialogArgumentsForChild = dialogargs
 
 		// modern async path using window.open + promise (no more showModalDialog or guseyield branching)
 		//example
@@ -1223,7 +1257,7 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 			return
 		}
 
-		//pass arguments and callback/resume function to child window
+		// Secondary: inject after open (may race load; not durable on refresh)
 		gchildwin.dialogArguments = dialogargs
 
 		// auto resume if the child window disappears — poll every n ms
@@ -1256,9 +1290,9 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 		//alert('Please enable popups for this site (1)\n\nError:'+(e.description?e.description:e)+'\n\n'+url+'\n\n'+arguments)
 		return
 	}
-
-	//return nothing if cannot popup
-	return
+	finally {
+		dialogArgumentsForChild = null
+	}
 
 }
 
