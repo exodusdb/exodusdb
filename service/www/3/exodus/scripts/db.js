@@ -28,14 +28,14 @@ async function exodus_val_url(protocol) {
 
   var regexp=new RegExp(protocol+'\:\/\/.','i')
   if (!gvalue.match(regexp)) {
-   return exodusinvalid('Should start with '+protocol+'://')
+   return await exodusinvalid('Should start with '+protocol+'://')
   }
   return true
  }
   
  var regexp=new RegExp('((http)|(https))'+'\:\/\/.','i')
  if (!gvalue.match(regexp)) {
-   return exodusinvalid('Should start with http:// or https://')
+   return await exodusinvalid('Should start with http:// or https://')
  }
  
  return true

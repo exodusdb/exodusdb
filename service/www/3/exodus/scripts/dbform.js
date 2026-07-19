@@ -4796,7 +4796,7 @@ async function form_onchangeselect(event) {
     }
 
     if (!(await validateupdate(event)))
-        return exodusinvalid()
+        return await exodusinvalid()
 
     //encourage changing key or key part in a SELECT to change record
     if (gpreviouselement.getAttribute('exodusfieldno') == '0')
@@ -5127,7 +5127,9 @@ async function unlockdoc() {
 
 ////////////////////// FIELD FUNCTIONS //////////////////////
 
-async function focuson(element) {
+// Sync DOM focus schedule only (not async — must not start a floating Promise).
+// Live path defers to focuson2 via timeout; does not do main-line dbio.
+function focuson(element) {
 
     //login('focuson')
 
@@ -5161,44 +5163,15 @@ async function focuson(element) {
 
     ///log(element.id + ' ' + element.outerHTML)
 
-    //if already focused on the element then .focus event will not occur so ...
-    //NOW will because do .blur() beforehand
-    //if (gpreviouselement==null) gpreviouselement=element
-    //nb activeElement not present in safari 3.1 at least
-    if (false && document.activeElement == element) {
-        try {
-            element.focus()
-            //if (element.tagName!='TEXTAREA')
-            if (element.select)
-                element.select()
-        }
-        catch (e) { }
+    //needed because delete line leaves grecn>nrecs
+    grecn = getrecn(element)
 
-        //gpreviouselement = element
-        //gpreviousvalue = getvalue(gpreviouselement)
-        setgpreviouselement(element)
-        await setdefault(element)
-        //should really call setgpreviouselement again here
-        ///log('gpreviouselement and value set to ' + gpreviouselement.id + ' ' + exodusquote(gpreviousvalue))
+    //taken out otherwise F7 on job number goes to market code
+    // and validateupdate fails because record has not been loaded
+    // (setdefault is async — must be awaited from a Gate A flight if re-enabled)
 
-        try {
-            if (element.tagName != 'TEXTAREA')
-                element.select()
-        }
-        catch (e) { }
-
-    } else {
-
-        //needed because delete line leaves grecn>nrecs
-        grecn = getrecn(element)
-
-        //taken out otherwise F7 on job number goes to market code
-        // and validateupdate fails because record has not been loaded
-        //await setdefault(element)
-
-        gfocusonelement = element
-        exodussettimeout('focuson2()', 10)
-    }
+    gfocusonelement = element
+    exodussettimeout('focuson2()', 10)
 
     //logout('focuson ' + element.id)
 

@@ -160,11 +160,11 @@ if (typeof document.createElement('div').innerText == 'undefined') {
 		*/
 	}
 }
-//define if our source contains function* and yield* statements (legacy only for dynamic strings)
-//HARD CODED DEPENDING ON PRESENCE OR NOT OF YIELD STATEMENTS IN SOURCE CODE (mostly for transition)
-//AND THEREFORE CANNOT BE CHANGED
+// Stage 6: no live function*/yield* in app code — only async/await + Gate A/B.
+// A repo-wide yield* count is almost all *commented* legacy (and docs/error strings).
+// Do not re-audit those as active generators. This regex is only for stripping old
+// 'yield* ' from dynamic strings (settimeout / functioncode attrs).
 var gyieldregex = /yield ?\*/g
-// legacy regex to detect old 'yield* ' strings in dynamic user code (settimeout, functioncode attrs, etc.)
 
 exodus_client_init()
 
@@ -538,7 +538,9 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 
 	//check element exists
 	if (!elementsorelementid) {
-		exodusinvalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
+		void exodus_begin(function () {
+			return exodusinvalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
+		}, 'exodussetexpression missing element')
 		return
 	}
 
@@ -641,8 +643,10 @@ function exodussetexpression2b(expressionid, elements, style, attributename, exp
 		//build a closure containing all the elements to be updated
 		//and to be called at intervals
 		function anon_from_exodussetexpression2b() {
-			// exodussetexpression2c is async; setInterval does not await — fire each tick.
-			void exodussetexpression2c(elements, style, attributename, expression)
+			// Interval tick: Gate A only when idle (skip if busy — expression UI is optional).
+			void exodus_begin_if_idle(function () {
+				return exodussetexpression2c(elements, style, attributename, expression)
+			}, 'exodussetexpression2c')
 		}
 		, 250)//every quarter second
 }
@@ -1789,7 +1793,12 @@ function exodus_set_style(mode, value, value2) {
 			document.documentElement.style.setProperty('--exodus-form-border', '#d0d0d0')
 		}
 		catch (e) {
-			if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised color'); return }
+			if (e.number == -2146827908) {
+				void exodus_begin(function () {
+					return exodusinvalid(value + ' is not a recognised color')
+				}, 'exodus_set_style color')
+				return
+			}
 			return systemerror('exodus_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
 		}
 		document.documentElement.style.removeProperty('--exodus-cardcolor')
@@ -1822,7 +1831,12 @@ function exodus_set_style(mode, value, value2) {
 				style.removeProperty('font-size')
 			}
 			catch (e) {
-				if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised font'); return }
+				if (e.number == -2146827908) {
+					void exodus_begin(function () {
+						return exodusinvalid(value + ' is not a recognised font')
+					}, 'exodus_set_style font')
+					return
+				}
 				return systemerror('exodus_set_style("' + mode + '","' + value + '","' + value2 + '")', e.number + ' ' + e.description)
 			}
 		}
@@ -3607,7 +3621,9 @@ function checkisdropdown(element) {
 	assertelement(element, 'checkisdropdown', 'element')
 
 	if (typeof (element) != 'object' || element.tagName != 'SELECT') {
-		exodusinvalid('Error: The target is not a SELECT tag')
+		void exodus_begin(function () {
+			return exodusinvalid('Error: The target is not a SELECT tag')
+		}, 'checkisdropdown')
 		return false
 	}
 	return true
@@ -4445,7 +4461,9 @@ function menuhide(element) {
 						var menuaccesskey = underlineelement[0].innerText.exodustrim().slice(0, 1).toUpperCase()
 						var temp = element.exodusmenuaccesskeys[menuaccesskey]
 						if (gusername == 'EXODUS' && temp)
-							void exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+							void exodus_begin(function () {
+								return exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+							}, 'duplicate menu access key')
 							// alert('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
 						element.exodusmenuaccesskeys[menuaccesskey] = child
 					}
