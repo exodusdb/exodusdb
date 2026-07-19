@@ -92,9 +92,11 @@ var gpreviouselement = null
 var gnextelement = null
 var gdependents = []
 var gKeyNodes = false//init will get an array of key nodes if any
-// Form OK/Cancel/Save etc.: 'top' menubar or 'bottom' after form body.
-// Default 'auto': top only when a real top menubar is used; else bottom.
-// Override with gparameters.formbuttonsplace in form_preinit: 'top' | 'bottom' | 'auto'.
+// Form OK/Cancel/Save/custom actions: 'top' menubar or 'bottom' under the form.
+// Default 'auto': bound → top; unbound → bottom *preferred*.
+// Bottom is revoked after full layout if the bar would be off-screen
+// (form_keep_action_buttons_on_screen) — never leave Save/OK below the fold.
+// Override: gparameters.formbuttonsplace = 'top' | 'bottom' | 'auto' in form_preinit.
 var gformbuttonsplace = 'top'
 var gkeyexternal = ''//external format of key eg STEVE*1/1/2000
 var gkey = ''//internal format of key eg STEVE*12080
@@ -159,36 +161,74 @@ if (eval('typeof dict_' + gdictfilename + '=="undefined"')) {
 
 var gds
 
-// True when the fixed top #exodus_menu is used as real chrome (Menu/Logout/Refresh etc.).
-// Dialogs and pages that skip the menubar put form actions under the form instead.
-function form_has_top_menubar() {
-    if (window.dialogArguments)
-        return false
-    if (typeof gshowmenu != 'undefined' && !gshowmenu)
-        return false
-    try {
-        var url = String(document.URL || location.href || '')
-        if (url.indexOf('.htm') < 0)
-            return false
-        // Same skip list as clientfunctions_windowonload add_exodus_menubar
-        if (/index|confirm|upload/i.test(url))
-            return false
-    } catch (e) {
-        return false
-    }
-    if (document.getElementsByClassName && document.getElementsByClassName('navbar').length)
-        return false
-    return true
-}
-
+// Preferred place only. Bottom may be revoked after layout if off-screen.
 // gparameters.formbuttonsplace: 'top' | 'bottom' | 'auto' (default auto).
 function form_formbuttons_place() {
     var place = (gparameters && gparameters.formbuttonsplace != null && gparameters.formbuttonsplace !== '')
         ? String(gparameters.formbuttonsplace).toLowerCase()
         : 'auto'
     if (place === 'auto')
-        return form_has_top_menubar() ? 'top' : 'bottom'
+        return gKeyNodes ? 'top' : 'bottom'
     return place === 'bottom' ? 'bottom' : 'top'
+}
+
+// Call after form_postdisplay / custom buttons: if the action bar is under the form
+// but below the fold, put it back in the top menubar. That is the whole rule —
+// do not place (keep) actions at the bottom when they are off-screen.
+function form_keep_action_buttons_on_screen() {
+    if (gformbuttonsplace !== 'bottom')
+        return
+    var bar = $$('formbuttonsdiv')
+    if (!bar)
+        return
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0
+    if (!vh)
+        return
+    if (bar.getBoundingClientRect().bottom <= vh)
+        return
+    form_move_action_buttons_to_top()
+}
+
+// Move #formbuttonsdiv from under the form into the fixed top menubar.
+function form_move_action_buttons_to_top() {
+    var bar = $$('formbuttonsdiv')
+    if (!bar || gformbuttonsplace === 'top')
+        return
+
+    gformbuttonsplace = 'top'
+
+    // Bottom bar used .graphicbutton; menubar uses .menubutton
+    var buttons = bar.querySelectorAll('.graphicbutton')
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('graphicbutton')
+        buttons[i].classList.add('menubutton')
+    }
+
+    add_exodus_menubar()
+
+    // #exodus_menu is a SPAN — keep formbuttonsdiv a SPAN for valid nesting
+    var topbar = bar
+    if (bar.tagName !== 'SPAN') {
+        topbar = document.createElement('SPAN')
+        topbar.id = 'formbuttonsdiv'
+        while (bar.firstChild)
+            topbar.appendChild(bar.firstChild)
+        if (bar.parentNode)
+            bar.parentNode.removeChild(bar)
+    }
+    else {
+        topbar.className = ''
+        if (topbar.parentNode)
+            topbar.parentNode.removeChild(topbar)
+    }
+
+    var clearleft = document.createElement('div')
+    clearleft.style.cssText = 'clear: left; min-height: 1px;'
+    gexodus_menubar.insertBefore(clearleft, gexodus_menubar.firstChild)
+    gexodus_menubar.insertBefore(topbar, gexodus_menubar.firstChild)
+
+    if (typeof adjust_bodymargin == 'function')
+        adjust_bodymargin()
 }
 
 // Extra form action next to OK/Cancel in #formbuttonsdiv. Call from form_postinit (not raw HTML).
@@ -1588,7 +1628,7 @@ async function formfunctions_onload() {
     //if (!gKeyNodes && $$('autofitwindowelement'))
     //    buttonhtml = '<div style="clear:both">&nbsp;</div>' + buttonhtml
 
-    // Form action bar: top menubar, or after the form body when no usable top menubar
+    // Form action bar: top menubar, or under the form (see form_formbuttons_place)
     var formbuttons = document.createElement(gformbuttonsplace === 'top' ? 'SPAN' : 'DIV')
     formbuttons.id = 'formbuttonsdiv'
     formbuttons.innerHTML = buttonhtml
@@ -1610,6 +1650,8 @@ async function formfunctions_onload() {
         }
 
         gexodus_menubar.insertBefore(formbuttons, gexodus_menubar.firstChild)
+        if (typeof adjust_bodymargin == 'function')
+            adjust_bodymargin()
     } else {
         formbuttons.className = 'exodusformactions'
         document.body.insertBefore(formbuttons, null)
@@ -1839,6 +1881,10 @@ async function formfunctions_onload() {
         //saverecord.value=gparameters.savebuttonvalue
         setgraphicbutton(saverecord, gparameters.savebuttonvalue)
     }
+
+    // After form_postdisplay (and form_add_action_button): if unbound put the bar
+    // under the form but it ended below the fold, keep it in the top menubar.
+    form_keep_action_buttons_on_screen()
 
     //logout('formfunctions_onload')
 
