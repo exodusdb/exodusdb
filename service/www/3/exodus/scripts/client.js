@@ -5314,10 +5314,38 @@ function starteventhandler(eventfunctionname, functionx) {
 					var keycode = event.keyCode ? event.keyCode : event.which
 					var keyletter = String.fromCharCode(keycode).toUpperCase()
 					var istextinput = !!$$('exodusconfirmdiv_textinput')
+					var isdecide = !!$$('decide_table1')
+					var active = document.activeElement
+					// focused yes/no/cancel menubutton (not decide OK/Cancel)
+					var focusedConfirmBtn = null
+					if (active) {
+						if (active.id == 'positivebutton' || active.id == 'negativebutton' || active.id == 'cancelbutton')
+							focusedConfirmBtn = active
+						else if (active.closest) {
+							var wrap = active.closest('#positivebutton, #negativebutton, #cancelbutton')
+							if (wrap)
+								focusedConfirmBtn = wrap
+						}
+					}
 
 					logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
 
-					//FIX detection of specific keys on buttons like Y N etc
+					// Tab: cycle text field and buttons (decide has its own keydown handler)
+					if (keycode == 9 && !isdecide) {
+						exodusconfirm_focus_cycle(!!event.shiftKey)
+						return exoduscancelevent(event)
+					}
+
+					// Space/Enter on a focused confirm button activates that button
+					if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
+						if (focusedConfirmBtn.id == 'negativebutton')
+							window.setTimeout(exodus_confirm_function2_sync, 1)
+						else if (focusedConfirmBtn.id == 'cancelbutton')
+							window.setTimeout(exodus_confirm_function3_sync, 1)
+						else
+							window.setTimeout(exodus_confirm_function1_sync, 1)
+						return exoduscancelevent(event)
+					}
 
 					//POSITIVE = F9 or Enter or (Space if not text input) or some initial
 					if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
@@ -5339,7 +5367,7 @@ function starteventhandler(eventfunctionname, functionx) {
 
 					// Home/End: first/last focusable (decide lists use decide_document_onkeydown)
 					else if (keycode == 36 || keycode == 35) {
-						if (!$$('decide_table1')) {
+						if (!isdecide) {
 							exodusconfirm_focus_endpoint(keycode == 36)
 							return exoduscancelevent(event)
 						}
@@ -6031,13 +6059,19 @@ function exodusconfirm_focusable_elements() {
 	var confirm=$$('exodusconfirmdiv')
 	if (!confirm)
 		return []
-	var nodes=confirm.querySelectorAll('input:not([type=hidden]), textarea, select, button, [tabindex], .graphicbutton')
+	// Document order: text input (if any), then footer action controls
+	var nodes=confirm.querySelectorAll(
+		'#exodusconfirmdiv_textinput,'
+		+ ' .exodusconfirm_footer .menubutton[tabindex],'
+		+ ' .exodusconfirm_footer .graphicbutton[tabindex]'
+	)
 	var list=[]
 	for (var i=0;i<nodes.length;++i) {
 		var el=nodes[i]
 		if (el.disabled||el.getAttribute('tabindex')=='-1')
 			continue
-		if (el.offsetParent===null&&el.style.display!='fixed')
+		// Fixed dialog children often have offsetParent null — use size instead
+		if (!(el.offsetWidth || el.offsetHeight || el.getClientRects().length))
 			continue
 		list[list.length]=el
 	}
@@ -6051,6 +6085,56 @@ function exodusconfirm_focus_endpoint(first) {
 		return false
 	client_focuson(first?list[0]:list[list.length-1])
 	return true
+}
+
+// Tab / Shift+Tab within the open confirm (not decide lists — those have their own handler).
+// If nothing in the dialog is focused yet, Tab focuses the first control (first button).
+function exodusconfirm_focus_cycle(reverse) {
+
+	var list=exodusconfirm_focusable_elements()
+	if (!list.length)
+		return false
+	var active=document.activeElement
+	var i=-1
+	var j
+	for (j=0;j<list.length;++j) {
+		if (list[j]===active||(list[j].contains&&list[j].contains(active))) {
+			i=j
+			break
+		}
+	}
+	var next
+	if (i<0)
+		// No prefocus: Tab → first button; Shift+Tab → last button
+		next=reverse?list[list.length-1]:list[0]
+	else if (reverse)
+		next=list[(i-1+list.length)%list.length]
+	else
+		next=list[(i+1)%list.length]
+	// focus immediately so successive Tabs work before client_focuson timeout
+	try {
+		next.focus()
+	} catch (e) {}
+	client_focuson(next)
+	return true
+}
+
+// Explicit default only: 1 / 2 / 3. Empty, 0, or omitted → no prefocus.
+function exodusconfirm_has_default_button(defaultbuttonn) {
+	var n=Number(defaultbuttonn)
+	return n===1||n===2||n===3
+}
+
+function exodusconfirm_default_button_element(defaultbuttonn) {
+
+	if (!exodusconfirm_has_default_button(defaultbuttonn))
+		return null
+	var defn=Number(defaultbuttonn)
+	if (defn==2)
+		return $$('negativebutton')||null
+	if (defn==3)
+		return $$('cancelbutton')||null
+	return $$('positivebutton')||null
 }
 
 var gexodusconfirm_scrollhint_resize
@@ -6250,21 +6334,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 		nbuttons++
 
+		// Top menubar style (menubutton), text only — no icons
 		html += '<span id="' + buttonid + 'button"'
-
 		html += ' tabindex="0"'
-		html += ' class="graphicbutton"'
-
-		//mouse events down/up/out/click
-		//html += ' onmousedown="this.style.borderStyle=\'inset\'"'
-		//html += ' onmouseup="this.style.borderStyle=\'outset\'"'
-		//html += ' onmouseout="this.style.borderStyle=\'outset\'"'
-		// discontinued inset/outset styles
-		html += ' onmousedown="this.style.borderStyle=\'solid\'"'
-		html += ' onmouseup="this.style.borderStyle=\'solid\'"'
-		html += ' onmouseout="this.style.borderStyle=\'solid\'"'
+		html += ' class="menubutton"'
 		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
-
 
 		//letter
 		var letter = buttontext.match(/(<[uU]>)(.)/)
@@ -6279,7 +6353,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		gexodusconfirmletters[buttonn] = letter
 
 		//title
-		html += 'title="Press '
+		html += ' title="Press '
 		if (letter)
 			html += letter + ' or '
 		html += buttonfunckey + '"'
@@ -6289,15 +6363,6 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' exodusyesnocancel="' + (buttonn % 3) + '"'
 
 		html += '>' + buttontext + '</span>'
-
-		//array of visible buttons
-		//buttons[buttons.length] = button
-
-		//set the default button
-		//if (buttons.length == defaultbuttonn) {
-		//	gdefaultbutton = button
-		//	window.setTimeout('gdefaultbutton.focus()', 10)
-		//}
 
 	}//end of addbutton
 
@@ -6389,7 +6454,14 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			textinput.type = 'password'
 		textinput.value = text
 		textinput.autocomplete = texthidden ? 'new-password' : 'off'
+		// Text-input mode: always start in the field (Tab among field/buttons is separate)
 		textinput.focus()
+	} else if (!decide_args) {
+		// Prefocus only an explicit default (1/2/3). No default → nothing focused;
+		// first Tab lands on the first button via exodusconfirm_focus_cycle.
+		var defbtn = exodusconfirm_default_button_element(defaultbuttonn)
+		if (defbtn)
+			client_focuson(defbtn)
 	}
 
 	//build rows of decide popup

@@ -1049,7 +1049,7 @@ input[type="radio"],input[type="checkbox"]{
     white-space: nowrap;
     min-width: min-content;
 }
-/* Match form Save/Close graphicbuttons (icon + label, focus ring) */
+/* Decide OK/Cancel: form Save/Close graphicbuttons (icon + label, focus ring) */
 .exodusconfirm_footer .graphicbutton {
     float: none;
     display: inline-flex;
@@ -1076,6 +1076,33 @@ input[type="radio"],input[type="checkbox"]{
     background-color: var(--exodus-menuhighlight);
 }
 .exodusconfirm_footer .graphicbutton:focus {
+    outline: none;
+    background-color: var(--exodus-menuhighlight);
+    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
+}
+
+/* Yes/No/Cancel: top menubar menubutton look, text only (no icons) */
+.exodusconfirm_footer .menubutton {
+    float: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    vertical-align: middle;
+    white-space: nowrap;
+    margin: 0.125em 4px;
+    padding: 0.35em 0.55em;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    color: inherit;
+    font-size: inherit;
+}
+.exodusconfirm_footer .menubutton:hover {
+    background-color: var(--exodus-menuhighlight);
+}
+.exodusconfirm_footer .menubutton:focus {
     outline: none;
     background-color: var(--exodus-menuhighlight);
     box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
@@ -1404,6 +1431,13 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 :root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:focus {
     border-color: #888888;
     background-color: var(--exodus-menuhighlight);
+    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:hover,
+:root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:focus {
+    background-color: var(--exodus-menuhighlight);
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:focus {
     box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {
