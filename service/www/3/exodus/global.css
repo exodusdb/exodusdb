@@ -1049,12 +1049,36 @@ input[type="radio"],input[type="checkbox"]{
     white-space: nowrap;
     min-width: min-content;
 }
+/* Match form Save/Close graphicbuttons (icon + label, focus ring) */
 .exodusconfirm_footer .graphicbutton {
     float: none;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25em;
     flex: 0 0 auto;
     vertical-align: middle;
     white-space: nowrap;
+    margin: 0.125em 4px;
+    padding: 0.35em 0.55em;
+}
+.exodusconfirm_footer .graphicbutton img {
+    height: var(--exodus-ui-icon-size);
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+}
+.exodusconfirm_footer .graphicbutton [id$="_label"] {
+    display: inline-block;
+    line-height: 1.2;
+}
+.exodusconfirm_footer .graphicbutton:hover {
+    background-color: var(--exodus-menuhighlight);
+}
+.exodusconfirm_footer .graphicbutton:focus {
+    outline: none;
+    background-color: var(--exodus-menuhighlight);
+    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 .exodusconfirm_iconcol {
     width: 4.3em;
@@ -1373,10 +1397,14 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     border-color: var(--exodusconfirm-border);
     cursor: pointer;
 }
-:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:hover,
-:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:focus {
+:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:hover {
     border-color: color-mix(in srgb, var(--exodusconfirm-border) 55%, white 45%);
-    background-color: color-mix(in srgb, var(--exodusconfirm-border) 12%, #292929 88%);
+    background-color: var(--exodus-menuhighlight);
+}
+:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:focus {
+    border-color: #888888;
+    background-color: var(--exodus-menuhighlight);
+    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {
     --exodusconfirm-border: #e06060;

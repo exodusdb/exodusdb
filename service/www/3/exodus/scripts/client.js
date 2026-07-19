@@ -6014,6 +6014,18 @@ function exodusconfirm_footerwrap(content) {
 		</div>'
 }
 
+// Same icons as form Save/OK (tick) and Close/Cancel (cross) menubar buttons
+function exodusconfirm_ok_image() {
+	if (typeof gsaveimage != 'undefined')
+		return gsaveimage
+	return gimagetheme + (gisdarktheme ? 'tick_darkmode.svg' : 'tick.svg')
+}
+function exodusconfirm_cancel_image() {
+	if (typeof gcloseimage != 'undefined')
+		return gcloseimage
+	return gimagetheme + (gisdarktheme ? 'cross_darkmode.svg' : 'cross.svg')
+}
+
 function exodusconfirm_focusable_elements() {
 
 	var confirm=$$('exodusconfirmdiv')
@@ -6321,19 +6333,18 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			</div>\
 			</td>\
 			</tr>'
-		footerhtml = exodusconfirm_footerwrap('\
-			<button id="decide_okbutton" tabindex="0" class="graphicbutton"\
-				onmousedown="this.style.borderStyle="inset"\
-				onmouseup="this.style.borderStyle="outset"\
-				onmouseout="this.style.borderStyle="outset"\
-				title="Press Ctrl+Enter or F9">\
-				OK</button>\
-			<button id="decide_cancelbutton" tabindex="0" class="graphicbutton"\
-				onmousedown="this.style.borderStyle="inset"\
-				onmouseup="this.style.borderStyle="outset"\
-				onmouseout="this.style.borderStyle="outset"\
-				title="Press Esc">\
-				Cancel</button>')
+		// Icon+label graphicbuttons like form Save/Close (tick / cross)
+		footerhtml = exodusconfirm_footerwrap(
+			'<span id="decide_okbutton" tabindex="0" class="graphicbutton"'
+			+ ' title="Press Ctrl+Enter or F9">'
+			+ '<img src="' + exodusconfirm_ok_image() + '" alt="">'
+			+ '<span id="decide_okbutton_label">OK</span>'
+			+ '</span>'
+			+ '<span id="decide_cancelbutton" tabindex="0" class="graphicbutton"'
+			+ ' title="Press Esc">'
+			+ '<img src="' + exodusconfirm_cancel_image() + '" alt="">'
+			+ '<span id="decide_cancelbutton_label">Cancel</span>'
+			+ '</span>')
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
 		bodyhtml += '\
@@ -7334,9 +7345,9 @@ function decide_onload(decide_args) {
 				current = stops.indexOf(allb)
 			else if (target && target.name == 'decide_selection')
 				current = stops.indexOf('option')
-			else if (okb && (target === okb || target.id == 'decide_okbutton'))
+			else if (okb && (target === okb || okb.contains(target)))
 				current = stops.indexOf(okb)
-			else if (canb && (target === canb || target.id == 'decide_cancelbutton'))
+			else if (canb && (target === canb || canb.contains(target)))
 				current = stops.indexOf(canb)
 			else
 				// body/header click target etc. — treat as list
@@ -7395,11 +7406,11 @@ function decide_onload(decide_args) {
 			var okb2 = $$('decide_okbutton')
 			var canb2 = $$('decide_cancelbutton')
 			var allb2 = decide_all_button()
-			if (okb2 && (element === okb2 || element.id == 'decide_okbutton')) {
+			if (okb2 && (element === okb2 || okb2.contains(element))) {
 				decide_ok_onclick_sync()
 				return exoduscancelevent(event)
 			}
-			if (canb2 && (element === canb2 || element.id == 'decide_cancelbutton')) {
+			if (canb2 && (element === canb2 || canb2.contains(element))) {
 				decide_cancel_onclick_sync()
 				return exoduscancelevent(event)
 			}
