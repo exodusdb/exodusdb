@@ -92,8 +92,9 @@ var gpreviouselement = null
 var gnextelement = null
 var gdependents = []
 var gKeyNodes = false//init will get an array of key nodes if any
-// Unbound OK/Cancel/custom actions: 'top' menubar (default) or 'bottom' after form.
-// Set gparameters.formbuttonsplace in form_preinit: 'top' | 'bottom' | 'auto'. Bound forms always 'top'.
+// Form OK/Cancel/Save etc.: 'top' menubar or 'bottom' after form body.
+// Default 'auto': top only when a real top menubar is used; else bottom.
+// Override with gparameters.formbuttonsplace in form_preinit: 'top' | 'bottom' | 'auto'.
 var gformbuttonsplace = 'top'
 var gkeyexternal = ''//external format of key eg STEVE*1/1/2000
 var gkey = ''//internal format of key eg STEVE*12080
@@ -158,13 +159,35 @@ if (eval('typeof dict_' + gdictfilename + '=="undefined"')) {
 
 var gds
 
-// Bound forms always top. Unbound: gparameters.formbuttonsplace 'top'|'bottom'|'auto' (default 'top').
+// True when the fixed top #exodus_menu is used as real chrome (Menu/Logout/Refresh etc.).
+// Dialogs and pages that skip the menubar put form actions under the form instead.
+function form_has_top_menubar() {
+    if (window.dialogArguments)
+        return false
+    if (typeof gshowmenu != 'undefined' && !gshowmenu)
+        return false
+    try {
+        var url = String(document.URL || location.href || '')
+        if (url.indexOf('.htm') < 0)
+            return false
+        // Same skip list as clientfunctions_windowonload add_exodus_menubar
+        if (/index|confirm|upload/i.test(url))
+            return false
+    } catch (e) {
+        return false
+    }
+    if (document.getElementsByClassName && document.getElementsByClassName('navbar').length)
+        return false
+    return true
+}
+
+// gparameters.formbuttonsplace: 'top' | 'bottom' | 'auto' (default auto).
 function form_formbuttons_place() {
-    if (gKeyNodes)
-        return 'top'
-    var place = String((gparameters && gparameters.formbuttonsplace) || 'top').toLowerCase()
+    var place = (gparameters && gparameters.formbuttonsplace != null && gparameters.formbuttonsplace !== '')
+        ? String(gparameters.formbuttonsplace).toLowerCase()
+        : 'auto'
     if (place === 'auto')
-        place = document.documentElement.scrollHeight > window.innerHeight * 0.9 ? 'top' : 'bottom'
+        return form_has_top_menubar() ? 'top' : 'bottom'
     return place === 'bottom' ? 'bottom' : 'top'
 }
 
@@ -1565,29 +1588,29 @@ async function formfunctions_onload() {
     //if (!gKeyNodes && $$('autofitwindowelement'))
     //    buttonhtml = '<div style="clear:both">&nbsp;</div>' + buttonhtml
 
-    // Form action bar: top menubar (default unbound + all bound) or after the form body
+    // Form action bar: top menubar, or after the form body when no usable top menubar
     var formbuttons = document.createElement(gformbuttonsplace === 'top' ? 'SPAN' : 'DIV')
     formbuttons.id = 'formbuttonsdiv'
     formbuttons.innerHTML = buttonhtml
 
-    add_exodus_menubar()
+    if (gformbuttonsplace === 'top') {
+        add_exodus_menubar()
 
-    // Keep form title below the (left-floating) menu buttons
-    var clearleft = document.createElement('div')
-    clearleft.style.cssText = 'clear: left; min-height: 1px;'
-    gexodus_menubar.insertBefore(clearleft, gexodus_menubar.firstChild)
+        // Keep form title below the (left-floating) menu buttons
+        var clearleft = document.createElement('div')
+        clearleft.style.cssText = 'clear: left; min-height: 1px;'
+        gexodus_menubar.insertBefore(clearleft, gexodus_menubar.firstChild)
 
-    // Unbound: database-username on the right of the menubar (bound embeds login in buttonhtml)
-    if (!gKeyNodes) {
-        var loginsp = document.createElement('span')
-        loginsp.style.float = 'right'
-        loginsp.innerHTML = loginhtml
-        gexodus_menubar.insertBefore(loginsp, gexodus_menubar.firstChild)
-    }
+        // Unbound: database-username on the right of the menubar (bound embeds login in buttonhtml)
+        if (!gKeyNodes) {
+            var loginsp = document.createElement('span')
+            loginsp.style.float = 'right'
+            loginsp.innerHTML = loginhtml
+            gexodus_menubar.insertBefore(loginsp, gexodus_menubar.firstChild)
+        }
 
-    if (gformbuttonsplace === 'top')
         gexodus_menubar.insertBefore(formbuttons, gexodus_menubar.firstChild)
-    else {
+    } else {
         formbuttons.className = 'exodusformactions'
         document.body.insertBefore(formbuttons, null)
     }

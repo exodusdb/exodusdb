@@ -1970,9 +1970,9 @@ async function clientfunctions_windowonload() {
 	//	exodussettimeout('exodusautofitwindow()', 10)
 	//exodussetinterval('exodusautofitwindow()', 10)
 
-	//add_exodus_menubar()
+	// Fixed top menubar for main windows only (not modal dialogs — form actions go under the form).
 	// Dont add menubar on login page where link doesnt end in .htm)
-	if (document.URL.includes(".htm")) {
+	if (document.URL.includes(".htm") && !window.dialogArguments) {
 		// Also no menubar in other pages
 		if (!document.URL.match(/index|confirm|upload/)) {
 			add_exodus_menubar();
