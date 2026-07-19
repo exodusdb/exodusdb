@@ -92,6 +92,9 @@ var gpreviouselement = null
 var gnextelement = null
 var gdependents = []
 var gKeyNodes = false//init will get an array of key nodes if any
+// Unbound OK/Cancel/custom actions: 'top' menubar (default) or 'bottom' after form.
+// Set gparameters.formbuttonsplace in form_preinit: 'top' | 'bottom' | 'auto'. Bound forms always 'top'.
+var gformbuttonsplace = 'top'
 var gkeyexternal = ''//external format of key eg STEVE*1/1/2000
 var gkey = ''//internal format of key eg STEVE*12080
 var gkeys = []
@@ -154,6 +157,71 @@ if (eval('typeof dict_' + gdictfilename + '=="undefined"')) {
 }
 
 var gds
+
+// Bound forms always top. Unbound: gparameters.formbuttonsplace 'top'|'bottom'|'auto' (default 'top').
+function form_formbuttons_place() {
+    if (gKeyNodes)
+        return 'top'
+    var place = String((gparameters && gparameters.formbuttonsplace) || 'top').toLowerCase()
+    if (place === 'auto')
+        place = document.documentElement.scrollHeight > window.innerHeight * 0.9 ? 'top' : 'bottom'
+    return place === 'bottom' ? 'bottom' : 'top'
+}
+
+// Extra form action next to OK/Cancel in #formbuttonsdiv. Call from form_postinit (not raw HTML).
+// spec: { id, text, title, accesskey, image, onclick, disabled, insert }
+// Element id is id+"button". Click: onclick expression (same as old HTML exodusonclick),
+// or omit onclick to use an existing id_onclick (e.g. proforma → proforma_onclick).
+function form_add_action_button(spec) {
+
+    if (!spec || !spec.id) {
+        systemerror('form_add_action_button()', 'id required')
+        return null
+    }
+    var bar = $$('formbuttonsdiv')
+    if (!bar) {
+        systemerror('form_add_action_button()', 'formbuttonsdiv not ready')
+        return null
+    }
+
+    var id = spec.id
+    if ($$(id + 'button'))
+        return $$(id + 'button')
+
+    var align = gformbuttonsplace === 'bottom' ? 'center' : 'left'
+    bar.insertAdjacentHTML(
+        spec.insert === 'start' ? 'afterbegin' : 'beforeend',
+        '<span>' + menubuttonhtml(
+            id,
+            spec.image || '',
+            spec.text != null ? spec.text : id,
+            spec.title || '',
+            spec.accesskey || '',
+            align
+        ) + '</span>'
+    )
+
+    var button = $$(id + 'button')
+    if (!button)
+        return null
+
+    // Optional expression — do not invent/overwrite id_onclick (avoids recursion with e.g. proforma)
+    if (spec.onclick) {
+        var expr = String(spec.onclick).replace(/^\s+/, '')
+        if (expr.slice(0, 6) !== 'await ')
+            expr = 'await ' + expr
+        var nodes = button.parentNode.querySelectorAll('[exodusonclick]')
+        for (var i = 0; i < nodes.length; i++)
+            nodes[i].setAttribute('exodusonclick', expr)
+    }
+
+    if (!gKeyNodes)
+        button.tabIndex = 9998
+    if (spec.disabled)
+        setdisabledandhidden(button, true)
+    window[id + 'button'] = button
+    return button
+}
 
 //'WINDOW LOAD
 //''''''''''''
@@ -1419,7 +1487,9 @@ async function formfunctions_onload() {
     //tabindex buttons at 9999 to come after other fields at 999
     var buttonhtml = ''
 
-    var buttonalign = gKeyNodes ? 'left' : 'center'
+    gformbuttonsplace = form_formbuttons_place()
+    // Menubar: left menubuttons. Below form: center graphicbuttons.
+    var buttonalign = gformbuttonsplace === 'top' ? 'left' : 'center'
 
     //wrap form buttons in a span so they align the same as the menu, logout and refresh buttons
     function menubuttonhtml2(id, imagesrc, name, title, accesskey, align) {
@@ -1495,55 +1565,32 @@ async function formfunctions_onload() {
     //if (!gKeyNodes && $$('autofitwindowelement'))
     //    buttonhtml = '<div style="clear:both">&nbsp;</div>' + buttonhtml
 
-    //create the button rank and insert it into the form
-    var formbuttons = document.createElement(gKeyNodes ? 'SPAN' : 'DIV')
-    if (gKeyNodes) {
-        formbuttons.style.padding = 0;
-        formbuttons.style.margin = 0;
-    }
-    //var formbuttons = document.createElement('span')
-    //formbuttons.style.float='left'
-    //formbuttons.style.float = 'left'
+    // Form action bar: top menubar (default unbound + all bound) or after the form body
+    var formbuttons = document.createElement(gformbuttonsplace === 'top' ? 'SPAN' : 'DIV')
+    formbuttons.id = 'formbuttonsdiv'
     formbuttons.innerHTML = buttonhtml
 
     add_exodus_menubar()
 
-    //insert a div that has NO boxes to the left of it so the form (title especially)
-    //cannot appear to right of the (left floating) menu buttons
-    var temp = document.createElement('div')
-    temp.style.cssText = 'clear: left; min-height: 1px;'
-    gexodus_menubar.insertBefore(temp, gexodus_menubar.firstChild)
+    // Keep form title below the (left-floating) menu buttons
+    var clearleft = document.createElement('div')
+    clearleft.style.cssText = 'clear: left; min-height: 1px;'
+    gexodus_menubar.insertBefore(clearleft, gexodus_menubar.firstChild)
 
-    if (gKeyNodes)
-        //document.body.insertBefore(formbuttons, document.body.firstChild)
+    // Unbound: database-username on the right of the menubar (bound embeds login in buttonhtml)
+    if (!gKeyNodes) {
+        var loginsp = document.createElement('span')
+        loginsp.style.float = 'right'
+        loginsp.innerHTML = loginhtml
+        gexodus_menubar.insertBefore(loginsp, gexodus_menubar.firstChild)
+    }
+
+    if (gformbuttonsplace === 'top')
         gexodus_menubar.insertBefore(formbuttons, gexodus_menubar.firstChild)
     else {
-        // login details "database-username" at the top left of
-        // unbounded screens eg. search.htm, voucher allocation
-        var temp = document.createElement('span')
-        //temp.style.float = 'left'
-        temp.style.float = 'right'
-        temp.innerHTML = loginhtml
-        //temp.style.textAlign='CENTER'
-        //document.body.insertBefore(temp, document.body.firstChild)
-        gexodus_menubar.insertBefore(temp, gexodus_menubar.firstChild)
-
-        //form buttons (save/ok etc.) at the bottom — styled like top menubar (.exodusformactions)
         formbuttons.className = 'exodusformactions'
-
-        //form buttons (save/ok etc.) at the bottom
-        document.body.insertBefore(formbuttons, null)//document.body.firstChild)
-        //var wholepage = document.getElementById('autofitwindowelement')
-        //if (!wholepage)
-        //    wholepage = document.body
-        //wholepage.insertBefore(formbuttons, null)//document.body.firstChild)
-
-        //alert(formbuttons.parentNode.innerHTML)
+        document.body.insertBefore(formbuttons, null)
     }
-    formbuttons.id = 'formbuttonsdiv'
-    //formbuttons.style.float='left'
-    //attempt to solve vertical alignment of buttons
-    //formbuttons.removeNode(false)//msie leaves childnode buttons
 
     //make global variables to correspond to the buttons
     //to provide backward compatibility with IE code which can refer to document elements like global variables
@@ -2261,10 +2308,8 @@ async function document_onkeydown(event) {
     return await document_onkeydown2(event)
 }
 
-// Enter/Space on a focused menubar / form-action control (span.graphicbutton|menubutton).
-// Unbound forms put OK/Cancel at the bottom with tabindex; they are not real <button>s so
-// the browser will not activate them. Only when focus is already on the control — does not
-// change Enter/Tab navigation between data fields.
+// Enter/Space on a focused form-action control (menubutton/graphicbutton with exodusonclick).
+// Not real <button>s — browser will not activate them. Only when already focused.
 async function form_activate_focused_action_button(event, element) {
 
     if (!element || !element.getAttribute)
