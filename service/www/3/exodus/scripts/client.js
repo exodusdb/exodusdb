@@ -6340,12 +6340,22 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' class="menubutton"'
 		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
 
-		//letter
-		var letter = buttontext.match(/(<[uU]>)(.)/)
-		if (letter)
-			letter = letter[2]
-		else if (!istextinput)
-			letter = buttontext.substr(0, 1)
+		// Hotkey letter: explicit <u>X</u> (or <i>X</i>), else first letter of plain label.
+		// Callers often pass 'Before' without markup; underline that letter for display.
+		var letter
+		var marked = String(buttontext).match(/<[uU]>(.)<\/[uU]>/)
+		if (!marked)
+			marked = String(buttontext).match(/<[iI]>(.)<\/[iI]>/)
+		if (marked) {
+			letter = marked[1]
+			// Normalise <i> hotkey markup to underline for display
+			buttontext = String(buttontext).replace(/<[iI]>(.)<\/[iI]>/, '<u>$1</u>')
+		} else if (!istextinput) {
+			letter = String(buttontext).replace(/<[^>]*>/g, '').charAt(0)
+			// Auto-underline first character when label is plain text (e.g. Before/After/Cancel)
+			if (letter && String(buttontext).charAt(0).toUpperCase() == letter.toUpperCase())
+				buttontext = '<u>' + String(buttontext).charAt(0) + '</u>' + String(buttontext).slice(1)
+		}
 		if (letter) {
 			letter = letter.toUpperCase()
 			html += ' exodusletter="' + letter + '"'
