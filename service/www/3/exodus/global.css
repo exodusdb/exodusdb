@@ -296,6 +296,8 @@ BODY
     --exodus-form-nested-cell-padding-y: 0.2em;
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
+    /* Fold point for form SPANs without exoduslength (DATELIST, long symbols, …) */
+    --exodus-form-span-max-width: 40ch;
     --exodus-informbutton-bg: #f0f0f0;
     --exodus-informbutton-hover-bg: #ffffff;
     --exodus-informbutton-hover-border: #aaaaaa;
@@ -460,6 +462,24 @@ TABLE.exodusform SPAN.clsRequired[contenteditable],
 TABLE.exodusform SPAN.clsNotRequired[contenteditable],
 TABLE.exodusform .clsReadOnly {
     font-style: var(--exodus-form-data-font-style);
+}
+
+/*
+ * Form SPANs use white-space:pre-wrap (dbform) so spaces/newlines are kept.
+ * pre-wrap only folds when width is capped; pure inline ignores max-width, and
+ * table width:max-content otherwise grows the column to the full unwrapped line.
+ * exoduslength sets a tighter max-width in dbform when present.
+ */
+TABLE.exodusform SPAN.clsRequired,
+TABLE.exodusform SPAN.clsNotRequired,
+TABLE.exodusform SPAN.clsRequired[contenteditable],
+TABLE.exodusform SPAN.clsNotRequired[contenteditable],
+TABLE.exodusform SPAN.clsReadOnly {
+    display: inline-block;
+    max-width: var(--exodus-form-span-max-width);
+    overflow-wrap: break-word;
+    vertical-align: top;
+    box-sizing: border-box;
 }
 
 /* UA forms.css shrinks controls after screenfont strips font-size from font-family rules */

@@ -581,6 +581,8 @@ async function formfunctions_onload() {
 
             //allow excess spaces in EXODUS data using pre-wrap
             //"Sequences of whitespace are preserved. Lines are broken at newline characters, at <br>, and as necessary to fill line boxes."
+            // Folding needs a width cap (see global.css SPAN max-width + length below);
+            // without it, table max-content columns grow to the full unwrapped line.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 try {
                     element.style.whiteSpace = 'pre-wrap'
@@ -593,23 +595,28 @@ async function formfunctions_onload() {
                     catch (e) {
                     }
                 }
+                // Tighter than the CSS default when dict length is known (INPUT size equivalent)
+                var spanlen = parseInt(element.getAttribute('exoduslength'), 10)
+                if (spanlen > 0 && !element.style.maxWidth)
+                    element.style.maxWidth = spanlen + 'ch'
             }
 
             //allow for data entry in SPAN elements (unless hidden)
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
                 // ch tracks font size; length*7px was for 8pt and over-widths at 1rem
-                var minwidth = element.getAttribute('exoduslength') + 'ch'
+                var spanfieldlen = parseInt(element.getAttribute('exoduslength'), 10)
+                var minwidth = spanfieldlen > 0 ? spanfieldlen + 'ch' : ''
                 //buggy and not necessary on msie7
                 //dont set display block if there is a link or popup so that the image stays to the left of the field
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
                     //    element.style.width=(element.getAttribute('exoduslength')*7)+'px'
-                    element.style.minWidth = minwidth
+                    if (minwidth)
+                        element.style.minWidth = minwidth
                     //moved to css_old.css as SPAN min-width:13px;
                     //element.style.minHeight = '13px'
                     //element.style.minHeight='12px'
                     //element.style.maxWidth=(element.getAttribute('exoduslength')*7*2)+'px'
-                    //element.style.maxWidth=minwidth+'px'
                     //element.multiLine=true
                     //element.style.display = 'inline-block'
                     //perhaps we ought to be using <div>
@@ -626,7 +633,7 @@ async function formfunctions_onload() {
                     element.contentEditable = 'true'
                     //element.contentEditable = true
                     //fixed width in msie but buggy in ff?
-                    if (isMSIE) {
+                    if (isMSIE && minwidth) {
                         //setting minWidth only causes problem in plan/schedule dates and extras entry
                         //setting width only causes problem almost everywhere that span data entry has no size initially
                         element.style.minWidth = minwidth
