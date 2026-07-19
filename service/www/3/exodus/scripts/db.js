@@ -3,6 +3,93 @@
 var glocktimeoutinmins=5
 var trailingspaces=/\s*$/g
 
+// Field width after dbform sets class/font.
+// INPUT/TEXTAREA (keeps HTML size; does not remove it):
+//   date/number → N×"8"
+//   codes (default) → N×"M"  e.g. BRAND_CODE 5, REF_NO 15
+//   free text / names: align T or exoduslowercase → N×"0" average
+//     e.g. EXECUTIVE_CODE (lowercase, length 30 layout)
+// Editable type-F SPAN: max-width Nch. Display SPANs: untouched.
+var gexodus_field_width_cache = {}
+var gexodus_field_width_digitconv = /^\[(DATE|NUMBER|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD)/
+var gexodus_field_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
+
+function exodus_field_width_char(element) {
+	var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+	if (gexodus_field_width_digitconv.test(conv))
+		return '8'
+	if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0)
+		return '8'
+	if (gexodus_field_width_dateconv.test(conv))
+		return '8'
+	// Average for free text (align T) and lowercase name fields (EXECUTIVE_CODE).
+	// Codes keep uppercase / empty lowercase → full M (BRAND_CODE, REF_NO).
+	var align = (element.getAttribute('exodusalign') || '').toUpperCase()
+	if (align.charAt(0) == 'T')
+		return '0'
+	var lc = element.getAttribute('exoduslowercase')
+	if (lc && lc !== 'false')
+		return '0'
+	return 'M'
+}
+
+function exodus_field_width_px(element, chars, widthChar) {
+	if (!widthChar)
+		widthChar = exodus_field_width_char(element)
+	var sample = widthChar.repeat(chars)
+	var cs = getComputedStyle(element)
+	var font = [cs.fontStyle, cs.fontVariant, cs.fontWeight, cs.fontSize, cs.fontFamily].join(' ').replace(/\s+/g, ' ').trim()
+	var key = font + '\t' + widthChar + '\t' + chars
+	if (gexodus_field_width_cache[key])
+		return gexodus_field_width_cache[key]
+	var canvas = document.createElement('canvas')
+	var ctx = canvas.getContext('2d')
+	ctx.font = font
+	var width = Math.ceil(ctx.measureText(sample).width)
+	gexodus_field_width_cache[key] = width
+	return width
+}
+
+function exodus_apply_field_width(element, chars, widthChar) {
+	if (!chars || !element || !element.getAttribute('exoduslength'))
+		return
+	if (element.type == 'radio' || element.type == 'checkbox')
+		return
+
+	// SPANs use average ch (length × average), not measured M.
+	// Editable type F: min+max Nch (empty click target + fold).
+	// Display (S/readonly) with align T: max-width Nch only (e.g. VEHICLE_NAME 30).
+	// Other display SPANs: untouched (CSS default fold).
+	if (element.tagName == 'SPAN') {
+		var spanw = chars + 'ch'
+		var editable = element.getAttribute('exodustype') == 'F'
+			&& !element.getAttribute('exodusreadonly')
+			&& (element.isContentEditable || element.contentEditable === 'true')
+		if (editable) {
+			element.style.minWidth = spanw
+			element.style.maxWidth = spanw
+			return
+		}
+		var align = (element.getAttribute('exodusalign') || '').toUpperCase()
+		if (align.charAt(0) == 'T')
+			element.style.maxWidth = spanw
+		return
+	}
+
+	// INPUT/TEXTAREA: measured width; HTML size kept for table preferred width
+	if (element.tagName != 'INPUT' && element.tagName != 'TEXTAREA')
+		return
+	if (!widthChar)
+		widthChar = exodus_field_width_char(element)
+	var width = exodus_field_width_px(element, chars, widthChar) + 'px'
+	element.style.boxSizing = 'content-box'
+	element.style.width = width
+	element.style.maxWidth = width
+	element.style.minWidth = width
+	if (element.tagName == 'TEXTAREA')
+		element.cols = chars
+}
+
 function exodus_dict_dow(di,many) {
 
  if (many) {

@@ -465,10 +465,10 @@ TABLE.exodusform .clsReadOnly {
 }
 
 /*
- * Form SPANs use white-space:pre-wrap (dbform) so spaces/newlines are kept.
- * pre-wrap only folds when width is capped; pure inline ignores max-width, and
- * table width:max-content otherwise grows the column to the full unwrapped line.
- * exoduslength sets a tighter max-width in dbform when present.
+ * Form SPANs: pre-wrap (dbform) + max-width so long text folds.
+ * Default: --exodus-form-span-max-width. exodus_apply_field_width:
+ *   editable type F → min/max Nch; display align T → max Nch (e.g. VEHICLE_NAME).
+ * Other display SPANs hug content under the CSS default.
  */
 TABLE.exodusform SPAN.clsRequired,
 TABLE.exodusform SPAN.clsNotRequired,
@@ -480,6 +480,16 @@ TABLE.exodusform SPAN.clsReadOnly {
     overflow-wrap: break-word;
     vertical-align: top;
     box-sizing: border-box;
+}
+
+/* field width: exodus_apply_field_width() in db.js */
+TABLE.exodusform INPUT.clsRequired,
+TABLE.exodusform INPUT.clsNotRequired,
+TABLE.exodustable INPUT.clsRequired,
+TABLE.exodustable INPUT.clsNotRequired,
+TABLE.exodustable SPAN.clsRequired[contenteditable],
+TABLE.exodustable SPAN.clsNotRequired[contenteditable] {
+    box-sizing: content-box;
 }
 
 /* UA forms.css shrinks controls after screenfont strips font-size from font-family rules */

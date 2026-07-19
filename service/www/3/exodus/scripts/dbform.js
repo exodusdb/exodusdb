@@ -461,7 +461,7 @@ async function formfunctions_onload() {
             //dictionary modifications
             //none - currently done in dictrec builder
 
-            //convert long text input to spans so that it can flow (if length not defined)
+            // Convert free text (align T) INPUT to SPAN so long values can fold/flow.
             if (element.tagName == 'INPUT' && dictitem.align == 'T') {
 
                 //replace original element
@@ -712,8 +712,7 @@ async function formfunctions_onload() {
 
             //allow excess spaces in EXODUS data using pre-wrap
             //"Sequences of whitespace are preserved. Lines are broken at newline characters, at <br>, and as necessary to fill line boxes."
-            // Folding needs a width cap (see global.css SPAN max-width + length below);
-            // without it, table max-content columns grow to the full unwrapped line.
+            // Folding: CSS --exodus-form-span-max-width. Length widths via exodus_apply_field_width later.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 try {
                     element.style.whiteSpace = 'pre-wrap'
@@ -726,28 +725,17 @@ async function formfunctions_onload() {
                     catch (e) {
                     }
                 }
-                // Tighter than the CSS default when dict length is known (INPUT size equivalent)
-                var spanlen = parseInt(element.getAttribute('exoduslength'), 10)
-                if (spanlen > 0 && !element.style.maxWidth)
-                    element.style.maxWidth = spanlen + 'ch'
             }
 
             //allow for data entry in SPAN elements (unless hidden)
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
-                // ch tracks font size; length*7px was for 8pt and over-widths at 1rem
-                var spanfieldlen = parseInt(element.getAttribute('exoduslength'), 10)
-                var minwidth = spanfieldlen > 0 ? spanfieldlen + 'ch' : ''
                 //buggy and not necessary on msie7
                 //dont set display block if there is a link or popup so that the image stays to the left of the field
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
-                    //    element.style.width=(element.getAttribute('exoduslength')*7)+'px'
-                    if (minwidth)
-                        element.style.minWidth = minwidth
                     //moved to css_old.css as SPAN min-width:13px;
                     //element.style.minHeight = '13px'
                     //element.style.minHeight='12px'
-                    //element.style.maxWidth=(element.getAttribute('exoduslength')*7*2)+'px'
                     //element.multiLine=true
                     //element.style.display = 'inline-block'
                     //perhaps we ought to be using <div>
@@ -764,11 +752,11 @@ async function formfunctions_onload() {
                     element.contentEditable = 'true'
                     //element.contentEditable = true
                     //fixed width in msie but buggy in ff?
-                    if (isMSIE && minwidth) {
+                    if (isMSIE) {
                         //setting minWidth only causes problem in plan/schedule dates and extras entry
                         //setting width only causes problem almost everywhere that span data entry has no size initially
-                        element.style.minWidth = minwidth
-                        element.style.Width = minwidth
+                        if (element.style.minWidth)
+                            element.style.Width = element.style.minWidth
                     }
                     if (!(element.getAttribute('tabindex')))
                         element.setAttribute('tabindex', 999)
@@ -1154,6 +1142,11 @@ async function formfunctions_onload() {
                 else
                     element.className = elementclassname
             }
+
+            // after class/font known: INPUT N×8|N×M|N×0(T/lowercase); SPAN fold Nch
+            if (element.tagName.match(gtexttagnames) && element.size != 1 && element.getAttribute('exoduslength')
+                && element.type != 'radio' && element.type != 'checkbox')
+                exodus_apply_field_width(element, parseInt(element.getAttribute('exoduslength'), 10), exodus_field_width_char(element))
 
             //handle groups
 
