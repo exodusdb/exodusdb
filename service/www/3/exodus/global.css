@@ -182,6 +182,12 @@ TABLE.exodusform TABLE.exodustable th {
     border-radius: 0;
     box-sizing: border-box;
 }
+/* Content width inside the rounded shell. Coalesced panes share one frame but
+   must not stretch sibling tables to the widest child. Opt out with HTML
+   width=… (or an inline style.width) when a form should expand. */
+.exodusformpane > TABLE.exodusform:not([width]) {
+    width: max-content;
+}
 /* Pane owns the outer edge; table cells draw internal grid lines only */
 .exodusformpane > TABLE.exodusform > thead > tr > :first-child,
 .exodusformpane > TABLE.exodusform > tbody > tr > :first-child,
