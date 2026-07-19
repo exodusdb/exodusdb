@@ -6920,12 +6920,15 @@ function decide_onload(decide_args) {
 	var selections = document.getElementsByName('decide_selection')
 
 	//focus on the first checked item or the first rown
+	// Tab cycles options (as one stop) -> OK -> Cancel -> same option (see decide_document_onkeydown)
+	var decide_last_option_element = null
 	for (var ii = 0; ii < selections.length; ++ii)
 		if (selections[ii].checked)
 			break
 	if (ii >= selections.length)
 		ii = 0
 	//selections[ii].focus()
+	decide_last_option_element = selections[ii]
 	client_focuson(selections[ii])
 
 	//ensure some history exists so that the "backpage/backbutton"
@@ -7144,6 +7147,7 @@ function decide_onload(decide_args) {
 		else
 			decide_radio_select(event, element)
 
+		decide_last_option_element = element
 		client_focuson(element)
 
 		return exoduscancelevent(event)
@@ -7244,9 +7248,54 @@ function decide_onload(decide_args) {
 			scrollpane.scrollTop=0
 		else if (idx==selection2.length-1)
 			scrollpane.scrollTop=scrollpane.scrollHeight
+		decide_last_option_element = newelement
 		newelement.focus()
 		newelement.select()
 		return true
+	}
+
+	// Return focus to the option the user last worked on (or checked / first).
+	// Options act as one Tab stop; arrows still move within the list.
+	function decide_focus_return_option() {
+
+		var selection2 = document.getElementsByName('decide_selection')
+		if (!selection2.length)
+			return false
+
+		var el = decide_last_option_element
+		if (!(el && el.name == 'decide_selection' && el.style.visibility != 'hidden'
+			&& document.body.contains(el))) {
+			el = null
+			var i
+			for (i = 0; i < selection2.length; ++i) {
+				if (selection2[i].checked && selection2[i].style.visibility != 'hidden') {
+					el = selection2[i]
+					break
+				}
+			}
+			if (!el) {
+				for (i = 0; i < selection2.length; ++i) {
+					if (selection2[i].style.visibility != 'hidden') {
+						el = selection2[i]
+						break
+					}
+				}
+			}
+		}
+		if (!el)
+			return false
+
+		decide_last_option_element = el
+		client_focuson(el)
+		return true
+	}
+
+	function decide_all_button() {
+		var headrow = $$('decide_table1head1row1')
+		if (!headrow)
+			return null
+		var buttons = headrow.getElementsByTagName('button')
+		return buttons.length ? buttons[0] : null
 	}
 
 	function decide_document_onkeydown(event) {
@@ -7259,6 +7308,54 @@ function decide_onload(decide_args) {
 		var keycode = event.keyCode
 
 		console.log('decide_document_onkeydown ' + keycode)
+
+		// Tab: list (one stop) -> OK -> Cancel -> list (Shift reverses).
+		// Multi-select also includes the All button before the list.
+		// Arrows still move among options; Tab leaves the list like a radio group.
+		if (keycode == 9) {
+			var okb = $$('decide_okbutton')
+			var canb = $$('decide_cancelbutton')
+			var allb = decide_all_button()
+			var target = event.target
+			if (target && target.name == 'decide_selection')
+				decide_last_option_element = target
+
+			var stops = []
+			if (allb)
+				stops.push(allb)
+			stops.push('option')
+			if (okb)
+				stops.push(okb)
+			if (canb)
+				stops.push(canb)
+
+			var current = -1
+			if (allb && (target === allb || allb.contains(target)))
+				current = stops.indexOf(allb)
+			else if (target && target.name == 'decide_selection')
+				current = stops.indexOf('option')
+			else if (okb && (target === okb || target.id == 'decide_okbutton'))
+				current = stops.indexOf(okb)
+			else if (canb && (target === canb || target.id == 'decide_cancelbutton'))
+				current = stops.indexOf(canb)
+			else
+				// body/header click target etc. — treat as list
+				current = stops.indexOf('option')
+
+			var next = event.shiftKey ? current - 1 : current + 1
+			if (next < 0)
+				next = stops.length - 1
+			if (next >= stops.length)
+				next = 0
+
+			var dest = stops[next]
+			if (dest === 'option')
+				decide_focus_return_option()
+			else
+				client_focuson(dest)
+
+			return exoduscancelevent(event)
+		}
 
 		//ctrl+Enter or single select
 		if (keycode == 13 && event.ctrlKey) {
@@ -7293,6 +7390,25 @@ function decide_onload(decide_args) {
 
 		var element = event.target
 
+		// Space/Enter on footer (or All) buttons — do not treat as option shortcuts
+		if (keycode == 13 || keycode == 32) {
+			var okb2 = $$('decide_okbutton')
+			var canb2 = $$('decide_cancelbutton')
+			var allb2 = decide_all_button()
+			if (okb2 && (element === okb2 || element.id == 'decide_okbutton')) {
+				decide_ok_onclick_sync()
+				return exoduscancelevent(event)
+			}
+			if (canb2 && (element === canb2 || element.id == 'decide_cancelbutton')) {
+				decide_cancel_onclick_sync()
+				return exoduscancelevent(event)
+			}
+			if (allb2 && (element === allb2 || allb2.contains(element))) {
+				decide_all_onclick_sync(event)
+				return exoduscancelevent(event)
+			}
+		}
+
 		//ctrl+enter and f9 is ok ... so is space if not !returnmany
 		if (keycode == 120 || (keycode == 13 && event.ctrlKey) || (keycode == 32 && !decide_returnmany)) {
 			decide_ok_onclick_sync()
@@ -7309,12 +7425,14 @@ function decide_onload(decide_args) {
 				if (options[rown].getAttribute('decide_optionno') == optionn) {
 					if (!decide_returnmany || selections.length == 1) {
 						//decide_ok_onclick_sync()
+						decide_last_option_element = selections[rown]
 						decide_radio_select(event, selections[rown])
 						break
 					}
 					//selections[rown].checked = !selections[rown].checked
 					//break;
 					var element = selections[rown]
+					decide_last_option_element = element
 					decide_checkbox_select(event, element)
 					client_focuson(element)
 					break
@@ -7344,12 +7462,12 @@ function decide_onload(decide_args) {
 
 		n -= 1
 
-		//pgup 33/pgdn 34/down 40/up 38/tab 9/backspace 8 keys
-		if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 9 || keycode == 8) {
+		//pgup 33/pgdn 34/down 40/up 38/backspace 8 keys (Tab is handled above)
+		if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 8) {
 
 			var direction
-			if (keycode == 34 || keycode == 40 || (keycode == 9 && !event.shiftKey)) direction = 1
-			if (keycode == 33 || keycode == 38 || (keycode == 9 && event.shiftKey || keycode == 8)) direction = -1
+			if (keycode == 34 || keycode == 40) direction = 1
+			if (keycode == 33 || keycode == 38 || keycode == 8) direction = -1
 			//pgdn
 			if (keycode == 34) {
 				if (event.ctrlKey) {
@@ -7412,6 +7530,7 @@ function decide_onload(decide_args) {
 
 			}
 
+			decide_last_option_element = newelement
 			newelement.focus()
 			newelement.select()
 
