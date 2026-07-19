@@ -2261,6 +2261,42 @@ async function document_onkeydown(event) {
     return await document_onkeydown2(event)
 }
 
+// Enter/Space on a focused menubar / form-action control (span.graphicbutton|menubutton).
+// Unbound forms put OK/Cancel at the bottom with tabindex; they are not real <button>s so
+// the browser will not activate them. Only when focus is already on the control — does not
+// change Enter/Tab navigation between data fields.
+async function form_activate_focused_action_button(event, element) {
+
+    if (!element || !element.getAttribute)
+        return false
+
+    var btn = element
+    while (btn && btn !== document && btn !== document.body) {
+        if (btn.classList
+            && (btn.classList.contains('graphicbutton') || btn.classList.contains('menubutton'))
+            && btn.getAttribute('exodusonclick'))
+            break
+        btn = btn.parentNode
+    }
+    if (!btn || !btn.getAttribute)
+        return false
+    if (!(btn.classList.contains('graphicbutton') || btn.classList.contains('menubutton')))
+        return false
+
+    if (btn.getAttribute('disabled') || btn.disabled)
+        return false
+    if (btn.style && btn.style.display == 'none')
+        return false
+
+    var onclickexpression = btn.getAttribute('exodusonclick')
+    if (!onclickexpression)
+        return false
+
+    // Same path as document_onclick for exodusonclick controls
+    await exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
+    return true
+}
+
 async function document_onkeydown2(event) {
 
     /*
@@ -2691,6 +2727,12 @@ async function document_onkeydown2(event) {
 
     //the rest of the keys are only when located on a exodus data entry field
     if (typeof ggroupno == 'undefined' || ggroupno == null) {
+        // Focused form action button (e.g. unbound OK/Cancel at bottom): Enter/Space activate
+        // it like a native button. Does not run when focus is on a data field (has groupno).
+        if ((keycode == 13 || keycode == 32) && !event.ctrlKey && !event.altKey) {
+            if (await form_activate_focused_action_button(event, element))
+                return exoduscancelevent(event)
+        }
         if (keycode == 37 || keycode == 38) {
             focusprevious(element)
             return exoduscancelevent()
