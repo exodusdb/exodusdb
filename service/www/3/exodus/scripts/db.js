@@ -3,13 +3,18 @@
 var glocktimeoutinmins=5
 var trailingspaces=/\s*$/g
 
-// Field width after dbform sets class/font.
-// INPUT/TEXTAREA (keeps HTML size; does not remove it):
-//   date/number → N×"8"
-//   codes (default) → N×"M"  e.g. BRAND_CODE 5, REF_NO 15
-//   free text / names: align T or exoduslowercase → N×"0" average
-//     e.g. EXECUTIVE_CODE (lowercase, length 30 layout)
-// Editable type-F SPAN: max-width Nch. Display SPANs: untouched.
+// Field width after dbform sets class/font (exodus_apply_field_width).
+// Keeps HTML size on INPUT (table preferred width); does not remove size.
+//
+// Control                              Rule
+// -----------------------------------  ------------------------------------------
+// INPUT/TEXTAREA date/number/period    N × "8"  (measured px)
+// INPUT/TEXTAREA codes (default)       N × "M"  (e.g. REF_NO 15, BRAND_CODE 5)
+// INPUT/TEXTAREA align T / lowercase   N × "0"  average (e.g. EXECUTIVE_CODE 30)
+// Editable type-F SPAN                 min + max = Nch  (empty click + fold)
+// Display SPAN, align T, has length    max-width only Nch  (e.g. VEHICLE_NAME 30)
+// Other display SPANs                  hug content; CSS default fold (~40ch)
+//
 var gexodus_field_width_cache = {}
 var gexodus_field_width_digitconv = /^\[(DATE|NUMBER|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD)/
 var gexodus_field_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
@@ -22,8 +27,6 @@ function exodus_field_width_char(element) {
 		return '8'
 	if (gexodus_field_width_dateconv.test(conv))
 		return '8'
-	// Average for free text (align T) and lowercase name fields (EXECUTIVE_CODE).
-	// Codes keep uppercase / empty lowercase → full M (BRAND_CODE, REF_NO).
 	var align = (element.getAttribute('exodusalign') || '').toUpperCase()
 	if (align.charAt(0) == 'T')
 		return '0'
@@ -56,10 +59,6 @@ function exodus_apply_field_width(element, chars, widthChar) {
 	if (element.type == 'radio' || element.type == 'checkbox')
 		return
 
-	// SPANs use average ch (length × average), not measured M.
-	// Editable type F: min+max Nch (empty click target + fold).
-	// Display (S/readonly) with align T: max-width Nch only (e.g. VEHICLE_NAME 30).
-	// Other display SPANs: untouched (CSS default fold).
 	if (element.tagName == 'SPAN') {
 		var spanw = chars + 'ch'
 		var editable = element.getAttribute('exodustype') == 'F'
@@ -76,7 +75,6 @@ function exodus_apply_field_width(element, chars, widthChar) {
 		return
 	}
 
-	// INPUT/TEXTAREA: measured width; HTML size kept for table preferred width
 	if (element.tagName != 'INPUT' && element.tagName != 'TEXTAREA')
 		return
 	if (!widthChar)
