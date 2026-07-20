@@ -1,24 +1,14 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g transform="translate(0.000000 -1.142857) scale(1.142857)">
-<rect x="2" y="1" width="8" height="1" fill="#005276"/>
-<rect x="1" y="2" width="2" height="1" fill="#005276"/>
-<rect x="9" y="2" width="2" height="1" fill="#005276"/>
-<rect x="1" y="3" width="1" height="10" fill="#005276"/>
-<rect x="9" y="3" width="3" height="1" fill="#005276"/>
-<rect x="9" y="4" width="4" height="1" fill="#005276"/>
-<rect x="7" y="5" width="2" height="1" fill="#f3991a"/>
-<rect x="9" y="5" width="1" height="1" fill="#f09821"/>
-<rect x="12" y="5" width="1" height="8" fill="#005276"/>
-<rect x="6" y="6" width="4" height="1" fill="#f3991a"/>
-<rect x="5" y="7" width="5" height="1" fill="#f3991a"/>
-<rect x="4" y="8" width="5" height="1" fill="#f3991a"/>
-<rect x="4" y="9" width="2" height="1" fill="#633f0b"/>
-<rect x="6" y="9" width="2" height="1" fill="#f3991a"/>
-<rect x="4" y="10" width="1" height="1" fill="#050300"/>
-<rect x="5" y="10" width="1" height="1" fill="#633f0b"/>
-<rect x="6" y="10" width="1" height="1" fill="#f1981a"/>
-<rect x="1" y="13" width="2" height="1" fill="#005276"/>
-<rect x="11" y="13" width="2" height="1" fill="#005276"/>
-<rect x="2" y="14" width="10" height="1" fill="#005276"/>
-</g>
+  <!-- page as form_add; stubby pencil slightly inset from edges -->
+  <path d="M1.5 1h8.2L14.5 6v8.5a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V1z"
+        fill="#ffffff" stroke="#005276" stroke-width="0.75" stroke-linejoin="round"/>
+  <path d="M9.7 1v4.2c0 .44.36.8.8.8H14.5"
+        fill="#e8f0f4" stroke="#005276" stroke-width="0.75" stroke-linejoin="round"/>
+  <!-- ~8% smaller than prior; same up-left bias, clear of fold and bottom corner -->
+  <path d="M4.35 10.0 10.2 4.15c.62-.62 1.62-.62 2.24 0l.48.48c.62.62.62 1.62 0 2.24L7.07 11.52c-.19.19-.43.32-.69.37l-2.4.48a.55.55 0 0 1-.65-.65l.48-2.4c.05-.26.18-.5.37-.69z"
+        fill="#f3991a"/>
+  <path d="M4.35 10.0 3.15 11.2c-.2.2-.26.52-.15.8l.36.9.9.36c.28.11.6.05.8-.15L6.3 11.52 4.35 10.0z"
+        fill="#633f0b"/>
+  <path d="M3.36 12.9 2.7 13.56a.32.32 0 0 0 .45.45l.66-.66-.45-.45z"
+        fill="#1a1208"/>
 </svg>

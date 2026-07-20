@@ -1,22 +1,10 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g transform="translate(-1.142857 -1.142857) scale(1.142857)">
-<rect x="2" y="1" width="12" height="1" fill="#d25300"/>
-<rect x="1" y="2" width="2" height="1" fill="#d25300"/>
-<rect x="13" y="2" width="2" height="1" fill="#d25300"/>
-<rect x="1" y="3" width="1" height="10" fill="#d25300"/>
-<rect x="14" y="3" width="1" height="6" fill="#d25300"/>
-<rect x="6" y="5" width="5" height="1" fill="#d25300"/>
-<rect x="5" y="6" width="2" height="1" fill="#d25300"/>
-<rect x="10" y="6" width="2" height="1" fill="#d25300"/>
-<rect x="5" y="7" width="1" height="3" fill="#d25300"/>
-<rect x="11" y="7" width="1" height="3" fill="#d25300"/>
-<rect x="5" y="10" width="2" height="1" fill="#d25300"/>
-<rect x="10" y="10" width="2" height="1" fill="#d25300"/>
-<rect x="6" y="11" width="7" height="1" fill="#d25300"/>
-<rect x="11" y="12" width="3" height="1" fill="#d25300"/>
-<rect x="1" y="13" width="2" height="1" fill="#d25300"/>
-<rect x="12" y="13" width="3" height="1" fill="#d25300"/>
-<rect x="2" y="14" width="7" height="1" fill="#d25300"/>
-<rect x="13" y="14" width="1" height="1" fill="#d25300"/>
-</g>
+  <!-- original: page outline + magnifying glass (not a folder); #d25300 -->
+  <!-- page frame -->
+  <path d="M2.2 1.5h11.6c.4 0 .7.3.7.7v11.2a1 1 0 0 1-1 1H3.5a1 1 0 0 1-1-1V2.2c0-.4.3-.7.7-.7z"
+        fill="none" stroke="#d25300" stroke-width="1.35" stroke-linejoin="round"/>
+  <!-- lens -->
+  <circle cx="8" cy="7.4" r="3.15" fill="none" stroke="#d25300" stroke-width="1.4"/>
+  <!-- handle -->
+  <path d="M10.35 10.0 13.7 14.0" stroke="#d25300" stroke-width="1.55" stroke-linecap="round"/>
 </svg>

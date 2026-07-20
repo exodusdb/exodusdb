@@ -1,14 +1,7 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g transform="translate(-2.666667 -2.666667) scale(1.333333)">
-<rect x="7" y="2" width="2" height="5" fill="#b8b8b8"/>
-<rect x="5" y="7" width="6" height="2" fill="#b8b8b8"/>
-<rect x="6" y="9" width="4" height="1" fill="#b8b8b8"/>
-<rect x="2" y="10" width="1" height="1" fill="#b8b8b8"/>
-<rect x="7" y="10" width="2" height="1" fill="#b8b8b8"/>
-<rect x="13" y="10" width="1" height="1" fill="#b8b8b8"/>
-<rect x="2" y="11" width="2" height="1" fill="#b8b8b8"/>
-<rect x="12" y="11" width="2" height="1" fill="#b8b8b8"/>
-<rect x="2" y="12" width="12" height="1" fill="#b8b8b8"/>
-<rect x="3" y="13" width="10" height="1" fill="#b8b8b8"/>
-</g>
+  <rect x="6.7" y="0" width="2.6" height="8.3" fill="#888888"/>
+  <rect x="3.85" y="6.45" width="8.3" height="2.7" rx="0.95" fill="#888888"/>
+  <path d="M3.85 9.05h8.3L8 13.0 3.85 9.05z" fill="#888888"/>
+  <path d="M0 11.6h2.7V16H0zM13.3 11.6H16V16H13.3z" fill="#888888"/>
+  <path d="M0 13.15h16V16H0z" fill="#888888"/>
 </svg>
