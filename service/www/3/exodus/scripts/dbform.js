@@ -181,6 +181,11 @@ var gfirstelement
 var gfirstnonkeyelement = ''
 var gstartelement
 var gfinalinputelement
+// Digit accesskey → control map (built by form_register_accesskeys). Alt+0…9.
+// Complements native HTML accesskey (unreliable) and hardcoded Alt+letter form chrome.
+var gformdigitaccesskeys = null
+// Capture-phase sync keydown installed once (not via Gate A addeventlistener).
+var gformdigitaccesskey_capture_installed = false
 var gchangesmade = false//set true in validateupdate exit and delete row (not insert row)
 var gelementthatjustcalledsetchangesmade
 var gallowsavewithoutchanges = false//allows locked records (with keys) to be saved anyway
@@ -394,6 +399,8 @@ function form_add_action_button(spec) {
     if (spec.disabled)
         setdisabledandhidden(button, true)
     window[id + 'button'] = button
+    // May add a digit accesskey; rebuild map used by Alt+0…9
+    form_register_accesskeys()
     return button
 }
 
@@ -1944,8 +1951,296 @@ async function formfunctions_onload() {
     // under the form but it ended below the fold, keep it in the top menubar.
     form_keep_action_buttons_on_screen()
 
+    // Page buttons with accesskey="1" etc. — map for Alt+digit (native accesskey is unreliable)
+    form_register_accesskeys()
+
     //logout('formfunctions_onload')
 
+}
+
+////////////////// FORM DIGIT ACCESSKEYS (Alt+0…9) /////////////////////
+//
+// Historical IE: HTML accesskey on real buttons worked with Alt+digit.
+//
+// Dual handling: if content script sees Alt+digit, it is not an uncancellable
+// chrome shortcut (those never reach the page). The second consumer is the
+// browser’s *native* accesskey processing on the same control — so we both
+// activate and the UA may still run accesskey / focus chrome.
+//
+// Fix: (1) register into gformdigitaccesskeys, (2) move accesskey →
+// data-exodus-accesskey so the UA no longer owns the key, (3) native capture
+// keydown (outside Gate A) preventDefaults and activates via Gate A.
+// Tooltips are not parsed. Letter shortcuts stay on the Alt+letter handlers.
+
+// True if element is shown and not disabled (at press time or when registering).
+function form_accesskey_usable(element) {
+
+    if (!element || !element.getAttribute)
+        return false
+
+    if (element.disabled)
+        return false
+    // setdisabledandhidden sets attribute disabled; empty string still means disabled
+    if (element.getAttribute('disabled') != null)
+        return false
+
+    if (element.style && element.style.display == 'none')
+        return false
+
+    // Hidden 1×1 / display:none capture stubs and truly collapsed nodes
+    if (!element.offsetWidth || !element.offsetHeight)
+        return false
+
+    return true
+}
+
+// Element that should receive activation (exodusonclick host, or the control itself).
+function form_accesskey_action_target(element) {
+
+    var target = element
+    while (target && target !== document && target !== document.body) {
+        if (target.getAttribute && target.getAttribute('exodusonclick'))
+            return target
+        target = target.parentNode
+    }
+
+    var tag = element.tagName
+    if (tag == 'BUTTON' || tag == 'A')
+        return element
+    if (tag == 'INPUT') {
+        var typ = (element.type || '').toLowerCase()
+        if (typ == 'button' || typ == 'submit' || typ == 'image' || typ == 'reset')
+            return element
+    }
+
+    return null
+}
+
+// Prefer a usable visible control over a later duplicate accesskey (or hidden twin).
+function form_accesskey_prefer(existing, candidate) {
+
+    var exOk = form_accesskey_usable(existing) && form_accesskey_action_target(existing)
+    var caOk = form_accesskey_usable(candidate) && form_accesskey_action_target(candidate)
+    if (caOk && !exOk)
+        return true
+    return false
+}
+
+// Read digit from accesskey or from data-exodus-accesskey after we disarm the UA.
+function form_accesskey_digit_attr(element) {
+
+    if (!element || !element.getAttribute)
+        return ''
+    var raw = element.getAttribute('data-exodus-accesskey')
+    if (raw == null || raw === '')
+        raw = element.getAttribute('accesskey')
+    if (raw == null)
+        return ''
+    raw = String(raw).replace(/^\s+|\s+$/g, '')
+    if (raw.length != 1 || raw < '0' || raw > '9')
+        return ''
+    return raw
+}
+
+// Build gformdigitaccesskeys from digit accesskeys in the document.
+// Disarm native accesskey (→ data-exodus-accesskey) so only our handler fires.
+// Call after form DOM is ready and after form_add_action_button.
+function form_register_accesskeys() {
+
+    var map = Object.create(null)
+    // Include already-disarmed controls from a prior register pass
+    var nodes = document.querySelectorAll('[accesskey], [data-exodus-accesskey]')
+
+    for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i]
+        var raw = form_accesskey_digit_attr(el)
+        if (!raw)
+            continue
+        if (!form_accesskey_action_target(el))
+            continue
+        // Prefer usable candidates when choosing among duplicates.
+        if (map[raw] && !form_accesskey_prefer(map[raw], el))
+            continue
+        map[raw] = el
+    }
+
+    // Disarm UA accesskey on winners (and digit accesskeys we skipped as losers
+    // still keep accesskey — disarm all digit accesskeys we considered usable targets)
+    for (var j = 0; j < nodes.length; j++) {
+        var el2 = nodes[j]
+        var dig = form_accesskey_digit_attr(el2)
+        if (!dig)
+            continue
+        if (!form_accesskey_action_target(el2))
+            continue
+        // Always store canonical digit; remove HTML accesskey so browser native
+        // accesskey path cannot also run when content handles the key.
+        el2.setAttribute('data-exodus-accesskey', dig)
+        if (el2.getAttribute('accesskey') != null)
+            el2.removeAttribute('accesskey')
+    }
+
+    gformdigitaccesskeys = map
+    form_ensure_digit_accesskey_capture()
+    return map
+}
+
+// Native capture keydown once — must NOT go through addeventlistener/Gate A.
+function form_ensure_digit_accesskey_capture() {
+
+    if (gformdigitaccesskey_capture_installed)
+        return
+    if (!document.addEventListener)
+        return
+    gformdigitaccesskey_capture_installed = true
+    // Capture phase, sync. keyup too: some UAs still apply accesskey residual on keyup.
+    document.addEventListener('keydown', form_digit_accesskey_capture_keydown, true)
+    document.addEventListener('keyup', form_digit_accesskey_capture_keyup, true)
+}
+
+// keyCode/which → '0'…'9' for main keyboard or numpad; empty if not a digit.
+function form_accesskey_digit_from_event(event) {
+
+    var kc = event.keyCode ? event.keyCode : event.which
+    if (kc >= 48 && kc <= 57)
+        return String.fromCharCode(kc)
+    if (kc >= 96 && kc <= 105)
+        return String.fromCharCode(kc - 96 + 48)
+    if (event.key && event.key.length == 1 && event.key >= '0' && event.key <= '9')
+        return event.key
+    return ''
+}
+
+// True if this form registered at least one digit accesskey (uses Alt+0…9 scheme).
+function form_has_digit_accesskeys() {
+
+    if (!gformdigitaccesskeys)
+        return false
+    for (var d in gformdigitaccesskeys)
+        return true
+    return false
+}
+
+// Sync lookup: first *usable* control for this digit (document order).
+// Hidden/disabled siblings with the same accesskey are registered but ignored
+// until they become usable — so hidden schedule buttons stay wired.
+function form_lookup_digit_accesskey_element(event) {
+
+    if (!gformdigitaccesskeys)
+        return null
+
+    var digit = form_accesskey_digit_from_event(event)
+    if (!digit)
+        return null
+
+    // Fast path: preferred map entry if still usable
+    var preferred = gformdigitaccesskeys[digit]
+    if (preferred
+        && (!document.contains || document.contains(preferred))
+        && form_accesskey_usable(preferred)
+        && form_accesskey_action_target(preferred))
+        return preferred
+
+    // Scan all controls sharing this digit (data-exodus-accesskey after disarm)
+    var nodes = document.querySelectorAll(
+        '[data-exodus-accesskey="' + digit + '"], [accesskey="' + digit + '"]'
+    )
+    for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i]
+        if (!form_accesskey_action_target(el))
+            continue
+        if (!form_accesskey_usable(el))
+            continue
+        return el
+    }
+
+    // None usable (e.g. only a hidden wired button) — no activation
+    return null
+}
+
+// Shared sync cancel for capture keydown/keyup.
+function form_digit_accesskey_cancel_event(event) {
+
+    if (event.preventDefault)
+        event.preventDefault()
+    event.returnValue = false
+    if (event.stopPropagation)
+        event.stopPropagation()
+    event.cancelBubble = true
+    if (event.stopImmediatePropagation)
+        event.stopImmediatePropagation()
+}
+
+// Capture keyup: swallow Alt+digit when the form uses digit accesskeys.
+function form_digit_accesskey_capture_keyup(event) {
+
+    if (!ginitok || !form_has_digit_accesskeys())
+        return
+    if (!event.altKey || event.ctrlKey || event.metaKey)
+        return
+    if (!form_accesskey_digit_from_event(event))
+        return
+    form_digit_accesskey_cancel_event(event)
+}
+
+// Capture keydown: if the form uses any digit accesskey, claim *all* Alt+0…9
+// (cancel even when the target is missing/hidden/disabled). Activate only when
+// a usable control exists for that digit.
+function form_digit_accesskey_capture_keydown(event) {
+
+    if (!ginitok || !form_has_digit_accesskeys())
+        return
+
+    if (!event.altKey || event.ctrlKey || event.metaKey)
+        return
+
+    var digit = form_accesskey_digit_from_event(event)
+    if (!digit)
+        return
+
+    // Always cancel — do not let the browser handle unused Alt+N on these forms
+    form_digit_accesskey_cancel_event(event)
+
+    var element = form_lookup_digit_accesskey_element(event)
+    if (!element)
+        return
+
+    var targetel = element
+    // Activation needs Gate A (exodusevaluate / dbio). Event already cancelled.
+    if (typeof exodus_begin == 'function') {
+        exodus_begin(async function form_digit_accesskey_activate(ev) {
+            await form_activate_accesskey_control(ev, targetel)
+        }, 'digit accesskey ' + digit, event)
+    } else {
+        void form_activate_accesskey_control(event, targetel)
+    }
+}
+
+// Run the same action as a click on the accesskey control. Returns true if handled.
+async function form_activate_accesskey_control(event, element) {
+
+    if (!form_accesskey_usable(element))
+        return false
+
+    var target = form_accesskey_action_target(element)
+    if (!target)
+        return false
+
+    var onclickexpression = target.getAttribute('exodusonclick')
+    if (onclickexpression) {
+        // Same path as document_onclick / form_activate_focused_action_button
+        await exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
+        return true
+    }
+
+    try {
+        if (typeof target.click == 'function') {
+            target.click()
+            return true
+        }
+    } catch (e) { }
+
+    return false
 }
 
 async function setfirstlastelement(element) {
@@ -2557,8 +2852,12 @@ async function document_onkeydown2(event) {
     if (gstepping)
         wstatus(gkeycode)
 
+    // Alt+0…9: handled in form_digit_accesskey_capture_keydown (native capture,
+    // outside Gate A). Not repeated here — preventDefault must not wait on async.
+
     //custom key handlers
     //must return false to prevent further action
+    // (Alt+digit is handled in form_digit_accesskey_capture_keydown — not here.)
     if (typeof form_onkeydown == 'function') {
         if (!(await form_onkeydown(event))) {
             return exoduscancelevent(event)
