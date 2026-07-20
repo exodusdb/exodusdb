@@ -5387,6 +5387,15 @@ function starteventhandler(eventfunctionname, functionx) {
 						return exoduscancelevent(event)
 					}
 
+					// Arrow keys: same cycle as Tab when focus is on a footer button
+					// (not while typing in the text field — leave caret movement alone).
+					// Left/Up = previous, Right/Down = next. Common for side-by-side actions.
+					if (!isdecide && focusedConfirmBtn
+						&& (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)) {
+						exodusconfirm_focus_cycle(keycode == 37 || keycode == 38)
+						return exoduscancelevent(event)
+					}
+
 					// Space/Enter on a focused confirm button activates that button
 					if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
 						if (focusedConfirmBtn.id == 'negativebutton')
