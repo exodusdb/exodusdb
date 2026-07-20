@@ -290,9 +290,9 @@ function form_place_menubar_session() {
     gexodus_menubar.appendChild(clear)
 }
 
-// Call after form_postdisplay / custom buttons: if the action bar is under the form
-// but below the fold, put it back in the top menubar. That is the whole rule —
-// do not place (keep) actions at the bottom when they are off-screen.
+// Call after form_postdisplay / custom buttons / pane wrap: if the action bar is
+// under the form but not fully on-screen, put it in the top menubar.
+// Idempotent when already top. client.js re-runs this after exoduswrapformpanes.
 function form_keep_action_buttons_on_screen() {
     if (gformbuttonsplace !== 'bottom')
         return
@@ -302,7 +302,9 @@ function form_keep_action_buttons_on_screen() {
     var vh = window.innerHeight || document.documentElement.clientHeight || 0
     if (!vh)
         return
-    if (bar.getBoundingClientRect().bottom <= vh)
+    var rect = bar.getBoundingClientRect()
+    // Fully visible in the viewport (any part below fold → move up)
+    if (rect.bottom <= vh && rect.top >= 0)
         return
     form_move_action_buttons_to_top()
 }

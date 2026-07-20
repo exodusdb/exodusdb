@@ -2041,6 +2041,20 @@ async function clientfunctions_windowonload() {
 
 	exoduswrapformpanes()
 
+	// Unbound form actions under the form: form_keep runs once inside formfunctions_onload,
+	// but wrap/pane padding can push the bar below the fold *after* that check.
+	// Re-run after wrap, and once more after the next paint.
+	if (typeof form_keep_action_buttons_on_screen == 'function') {
+		form_keep_action_buttons_on_screen()
+		if (typeof requestAnimationFrame == 'function') {
+			requestAnimationFrame(function () {
+				requestAnimationFrame(form_keep_action_buttons_on_screen)
+			})
+		} else {
+			window.setTimeout(form_keep_action_buttons_on_screen, 0)
+		}
+	}
+
 	//add menu, logout and refresh buttons if not a popup, depending on gshowmenu, not /exodus/ location and no navbar elements
 	//if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
 	if (!window.dialogArguments && (typeof gshowmenu == 'undefined' || gshowmenu) && EXODUSlocation != './exodus/' && document.getElementsByClassName('navbar').length == 0) {
