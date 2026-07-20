@@ -3165,6 +3165,13 @@ async function document_onkeydown2(event) {
 
     }
 
+    // Tab: same path as Enter-as-tab so focusdirection can land on form actions
+    // (see form-action exception there). Enter/down keep gkeycode 13/40 and skip them.
+    if (keycode == 9 && !event.ctrlKey && !event.altKey) {
+        focusdirection(event.shiftKey ? -1 : 1, element)
+        return exoduscancelevent(event)
+    }
+
     //all remaining key events are related to loaded records
     if (gKeyNodes && closerecord.getAttribute('disabled'))
         return true
@@ -3614,10 +3621,19 @@ function focusdirection(direction, element, notgroupno, scopex) {
             continue
         }
 
-        //skip uneditable elements
+        // Form action controls are SPANs (menubutton/graphicbutton), not inputs.
+        // Accept them on Tab only (gkeycode 9) so OK/Search is next after the last
+        // field; Enter/arrows still skip them and wrap to the first field.
+        var isformaction = nextelement.classList
+            && (nextelement.classList.contains('graphicbutton') || nextelement.classList.contains('menubutton'))
+            && nextelement.getAttribute('exodusonclick')
+
+        //skip uneditable elements (except form actions when Tabbing)
         if (nextelement.tagName != 'INPUT' && !nextelement.isContentEditable && nextelement.tagName != 'SELECT' && nextelement.tagName != 'TEXTAREA') {
-            //console.log('SKIP '+nextid+' is not contentEditable')
-            continue
+            if (!(gkeycode == 9 && isformaction)) {
+                //console.log('SKIP '+nextid+' is not contentEditable')
+                continue
+            }
         }
 
         //skip undesired group
