@@ -7830,12 +7830,24 @@ async function form_insertrow(event, append) {
         }
     }
 
-    //focus on first column of new row (after running postinsert routine)
+    //focus on first input column of new row (after postinsert — may rebind rows)
     if (!append) {
-        if (document.getElementsByClassName)
-            focuson(row.getElementsByClassName('exodusid_' + id)[0])
-        else
-            focuson(row.all[id])
+        // re-get row; postinsert (e.g. schedule_copy) may replace DOM
+        row = tablex.tBodies[0].getElementsByTagName('tr')[grecn]
+        var firstsfn = form_getfirstinputcolscreenfn(tablex)
+        if (firstsfn != null && firstsfn !== '' && typeof firstsfn != 'undefined' && gfields[firstsfn])
+            id = gfields[firstsfn].id
+        var focusel = null
+        if (row) {
+            if (row.exodusfields && row.exodusfields[id])
+                focusel = row.exodusfields[id]
+            else if (document.getElementsByClassName)
+                focusel = row.getElementsByClassName('exodusid_' + id)[0]
+            else if (row.all)
+                focusel = row.all[id]
+        }
+        if (focusel)
+            focuson(focusel)
     }
 
     //logout('insertrow')
