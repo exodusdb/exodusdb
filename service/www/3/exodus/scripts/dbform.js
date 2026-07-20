@@ -882,7 +882,7 @@ async function formfunctions_onload() {
                 }
             }
 
-            //prevent tab focussing on uneditable spans
+            // Type S display SPANs: not tabbable (empty chrome is CSS :empty::before only)
             if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S')
                 element.tabIndex = -1
 
