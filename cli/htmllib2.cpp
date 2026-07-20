@@ -757,8 +757,8 @@ func getvogonpoetry_css(in version) {
 			.nobr {white-space:nowrap;}
 			.pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
 			@media print {.noprint {display:none}}
+	)V0G0N"; // </style> tag close on ver1/ver2
 
-	)V0G0N";
 
 	if (version.assigned() and version == 2) {
 
