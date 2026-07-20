@@ -5151,8 +5151,6 @@ function exoduscoalesceformpanes() {
 function exoduswrapformpanes() {
 
 	// Wrap top-level TABLE.exodusform in a rounded shell (see global.css .exodusformpane).
-	// Do not set table or pane widths here — default/auto sizing, or author width=
-	// / style.width. Coalesce only merges shells; it must not resize tables either.
 	var tables = document.getElementsByTagName('TABLE')
 	for (var tablen = 0; tablen < tables.length; tablen++) {
 		var tablex = tables[tablen]

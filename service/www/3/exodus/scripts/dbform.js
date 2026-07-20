@@ -5,6 +5,79 @@ var gtexttagnames = /(^SPAN$)|(^INPUT$)|(^TEXTAREA$)/
 var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //var nbsp160 = String.fromCharCode(160)
 
+// =============================================================================
+// INPUT field width rules (only elements that remain <input> after onload).
+// Align-T free text is converted to SPAN first — not covered here.
+// Change this table first if behaviour must change; do not add one-off patches.
+//
+// Scope
+//   INCLUDE  INPUT type text/password (and blank type) with exoduslength, size!=1
+//   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA; SELECT
+//
+// Paint width = exoduslength × glyph, measured in the field's computed font
+// (after clsRequired/clsReadOnly). content-box width = minWidth = maxWidth.
+// HTML size = length only (table preferred-width hint); never size+2; never size
+// as the painted width.
+//
+// Glyph choice (first match wins)
+//   "8"  digit-ish — exodusconversion matches DATE / NUMBER / PERIOD /
+//        YEAR_PERIOD / FINANCIAL_PERIOD / YEARPERIOD / TIME (leading […),
+//        or contains DATE, or exoduspopup includes form_pop_calendar
+//   "0"  average  — exoduslowercase is set and not "false"
+//        (free-text / name-like entry that stayed INPUT, e.g. EXECUTIVE_CODE)
+//   "M"  max char — all other INPUTs (codes, keys, uppercase text)
+//
+// Not used for INPUT width: exodusalign (except T already left this path),
+// groupno, popup except calendar detection above.
+// =============================================================================
+var gform_input_width_digitconv = /^\[(DATE|NUMBER|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD|TIME)/
+var gform_input_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
+var gform_input_width_cache = {}
+
+function form_input_width_char(element) {
+    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    if (gform_input_width_digitconv.test(conv))
+        return '8'
+    if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0)
+        return '8'
+    if (gform_input_width_dateconv.test(conv))
+        return '8'
+    var lc = element.getAttribute('exoduslowercase')
+    if (lc && lc !== 'false')
+        return '0'
+    return 'M'
+}
+
+function form_apply_input_field_width(element) {
+    if (!element || element.tagName != 'INPUT')
+        return
+    if (element.type == 'radio' || element.type == 'checkbox'
+        || element.type == 'button' || element.type == 'submit' || element.type == 'image')
+        return
+    if (element.size == 1)
+        return
+    var n = parseInt(element.getAttribute('exoduslength'), 10)
+    if (!(n > 0))
+        return
+    var ch = form_input_width_char(element)
+    var cs = getComputedStyle(element)
+    var font = [cs.fontStyle, cs.fontVariant, cs.fontWeight, cs.fontSize, cs.fontFamily].join(' ').replace(/\s+/g, ' ').trim()
+    var key = font + '\t' + ch + '\t' + n
+    var px = gform_input_width_cache[key]
+    if (!px) {
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        ctx.font = font
+        px = Math.ceil(ctx.measureText(ch.repeat(n)).width)
+        gform_input_width_cache[key] = px
+    }
+    var w = px + 'px'
+    element.style.boxSizing = 'content-box'
+    element.style.width = w
+    element.style.minWidth = w
+    element.style.maxWidth = w
+}
+
 // set global image paths
 gnewimage = gimagetheme + 'form_add.svg'
 gopenimage = gimagetheme + 'open.svg'
@@ -461,7 +534,7 @@ async function formfunctions_onload() {
             //dictionary modifications
             //none - currently done in dictrec builder
 
-            // Convert free text (align T) INPUT to SPAN so long values can fold/flow.
+            //convert long text input to spans so that it can flow (if length not defined)
             if (element.tagName == 'INPUT' && dictitem.align == 'T') {
 
                 //replace original element
@@ -712,7 +785,6 @@ async function formfunctions_onload() {
 
             //allow excess spaces in EXODUS data using pre-wrap
             //"Sequences of whitespace are preserved. Lines are broken at newline characters, at <br>, and as necessary to fill line boxes."
-            // Folding: CSS --exodus-form-span-max-width. Length widths via exodus_apply_field_width later.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 try {
                     element.style.whiteSpace = 'pre-wrap'
@@ -728,14 +800,16 @@ async function formfunctions_onload() {
             }
 
             //allow for data entry in SPAN elements (unless hidden)
+            // min-width = length × 1 average char (CSS ch = width of "0"); no max from length.
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
+                var spanlen = parseInt(element.getAttribute('exoduslength'), 10)
+                var minwidth = spanlen > 0 ? spanlen + 'ch' : ''
                 //buggy and not necessary on msie7
                 //dont set display block if there is a link or popup so that the image stays to the left of the field
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
-                    //moved to css_old.css as SPAN min-width:13px;
-                    //element.style.minHeight = '13px'
-                    //element.style.minHeight='12px'
+                    if (minwidth)
+                        element.style.minWidth = minwidth
                     //element.multiLine=true
                     //element.style.display = 'inline-block'
                     //perhaps we ought to be using <div>
@@ -752,11 +826,11 @@ async function formfunctions_onload() {
                     element.contentEditable = 'true'
                     //element.contentEditable = true
                     //fixed width in msie but buggy in ff?
-                    if (isMSIE) {
+                    if (isMSIE && minwidth) {
                         //setting minWidth only causes problem in plan/schedule dates and extras entry
                         //setting width only causes problem almost everywhere that span data entry has no size initially
-                        if (element.style.minWidth)
-                            element.style.Width = element.style.minWidth
+                        element.style.minWidth = minwidth
+                        element.style.Width = minwidth
                     }
                     if (!(element.getAttribute('tabindex')))
                         element.setAttribute('tabindex', 999)
@@ -949,27 +1023,15 @@ async function formfunctions_onload() {
 			}
 
             //length and maxlength
-            //
-            // Table column width for a cell is not "this td's padding" — it is the
-            // column's max preferred width. For text INPUTs that preferred width is
-            // driven by the HTML size attribute (default 20 if omitted). CSS width
-            // only paints the control; it does not shrink the column. So size must
-            // equal exoduslength (no +2, and never remove size or the default 20
-            // holds the column open while a smaller style.width makes the field look
-            // short inside a wide td).
+            // INPUT paint width is set later (form_apply_input_field_width) after class/font.
+            // Keep size = length only as a weak table hint — not +2, not the painted width.
             if (element.tagName.match(gtexttagnames)) {
                 if (element.size != 1 && element.getAttribute('exoduslength')) {
                     if (!(parseInt(element.getAttribute('exoduslength')))) {
                         systemerror('formfunctions_onload()', element.id + '.getAttribute("exoduslength")=' + element.getAttribute('exoduslength') + ' is invalid. 10 used.')
                         element.setAttribute('exoduslength', 10)
                     }
-                    var fieldlen = parseInt(element.getAttribute('exoduslength'), 10)
-                    if (element.tagName == 'INPUT'
-                        && (element.type == 'text' || element.type == '' || !element.type || element.type == 'password')) {
-                        element.size = fieldlen
-                    } else if (element.tagName != 'INPUT') {
-                        element.size = fieldlen
-                    }
+                    element.size = parseInt(element.getAttribute('exoduslength'), 10)
                 }
                 if (element.tagName == 'TEXTAREA') {
 
@@ -1143,10 +1205,9 @@ async function formfunctions_onload() {
                     element.className = elementclassname
             }
 
-            // after class/font known: INPUT N×8|N×M|N×0(T/lowercase); SPAN fold Nch
-            if (element.tagName.match(gtexttagnames) && element.size != 1 && element.getAttribute('exoduslength')
-                && element.type != 'radio' && element.type != 'checkbox')
-                exodus_apply_field_width(element, parseInt(element.getAttribute('exoduslength'), 10), exodus_field_width_char(element))
+            // After clsRequired/clsReadOnly so measure uses final font.
+            // Only INPUTs that remained INPUT (align T already converted to SPAN).
+            form_apply_input_field_width(element)
 
             //handle groups
 

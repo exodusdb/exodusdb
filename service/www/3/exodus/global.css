@@ -182,12 +182,6 @@ TABLE.exodusform TABLE.exodustable th {
     border-radius: 0;
     box-sizing: border-box;
 }
-/* Content width inside the rounded shell. Coalesced panes share one frame but
-   must not stretch sibling tables to the widest child. Opt out with HTML
-   width=… (or an inline style.width) when a form should expand. */
-.exodusformpane > TABLE.exodusform:not([width]) {
-    width: max-content;
-}
 /* Pane owns the outer edge; table cells draw internal grid lines only */
 .exodusformpane > TABLE.exodusform > thead > tr > :first-child,
 .exodusformpane > TABLE.exodusform > tbody > tr > :first-child,
@@ -296,8 +290,6 @@ BODY
     --exodus-form-nested-cell-padding-y: 0.2em;
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
-    /* Fold point for form SPANs without exoduslength (DATELIST, long symbols, …) */
-    --exodus-form-span-max-width: 40ch;
     --exodus-informbutton-bg: #f0f0f0;
     --exodus-informbutton-hover-bg: #ffffff;
     --exodus-informbutton-hover-border: #aaaaaa;
@@ -462,34 +454,6 @@ TABLE.exodusform SPAN.clsRequired[contenteditable],
 TABLE.exodusform SPAN.clsNotRequired[contenteditable],
 TABLE.exodusform .clsReadOnly {
     font-style: var(--exodus-form-data-font-style);
-}
-
-/*
- * Form SPANs: pre-wrap (dbform) + max-width so long text folds.
- * Default: --exodus-form-span-max-width. exodus_apply_field_width:
- *   editable type F → min/max Nch; display align T → max Nch (e.g. VEHICLE_NAME).
- * Other display SPANs hug content under the CSS default.
- */
-TABLE.exodusform SPAN.clsRequired,
-TABLE.exodusform SPAN.clsNotRequired,
-TABLE.exodusform SPAN.clsRequired[contenteditable],
-TABLE.exodusform SPAN.clsNotRequired[contenteditable],
-TABLE.exodusform SPAN.clsReadOnly {
-    display: inline-block;
-    max-width: var(--exodus-form-span-max-width);
-    overflow-wrap: break-word;
-    vertical-align: top;
-    box-sizing: border-box;
-}
-
-/* field width: exodus_apply_field_width() in db.js */
-TABLE.exodusform INPUT.clsRequired,
-TABLE.exodusform INPUT.clsNotRequired,
-TABLE.exodustable INPUT.clsRequired,
-TABLE.exodustable INPUT.clsNotRequired,
-TABLE.exodustable SPAN.clsRequired[contenteditable],
-TABLE.exodustable SPAN.clsNotRequired[contenteditable] {
-    box-sizing: content-box;
 }
 
 /* UA forms.css shrinks controls after screenfont strips font-size from font-family rules */
@@ -865,9 +829,7 @@ input[type=radio] {
     appearance: none;
     box-sizing: border-box;
     min-height: 0;
-    width: var(--exodus-check-size) !important;
-    min-width: var(--exodus-check-size) !important;
-    max-width: var(--exodus-check-size) !important;
+    width: var(--exodus-check-size);
     height: var(--exodus-check-size);
     border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
@@ -907,9 +869,7 @@ input[type=checkbox] {
     appearance: none;
     box-sizing: border-box;
     min-height: 0;
-    width: var(--exodus-check-size) !important;
-    min-width: var(--exodus-check-size) !important;
-    max-width: var(--exodus-check-size) !important;
+    width: var(--exodus-check-size);
     height: var(--exodus-check-size);
     border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
