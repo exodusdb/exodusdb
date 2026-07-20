@@ -132,14 +132,6 @@ body > #formbuttonsdiv .graphicbutton:hover {
     background-color: var(--exodus-menuhighlight);
 }
 
-/* Same orange focus ring as data fields (--exodus-field-focus-color) */
-.exodusformactions .graphicbutton:focus,
-body > #formbuttonsdiv .graphicbutton:focus {
-    outline: none;
-    background-color: var(--exodus-menuhighlight);
-    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
-}
-
 .exodusformactions .exodusbutton {
     margin: 0.125em 4px;
 }
@@ -652,6 +644,15 @@ span.clsReadOnly:empty
     background-color: var(--exodus-menuhighlight);
 }
 
+/* Shared chrome focus (form actions bottom or menubar, confirm footer, menu tools).
+   Same orange ring as data fields; covers Tab onto OK/Search after move to #exodus_menu. */
+.graphicbutton:focus,
+.menubutton:focus {
+    outline: none;
+    background-color: var(--exodus-menuhighlight);
+    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
+}
+
 .exodusbutton:hover:enabled {
     background-color: var(--exodus-informbutton-hover-bg);
     border-color: var(--exodus-informbutton-hover-border);
@@ -1079,11 +1080,6 @@ input[type=checkbox]:focus-visible {
 .exodusconfirm_footer .graphicbutton:hover {
     background-color: var(--exodus-menuhighlight);
 }
-.exodusconfirm_footer .graphicbutton:focus {
-    outline: none;
-    background-color: var(--exodus-menuhighlight);
-    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
-}
 
 /* Yes/No/Cancel: top menubar menubutton look, text only (no icons) */
 .exodusconfirm_footer .menubutton {
@@ -1105,11 +1101,6 @@ input[type=checkbox]:focus-visible {
 }
 .exodusconfirm_footer .menubutton:hover {
     background-color: var(--exodus-menuhighlight);
-}
-.exodusconfirm_footer .menubutton:focus {
-    outline: none;
-    background-color: var(--exodus-menuhighlight);
-    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 .exodusconfirm_iconcol {
     width: 4.3em;
@@ -1380,16 +1371,11 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 }
 
 :root[data-theme="dark_mode"] .exodusformactions .graphicbutton:hover,
-:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:hover {
-    background-color: var(--exodus-menuhighlight);
-    border-color: #888888;
-}
-
 :root[data-theme="dark_mode"] .exodusformactions .graphicbutton:focus,
+:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:hover,
 :root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:focus {
     background-color: var(--exodus-menuhighlight);
     border-color: #888888;
-    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 
 :root[data-theme="dark_mode"] A:link { color: #8ab4f8; }
@@ -1435,14 +1421,10 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 :root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:focus {
     border-color: #888888;
     background-color: var(--exodus-menuhighlight);
-    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:hover,
 :root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:focus {
     background-color: var(--exodus-menuhighlight);
-}
-:root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:focus {
-    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {
     --exodusconfirm-border: #e06060;

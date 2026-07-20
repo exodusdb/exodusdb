@@ -31,6 +31,16 @@ Do **not** run `git commit` (or push) unless the user clearly asks — e.g. “c
 - Prefer **dict** / **HTM column class** / **page-local CSS** over global `!important` hacks.
 - Find **root cause** (page `<style>`, inline dbform styles, pane rules) before adding suppressions.
 
+## Light framework changes (dbform / client)
+
+When the user asks to *lightly* adapt keyboard, focus, tab order, or form actions:
+
+- **`focusdirection` is a dumb DOM walker**, not a form model. Policy is the skip/accept list. Prefer **one more accepted target** (e.g. form-action SPANs on Tab only via `gkeycode`) over wrap helpers, last-field oracles, or parallel routers.
+- Do **not** trust `gfinalinputelement` / `gstartelement` identity alone after `form_postinit` (pages like search reorder rows; “last field” is “walker finds nothing else before wrap”).
+- Key-specific behaviour already uses **`gkeycode`** (e.g. Enter skips buttons). Extend that pattern: Tab-only vs Enter/arrows, not a new code path.
+- Form actions are **SPANs** (`.menubutton` / `.graphicbutton` + `exodusonclick`), not native `<button>`s — the walker already visits them if the skip list allows.
+- If the first idea needs a new named helper + special-case call site, **pause** and re-read the existing walker/filter first.
+
 ## Neosys modules
 
 Agency/finance/jobs/media HTM under `~/neosys/web/3/` is symlinked into `service/www/3/` via `~/neosys/merge_web_modules`. Module pages use the same Exodus framework paths (`../exodus/scripts/client.js`, etc.).
