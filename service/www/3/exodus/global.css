@@ -777,6 +777,24 @@ img[id^="deleterowbutton"] {
     border-left: 0.2px solid var(--exodus-smallerbordercolor);
 }
 
+/* Database name + username: same row as theme/logout (float:right sibling) */
+.exodus_menubar_session {
+    float: right;
+    margin: 7px 10px;
+    line-height: var(--exodus-ui-icon-size, 1.325em);
+    vertical-align: middle;
+    white-space: nowrap;
+    color: inherit;
+}
+.exodus_menubar_session_test {
+    color: red;
+}
+/* After all floated menubar children so session is not pushed to a second row */
+.exodus_menubar_clear {
+    clear: left;
+    min-height: 1px;
+}
+
 
 :root {
     --bg-color: #fff;

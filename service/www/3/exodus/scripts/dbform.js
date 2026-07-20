@@ -245,6 +245,46 @@ function form_formbuttons_place() {
     return place === 'bottom' ? 'bottom' : 'top'
 }
 
+// Database name + username on the top menubar, immediately left of theme/logout.
+// Uses float:right as a menubar sibling (same packing as .logout_wrapper / .theme_button).
+// Never nest inside #formbuttonsdiv (float:left) — that pins the label to the form actions.
+// clear:left must come AFTER all floated menubar children or the session drops to a new row.
+function form_place_menubar_session() {
+    if (typeof gdatasetname == 'undefined' && typeof gusername == 'undefined')
+        return
+    if (typeof add_exodus_menubar == 'function')
+        add_exodus_menubar()
+    if (!gexodus_menubar)
+        return
+
+    var old = gexodus_menubar.querySelector('.exodus_menubar_session')
+    if (old)
+        old.parentNode.removeChild(old)
+
+    // Remove prior clear divs so we can re-append clear as the last child
+    var clears = gexodus_menubar.querySelectorAll('.exodus_menubar_clear')
+    for (var ci = 0; ci < clears.length; ci++)
+        clears[ci].parentNode.removeChild(clears[ci])
+
+    var text = (gdatasetname || '') + ' - ' + (gusername || '')
+    if (text === ' - ' || text === '-')
+        return
+
+    var span = document.createElement('span')
+    span.className = 'exodus_menubar_session'
+    if (gdataset && String(gdataset).split('_')[1] == 'test')
+        span.classList.add('exodus_menubar_session_test')
+    span.appendChild(document.createTextNode(text))
+
+    // Session before clear. client.js later inserts logout/theme at firstChild;
+    // float:right order becomes logout, theme, session → visual session | Theme | Logout.
+    gexodus_menubar.appendChild(span)
+
+    var clear = document.createElement('div')
+    clear.className = 'exodus_menubar_clear'
+    gexodus_menubar.appendChild(clear)
+}
+
 // Call after form_postdisplay / custom buttons: if the action bar is under the form
 // but below the fold, put it back in the top menubar. That is the whole rule —
 // do not place (keep) actions at the bottom when they are off-screen.
@@ -295,10 +335,8 @@ function form_move_action_buttons_to_top() {
             topbar.parentNode.removeChild(topbar)
     }
 
-    var clearleft = document.createElement('div')
-    clearleft.style.cssText = 'clear: left; min-height: 1px;'
-    gexodus_menubar.insertBefore(clearleft, gexodus_menubar.firstChild)
     gexodus_menubar.insertBefore(topbar, gexodus_menubar.firstChild)
+    form_place_menubar_session()
 
     if (typeof adjust_bodymargin == 'function')
         adjust_bodymargin()
@@ -1658,30 +1696,6 @@ async function formfunctions_onload() {
 
     }
 
-    //login details (database/username)
-    var loginhtml = ''
-
-    //loginhtml+='<div style="float:left; white-space:nowrap">'
-    //loginhtml += '<span style="float:left; vertical-align:middle">'
-    // Right side login details, disappears if zoomed in to avoid menu extending vertically
-    //loginhtml += '<span style="float:right; margin: 5px 10px; vertical-align:middle">'
-    // Adjust margin to center element vertically. Not exact middle due to settings in client.js
-    //loginhtml += '<span style="float:right; margin: 7px 10px; vertical-align:middle">'
-    loginhtml += '<span style="float:right; margin: 7px 10px; vertical-align:middle;'
-    // Highlight if logged into test database
-    if (gdataset.split('_')[1] == 'test')
-        loginhtml += 'color: red;'
-    //loginhtml += gdatasetname + ' - ' + gdataset + ' - ' + gusername + '</span>'
-    // Reduce clutter by displaying database name and username only
-    loginhtml += '">' + gdatasetname + ' - ' + gusername + '</span>'
-
-    if (gKeyNodes)
-        buttonhtml += loginhtml
-
-    //a separator span to keep the ok and cancel buttons from overlapping a floating div
-    //if (!gKeyNodes && $$('autofitwindowelement'))
-    //    buttonhtml = '<div style="clear:both">&nbsp;</div>' + buttonhtml
-
     // Form action bar: top menubar, or under the form (see form_formbuttons_place)
     var formbuttons = document.createElement(gformbuttonsplace === 'top' ? 'SPAN' : 'DIV')
     formbuttons.id = 'formbuttonsdiv'
@@ -1689,20 +1703,7 @@ async function formfunctions_onload() {
 
     if (gformbuttonsplace === 'top') {
         add_exodus_menubar()
-
-        // Keep form title below the (left-floating) menu buttons
-        var clearleft = document.createElement('div')
-        clearleft.style.cssText = 'clear: left; min-height: 1px;'
-        gexodus_menubar.insertBefore(clearleft, gexodus_menubar.firstChild)
-
-        // Unbound: database-username on the right of the menubar (bound embeds login in buttonhtml)
-        if (!gKeyNodes) {
-            var loginsp = document.createElement('span')
-            loginsp.style.float = 'right'
-            loginsp.innerHTML = loginhtml
-            gexodus_menubar.insertBefore(loginsp, gexodus_menubar.firstChild)
-        }
-
+        // Form actions on the left; session + clear:left appended in form_place_menubar_session
         gexodus_menubar.insertBefore(formbuttons, gexodus_menubar.firstChild)
         if (typeof adjust_bodymargin == 'function')
             adjust_bodymargin()
@@ -1710,6 +1711,9 @@ async function formfunctions_onload() {
         formbuttons.className = 'exodusformactions'
         document.body.insertBefore(formbuttons, null)
     }
+
+    // Database name + username on menubar right (left of theme/logout). clear:left last.
+    form_place_menubar_session()
 
     //make global variables to correspond to the buttons
     //to provide backward compatibility with IE code which can refer to document elements like global variables
