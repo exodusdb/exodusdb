@@ -102,7 +102,7 @@ glastimage = gimagetheme + 'resultset_last.svg'
 gnextimage = gimagetheme + 'resultset_next.svg'
 gpreviousimage = gimagetheme + 'resultset_previous.svg'
 gspacerimage = gimagetheme + 'spacer.svg'
-gblankimage = gimagetheme + 'blank.gif'
+gblankimage = gimagetheme + 'blank.svg'
 
 // Mitigate icon flash between default (light) to dark versions
 // gisdarktheme assigned in client.js init. See global.css file linking

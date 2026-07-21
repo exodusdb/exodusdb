@@ -47,7 +47,6 @@ var glogflights
 
 //various images
 var gimagetheme = '../../exodus/images/theme2/'
-//var gmenuimage=gimagetheme+'menu.png'//'add.png'
 var gmenuimage = gimagetheme + 'menu_burger.svg'
 var glogoutimage = gimagetheme + 'logout.svg'
 var gloginimage = gimagetheme + 'login.svg'

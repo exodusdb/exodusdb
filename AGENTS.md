@@ -59,6 +59,17 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 - Icons drawn with a 1-unit internal margin can use `viewBox="1 1 14 14"` so they still render full-bleed before CSS pad (New/Delete/Edit).
 - Colours (e.g. dark-mode green on bare vs page-backed icons) stay in the SVGs; mass/size do not.
 
+### Raster → SVG migration (multi-turn)
+
+**Menubar / form chrome:** already SVG (menu, refresh, logout, theme, company, New…nav, zoom, calendar, row add/delete). Delete obsolete PNG/GIF twins only when no HTM/JS refs remain.
+
+**Next batches (in order):**
+1. Login: `eye.png` / `eye-slash.png` (+ index.html)
+2. Dialog chrome: `xpinfo.gif`, `xpquestion.gif`, `xpwarning.gif`, `xpcritical.gif`
+3. Leftover form GIF: `smallopen.gif` if still referenced
+4. Neosys page icons: `play.png`, `pencil.png`, `page_copy.png`, address/detail icons, logos as needed
+5. Purge unused rasters after refs are gone
+
 ### Deferred: framework mental model write-up
 
 User asked (2026-07) for a stored **end-to-end mental model** of Gate A/B, focus, form validation, and DOM events so future work is not terra nullius / spaghetti. **Remind the user** to run that analysis session when they have bandwidth; do not invent parallel “AI patch” layers meanwhile. Natural home: extend `PROGRAMMERS_OVERVIEW.md` §3 (or a short sibling) from real call paths, not speculation.
