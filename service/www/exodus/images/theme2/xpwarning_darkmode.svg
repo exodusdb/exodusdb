@@ -1,7 +1,7 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- warning dark: keep yellow; slightly softer edge for dark face -->
+  <!-- DM warning: bright yellow + black ! (same glyph rule as LM) -->
   <path d="M16 3.2 29.6 27.4H2.4L16 3.2z"
-        fill="#F5D040" stroke="#1a1808" stroke-width="1.6" stroke-linejoin="round"/>
-  <rect x="14.45" y="11.2" width="3.1" height="8.6" rx="1.2" fill="#1a1808"/>
-  <circle cx="16" cy="23.3" r="1.75" fill="#1a1808"/>
+        fill="#F5D040" stroke="#1a1400" stroke-width="1.5" stroke-linejoin="round"/>
+  <rect x="14.4" y="11.0" width="3.2" height="8.8" rx="1.2" fill="#1a1400"/>
+  <circle cx="16" cy="23.4" r="1.8" fill="#1a1400"/>
 </svg>

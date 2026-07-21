@@ -1,8 +1,7 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- question: blue disc + white ? -->
+  <!-- LM question: blue disc + white ? (XP-style) -->
   <circle cx="16" cy="16" r="14.5" fill="#023292"/>
-  <!-- curved ? body -->
   <path d="M11.2 11.6c0-2.9 2.15-5.05 4.85-5.05 2.75 0 4.9 2 4.9 4.7 0 1.7-.75 2.85-2.35 4.05l-1.15.85c-.85.65-1.2 1.25-1.2 2.35v.55h-2.55v-.7c0-1.7.55-2.65 1.85-3.6l1.15-.85c1.15-.85 1.65-1.55 1.65-2.65 0-1.35-1-2.3-2.4-2.3-1.35 0-2.3.95-2.4 2.35h-2.85z"
-        fill="#FAFAFA"/>
-  <circle cx="16" cy="24.2" r="1.85" fill="#FAFAFA"/>
+        fill="#FFFFFF"/>
+  <circle cx="16" cy="24.2" r="1.85" fill="#FFFFFF"/>
 </svg>

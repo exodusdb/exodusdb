@@ -1,7 +1,7 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- info dark: brighter green for contrast on #284a28 face -->
+  <!-- DM info: brighter green on dark face; white i -->
   <circle cx="16" cy="16" r="14.5" fill="#3ec848"/>
-  <circle cx="16" cy="16" r="14.5" fill="none" stroke="#a8f0b0" stroke-width="1.2" opacity="0.55"/>
-  <circle cx="16" cy="9.2" r="2.15" fill="#FFFFFF"/>
-  <rect x="14.15" y="13.2" width="3.7" height="11.2" rx="1.4" fill="#FFFFFF"/>
+  <circle cx="16" cy="16" r="14.5" fill="none" stroke="#c8f5cc" stroke-width="1" opacity="0.45"/>
+  <circle cx="16" cy="9.0" r="2.2" fill="#FFFFFF"/>
+  <rect x="14.1" y="13.0" width="3.8" height="11.4" rx="1.5" fill="#FFFFFF"/>
 </svg>
