@@ -89,27 +89,23 @@
 			min-height: 0;
 		}
 
-		/* Visible keyboard focus for every stop in the login Tab cycle */
+		/* Keyboard focus: browser Highlight (system selection/focus colour), not app orange */
 		#logindiv .loginfield:focus,
 		#logindiv .loginbutton:focus,
 		#logindiv .toggle-password:focus,
 		#logindiv .login-options-row input[type=checkbox]:focus,
+		#logindiv .login-options-row input[type=checkbox]:focus-visible,
 		#logindiv .login-reset-link:focus {
-			outline: 2px solid #b28d4f;
+			outline: 2px solid Highlight;
 			outline-offset: 2px;
+			/* global.css paints orange box-shadow on checkbox:focus — cancel here */
+			box-shadow: none;
 		}
 		#logindiv .toggle-password:focus {
 			border-radius: 2px;
 		}
 		#logindiv .login-reset-link:focus {
 			border-radius: 2px;
-		}
-		:root[data-theme="dark_mode"] #logindiv .loginfield:focus,
-		:root[data-theme="dark_mode"] #logindiv .loginbutton:focus,
-		:root[data-theme="dark_mode"] #logindiv .toggle-password:focus,
-		:root[data-theme="dark_mode"] #logindiv .login-options-row input[type=checkbox]:focus,
-		:root[data-theme="dark_mode"] #logindiv .login-reset-link:focus {
-			outline-color: #d4b06a;
 		}
 
 		body.login-page {
