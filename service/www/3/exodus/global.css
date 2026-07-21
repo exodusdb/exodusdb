@@ -1266,26 +1266,7 @@ input[type=checkbox]:focus-visible {
     color: #000000;
     text-align: left;
 }
-.exodusconfirmdiv.exodusconfirm_critical {
-    --exodusconfirm-face: #ffdddd;
-    background-color: #ffdddd;
-    border-color: #cc3333;
-}
-.exodusconfirmdiv.exodusconfirm_warning {
-    --exodusconfirm-face: #ffff99;
-    background-color: #ffff99;
-    border-color: #b8a800;
-}
-.exodusconfirmdiv.exodusconfirm_info {
-    --exodusconfirm-face: #ddffdd;
-    background-color: #ddffdd;
-    border-color: #339933;
-}
-.exodusconfirmdiv.exodusconfirm_question1 {
-    --exodusconfirm-face: #ddddff;
-    background-color: #ddddff;
-    border-color: #4444cc;
-}
+/* Type (info/critical/warning/question): icon only — no face/border tint */
 
 .exodusconfirmdiv #decide_table1 > thead {
     position: sticky;
