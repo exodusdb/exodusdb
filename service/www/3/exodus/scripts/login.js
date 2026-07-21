@@ -148,7 +148,11 @@ async function autologin_onclick() {
 }
 
 //treat password reminders/resets like logins because we have validated session yet to pass requests
-async function passwordreset_onclick() {
+async function passwordreset_onclick(event) {
+
+    // href="#" only for keyboard focus — do not jump to top of page
+    if (event && event.preventDefault)
+        event.preventDefault()
 
     if (await hidepassword('await passwordreset_onclick()'))
         return

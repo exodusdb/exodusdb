@@ -89,6 +89,29 @@
 			min-height: 0;
 		}
 
+		/* Visible keyboard focus for every stop in the login Tab cycle */
+		#logindiv .loginfield:focus,
+		#logindiv .loginbutton:focus,
+		#logindiv .toggle-password:focus,
+		#logindiv .login-options-row input[type=checkbox]:focus,
+		#logindiv .login-reset-link:focus {
+			outline: 2px solid #b28d4f;
+			outline-offset: 2px;
+		}
+		#logindiv .toggle-password:focus {
+			border-radius: 2px;
+		}
+		#logindiv .login-reset-link:focus {
+			border-radius: 2px;
+		}
+		:root[data-theme="dark_mode"] #logindiv .loginfield:focus,
+		:root[data-theme="dark_mode"] #logindiv .loginbutton:focus,
+		:root[data-theme="dark_mode"] #logindiv .toggle-password:focus,
+		:root[data-theme="dark_mode"] #logindiv .login-options-row input[type=checkbox]:focus,
+		:root[data-theme="dark_mode"] #logindiv .login-reset-link:focus {
+			outline-color: #d4b06a;
+		}
+
 		body.login-page {
 			background: #F9F9F9;
 		}
@@ -268,18 +291,7 @@
 			document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/login.js"></scr' + 'ipt>')
 		}
 
-		<!--To ensure the focus moves from Login button to Usercode field-->
-		window.addEventListener('DOMContentLoaded', (event) => {
-			var loginButton = document.getElementById('loginbutton');
-			var userCodeField = document.getElementById('usernameelement');
-
-			loginButton.addEventListener('keydown', function(event) {
-				if (event.key === 'Tab' && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
-					event.preventDefault(); // Prevent default tabbing behavior
-					userCodeField.focus(); // Focus the user code field
-				}
-			});
-		});
+		// Login Tab order: native DOM order only (no tabindex, no Tab keydown trap).
 
 	</script>
 
@@ -297,19 +309,19 @@
 				</div>
 
 				<div style="margin-bottom: 1rem;">
-					<input tabindex="1" id="usernameelement" class="loginfield" placeholder="USERCODE" style="text-transform: uppercase;" />
+					<input id="usernameelement" class="loginfield" placeholder="USERCODE" style="text-transform: uppercase;" />
 				</div>
 
 				<!--button behavior set in login.js				-->
 				<div style="margin-bottom: 1rem; position: relative; display: flex; align-items: center;">
-					<input tabindex="2" type="password" id="passwordelement" class="loginfield" placeholder="PASSWORD" style="padding-right: 40px; text-transform: uppercase;">
-					<button id="togglePassword" class="toggle-password" type="button" onclick="showpassword_sync()" title="Show/Hide password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; outline: none;">
+					<input type="password" id="passwordelement" class="loginfield" placeholder="PASSWORD" style="padding-right: 40px; text-transform: uppercase;">
+					<button id="togglePassword" class="toggle-password" type="button" onclick="showpassword_sync()" title="Show/Hide password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0;">
 						<img src="../exodus/images/theme2/eye-slash.svg" alt="" width="21" height="14">
 					</button>
 				</div>
 
 				<div style="margin-bottom: 1rem;">
-					<select tabindex="3" id="datasetelement" class="loginfield" title="Database">
+					<select id="datasetelement" class="loginfield" title="Database">
 					</select>
 				</div>
 
@@ -324,7 +336,7 @@
 						<input type="checkbox" id="autologinelement" />
 						<label for="autologinelement">Remember me</label>
 					</div>
-					<a id="passwordresetlink" class="login-reset-link">
+					<a id="passwordresetlink" class="login-reset-link" href="#" role="button">
 						Reset Password
 					</a>
 				</div>
