@@ -331,12 +331,8 @@ function form_move_action_buttons_to_top() {
 
     gformbuttonsplace = 'top'
 
-    // Bottom bar used .graphicbutton; menubar uses .menubutton
-    var buttons = bar.querySelectorAll('.graphicbutton')
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].classList.remove('graphicbutton')
-        buttons[i].classList.add('menubutton')
-    }
+    // Unbound Save/Close stay .graphicbutton when moved up (do not flatten).
+    // Bound form tools are already .menubutton.
 
     add_exodus_menubar()
 
@@ -386,7 +382,8 @@ function form_add_action_button(spec) {
     if ($$(id + 'button'))
         return $$(id + 'button')
 
-    var align = gformbuttonsplace === 'bottom' ? 'center' : 'left'
+    // Unbound form extras match Save/Close (raised); bound stay flat menubar tools
+    var align = gKeyNodes ? 'left' : 'center'
     bar.insertAdjacentHTML(
         spec.insert === 'start' ? 'afterbegin' : 'beforeend',
         '<span>' + menubuttonhtml(
@@ -1669,12 +1666,15 @@ async function formfunctions_onload() {
     var buttonhtml = ''
 
     gformbuttonsplace = form_formbuttons_place()
-    // Menubar: left menubuttons. Below form: center graphicbuttons.
-    var buttonalign = gformbuttonsplace === 'top' ? 'left' : 'center'
+    // Unbound (no keys): OK/Save + Close are real actions → raised .graphicbutton
+    // (same face if relocated from bottom into the menubar).
+    // Bound: New/Open/Save/nav… live as flat menubar tools → .menubutton
+    // (Menu/Refresh/Logout are always flat menubutton too).
+    var formActionAlign = gKeyNodes ? 'left' : 'center'
 
     //wrap form buttons in a span so they align the same as the menu, logout and refresh buttons
-    function menubuttonhtml2(id, imagesrc, name, title, accesskey, align) {
-        return '<span>' + menubuttonhtml(id, imagesrc, name, title, accesskey, align) + '</span>'
+    function menubuttonhtml2(id, imagesrc, name, title, accesskey) {
+        return '<span>' + menubuttonhtml(id, imagesrc, name, title, accesskey, formActionAlign) + '</span>'
     }
 
     //bound form buttons NEW/OPEN/EDIT-RELEASE
@@ -1685,40 +1685,40 @@ async function formfunctions_onload() {
     }
 
     //bound and unbound form buttons have OK/SAVE and CLOSE buttons
-    buttonhtml += menubuttonhtml2('saverecord', gsaveimage, '<u>S</u>ave', 'Save the current document. ' + AltorCtrl + '+S, Ctrl+Enter or F9', 'S', buttonalign)
-    buttonhtml += menubuttonhtml2('closerecord', gcloseimage, '<u>C</u>lose', 'Close the current document. ' + AltorCtrl + '+C', 'C', buttonalign)
+    buttonhtml += menubuttonhtml2('saverecord', gsaveimage, '<u>S</u>ave', 'Save the current document. ' + AltorCtrl + '+S, Ctrl+Enter or F9', 'S')
+    buttonhtml += menubuttonhtml2('closerecord', gcloseimage, '<u>C</u>lose', 'Close the current document. ' + AltorCtrl + '+C', 'C')
 
     //bound form buttons
     if (gKeyNodes) {
 
         //COPY
         if (typeof form_copyrecord == 'function')
-            buttonhtml += menubuttonhtml2('copyrecord', gcopyimage, 'Copy', 'Copy the current document.', '', buttonalign)
+            buttonhtml += menubuttonhtml2('copyrecord', gcopyimage, 'Copy', 'Copy the current document.', '')
 
         //DELETE
         //Alt+D not allowed in IE or FF since it goes to the address bar
         if (typeof gpreventdeletion == 'undefined' || gpreventdeletion != false) {
-            //buttonhtml += menubuttonhtml2('deleterecord', gdeleteimage, '<u>D</u>elete', 'Delete the current document. ' + AltorCtrl + '+D', 'D', buttonalign)
-            buttonhtml += menubuttonhtml2('deleterecord', gdeleteimage, 'Delete', 'Delete the current document.', '', buttonalign)
+            //buttonhtml += menubuttonhtml2('deleterecord', gdeleteimage, '<u>D</u>elete', 'Delete the current document. ' + AltorCtrl + '+D', 'D')
+            buttonhtml += menubuttonhtml2('deleterecord', gdeleteimage, 'Delete', 'Delete the current document.', '')
         }
 
         //PRINT
         if (gKeyNodes[0].getAttribute('exodusprintfunction'))
-            buttonhtml += menubuttonhtml2('printsendrecord', gprintsendimage, '<u>P</u>rint/Send', 'Print/Send this or these documents. ' + AltorCtrl + '+P', 'P', buttonalign)
+            buttonhtml += menubuttonhtml2('printsendrecord', gprintsendimage, '<u>P</u>rint/Send', 'Print/Send this or these documents. ' + AltorCtrl + '+P', 'P')
 
         //LIST
         var tt2 = gKeyNodes[0].getAttribute('exoduslistfunction')
         if (tt2)
-            buttonhtml += menubuttonhtml2('listrecord', glistimage, '<u>L</u>ist', 'List the current file. ' + AltorCtrl + '+L', 'L', buttonalign)
+            buttonhtml += menubuttonhtml2('listrecord', glistimage, '<u>L</u>ist', 'List the current file. ' + AltorCtrl + '+L', 'L')
 
         //NAVIGATION multirecord — one floated group so they wrap together, not one-by-one
         buttonhtml += '<span class="exodus_recordnav_group">'
-        buttonhtml += menubuttonhtml2('firstrecord', gfirstimage, ' ', 'Open the first document. ' + AltorCtrl + '+{', '{', buttonalign)
-        buttonhtml += menubuttonhtml2('previousrecord', gpreviousimage, ' ', 'Open the previous document. ' + AltorCtrl + '+[', '[', buttonalign)
+        buttonhtml += menubuttonhtml2('firstrecord', gfirstimage, ' ', 'Open the first document. ' + AltorCtrl + '+{', '{')
+        buttonhtml += menubuttonhtml2('previousrecord', gpreviousimage, ' ', 'Open the previous document. ' + AltorCtrl + '+[', '[')
         // No spacer img — CSS shares height with icon nav and centers the "n of m" label
-        buttonhtml += menubuttonhtml2('selectrecord', '', ' ', 'Select document. ' + AltorCtrl + '+^', '^', buttonalign)
-        buttonhtml += menubuttonhtml2('nextrecord', gnextimage, ' ', 'Open the next document. ' + AltorCtrl + '+]', ']', buttonalign)
-        buttonhtml += menubuttonhtml2('lastrecord', glastimage, ' ', 'Open the last document. ' + AltorCtrl + '+}', '}', buttonalign)
+        buttonhtml += menubuttonhtml2('selectrecord', '', ' ', 'Select document. ' + AltorCtrl + '+^', '^')
+        buttonhtml += menubuttonhtml2('nextrecord', gnextimage, ' ', 'Open the next document. ' + AltorCtrl + '+]', ']')
+        buttonhtml += menubuttonhtml2('lastrecord', glastimage, ' ', 'Open the last document. ' + AltorCtrl + '+}', '}')
         buttonhtml += '</span>'
 
     }
@@ -8097,7 +8097,8 @@ async function form_insertrow(event, append) {
         //clicking a single row OR clicking the penultimate row
         else if (nrows == 1 || rown == nrows - 2) {
             var defaultchoice = (nrows == 1) ? 2 : 1
-            var choice = await exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel')
+            // default_icons false: Before/After are alternatives, not Yes/No
+            var choice = await exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel', null, null, null, false)
             if (!choice)
                 return false
             if (choice == 2)
@@ -8643,7 +8644,8 @@ async function exoduspopup2(element) {
 
             if (reply.length > 1 && reply.length <= 50) {
                 var openall = 2
-                openall = await exodusconfirm('Open all in one tab?', 1, 'One', 'Many')
+                // default_icons false: One/Many are alternatives, not Yes/No
+                openall = await exodusconfirm('Open all in one tab?', 1, 'One', 'Many', '', null, null, null, false)
                 if (!openall)
                     return false
                 if (openall == 2) {

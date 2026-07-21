@@ -195,7 +195,8 @@ async function form_prewrite() {
     if (!newusers)
         return await exodusokcancel('OK to save?', 1)
 
-    var reply = await exodusconfirm('OK to save?', 3, 'Email new users', 'Save only', 'Cancel')
+    // default_icons false: Email vs Save only are alternatives, not Yes/No
+    var reply = await exodusconfirm('OK to save?', 3, 'Email new users', 'Save only', 'Cancel', null, null, null, false)
     if (!reply)
         return false
 

@@ -62,7 +62,8 @@ async function user_setpassword(savemode,element) {
      newpassword+=vowels.substr(exodusrnd(vowels.length),1)
     }
     
-    if (!(reply=await exodusconfirm('The new password for '+userid+' will be\r\r'+newpassword+'\r\rRemember the new password!\r\rPassword is case-insensitive',1,'OK','No, generate another','Cancel')))
+    // default_icons false: "generate another" is not a No/reject
+    if (!(reply=await exodusconfirm('The new password for '+userid+' will be\r\r'+newpassword+'\r\rRemember the new password!\r\rPassword is case-insensitive',1,'OK','No, generate another','Cancel',null,null,null,false)))
         return false
     if (reply==1)
         break

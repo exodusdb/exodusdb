@@ -130,11 +130,6 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
     line-height: 1.2;
 }
 
-.exodusformactions .graphicbutton:hover,
-body > #formbuttonsdiv .graphicbutton:hover {
-    background-color: var(--exodus-menuhighlight);
-}
-
 .exodusformactions .exodusbutton {
     margin: 0.125em 4px;
 }
@@ -286,6 +281,7 @@ BODY
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
     --exodus-form-data-font-size: 1rem; /* INPUT and display SPANs share this */
+    /* Normal buttons: .exodusbutton + .graphicbutton (unbound form actions, confirm) */
     --exodus-informbutton-bg: #f0f0f0;
     --exodus-informbutton-hover-bg: #ffffff;
     --exodus-informbutton-hover-border: #aaaaaa;
@@ -302,9 +298,15 @@ BODY
     --exodus-check-size: 1.3125em;
 }
 
-/* In-form actions: exodusbutton. Tab bar: exodustab only (authorisation.htm). */
+/*
+ * Normal button face — one set of tokens for all raised actions:
+ *   .exodusbutton / .exodustab  — in-form / login / page HTML
+ *   .graphicbutton             — unbound form Save/Close, confirm/decide
+ * Restyle via --exodus-informbutton-* (LM :root / DM dark_mode) to hit all of them.
+ */
 .exodusbutton,
-.exodustab {
+.exodustab,
+.graphicbutton {
     background-color: var(--exodus-informbutton-bg);
     color: var(--exodus-informbutton-color);
     padding: 0.2em 0.45em;
@@ -615,32 +617,20 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
     margin: 0.35em 0;
 }
 
-.graphicbutton:hover
-{
-    border-color: #aaaaaa;
-}
-
-/*eg. Ok/Cancel buttons*/
-.graphicbutton
-{
+/* Span-hosted actions: layout only; face comes from shared rule with .exodusbutton */
+.graphicbutton {
     float: left;
     font-size: inherit;
-    background-color: #f0f0f0;
-    border-color: #cccccc;
     margin: 0.125em;
-    border-width: 2px;
-    border-style: outset;
-    cursor: pointer;
-    padding: 0.35em 0.55em;
-    border-radius: 0.3rem;
+    padding: 0.35em 0.55em; /* slightly roomier for icon+label */
 }
 
-/*eg. Refresh/New buttons*/
+/* Menubar tools only (Menu, Refresh, Logout) — flat, no button chrome */
 .menubutton
 {
     float: left;
     background-color: inherit;
-    border-color: #cccccc;
+    border: none;
     margin: 0.125em;
     cursor: pointer;
     padding: 0.35em 0.55em;
@@ -648,30 +638,25 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
 }
 
 .menubutton:hover {
-    /*background-color: highlight;*/
-    /*color: highlighttext;*/
     background-color: var(--exodus-menuhighlight);
 }
 
-/* Shared chrome focus (form actions bottom or menubar, confirm footer, menu tools).
-   Same orange ring as data fields; covers Tab onto OK/Search after move to #exodus_menu. */
-.graphicbutton:focus,
-.menubutton:focus {
-    outline: none;
-    background-color: var(--exodus-menuhighlight);
-    box-shadow: 0 0 0 3px var(--exodus-field-focus-color);
-}
-
-.exodusbutton:hover:enabled {
+/* Normal button hover/focus (exodusbutton + graphicbutton share informbutton tokens) */
+.exodusbutton:hover:enabled,
+.graphicbutton:hover {
     background-color: var(--exodus-informbutton-hover-bg);
     border-color: var(--exodus-informbutton-hover-border);
 }
-
-/* Same orange focus ring as data fields (--exodus-field-focus-color; LM/DM) */
-.exodusbutton:focus:enabled {
+.exodusbutton:focus:enabled,
+.graphicbutton:focus {
     outline: none;
     background-color: var(--exodus-informbutton-hover-bg);
-    border-color: var(--exodus-field-focus-color);
+    box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
+}
+/* Flat menubar tools: highlight fill + same focus ring */
+.menubutton:focus {
+    outline: none;
+    background-color: var(--exodus-menuhighlight);
     box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
 }
 
@@ -741,6 +726,7 @@ img[id^="deleterowbutton"] {
     border-left: 1px solid var(--exodus-smallerbordercolor);
 }
 
+/* Form chrome in menubar: bound tools (menubutton) + unbound actions (graphicbutton) */
 #exodus_menu #formbuttonsdiv .menubutton,
 #exodus_menu #formbuttonsdiv .graphicbutton {
     float: none;
@@ -902,8 +888,10 @@ img[id^="deleterowbutton"] {
     --exodus-dotcolor: #5a4a3a;
     --exodus-field-underline: 2.5px dotted var(--exodus-dotcolor);
     --exodus-field-focus-color: #e04510;
-    --exodus-field-focus-underline: 3px solid var(--exodus-field-focus-color);
-    --exodus-field-focus-border: 3px solid var(--exodus-field-focus-color);
+    /* One stroke weight for field underlines and chrome-button focus marks */
+    --exodus-field-focus-width: 3px;
+    --exodus-field-focus-underline: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
+    --exodus-field-focus-border: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
     --exodus-textarea-border: #8f8378;
     --radio-color: rgba(0, 84, 187, 0.596);
     --radio-ring-color: #999999;
@@ -1146,8 +1134,8 @@ input[type=checkbox]:focus-visible {
     min-width: min-content;
 }
 /* Confirm Yes/No/Cancel and decide Select/Cancel: same graphicbutton chrome
-   (filled outset face). Inline flow — not flex — so hotkey markup (<u>Y</u>es)
-   stays normal text; flex+gap would treat <u> and siblings as separate items. */
+   (filled outset face). Icons: check / cross / goback. Inline flow — not flex —
+   so hotkey markup (<u>Y</u>es) stays normal text. */
 .exodusconfirm_footer .graphicbutton {
     float: none;
     display: inline-block;
@@ -1171,9 +1159,7 @@ input[type=checkbox]:focus-visible {
 .exodusconfirm_footer .graphicbutton [id$="_label"] {
     vertical-align: middle;
 }
-.exodusconfirm_footer .graphicbutton:hover {
-    background-color: var(--exodus-menuhighlight);
-}
+/* hover/focus face: shared .graphicbutton rules (informbutton tokens) */
 .exodusconfirm_iconcol {
     width: 4.3em;
     vertical-align: middle;
@@ -1327,15 +1313,16 @@ input:checked + .toggle_button .knob img {
     --exodus-dotcolor: #c8c0b0;
     --exodus-field-underline: 2.5px dotted var(--exodus-dotcolor);
     --exodus-field-focus-color: #ff7a40;
-    --exodus-field-focus-underline: 3px solid var(--exodus-field-focus-color);
-    --exodus-field-focus-border: 3px solid var(--exodus-field-focus-color);
+    --exodus-field-focus-width: 3px;
+    --exodus-field-focus-underline: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
+    --exodus-field-focus-border: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
     --exodus-form-face: #28304a;
     --exodus-form-border: #7070e0;
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
     --exodus-form-data-font-size: 1rem;
     --exodus-textarea-border: #6070b8;
-    /* In-form buttons: aligned with question-mode popup chrome */
+    /* Normal buttons (exodusbutton + graphicbutton): themed face, not near-black */
     --exodus-informbutton-bg: #354060;
     --exodus-informbutton-hover-bg: #455880;
     --exodus-informbutton-hover-border: #9898f8;
@@ -1446,31 +1433,16 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     border-color: #646ca8;
 }
 
-:root[data-theme="dark_mode"] .graphicbutton,
-:root[data-theme="dark_mode"] BUTTON:not(.exodusbutton) {
-    background-color: #292929;
-    border: 2px outset #343434;
-    color: #ffffff;
+/* Bare BUTTON only — .graphicbutton uses --exodus-informbutton-* like .exodusbutton */
+:root[data-theme="dark_mode"] BUTTON:not(.exodusbutton):not(.exodustab) {
+    background-color: var(--exodus-informbutton-bg);
+    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
+    color: var(--exodus-informbutton-color);
 }
 
 :root[data-theme="dark_mode"] #exodus_menu .menubutton:hover,
-:root[data-theme="dark_mode"] #exodus_menu .menubutton:focus,
-:root[data-theme="dark_mode"] #exodus_menu .graphicbutton:hover,
-:root[data-theme="dark_mode"] #exodus_menu .graphicbutton:focus {
+:root[data-theme="dark_mode"] #exodus_menu .menubutton:focus {
     background-color: var(--exodus-menuhighlight);
-}
-
-:root[data-theme="dark_mode"] #exodus_menu .graphicbutton:hover,
-:root[data-theme="dark_mode"] #exodus_menu .graphicbutton:focus {
-    border-color: #888888;
-}
-
-:root[data-theme="dark_mode"] .exodusformactions .graphicbutton:hover,
-:root[data-theme="dark_mode"] .exodusformactions .graphicbutton:focus,
-:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:hover,
-:root[data-theme="dark_mode"] body > #formbuttonsdiv .graphicbutton:focus {
-    background-color: var(--exodus-menuhighlight);
-    border-color: #888888;
 }
 
 :root[data-theme="dark_mode"] A:link { color: #8ab4f8; }
@@ -1503,20 +1475,7 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
     background-color: rgba(255, 255, 255, 0.18);
 }
-:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton {
-    border-width: 2px;
-    border-style: solid;
-    border-color: var(--exodusconfirm-border);
-    cursor: pointer;
-}
-:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:hover {
-    border-color: color-mix(in srgb, var(--exodusconfirm-border) 55%, white 45%);
-    background-color: var(--exodus-menuhighlight);
-}
-:root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:focus {
-    border-color: #888888;
-    background-color: var(--exodus-menuhighlight);
-}
+/* Confirm footer buttons: same normal button face as .exodusbutton (no special black chrome) */
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {
     --exodusconfirm-border: #e06060;
     --exodusconfirm-face: #4a2828;

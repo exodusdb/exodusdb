@@ -3972,7 +3972,9 @@ async function exodusokcancel(question, defaultbutton) {
 	return await exodusconfirm(question, defaultbutton, 'OK', '', 'Cancel')
 }
 
-async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image) {
+// default_icons (9th, default true): role icons on footer buttons — 1=check, 2=cross, 3=goback.
+// Pass false when labels are alternatives (Before/After, One/Many, Save only vs …) not Yes/No/Cancel.
+async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image, default_icons) {
 
 	//clean up question
 	if (!question)
@@ -3984,7 +3986,7 @@ async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttonti
 	console.log(question)
 
 	// In-window popup (exodusconfirm2) for questions and text/password input.
-	return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
+	return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image, default_icons)
 
 }
 
@@ -4980,10 +4982,10 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	}
 
 	if (align == 'center') {
-		// eg. Ok, Cancel, List and Save buttons — layout via .exodusformactions / #formbuttonsdiv
+		// Unbound form OK/Save/Close (+ extras) and confirm/decide — raised button face
 		tx += ' class=graphicbutton'
 	} else {
-		// eg. Refresh, New etc.
+		// Bound form tools + Menu/Refresh/Logout — flat menubar chrome, not a button
 		tx += ' class=menubutton'
 		style += ''//';float:' + align
 	}
@@ -6206,16 +6208,27 @@ function exodusconfirm_footerwrap(content) {
 		</div>'
 }
 
-// Same icons as form Save/OK (tick) and Close/Cancel (cross) menubar buttons
+// Decide Select: green check (not the form Save tray icon)
 function exodusconfirm_ok_image() {
-	if (typeof gsaveimage != 'undefined')
-		return gsaveimage
-	return gimagetheme + (gisdarktheme ? 'tick_darkmode.svg' : 'tick.svg')
+	return gimagetheme + (gisdarktheme ? 'check_darkmode.svg' : 'check.svg')
 }
+// Confirm No + decide Cancel: same red X as form Close
 function exodusconfirm_cancel_image() {
 	if (typeof gcloseimage != 'undefined')
 		return gcloseimage
 	return gimagetheme + (gisdarktheme ? 'cross_darkmode.svg' : 'cross.svg')
+}
+// Confirm Yes/OK (positive)
+function exodusconfirm_yes_image() {
+	return exodusconfirm_ok_image()
+}
+// Confirm No (negative) — same red X as Close
+function exodusconfirm_no_image() {
+	return exodusconfirm_cancel_image()
+}
+// Confirm Cancel (Esc) — leave without choosing
+function exodusconfirm_back_image() {
+	return gimagetheme + (gisdarktheme ? 'goback_darkmode.svg' : 'goback.svg')
 }
 
 function exodusconfirm_focusable_elements() {
@@ -6365,12 +6378,16 @@ function exodusconfirm_unbind_scroll_hints() {
 	}
 }
 
-async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc) {
+async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc, default_icons) {
 
 	//performs "in-window" questions, selections and inputs
 	//replaces (or called by)
 	//exodusconfirm: questions (yes/no/cancel) and one line inputs
 	//exodusdecide/exodusdecide2: selections
+	// default_icons: role icons on Yes/No/Cancel-style buttons (default true; false for multi-choice labels)
+
+	if (typeof default_icons == 'undefined')
+		default_icons = true
 
 	var decide_args//holds popup list args if any
 
@@ -6500,7 +6517,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		nbuttons++
 
 		// Same chrome as decide Select/Cancel (graphicbutton: filled outset face).
-		// Text only — confirm labels are arbitrary (Yes/No/Cancel or custom).
+		// Icons by role: 1 Yes/OK = green check, 2 No = red X (Close), 3 Cancel = go-back.
 		html += '<span id="' + buttonid + 'button"'
 		html += ' tabindex="0"'
 		html += ' class="graphicbutton"'
@@ -6538,7 +6555,20 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' exodusbuttonnumber="' + nbuttons + '"'
 		html += ' exodusyesnocancel="' + (buttonn % 3) + '"'
 
-		html += '>' + buttontext + '</span>'
+		var imgsrc = ''
+		if (default_icons) {
+			if (buttonn == 1)
+				imgsrc = exodusconfirm_yes_image()
+			else if (buttonn == 2)
+				imgsrc = exodusconfirm_no_image()
+			else if (buttonn == 3)
+				imgsrc = exodusconfirm_back_image()
+		}
+
+		html += '>'
+		if (imgsrc)
+			html += '<img src="' + imgsrc + '" alt="">'
+		html += buttontext + '</span>'
 
 	}//end of addbutton
 
