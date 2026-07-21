@@ -48,6 +48,12 @@ async function formfunctions_onload() {
     $$('wrongconfiguration').style.display = 'none'
     $$('logindiv').style.display = ''
 
+    // Warm both eye assets (open + slash) so first click is not blocked on fetch
+    ;['eye.svg', 'eye-slash.svg'].forEach(function (name) {
+        var img = new Image()
+        img.src = '../exodus/images/theme2/' + name
+    })
+
     addeventlistener(glogin_button,'click','login_onclick')
     addeventlistener(gautologin_element,'click','autologin_onclick')
     //addeventlistener(gpasswordreset_button,'click','passwordreset_onclick')
@@ -402,7 +408,7 @@ function showpassword_sync() {
 	var showpasswordelement = togglePasswordBtn.getElementsByTagName('img')[0];
 	//var showpasswordelement=$$('showpasswordelement')
 	if (gsavedpasswordelement){
-		// hide password
+		// hide password → closed/slash icon
 		currpasswordelement.id='visiblepasswordelement'
 		gsavedpasswordelement.id='passwordelement'
 		gsavedpasswordelement.value=currpasswordelement.value
@@ -410,12 +416,12 @@ function showpassword_sync() {
 		currpasswordelement.parentNode.insertBefore(gsavedpasswordelement,currpasswordelement)
 		currpasswordelement.parentNode.removeChild(currpasswordelement)
 		gsavedpasswordelement=null
-		showpasswordelement.src = '../exodus/images/theme2/eye.png';
+		showpasswordelement.src = '../exodus/images/theme2/eye-slash.svg'
 		return true
 
 	} else {
 
-		// show password
+		// show password → open eye
 		gsavedpasswordelement=currpasswordelement
 		// get attributes from the parent
 		var parent = gsavedpasswordelement.parentNode;
@@ -439,7 +445,7 @@ function showpassword_sync() {
 		parent.insertBefore(el, gsavedpasswordelement);
 		//gsavedpasswordelement.parentNode.removeChild(gsavedpasswordelement)
 		parent.removeChild(gsavedpasswordelement);
-		showpasswordelement.src = '../exodus/images/theme2/eye-slash.png';
+		showpasswordelement.src = '../exodus/images/theme2/eye.svg'
 		return false
 	}
 }

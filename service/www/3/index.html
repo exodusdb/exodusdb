@@ -15,6 +15,9 @@
 				document.documentElement.setAttribute('data-theme', 'dark_mode')
 		})()
 	</script>
+	<!-- Password eye open+slash: warm cache so first toggle and theme invert are instant -->
+	<link rel="preload" href="../exodus/images/theme2/eye.svg" as="image">
+	<link rel="preload" href="../exodus/images/theme2/eye-slash.svg" as="image">
 
 	<style>
 		/*entire form including left form side and right image side*/
@@ -198,8 +201,15 @@
 			-webkit-text-fill-color: #d0d3dc;
 		}
 
+		#logindiv .toggle-password img {
+			display: block;
+			height: 14px;
+			width: 21px;
+		}
+
+		/* Same approach as legacy PNG: black art, invert for dark field (no JS theme swap) */
 		:root[data-theme="dark_mode"] #logindiv .toggle-password img {
-			filter: brightness(0) invert(0.8);
+			filter: brightness(0) invert(0.85);
 		}
 
 		:root[data-theme="dark_mode"] #logindiv .loginbutton {
@@ -293,8 +303,8 @@
 				<!--button behavior set in login.js				-->
 				<div style="margin-bottom: 1rem; position: relative; display: flex; align-items: center;">
 					<input tabindex="2" type="password" id="passwordelement" class="loginfield" placeholder="PASSWORD" style="padding-right: 40px; text-transform: uppercase;">
-					<button id="togglePassword" class="toggle-password" onclick="showpassword_sync()" title="Hide/Show Password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; outline: none;">
-						<img src="../exodus/images/theme2/eye.png" style="height: 10px; width: 15px;">
+					<button id="togglePassword" class="toggle-password" type="button" onclick="showpassword_sync()" title="Show/Hide password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; outline: none;">
+						<img src="../exodus/images/theme2/eye-slash.svg" alt="" width="21" height="14">
 					</button>
 				</div>
 

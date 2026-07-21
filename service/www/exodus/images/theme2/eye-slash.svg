@@ -1,0 +1,8 @@
+<svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- closed/hidden: eye + broad slash -->
+  <path d="M1.5 8C3.4 3.9 7.3 1.2 12 1.2S20.6 3.9 22.5 8C20.6 12.1 16.7 14.8 12 14.8S3.4 12.1 1.5 8z"
+        stroke="#111" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+  <circle cx="10" cy="8" r="3.6" fill="#111"/>
+  <!-- broad slash (thicker/longer than first draft) -->
+  <path d="M2 14.5 22 1.5" stroke="#111" stroke-width="2.4" stroke-linecap="round"/>
+</svg>
