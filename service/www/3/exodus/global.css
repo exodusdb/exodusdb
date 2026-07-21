@@ -312,6 +312,7 @@ BODY
     --exodus-icon-green: #22b014;
     --exodus-icon-red: #9c1516;
     --exodus-icon-orange: #e04510;
+    --exodus-icon-blue: #1e97cc;
     --exodus-icon-darkgrey: #555555;
     --exodus-icon-lightgrey: #b0b0b0;
     --exodus-icon-neutral: var(--exodus-icon-darkgrey);
@@ -349,6 +350,7 @@ BODY
 .exodus-icon-green { --exodus-icon-color: var(--exodus-icon-green); }
 .exodus-icon-red { --exodus-icon-color: var(--exodus-icon-red); }
 .exodus-icon-orange { --exodus-icon-color: var(--exodus-icon-orange); }
+.exodus-icon-blue { --exodus-icon-color: var(--exodus-icon-blue); }
 .exodus-icon-darkgrey { --exodus-icon-color: var(--exodus-icon-darkgrey); }
 .exodus-icon-lightgrey { --exodus-icon-color: var(--exodus-icon-lightgrey); }
 .exodus-icon-neutral { --exodus-icon-color: var(--exodus-icon-neutral); }
@@ -1414,6 +1416,7 @@ input:checked + .toggle_button .knob img {
     --exodus-icon-green: #3ec848;
     --exodus-icon-red: #ff442a;
     --exodus-icon-orange: #ff7a40;
+    --exodus-icon-blue: #6aa3e8;
     --exodus-icon-darkgrey: #c0c0c0;
     --exodus-icon-lightgrey: #707070;
     --exodus-icon-neutral: var(--exodus-icon-darkgrey);

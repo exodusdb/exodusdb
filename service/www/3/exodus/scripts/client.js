@@ -51,7 +51,7 @@ var gimagetheme = '../../exodus/images/theme2/'
  * Icon values are either:
  *   string URL  — painted multicolour SVG (New/Edit/Delete, theme, …)
  *   { mask, color } — black monochrome SVG, tinted via CSS --exodus-icon-*
- * Colour names: green, red, orange, darkgrey, lightgrey, neutral
+ * Colour names: green, red, orange, blue, darkgrey, lightgrey, neutral
  */
 function exodus_icon_spec(mask, color) {
 	return { mask: mask, color: color || 'darkgrey' }
@@ -63,7 +63,7 @@ function exodus_is_icon_spec(x) {
 var gmenuimage = exodus_icon_spec('menu_burger.svg', 'darkgrey')
 var glogoutimage = exodus_icon_spec('logout.svg', 'red')
 var gloginimage = exodus_icon_spec('login.svg', 'green')
-var grefreshimage = exodus_icon_spec('refresh.svg', 'darkgrey')
+var grefreshimage = exodus_icon_spec('refresh.svg', 'green')
 var gthemeimage = gimagetheme + 'theme_button.svg' // painted sun/moon chrome
 // company icon uses a patterned SVG — keep painted (LM/DM twins)
 var gcompanyimage = gimagetheme + 'formpage_companies.svg'

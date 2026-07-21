@@ -81,14 +81,14 @@ function form_apply_input_field_width(element) {
 // Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Edit/Delete.
 // (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
 gnewimage = gimagetheme + 'form_add.svg' // painted multicolour — excluded from mask tint
-gopenimage = exodus_icon_spec('open.svg', 'darkgrey')
+gopenimage = exodus_icon_spec('open.svg', 'orange') // was #d25300
 gfindimage = exodus_icon_spec('zoom.svg', 'darkgrey')
 gcalendarimage = exodus_icon_spec('calendar.svg', 'darkgrey')
 gsaveimage = exodus_icon_spec('tick.svg', 'green')
 gsavegreyimage = exodus_icon_spec('tick.svg', 'lightgrey') // inactive Save
-gcopyimage = exodus_icon_spec('copy.svg', 'darkgrey')
+gcopyimage = exodus_icon_spec('copy.svg', 'blue')
 gcloseimage = exodus_icon_spec('cross_mono.svg', 'red')
-greleaseimage = exodus_icon_spec('lock.svg', 'darkgrey')
+greleaseimage = exodus_icon_spec('lock.svg', 'blue') // was #1E97CC
 geditimage = gimagetheme + 'pencil_edit.svg' // painted multicolour
 gdeleteimage = gimagetheme + 'form_delete.svg' // painted multicolour
 glistimage = exodus_icon_spec('table.svg', 'darkgrey')
@@ -98,10 +98,10 @@ gdeleterowimage = exodus_icon_spec('delete.svg', 'red')
 gexpandrowimage = exodus_icon_spec('smallexpand.svg', 'darkgrey')
 gsortimage = exodus_sortimage()
 glinkimage = exodus_icon_spec('application_form.svg', 'darkgrey')
-gfirstimage = exodus_icon_spec('resultset_first.svg', 'darkgrey')
-glastimage = exodus_icon_spec('resultset_last.svg', 'darkgrey')
-gnextimage = exodus_icon_spec('resultset_next.svg', 'darkgrey')
-gpreviousimage = exodus_icon_spec('resultset_previous.svg', 'darkgrey')
+gfirstimage = exodus_icon_spec('resultset_first.svg', 'blue')
+glastimage = exodus_icon_spec('resultset_last.svg', 'blue')
+gnextimage = exodus_icon_spec('resultset_next.svg', 'blue')
+gpreviousimage = exodus_icon_spec('resultset_previous.svg', 'blue')
 gspacerimage = gimagetheme + 'blank.svg'
 gblankimage = gimagetheme + 'blank.svg'
 
