@@ -1975,16 +1975,50 @@ function add_exodus_menubar() {
 			document.body.insertBefore(span, document.body.firstChild)
 		gexodus_menubar = document.getElementById('exodus_menu')
 	}
+	// Modals (e.g. search.htm) create the bar late via form_place_menubar_session —
+	// still need body offset + resize/mutation wiring so content is not under the bar.
+	wire_exodus_bodymargin()
 }
 
 // Adjust the body's top margin dynamically so that body is never overlapped by the menubar
 function adjust_bodymargin() {
 	gexodus_menubar = document.getElementById('exodus_menu')
-	if (gexodus_menubar) {
-		var menuheight = gexodus_menubar.offsetHeight;
-		document.body.style.marginTop = (menuheight + 10) + 'px';
-		// stick flush under fixed menubar (body margin +10 is page spacing, not sticky offset)
-		document.documentElement.style.setProperty('--exodus-sticky-top', gexodus_menubar.getBoundingClientRect().bottom + 'px');
+	if (!gexodus_menubar)
+		return
+	var menuheight = gexodus_menubar.offsetHeight
+	// Floated session/trailing can stick out if clearfix is incomplete — use visual extent
+	var barTop = gexodus_menubar.getBoundingClientRect().top
+	var kids = gexodus_menubar.children
+	for (var i = 0; i < kids.length; i++) {
+		var extent = kids[i].getBoundingClientRect().bottom - barTop
+		if (extent > menuheight)
+			menuheight = extent
+	}
+	document.body.style.marginTop = (menuheight + 10) + 'px'
+	// stick flush under fixed menubar (body margin +10 is page spacing, not sticky offset)
+	document.documentElement.style.setProperty('--exodus-sticky-top', (barTop + menuheight) + 'px')
+}
+
+// Once per window: resize + MutationObserver so late-built bars (modals) keep body clear.
+var g_exodus_bodymargin_wired = false
+function wire_exodus_bodymargin() {
+	gexodus_menubar = document.getElementById('exodus_menu')
+	if (!gexodus_menubar)
+		return
+	adjust_bodymargin()
+	if (g_exodus_bodymargin_wired)
+		return
+	g_exodus_bodymargin_wired = true
+	window.addEventListener('resize', adjust_bodymargin)
+	if (typeof MutationObserver == 'function') {
+		var observer = new MutationObserver(function () {
+			adjust_bodymargin()
+		})
+		observer.observe(gexodus_menubar, {
+			attributes: true,
+			childList: true,
+			subtree: true
+		})
 	}
 }
 
@@ -2034,26 +2068,10 @@ async function clientfunctions_windowonload() {
 		}
 	}
 
-	// Should be done before form_functions_onload or else window is hidden behind menubar, until popup is selected
-	// Adjust the body's top margin dynamically so that body is never overlapped by the menubar
-	gexodus_menubar = document.getElementById('exodus_menu')
-	if (gexodus_menubar) {
-		// Adjust on load - for any new window that opens from current window eg. search.htm
-		adjust_bodymargin();
-
-		// Adjust on resize - in case menu height changes
-		window.addEventListener('resize', adjust_bodymargin);
-
-		// Adjust if number of buttons or button size cause menu height to change
-		const observer = new MutationObserver(() => {
-			adjust_bodymargin();
-		});
-		observer.observe(gexodus_menubar, {
-			attributes: true, // Detect style changes
-			childList: true,  // Detect added/removed menu items
-			subtree: true	 // Detect deep changes in child elements
-		});
-	}
+	// Before form_functions_onload so content is not under a pre-existing bar.
+	// Modals (search.htm) often create #exodus_menu later via add_exodus_menubar —
+	// wire_exodus_bodymargin runs again from there.
+	wire_exodus_bodymargin()
 
 	//trigger formfunctions_onload
 	if (typeof formfunctions_onload == 'function')

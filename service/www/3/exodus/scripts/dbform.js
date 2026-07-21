@@ -253,7 +253,7 @@ function form_formbuttons_place() {
 // Database name + username in the trailing menubar cluster (left of theme/logout).
 // Cluster is one float:right flex row with equal gap — see exodus_menubar_trailing_cluster.
 // Never nest inside #formbuttonsdiv (float:left) — that pins the label to the form actions.
-// clear:left must come AFTER all floated menubar children or the session drops to a new row.
+// clear:both must come AFTER all floated menubar children (height for adjust_bodymargin).
 function form_place_menubar_session() {
     if (typeof gdatasetname == 'undefined' && typeof gusername == 'undefined')
         return
@@ -297,6 +297,10 @@ function form_place_menubar_session() {
     var clear = document.createElement('div')
     clear.className = 'exodus_menubar_clear'
     gexodus_menubar.appendChild(clear)
+
+    // Session-only bars (modal search.htm) and late content must push body below the fixed bar
+    if (typeof adjust_bodymargin == 'function')
+        adjust_bodymargin()
 }
 
 // Call after form_postdisplay / custom buttons / pane wrap: if the action bar is

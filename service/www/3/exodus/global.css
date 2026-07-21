@@ -877,9 +877,12 @@ img[id^="deleterowbutton"] {
 .exodus_menubar_session_test {
     color: red;
 }
-/* After all floated menubar children so session is not pushed to a second row */
+/* After all floated menubar children so the bar's height includes them.
+   clear:both (not only left) — session-only bars have float:right trailing
+   and no left floats; clear:left left the bar height collapsed so body
+   margin under-estimated and page titles sat under the fixed bar. */
 .exodus_menubar_clear {
-    clear: left;
+    clear: both;
     min-height: 1px;
 }
 
