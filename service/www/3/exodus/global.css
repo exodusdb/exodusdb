@@ -725,12 +725,17 @@ img[id^="deleterowbutton"] {
     display: block;
 }
 
-/* Form actions after Menu/Refresh: flex so padding/border gap is real (not float-collapsed) */
+/* Form actions in menubar: flex so button gaps are real (not float-collapsed). */
 #exodus_menu #formbuttonsdiv {
     float: left;
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
+}
+
+/* Wide Refresh|actions separator only when the bar was relocated from under the
+   form (off-screen). Native top placement (bound New/Open…) keeps normal spacing. */
+#exodus_menu #formbuttonsdiv.exodus_formbuttons_relocated {
     margin-left: 8px;
     padding-left: 14px;
     border-left: 1px solid var(--exodus-smallerbordercolor);
