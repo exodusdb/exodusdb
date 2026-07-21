@@ -78,57 +78,39 @@ function form_apply_input_field_width(element) {
     element.style.maxWidth = w
 }
 
-// set global image paths
-gnewimage = gimagetheme + 'form_add.svg'
-gopenimage = gimagetheme + 'open.svg'
-gfindimage = gimagetheme + 'zoom.svg'
-gcalendarimage = gimagetheme + 'calendar.svg'
-gsaveimage = gimagetheme + 'tick.svg'
-gsavegreyimage = gimagetheme + 'tickgrey.svg'
-gcopyimage = gimagetheme + 'copy.svg'
-gcloseimage = gimagetheme + 'cross.svg'
-greleaseimage = gimagetheme + 'lock.svg'
-geditimage = gimagetheme + 'pencil_edit.svg'
-gdeleteimage = gimagetheme + 'form_delete.svg'
-glistimage = gimagetheme + 'table.svg'
-gprintsendimage = gimagetheme + 'printer.svg'
-ginsertrowimage = gimagetheme + 'add.svg'
-gdeleterowimage = gimagetheme + 'delete.svg'
-gexpandrowimage = gimagetheme + 'smallexpand.svg'
+// Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Edit/Delete.
+// (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
+gnewimage = gimagetheme + 'form_add.svg' // painted multicolour — excluded from mask tint
+gopenimage = exodus_icon_spec('open.svg', 'darkgrey')
+gfindimage = exodus_icon_spec('zoom.svg', 'darkgrey')
+gcalendarimage = exodus_icon_spec('calendar.svg', 'darkgrey')
+gsaveimage = exodus_icon_spec('tick.svg', 'green')
+gsavegreyimage = exodus_icon_spec('tick.svg', 'lightgrey') // inactive Save
+gcopyimage = exodus_icon_spec('copy.svg', 'darkgrey')
+gcloseimage = exodus_icon_spec('cross_mono.svg', 'red')
+greleaseimage = exodus_icon_spec('lock.svg', 'darkgrey')
+geditimage = gimagetheme + 'pencil_edit.svg' // painted multicolour
+gdeleteimage = gimagetheme + 'form_delete.svg' // painted multicolour
+glistimage = exodus_icon_spec('table.svg', 'darkgrey')
+gprintsendimage = exodus_icon_spec('printer.svg', 'darkgrey')
+ginsertrowimage = exodus_icon_spec('add.svg', 'green')
+gdeleterowimage = exodus_icon_spec('delete.svg', 'red')
+gexpandrowimage = exodus_icon_spec('smallexpand.svg', 'darkgrey')
 gsortimage = exodus_sortimage()
-glinkimage = gimagetheme + 'application_form.svg'
-gfirstimage = gimagetheme + 'resultset_first.svg'
-glastimage = gimagetheme + 'resultset_last.svg'
-gnextimage = gimagetheme + 'resultset_next.svg'
-gpreviousimage = gimagetheme + 'resultset_previous.svg'
-gspacerimage = gimagetheme + 'spacer.svg'
+glinkimage = exodus_icon_spec('application_form.svg', 'darkgrey')
+gfirstimage = exodus_icon_spec('resultset_first.svg', 'darkgrey')
+glastimage = exodus_icon_spec('resultset_last.svg', 'darkgrey')
+gnextimage = exodus_icon_spec('resultset_next.svg', 'darkgrey')
+gpreviousimage = exodus_icon_spec('resultset_previous.svg', 'darkgrey')
+gspacerimage = gimagetheme + 'blank.svg'
 gblankimage = gimagetheme + 'blank.svg'
 
-// Mitigate icon flash between default (light) to dark versions
-// gisdarktheme assigned in client.js init. See global.css file linking
+// Painted New/Edit/Delete only need DM twin files
 if (gisdarktheme) {
-gfindimage = gimagetheme + 'zoom_darkmode.svg'
-glinkimage = gimagetheme + 'application_form_darkmode.svg'
-gthemeimage = gimagetheme + 'theme_button_darkmode.svg'
-gprintsendimage = gimagetheme + 'printer_darkmode.svg'
-glistimage = gimagetheme + 'table_darkmode.svg'
-gcompanyimage = gimagetheme + 'formpage_companies_darkmode.svg'
-ginsertrowimage = gimagetheme + 'add_darkmode.svg'
-gdeleterowimage = gimagetheme + 'delete_darkmode.svg'
-gcalendarimage = gimagetheme + 'calendar_darkmode.svg'
-gnewimage = gimagetheme + 'form_add_darkmode.svg'
-gdeleteimage = gimagetheme + 'form_delete_darkmode.svg'
-geditimage = gimagetheme + 'pencil_edit_darkmode.svg'
-gopenimage = gimagetheme + 'open_darkmode.svg'
-gsaveimage = gimagetheme + 'tick_darkmode.svg'
-gsavegreyimage = gimagetheme + 'tickgrey_darkmode.svg'
-gcopyimage = gimagetheme + 'copy_darkmode.svg'
-gcloseimage = gimagetheme + 'cross_darkmode.svg'
-greleaseimage = gimagetheme + 'lock_darkmode.svg'
-gfirstimage = gimagetheme + 'resultset_first_darkmode.svg'
-gpreviousimage = gimagetheme + 'resultset_previous_darkmode.svg'
-gnextimage = gimagetheme + 'resultset_next_darkmode.svg'
-glastimage = gimagetheme + 'resultset_last_darkmode.svg'
+	gnewimage = gimagetheme + 'form_add_darkmode.svg'
+	gdeleteimage = gimagetheme + 'form_delete_darkmode.svg'
+	geditimage = gimagetheme + 'pencil_edit_darkmode.svg'
+	gthemeimage = gimagetheme + 'theme_button_darkmode.svg'
 }
 
 // document.getElementsByTagName('BODY').onload=window_onload
@@ -928,10 +910,11 @@ async function formfunctions_onload() {
 
                     element.style.verticalAlign = 'top'
 
-                    var element2 = document.createElement('img')
+                    var element2 = exodus_create_icon_element(
+                        fieldname.indexOf('DATE') >= 0 ? gcalendarimage : gfindimage
+                    )
                     //add the button right before/after the field
                     element2.id = element.id + '_popup'
-                    //                    element2.style.float='left'
 
                     //ensure popup icon stays to the left of the input field
                     var nowrapper = document.createElement('span')
@@ -941,25 +924,10 @@ async function formfunctions_onload() {
                     nowrapper.insertBefore(element, null)
                     nowrapper.insertBefore(element2, null)
 
-                    /*
-                    //put nowrap flag on TD in 3 levels
-                    //except on span fields because otherwise they dont text wrap
-                    if (element.tagName != 'SPAN') {
-                    var td = element.parentNode
-                    if (td && td.tagName != 'TD') td = td.parentNode
-                    if (td && td.tagName != 'TD') td = td.parentNode
-                    if (td && td.tagName == 'TD') td.noWrap = true
-                    }
-                    */
-
                     //insertafter(element,element2)
                     element.parentNode.insertBefore(element2, element)
 
                     element2.style.verticalAlign = 'top'
-                    if (fieldname.indexOf('DATE') >= 0)
-                        element2.src = gcalendarimage
-                    else
-                        element2.src = gfindimage
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
                     element2.title += ' (F7)'
                     element2.style.cursor = 'pointer'
@@ -980,7 +948,7 @@ async function formfunctions_onload() {
 
                     element.style.verticalAlign = 'top'
 
-                    var element2 = document.createElement('img')
+                    var element2 = exodus_create_icon_element(glinkimage)
                     //add the button right after the field
 
                     //ensure popup icon stays to the left of the input field
@@ -994,26 +962,7 @@ async function formfunctions_onload() {
                     //insertafter(element,element2)
                     element.parentNode.insertBefore(element2, element)
 
-                    /*
-                                        //put nowrap flag on TD in 3 levels
-                                        var td = element.parentNode
-                                        if (element.tagName != 'SPAN') {
-                                            if (td && td.tagName != 'TD') td = td.parentNode
-                                            if (td && td.tagName != 'TD') td = td.parentNode
-                                            if (td && td.tagName == 'TD') td.noWrap = true
-                                        }
-                    
-                                        if (Number(element.getAttribute('exodusgroupno')) && element.getAttribute('exodusalign') == 'R') {
-                                            element.parentNode.insertBefore(element2, null)
-                                        }
-                                        else {
-                                            element.parentNode.insertBefore(element2, element)
-                                        }
-                    */
-                    element2.src = glinkimage
-                    //element2.style.border='solid 1px'
                     element2.style.verticalAlign = 'top'
-                    //                    element2.style.verticalAlign = 'middle'
                     element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
                     element2.style.cursor = 'pointer'
 
@@ -1317,23 +1266,10 @@ async function formfunctions_onload() {
                 var titleelement
                 if (1 && (titleelement = $$(element.id + '_title'))) {
 
-                    var element2 = document.createElement('img')
-                    //add the button right after the field
-
-                    //put nowrap flag on TD in 3 levels
-                    //var td=element.parentNode
-                    //if (element.tagName!='SPAN')
-                    //{
-                    // if (td&&td.tagName!='TD') td=td.parentNode
-                    // if (td&&td.tagName!='TD') td=td.parentNode
-                    // if (td&&td.tagName=='TD') td.noWrap=true
-                    //}
-
+                    var element2 = exodus_create_icon_element(gsortimage)
                     titleelement.insertBefore(element2, null)
 
                     element2.id = 'sortbutton_' + Number(element.getAttribute('exodusgroupno'))
-                    element2.src = gsortimage
-                    element2.originalsrc = element2.src
                     element2.title = 'Sort by ' + element.getAttribute('exodustitle')
                     //addeventlistener(element2, 'click', 'sorttable')
                     element2.setAttribute('exodusonclick', 'await sorttable(event)')
@@ -1495,17 +1431,17 @@ async function formfunctions_onload() {
                     t += ' <span style="white-space: nowrap">'
                     //if (!(exodusgetattribute(element,'exodusnoinsertrow')))
                     if (!(element.getAttribute('exodusnoinsertrow'))) {
-                        t += '  <IMG id=insertrowbutton' + groupno
-                            + ' title="Insert a new row here ' + t2
-                            + '" exodusonclick="await insertrow_onclick(event)" src="' + ginsertrowimage
-                            + '" style="cursor:pointer;">'//: solid 1px">'
+                        t += exodus_icon_html(ginsertrowimage)
+                            .replace('class="exodus-icon', 'id=insertrowbutton' + groupno
+                                + ' title="Insert a new row here ' + t2
+                                + '" exodusonclick="await insertrow_onclick(event)" style="cursor:pointer" class="exodus-icon')
                     }
                     //if (!(exodusgetattribute(element,'exodusnodeleterow')))
                     if (!(element.getAttribute('exodusnodeleterow'))) {
-                        t += '  <IMG id=deleterowbutton' + groupno
-                            + ' title="Delete this row ' + t3
-                            + '" exodusonclick="await deleterow_onclick(event)" src ="' + gdeleterowimage
-                            + '" style="cursor:pointer">'//: solid 1px">'
+                        t += exodus_icon_html(gdeleterowimage)
+                            .replace('class="exodus-icon', 'id=deleterowbutton' + groupno
+                                + ' title="Delete this row ' + t3
+                                + '" exodusonclick="await deleterow_onclick(event)" style="cursor:pointer" class="exodus-icon')
                     }
                     t += ' </span>'
                     var insertdeletebuttons = document.createElement('td')
@@ -5153,7 +5089,7 @@ async function resetsortimages(groupno) {
         elements = [elements]
     if (elements) {
         for (elementn = 0; elementn < elements.length; elementn++)
-            elements[elementn].src = elements[elementn].originalsrc
+            exodus_set_icon_element(elements[elementn], gsortimage)
     }
 
 }
@@ -8211,12 +8147,12 @@ function setinsertimage(mode, row, groupno) {
         return
 
     if (mode == 'expand') {
-        insertimage.src = gexpandrowimage
+        insertimage = exodus_set_icon_element(insertimage, gexpandrowimage)
         //duplicate keycodes in 3 places
         insertimage.title = 'Expand hidden rows here (Ctrl+I or Ctrl+Insert)'
     }
     else {
-        insertimage.src = ginsertrowimage
+        insertimage = exodus_set_icon_element(insertimage, ginsertrowimage)
         //duplicate keycodes in 3 places
         insertimage.title = 'Insert a new row here (Ctrl+I or Ctrl+Insert)'
     }

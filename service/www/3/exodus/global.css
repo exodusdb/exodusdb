@@ -312,7 +312,9 @@ BODY
     --exodus-icon-green: #22b014;
     --exodus-icon-red: #9c1516;
     --exodus-icon-orange: #e04510;
-    --exodus-icon-neutral: #555555;
+    --exodus-icon-darkgrey: #555555;
+    --exodus-icon-lightgrey: #b0b0b0;
+    --exodus-icon-neutral: var(--exodus-icon-darkgrey);
 }
 
 /*
@@ -340,6 +342,8 @@ BODY
 .exodus-icon-green { --exodus-icon-color: var(--exodus-icon-green); }
 .exodus-icon-red { --exodus-icon-color: var(--exodus-icon-red); }
 .exodus-icon-orange { --exodus-icon-color: var(--exodus-icon-orange); }
+.exodus-icon-darkgrey { --exodus-icon-color: var(--exodus-icon-darkgrey); }
+.exodus-icon-lightgrey { --exodus-icon-color: var(--exodus-icon-lightgrey); }
 .exodus-icon-neutral { --exodus-icon-color: var(--exodus-icon-neutral); }
 
 /*
@@ -720,7 +724,18 @@ img[id^="deleterowbutton"] {
     padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
     object-fit: contain;
 }
-/* Mask icons inside buttons: size box already set; optional glyph inset via padding on host */
+/* Monochrome mask icons (same footprint as toolbar imgs) */
+.exodus-icon[isexoduspopup="1"],
+.exodus-icon[isexoduslink="1"],
+.exodus-icon[exodusonclick],
+.exodus-icon[id^="sortbutton_"],
+.exodus-icon[id^="insertrowbutton"],
+.exodus-icon[id^="deleterowbutton"] {
+    height: var(--exodus-ui-icon-size);
+    width: var(--exodus-ui-icon-size);
+    cursor: pointer;
+}
+/* Mask icons inside buttons: size box already set */
 .graphicbutton .exodus-icon,
 .menubutton .exodus-icon {
     margin-inline-end: 0.25em;
@@ -1386,7 +1401,9 @@ input:checked + .toggle_button .knob img {
     --exodus-icon-green: #3ec848;
     --exodus-icon-red: #ff442a;
     --exodus-icon-orange: #ff7a40;
-    --exodus-icon-neutral: #c0c0c0;
+    --exodus-icon-darkgrey: #c0c0c0;
+    --exodus-icon-lightgrey: #707070;
+    --exodus-icon-neutral: var(--exodus-icon-darkgrey);
     --bg-color: #1e1e1e;
     --h-color: #ffffff;
     --text-color: #fdfdfd;

@@ -1,7 +1,7 @@
 <svg width="16" height="16" viewBox="1.5 0.75 13.5 14.25" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- page + magnifier; viewBox crops to ink so art is full-bleed before CSS glyph pad -->
   <path d="M2.2 1.5h11.6c.4 0 .7.3.7.7v11.2a1 1 0 0 1-1 1H3.5a1 1 0 0 1-1-1V2.2c0-.4.3-.7.7-.7z"
-        fill="none" stroke="#d25300" stroke-width="1.35" stroke-linejoin="round"/>
-  <circle cx="8" cy="7.4" r="3.15" fill="none" stroke="#d25300" stroke-width="1.4"/>
-  <path d="M10.35 10.0 13.7 14.0" stroke="#d25300" stroke-width="1.55" stroke-linecap="round"/>
+        fill="none" stroke="#000" stroke-width="1.35" stroke-linejoin="round"/>
+  <circle cx="8" cy="7.4" r="3.15" fill="none" stroke="#000" stroke-width="1.4"/>
+  <path d="M10.35 10.0 13.7 14.0" stroke="#000" stroke-width="1.55" stroke-linecap="round"/>
 </svg>

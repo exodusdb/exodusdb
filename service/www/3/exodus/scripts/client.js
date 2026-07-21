@@ -47,12 +47,25 @@ var glogflights
 
 //various images
 var gimagetheme = '../../exodus/images/theme2/'
-var gmenuimage = gimagetheme + 'menu_burger.svg'
-var glogoutimage = gimagetheme + 'logout.svg'
-var gloginimage = gimagetheme + 'login.svg'
-var grefreshimage = gimagetheme + 'refresh.svg'
-var gthemeimage = gimagetheme + 'theme_button.svg'
-var gcompanyimage = gimagetheme + 'formpage_companies.svg'
+/*
+ * Icon values are either:
+ *   string URL  — painted multicolour SVG (New/Edit/Delete, theme, …)
+ *   { mask, color } — black monochrome SVG, tinted via CSS --exodus-icon-*
+ * Colour names: green, red, orange, darkgrey, lightgrey, neutral
+ */
+function exodus_icon_spec(mask, color) {
+	return { mask: mask, color: color || 'darkgrey' }
+}
+function exodus_is_icon_spec(x) {
+	return !!(x && typeof x == 'object' && x.mask)
+}
+
+var gmenuimage = exodus_icon_spec('menu_burger.svg', 'darkgrey')
+var glogoutimage = exodus_icon_spec('logout.svg', 'red')
+var gloginimage = exodus_icon_spec('login.svg', 'green')
+var grefreshimage = exodus_icon_spec('refresh.svg', 'darkgrey')
+var gthemeimage = gimagetheme + 'theme_button.svg' // painted sun/moon chrome
+var gcompanyimage = exodus_icon_spec('formpage_companies.svg', 'darkgrey')
 
 var gisdarktheme
 // LM/DM preference cookie — global per browser (not glogincode / dataset / user)
@@ -60,25 +73,27 @@ var gthemecookiekey = 'EXODUStheme'
 
 function exodus_sortimage(order) {
 
-	// order: '' (neutral), 'up', or 'down'
+	// order: '' (neutral), 'up', or 'down' — monochrome sort chevrons
 	var name = 'smallsort' + (order || '')
-	if (gisdarktheme)
-		name += '_darkmode'
-	return gimagetheme + name + '.svg'
+	return exodus_icon_spec(name + '.svg', 'darkgrey')
 }
 
 function exodus_refresh_sortimages() {
 
-	document.querySelectorAll('img[id^="sortbutton_"]').forEach(img => {
+	document.querySelectorAll('img[id^="sortbutton_"], .exodus-icon[id^="sortbutton_"]').forEach(el => {
 		var order = ''
-		var src = img.getAttribute('src') || ''
+		var src = el.getAttribute('src') || el.style.getPropertyValue('--exodus-icon-mask') || ''
 		if (src.indexOf('up') >= 0)
 			order = 'up'
 		else if (src.indexOf('down') >= 0)
 			order = 'down'
-		img.src = exodus_sortimage(order)
-		if (!order)
-			img.originalsrc = img.src
+		var spec = exodus_sortimage(order)
+		if (el.classList && el.classList.contains('exodus-icon'))
+			exodus_icon_apply(el, spec)
+		else if (el.tagName == 'IMG') {
+			// still painted path (should not happen after mono conversion)
+			el.src = gimagetheme + spec.mask
+		}
 	})
 }
 
@@ -1618,48 +1633,51 @@ function exodus_update_auth_button() {
 	var btn = $$('exoduslogoutbutton')
 	if (!btn)
 		return
-	var img = btn.querySelector('img')
 	var label = $$('exoduslogoutbutton_label')
 	var ctrlalt = isMac ? 'Ctrl' : 'Alt'
 	if (!gusername) {
 		if (label)
 			label.innerHTML = 'Login'
 		btn.title = 'Login. ' + ctrlalt + '+L'
-		if (img)
-			img.src = gloginimage
+		setgraphicbutton(btn, null, gloginimage)
 	} else {
 		if (label)
 			label.innerHTML = 'Lo<u>g</u>out'
 		btn.title = 'Logout. ' + ctrlalt + '+G'
-		if (img)
-			img.src = glogoutimage
+		setgraphicbutton(btn, null, glogoutimage)
 	}
 }
 
 function exodus_set_theme_icons() {
 
-	gmenuimage = gimagetheme + (gisdarktheme ? 'menu_burger_darkmode.svg' : 'menu_burger.svg')
-	glogoutimage = gimagetheme + (gisdarktheme ? 'logout_darkmode.svg' : 'logout.svg')
-	gloginimage = gimagetheme + (gisdarktheme ? 'login_darkmode.svg' : 'login.svg')
-	grefreshimage = gimagetheme + (gisdarktheme ? 'refresh_darkmode.svg' : 'refresh.svg')
+	// Monochrome icons: colours come from CSS vars (no path swap).
+	// Painted multicolour only (New/Edit/Delete + theme button):
+	gthemeimage = gimagetheme + (gisdarktheme ? 'theme_button_darkmode.svg' : 'theme_button.svg')
 	if (typeof gnewimage != 'undefined') {
 		gnewimage = gimagetheme + (gisdarktheme ? 'form_add_darkmode.svg' : 'form_add.svg')
 		gdeleteimage = gimagetheme + (gisdarktheme ? 'form_delete_darkmode.svg' : 'form_delete.svg')
 		geditimage = gimagetheme + (gisdarktheme ? 'pencil_edit_darkmode.svg' : 'pencil_edit.svg')
-		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.svg' : 'open.svg')
-		gsaveimage = gimagetheme + (gisdarktheme ? 'tick_darkmode.svg' : 'tick.svg')
-		gsavegreyimage = gimagetheme + (gisdarktheme ? 'tickgrey_darkmode.svg' : 'tickgrey.svg')
-		gcopyimage = gimagetheme + (gisdarktheme ? 'copy_darkmode.svg' : 'copy.svg')
-		gcloseimage = gimagetheme + (gisdarktheme ? 'cross_darkmode.svg' : 'cross.svg')
-		greleaseimage = gimagetheme + (gisdarktheme ? 'lock_darkmode.svg' : 'lock.svg')
-		gfirstimage = gimagetheme + (gisdarktheme ? 'resultset_first_darkmode.svg' : 'resultset_first.svg')
-		gpreviousimage = gimagetheme + (gisdarktheme ? 'resultset_previous_darkmode.svg' : 'resultset_previous.svg')
-		gnextimage = gimagetheme + (gisdarktheme ? 'resultset_next_darkmode.svg' : 'resultset_next.svg')
-		glastimage = gimagetheme + (gisdarktheme ? 'resultset_last_darkmode.svg' : 'resultset_last.svg')
 	}
 	if (typeof gsortimage != 'undefined')
 		gsortimage = exodus_sortimage()
 	exodus_update_auth_button()
+	// Refresh painted <img> srcs for New/Edit/Delete if already in the DOM
+	if (typeof gnewimage != 'undefined') {
+		;['newrecord', 'editreleaserecord', 'deleterecord'].forEach(function (id) {
+			var b = $$(id + 'button')
+			if (!b)
+				return
+			var img = b.getElementsByTagName('IMG')[0]
+			if (!img)
+				return
+			if (id == 'newrecord')
+				img.src = gnewimage
+			else if (id == 'deleterecord')
+				img.src = gdeleteimage
+			else if (id.indexOf('edit') >= 0 && b.querySelector && !b.querySelector('.exodus-icon'))
+				img.src = geditimage // Edit mode; Release uses lock mono
+		})
+	}
 }
 
 // Right-side menubar cluster: session | theme | logout as one float:right flex row.
@@ -1781,34 +1799,10 @@ function theme_toggle(theme = 'default') {
 		html.style.removeProperty('--exodus-form-border')
 	}
 
-	// Switch colour of button icons after page load
+	// Monochrome icons recolor via CSS vars automatically.
+	// Painted multicolour (New/Edit/Delete, theme, static add/delete/refresh) still swap files.
 	const xform_postload = document.readyState === 'complete'
 	if (xform_postload) {
-		const icon_paths = { 'gfindimage': gfindimage, 'gprintsendimage': gprintsendimage, 'glistimage': glistimage, 'gthemeimage': gthemeimage, 'glinkimage': glinkimage, 'ginsertrowimage': ginsertrowimage, 'gdeleterowimage': gdeleterowimage, 'gcalendarimage': gcalendarimage, 'gmenuimage': gmenuimage, 'glogoutimage': glogoutimage, 'gloginimage': gloginimage, 'grefreshimage': grefreshimage, 'gnewimage': gnewimage, 'gdeleteimage': gdeleteimage, 'geditimage': geditimage, 'gopenimage': gopenimage, 'gsaveimage': gsaveimage, 'gsavegreyimage': gsavegreyimage }
-		if (typeof gcopyimage != 'undefined') icon_paths.gcopyimage = gcopyimage
-		if (typeof gcloseimage != 'undefined') icon_paths.gcloseimage = gcloseimage
-		if (typeof greleaseimage != 'undefined') icon_paths.greleaseimage = greleaseimage
-		if (typeof gfirstimage != 'undefined') icon_paths.gfirstimage = gfirstimage
-		if (typeof gpreviousimage != 'undefined') icon_paths.gpreviousimage = gpreviousimage
-		if (typeof gnextimage != 'undefined') icon_paths.gnextimage = gnextimage
-		if (typeof glastimage != 'undefined') icon_paths.glastimage = glastimage
-		if (gdatafilename == 'ADDRESSES')
-			icon_paths['gcompanyimage'] = gcompanyimage
-		const filetype_rex = /(\.[a-zA-Z]+$)/
-
-		for (let [icon_varname, icon_path] of Object.entries(icon_paths)) {
-			if (!icon_path)
-				continue
-			document.querySelectorAll(`img[src*="${icon_path}"]`).forEach(img => {
-				if (gisdarktheme)
-					img.setAttribute('src', img.getAttribute('src').replace(filetype_rex, "_darkmode$1"))
-				else
-					img.setAttribute('src', img.getAttribute('src').replace('_darkmode', ''))
-
-				if (img.getAttribute('src') != window[icon_varname])
-					window[icon_varname] = img.getAttribute('src')
-			});
-		}
 		exodus_swap_tool_icons()
 		exodus_refresh_sortimages()
 	}
@@ -4455,7 +4449,7 @@ async function sorttable(event, order) {
 	//change the sort image now confirmed
 	try {
 		await resetsortimages(groupno)
-		clickedelement.src = exodus_sortimage(order)
+		exodus_set_icon_element(clickedelement, exodus_sortimage(order))
 	} catch (e) { }
 
 	//reorder data and table rows
@@ -5005,9 +4999,12 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	tx += '>'
 
 	//alert(id+' '+tx)
-	//image inside span button (any styling should also be edited into menu.htm menu <img>
+	// image: painted URL string, or monochrome { mask, color }
 	if (imagesrc) {
-		tx += '<IMG src=' + imagesrc + '>'
+		if (exodus_is_icon_spec(imagesrc))
+			tx += exodus_icon_html(imagesrc)
+		else
+			tx += '<IMG src=' + imagesrc + '>'
 	}
 
 	//tx+='<br />'
@@ -5038,12 +5035,40 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
 function setgraphicbutton(button, labeltext, src) {
 
+	if (!button)
+		return
 	if (labeltext) {
 		var label = $$(button.id + '_label')
-		label.innerHTML = labeltext.replace(/^\s+/, '')
+		if (label)
+			label.innerHTML = labeltext.replace(/^\s+/, '')
 	}
-	if (src)
-		button.getElementsByTagName('IMG')[0].src = src
+	if (src == null || typeof src == 'undefined')
+		return
+
+	var icon = button.querySelector('.exodus-icon')
+	var img = button.getElementsByTagName('IMG')[0]
+
+	if (exodus_is_icon_spec(src)) {
+		if (icon) {
+			exodus_icon_apply(icon, src)
+		} else if (img) {
+			var span = document.createElement('span')
+			span.innerHTML = exodus_icon_html(src)
+			span = span.firstChild
+			img.parentNode.replaceChild(span, img)
+		} else {
+			button.insertAdjacentHTML('afterbegin', exodus_icon_html(src))
+		}
+	} else {
+		// painted multicolour URL (New/Edit/Delete)
+		if (img) {
+			img.src = src
+		} else if (icon) {
+			var im = document.createElement('IMG')
+			im.src = src
+			icon.parentNode.replaceChild(im, icon)
+		}
+	}
 }
 
 async function refreshcache_onclick() {
@@ -6210,23 +6235,96 @@ function exodusconfirm_footerwrap(content) {
 
 /*
  * Monochrome icons: black SVG + CSS mask tint (--exodus-icon-green/red/orange/…).
- * Multicolour icons stay as normal <img src>. See global.css .exodus-icon.
+ * Multicolour icons (New/Edit/Delete) stay as normal <img src>. See global.css .exodus-icon.
  */
-function exodus_icon_html(maskFile, colorName) {
-	var url = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + maskFile
-	var color = colorName || 'neutral'
+function exodus_icon_html(maskFileOrSpec, colorName) {
+	var mask = maskFileOrSpec
+	var color = colorName || 'darkgrey'
+	if (exodus_is_icon_spec(maskFileOrSpec)) {
+		mask = maskFileOrSpec.mask
+		color = maskFileOrSpec.color || 'darkgrey'
+	}
+	var url = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + mask
 	return '<span class="exodus-icon exodus-icon-' + color + '"'
 		+ ' style="--exodus-icon-mask:url(\'' + url + '\')"'
 		+ ' aria-hidden="true"></span>'
 }
 
+function exodus_icon_apply(el, spec) {
+	if (!el || !exodus_is_icon_spec(spec))
+		return
+	var url = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + spec.mask
+	var id = el.id
+	el.className = 'exodus-icon exodus-icon-' + (spec.color || 'darkgrey')
+	if (id)
+		el.id = id
+	el.style.setProperty('--exodus-icon-mask', "url('" + url + "')")
+}
+
+// Create or update an icon host: monochrome {mask,color} → .exodus-icon; string → <img>
+function exodus_create_icon_element(specOrUrl) {
+	if (exodus_is_icon_spec(specOrUrl)) {
+		var tmp = document.createElement('span')
+		tmp.innerHTML = exodus_icon_html(specOrUrl)
+		return tmp.firstChild
+	}
+	var img = document.createElement('img')
+	img.src = specOrUrl
+	return img
+}
+
+function exodus_set_icon_element(el, specOrUrl) {
+	if (!el)
+		return null
+	if (exodus_is_icon_spec(specOrUrl)) {
+		if (el.classList && el.classList.contains('exodus-icon')) {
+			exodus_icon_apply(el, specOrUrl)
+			return el
+		}
+		var span = exodus_create_icon_element(specOrUrl)
+		if (el.id)
+			span.id = el.id
+		// keep common attributes used on field chrome icons
+		;['title', 'isexoduspopup', 'isexoduslink', 'exodusonclick', 'style', 'class'].forEach(function (n) {
+			if (n == 'class' || n == 'style')
+				return
+			var v = el.getAttribute && el.getAttribute(n)
+			if (v)
+				span.setAttribute(n, v)
+		})
+		if (el.getAttribute && el.getAttribute('style')) {
+			// keep cursor etc. without wiping mask
+			var st = el.getAttribute('style')
+			if (st.indexOf('cursor') >= 0)
+				span.style.cursor = el.style.cursor || 'pointer'
+			if (el.style.verticalAlign)
+				span.style.verticalAlign = el.style.verticalAlign
+		}
+		if (el.parentNode)
+			el.parentNode.replaceChild(span, el)
+		return span
+	}
+	// painted URL
+	if (el.tagName == 'IMG') {
+		el.src = specOrUrl
+		return el
+	}
+	var img = document.createElement('img')
+	if (el.id)
+		img.id = el.id
+	img.src = specOrUrl
+	if (el.parentNode)
+		el.parentNode.replaceChild(img, el)
+	return img
+}
+
 // Decide Select: green check (mask)
 function exodusconfirm_ok_image() {
-	return exodus_icon_html('check.svg', 'green')
+	return exodus_icon_html(exodus_icon_spec('check.svg', 'green'))
 }
-// Decide Cancel: red X mask (form Close still uses painted cross.svg via gcloseimage)
+// Decide Cancel: red X mask
 function exodusconfirm_cancel_image() {
-	return exodus_icon_html('cross_mono.svg', 'red')
+	return exodus_icon_html(exodus_icon_spec('cross_mono.svg', 'red'))
 }
 // Confirm Yes/OK (positive)
 function exodusconfirm_yes_image() {
@@ -6234,11 +6332,11 @@ function exodusconfirm_yes_image() {
 }
 // Confirm No: orange X if Cancel also shown, else red X
 function exodusconfirm_no_image(hasCancelButton) {
-	return exodus_icon_html('cross_mono.svg', hasCancelButton ? 'orange' : 'red')
+	return exodus_icon_html(exodus_icon_spec('cross_mono.svg', hasCancelButton ? 'orange' : 'red'))
 }
 // Confirm Cancel (Esc) — red U-turn
 function exodusconfirm_back_image() {
-	return exodus_icon_html('goback.svg', 'red')
+	return exodus_icon_html(exodus_icon_spec('goback.svg', 'red'))
 }
 
 function exodusconfirm_focusable_elements() {
