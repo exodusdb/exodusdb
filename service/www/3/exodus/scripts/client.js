@@ -6232,11 +6232,8 @@ function exodusconfirm_scrollpane() {
 }
 
 function exodusconfirm_footerwrap(content) {
-	return '\
-		<div class="exodusconfirm_footerrow">\
-			<div class="exodusconfirm_iconcol" aria-hidden="true">&nbsp;</div>\
-			<div class="exodusconfirm_promptcol">'+ content + '</div>\
-		</div>'
+	// Buttons only — left edge shared via one-row two-col shell (icon | everything).
+	return content
 }
 
 /*
@@ -6475,14 +6472,6 @@ function exodusconfirm_update_scroll_hints() {
 	wrap.setAttribute('aria-hidden', canDown ? 'false' : 'true')
 }
 
-function exodusconfirm_sync_decide_scrollhint_width() {
-
-	var table=$$('decide_table1')
-	var hintBlock=$$('exodusconfirm_scrollhint_block')
-	if (table&&hintBlock)
-		hintBlock.style.width=table.offsetWidth+'px'
-}
-
 function exodusconfirm_fit_decide_popup(force) {
 
 	var div=$$('exodusconfirmdiv')
@@ -6492,13 +6481,15 @@ function exodusconfirm_fit_decide_popup(force) {
 	if (div.getAttribute('exodusconfirm_fitted')&&!force)
 		return
 	var maxw=window.innerWidth-40
-	var want=table.offsetWidth+24
+	// iconcol + prompt content + padding
+	var iconcol=div.querySelector('.exodusconfirm_iconcol')
+	var iconw=iconcol ? iconcol.offsetWidth : 0
+	var want=table.offsetWidth+iconw+24
 	var footer=div.querySelector('.exodusconfirm_footer')
 	if (footer)
-		want=Math.max(want,footer.scrollWidth+24)
+		want=Math.max(want,footer.scrollWidth+iconw+24)
 	div.style.width=Math.min(want,maxw)+'px'
 	div.setAttribute('exodusconfirm_fitted','1')
-	exodusconfirm_sync_decide_scrollhint_width()
 }
 
 function exodusconfirm_bind_scroll_hints() {
@@ -6719,26 +6710,18 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	}//end of addbutton
 
-	// Scrollable body + pinned footer (see global.css .exodusconfirm_layout)
-	var bodyhtml = '\
-			<table class="exodusconfirm_layout">\
-			<tr>\
-				<td class="exodusconfirm_iconcol">\
-					'+ imagehtml + '\
-				</td>\
-				<td class="exodusconfirm_promptcol">\
+	// One-row two-col shell: col1 = type icon, col2 = everything else
+	// (question, option table / text input, scroll ▼, footer buttons).
+	// Shared left edge for title / table / cont mark / buttons — no spacer hacks.
+	var bodyinner = '\
 					<div class="statementclass" id="question1">\
 					'+ questionhtml + '\
-					</div>\
-				</td>\
-			</tr>'
+					</div>'
 
 	var footerhtml = ''
 
 	if (decide_args) {
-		bodyhtml += '\
-			<tr>\
-			<td colspan=2 align="center">\
+		bodyinner += '\
 			<div class="exodusconfirm_decideblock">\
 			<table id="decide_table1" xwidth=100% xclass="exodusform" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
 				<thead onclick="decide_sorttable2_sync(event)" style="cursor: pointer">\
@@ -6748,9 +6731,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				<tbody id="decide_table1body1">\
 				</tbody>\
 			</table>\
-			</div>\
-			</td>\
-			</tr>'
+			</div>'
 		// Icon+label graphicbuttons (mask-tinted mono icons).
 		// "Select" not "OK" — avoids confusion when an option is itself named Cancel.
 		footerhtml = exodusconfirm_footerwrap(
@@ -6766,35 +6747,35 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			+ '</span>')
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
-		bodyhtml += '\
-				<tr>\
-					<td class="exodusconfirm_iconcol">\
-						&nbsp;\
-					</td>\
-					<td class="exodusconfirm_promptcol">\
-						<input id="exodusconfirmdiv_textinput" size="60" style="display: block;">\
-					</td>\
-				</tr>'
+		bodyinner += '\
+						<input id="exodusconfirmdiv_textinput" size="60" style="display: block;">'
 		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	} else {
 		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	}
 
-	bodyhtml += '</table>'
-
 	var scrollhinthtml = ''
 	if (decide_args)
 		scrollhinthtml = '\
 			<div class="exodusconfirm_scrollhint_wrap" id="exodusconfirm_scrollhint_wrap" aria-hidden="true">\
-				<div class="exodusconfirm_decideblock" id="exodusconfirm_scrollhint_block">\
-					<div class="exodusconfirm_scrollhint" id="exodusconfirm_scrollhint">&#9660;</div>\
-				</div>\
+				<div class="exodusconfirm_scrollhint" id="exodusconfirm_scrollhint">&#9660;</div>\
 			</div>'
 
 	var html = '\
-		<div class="exodusconfirm_body">'+ bodyhtml + '</div>\
-		'+ scrollhinthtml + '\
-		<div class="exodusconfirm_footer">'+ footerhtml + '</div>'
+		<table class="exodusconfirm_layout">\
+		<tr>\
+			<td class="exodusconfirm_iconcol">\
+				'+ imagehtml + '\
+			</td>\
+			<td class="exodusconfirm_promptcol">\
+				<div class="exodusconfirm_promptstack">\
+					<div class="exodusconfirm_body">'+ bodyinner + '</div>\
+					'+ scrollhinthtml + '\
+					<div class="exodusconfirm_footer">'+ footerhtml + '</div>\
+				</div>\
+			</td>\
+		</tr>\
+		</table>'
 
 	//finally create the div body
 	div.innerHTML = html

@@ -1090,9 +1090,12 @@ input[type=checkbox]:focus-visible {
 }
 
 /* ========== In-window confirm/decide popups ========== */
+/* Shell: one-row two-col table — icon | (title + options + ▼ + buttons).
+   Everything in col2 shares one left edge; no spacer/padding alignment hacks. */
 .exodusconfirmdiv {
     /* Same face as form pane / TABLE.exodusform */
     --exodusconfirm-face: var(--exodus-form-face);
+    --exodusconfirm-iconcol-width: 4.3em;
     z-index: 1001;
     position: fixed;
     width: fit-content;
@@ -1101,7 +1104,7 @@ input[type=checkbox]:focus-visible {
     height: fit-content;
     margin: auto;
     inset: 0;
-    text-align: center;
+    text-align: left;
     background: var(--exodusconfirm-face);
     border: 2px solid #666666;
     border-radius: 10px;
@@ -1109,8 +1112,62 @@ input[type=checkbox]:focus-visible {
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     overflow: hidden;
+}
+/* Outer shell table fills the dialog; cells use flex display for reliable scroll */
+.exodusconfirm_layout {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: none;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+}
+.exodusconfirm_layout > tbody {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+}
+.exodusconfirm_layout > tbody > tr {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    align-items: stretch;
+}
+.exodusconfirm_layout td,
+.exodusconfirm_layout th {
+    border: none;
+}
+.exodusconfirm_iconcol {
+    width: var(--exodusconfirm-iconcol-width);
+    flex: 0 0 auto;
+    vertical-align: top;
+    padding: 0.35em 12px 0 2px; /* match question top air */
+    white-space: nowrap;
+}
+.exodusconfirm_promptcol {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    vertical-align: top;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+/* Nested stack in col2: scrollable body + pinned scrollhint + footer */
+.exodusconfirm_promptstack {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    text-align: left;
 }
 .exodusconfirm_body {
     flex: 1 1 auto;
@@ -1130,21 +1187,19 @@ input[type=checkbox]:focus-visible {
 }
 .exodusconfirmdiv.exodusconfirm_decide .exodusconfirm_body {
     overflow-x: auto;
-    align-self: stretch;
-    text-align: center;
+    text-align: left;
 }
-.exodusconfirmdiv.exodusconfirm_decide .exodusconfirm_layout {
-    margin-left: auto;
-    margin-right: auto;
-}
+/* Option table shares promptcol left edge with title + footer buttons */
 .exodusconfirm_decideblock {
-    display: inline-block;
+    display: block;
     text-align: left;
     vertical-align: top;
+    margin-top: 1.1em; /* air between question and column titles */
 }
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 {
     width: auto;
     max-width: 100%;
+    margin: 0;
 }
 /* Extra horizontal air in decide dialog columns */
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 th,
@@ -1162,11 +1217,12 @@ input[type=checkbox]:focus-visible {
     white-space: normal;
     overflow-wrap: break-word;
 }
+/* Already in promptcol — slight inset from shared left edge */
 .exodusconfirm_scrollhint_wrap {
     flex: 0 0 auto;
-    align-self: stretch;
     display: none;
-    text-align: center;
+    text-align: left;
+    padding-left: 0.5em;
 }
 .exodusconfirm_scrollhint_wrap.can_scroll_down {
     display: block;
@@ -1174,8 +1230,7 @@ input[type=checkbox]:focus-visible {
 .exodusconfirm_scrollhint {
     display: inline-block;
     min-height: 0;
-    /* Indent off the hard left of the decide block (table is left-aligned inside) */
-    margin: 0 0 4px 1em;
+    margin: 0 0 4px 0;
     padding: 0;
     border: none;
     line-height: 1;
@@ -1185,33 +1240,19 @@ input[type=checkbox]:focus-visible {
 }
 .exodusconfirm_footer {
     flex: 0 0 auto;
-    align-self: stretch;
     padding-top: 10px;
     min-width: min-content;
+    text-align: left;
 }
-.exodusconfirm_footerrow {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    flex-wrap: nowrap;
-    min-width: min-content;
+#yesnocancelbuttons,
+.exodusconfirm_footer {
+    white-space: nowrap;
 }
-.exodusconfirm_layout {
-    border-collapse: collapse;
-    border-spacing: 0;
-    border: none;
-}
-.exodusconfirm_layout td,
-.exodusconfirm_layout th {
-    border: none;
-}
-.exodusconfirm_footer .exodusconfirm_promptcol,
 #yesnocancelbuttons {
     display: inline-flex;
     flex-wrap: nowrap;
     align-items: center;
     gap: 0.25em;
-    white-space: nowrap;
     min-width: min-content;
 }
 /* Confirm Yes/No/Cancel and decide Select/Cancel: same graphicbutton chrome
@@ -1222,7 +1263,7 @@ input[type=checkbox]:focus-visible {
     display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
-    margin: 0.125em 4px;
+    margin: 0.125em 4px 0.125em 0;
     padding: 0.35em 0.55em;
     line-height: 1.2;
 }
@@ -1244,16 +1285,6 @@ input[type=checkbox]:focus-visible {
     vertical-align: middle;
 }
 /* hover/focus face: shared .graphicbutton rules (informbutton tokens) */
-.exodusconfirm_iconcol {
-    width: 4.3em;
-    vertical-align: middle;
-    padding: 2px 12px 0 2px;
-    white-space: nowrap;
-}
-.exodusconfirm_promptcol {
-    vertical-align: middle;
-    text-align: left;
-}
 .exodusconfirm_iconcol img {
     display: block;
     height: calc(2 * var(--exodus-ui-icon-size));
@@ -1266,6 +1297,8 @@ input[type=checkbox]:focus-visible {
 .exodusconfirmdiv .statementclass {
     color: #000000;
     text-align: left;
+    padding-top: 0.35em; /* not flush against dialog top */
+    margin-bottom: 0.15em;
 }
 /* Type (info/critical/warning/question): icon only — no face/border tint */
 
@@ -1276,7 +1309,7 @@ input[type=checkbox]:focus-visible {
 }
 .exodusconfirmdiv #decide_table1 > thead th,
 .exodusconfirmdiv #decide_table1 > thead td {
-    background-color: var(--exodusconfirm-face, #e8e8e8);
+    background-color: var(--exodusconfirm-face);
 }
 
 .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
@@ -1523,8 +1556,8 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 
 :root[data-theme="dark_mode"] .exodusconfirmdiv {
     --exodusconfirm-border: #b8a99a;
-    --exodusconfirm-face: #3a3530;
-    background: #3a3530;
+    --exodusconfirm-face: var(--exodus-form-face);
+    background: var(--exodusconfirm-face);
     border: 2px solid var(--exodusconfirm-border);
     color: #ffffff;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
