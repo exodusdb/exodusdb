@@ -7825,6 +7825,41 @@ async function decide_onload(decide_args) {
 			return exoduscancelevent(event)
 		}
 
+		// Arrows on footer buttons (Select / Cancel / All): cycle among those only.
+		// Left/Up = previous, Right/Down = next. Options keep using arrows for the list.
+		if (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40) {
+			var okbA = $$('decide_okbutton')
+			var canbA = $$('decide_cancelbutton')
+			var allbA = decide_all_button()
+			var targetA = event.target
+			var footerBtns = []
+			if (allbA)
+				footerBtns.push(allbA)
+			if (okbA)
+				footerBtns.push(okbA)
+			if (canbA)
+				footerBtns.push(canbA)
+			var fi = -1
+			for (var fii = 0; fii < footerBtns.length; ++fii) {
+				if (targetA === footerBtns[fii]
+					|| (footerBtns[fii].contains && footerBtns[fii].contains(targetA))) {
+					fi = fii
+					break
+				}
+			}
+			if (fi >= 0 && footerBtns.length > 1) {
+				var reverseA = (keycode == 37 || keycode == 38)
+				var nexti = reverseA
+					? (fi - 1 + footerBtns.length) % footerBtns.length
+					: (fi + 1) % footerBtns.length
+				var destA = footerBtns[nexti]
+				try { destA.focus() } catch (e) {}
+				client_focuson(destA)
+				return exoduscancelevent(event)
+			}
+			// else fall through: arrows on options / body still move the list
+		}
+
 		//ctrl+Enter or single select
 		if (keycode == 13 && event.ctrlKey) {
 			decide_ok_onclick_sync()
