@@ -1,7 +1,7 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Cancel: U-turn — down right, curve, up left, arrowhead on top of left stem (red) -->
   <path d="M11.8 3.2 V10.2 C11.8 13.1 9.6 13.6 8 13.6 C6.4 13.6 4.2 13.1 4.2 10.2 V5.4"
-        stroke="#FF8585" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        stroke="#ff442a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <path d="M0.8 5.6 4.2 2.0 7.6 5.6"
-        stroke="#FF8585" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        stroke="#ff442a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>
