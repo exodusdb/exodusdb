@@ -1,3 +1,13 @@
+/*
+ * Form frame model (keep this simple)
+ * -----------------------------------
+ * 1. .exodusformpane   — sole outer frame (border, radius, padding). All forms
+ *                        are wrapped by exoduswrapformpanes() in client.js.
+ * 2. TABLE.exodusform  — no table border (never competes with the pane).
+ * 3. Direct form cells — full lightgrey borders = the internal grid.
+ * 4. Outer cell edges  — stripped so only *inner* lines remain (see below).
+ * Nested tables / .exodustable / [exodusgroupno] are not this grid.
+ */
 /*must be first in order to customise screen form color*/
 TABLE.exodusform
 {
@@ -6,27 +16,20 @@ TABLE.exodusform
     border-collapse: collapse;
     /* background-color: #ffffc0; cellpadding: 1; */
     background-color: #fdf5e6;
-    border-color: #d0d0d0;
-    border-width: 1px 1px 1px 1px;
-    border-style:  solid; /* works in ie     border-right: thin;     border-left: thin;     border-bottom: thin;     border-top: thin;     */
+    border: none; /* outer frame is .exodusformpane only */
     padding: 0.125em;
     text-align: left;
     /* prompts/labels — tune via --exodus-form-label-font-style */
     font-style: var(--exodus-form-label-font-style);
 }
 
-.exodusform > tbody > tr > td,.exodusform > tbody > tr > thead, .exodusform > thead > tr > th, .exodusform > thead > tr > td
-{
-    border: 1px lightgrey solid;
-}
-
-/* Outer grid rows — label|value forms (ledgerprint, filters, headers) */
-TABLE.exodusform > tbody > tr > td,
-TABLE.exodusform > tbody > tr > th,
-TABLE.exodusform > thead > tr > td,
-TABLE.exodusform > thead > tr > th,
-TABLE.exodusform > tr > td,
-TABLE.exodusform > tr > th {
+/* Internal grid: every direct form cell (label|value rows) */
+.exodusform > tbody > tr > td,
+.exodusform > thead > tr > th,
+.exodusform > thead > tr > td,
+.exodusform > tr > td,
+.exodusform > tr > th {
+    border: 1px solid lightgrey;
     padding-left: var(--exodus-form-cell-padding-left);
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
@@ -172,25 +175,30 @@ TABLE.exodusform TABLE.exodustable th {
     border-radius: 0;
     box-sizing: border-box;
 }
-/* Pane owns the outer edge; table cells draw internal grid lines only */
-.exodusformpane > TABLE.exodusform > thead > tr > :first-child,
-.exodusformpane > TABLE.exodusform > tbody > tr > :first-child,
+/*
+ * No outer cell borders (pane is the frame). Four edges of the cell grid:
+ *   left  = first column,  right = last column
+ *   top   = first row, or the row after a display:none row (hidden leading Mode rows)
+ *   bottom = last row
+ */
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr > :first-child,
 .exodusformpane > TABLE.exodusform > tr > :first-child {
     border-left: none;
 }
-.exodusformpane > TABLE.exodusform > thead > tr > :last-child,
-.exodusformpane > TABLE.exodusform > tbody > tr > :last-child,
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr > :last-child,
 .exodusformpane > TABLE.exodusform > tr > :last-child {
     border-right: none;
 }
-.exodusformpane > TABLE.exodusform > thead > tr:first-child > *,
-.exodusformpane > TABLE.exodusform > tbody:first-child > tr:first-child > *,
-.exodusformpane > TABLE.exodusform > tr:first-child > * {
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr:first-child > *,
+.exodusformpane > TABLE.exodusform > tr:first-child > *,
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr[style*="display: none"] + tr > *,
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr[style*="display:none"] + tr > *,
+.exodusformpane > TABLE.exodusform > tr[style*="display: none"] + tr > *,
+.exodusformpane > TABLE.exodusform > tr[style*="display:none"] + tr > * {
     border-top: none;
 }
-.exodusformpane > TABLE.exodusform > tbody > tr:last-child > *,
-.exodusformpane > TABLE.exodusform:not(:has(> tbody)) > thead > tr:last-child > *,
-.exodusformpane > TABLE.exodusform:not(:has(> thead)):not(:has(> tbody)) > tr:last-child > * {
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr:last-child > *,
+.exodusformpane > TABLE.exodusform > tr:last-child > * {
     border-bottom: none;
 }
 
