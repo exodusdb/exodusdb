@@ -1652,8 +1652,9 @@ function exodus_update_auth_button() {
 function exodus_set_theme_icons() {
 
 	// Monochrome icons: colours come from CSS vars (no path swap).
-	// Painted multicolour only (New/Edit/Delete + theme button):
+	// Painted: New/Edit/Delete, theme, company
 	gthemeimage = gimagetheme + (gisdarktheme ? 'theme_button_darkmode.svg' : 'theme_button.svg')
+	gcompanyimage = gimagetheme + (gisdarktheme ? 'formpage_companies_darkmode.svg' : 'formpage_companies.svg')
 	if (typeof gnewimage != 'undefined') {
 		gnewimage = gimagetheme + (gisdarktheme ? 'form_add_darkmode.svg' : 'form_add.svg')
 		gdeleteimage = gimagetheme + (gisdarktheme ? 'form_delete_darkmode.svg' : 'form_delete.svg')
@@ -6237,29 +6238,62 @@ function exodusconfirm_footerwrap(content) {
 /*
  * Monochrome icons: black SVG + CSS mask tint (--exodus-icon-green/red/orange/…).
  * Multicolour icons (New/Edit/Delete) stay as normal <img src>. See global.css .exodus-icon.
+ *
+ * IMPORTANT: mask-image URLs must be applied on the element (or resolved absolute).
+ * url() inside a custom property used from global.css is resolved against the CSS
+ * file path and often 404s → solid coloured square.
  */
-function exodus_icon_html(maskFileOrSpec, colorName) {
+function exodus_icon_abs_url(maskFile) {
+	var rel = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + maskFile
+	try {
+		// Resolve like <img src> — against the document URL
+		var a = document.createElement('a')
+		a.href = rel
+		return a.href
+	} catch (e) {
+		return rel
+	}
+}
+
+function exodus_icon_mask_style(maskFile) {
+	var abs = exodus_icon_abs_url(maskFile)
+	// Set mask on the element style so the URL resolves against the document
+	return '-webkit-mask-image:url(\'' + abs + '\');mask-image:url(\'' + abs + '\')'
+}
+
+function exodus_icon_html(maskFileOrSpec, colorName, extraAttrs) {
 	var mask = maskFileOrSpec
 	var color = colorName || 'darkgrey'
 	if (exodus_is_icon_spec(maskFileOrSpec)) {
 		mask = maskFileOrSpec.mask
 		color = maskFileOrSpec.color || 'darkgrey'
 	}
-	var url = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + mask
+	var attrs = extraAttrs || ''
+	// extraAttrs may include style=; merge mask into style if present
+	var style = exodus_icon_mask_style(mask)
+	var m = attrs.match(/\bstyle="([^"]*)"/)
+	if (m) {
+		attrs = attrs.replace(/\bstyle="([^"]*)"/, 'style="' + m[1] + ';' + style + '"')
+	} else {
+		attrs += ' style="' + style + '"'
+	}
 	return '<span class="exodus-icon exodus-icon-' + color + '"'
-		+ ' style="--exodus-icon-mask:url(\'' + url + '\')"'
+		+ attrs
 		+ ' aria-hidden="true"></span>'
 }
 
 function exodus_icon_apply(el, spec) {
 	if (!el || !exodus_is_icon_spec(spec))
 		return
-	var url = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + spec.mask
 	var id = el.id
 	el.className = 'exodus-icon exodus-icon-' + (spec.color || 'darkgrey')
 	if (id)
 		el.id = id
-	el.style.setProperty('--exodus-icon-mask', "url('" + url + "')")
+	var abs = exodus_icon_abs_url(spec.mask)
+	el.style.webkitMaskImage = 'url(\'' + abs + '\')'
+	el.style.maskImage = 'url(\'' + abs + '\')'
+	// clear any old custom-prop approach
+	el.style.removeProperty('--exodus-icon-mask')
 }
 
 // Create or update an icon host: monochrome {mask,color} → .exodus-icon; string → <img>

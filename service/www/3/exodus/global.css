@@ -318,9 +318,9 @@ BODY
 }
 
 /*
- * Tinted monochrome icon: black (or any opaque) SVG used as mask; fill from
- * --exodus-icon-color / .exodus-icon-{green,red,orange,neutral}.
- * Set mask: style="--exodus-icon-mask:url(...)" or CSS.
+ * Tinted monochrome icon: black SVG used as mask; fill from --exodus-icon-color.
+ * mask-image is set inline on the element (absolute URL) — do not put relative
+ * url() only in a custom property used from this file (resolves against CSS path → 404).
  */
 .exodus-icon {
     display: inline-block;
@@ -329,15 +329,22 @@ BODY
     box-sizing: border-box;
     flex-shrink: 0;
     vertical-align: middle;
-    background-color: var(--exodus-icon-color, currentColor);
-    -webkit-mask-image: var(--exodus-icon-mask);
-    mask-image: var(--exodus-icon-mask);
+    /* Colour the glyph; never inherit button/menubar background as the fill */
+    background-color: var(--exodus-icon-color, currentColor) !important;
+    background-image: none !important;
     -webkit-mask-size: contain;
     mask-size: contain;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
     mask-position: center;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+    /* avoid menubar hover / radius clipping the glyph oddly */
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible;
 }
 .exodus-icon-green { --exodus-icon-color: var(--exodus-icon-green); }
 .exodus-icon-red { --exodus-icon-color: var(--exodus-icon-red); }
@@ -735,10 +742,16 @@ img[id^="deleterowbutton"] {
     width: var(--exodus-ui-icon-size);
     cursor: pointer;
 }
-/* Mask icons inside buttons: size box already set */
+/* Mask icons inside buttons: size box already set; keep tint on menubar hover */
 .graphicbutton .exodus-icon,
 .menubutton .exodus-icon {
     margin-inline-end: 0.25em;
+}
+.menubutton:hover .exodus-icon,
+.menubutton:focus .exodus-icon,
+.graphicbutton:hover .exodus-icon,
+.graphicbutton:focus .exodus-icon {
+    background-color: var(--exodus-icon-color, currentColor) !important;
 }
 
 #menubutton_label {

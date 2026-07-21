@@ -1431,17 +1431,19 @@ async function formfunctions_onload() {
                     t += ' <span style="white-space: nowrap">'
                     //if (!(exodusgetattribute(element,'exodusnoinsertrow')))
                     if (!(element.getAttribute('exodusnoinsertrow'))) {
-                        t += exodus_icon_html(ginsertrowimage)
-                            .replace('class="exodus-icon', 'id=insertrowbutton' + groupno
-                                + ' title="Insert a new row here ' + t2
-                                + '" exodusonclick="await insertrow_onclick(event)" style="cursor:pointer" class="exodus-icon')
+                        t += exodus_icon_html(ginsertrowimage, null,
+                            ' id="insertrowbutton' + groupno + '"'
+                            + ' title="Insert a new row here ' + t2 + '"'
+                            + ' exodusonclick="await insertrow_onclick(event)"'
+                            + ' style="cursor:pointer"')
                     }
                     //if (!(exodusgetattribute(element,'exodusnodeleterow')))
                     if (!(element.getAttribute('exodusnodeleterow'))) {
-                        t += exodus_icon_html(gdeleterowimage)
-                            .replace('class="exodus-icon', 'id=deleterowbutton' + groupno
-                                + ' title="Delete this row ' + t3
-                                + '" exodusonclick="await deleterow_onclick(event)" style="cursor:pointer" class="exodus-icon')
+                        t += exodus_icon_html(gdeleterowimage, null,
+                            ' id="deleterowbutton' + groupno + '"'
+                            + ' title="Delete this row ' + t3 + '"'
+                            + ' exodusonclick="await deleterow_onclick(event)"'
+                            + ' style="cursor:pointer"')
                     }
                     t += ' </span>'
                     var insertdeletebuttons = document.createElement('td')
