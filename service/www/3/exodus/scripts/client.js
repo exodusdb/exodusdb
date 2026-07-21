@@ -6222,10 +6222,10 @@ function exodusconfirm_cancel_image() {
 function exodusconfirm_yes_image() {
 	return exodusconfirm_ok_image()
 }
-// Confirm No (negative): blue X if a Cancel button is also shown (red reserved for U-turn Cancel)
+// Confirm No (negative): orange X if a Cancel button is also shown (red reserved for U-turn Cancel)
 function exodusconfirm_no_image(hasCancelButton) {
 	if (hasCancelButton)
-		return gimagetheme + (gisdarktheme ? 'cross_blue_darkmode.svg' : 'cross_blue.svg')
+		return gimagetheme + (gisdarktheme ? 'cross_orange_darkmode.svg' : 'cross_orange.svg')
 	return exodusconfirm_cancel_image()
 }
 // Confirm Cancel (Esc) — red U-turn, leave without choosing
@@ -6519,7 +6519,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		nbuttons++
 
 		// Same chrome as decide Select/Cancel (graphicbutton: filled outset face).
-		// Icons by role: 1 Yes/OK = green check, 2 No = red X (Close), 3 Cancel = go-back.
+		// Icons: 1 Yes=green check; 2 No=orange X if Cancel present else red X; 3 Cancel=red U-turn.
 		html += '<span id="' + buttonid + 'button"'
 		html += ' tabindex="0"'
 		html += ' class="graphicbutton"'
@@ -6562,7 +6562,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			if (buttonn == 1)
 				imgsrc = exodusconfirm_yes_image()
 			else if (buttonn == 2)
-				imgsrc = exodusconfirm_no_image()
+				imgsrc = exodusconfirm_no_image(!!cancelbuttonx)
 			else if (buttonn == 3)
 				imgsrc = exodusconfirm_back_image()
 		}
