@@ -1698,7 +1698,8 @@ async function formfunctions_onload() {
         buttonhtml += '<span class="exodus_recordnav_group">'
         buttonhtml += menubuttonhtml2('firstrecord', gfirstimage, ' ', 'Open the first document. ' + AltorCtrl + '+{', '{', buttonalign)
         buttonhtml += menubuttonhtml2('previousrecord', gpreviousimage, ' ', 'Open the previous document. ' + AltorCtrl + '+[', '[', buttonalign)
-        buttonhtml += menubuttonhtml2('selectrecord', gspacerimage, ' ', 'Select document. ' + AltorCtrl + '+^', '^', buttonalign)
+        // No spacer img — CSS shares height with icon nav and centers the "n of m" label
+        buttonhtml += menubuttonhtml2('selectrecord', '', ' ', 'Select document. ' + AltorCtrl + '+^', '^', buttonalign)
         buttonhtml += menubuttonhtml2('nextrecord', gnextimage, ' ', 'Open the next document. ' + AltorCtrl + '+]', ']', buttonalign)
         buttonhtml += menubuttonhtml2('lastrecord', glastimage, ' ', 'Open the last document. ' + AltorCtrl + '+}', '}', buttonalign)
         buttonhtml += '</span>'
@@ -8674,7 +8675,13 @@ async function setgkeys(keys, keyn) {
 async function setgkeyn(keyn) {
     gkeyn = keyn
     firstrecord.disabled = gkeyn == 0 ? true : false
-    selectrecord.innerHTML = (gkeyn + 1) + " of " + gkeys.length
+    // Update label only — CSS ::before strut matches nav icon height for v-center.
+    var navtext = (gkeyn + 1) + ' of ' + gkeys.length
+    var navlabel = $$('selectrecordbutton_label')
+    if (navlabel)
+        navlabel.innerHTML = navtext
+    else if (selectrecord)
+        selectrecord.innerHTML = navtext
     lastrecord.disabled = (gkeyn == (gkeys.length - 1)) ? true : false
 }
 

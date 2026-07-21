@@ -116,7 +116,10 @@ body > #formbuttonsdiv .graphicbutton {
 .exodusformactions .graphicbutton img,
 body > #formbuttonsdiv .graphicbutton img {
     height: var(--exodus-ui-icon-size);
-    width: auto;
+    width: var(--exodus-ui-icon-size);
+    box-sizing: border-box;
+    padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
+    object-fit: contain;
     display: block;
     flex-shrink: 0;
 }
@@ -289,8 +292,12 @@ BODY
     --exodus-informbutton-border: #cccccc;
     --exodus-informbutton-border-style: outset;
     --exodus-informbutton-color: inherit;
-    /* Toolbar/field icons: ~16px beside former 8pt body text; slightly below 1.5× */
+    /* Toolbar/field icons — one place to retune ALL menubar/form icons together:
+       --exodus-ui-icon-size  = outer img box (scales with text)
+       --exodus-ui-icon-glyph = fraction of that box the SVG may fill (1 = edge-to-edge).
+       0.875 ≈ 1 unit inset on a 16px canvas. SVGs should be full-bleed; CSS owns padding. */
     --exodus-ui-icon-size: 1.325em;
+    --exodus-ui-icon-glyph: 0.875;
     /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
     --exodus-check-size: 1.3125em;
 }
@@ -668,7 +675,7 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
     box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
 }
 
-/* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size) */
+/* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size / glyph) */
 .graphicbutton img,
 img[isexoduspopup="1"],
 img[isexoduslink="1"],
@@ -678,7 +685,10 @@ img[id^="sortbutton_"],
 img[id^="insertrowbutton"],
 img[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);
-    width: auto;
+    width: var(--exodus-ui-icon-size);
+    box-sizing: border-box;
+    padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
+    object-fit: contain;
 }
 
 #menubutton_label {
@@ -708,7 +718,10 @@ img[id^="deleterowbutton"] {
 #exodus_menu .menubutton img,
 #exodus_menu .graphicbutton img {
     height: var(--exodus-ui-icon-size);
-    width: auto;
+    width: var(--exodus-ui-icon-size);
+    box-sizing: border-box;
+    padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
+    object-fit: contain;
     display: block;
 }
 
@@ -734,30 +747,71 @@ img[id^="deleterowbutton"] {
     margin-left: 4px;
 }
 
-#exodus_menu .exodus_recordnav_group {
+/* First/prev/n-of-m/next/last: one flex row so the text centers with icon buttons
+   (menubar or under-form actions). */
+.exodus_recordnav_group {
     float: left;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
 }
 
-/* Horizontal spacing only — leave top/bottom margin and padding as other menubuttons */
-#exodus_menu .exodus_recordnav_group .menubutton {
+.exodus_recordnav_group > span {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* All record-nav controls share one height (icon + former 5px+5px pad) and
+   flex-center their content so "n of m" sits on the same midline as the chevrons.
+   !important beats menubuttonhtml inline padding: 5px. */
+.exodus_recordnav_group .menubutton,
+.exodus_recordnav_group .graphicbutton {
+    float: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center;
+    box-sizing: border-box !important;
+    height: calc(var(--exodus-ui-icon-size) + 10px) !important;
+    margin-top: 0.125em !important;
+    margin-bottom: 0.125em !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    padding-left: 0.2em !important;
-    padding-right: 0.2em !important;
+    padding: 0 0.2em !important;
 }
 
-#exodus_menu .exodus_recordnav_group > span:first-child .menubutton {
+.exodus_recordnav_group > span:first-child .menubutton,
+.exodus_recordnav_group > span:first-child .graphicbutton {
     margin-left: 2px !important;
 }
 
-#exodus_menu .exodus_recordnav_group > span:last-child .menubutton {
+.exodus_recordnav_group > span:last-child .menubutton,
+.exodus_recordnav_group > span:last-child .graphicbutton {
     margin-right: 2px !important;
 }
 
-#exodus_menu .exodus_recordnav_group #selectrecordbutton {
+.exodus_recordnav_group #selectrecordbutton {
     padding-left: 4px !important;
     padding-right: 4px !important;
+    gap: 0;
+}
+
+/* No spacer img — height comes from the shared button height above */
+.exodus_recordnav_group #selectrecordbutton > img {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.exodus_recordnav_group #selectrecordbutton_label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center;
+    height: var(--exodus-ui-icon-size) !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .hamburger_menu {
@@ -1071,7 +1125,10 @@ input[type=checkbox]:focus-visible {
 }
 .exodusconfirm_footer .graphicbutton img {
     height: var(--exodus-ui-icon-size);
-    width: auto;
+    width: var(--exodus-ui-icon-size);
+    box-sizing: border-box;
+    padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
+    object-fit: contain;
     display: block;
     flex-shrink: 0;
 }

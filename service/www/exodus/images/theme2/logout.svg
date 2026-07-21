@@ -1,11 +1,8 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- door + arrow out; legacy red #9c1516 -->
-  <!-- door frame -->
+<svg width="16" height="16" viewBox="0.5 1 13.5 13.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- door + arrow out; viewBox crops ~2u top/bottom gap, keeps aspect -->
   <path d="M2.2 2.0h5.2c.45 0 .8.35.8.8v10.4c0 .45-.35.8-.8.8H2.2c-.45 0-.8-.35-.8-.8V2.8c0-.45.35-.8.8-.8z"
         fill="none" stroke="#9c1516" stroke-width="1.35" stroke-linejoin="round"/>
-  <!-- door panel fill thin left wall visual -->
   <path d="M2.2 2.65h4.5v10.7H2.2V2.65z" fill="#9c1516" opacity="0.15"/>
-  <!-- arrow shaft + head pointing right (exit) -->
   <path d="M6.6 7.05h6.4c.45 0 .8.35.8.8v.3c0 .45-.35.8-.8.8H6.6c-.45 0-.8-.35-.8-.8v-.3c0-.45.35-.8.8-.8z"
         fill="#9c1516"/>
   <path d="M11.2 4.7 14.6 8l-3.4 3.3c-.35.35-.95.1-.95-.4V5.1c0-.5.6-.75.95-.4z"

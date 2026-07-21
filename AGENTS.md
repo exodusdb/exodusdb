@@ -21,7 +21,9 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 
 ## Git / commits
 
-Do **not** run `git commit` (or push) unless the user clearly asks — e.g. “commit”, “commit this”, “ok commit”. Approval of a **change** (“ok”, “looks good”, “go ahead”) is not commit approval. When work is done but unstated, report status and ask before committing.
+- **Commit after each completed turn** of substantive work so history is easy to bisect/backtrack. Prefer small, descriptive commits over large batches.
+- **Do not push** unless the user asks.
+- Squash only when the user asks.
 
 ## Principles (short)
 
@@ -49,6 +51,13 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 - **Focus is not modal.** Do not mount `#uiblockerdiv` on focus/activate flights (native `<select>` dies under a full-page overlay).
 - **Same gesture:** focus runs *before* the click of that click. Cancelling that click → SELECT focus-only on first press. Allow native SELECT activation through while blocked; still do not start a new flight.
 - **Do not blur+refocus** a control that already holds `document.activeElement` (closes open listboxes). `focuson` / `focuson2` only re-assert when focus was lost.
+
+### Menubar / form icons (theme2)
+
+- **Display size:** `--exodus-ui-icon-size` and **glyph mass:** `--exodus-ui-icon-glyph` in `global.css` (both apply to all menubar/form icons together).
+- **SVG assets should be full-bleed** in their viewBox (art to the edges). CSS padding owns the shared inset — do **not** add per-file `scale(0.875)` wrappers (that double-pads icons that already had gap, e.g. Release).
+- Icons drawn with a 1-unit internal margin can use `viewBox="1 1 14 14"` so they still render full-bleed before CSS pad (New/Delete/Edit).
+- Colours (e.g. dark-mode green on bare vs page-backed icons) stay in the SVGs; mass/size do not.
 
 ### Deferred: framework mental model write-up
 
