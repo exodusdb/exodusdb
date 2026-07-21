@@ -6212,7 +6212,7 @@ function exodusconfirm_footerwrap(content) {
 function exodusconfirm_ok_image() {
 	return gimagetheme + (gisdarktheme ? 'check_darkmode.svg' : 'check.svg')
 }
-// Confirm No + decide Cancel: same red X as form Close
+// Decide Cancel + Confirm No (when no Esc Cancel): red X like form Close
 function exodusconfirm_cancel_image() {
 	if (typeof gcloseimage != 'undefined')
 		return gcloseimage
@@ -6222,11 +6222,13 @@ function exodusconfirm_cancel_image() {
 function exodusconfirm_yes_image() {
 	return exodusconfirm_ok_image()
 }
-// Confirm No (negative) — same red X as Close
-function exodusconfirm_no_image() {
+// Confirm No (negative): blue X if a Cancel button is also shown (red reserved for U-turn Cancel)
+function exodusconfirm_no_image(hasCancelButton) {
+	if (hasCancelButton)
+		return gimagetheme + (gisdarktheme ? 'cross_blue_darkmode.svg' : 'cross_blue.svg')
 	return exodusconfirm_cancel_image()
 }
-// Confirm Cancel (Esc) — leave without choosing
+// Confirm Cancel (Esc) — red U-turn, leave without choosing
 function exodusconfirm_back_image() {
 	return gimagetheme + (gisdarktheme ? 'goback_darkmode.svg' : 'goback.svg')
 }
