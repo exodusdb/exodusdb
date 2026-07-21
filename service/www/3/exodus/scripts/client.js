@@ -1005,9 +1005,9 @@ function modalblock_create() {
 
 	document.body.insertBefore(blocker, null)
 
-	// Gate A calls blockmodalui on every flight (including document_onfocus while
-	// tabbing fields). overflow:hidden on html/body often clamps the viewport to
-	// the top — save and restore scroll so field focus does not "home" the form.
+	// Gate A mounts this on non-focus flights. Focus/activate skips it (native
+	// <select> would close under the overlay). overflow:hidden on html/body can
+	// clamp the viewport to the top — save and restore scroll when locking.
 	// Scroll lock itself is still needed so the page cannot move under confirms.
 	gmodalblock_savedoverflow = {
 		body: document.body.style.overflow,
@@ -5302,7 +5302,16 @@ function getmaxwindow_sync() {
 }
 
 
-var gblockevents//stops onclick event at the same time as onfocus event
+// gblockevents: while a Gate A flight is airborne, starteventhandler must not
+// start a *second* flight (classic case: document_onfocus still validating the
+// previous field when the same click's document_onclick would also run).
+//
+// It is *not* a license to cancel browser default actions for the control that
+// just received focus. document_onfocus is entered on focus, *before* the click
+// of that gesture; preventDefault on that click yields non-native SELECT
+// behaviour (focus only on first click; open on second). Competing clicks on
+// other targets stay cancelled. Modal work uses #uiblockerdiv separately.
+var gblockevents
 function form_blockevents(truefalse, callinfo) {
 
 	var callername = ''
@@ -5324,6 +5333,27 @@ function form_blockevents(truefalse, callinfo) {
 
 	if (gblockevents < 0)
 		gblockevents = 0
+
+}
+
+// True when the event is the pointer activation of a native listbox that should
+// keep browser-default open/toggle behaviour while Gate A is already airborne.
+// Does not start a flight; only skips preventDefault.
+function exodus_native_select_activation(event) {
+
+	if (!event || !event.target || !event.target.tagName)
+		return false
+	var typ = event.type
+	if (typ != 'click' && typ != 'mousedown' && typ != 'mouseup')
+		return false
+	var t = event.target
+	if (t.tagName == 'OPTION' && t.parentNode)
+		t = t.parentNode
+	if (t.tagName != 'SELECT')
+		return false
+	// By click time the select should already hold focus from this gesture.
+	var active = document.activeElement
+	return !active || active == t || (t.contains && t.contains(active))
 
 }
 
@@ -5451,6 +5481,12 @@ function starteventhandler(eventfunctionname, functionx) {
 					if (istextinput)
 						return true
 				}
+			}
+
+			// Let native <select> complete open/toggle; do not start a new flight.
+			if (exodus_native_select_activation(event)) {
+				logevent('native SELECT activation while blocked: ' + eventdescription)
+				return true
 			}
 
 			logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
@@ -5631,7 +5667,14 @@ async function exodus_begin_run(asyncHandler, location, event) {
 	exodus_flight_log('TAKEOFF #' + n + ' "' + location + '"')
 
 	form_blockevents(true, location)
-	blockmodalui_sync()
+	// Focus/activate (document_onfocus): keep form_blockevents for re-entry, but do
+	// not mount #uiblockerdiv. A full-viewport overlay mid-click closes native
+	// <select> lists (first click opens then snaps shut; second works because
+	// focus already held). Real dialogs/db waits call blockmodalui themselves.
+	var etype = event && event.type
+	var modalblock = !(etype == 'focus' || etype == 'focusin' || etype == 'activate')
+	if (modalblock)
+		blockmodalui_sync()
 
 	try {
 		var result = await asyncHandler(event)
@@ -5645,7 +5688,8 @@ async function exodus_begin_run(asyncHandler, location, event) {
 		throw e
 	} finally {
 		form_blockevents(false, location)
-		unblockmodalui_sync()
+		if (modalblock)
+			unblockmodalui_sync()
 		g_exodus_flow = null
 		exodus_begin_drain()
 	}

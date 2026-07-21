@@ -41,6 +41,19 @@ When the user asks to *lightly* adapt keyboard, focus, tab order, or form action
 - Form actions are **SPANs** (`.menubutton` / `.graphicbutton` + `exodusonclick`), not native `<button>`s — the walker already visits them if the skip list allows.
 - If the first idea needs a new named helper + special-case call site, **pause** and re-read the existing walker/filter first.
 
+### Gate A / DOM events (do not layer hacks)
+
+Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
+
+- **Gate A** = exclusive async *business* flight (`exodus_begin`). `form_blockevents` prevents a *second flight*, not browser defaults for the control that just focused.
+- **Focus is not modal.** Do not mount `#uiblockerdiv` on focus/activate flights (native `<select>` dies under a full-page overlay).
+- **Same gesture:** focus runs *before* the click of that click. Cancelling that click → SELECT focus-only on first press. Allow native SELECT activation through while blocked; still do not start a new flight.
+- **Do not blur+refocus** a control that already holds `document.activeElement` (closes open listboxes). `focuson` / `focuson2` only re-assert when focus was lost.
+
+### Deferred: framework mental model write-up
+
+User asked (2026-07) for a stored **end-to-end mental model** of Gate A/B, focus, form validation, and DOM events so future work is not terra nullius / spaghetti. **Remind the user** to run that analysis session when they have bandwidth; do not invent parallel “AI patch” layers meanwhile. Natural home: extend `PROGRAMMERS_OVERVIEW.md` §3 (or a short sibling) from real call paths, not speculation.
+
 ## Neosys modules
 
 Agency/finance/jobs/media HTM under `~/neosys/web/3/` is symlinked into `service/www/3/` via `~/neosys/merge_web_modules`. Module pages use the same Exodus framework paths (`../exodus/scripts/client.js`, etc.).

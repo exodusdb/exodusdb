@@ -5636,19 +5636,17 @@ function focuson2() {
         return focusnext(focusonelement)
 
     try {
-        focusonelement.blur()
-        focusonelement.focus()
+        // Never blur() to "force" focus. blur closes a native <select> list that
+        // the browser already opened on the user's click; re-focus then looks like
+        // open-then-snap-shut when arriving from another field.
+        if (document.activeElement != focusonelement)
+            focusonelement.focus()
 
-
-        //focusing may cause validation that returns focus back to gpreviouselement
-        //activeElement not available everywhere
-        //if (document.activeElement!=focusonelement)
-        //commented attempting to allow left/right key to work
-        //if (event.target != focusonelement)
-        //    return
-
-        //if (focusonelement.tagName!='TEXTAREA')
-        if (focusonelement.select)
+        // Text selection only — not SELECT (no .select() listbox contract).
+        if (focusonelement.tagName != 'SELECT'
+            && focusonelement.tagName != 'OPTION'
+            && focusonelement.tagName != 'TEXTAREA'
+            && focusonelement.select)
             focusonelement.select()
 
     }
@@ -5916,17 +5914,16 @@ async function document_onfocus(event) {
 
         } catch (e) { }
 
-    //log('focus on current or next element')
-    //this is not necessary unless .select() is used above
-    //note that validation code from previous field may make current element disappear
-    if (!element.isckeditor) {
+    // Re-assert focus only if the browser is no longer on this control (e.g.
+    // prior validation removed a node). If we already have focus — the normal
+    // click/tab path — do not schedule focuson: that deferred path used to
+    // blur+focus and closed native <select> lists after document_onfocus.
+    // Text .select() for INPUT already ran above when applicable.
+    if (!element.isckeditor && document.activeElement != element) {
         try {
-            //element.focus()
             focuson(element)
-            //log('focussed on current element')
         }
         catch (e) {
-            //log('try focusnext')
             focusnext(element)
         }
     }
