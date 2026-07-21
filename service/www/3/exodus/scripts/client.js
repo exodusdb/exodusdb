@@ -6943,13 +6943,16 @@ function exodus_confirm_function3_sync(event) {
 	return exodus_confirm_function(0, event)
 }
 
-//click on modal blocker outside confirm dialog — same as default button (Enter/F9)
+// Click on modal blocker outside confirm: last footer action (Cancel/No), not OK/Select.
+// Matches Esc-ish "leave" rather than affirming the default/first button.
 function exodus_confirm_outside_click_sync(event) {
-	var defaultbutton = gexodusconfirmdefaultbutton || 1
-	if (defaultbutton == 2)
-		return exodus_confirm_function2_sync(event)
-	if (defaultbutton == 3)
+	if ($$('decide_cancelbutton'))
+		return resolvePendingConfirm('', 'exodus_confirm_outside_click_sync')
+	if ($$('cancelbutton'))
 		return exodus_confirm_function3_sync(event)
+	if ($$('negativebutton'))
+		return exodus_confirm_function2_sync(event)
+	// Only one action button (e.g. OK alone)
 	return exodus_confirm_function1_sync(event)
 }
 
