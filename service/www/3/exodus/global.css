@@ -763,12 +763,13 @@ img[id^="deleterowbutton"] {
 
 /* All record-nav controls share one height (icon + former 5px+5px pad) and
    flex-center their content so "n of m" sits on the same midline as the chevrons.
-   !important beats menubuttonhtml inline padding: 5px. */
+   Do NOT put !important on display — setgkeys() uses inline display:none when
+   gkeys.length <= 1; stylesheet !important would force them always visible. */
 .exodus_recordnav_group .menubutton,
 .exodus_recordnav_group .graphicbutton {
     float: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
     box-sizing: border-box !important;
     height: calc(var(--exodus-ui-icon-size) + 10px) !important;
@@ -795,23 +796,29 @@ img[id^="deleterowbutton"] {
     gap: 0;
 }
 
-/* No spacer img — height comes from the shared button height above */
+/* No spacer img — height comes from the shared button height above.
+   Prefer visibility/size collapse over display so setgkeys display:none on the
+   parent button remains the only visibility switch. */
 .exodus_recordnav_group #selectrecordbutton > img {
-    display: none !important;
+    position: absolute;
     width: 0 !important;
     height: 0 !important;
     padding: 0 !important;
     margin: 0 !important;
+    border: 0 !important;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .exodus_recordnav_group #selectrecordbutton_label {
-    display: flex !important;
-    align-items: center !important;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    height: var(--exodus-ui-icon-size) !important;
-    line-height: 1 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    height: var(--exodus-ui-icon-size);
+    line-height: 1;
+    margin: 0;
+    padding: 0;
 }
 
 .hamburger_menu {
