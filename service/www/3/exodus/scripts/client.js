@@ -1662,6 +1662,27 @@ function exodus_set_theme_icons() {
 	exodus_update_auth_button()
 }
 
+// Right-side menubar cluster: session | theme | logout as one float:right flex row.
+// Equal CSS gap — no independent float:right packing (that made session↔theme↔logout uneven).
+function exodus_menubar_trailing_cluster() {
+
+	if (!gexodus_menubar)
+		return null
+	var trail = gexodus_menubar.querySelector('.exodus_menubar_trailing')
+	if (trail)
+		return trail
+	trail = document.createElement('span')
+	trail.className = 'exodus_menubar_trailing'
+	// Before clear:left spacer if present; else at end of menubar
+	var clear = gexodus_menubar.querySelector('.exodus_menubar_clear')
+	if (clear)
+		gexodus_menubar.insertBefore(trail, clear)
+	else
+		gexodus_menubar.appendChild(trail)
+	return trail
+
+}
+
 function add_theme_toggle_btn() {
 
 	// Interactive theme toggle: hidden checkbox + styled label (with SVGs + CSS animation).
@@ -1679,8 +1700,8 @@ function add_theme_toggle_btn() {
 	const knob = document.createElement('div');
 	knob.className = 'knob';
 
-	const sun_svg = `<img src="${gimagetheme}toggle_sun.svg" alt="" width="18" height="18" style="display:block">`
-	const moon_svg = `<img src="${gimagetheme}toggle_moon.svg" alt="" width="18" height="18" style="display:block">`
+	const sun_svg = `<img src="${gimagetheme}toggle_sun.svg" alt="" width="18" height="18" style="display:block;margin:0;padding:0">`
+	const moon_svg = `<img src="${gimagetheme}toggle_moon.svg" alt="" width="18" height="18" style="display:block;margin:0;padding:0">`
 
 	knob.innerHTML = gisdarktheme ? moon_svg : sun_svg;
 
@@ -2074,17 +2095,19 @@ async function clientfunctions_windowonload() {
 				addeventlistener(temp2, 'click', 'refreshcache_onclick')
 		}
 
+		// Session | theme | logout: one trailing flex cluster (equal gap)
+		var trailing = exodus_menubar_trailing_cluster()
+
 		//button to theme toggle
 		var button = add_theme_toggle_btn()
-		gexodus_menubar.insertBefore(button, gexodus_menubar.firstChild)
 		button.classList.add('theme_button')
+		trailing.appendChild(button)
 
 		//button to logout
 		var temp2 = document.createElement('span')
 		temp2.classList.add('logout_wrapper')
 		temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
-		//document.body.insertBefore(temp2, document.body.firstChild)
-		gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
+		trailing.appendChild(temp2)
 
 		exodus_update_auth_button()
 		//if no dbform

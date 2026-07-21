@@ -250,8 +250,8 @@ function form_formbuttons_place() {
     return place === 'bottom' ? 'bottom' : 'top'
 }
 
-// Database name + username on the top menubar, immediately left of theme/logout.
-// Uses float:right as a menubar sibling (same packing as .logout_wrapper / .theme_button).
+// Database name + username in the trailing menubar cluster (left of theme/logout).
+// Cluster is one float:right flex row with equal gap — see exodus_menubar_trailing_cluster.
 // Never nest inside #formbuttonsdiv (float:left) — that pins the label to the form actions.
 // clear:left must come AFTER all floated menubar children or the session drops to a new row.
 function form_place_menubar_session() {
@@ -281,9 +281,18 @@ function form_place_menubar_session() {
         span.classList.add('exodus_menubar_session_test')
     span.appendChild(document.createTextNode(text))
 
-    // Session before clear. client.js later inserts logout/theme at firstChild;
-    // float:right order becomes logout, theme, session → visual session | Theme | Logout.
-    gexodus_menubar.appendChild(span)
+    // First child of trailing cluster: [session | theme | logout]
+    var trailing = (typeof exodus_menubar_trailing_cluster == 'function')
+        ? exodus_menubar_trailing_cluster()
+        : null
+    if (trailing) {
+        if (trailing.firstChild)
+            trailing.insertBefore(span, trailing.firstChild)
+        else
+            trailing.appendChild(span)
+    } else {
+        gexodus_menubar.appendChild(span)
+    }
 
     var clear = document.createElement('div')
     clear.className = 'exodus_menubar_clear'

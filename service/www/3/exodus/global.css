@@ -839,19 +839,38 @@ img[id^="deleterowbutton"] {
     padding-left: 8px;
 }
 
-.logout_wrapper {
+/* Right menubar cluster: one float:right flex row — equal gap session|theme|logout */
+.exodus_menubar_trailing {
     float: right;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
     margin-right: 10px;
-    padding-left: 5px;
-    border-left: 0.2px solid var(--exodus-smallerbordercolor);
+    margin-left: 10px;
 }
 
-/* Database name + username: same row as theme/logout (float:right sibling) */
+.logout_wrapper {
+    float: none;
+    margin: 0;
+    padding: 0;
+    border-left: none;
+    display: flex;
+    align-items: center;
+}
+
+/* Strip menubutton horizontal chrome inside the cluster so gap is the only spacing */
+.exodus_menubar_trailing .logout_wrapper .menubutton {
+    margin: 0 !important;
+    padding-left: 0.25em !important;
+    padding-right: 0.25em !important;
+}
+
+/* Database name + username: first flex child of .exodus_menubar_trailing */
 .exodus_menubar_session {
-    float: right;
-    margin: 7px 10px;
+    float: none;
+    margin: 0;
     line-height: var(--exodus-ui-icon-size, 1.325em);
-    vertical-align: middle;
     white-space: nowrap;
     color: inherit;
 }
@@ -1241,13 +1260,18 @@ input[type=checkbox]:focus-visible {
     overflow: hidden;
     transition: background 0.4s;
     cursor: pointer;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 .knob {
     position: absolute;
     width: 18px;
     height: 18px;
-    top: 2px;
+    /* Center in 22px track (not top:2px only — sun/moon sat low) */
+    top: 50%;
     left: 2px;
+    margin: 0;
+    padding: 0;
     background: transparent;
     border-radius: 50%;
     box-shadow: none;
@@ -1255,12 +1279,24 @@ input[type=checkbox]:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
+    transform: translateY(-50%);
     z-index: 2;
+    line-height: 0;
+    box-sizing: border-box;
 }
 input:checked + .toggle_button { background: #3b3b3b; }
-input:checked + .toggle_button .knob { transform: translateX(21px); }
+/* Slide + keep vertical center */
+input:checked + .toggle_button .knob { transform: translate(21px, -50%); }
 .toggle_button svg,
-.toggle_button img { width: 18px; height: 18px; }
+.toggle_button img {
+    /* Fill the 18px knob; other menubar icons are ~1.325em (~21px) */
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
 input:not(:checked) + .toggle_button .knob img {
     filter: drop-shadow(0 0 0.6px rgba(120, 80, 0, 0.55)) drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.18));
 }
@@ -1268,11 +1304,16 @@ input:checked + .toggle_button .knob img {
     filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.2));
 }
 #theme_toggle { display: none; }
+/* Theme toggle: flex child of .exodus_menubar_trailing (gap owns horizontal space) */
 .theme_button {
-    float: right;
-    margin-right: 10px;
-    padding-left: 5px;
-    margin-top: 4px;
+    float: none;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    line-height: 0;
+    cursor: pointer;
 }
 
 /* ========== Dark mode (light mode rules above stay unchanged) ========== */
