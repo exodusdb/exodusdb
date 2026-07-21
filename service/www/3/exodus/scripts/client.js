@@ -5558,16 +5558,22 @@ function exodusispromise(value) {
 // The active job is not counted in the wait list.
 //
 // g_exodus_flow_queue_max = wait-list capacity only:
-//   0 = no queuing — second start while airborne is SKIPPED (legacy / current)
+//   0 = no queuing — second start while airborne is systemerror (debug signal)
 //   1 = at most one deferred takeoff, drained after land
 //   N = deeper FIFO
+//
+// Parallel starts: avoid at the source. Nested await in the current flight is
+// fine; a second exodus_begin while airborne is not. Callers outside Gate A
+// (capture keydown, timers, etc.) must check g_exodus_flow / use
+// exodus_begin_if_idle (optional) or exodus_begin_when_idle (required after land).
+// Gate A does not silently ignore conflicts — systemerror is intentional so races
+// surface until the initiating call site is fixed.
 //
 // Not implemented (bridge too far for now): a pool where "size" means active +
 // waiting together, and size > 1 could mean several flights airborne at once.
 // That needs safe multi-active rules; today xhttp/session largely serializes or
 // rejects parallel dbio (db.requesting). Until then: exclusive active + optional
-// wait list. Intentional "run after this flight" can also use feature-local
-// setTimeout → exodus_begin (does not need the wait list).
+// wait list.
 //
 // Gate B (wait/cancel) is a separate concurrent stack — see exodus_begin_waitcancel.
 var g_exodus_flow = null

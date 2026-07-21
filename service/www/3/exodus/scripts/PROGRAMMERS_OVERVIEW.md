@@ -18,7 +18,7 @@ The framework originated in an era of older browsers and cooperative generators;
 - **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodusdblink`, `exodusshowmodaldialog`, security, cookies, utilities, string/array prototypes.
 - **Form automation:** `dbform.js` + helpers in `db.js` — Dictionary-driven (`dict_*`) CRUD forms, MV groups, validation, buttons.
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
-- **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is **skipped**). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work.
+- **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is a **visible `systemerror`**, not a silent skip). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work. Avoid parallel starts at the source (check `g_exodus_flow` / use `exodus_begin_if_idle` for optional work).
 - **Wait/Cancel (Gate B):** Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on `db.send` XHR. No main-line form dbio from Gate B.
 - **Public commencement API (only three):** `exodus_begin` (business), `exodus_begin_if_idle` (background), `exodus_begin_waitcancel` (Wait/Cancel). No fourth entry path. `startAsyncFlow` is a deprecated alias of `exodus_begin`.
 - **Flight log:** Quiet by default. Enable with `?logflights=1` or `glogflights=true` in the console (`[exodus flight] TAKEOFF|LANDING|SKIP|…`).
@@ -143,9 +143,11 @@ async function save_onclick() {
 - **`setvalue(el, v)`** — sync DOM paint only (no conversion/validation).
 - **`await gds.setx(id, recn, v)`** — data store + conversion + validation (async; must `await` inside a flight).
 - Bare call of an async function **without** `await` is a bug (you get a Promise, not a result).
-- Nested `await` inside one flight is correct; a second *commencement* while busy is skipped (`queue_max = 0`).
+- Nested `await` inside one flight is correct; a second *commencement* while busy is a **bug signal** (`queue_max = 0` → `systemerror` dialog). Do not treat that dialog as something to silence in Gate A — stop initiating the second start.
 
 DOM events, HTM `*_sync` bridges, and deferred work all enter **Gate A** (`exodus_begin`). Nested `await` stays on that one flight. `g_exodus_flow_queue_max` is wait-list capacity only: **0 = no queuing** (current); raise later if multi-flight wait is wanted.
+
+**Parallel starts:** avoid at the source. Capture/sync code outside a flight must not call `exodus_begin` while `g_exodus_flow` is set (return/ignore, or use `exodus_begin_if_idle` / `exodus_begin_when_idle`). Gate A does **not** quietly drop conflicting takeoffs — races surface as error messages on purpose so bad call sites get fixed.
 
 Optional background work (session keepalive, relock) uses `exodus_begin_if_idle` — **skip** if busy (never uses the queue).
 
@@ -330,7 +332,7 @@ Other frequent utilities:
 - `await exodusokcancel(msg, default)`
 - `await exodusdecide(question, data, ...)`
 - `exoduswindowclose(value)`
-- `exodus_begin(asyncFn, 'label')` — **public #1** Gate A business (skip if busy when `queue_max` is 0)
+- `exodus_begin(asyncFn, 'label')` — **public #1** Gate A business (`systemerror` if busy when `queue_max` is 0)
 - `exodus_begin_if_idle(asyncFn, 'label')` — **public #2** optional background; skip if busy
 - `exodus_begin_waitcancel(source)` — **public #3** Gate B Wait/Cancel only (from uiblocker)
 - `$$('id')` or `$$('classname')` — element lookup

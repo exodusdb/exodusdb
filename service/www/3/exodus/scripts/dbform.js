@@ -2211,10 +2211,15 @@ function form_digit_accesskey_capture_keydown(event) {
     if (!element)
         return
 
+    // Already in a Gate A flight (e.g. focus/validate) — event already cancelled;
+    // do not start a concurrent flight or systemerror. User can press Alt+N again.
+    if (typeof g_exodus_flow != 'undefined' && g_exodus_flow)
+        return
+
     var targetel = element
-    // Activation needs Gate A (exodusevaluate / dbio). Event already cancelled.
+    // Activation needs Gate A (exodusevaluate / dbio).
     if (typeof exodus_begin == 'function') {
-        exodus_begin(async function form_digit_accesskey_activate(ev) {
+        void exodus_begin(async function form_digit_accesskey_activate(ev) {
             await form_activate_accesskey_control(ev, targetel)
         }, 'digit accesskey ' + digit, event)
     } else {
