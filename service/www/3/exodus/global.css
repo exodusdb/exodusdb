@@ -1141,55 +1141,33 @@ input[type=checkbox]:focus-visible {
     white-space: nowrap;
     min-width: min-content;
 }
-/* Decide OK/Cancel: form Save/Close graphicbuttons (icon + label, focus ring) */
+/* Confirm Yes/No/Cancel and decide Select/Cancel: same graphicbutton chrome
+   (filled outset face). Inline flow — not flex — so hotkey markup (<u>Y</u>es)
+   stays normal text; flex+gap would treat <u> and siblings as separate items. */
 .exodusconfirm_footer .graphicbutton {
     float: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.25em;
-    flex: 0 0 auto;
+    display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
     margin: 0.125em 4px;
     padding: 0.35em 0.55em;
+    line-height: 1.2;
 }
+/* Icon→label space for decide (img is the only intentional box beside text) */
 .exodusconfirm_footer .graphicbutton img {
     height: var(--exodus-ui-icon-size);
     width: var(--exodus-ui-icon-size);
     box-sizing: border-box;
     padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
     object-fit: contain;
-    display: block;
-    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+    margin-inline-end: 0.25em;
 }
 .exodusconfirm_footer .graphicbutton [id$="_label"] {
-    display: inline-block;
-    line-height: 1.2;
+    vertical-align: middle;
 }
 .exodusconfirm_footer .graphicbutton:hover {
-    background-color: var(--exodus-menuhighlight);
-}
-
-/* Yes/No/Cancel: top menubar menubutton look, text only (no icons) */
-.exodusconfirm_footer .menubutton {
-    float: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    vertical-align: middle;
-    white-space: nowrap;
-    margin: 0.125em 4px;
-    padding: 0.35em 0.55em;
-    background-color: transparent;
-    border: 1px solid transparent;
-    border-radius: 0.3rem;
-    cursor: pointer;
-    color: inherit;
-    font-size: inherit;
-}
-.exodusconfirm_footer .menubutton:hover {
     background-color: var(--exodus-menuhighlight);
 }
 .exodusconfirm_iconcol {
@@ -1533,10 +1511,6 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv .graphicbutton:focus {
     border-color: #888888;
-    background-color: var(--exodus-menuhighlight);
-}
-:root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:hover,
-:root[data-theme="dark_mode"] .exodusconfirmdiv .menubutton:focus {
     background-color: var(--exodus-menuhighlight);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv.exodusconfirm_critical {

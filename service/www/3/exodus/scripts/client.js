@@ -5433,7 +5433,7 @@ function starteventhandler(eventfunctionname, functionx) {
 					var istextinput = !!$$('exodusconfirmdiv_textinput')
 					var isdecide = !!$$('decide_table1')
 					var active = document.activeElement
-					// focused yes/no/cancel menubutton (not decide OK/Cancel)
+					// focused yes/no/cancel graphicbutton (not decide Select/Cancel)
 					var focusedConfirmBtn = null
 					if (active) {
 						if (active.id == 'positivebutton' || active.id == 'negativebutton' || active.id == 'cancelbutton')
@@ -6208,7 +6208,6 @@ function exodusconfirm_focusable_elements() {
 	// Document order: text input (if any), then footer action controls
 	var nodes=confirm.querySelectorAll(
 		'#exodusconfirmdiv_textinput,'
-		+ ' .exodusconfirm_footer .menubutton[tabindex],'
 		+ ' .exodusconfirm_footer .graphicbutton[tabindex]'
 	)
 	var list=[]
@@ -6482,10 +6481,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 		nbuttons++
 
-		// Top menubar style (menubutton), text only — no icons
+		// Same chrome as decide Select/Cancel (graphicbutton: filled outset face).
+		// Text only — confirm labels are arbitrary (Yes/No/Cancel or custom).
 		html += '<span id="' + buttonid + 'button"'
 		html += ' tabindex="0"'
-		html += ' class="menubutton"'
+		html += ' class="graphicbutton"'
 		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
 
 		// Hotkey letter: explicit <u>X</u> (or <i>X</i>), else first letter of plain label.
