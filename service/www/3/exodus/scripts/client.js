@@ -6389,20 +6389,22 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			imagesrc = 'question1'
 	}
 	if (imagesrc) {
+		// Dark faces need brighter discs than light-mode XP colours (else info/question vanish).
+		var xpdm = (typeof gisdarktheme != 'undefined' && gisdarktheme) ? '_darkmode' : ''
 		if (imagesrc == 'critical') {
-			imagesrc = 'xpcritical.webp'
+			imagesrc = 'xpcritical' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_critical')
 		}
 		if (imagesrc == 'warning') {
-			imagesrc = 'xpwarning.webp'
+			imagesrc = 'xpwarning' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_warning')
 		}
 		if (imagesrc == 'info') {
-			imagesrc = 'xpinfo.webp'
+			imagesrc = 'xpinfo' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_info')
 		}
 		if (imagesrc == 'question1') {
-			imagesrc = 'xpquestion.webp'
+			imagesrc = 'xpquestion' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_question1')
 		}
 		if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
