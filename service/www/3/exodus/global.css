@@ -304,7 +304,43 @@ BODY
     --exodus-ui-icon-glyph: 0.875;
     /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
     --exodus-check-size: 1.3125em;
+    /*
+     * Monochrome icon tints (CSS mask + black SVG). Change tone once per role;
+     * no per-file colour, no _darkmode twin for these shapes.
+     * Multicolour icons (New/Edit/Delete, logout door, …) stay painted SVGs.
+     */
+    --exodus-icon-green: #22b014;
+    --exodus-icon-red: #9c1516;
+    --exodus-icon-orange: #e04510;
+    --exodus-icon-neutral: #555555;
 }
+
+/*
+ * Tinted monochrome icon: black (or any opaque) SVG used as mask; fill from
+ * --exodus-icon-color / .exodus-icon-{green,red,orange,neutral}.
+ * Set mask: style="--exodus-icon-mask:url(...)" or CSS.
+ */
+.exodus-icon {
+    display: inline-block;
+    width: var(--exodus-ui-icon-size);
+    height: var(--exodus-ui-icon-size);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    vertical-align: middle;
+    background-color: var(--exodus-icon-color, currentColor);
+    -webkit-mask-image: var(--exodus-icon-mask);
+    mask-image: var(--exodus-icon-mask);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+.exodus-icon-green { --exodus-icon-color: var(--exodus-icon-green); }
+.exodus-icon-red { --exodus-icon-color: var(--exodus-icon-red); }
+.exodus-icon-orange { --exodus-icon-color: var(--exodus-icon-orange); }
+.exodus-icon-neutral { --exodus-icon-color: var(--exodus-icon-neutral); }
 
 /*
  * Normal button face — one set of tokens for all raised actions:
@@ -670,6 +706,7 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
 
 /* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size / glyph) */
 .graphicbutton img,
+.menubutton img,
 img[isexoduspopup="1"],
 img[isexoduslink="1"],
 img[exodustype="B"],
@@ -682,6 +719,11 @@ img[id^="deleterowbutton"] {
     box-sizing: border-box;
     padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
     object-fit: contain;
+}
+/* Mask icons inside buttons: size box already set; optional glyph inset via padding on host */
+.graphicbutton .exodus-icon,
+.menubutton .exodus-icon {
+    margin-inline-end: 0.25em;
 }
 
 #menubutton_label {
@@ -1153,16 +1195,19 @@ input[type=checkbox]:focus-visible {
     padding: 0.35em 0.55em;
     line-height: 1.2;
 }
-/* Icon→label space for decide (img is the only intentional box beside text) */
-.exodusconfirm_footer .graphicbutton img {
+/* Icon→label space (painted <img> or tinted .exodus-icon mask) */
+.exodusconfirm_footer .graphicbutton img,
+.exodusconfirm_footer .graphicbutton .exodus-icon {
     height: var(--exodus-ui-icon-size);
     width: var(--exodus-ui-icon-size);
     box-sizing: border-box;
-    padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
-    object-fit: contain;
     display: inline-block;
     vertical-align: middle;
     margin-inline-end: 0.25em;
+}
+.exodusconfirm_footer .graphicbutton img {
+    padding: calc(var(--exodus-ui-icon-size) * (1 - var(--exodus-ui-icon-glyph)) / 2);
+    object-fit: contain;
 }
 .exodusconfirm_footer .graphicbutton [id$="_label"] {
     vertical-align: middle;
@@ -1337,6 +1382,11 @@ input:checked + .toggle_button .knob img {
     --exodus-informbutton-border: #7070e0;
     --exodus-informbutton-border-style: solid;
     --exodus-informbutton-color: #ffffff;
+    /* Monochrome icon tints (DM) */
+    --exodus-icon-green: #3ec848;
+    --exodus-icon-red: #ff442a;
+    --exodus-icon-orange: #ff7a40;
+    --exodus-icon-neutral: #c0c0c0;
     --bg-color: #1e1e1e;
     --h-color: #ffffff;
     --text-color: #fdfdfd;

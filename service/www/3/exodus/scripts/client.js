@@ -6208,29 +6208,37 @@ function exodusconfirm_footerwrap(content) {
 		</div>'
 }
 
-// Decide Select: green check (not the form Save tray icon)
-function exodusconfirm_ok_image() {
-	return gimagetheme + (gisdarktheme ? 'check_darkmode.svg' : 'check.svg')
+/*
+ * Monochrome icons: black SVG + CSS mask tint (--exodus-icon-green/red/orange/…).
+ * Multicolour icons stay as normal <img src>. See global.css .exodus-icon.
+ */
+function exodus_icon_html(maskFile, colorName) {
+	var url = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + maskFile
+	var color = colorName || 'neutral'
+	return '<span class="exodus-icon exodus-icon-' + color + '"'
+		+ ' style="--exodus-icon-mask:url(\'' + url + '\')"'
+		+ ' aria-hidden="true"></span>'
 }
-// Decide Cancel + Confirm No (when no Esc Cancel): red X like form Close
+
+// Decide Select: green check (mask)
+function exodusconfirm_ok_image() {
+	return exodus_icon_html('check.svg', 'green')
+}
+// Decide Cancel: red X mask (form Close still uses painted cross.svg via gcloseimage)
 function exodusconfirm_cancel_image() {
-	if (typeof gcloseimage != 'undefined')
-		return gcloseimage
-	return gimagetheme + (gisdarktheme ? 'cross_darkmode.svg' : 'cross.svg')
+	return exodus_icon_html('cross_mono.svg', 'red')
 }
 // Confirm Yes/OK (positive)
 function exodusconfirm_yes_image() {
 	return exodusconfirm_ok_image()
 }
-// Confirm No (negative): orange X if a Cancel button is also shown (red reserved for U-turn Cancel)
+// Confirm No: orange X if Cancel also shown, else red X
 function exodusconfirm_no_image(hasCancelButton) {
-	if (hasCancelButton)
-		return gimagetheme + (gisdarktheme ? 'cross_orange_darkmode.svg' : 'cross_orange.svg')
-	return exodusconfirm_cancel_image()
+	return exodus_icon_html('cross_mono.svg', hasCancelButton ? 'orange' : 'red')
 }
-// Confirm Cancel (Esc) — red U-turn, leave without choosing
+// Confirm Cancel (Esc) — red U-turn
 function exodusconfirm_back_image() {
-	return gimagetheme + (gisdarktheme ? 'goback_darkmode.svg' : 'goback.svg')
+	return exodus_icon_html('goback.svg', 'red')
 }
 
 function exodusconfirm_focusable_elements() {
@@ -6557,19 +6565,19 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' exodusbuttonnumber="' + nbuttons + '"'
 		html += ' exodusyesnocancel="' + (buttonn % 3) + '"'
 
-		var imgsrc = ''
+		var iconhtml = ''
 		if (default_icons) {
 			if (buttonn == 1)
-				imgsrc = exodusconfirm_yes_image()
+				iconhtml = exodusconfirm_yes_image()
 			else if (buttonn == 2)
-				imgsrc = exodusconfirm_no_image(!!cancelbuttonx)
+				iconhtml = exodusconfirm_no_image(!!cancelbuttonx)
 			else if (buttonn == 3)
-				imgsrc = exodusconfirm_back_image()
+				iconhtml = exodusconfirm_back_image()
 		}
 
 		html += '>'
-		if (imgsrc)
-			html += '<img src="' + imgsrc + '" alt="">'
+		if (iconhtml)
+			html += iconhtml
 		html += buttontext + '</span>'
 
 	}//end of addbutton
@@ -6606,17 +6614,17 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			</div>\
 			</td>\
 			</tr>'
-		// Icon+label graphicbuttons like form Save/Close (tick / cross).
+		// Icon+label graphicbuttons (mask-tinted mono icons).
 		// "Select" not "OK" — avoids confusion when an option is itself named Cancel.
 		footerhtml = exodusconfirm_footerwrap(
 			'<span id="decide_okbutton" tabindex="0" class="graphicbutton"'
 			+ ' title="Press S, Ctrl+Enter or F9">'
-			+ '<img src="' + exodusconfirm_ok_image() + '" alt="">'
+			+ exodusconfirm_ok_image()
 			+ '<span id="decide_okbutton_label"><u>S</u>elect</span>'
 			+ '</span>'
 			+ '<span id="decide_cancelbutton" tabindex="0" class="graphicbutton"'
 			+ ' title="Press C or Esc">'
-			+ '<img src="' + exodusconfirm_cancel_image() + '" alt="">'
+			+ exodusconfirm_cancel_image()
 			+ '<span id="decide_cancelbutton_label"><u>C</u>ancel</span>'
 			+ '</span>')
 	} else if (istextinput) {
