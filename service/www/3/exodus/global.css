@@ -1102,7 +1102,8 @@ input[type=checkbox]:focus-visible {
 .exodusconfirm_scrollhint {
     display: inline-block;
     min-height: 0;
-    margin: 0 0 4px;
+    /* Indent off the hard left of the decide block (table is left-aligned inside) */
+    margin: 0 0 4px 1em;
     padding: 0;
     border: none;
     line-height: 1;
