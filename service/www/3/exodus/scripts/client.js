@@ -65,7 +65,8 @@ var glogoutimage = exodus_icon_spec('logout.svg', 'red')
 var gloginimage = exodus_icon_spec('login.svg', 'green')
 var grefreshimage = exodus_icon_spec('refresh.svg', 'darkgrey')
 var gthemeimage = gimagetheme + 'theme_button.svg' // painted sun/moon chrome
-var gcompanyimage = exodus_icon_spec('formpage_companies.svg', 'darkgrey')
+// company icon uses a patterned SVG — keep painted (LM/DM twins)
+var gcompanyimage = gimagetheme + 'formpage_companies.svg'
 
 var gisdarktheme
 // LM/DM preference cookie — global per browser (not glogincode / dataset / user)
