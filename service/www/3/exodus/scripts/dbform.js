@@ -86,7 +86,8 @@ gfindimage = exodus_icon_spec('zoom.svg', 'darkgrey')
 gcalendarimage = exodus_icon_spec('calendar.svg', 'darkgrey')
 gsaveimage = exodus_icon_spec('tick.svg', 'green')
 gsavegreyimage = exodus_icon_spec('tick.svg', 'lightgrey') // inactive Save
-gcopyimage = exodus_icon_spec('copy.svg', 'blue')
+// Painted multi-colour (overlapping sheets) — not a single CSS tint
+gcopyimage = gimagetheme + (gisdarktheme ? 'copy_darkmode.svg' : 'copy.svg')
 gcloseimage = exodus_icon_spec('cross_mono.svg', 'red')
 greleaseimage = exodus_icon_spec('lock.svg', 'blue') // was #1E97CC
 geditimage = gimagetheme + 'pencil_edit.svg' // painted multicolour

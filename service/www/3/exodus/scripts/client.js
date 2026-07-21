@@ -1652,9 +1652,11 @@ function exodus_update_auth_button() {
 function exodus_set_theme_icons() {
 
 	// Monochrome icons: colours come from CSS vars (no path swap).
-	// Painted: New/Edit/Delete, theme, company
+	// Painted multi-colour: New/Edit/Delete, Copy, theme, company
 	gthemeimage = gimagetheme + (gisdarktheme ? 'theme_button_darkmode.svg' : 'theme_button.svg')
 	gcompanyimage = gimagetheme + (gisdarktheme ? 'formpage_companies_darkmode.svg' : 'formpage_companies.svg')
+	if (typeof gcopyimage != 'undefined')
+		gcopyimage = gimagetheme + (gisdarktheme ? 'copy_darkmode.svg' : 'copy.svg')
 	if (typeof gnewimage != 'undefined') {
 		gnewimage = gimagetheme + (gisdarktheme ? 'form_add_darkmode.svg' : 'form_add.svg')
 		gdeleteimage = gimagetheme + (gisdarktheme ? 'form_delete_darkmode.svg' : 'form_delete.svg')
@@ -1663,9 +1665,9 @@ function exodus_set_theme_icons() {
 	if (typeof gsortimage != 'undefined')
 		gsortimage = exodus_sortimage()
 	exodus_update_auth_button()
-	// Refresh painted <img> srcs for New/Edit/Delete if already in the DOM
+	// Refresh painted <img> srcs if already in the DOM
 	if (typeof gnewimage != 'undefined') {
-		;['newrecord', 'editreleaserecord', 'deleterecord'].forEach(function (id) {
+		;['newrecord', 'editreleaserecord', 'deleterecord', 'copyrecord'].forEach(function (id) {
 			var b = $$(id + 'button')
 			if (!b)
 				return
@@ -1676,6 +1678,8 @@ function exodus_set_theme_icons() {
 				img.src = gnewimage
 			else if (id == 'deleterecord')
 				img.src = gdeleteimage
+			else if (id == 'copyrecord' && typeof gcopyimage == 'string')
+				img.src = gcopyimage
 			else if (id.indexOf('edit') >= 0 && b.querySelector && !b.querySelector('.exodus-icon'))
 				img.src = geditimage // Edit mode; Release uses lock mono
 		})
