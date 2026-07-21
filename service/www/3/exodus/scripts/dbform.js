@@ -277,7 +277,8 @@ function form_place_menubar_session() {
 
     var span = document.createElement('span')
     span.className = 'exodus_menubar_session'
-    if (gdataset && String(gdataset).split('_')[1] == 'test')
+    // Codes are only "xxx" or "xxx_test"
+    if (gdataset && String(gdataset).slice(-5) == '_test')
         span.classList.add('exodus_menubar_session_test')
     span.appendChild(document.createTextNode(text))
 
