@@ -3604,9 +3604,12 @@ async function document_onkeydown2(event) {
         var npages = Math.ceil((rs.length) / pagesize)
 
         //pgdn or down arrow
+        // Set gfocus_nav_hdir so scrollintoview prefers the right edge (multirow
+        // uses focuson directly, not focusdirection).
         if (keycode == 34 || (keycode == 40 && !event.ctrlKey && !event.shiftKey && !event.altKey)) {
 
             //ctrl+pgdn sadly not supported since reserved by firefox to change tabs
+            gfocus_nav_hdir = 1
 
             if (rown < nrows - 1) {
                 if (keycode == 40) {
@@ -3640,6 +3643,7 @@ async function document_onkeydown2(event) {
 
             //ctrl+pgup or up (sadly not since reserved by firefox to change tabs
             //goes to first line of first page
+            gfocus_nav_hdir = -1
             if (event.ctrlKey) {
                 //tablex.firstPage()
                 focuson(grows[0].exodusfields[id])
@@ -3996,7 +4000,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
 
 }
 
-// Programmatic focus without browser mid-viewport jump (horizontal is scrollintoview).
+// Programmatic focus without browser mid-viewport jump (scrollintoview owns both axes).
 function form_focus_noscroll(el) {
     if (!el)
         return
@@ -4008,13 +4012,111 @@ function form_focus_noscroll(el) {
 }
 
 /*
- * Horizontal only — vertical left to the browser.
- * gfocus_nav_hdir (from focusdirection): +1 Tab/Enter/→/↓, -1 Shift+Tab/←/↑, 0 click.
- * Fit the enclosing TD/TH column cell (not just the control), so column titles
- * that share that column width scroll into view with the field.
- * docLeft near document origin + page scrolled → hard scroll fully left.
- * Else minimal dx to fit; wide cells pin leading edge by direction.
- * Consumes gfocus_nav_hdir. Window scroll only.
+ * Top of "safe" viewport for focus: menubar + sticky/fixed ancestors that
+ * actually cover the focused cell (group column headings, etc.).
+ * Uses getComputedStyle(position) sticky/fixed, then elementFromPoint if the
+ * cell centre is still hit-tested as something other than the field/cell.
+ */
+function scrollintoview_top_cover(element, cell) {
+    var topCover = 0
+    try {
+        topCover = parseFloat(
+            window.getComputedStyle(document.documentElement)
+                .getPropertyValue('--exodus-sticky-top')
+        ) || 0
+    } catch (e) { }
+
+    // Sticky/fixed thead (and other sticky ancestors) above the field
+    try {
+        var node = element
+        while (node && node !== document && node !== document.documentElement) {
+            if (node.nodeType == 1) {
+                var st = window.getComputedStyle(node)
+                var pos = st && st.position
+                if (pos == 'sticky' || pos == 'fixed') {
+                    var nr = node.getBoundingClientRect()
+                    // Only count overlays that sit in the top band (not fixed footers)
+                    if (nr.bottom > topCover && nr.top < (topCover + 1) + nr.height
+                        && nr.top < (window.innerHeight || 0) * 0.5)
+                        topCover = Math.max(topCover, nr.bottom)
+                }
+                // Table thead may be sticky even when walking from a tbody cell
+                if (node.tagName == 'TABLE' && node.tHead) {
+                    var thSt = window.getComputedStyle(node.tHead)
+                    if (thSt && (thSt.position == 'sticky' || thSt.position == 'fixed')) {
+                        var thr = node.tHead.getBoundingClientRect()
+                        if (thr.bottom > topCover && thr.top < (window.innerHeight || 0) * 0.5)
+                            topCover = Math.max(topCover, thr.bottom)
+                    }
+                }
+            }
+            node = node.parentNode
+        }
+    } catch (e) { }
+
+    // Hit-test: is the cell centre covered by something outside the field/cell?
+    try {
+        var probe = cell || element
+        var pr = probe.getBoundingClientRect()
+        var vw = window.innerWidth || document.documentElement.clientWidth || 0
+        var vh = window.innerHeight || document.documentElement.clientHeight || 0
+        if (vw && vh && pr.width > 0 && pr.height > 0) {
+            var cx = Math.min(Math.max(pr.left + pr.width / 2, 0), vw - 1)
+            var cy = Math.min(Math.max(pr.top + Math.min(pr.height / 2, 8), 0), vh - 1)
+            var hit = document.elementFromPoint(cx, cy)
+            if (hit
+                && hit !== element && hit !== cell
+                && !(element.contains && element.contains(hit))
+                && !(cell && cell.contains && cell.contains(hit))
+                && !(hit.contains && (hit.contains(element) || (cell && hit.contains(cell))))
+            ) {
+                var hr = hit.getBoundingClientRect()
+                // Overlay sitting over the top of the cell → push safe top down
+                if (hr.bottom > topCover && hr.top <= pr.top + 2)
+                    topCover = Math.max(topCover, hr.bottom)
+            }
+        }
+    } catch (e) { }
+
+    return topCover
+}
+
+/*
+ * True if element centre is hit-tested as itself or a descendant (not overlaid).
+ * Optional probe; defaults to centre of element.
+ */
+function element_is_visually_clear(element, x, y) {
+    if (!element || !document.elementFromPoint)
+        return true
+    try {
+        var r = element.getBoundingClientRect()
+        var vw = window.innerWidth || document.documentElement.clientWidth || 0
+        var vh = window.innerHeight || document.documentElement.clientHeight || 0
+        if (!vw || !vh || r.width <= 0 || r.height <= 0)
+            return false
+        if (typeof x != 'number')
+            x = r.left + r.width / 2
+        if (typeof y != 'number')
+            y = r.top + r.height / 2
+        x = Math.min(Math.max(x, 0), vw - 1)
+        y = Math.min(Math.max(y, 0), vh - 1)
+        var hit = document.elementFromPoint(x, y)
+        return !!(hit && (hit === element || element.contains(hit) || (hit.contains && hit.contains(element))))
+    } catch (e) {
+        return true
+    }
+}
+
+/*
+ * Window scroll after focus (preventScroll on focuson2).
+ * gfocus_nav_hdir (from focusdirection / multirow arrows): +1 forward, -1 back, 0 click.
+ * Fit the enclosing TD/TH column cell so column titles stay with the field.
+ * Horizontal: hard-snap fully left only for first-of-row (~12rem docLeft);
+ *   else minimal dx; wide cells pin leading edge by direction.
+ * Vertical: minimal dy so the cell is not clipped by viewport edges OR sticky
+ *   menubar/column headings (multirow ↑ under sticky thead). Always min-fit;
+ *   hdir only chooses which edge to prefer when the cell is taller than the
+ *   free band. Consumes gfocus_nav_hdir.
  */
 function scrollintoview(element) {
     if (!element || !element.getBoundingClientRect)
@@ -4046,52 +4148,108 @@ function scrollintoview(element) {
         : element.getBoundingClientRect()
 
     var vw = window.innerWidth || document.documentElement.clientWidth || 0
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0
     var pageX = window.pageXOffset || document.documentElement.scrollLeft || 0
     var pageY = window.pageYOffset || document.documentElement.scrollTop || 0
     var docLeft = r.left + pageX
 
-    if (!vw)
-        return
-
-    // Early columns of the form (document left, not viewport left)
-    if (pageX > 0 && docLeft < nearDocLeft) {
-        window.scrollTo(0, pageY)
-        return
-    }
-
-    var leftPad = pad
-    var rightPad = vw - pad
-    if (r.left >= leftPad && r.right <= rightPad)
-        return
-
-    var w = r.right - r.left
-    var avail = vw - 2 * pad
+    // --- horizontal ---
     var dx = 0
+    if (vw) {
+        // Early columns of the form (document left, not viewport left)
+        if (pageX > 0 && docLeft < nearDocLeft) {
+            dx = -pageX
+        } else {
+            var leftPad = pad
+            var rightPad = vw - pad
+            var w = r.right - r.left
+            var avail = vw - 2 * pad
 
-    if (hdir > 0) {
-        if (w <= avail) {
-            if (r.left < leftPad)
-                dx = r.left - leftPad
-            else if (r.right > rightPad)
-                dx = r.right - rightPad
-        } else {
-            dx = r.left - leftPad
+            if (!(r.left >= leftPad && r.right <= rightPad)) {
+                if (hdir > 0) {
+                    if (w <= avail) {
+                        if (r.left < leftPad)
+                            dx = r.left - leftPad
+                        else if (r.right > rightPad)
+                            dx = r.right - rightPad
+                    } else {
+                        dx = r.left - leftPad
+                    }
+                } else if (hdir < 0) {
+                    if (w <= avail) {
+                        if (r.right > rightPad)
+                            dx = r.right - rightPad
+                        else if (r.left < leftPad)
+                            dx = r.left - leftPad
+                    } else {
+                        dx = r.right - rightPad
+                    }
+                } else if (r.right <= 0 || r.left >= vw) {
+                    dx = r.left - leftPad
+                }
+            }
         }
-    } else if (hdir < 0) {
-        if (w <= avail) {
-            if (r.right > rightPad)
-                dx = r.right - rightPad
-            else if (r.left < leftPad)
-                dx = r.left - leftPad
-        } else {
-            dx = r.right - rightPad
-        }
-    } else if (r.right <= 0 || r.left >= vw) {
-        dx = r.left - leftPad
     }
 
-    if (dx)
-        window.scrollBy(dx, 0)
+    // --- vertical: always min-fit under sticky covers (not only when fully off-screen) ---
+    var dy = 0
+    if (vh) {
+        var topPad = scrollintoview_top_cover(element, cell) + pad
+        var bottomPad = vh - pad
+        var h = r.bottom - r.top
+        var vAvail = bottomPad - topPad
+
+        if (vAvail > 0 && !(r.top >= topPad && r.bottom <= bottomPad)) {
+            if (hdir < 0) {
+                // Up / back: prefer top edge clear of sticky headings
+                if (h <= vAvail) {
+                    if (r.top < topPad)
+                        dy = r.top - topPad
+                    else if (r.bottom > bottomPad)
+                        dy = r.bottom - bottomPad
+                } else {
+                    dy = r.bottom - bottomPad
+                }
+            } else if (hdir > 0) {
+                // Down / forward: prefer bottom edge
+                if (h <= vAvail) {
+                    if (r.bottom > bottomPad)
+                        dy = r.bottom - bottomPad
+                    else if (r.top < topPad)
+                        dy = r.top - topPad
+                } else {
+                    dy = r.top - topPad
+                }
+            } else {
+                // Click / multirow without dir: same min-fit (fixes ↑ under sticky thead)
+                if (r.top < topPad)
+                    dy = r.top - topPad
+                else if (r.bottom > bottomPad)
+                    dy = r.bottom - bottomPad
+            }
+        }
+    }
+
+    if (dx || dy)
+        window.scrollBy(dx, dy)
+
+    // Second pass: re-measure sticky cover after scroll (thead stick position can lag).
+    if (vh) {
+        try {
+            var r2 = (cell && cell.getBoundingClientRect)
+                ? cell.getBoundingClientRect()
+                : element.getBoundingClientRect()
+            var topPad2 = scrollintoview_top_cover(element, cell) + pad
+            if (r2.top < topPad2)
+                window.scrollBy(0, r2.top - topPad2)
+            else if (!element_is_visually_clear(element)
+                && !(cell && element_is_visually_clear(cell))) {
+                var cover2 = scrollintoview_top_cover(element, cell)
+                if (r2.top < cover2 + pad)
+                    window.scrollBy(0, r2.top - (cover2 + pad))
+            }
+        } catch (e) { }
+    }
 }
 
 ///////////////////// BUTTON EVENTS /////////////////////////
@@ -5655,7 +5813,7 @@ function focuson2() {
 
     try {
         // Never blur() to "force" focus — that closes a native <select> opened on click.
-        // preventScroll: native focus scroll jumps mid-viewport; scrollintoview owns horizontal.
+        // preventScroll: native focus scroll jumps mid-viewport; scrollintoview owns axes.
         if (document.activeElement != focusonelement)
             form_focus_noscroll(focusonelement)
 
