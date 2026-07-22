@@ -1934,9 +1934,10 @@ async function clientfunctions_getglobals() {
 		gtz = [new Date().getTimezoneOffset() * -60, 0]
 	}
 
-	//support input of numbers like 999,999,999.99 or 999.999.999,99
-	//gbasefmt is MDn0, or MCn0, where n=2 or 3 for number of decimals and D/C means , or . for thousand sep
-	if (gbasefmt.substr(0, 2) == 'MC')
+	// gbasefmt from cookie 'bf' = server BASEFMT, e.g. MD20P / MC20P / MD20P, / MC20P,
+	// MD = '.' decimal (',' thousands); MC = ',' decimal ('.' thousands);
+	// trailing ',' = thousands grouping enabled (company number format).
+	if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC')
 		gthousands_regex = /\./gi
 	else
 		gthousands_regex = /,/gi

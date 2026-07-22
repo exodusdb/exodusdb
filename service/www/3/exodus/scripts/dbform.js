@@ -6287,6 +6287,30 @@ function getvalues(elementx, sepchar) {
 
 }
 
+// Display SPANs may show external NUMBER (thousands / unit). Callers using
+// Number(getvalue(...)) need internal form. Does not change validate ICONV.
+function getvalue_number_internal(element, value) {
+    if (value === '' || value == null || !element || !element.getAttribute)
+        return value
+    var conversion = element.getAttribute('exodusconversion')
+    if (typeof conversion != 'string' || conversion.toUpperCase().indexOf('[NUMBER') != 0)
+        return value
+    try {
+        var unit = ''
+        var raw = String(value)
+        // reverse display amount+unit if present (display-only OCONV may have added grouping)
+        var um = raw.match(/^([-+]?[0-9.,]+)([A-Za-z]+)$/)
+        if (um) {
+            raw = um[1]
+            unit = um[2]
+        }
+        var iv = raw.exodusiconv(conversion)
+        if (iv != null)
+            return unit ? iv + unit : iv
+    } catch (e) { }
+    return value
+}
+
 function getvalue(element, recn) {
 
     if (element == null) {
@@ -6377,7 +6401,7 @@ function getvalue(element, recn) {
 						//trim leading white space if lower case not allowed
 						tx = tx.replace(/^\s+/, '')
 					}
-                    return tx
+                    return getvalue_number_internal(element, tx)
 
                 case 'radio': {
 
@@ -6463,7 +6487,7 @@ function getvalue(element, recn) {
                 //trim leading white space if lower case not allowed
                 value = value.replace(/^\s+/, '')
             }
-            return value
+            return getvalue_number_internal(element, value)
 
         case 'TEXTAREA': {
 
@@ -7638,10 +7662,16 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
     return await functionx.call(thisobject || this, arg1)
 }
 
-async function oconvertvalue(ivalue, conversion) {
+async function oconvertvalue(ivalue, conversion, element) {
     if (!conversion) return ivalue
     if (typeof (conversion) != 'string' || conversion.slice(0, 1) != '[') return ivalue
-    return ivalue.exodusoconv(conversion)
+    // element: thousands grouping only for non-editable display hosts (see NUMBER)
+    number_oconv_begin(element)
+    try {
+        return ivalue.exodusoconv(conversion)
+    } finally {
+        number_oconv_end()
+    }
 }
 
 async function deleterow_onclick(event) {

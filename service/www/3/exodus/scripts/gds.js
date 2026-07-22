@@ -489,7 +489,7 @@ async function gds_setx2(cells, values, forced) {
                     conversion = screenelement.getAttribute('exodusconversion')
                 if (conversion) {
                     var ivalue = value
-                    value = await oconvertvalue(value, conversion)
+                    value = await oconvertvalue(value, conversion, screenelement)
                     if (value == null) {
                         systemerror('await gds_setx2("' + screenelement.id + '") ' + exodusquote(ivalue) + ' is not a ' + conversion)
                         return
@@ -935,10 +935,15 @@ async function gds_bind(datasource, elements, rownx) {
                 //put the value into the screen
                 //log('value=')
 
-                //conversions
+                //conversions (NUMBER thousands only on non-editable display hosts)
                 var conversion = element.getAttribute('exodusconversion')
                 if (value != '' && typeof (conversion) == 'string' && conversion.substr(0, 1) == '[') {
-                    value2 = value.exodusoconv(conversion)
+                    number_oconv_begin(element)
+                    try {
+                        value2 = value.exodusoconv(conversion)
+                    } finally {
+                        number_oconv_end()
+                    }
                     if (value2 == null) {
                         return systemerror('bind()', 'bind("' + element.id + '") ' + exodusquote(value) + ' is not a valid internal ' + conversion.slice(1, -1) + ' value')
                     }

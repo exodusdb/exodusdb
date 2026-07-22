@@ -797,7 +797,39 @@ function exodusconvarray(functionx, mode, value, params) {
     return result
 }
 
+// Display-only NUMBER OCONV extras (set by number_oconv_begin around bind/setx).
+// ICONV / editable input path is historical — do not change it.
+//   • Display (SPAN, SELECT, …) → MD/MC + thousands when BASEFMT ends with ,
+//   • Editable INPUT/TEXTAREA/contenteditable + bare .exodusoconv → no extras
+var gnumber_oconv_display = false
+
+function number_oconv_wants_display_format(el) {
+    if (!el || !el.tagName)
+        return false
+    var tag = el.tagName
+    if (tag == 'INPUT' || tag == 'TEXTAREA')
+        return false
+    if (el.isContentEditable)
+        return false
+    return true
+}
+
+function number_oconv_begin(el) {
+    gnumber_oconv_display = number_oconv_wants_display_format(el)
+}
+
+function number_oconv_end() {
+    gnumber_oconv_display = false
+}
+
 function NUMBER(mode, value, params) {
+
+    /*
+     * Display-only OCONV extras when gnumber_oconv_display (bind/setx to SPAN etc.):
+     *   • MD/MC decimal from gbasefmt; thousands if BASEFMT ends with ,
+     *   • Peel/reattach trailing currency unit (e.g. 1897.50USD)
+     * ICONV is historical only — no unit peel, no new input behaviour.
+     */
 
     gmsg=''
     
@@ -821,7 +853,20 @@ function NUMBER(mode, value, params) {
     if (value == '')
         return value
 
+    // Display OCONV only: peel trailing currency/unit before numeric work; reattach later
+    var unitSuffix = ''
+    if (mode != 'ICONV' && gnumber_oconv_display) {
+        try {
+            var um = String(value).match(/^([-+]?[0-9.]+)([A-Za-z]+)$/)
+            if (um) {
+                value = um[1]
+                unitSuffix = um[2]
+            }
+        } catch (e) { }
+    }
+
     //accept comma as decimal point - use exceptions for speed since usually string but might not be
+    // historical ICONV (validate / editable NUMBER fields) — leave as-is
     if (mode == 'ICONV') {
         if (gbasefmt.substr(0, 2) != 'MC') {
             try {
@@ -925,8 +970,27 @@ function NUMBER(mode, value, params) {
 
     //output conversion
     else {
-        //zzz should format it with params?
+        //zzz should format it with params? — plain for INPUT / scripts
         result = value.toString()
+        // Display hosts only: locale decimal + optional thousands + unit
+        if (gnumber_oconv_display && result !== '' && typeof gbasefmt == 'string' && gbasefmt) {
+            var isMC = gbasefmt.substr(0, 2) == 'MC'
+            var useThousands = gbasefmt.slice(-1) == ','
+            var thousep = isMC ? '.' : ','
+            var decsep = isMC ? ',' : '.'
+            var neg = result.charAt(0) == '-'
+            var body = neg ? result.slice(1) : result
+            var parts = body.split('.')
+            var intpart = parts[0]
+            var decpart = parts.length > 1 ? parts[1] : null
+            if (useThousands && intpart)
+                intpart = intpart.replace(/\B(?=(\d{3})+(?!\d))/g, thousep)
+            result = (neg ? '-' : '') + intpart
+            if (decpart != null && decpart !== '')
+                result += decsep + decpart
+            if (unitSuffix)
+                result += unitSuffix
+        }
     }
 
     return result
