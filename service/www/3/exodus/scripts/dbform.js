@@ -119,6 +119,9 @@ if (gisdarktheme) {
 //form function global variables
 var gpagenrows = 10
 var gkeycode
+// Set by focusdirection only: +1 forward/right, -1 back/left, 0 = click/unknown.
+// Consumed once by scrollintoview on land (document_onfocus).
+var gfocus_nav_hdir = 0
 var gdictfilename
 
 var gparameters
@@ -2794,14 +2797,14 @@ async function document_onkeydown2(event) {
 
     event = getevent(event)
     var keycode = event.keyCode ? event.keyCode : event.which
-    var tt = 'onkeydown ' + keycode
-    if (event.ctrlKey)
-        tt += ' + ctrl'
-    if (event.shiftKey)
-        tt += ' + shift'
-    if (event.altKey)
-        tt += ' + alt'
-    console.log(tt)
+    //var tt = 'onkeydown ' + keycode
+    //if (event.ctrlKey)
+    //    tt += ' + ctrl'
+    //if (event.shiftKey)
+    //    tt += ' + shift'
+    //if (event.altKey)
+    //    tt += ' + alt'
+    //console.log(tt)
 
     ///log('document_onkeydown ' + event.target.id + ' ' + keycode)
 
@@ -3788,6 +3791,9 @@ function focusdirection(direction, element, notgroupno, scopex) {
     //if (!document.body.sourceIndex)
     //    return
 
+    // For scrollintoview after focus lands (see document_onfocus)
+    gfocus_nav_hdir = direction > 0 ? 1 : -1
+
     if (typeof notgroupno == 'undefined')
         notgroupno = ''
 
@@ -3872,11 +3878,6 @@ function focusdirection(direction, element, notgroupno, scopex) {
         //get the next possible element by scopeindex
         nextelement = scope[scopeindex]
         var nextid = nextelement.id
-
-        //scroll into view
-        if (typeof (notgroupno) == 'undefined') {
-            scrollintoview(nextelement)
-        }
 
         //skip uninteresting tags with no id or non-data entry tag
         if (!nextelement.id || !nextelement.tagName.match(gdatatagnames)) {
@@ -3990,52 +3991,107 @@ function focusdirection(direction, element, notgroupno, scopex) {
     }
 
     //found it. focus on it
-    console.log('focusdirection ' + nextelement.tagName + ' ' + nextelement.id)
+    //console.log('focusdirection ' + nextelement.tagName + ' ' + nextelement.id)
     focuson(nextelement)
 
 }
 
-function scrollintoview(element) {
-    if (!element) return
-
-    //only scroll input fields
-    var tagname = element.tagName
-    if (!tagname.match(gdatatagnames)) return
-    if (!element.name) return
-
-    //get total left offset
-    var offsetleft = 0
-    var element2 = element
-    do {
-        offsetleft += element2.offsetLeft
-        element2 = element2.offsetParent
+// Programmatic focus without browser mid-viewport jump (horizontal is scrollintoview).
+function form_focus_noscroll(el) {
+    if (!el)
+        return
+    try {
+        el.focus({ preventScroll: true })
+    } catch (e) {
+        try { el.focus() } catch (e2) { }
     }
-    while (element2)
+}
 
-    leftextra = 100
-    rightextra = 100
+/*
+ * Horizontal only — vertical left to the browser.
+ * gfocus_nav_hdir (from focusdirection): +1 Tab/Enter/→/↓, -1 Shift+Tab/←/↑, 0 click.
+ * Fit the enclosing TD/TH column cell (not just the control), so column titles
+ * that share that column width scroll into view with the field.
+ * docLeft near document origin + page scrolled → hard scroll fully left.
+ * Else minimal dx to fit; wide cells pin leading edge by direction.
+ * Consumes gfocus_nav_hdir. Window scroll only.
+ */
+function scrollintoview(element) {
+    if (!element || !element.getBoundingClientRect)
+        return
+    if (!element.tagName || !element.tagName.match(gdatatagnames))
+        return
 
-    if (offsetleft < leftextra) {
-        window.scrollBy(-99999, 0)
+    var hdir = gfocus_nav_hdir
+    gfocus_nav_hdir = 0
+
+    // rem-based measures (scale with root font size; avoid fixed px screen assumptions)
+    var rem = 16
+    try {
+        rem = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
+    } catch (e) { }
+    var pad = 0.75 * rem           // edge air when fitting a clipped cell
+    // Hard-snap fully left only for true first-of-row fields (journal VOUCHER_DATE
+    // docLeft≈108). 20rem (320) also caught VOUCHER_NO (≈243) — too sensitive.
+    var nearDocLeft = 12 * rem     // ~ first field only (~192px at 16px root)
+
+    // Column cell bounds (TD/TH) — titles live in the matching thead column.
+    // Fall back to the control if not in a table cell.
+    var cell = null
+    try {
+        cell = typeof getancestor === 'function' ? getancestor(element, ' TD TH ') : null
+    } catch (e) { }
+    var r = (cell && cell.getBoundingClientRect)
+        ? cell.getBoundingClientRect()
+        : element.getBoundingClientRect()
+
+    var vw = window.innerWidth || document.documentElement.clientWidth || 0
+    var pageX = window.pageXOffset || document.documentElement.scrollLeft || 0
+    var pageY = window.pageYOffset || document.documentElement.scrollTop || 0
+    var docLeft = r.left + pageX
+
+    if (!vw)
+        return
+
+    // Early columns of the form (document left, not viewport left)
+    if (pageX > 0 && docLeft < nearDocLeft) {
+        window.scrollTo(0, pageY)
         return
     }
 
-    //scroll left
-    var scrollleft = document.body.scrollLeft - offsetleft
-    if (scrollleft > 0) {
-        window.scrollBy(-scrollleft - leftextra, 0)
-    }
+    var leftPad = pad
+    var rightPad = vw - pad
+    if (r.left >= leftPad && r.right <= rightPad)
+        return
 
-    //scroll right
-    else {
-        var scrollright = offsetleft + element.offsetWidth - document.body.clientWidth - document.body.scrollLeft
-        if (scrollright > 0) {
-            window.scrollBy(scrollright + rightextra, 0)
+    var w = r.right - r.left
+    var avail = vw - 2 * pad
+    var dx = 0
+
+    if (hdir > 0) {
+        if (w <= avail) {
+            if (r.left < leftPad)
+                dx = r.left - leftPad
+            else if (r.right > rightPad)
+                dx = r.right - rightPad
+        } else {
+            dx = r.left - leftPad
         }
+    } else if (hdir < 0) {
+        if (w <= avail) {
+            if (r.right > rightPad)
+                dx = r.right - rightPad
+            else if (r.left < leftPad)
+                dx = r.left - leftPad
+        } else {
+            dx = r.right - rightPad
+        }
+    } else if (r.right <= 0 || r.left >= vw) {
+        dx = r.left - leftPad
     }
 
-    return
-
+    if (dx)
+        window.scrollBy(dx, 0)
 }
 
 ///////////////////// BUTTON EVENTS /////////////////////////
@@ -5591,18 +5647,17 @@ function focuson2() {
     var focusonelement = gfocusonelement
     gfocusonelement = null
 
-    console.log('focuson2 ' + focusonelement.tagName + ' ' + focusonelement.id)
+    //console.log('focuson2 ' + focusonelement.tagName + ' ' + focusonelement.id)
 
     //allowreadonly=true
     if (!(exodusenabledandvisible(focusonelement, true)))
         return focusnext(focusonelement)
 
     try {
-        // Never blur() to "force" focus. blur closes a native <select> list that
-        // the browser already opened on the user's click; re-focus then looks like
-        // open-then-snap-shut when arriving from another field.
+        // Never blur() to "force" focus — that closes a native <select> opened on click.
+        // preventScroll: native focus scroll jumps mid-viewport; scrollintoview owns horizontal.
         if (document.activeElement != focusonelement)
-            focusonelement.focus()
+            form_focus_noscroll(focusonelement)
 
         // Text selection only — not SELECT (no .select() listbox contract).
         if (focusonelement.tagName != 'SELECT'
@@ -5647,8 +5702,8 @@ async function document_onfocus(event) {
     exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
     //window.status=new Date()+' '+glogincode
 
-    var text = 'document_onfocus' + ' tag:' + event.target.tagName + ' id:' + event.target.id + (gpreviouselement ? ' gpreviouselement:' + gpreviouselement.id : '')
-    console.log(text)
+    //var text = 'document_onfocus' + ' tag:' + event.target.tagName + ' id:' + event.target.id + (gpreviouselement ? ' gpreviouselement:' + gpreviouselement.id : '')
+    //console.log(text)
     ///log(text)
     //window.status=text
 
@@ -5815,8 +5870,8 @@ async function document_onfocus(event) {
             gmodalblock_savedoverflow.x = 0
             gmodalblock_savedoverflow.y = 0
         }
+        gfocus_nav_hdir = 0
     } else {
-        ///log('scroll into view')
         scrollintoview(element)
     }
 
@@ -6145,9 +6200,9 @@ function focusongpreviouselement2() {
     //}
 
     //dont focus back to checkboxes because that causes instant revalidation thereby causing endless loop if invalid
-    if (gpreviouselement.type != 'checkbox') {
-        try { gpreviouselement.focus() } catch (e) { }
-    }
+    if (gpreviouselement.type != 'checkbox')
+        form_focus_noscroll(gpreviouselement)
+
     if (isMac && gpreviouselement.tagName != 'SELECT' && gpreviouselement.tagName != 'TEXTAREA')
         gpreviouselement.select()
 
