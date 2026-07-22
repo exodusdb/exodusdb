@@ -172,6 +172,8 @@ var gfinalinputelement
 var gformdigitaccesskeys = null
 // Capture-phase sync keydown installed once (not via Gate A addeventlistener).
 var gformdigitaccesskey_capture_installed = false
+// Alt+arrows viewport pan — also capture/sync (Gate A modal block undoes scrollBy).
+var gform_scroll_viewport_capture_installed = false
 var gchangesmade = false//set true in validateupdate exit and delete row (not insert row)
 var gelementthatjustcalledsetchangesmade
 var gallowsavewithoutchanges = false//allows locked records (with keys) to be saved anyway
@@ -1853,6 +1855,8 @@ async function formfunctions_onload() {
     window.onunload = window_onunload_sync
 
     addeventlistener(document, 'keydown', 'document_onkeydown')
+    // Alt+arrows pan: must be capture/sync outside Gate A (see form_ensure_scroll_viewport_capture).
+    form_ensure_scroll_viewport_capture()
     //to prevent ctrl+N opening documents in not msie browsers but kills enter key in msie for some reason
     //if (!isMSIE)
     //    addeventlistener(document, 'keypress', 'document_onkeypress')
@@ -2869,6 +2873,9 @@ async function document_onkeydown2(event) {
         await exoduspopup(event)
         return exoduscancelevent(event)
     }
+
+    // Alt+arrows (viewport pan): form_scroll_viewport_capture_keydown (capture/sync).
+    // Not handled here — Gate A blockmodalui restores scroll and undoes scrollBy.
 
     //close (F8)
     if (keycode == 119) {
@@ -4009,6 +4016,89 @@ function form_focus_noscroll(el) {
     } catch (e) {
         try { el.focus() } catch (e2) { }
     }
+}
+
+/*
+ * Alt+arrows: pan the window by almost one viewport (overlap retained for context).
+ * keycode 37← 38↑ 39→ 40↓. Focus stays put; does not move fields.
+ * Called only from form_scroll_viewport_capture_keydown (sync, outside Gate A).
+ */
+function form_scroll_viewport(keycode) {
+    var rem = 16
+    try {
+        rem = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
+    } catch (e) { }
+    var vw = window.innerWidth || document.documentElement.clientWidth || 0
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0
+    var topCover = 0
+    try {
+        topCover = parseFloat(
+            window.getComputedStyle(document.documentElement)
+                .getPropertyValue('--exodus-sticky-top')
+        ) || 0
+    } catch (e) { }
+
+    // Leave ~3rem of previous content visible so you don't lose place
+    var stepY = Math.max(vh - topCover - 3 * rem, rem)
+    var stepX = Math.max(vw - 3 * rem, rem)
+    var dx = 0
+    var dy = 0
+    if (keycode == 38)
+        dy = -stepY
+    else if (keycode == 40)
+        dy = stepY
+    else if (keycode == 37)
+        dx = -stepX
+    else if (keycode == 39)
+        dx = stepX
+
+    if (!(dx || dy))
+        return
+
+    // window.scrollBy is enough when overflow is not locked (Gate A modal block).
+    window.scrollBy(dx, dy)
+}
+
+// Sync capture — same reason as digit accesskeys: preventDefault must not wait on
+// async Gate A, and blockmodalui overflow:hidden + scroll restore undoes scrollBy.
+function form_ensure_scroll_viewport_capture() {
+    if (gform_scroll_viewport_capture_installed)
+        return
+    if (!document.addEventListener)
+        return
+    gform_scroll_viewport_capture_installed = true
+    document.addEventListener('keydown', form_scroll_viewport_capture_keydown, true)
+}
+
+function form_scroll_viewport_capture_keydown(event) {
+    if (!ginitok)
+        return
+    if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+        return
+
+    var keycode = event.keyCode ? event.keyCode : event.which
+    if (keycode != 37 && keycode != 38 && keycode != 39 && keycode != 40)
+        return
+
+    // Alt+Down on SELECT opens popup (F7 path in async keydown) — do not pan
+    var t = event.target
+    if (keycode == 40 && t && t.tagName == 'SELECT')
+        return
+
+    // Confirm dialog owns keyboard
+    if (typeof $$ == 'function' && $$('exodusconfirmdiv'))
+        return
+
+    form_scroll_viewport(keycode)
+
+    if (event.preventDefault)
+        event.preventDefault()
+    event.returnValue = false
+    if (event.stopPropagation)
+        event.stopPropagation()
+    event.cancelBubble = true
+    if (event.stopImmediatePropagation)
+        event.stopImmediatePropagation()
 }
 
 /*
