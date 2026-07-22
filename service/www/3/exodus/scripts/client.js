@@ -187,6 +187,9 @@ exodus_client_init()
 //any global variable defined in this function must not of course be declare var here otherwise would be local function variables
 function exodus_client_init() {
 
+	// Browser zoom keys: sync capture, out of form/Gate A key path (see client.js)
+	exodus_ensure_browser_chrome_keydown()
+
 	//actually this is only needed if exodusforms are used
 	if (!document.getElementsByClassName && !document.all)
 		gunsupported += ' getElementsByClassName or .all'
@@ -5386,6 +5389,54 @@ function getmaxwindow_sync() {
 // behaviour (focus only on first click; open on second). Competing clicks on
 // other targets stay cancelled. Modal work uses #uiblockerdiv separately.
 var gblockevents
+
+// Browser chrome keys (zoom…): early *sync capture* keydown — not Gate A, not
+// document_onkeydown. Stops propagation without preventDefault so the browser
+// still acts and our complex key path never runs. Install once from client init.
+var gexodus_browser_chrome_keydown_installed = false
+
+function exodus_is_browser_chrome_keydown(event) {
+	if (!event || event.type != 'keydown')
+		return false
+	// Ctrl or Cmd (Mac); not Alt
+	if (!(event.ctrlKey || event.metaKey) || event.altKey)
+		return false
+	var kc = event.keyCode ? event.keyCode : event.which
+	// Zoom in: + / = / numpad+
+	if (kc == 187 || kc == 61 || kc == 107)
+		return true
+	// Zoom out: - / numpad-
+	if (kc == 189 || kc == 173 || kc == 109)
+		return true
+	// Zoom reset: 0 / numpad0
+	if (kc == 48 || kc == 96)
+		return true
+	return false
+}
+
+function exodus_browser_chrome_keydown_capture(event) {
+	if (!exodus_is_browser_chrome_keydown(event))
+		return
+	// Do not preventDefault — browser zoom (etc.) must still run.
+	if (event.stopPropagation)
+		event.stopPropagation()
+	if (event.stopImmediatePropagation)
+		event.stopImmediatePropagation()
+	// Decide locks px width; reflow after zoom (resize/visualViewport also refit)
+	var conf = $$('exodusconfirmdiv')
+	if (conf && conf.classList && conf.classList.contains('exodusconfirm_decide'))
+		window.setTimeout(function () { exodusconfirm_fit_decide_popup(true) }, 0)
+}
+
+function exodus_ensure_browser_chrome_keydown() {
+	if (gexodus_browser_chrome_keydown_installed)
+		return
+	if (!document.addEventListener)
+		return
+	gexodus_browser_chrome_keydown_installed = true
+	document.addEventListener('keydown', exodus_browser_chrome_keydown_capture, true)
+}
+
 function form_blockevents(truefalse, callinfo) {
 
 	var callername = ''
@@ -6363,8 +6414,12 @@ function exodusconfirm_ok_image() {
 function exodusconfirm_cancel_image() {
 	return exodus_icon_html(exodus_icon_spec('cross_mono.svg', 'red'))
 }
-// Confirm Yes/OK (positive)
-function exodusconfirm_yes_image() {
+// Confirm Yes/OK (positive) — Save label uses menubar tray icon (tick.svg), else check
+function exodusconfirm_yes_image(buttontext) {
+	var plain = String(buttontext == null ? '' : buttontext).replace(/<[^>]*>/g, '')
+	plain = plain.replace(/\s+/g, ' ').trim()
+	if (plain.toLowerCase() == 'save')
+		return exodus_icon_html(exodus_icon_spec('tick.svg', 'green'))
 	return exodusconfirm_ok_image()
 }
 // Confirm No: orange X if Cancel also shown, else red X
@@ -6469,6 +6524,21 @@ function exodusconfirm_update_scroll_hints() {
 	var canDown = scrollpane.scrollHeight > scrollpane.clientHeight + 1
 		&& scrollpane.scrollTop + scrollpane.clientHeight < scrollpane.scrollHeight - 2
 
+	// Type-filter may hide every option (display:none); no triangle when nothing to scroll to
+	var tbody = $$('decide_table1body1')
+	if (tbody && canDown) {
+		var anyVisible = false
+		var rows = tbody.getElementsByTagName('tr')
+		for (var i = 0; i < rows.length; i++) {
+			if (rows[i].style.display == 'none')
+				continue
+			anyVisible = true
+			break
+		}
+		if (!anyVisible)
+			canDown = false
+	}
+
 	wrap.classList.toggle('can_scroll_down', canDown)
 	wrap.setAttribute('aria-hidden', canDown ? 'false' : 'true')
 }
@@ -6481,16 +6551,36 @@ function exodusconfirm_fit_decide_popup(force) {
 		return
 	if (div.getAttribute('exodusconfirm_fitted')&&!force)
 		return
-	var maxw=window.innerWidth-40
-	// iconcol + prompt content + padding
+
+	// Drop previous pixel lock so the table can measure at natural size after zoom
+	div.style.width=''
+	div.style.maxHeight=''
+
+	var vw=window.innerWidth||document.documentElement.clientWidth||0
+	var vh=window.innerHeight||document.documentElement.clientHeight||0
+	// visualViewport tracks pinch/keyboard zoom better than layout viewport alone
+	try {
+		if (window.visualViewport) {
+			if (window.visualViewport.width)
+				vw=window.visualViewport.width
+			if (window.visualViewport.height)
+				vh=window.visualViewport.height
+		}
+	} catch (e) { }
+
+	var maxw=Math.max(vw-40, 120)
+	var maxh=Math.max(vh-40, 120)
 	var iconcol=div.querySelector('.exodusconfirm_iconcol')
 	var iconw=iconcol ? iconcol.offsetWidth : 0
-	var want=table.offsetWidth+iconw+24
+	// scrollWidth after clearing width = natural content width
+	var want=Math.max(table.scrollWidth, table.offsetWidth)+iconw+24
 	var footer=div.querySelector('.exodusconfirm_footer')
 	if (footer)
-		want=Math.max(want,footer.scrollWidth+iconw+24)
-	div.style.width=Math.min(want,maxw)+'px'
+		want=Math.max(want, footer.scrollWidth+iconw+24)
+	div.style.width=Math.min(want, maxw)+'px'
+	div.style.maxHeight=maxh+'px'
 	div.setAttribute('exodusconfirm_fitted','1')
+	exodusconfirm_update_scroll_hints()
 }
 
 function exodusconfirm_bind_scroll_hints() {
@@ -6500,19 +6590,27 @@ function exodusconfirm_bind_scroll_hints() {
 	if (!scrollpane || !$$('exodusconfirm_scrollhint_wrap'))
 		return
 
+	// fit_decide_popup already refreshes the ▼ hint
 	exodusconfirm_fit_decide_popup()
-	exodusconfirm_update_scroll_hints()
 	scrollpane.addEventListener('scroll', exodusconfirm_update_scroll_hints, { passive: true })
 	gexodusconfirm_scrollhint_resize=function() {
 		exodusconfirm_fit_decide_popup(true)
-		exodusconfirm_update_scroll_hints()
 	}
 	window.addEventListener('resize', gexodusconfirm_scrollhint_resize, { passive: true })
+	// Zoom often updates visualViewport without (or before) window.resize
+	try {
+		if (window.visualViewport)
+			window.visualViewport.addEventListener('resize', gexodusconfirm_scrollhint_resize, { passive: true })
+	} catch (e) { }
 }
 
 function exodusconfirm_unbind_scroll_hints() {
 	if (gexodusconfirm_scrollhint_resize) {
 		window.removeEventListener('resize', gexodusconfirm_scrollhint_resize)
+		try {
+			if (window.visualViewport)
+				window.visualViewport.removeEventListener('resize', gexodusconfirm_scrollhint_resize)
+		} catch (e) { }
 		gexodusconfirm_scrollhint_resize = null
 	}
 }
@@ -6697,7 +6795,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		var iconhtml = ''
 		if (default_icons) {
 			if (buttonn == 1)
-				iconhtml = exodusconfirm_yes_image()
+				iconhtml = exodusconfirm_yes_image(buttontext)
 			else if (buttonn == 2)
 				iconhtml = exodusconfirm_no_image(!!cancelbuttonx)
 			else if (buttonn == 3)
@@ -6724,6 +6822,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	if (decide_args) {
 		bodyinner += '\
 			<div class="exodusconfirm_decideblock">\
+			<div id="decide_filter_status" class="decide_filter_status" style="display:none"></div>\
 			<table id="decide_table1" xwidth=100% xclass="exodusform" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
 				<thead onclick="decide_sorttable2_sync(event)" style="cursor: pointer">\
 					<tr id="decide_table1head1row1">\
@@ -6735,14 +6834,15 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			</div>'
 		// Icon+label graphicbuttons (mask-tinted mono icons).
 		// "Select" not "OK" — avoids confusion when an option is itself named Cancel.
+		// Bare letters type-to-filter; Select/Cancel via Enter/Esc/F9 or Alt+S / Alt+C.
 		footerhtml = exodusconfirm_footerwrap(
 			'<span id="decide_okbutton" tabindex="0" class="graphicbutton"'
-			+ ' title="Press S, Ctrl+Enter or F9">'
+			+ ' title="Press Enter, Ctrl+Enter, F9 or Alt+S">'
 			+ exodusconfirm_ok_image()
 			+ '<span id="decide_okbutton_label"><u>S</u>elect</span>'
 			+ '</span>'
 			+ '<span id="decide_cancelbutton" tabindex="0" class="graphicbutton"'
-			+ ' title="Press C or Esc">'
+			+ ' title="Press Esc or Alt+C (Esc clears type-filter first)">'
 			+ exodusconfirm_cancel_image()
 			+ '<span id="decide_cancelbutton_label"><u>C</u>ancel</span>'
 			+ '</span>')
@@ -7114,10 +7214,10 @@ async function decide_onload(decide_args) {
 	oCell.align = 'center'
 	if (decide_returnmany)
 		var tt = '<button'
-			+ ' title="Press A for All"'
+			+ ' title="Alt+A: select/deselect all visible (filtered) rows"'
 			//+ ' onclick="decide_all_onclick_sync()"'
 			+ ' style="font-size:80%" class="exodusbutton"'
-			+ '>All</button>'
+			+ '><u>A</u>ll</button>'
 	else
 		var tt = '&nbsp;'
 	oCell.innerHTML = tt
@@ -7375,6 +7475,8 @@ async function decide_onload(decide_args) {
 	//focus on the first checked item or the first rown
 	// Tab cycles options (as one stop) -> Select -> Cancel -> same option (see decide_document_onkeydown)
 	var decide_last_option_element = null
+	// Must init before return — handlers below are hoisted but var assignment after return never runs
+	var decide_filter_text = ''
 	for (var ii = 0; ii < selections.length; ++ii)
 		if (selections[ii].checked)
 			break
@@ -7405,19 +7507,51 @@ async function decide_onload(decide_args) {
 
 	//remainder of functions is event handlers
 
+	// Alt+A / All: toggle only visible (type-filtered) rows; leave hidden alone.
 	function decide_all_onclick_sync(event) {
 
 		selections = document.getElementsByName('decide_selection')
-		var truefalse = !selections[0].checked
+		var ranks = document.getElementsByName('decide_rank')
+		var ii
 
-		//have to clear all existing ranking first
-		decide_all_clear()
+		// If every visible row is checked → uncheck them; else check all visible
+		var allVisibleChecked = true
+		var anyVisible = false
+		for (ii = 0; ii < selections.length; ii++) {
+			if (decide_selection_row_hidden(selections[ii]))
+				continue
+			anyVisible = true
+			if (!selections[ii].checked) {
+				allVisibleChecked = false
+				break
+			}
+		}
+		if (!anyVisible)
+			return
+		var checking = !allVisibleChecked
 
+		if (!checking) {
+			for (ii = 0; ii < selections.length; ii++) {
+				if (decide_selection_row_hidden(selections[ii]))
+					continue
+				if (selections[ii].checked)
+					decide_checkbox_select(event, selections[ii], false, ii)
+			}
+			return
+		}
+
+		// Append ranks after any already-selected (including filtered-out) rows
 		var lastrank = 0
-		if (truefalse) {
-			for (var ii = 0; ii < selections.length; ii++)
-				//selections[ii].checked = truefalse
-				lastrank = decide_checkbox_select(event, selections[ii], truefalse, ii, lastrank)
+		for (ii = 0; ii < ranks.length; ++ii) {
+			var rank = Number(ranks[ii].innerText)
+			if (rank > lastrank)
+				lastrank = rank
+		}
+		for (ii = 0; ii < selections.length; ii++) {
+			if (decide_selection_row_hidden(selections[ii]))
+				continue
+			if (!selections[ii].checked)
+				lastrank = decide_checkbox_select(event, selections[ii], true, ii, lastrank)
 		}
 	}
 
@@ -7679,7 +7813,7 @@ async function decide_onload(decide_args) {
 		var idx
 		if (first) {
 			for (idx=0;idx<selection2.length;++idx) {
-				if (selection2[idx].style.visibility!='hidden') {
+				if (!decide_selection_row_hidden(selection2[idx])) {
 					newelement=selection2[idx]
 					break
 				}
@@ -7687,7 +7821,7 @@ async function decide_onload(decide_args) {
 		}
 		else {
 			for (idx=selection2.length-1;idx>=0;--idx) {
-				if (selection2[idx].style.visibility!='hidden') {
+				if (!decide_selection_row_hidden(selection2[idx])) {
 					newelement=selection2[idx]
 					break
 				}
@@ -7716,19 +7850,19 @@ async function decide_onload(decide_args) {
 			return false
 
 		var el = decide_last_option_element
-		if (!(el && el.name == 'decide_selection' && el.style.visibility != 'hidden'
+		if (!(el && el.name == 'decide_selection' && !decide_selection_row_hidden(el)
 			&& document.body.contains(el))) {
 			el = null
 			var i
 			for (i = 0; i < selection2.length; ++i) {
-				if (selection2[i].checked && selection2[i].style.visibility != 'hidden') {
+				if (selection2[i].checked && !decide_selection_row_hidden(selection2[i])) {
 					el = selection2[i]
 					break
 				}
 			}
 			if (!el) {
 				for (i = 0; i < selection2.length; ++i) {
-					if (selection2[i].style.visibility != 'hidden') {
+					if (!decide_selection_row_hidden(selection2[i])) {
 						el = selection2[i]
 						break
 					}
@@ -7751,6 +7885,85 @@ async function decide_onload(decide_args) {
 		return buttons.length ? buttons[0] : null
 	}
 
+	// Type-to-filter: decide_filter_text is declared above (before return undefined).
+
+	// True if option is not pickable / not shown (visibility or type-filter display:none).
+	function decide_selection_row_hidden(sel) {
+		if (!sel || sel.style.visibility == 'hidden')
+			return true
+		var row = typeof getancestor == 'function' ? getancestor(sel, 'TR') : null
+		return !!(row && row.style && row.style.display == 'none')
+	}
+
+	// Hide non-matches with display:none only — keep original option numbers.
+	function decide_apply_filter() {
+		var filter = (decide_filter_text || '').toLowerCase()
+		var tbody = $$('decide_table1body1')
+		if (!tbody)
+			return
+		var rows = tbody.getElementsByTagName('tr')
+		var vis = 0
+		var firstVis = null
+		var i
+		for (i = 0; i < rows.length; ++i) {
+			var row = rows[i]
+			var sel = null
+			var inputs = row.getElementsByTagName('input')
+			for (var ii = 0; ii < inputs.length; ++ii) {
+				if (inputs[ii].name == 'decide_selection') {
+					sel = inputs[ii]
+					break
+				}
+			}
+			// Permanently non-returnable rows (hidden radio) stay out of the list
+			if (sel && sel.style.visibility == 'hidden') {
+				row.style.display = filter ? 'none' : ''
+				continue
+			}
+			var match = !filter
+				|| (row.innerText || row.textContent || '').toLowerCase().indexOf(filter) >= 0
+			row.style.display = match ? '' : 'none'
+			if (!match || !sel)
+				continue
+			vis++
+			if (!firstVis)
+				firstVis = sel
+		}
+		var st = $$('decide_filter_status')
+		if (st) {
+			if (filter) {
+				st.style.display = ''
+				st.textContent = 'Filter: ' + decide_filter_text
+					+ (vis ? ' — ' + vis + ' match' + (vis == 1 ? '' : 'es') : ' — no matches')
+				st.className = 'decide_filter_status '
+					+ (vis ? 'decide_filter_ok' : 'decide_filter_empty')
+			} else {
+				st.style.display = 'none'
+				st.textContent = ''
+				st.className = 'decide_filter_status'
+			}
+		}
+		if (firstVis) {
+			var cur = document.activeElement
+			var needFocus = !cur || cur.name != 'decide_selection' || decide_selection_row_hidden(cur)
+			if (needFocus) {
+				decide_last_option_element = firstVis
+				try {
+					client_focuson(firstVis)
+				} catch (e) { }
+				if (!decide_returnmany)
+					firstVis.checked = true
+			}
+		} else if (filter) {
+			// No matches: park on Select so keydown still reaches the dialog
+			var okb = $$('decide_okbutton')
+			if (okb)
+				try { client_focuson(okb) } catch (e) { }
+		}
+		// Refit + refresh ▼ (fit calls update_scroll_hints)
+		exodusconfirm_fit_decide_popup(true)
+	}
+
 	function decide_document_onkeydown(event) {
 
 		event = getevent(event)
@@ -7760,7 +7973,7 @@ async function decide_onload(decide_args) {
 
 		var keycode = event.keyCode
 
-		console.log('decide_document_onkeydown ' + keycode)
+		//console.log('decide_document_onkeydown ' + keycode)
 
 		// Tab: list (one stop) -> Select -> Cancel -> list (Shift reverses).
 		// Multi-select also includes the All button before the list.
@@ -7845,21 +8058,35 @@ async function decide_onload(decide_args) {
 			// else fall through: arrows on options / body still move the list
 		}
 
-		//ctrl+Enter or single select
-		if (keycode == 13 && event.ctrlKey) {
-			decide_ok_onclick_sync()
-			return exoduscancelevent(event)
-		}
-
-		//F9 is old save; S = Select hotkey
-		if (keycode == 120 || keycode == 83) {
-			decide_ok_onclick_sync()
-			return exoduscancelevent(event)
-		}
-
-		//Esc or C = Cancel
-		if (keycode == 27 || keycode == 67) {
+		// Esc: clear type-filter first, then Cancel
+		if (keycode == 27) {
+			if (decide_filter_text) {
+				decide_filter_text = ''
+				decide_apply_filter()
+				return exoduscancelevent(event)
+			}
 			decide_cancel_onclick_sync()
+			return exoduscancelevent(event)
+		}
+
+		// Alt+C = Cancel (bare C is free for type-filter)
+		if (keycode == 67 && event.altKey && !event.ctrlKey && !event.metaKey) {
+			decide_cancel_onclick_sync()
+			return exoduscancelevent(event)
+		}
+
+		// F9 / Ctrl+Enter / Alt+S = Select (bare S is free for type-filter)
+		if (keycode == 120
+			|| (keycode == 13 && event.ctrlKey)
+			|| (keycode == 83 && event.altKey && !event.ctrlKey && !event.metaKey)) {
+			decide_ok_onclick_sync()
+			return exoduscancelevent(event)
+		}
+
+		// Alt+A = All (multi-select only; bare A is free for type-filter)
+		if (keycode == 65 && event.altKey && !event.ctrlKey && !event.metaKey) {
+			if (decide_returnmany)
+				decide_all_onclick_sync(event)
 			return exoduscancelevent(event)
 		}
 
@@ -7903,14 +8130,41 @@ async function decide_onload(decide_args) {
 			return exoduscancelevent(event)
 		}
 
-		//digits 0-9 select options 1-10
-		if (keycode >= 49 && keycode <= 57) {
+		// Backspace: always shorten type-filter first (even when no matches /
+		// focus is on filter status). Must run before list navigation.
+		if (keycode == 8 && decide_filter_text) {
+			decide_filter_text = decide_filter_text.slice(0, -1)
+			decide_apply_filter()
+			return exoduscancelevent(event)
+		}
+
+		// Type-to-filter: letters always; digits/space/- etc only once filter is active.
+		// First character cannot be 1-9 (those select option 1-9 when filter empty).
+		if (!event.ctrlKey && !event.altKey && !event.metaKey) {
+			var ch = ''
+			if (event.key && event.key.length == 1)
+				ch = event.key
+			if (ch) {
+				var isDigit = ch >= '0' && ch <= '9'
+				var isLetter = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+				var isExtra = ch == ' ' || ch == '-' || ch == '.' || ch == '/' || ch == '_' || ch == '*' || ch == '#'
+				if (isLetter || (decide_filter_text && (isDigit || isExtra))) {
+					decide_filter_text += ch
+					decide_apply_filter()
+					return exoduscancelevent(event)
+				}
+			}
+		}
+
+		// digits 1-9 select options 1-9 (only when filter empty — else digits extend filter above)
+		if (!decide_filter_text && keycode >= 49 && keycode <= 57 && !event.altKey && !event.ctrlKey) {
 
 			var optionn = keycode - 48
 			if (optionn == 0)
 				optionn = 10
 			for (var rown = 0; rown < options.length; ++rown) {
-				if (options[rown].getAttribute('decide_optionno') == optionn) {
+				if (options[rown].getAttribute('decide_optionno') == optionn
+					&& !decide_selection_row_hidden(selections[rown])) {
 					if (!decide_returnmany || selections.length == 1) {
 						//decide_ok_onclick_sync()
 						decide_last_option_element = selections[rown]
@@ -7938,92 +8192,126 @@ async function decide_onload(decide_args) {
 				keycode = 40//fake down
 		}
 
-		var n
-		if (element.rowIndex)
-			n = element.rowIndex
-		else if (element.parentNode && element.parentNode.rowIndex)
-			n = element.parentNode.rowIndex
-		else if (element.parentNode && element.parentNode.parentNode && element.parentNode.parentNode.rowIndex)
-			n = element.parentNode.parentNode.rowIndex
-		else
+		// Index into selections[] (not table rowIndex — thead shifts rowIndex).
+		var n = -1
+		var si
+		for (si = 0; si < selections.length; ++si) {
+			if (selections[si] == element) {
+				n = si
+				break
+			}
+		}
+		if (n < 0) {
+			// event target may be a cell/label in the row
+			var tr = element
+			while (tr && tr.tagName != 'TR')
+				tr = tr.parentNode
+			if (tr) {
+				var tin = tr.getElementsByTagName('input')
+				for (var ti = 0; ti < tin.length; ++ti) {
+					if (tin[ti].name == 'decide_selection') {
+						for (si = 0; si < selections.length; ++si) {
+							if (selections[si] == tin[ti]) {
+								n = si
+								element = tin[ti]
+								break
+							}
+						}
+						break
+					}
+				}
+			}
+		}
+		if (n < 0)
 			return
 
-		n -= 1
-
 		//pgup 33/pgdn 34/down 40/up 38/backspace 8 keys (Tab is handled above)
+		// Step by *visible* rows only (display:none filter skips); PgUp/PgDn = 10 visible.
 		if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 8) {
 
 			var direction
 			if (keycode == 34 || keycode == 40) direction = 1
 			if (keycode == 33 || keycode == 38 || keycode == 8) direction = -1
-			//pgdn
-			if (keycode == 34) {
-				if (event.ctrlKey) {
-					n = selections.length - 1
-				}
-				else {
-					if (n == (selections.length - 1))
-						n = 0
-					else {
-						n += 10
-						if (n >= (selections.length - 1))
-							n = selections.length - 1
-					}
-				}
-				n--
+
+			var steps = 1
+			var toEnd = false
+			if (keycode == 34 || keycode == 33) {
+				if (event.ctrlKey)
+					toEnd = true
+				else
+					steps = 10
 			}
-			//pgup
-			if (keycode == 33) {
-				if (event.ctrlKey) {
-					n = 0
-				}
-				else {
-					if (n == 0)
-						n = selections.length - 1
-					else {
-						n -= 10
-						if (n <= 0)
-							n = 0
-					}
-				}
-				n++
-			}
+
+			var startn = n
 			var newelement = element
-			while (true) {
+			var stepped = 0
+			var guard = 0
+			var lastVisible = null
 
-				n += direction
-				if (n < 0) n = selections.length - 1
-				if (n >= selections.length) n = 0
-
-				newelement = selections[n]
-
-				//skip if no other suitable elements
-				if (newelement == element)
-					return
-
-				//skip if not visible
-				if (!newelement)
-					return false//may not be on an element
-				if (newelement.style.visibility == 'hidden')
-					continue
-
-				//scroll to the top or bottom if on the first or last option
-				var newoptionno = newelement.getAttribute('decide_optionno')
-				var scrollpane = exodusconfirm_scrollpane()
-				if (n == 0 || newoptionno == 1)
-					scrollpane.scrollTop = 0
-				else if (n == (selections.length - 1))
-					scrollpane.scrollTop = scrollpane.scrollHeight
-				break
-
+			if (toEnd) {
+				// Ctrl+PgDn / Ctrl+PgUp: last or first visible
+				if (direction > 0) {
+					for (var j = 0; j < selections.length; j++) {
+						if (!decide_selection_row_hidden(selections[j]))
+							lastVisible = selections[j]
+					}
+				} else {
+					for (var j2 = 0; j2 < selections.length; j2++) {
+						if (!decide_selection_row_hidden(selections[j2])) {
+							lastVisible = selections[j2]
+							break
+						}
+					}
+				}
+				if (!lastVisible || lastVisible == element)
+					return exoduscancelevent(event)
+				newelement = lastVisible
+			} else {
+				while (guard++ <= selections.length) {
+					n += direction
+					if (n < 0) n = selections.length - 1
+					if (n >= selections.length) n = 0
+					// full wrap with no other visible
+					if (n == startn && stepped == 0 && guard > 1)
+						break
+					newelement = selections[n]
+					if (!newelement || decide_selection_row_hidden(newelement))
+						continue
+					if (newelement == element && stepped == 0)
+						continue
+					stepped++
+					lastVisible = newelement
+					if (stepped >= steps)
+						break
+				}
+				if (!stepped || !lastVisible)
+					return exoduscancelevent(event)
+				newelement = lastVisible
 			}
+
+			//scroll to the top or bottom if on the first or last option
+			var newoptionno = newelement.getAttribute('decide_optionno')
+			var scrollpane = exodusconfirm_scrollpane()
+			var newn = -1
+			for (si = 0; si < selections.length; ++si) {
+				if (selections[si] == newelement) {
+					newn = si
+					break
+				}
+			}
+			if (newn == 0 || newoptionno == 1)
+				scrollpane.scrollTop = 0
+			else if (newn == (selections.length - 1))
+				scrollpane.scrollTop = scrollpane.scrollHeight
 
 			decide_last_option_element = newelement
 			newelement.focus()
 			newelement.select()
 
+			// Backspace (no filter): move up and uncheck only — never check
 			if (keycode == 8 && decide_returnmany) {
-				decide_checkbox_select(event, newelement)
+				if (newelement.checked)
+					decide_checkbox_select(event, newelement, false)
 				return exoduscancelevent(event)
 			}
 
@@ -8042,12 +8330,6 @@ async function decide_onload(decide_args) {
 				return exoduscancelevent(event)
 			}
 			return
-		}
-
-		//A=all or none
-		if (keycode == 65) {
-			decide_all_onclick_sync()
-			return exoduscancelevent(event)
 		}
 
 		//del or F8 none/delete

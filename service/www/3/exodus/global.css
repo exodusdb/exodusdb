@@ -1210,6 +1210,41 @@ input[type=checkbox]:focus-visible {
     vertical-align: top;
     margin-top: 1.1em; /* air between question and column titles */
 }
+/* Type-to-filter status (letters filter options; Esc clears).
+ * inline-block so the box is text-width only (not a full dialog bar).
+ * Not a focus target — no outline/ring. */
+.decide_filter_status {
+    display: inline-block;
+    font-size: 0.9em;
+    margin: 0 0 0.4em 0;
+    padding: 0.2em 0.5em;
+    border-radius: 0.2em;
+    font-weight: 600;
+    outline: none;
+    box-shadow: none;
+}
+.decide_filter_status:focus {
+    outline: none;
+    box-shadow: none;
+}
+.decide_filter_status.decide_filter_ok {
+    color: #0a7a0a;
+    background: rgba(34, 176, 20, 0.12);
+}
+/* No matches: red text only — no fill, no focus chrome */
+.decide_filter_status.decide_filter_empty {
+    color: #b00000;
+    background: none;
+    padding: 0.2em 0;
+}
+:root[data-theme="dark_mode"] .decide_filter_status.decide_filter_ok {
+    color: #3ec848;
+    background: rgba(62, 200, 72, 0.15);
+}
+:root[data-theme="dark_mode"] .decide_filter_status.decide_filter_empty {
+    color: #ff6b6b;
+    background: none;
+}
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 {
     width: auto;
     max-width: 100%;
@@ -1248,7 +1283,8 @@ input[type=checkbox]:focus-visible {
     padding: 0;
     border: none;
     line-height: 1;
-    font-size: 0.875rem;
+    font-size: 1.35rem;
+    font-weight: 700;
     color: rgba(0, 0, 0, 0.4);
     vertical-align: middle;
 }
