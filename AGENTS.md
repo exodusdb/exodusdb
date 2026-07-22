@@ -32,6 +32,7 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 - **Embedded groups** live in host cells (`:has(> TABLE[exodusgroupno])`); a line “under” a group is often the **outer** row, not the inner table.
 - Prefer **dict** / **HTM column class** / **page-local CSS** over global `!important` hacks.
 - Find **root cause** (page `<style>`, inline dbform styles, pane rules) before adding suppressions.
+- **Craftsmanship:** obvious local fix over thoughtless scaffolding (see global `~/.grok/AGENTS.md` change style §5).
 
 ## Light framework changes (dbform / client)
 
