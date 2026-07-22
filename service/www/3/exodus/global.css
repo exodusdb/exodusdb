@@ -142,7 +142,8 @@ TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]) {
     width: max-content;
 }
 
-/* Embedded group/detail tables — no extra frame inside the grid */
+/* Embedded group/detail tables — flush padding only; host cell stays on the form grid
+   (border-bottom etc.). Do not border:none here — that dropped inner grid lines. */
 TABLE.exodusform > tbody > tr > td:has(> TABLE[exodusgroupno]),
 TABLE.exodusform > tbody > tr > td:has(> TABLE.exodustable),
 TABLE.exodusform > tbody > tr > th:has(> TABLE[exodusgroupno]),
@@ -156,7 +157,6 @@ TABLE.exodusform > tr > td:has(> TABLE.exodustable),
 TABLE.exodusform > tr > th:has(> TABLE[exodusgroupno]),
 TABLE.exodusform > tr > th:has(> TABLE.exodustable) {
     padding: 0;
-    border: none;
 }
 
 /* Group/exodustable line grids (costs, jobs, schedules, …) */
@@ -743,6 +743,20 @@ img[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);
     width: var(--exodus-ui-icon-size);
     cursor: pointer;
+}
+/*
+ * Find/link icons sit left of the data field inside the cell. Cell padding-left
+ * already applies before the first icon; replicate that pad after the last chrome
+ * icon so the field keeps the same left inset (icons must not consume it).
+ * Only adjacent data controls — not intermediate wrapper spans when both icons exist.
+ */
+TABLE.exodusform :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly),
+TABLE.exodusform :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
+    margin-left: var(--exodus-form-cell-padding-left);
+}
+TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly),
+TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
+    margin-left: var(--exodus-form-nested-cell-padding-left);
 }
 /* Mask icons inside buttons: size box already set; keep tint on menubar hover */
 .graphicbutton .exodus-icon,
