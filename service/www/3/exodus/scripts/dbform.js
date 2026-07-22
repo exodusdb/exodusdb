@@ -1436,7 +1436,7 @@ async function formfunctions_onload() {
                             ' id="insertrowbutton' + groupno + '"'
                             + ' title="Insert a new row here ' + t2 + '"'
                             + ' exodusonclick="await insertrow_onclick(event)"'
-                            + ' style="cursor:pointer"')
+                            + ' style="cursor:pointer;vertical-align:top"')
                     }
                     //if (!(exodusgetattribute(element,'exodusnodeleterow')))
                     if (!(element.getAttribute('exodusnodeleterow'))) {
@@ -1444,7 +1444,7 @@ async function formfunctions_onload() {
                             ' id="deleterowbutton' + groupno + '"'
                             + ' title="Delete this row ' + t3 + '"'
                             + ' exodusonclick="await deleterow_onclick(event)"'
-                            + ' style="cursor:pointer"')
+                            + ' style="cursor:pointer;vertical-align:top"')
                     }
                     t += ' </span>'
                     var insertdeletebuttons = document.createElement('td')
