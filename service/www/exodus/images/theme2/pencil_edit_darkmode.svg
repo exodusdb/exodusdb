@@ -1,12 +1,13 @@
-<svg width="16" height="16" viewBox="1 0.5 14 15.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="16" height="16" viewBox="1 0.5 14 15.5" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M1.5 1h8.2L14.5 6v8.5a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V1z"
-        fill="#e4e4e0" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
+        fill="#e4e4e0" stroke="none"/>
   <path d="M9.7 1v4.2c0 .44.36.8.8.8H14.5"
-        fill="#d0d0cc" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
-  <path d="M4.35 10.0 10.2 4.15c.62-.62 1.62-.62 2.24 0l.48.48c.62.62.62 1.62 0 2.24L7.07 11.52c-.19.19-.43.32-.69.37l-2.4.48a.55.55 0 0 1-.65-.65l.48-2.4c.05-.26.18-.5.37-.69z"
-        fill="#f3991a"/>
-  <path d="M4.35 10.0 3.15 11.2c-.2.2-.26.52-.15.8l.36.9.9.36c.28.11.6.05.8-.15L6.3 11.52 4.35 10.0z"
-        fill="#633f0b"/>
-  <path d="M3.36 12.9 2.7 13.56a.32.32 0 0 0 .45.45l.66-.66-.45-.45z"
-        fill="#1a1208"/>
+        fill="#d0d0cc" stroke="none"/>
+  <g transform="translate(8,8.25) scale(0.92) translate(-8,-8)">
+    <image width="16" height="16" x="0" y="0" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAqFBMVEVHcEymi1FFQEg7OUoiLUoKFi8vL0Y2OEkZJ0gxMUWZkph9TC2FTylQT1+Dg4uIfINhYXC0T19lS1oAAAB0R1h1STB6VmSNeEx1STFLP1Ggh1NqY2+GQFJeT1KdhlOIcEZ9WWX4xTv/uAj/nQCijnr/mQDedQzWmha2p6fr5uCXj3/ZdHanWGSuYx7jeAvh2NPleQn/cnPvg4LnegmhgmTMcRK3bXLFsa/0piK3AAAAIXRSTlMA6FOIIRE+TRcv77fC9szVkfOJBKarrOivSeTPysrk5ee0azDmAAAAdUlEQVQY02NgQALCDKhAUkyIA5nPrmCkLcKKxOfSMDMUZEPw5VX0NXRkWOB8OUV1E3NpTjhfSlFJ2VQWzmdiBPKNeVD5BjwsKHw9bjifTVxRSVUNwWcQ0FJXVZNAuJGVT1NFVxTJzWy8XPzMyH7gZGbnYMADAB0cCP61TUqxAAAAAElFTkSuQmCC"/>
+  </g>
+  <path d="M1.5 1h8.2L14.5 6v8.5a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V1z"
+        fill="none" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
+  <path d="M9.7 1v4.2c0 .44.36.8.8.8H14.5"
+        fill="none" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
 </svg>

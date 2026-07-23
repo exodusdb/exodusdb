@@ -1616,18 +1616,17 @@ function theme_toggle_title(dark) {
 
 function exodus_swap_tool_icons() {
 
-	// Swap static toolbar icons (e.g. reports.htm) that use add/delete/refresh svg/png
-	const filetype_rex = /(\.[a-zA-Z]+$)/
-	for (const base of ['add', 'delete', 'refresh']) {
-		document.querySelectorAll(`img[src*="/${base}.svg"], img[src*="/${base}.png"], img[src*="/${base}_darkmode.svg"], img[src*="/${base}_darkmode.png"]`).forEach(img => {
-			let src = img.getAttribute('src')
-			if (gisdarktheme) {
-				if (src.indexOf('_darkmode') < 0)
-					src = src.replace(filetype_rex, '_darkmode$1')
-			} else {
-				src = src.replace('_darkmode', '')
-			}
-			img.setAttribute('src', src)
+	// Static toolbar icons (e.g. reports.htm add/delete/refresh/play). SVG masks are
+	// black monochrome; convert to tinted .exodus-icon spans (size/v-align with menubar).
+	var colors = { add: 'green', delete: 'red', refresh: 'green', play: 'green', pause: 'blue' }
+	for (var base of ['add', 'delete', 'refresh', 'play', 'pause']) {
+		// Match /add.svg not form_add.svg (slash before basename)
+		var sel = 'img[src*="/' + base + '.svg"], img[src*="/' + base + '.png"], '
+			+ 'img[src*="/' + base + '_darkmode.svg"], img[src*="/' + base + '_darkmode.png"]'
+		document.querySelectorAll(sel).forEach(function (img) {
+			var span = exodus_set_icon_element(img, exodus_icon_spec(base + '.svg', colors[base]))
+			if (span && span.style)
+				span.style.cursor = 'pointer'
 		})
 	}
 }
@@ -1809,7 +1808,8 @@ function theme_toggle(theme = 'default') {
 	}
 
 	// Monochrome icons recolor via CSS vars automatically.
-	// Painted multicolour (New/Edit/Delete, theme, static add/delete/refresh) still swap files.
+	// Painted multicolour (New/Edit/Delete, theme, …) still swap files.
+	// Static reports.htm add/delete/refresh: converted to mono tints in exodus_swap_tool_icons.
 	const xform_postload = document.readyState === 'complete'
 	if (xform_postload) {
 		exodus_swap_tool_icons()
@@ -6372,8 +6372,9 @@ function exodus_set_icon_element(el, specOrUrl) {
 		var span = exodus_create_icon_element(specOrUrl)
 		if (el.id)
 			span.id = el.id
-		// keep common attributes used on field chrome icons
-		;['title', 'isexoduspopup', 'isexoduslink', 'exodusonclick', 'style', 'class'].forEach(function (n) {
+		// keep common attributes used on field chrome / static toolbar buttons
+		;['title', 'isexoduspopup', 'isexoduslink', 'exodusonclick', 'exodustype',
+			'accesskey', 'exodusgroupno', 'style', 'class'].forEach(function (n) {
 			if (n == 'class' || n == 'style')
 				return
 			var v = el.getAttribute && el.getAttribute(n)

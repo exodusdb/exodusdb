@@ -308,23 +308,26 @@ BODY
     --exodus-informbutton-border-style: outset;
     --exodus-informbutton-color: inherit;
     /* Toolbar/field icons — one place to retune ALL menubar/form icons together:
-       --exodus-ui-icon-size  = outer img box (scales with text)
-       --exodus-ui-icon-glyph = fraction of that box the SVG may fill (1 = edge-to-edge).
-       0.875 ≈ 1 unit inset on a 16px canvas. SVGs should be full-bleed; CSS owns padding. */
+       --exodus-ui-icon-size  = outer box (scales with text)
+       --exodus-ui-icon-glyph = fraction of that box the art may fill (1 = edge-to-edge).
+       1 = fill the box (no CSS inset); 0.875 = 14/16 ≈ one unit inset on a 16 canvas.
+       SVGs are full-bleed 16×16; CSS owns the shared inset (img padding / mask-size). */
     --exodus-ui-icon-size: 1.325em;
-    --exodus-ui-icon-glyph: 0.875;
+    --exodus-ui-icon-glyph: 1;
     /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
     --exodus-check-size: 1.3125em;
     /*
      * Monochrome icon tints (CSS mask + black SVG). Change tone once per role;
      * no per-file colour, no _darkmode twin for these shapes.
-     * Multicolour icons (New/Edit/Delete, logout door, …) stay painted SVGs.
+     * Multicolour icons (New/Edit/Delete, theme, company, …) stay painted SVGs.
+     * darkgrey/neutral track default text (--exodus-textcolor LM/DM).
+     * lightgrey stays muted (inactive Save).
      */
     --exodus-icon-green: #22b014;
     --exodus-icon-red: #9c1516;
     --exodus-icon-orange: #e04510;
     --exodus-icon-blue: #1e97cc;
-    --exodus-icon-darkgrey: #555555;
+    --exodus-icon-darkgrey: var(--exodus-textcolor);
     --exodus-icon-lightgrey: #b0b0b0;
     --exodus-icon-neutral: var(--exodus-icon-darkgrey);
 }
@@ -344,8 +347,9 @@ BODY
     /* Colour the glyph; never inherit button/menubar background as the fill */
     background-color: var(--exodus-icon-color, currentColor) !important;
     background-image: none !important;
-    -webkit-mask-size: contain;
-    mask-size: contain;
+    /* Same mass as painted img icons (those use padding + object-fit) */
+    -webkit-mask-size: calc(100% * var(--exodus-ui-icon-glyph));
+    mask-size: calc(100% * var(--exodus-ui-icon-glyph));
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
@@ -1488,12 +1492,12 @@ input:checked + .toggle_button .knob img {
     --exodus-informbutton-border: #7070e0;
     --exodus-informbutton-border-style: solid;
     --exodus-informbutton-color: #ffffff;
-    /* Monochrome icon tints (DM) */
+    /* Monochrome icon tints (DM); darkgrey/neutral inherit text via LM token chain */
     --exodus-icon-green: #3ec848;
     --exodus-icon-red: #ff442a;
     --exodus-icon-orange: #ff7a40;
     --exodus-icon-blue: #6aa3e8;
-    --exodus-icon-darkgrey: #c0c0c0;
+    --exodus-icon-darkgrey: var(--exodus-textcolor);
     --exodus-icon-lightgrey: #707070;
     --exodus-icon-neutral: var(--exodus-icon-darkgrey);
     --bg-color: #1e1e1e;

@@ -1,0 +1,6 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Monochrome mask: ring + play (same family as add/delete; circle gives mass alone) -->
+  <circle cx="8" cy="8" r="6.25" stroke="#000" stroke-width="1.75" fill="none"/>
+  <!-- Triangle optically centred in the ring (shift left of geometric centre) -->
+  <path fill="#000" d="M5.55 4.35v7.3L12.15 8 5.55 4.35z"/>
+</svg>

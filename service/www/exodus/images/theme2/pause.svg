@@ -1,0 +1,4 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Monochrome pause bars; black mask, tint via CSS (timesheets) -->
+  <path fill="#000" d="M3.75 2.75h2.85v10.5H3.75V2.75zm5.65 0H12.25v10.5H9.4V2.75z"/>
+</svg>

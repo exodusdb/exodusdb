@@ -57,9 +57,10 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 
 ### Menubar / form icons (theme2)
 
-- **Display size:** `--exodus-ui-icon-size` and **glyph mass:** `--exodus-ui-icon-glyph` in `global.css` (both apply to all menubar/form icons together).
-- **SVG assets should be full-bleed** in their viewBox (art to the edges). CSS padding owns the shared inset — do **not** add per-file `scale(0.875)` wrappers (that double-pads icons that already had gap, e.g. Release).
-- Icons drawn with a 1-unit internal margin can use `viewBox="1 1 14 14"` so they still render full-bleed before CSS pad (New/Delete/Edit).
+- **Display size:** `--exodus-ui-icon-size` (outer box) and **glyph mass:** `--exodus-ui-icon-glyph` in `global.css` — one pair retunes all menubar/form icons.
+- **SVG assets are full-bleed 16×16** (art to the edges of the viewBox). Do **not** bake a 1px/1-unit empty border into the file.
+- **CSS owns the shared inset:** `--exodus-ui-icon-glyph` defaults to `1` (fill the outer box). Use `0.875` (= 14/16) if a one-unit inset is wanted. Painted `<img>` use padding+object-fit; monochrome `.exodus-icon` use the same fraction as `mask-size`. Do **not** add per-file `scale(0.875)` wrappers (double-pads).
+- Icons drawn with an internal margin can use `viewBox="1 1 14 14"` so they still render full-bleed before CSS pad (New/Delete/Edit).
 - Colours (e.g. dark-mode green on bare vs page-backed icons) stay in the SVGs; mass/size do not.
 
 ### Raster → SVG migration (multi-turn)
