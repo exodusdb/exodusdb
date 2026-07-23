@@ -67,6 +67,7 @@ TABLE[exodusgroupno] tr {
     vertical-align: top;
     text-align: left;
     box-sizing: border-box;
+    max-width: 100%; /* stay within viewport so line-grid text can fold */
     background-color: var(--exodus-form-face);
     border: 1px solid var(--exodus-form-border);
     border-radius: var(--exodus-form-radius);
@@ -78,6 +79,7 @@ TABLE[exodusgroupno] tr {
 div[align="center"] > .exodusformpane {
     display: block;
     width: max-content;
+    max-width: 100%;
     margin: var(--exodus-form-pane-margin) auto;
 }
 /* Unbound form OK/List + Close bar (dbform.js #formbuttonsdiv) and inline action rows */
@@ -136,14 +138,20 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
 .exodusformactions .exodusbutton {
     margin: 0.125em 4px;
 }
-/* Embedded exodustable: content width (UA may stretch inputs to fill a wide host cell) */
+/* Embedded line grid: hug content when short, but never wider than host/pane
+ * so pre-wrap DETAILS/DESCRIPTION can fold within the screen (was max-content
+ * alone, which grew the table to the full unwrapped text run). */
 TABLE.exodusform > tbody > tr > td > TABLE.exodustable:not([width]),
 TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]) {
-    width: max-content;
+    width: min(max-content, 100%);
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Embedded group/detail tables — flush padding only; host cell stays on the form grid
-   (border-bottom etc.). Do not border:none here — that dropped inner grid lines. */
+   (border-bottom etc.). Do not border:none here — that dropped inner grid lines.
+   max-width + min-width:0 so nested min(max-content, 100%) can resolve against the
+   pane (default min-width:auto keeps the cell at unwrapped text width). */
 TABLE.exodusform > tbody > tr > td:has(> TABLE[exodusgroupno]),
 TABLE.exodusform > tbody > tr > td:has(> TABLE.exodustable),
 TABLE.exodusform > tbody > tr > th:has(> TABLE[exodusgroupno]),
@@ -157,6 +165,8 @@ TABLE.exodusform > tr > td:has(> TABLE.exodustable),
 TABLE.exodusform > tr > th:has(> TABLE[exodusgroupno]),
 TABLE.exodusform > tr > th:has(> TABLE.exodustable) {
     padding: 0;
+    max-width: 100%;
+    min-width: 0;
 }
 
 /* Group/exodustable line grids (costs, jobs, schedules, …) */
@@ -174,6 +184,7 @@ TABLE.exodusform TABLE.exodustable th {
     border: none;
     border-radius: 0;
     box-sizing: border-box;
+    max-width: 100%; /* with pane max-width:100%, caps line grids so text folds */
 }
 /*
  * No outer cell borders (pane is the frame). Four edges of the cell grid:
