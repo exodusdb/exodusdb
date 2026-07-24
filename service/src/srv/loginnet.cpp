@@ -252,7 +252,8 @@ nextcomp:
 	// cookie:='&sp=':agp<5>
 	cookie ^= "&sp=1";
 
-	// form color, font and fontsize
+	// form body color (fc), font (ff), fontsize (fs) — LM client screencolor / screenfont
+	// SYSTEM 46,4 formheadcolor is not exported (unused on client; thead tint is CSS)
 	cookie ^= "&fc=" ^ SYSTEM.f(46, 5);
 	cookie ^= "&ff=" ^ SYSTEM.f(46, 6);
 	cookie ^= "&fs=" ^ SYSTEM.f(46, 7);

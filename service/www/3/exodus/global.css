@@ -222,14 +222,44 @@ TABLE[exodusgroupno] > thead {
     top: var(--exodus-sticky-top, 0);
     z-index: 11;
 }
+/*
+ * LM sticky thead tint (from form body / --exodus-form-face)
+ * ----------------------------------------------------------
+ * Goal: subliminal contrast between body and column heads for any
+ * SCREEN_BODY_COLOR. Not SCREEN_HEAD_COLOR (unused — see colors.js).
+ *
+ * Switch: <html data-form-head="deeper"|"lighter"> set by
+ * exodus_set_form_head_direction() from Rec.601 body luma (threshold 128).
+ *
+ *   deeper (light bodies, default):
+ *     Perceptual shade — same hue/chroma, slightly lower OKLCH L.
+ *     Fallback line = plain form face if oklch(from) unsupported.
+ *
+ *   lighter (dark bodies):
+ *     Tint toward white (color-mix). Do NOT raise OKLCH L alone: saturated
+ *     sRGB colours (e.g. #ff20ff, #ff4060) already sit on the gamut edge so
+ *     L+ clips and the step is invisible.
+ *
+ * Tune: L steps 0.04 / 0.06; white mix 88% / 82% face (plain / exodustable).
+ * DM: fixed greys further below (ignore data-form-head).
+ */
 TABLE[exodusgroupno] > thead th,
 TABLE[exodusgroupno] > thead td {
-    background-color: #fdf5e6;
+    background-color: var(--exodus-form-face);
+    background-color: oklch(from var(--exodus-form-face) calc(l - 0.04) c h);
 }
-/* in-form exodustable header colour (e.g. clients brands) */
 TABLE.exodustable[exodusgroupno] > thead th,
 TABLE.exodustable[exodusgroupno] > thead td {
-    background-color: #ffff80;
+    background-color: var(--exodus-form-face);
+    background-color: oklch(from var(--exodus-form-face) calc(l - 0.06) c h);
+}
+:root[data-form-head="lighter"] TABLE[exodusgroupno] > thead th,
+:root[data-form-head="lighter"] TABLE[exodusgroupno] > thead td {
+    background-color: color-mix(in oklch, var(--exodus-form-face) 88%, white);
+}
+:root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead th,
+:root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead td {
+    background-color: color-mix(in oklch, var(--exodus-form-face) 82%, white);
 }
 
 TABLE

@@ -713,7 +713,7 @@ function request_response($request, &$data_io, $remoteaddr, $remotehost, $https,
 		swap '&' with ' and ' in temp
 		cookie:='&db=':temp
 	
-		*form color, font and fontsize
+		*form body color (fc), font, fontsize — 46,4 formhead unused on client
 		cookie:='&fc=':system<46,5>
 		cookie:='&ff=':system<46,6>
 		cookie:='&fs=':system<46,7>

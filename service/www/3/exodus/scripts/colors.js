@@ -364,12 +364,18 @@ function exodus_dict_colorfontsize(dict, fn) {
     exodus_dict_font(di)
     //di.required=true
 
+    // SCREEN_HEAD_COLOR — UNUSED in the live UI (no cookie, no set_style, no HTM
+    // input on Screens row). Kept as word 4 so SYSTEM 46,* field layout stays stable
+    // (see initgeneral formheadcolor). Sticky thead tint is CSS: slightly darker
+    // mix of --exodus-form-face (body colour), not this field.
     di = dict[++din] = dictrec('SCREEN_HEAD_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 4
     di.nwords = 1
     exodus_dict_color(di)
 
+    // SCREEN_BODY_COLOR — live LM form face: cookie fc, colors_val_screencolor,
+    // exodus_set_style('screencolor') → TABLE.exodusform + --exodus-form-face.
     di = dict[++din] = dictrec('SCREEN_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 5

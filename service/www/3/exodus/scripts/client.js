@@ -1805,6 +1805,7 @@ function theme_toggle(theme = 'default') {
 		// Inline LM screencolor on <html> overrides :root[data-theme] custom properties
 		html.style.removeProperty('--exodus-form-face')
 		html.style.removeProperty('--exodus-form-border')
+		html.removeAttribute('data-form-head')
 	}
 
 	// Monochrome icons recolor via CSS vars automatically.
@@ -1821,6 +1822,31 @@ function theme_toggle(theme = 'default') {
 	return true
 }
 
+/*
+ * Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
+ *
+ * Only decides deeper vs lighter from body luma; CSS owns the two formulas:
+ *   deeper  → oklch L−   (light form faces)
+ *   lighter → mix white  (dark form faces; L+ clips on hot sRGB colours)
+ *
+ * Call whenever --exodus-form-face is set (screencolor / cookie fc).
+ */
+function exodus_set_form_head_direction(cssColor) {
+	var s = String(cssColor == null ? '' : cssColor).replace(/\s+/g, '')
+	if (/^[0-9a-fA-F]{3}$/.test(s) || /^[0-9a-fA-F]{6}$/.test(s))
+		s = '#' + s
+	var el = document.createElement('span')
+	el.style.cssText = 'position:absolute;visibility:hidden;color:' + s
+	document.documentElement.appendChild(el)
+	var m = /(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(window.getComputedStyle(el).color)
+	document.documentElement.removeChild(el)
+	// Rec. 601 luma; ≥128 → deepen head, else lighten head
+	var light = true
+	if (m)
+		light = (0.299 * Number(m[1]) + 0.587 * Number(m[2]) + 0.114 * Number(m[3])) >= 128
+	document.documentElement.setAttribute('data-form-head', light ? 'deeper' : 'lighter')
+}
+
 function exodus_set_style(mode, value, value2) {
 
 	if (value.toUpperCase() == 'DEFAULT') value = ''
@@ -1833,7 +1859,8 @@ function exodus_set_style(mode, value, value2) {
 	var rules = link.sheet.cssRules || link.sheet.rules
 	var oldvalue = ''
 
-	//screencolor - light mode only: user-customisable TABLE.exodusform background
+	// LM form body colour (SCREEN_BODY_COLOR / cookie fc) → face + thead direction.
+	// SCREEN_HEAD_COLOR (SYSTEM 46,4) is unused — no cookie/UI apply path.
 	if (mode == 'screencolor' && rules && !gisdarktheme) {
 
 		var style = exodus_exodusform_rule_style()
@@ -1848,6 +1875,7 @@ function exodus_set_style(mode, value, value2) {
 			style.backgroundColor = value
 			document.documentElement.style.setProperty('--exodus-form-face', value)
 			document.documentElement.style.setProperty('--exodus-form-border', '#d0d0d0')
+			exodus_set_form_head_direction(style.backgroundColor || value)
 		}
 		catch (e) {
 			if (e.number == -2146827908) {
