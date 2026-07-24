@@ -1048,6 +1048,11 @@ function modalblock_create() {
 		if ($$('exodusconfirmdiv')) {
 			window.setTimeout(exodus_confirm_outside_click_sync, 10)
 		}
+		// Colour popup: kill OS spectrum immediately (sync) — do not queue on Gate A
+		else if (typeof colors_popup != 'undefined' && colors_popup && colors_popup._showing
+			&& typeof colors_popup_cancel == 'function') {
+			void colors_popup_cancel()
+		}
 		else if (gchildwin) {
 			if (gchildwin.lazy) {
 				//ignore spurious click events without a prior mousedown on this blocker
@@ -1822,15 +1827,13 @@ function theme_toggle(theme = 'default') {
 	return true
 }
 
-/*
- * Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
- *
- * Only decides deeper vs lighter from body luma; CSS owns the two formulas:
- *   deeper  → oklch L−   (light form faces)
- *   lighter → mix white  (dark form faces; L+ clips on hot sRGB colours)
- *
- * Call whenever --exodus-form-face is set (screencolor / cookie fc).
- */
+// Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
+//
+// Only decides deeper vs lighter from body luma; CSS owns the two formulas:
+//   deeper  → oklch L−   (light form faces)
+//   lighter → mix white  (dark form faces; L+ clips on hot sRGB colours)
+//
+// Call whenever --exodus-form-face is set (screencolor / cookie fc).
 function exodus_set_form_head_direction(cssColor) {
 	var s = String(cssColor == null ? '' : cssColor).replace(/\s+/g, '')
 	if (/^[0-9a-fA-F]{3}$/.test(s) || /^[0-9a-fA-F]{6}$/.test(s))
@@ -5546,94 +5549,42 @@ function starteventhandler(eventfunctionname, functionx) {
 				//always call unloadevents
 				//TODO create a new gcurrentevent?
 
-				//special treatment of events while exodusconfirm is up
-			} else if ($$('exodusconfirmdiv')) {
-
-				//allow mouse right click, copy of error message text etc.
-				if (event.type == 'copy')
+				// ---------------------------------------------------------------
+				// Popup isolation while gblockevents (modal / exclusive UI).
+				//
+				// Mental model: starteventhandler is a *dispatcher*, not the home
+				// of each product’s key map. Each popup implements the same
+				// contract when its script is present:
+				//   null  — that popup is not open; try next / fall through
+				//   true  — allow browser default; do not run form key logic
+				//   false — caller must exoduscancelevent (swallow form shortcuts)
+				//
+				// Order: confirm first (almost always loaded), then colour
+				// (colors.js only when needed). Calendar keys live on its div
+				// (calendar.js); Esc closes via form_closepopups — left as-is.
+				//
+				// Future (slow steps, not a big bang):
+				//   - Keep decide’s own decide_document_onkeydown until a calm
+				//     pass can fold decide vs plain confirm inside confirm helper
+				//   - Optional calendar_popup_is_open / document_keydown for
+				//     symmetry only if form path grows; do not change hide-on-key
+				//   - Capture-phase (Alt+digit, Alt+arrows): thin *_is_open() only
+				//   - Do not invent one mega-popup_onkeydown for all products
+				// ---------------------------------------------------------------
+			} else if (typeof exodusconfirm_startevent == 'function') {
+				var confEv = exodusconfirm_startevent(event)
+				if (confEv === true)
 					return true
+				if (confEv === false)
+					return exoduscancelevent(event)
+			}
 
-				if (event.type == 'keydown') {
-
-					//allow keyboard Ctrl+c to copy error message text etc.
-					if (event.ctrlKey && event.which == 67)
-						return true
-
-					var keycode = event.keyCode ? event.keyCode : event.which
-					var keyletter = String.fromCharCode(keycode).toUpperCase()
-					var istextinput = !!$$('exodusconfirmdiv_textinput')
-					var isdecide = !!$$('decide_table1')
-					var active = document.activeElement
-					// focused yes/no/cancel graphicbutton (not decide Select/Cancel)
-					var focusedConfirmBtn = null
-					if (active) {
-						if (active.id == 'positivebutton' || active.id == 'negativebutton' || active.id == 'cancelbutton')
-							focusedConfirmBtn = active
-						else if (active.closest) {
-							var wrap = active.closest('#positivebutton, #negativebutton, #cancelbutton')
-							if (wrap)
-								focusedConfirmBtn = wrap
-						}
-					}
-
-					logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
-
-					// Tab: cycle text field and buttons (decide has its own keydown handler)
-					if (keycode == 9 && !isdecide) {
-						exodusconfirm_focus_cycle(!!event.shiftKey)
-						return exoduscancelevent(event)
-					}
-
-					// Arrow keys: same cycle as Tab when focus is on a footer button
-					// (not while typing in the text field — leave caret movement alone).
-					// Left/Up = previous, Right/Down = next. Common for side-by-side actions.
-					if (!isdecide && focusedConfirmBtn
-						&& (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)) {
-						exodusconfirm_focus_cycle(keycode == 37 || keycode == 38)
-						return exoduscancelevent(event)
-					}
-
-					// Space/Enter on a focused confirm button activates that button
-					if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
-						if (focusedConfirmBtn.id == 'negativebutton')
-							window.setTimeout(exodus_confirm_function2_sync, 1)
-						else if (focusedConfirmBtn.id == 'cancelbutton')
-							window.setTimeout(exodus_confirm_function3_sync, 1)
-						else
-							window.setTimeout(exodus_confirm_function1_sync, 1)
-						return exoduscancelevent(event)
-					}
-
-					//POSITIVE = F9 or Enter or (Space if not text input) or some initial
-					if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
-						window.setTimeout(exodus_confirm_function1_sync, 1)
-						return exoduscancelevent(event)
-					}
-
-					//CANCEL = Esc or some initial
-					else if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
-						window.setTimeout(exodus_confirm_function3_sync, 1)
-						return exoduscancelevent(event)
-					}
-
-					//NEGATIVE = F8 or some initial
-					else if (keycode == 119 || keyletter == gexodusconfirmletters[2]) {
-						window.setTimeout(exodus_confirm_function2_sync, 1)
-						return exoduscancelevent(event)
-					}
-
-					// Home/End: first/last focusable (decide lists use decide_document_onkeydown)
-					else if (keycode == 36 || keycode == 35) {
-						if (!isdecide) {
-							exodusconfirm_focus_endpoint(keycode == 36)
-							return exoduscancelevent(event)
-						}
-					}
-
-					// Allow keyboard typing for text popups
-					if (istextinput)
-						return true
-				}
+			if (typeof colors_popup_startevent == 'function') {
+				var colorEv = colors_popup_startevent(event)
+				if (colorEv === true)
+					return true
+				if (colorEv === false)
+					return exoduscancelevent(event)
 			}
 
 			// Let native <select> complete open/toggle; do not start a new flight.
@@ -6490,6 +6441,126 @@ function exodusconfirm_focus_endpoint(first) {
 		return false
 	client_focuson(first?list[0]:list[list.length-1])
 	return true
+}
+
+// Isolation while #exodusconfirmdiv is open (starteventhandler gblockevents path).
+//
+// Strategy: product key policy lives next to the UI, not in the generic
+// onkeydown switchboard. Same contract as colors_popup_startevent:
+//   null  — confirm not open
+//   true  — allow (e.g. type in text field, copy)
+//   false — block form path (caller exoduscancelevent)
+//
+// Confirm also uses blockmodalui + form_blockevents while open — isolation is
+// not document_onkeydown alone. Decide lists keep decide_document_onkeydown on
+// the div; do not rip that out in a drive-by.
+//
+// Return null = no confirm; true = allow; false = caller should exoduscancelevent.
+// Extracted from starteventhandler only — behaviour unchanged.
+function exodusconfirm_startevent(event) {
+
+	var confirmdiv = $$('exodusconfirmdiv')
+	if (!confirmdiv)
+		return null
+
+	// allow mouse right click, copy of error message text etc.
+	if (event.type == 'copy')
+		return true
+
+	if (event.type != 'keydown')
+		// non-keydown falls through to generic skip (same as before: no return → cancel)
+		return false
+
+	//allow keyboard Ctrl+c to copy error message text etc.
+	if (event.ctrlKey && event.which == 67)
+		return true
+
+	var keycode = event.keyCode ? event.keyCode : event.which
+	var keyletter = String.fromCharCode(keycode).toUpperCase()
+	var istextinput = !!$$('exodusconfirmdiv_textinput')
+	var isdecide = !!$$('decide_table1')
+	var active = document.activeElement
+	// focused yes/no/cancel graphicbutton (not decide Select/Cancel)
+	var focusedConfirmBtn = null
+	if (active) {
+		if (active.id == 'positivebutton' || active.id == 'negativebutton' || active.id == 'cancelbutton')
+			focusedConfirmBtn = active
+		else if (active.closest) {
+			var wrap = active.closest('#positivebutton, #negativebutton, #cancelbutton')
+			if (wrap)
+				focusedConfirmBtn = wrap
+		}
+	}
+
+	logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
+
+	// Tab: cycle text field and buttons (decide has its own keydown handler)
+	if (keycode == 9 && !isdecide) {
+		exodusconfirm_focus_cycle(!!event.shiftKey)
+		return false
+	}
+
+	// Arrow keys: same cycle as Tab when focus is on a footer button
+	if (!isdecide && focusedConfirmBtn
+		&& (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)) {
+		exodusconfirm_focus_cycle(keycode == 37 || keycode == 38)
+		return false
+	}
+
+	// Space/Enter on a focused confirm button activates that button
+	if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
+		if (focusedConfirmBtn.id == 'negativebutton')
+			window.setTimeout(exodus_confirm_function2_sync, 1)
+		else if (focusedConfirmBtn.id == 'cancelbutton')
+			window.setTimeout(exodus_confirm_function3_sync, 1)
+		else
+			window.setTimeout(exodus_confirm_function1_sync, 1)
+		return false
+	}
+
+	//POSITIVE = F9 or Enter or (Space if not text input) or some initial
+	if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
+		window.setTimeout(exodus_confirm_function1_sync, 1)
+		return false
+	}
+
+	//CANCEL = Esc or some initial
+	if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
+		window.setTimeout(exodus_confirm_function3_sync, 1)
+		return false
+	}
+
+	//NEGATIVE = F8 or some initial
+	if (keycode == 119 || keyletter == gexodusconfirmletters[2]) {
+		window.setTimeout(exodus_confirm_function2_sync, 1)
+		return false
+	}
+
+	// Home/End: first/last focusable (decide lists use decide_document_onkeydown)
+	if ((keycode == 36 || keycode == 35) && !isdecide) {
+		exodusconfirm_focus_endpoint(keycode == 36)
+		return false
+	}
+
+	// Allow keyboard typing for text popups
+	if (istextinput)
+		return true
+
+	// Other keys while confirm up (same as fall-through → cancel before)
+	return false
+}
+
+// document_onkeydown defense (secondary to gblockevents + modal).
+// Keys inside confirm skip form handler; outside cancelled. null = no confirm.
+// Prefer starteventhandler path under load; this is the belt when that path is not hit.
+function exodusconfirm_document_keydown(event) {
+
+	var confirmdiv = $$('exodusconfirmdiv')
+	if (!confirmdiv)
+		return null
+	if (confirmdiv.contains(event.target))
+		return true
+	return false
 }
 
 // Tab / Shift+Tab within the open confirm (not decide lists — those have their own handler).

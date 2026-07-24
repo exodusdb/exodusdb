@@ -2690,12 +2690,21 @@ async function document_onkeydown(event) {
 
     //document_onkeydown also occurs in non-form windows not using dbform.js - like upload.htm etc
 
-    // Block form shortcuts while a confirm is up (defense if this path is reached)
-    if ($$('exodusconfirmdiv')) {
-        var confirmdiv = $$('exodusconfirmdiv')
-        if (confirmdiv && confirmdiv.contains(event.target))
+    // Popup isolation (secondary to gblockevents + modal). Contract: null / true / false.
+    // Confirm: client.js helpers. Colour: colors.js when loaded. Calendar: form_closepopups later.
+    if (typeof exodusconfirm_document_keydown == 'function') {
+        var confKey = exodusconfirm_document_keydown(event)
+        if (confKey === true)
             return true
-        return exoduscancelevent(event)
+        if (confKey === false)
+            return exoduscancelevent(event)
+    }
+    if (typeof colors_popup_document_keydown == 'function') {
+        var colorKey = colors_popup_document_keydown(event)
+        if (colorKey === true)
+            return true
+        if (colorKey === false)
+            return exoduscancelevent(event)
     }
 
     return await document_onkeydown2(event)
