@@ -2,10 +2,8 @@
 
 async function form_postinit() {
 
-    //force retrieval of own record
-    if (gro.dictitem('USER_ID').defaultvalue)
-        exodussettimeout('focuson("USER_NAME")', 100)
-
+    // Own-user open is via gparameters.key set in dict_USERS (dbform opendoc path).
+    // Only leftover: optional what's-new window after login cookie.
     gwhatsnew = exodusgetcookie2('wn').toLowerCase()
     if (gwhatsnew) {
         if (window.location.href.toString().slice(0, 5) == 'file:')
@@ -46,6 +44,11 @@ async function form_postdisplay() {
         //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
     }
 
+    // Form chrome follows last-saved cookie, not unsaved field edits / popup Default.
+    // Discard and cleardoc both re-enter postdisplay — restores face without save.
+    if (typeof colors_restore_saved_screencolor == 'function')
+        colors_restore_saved_screencolor()
+
     // After gds.load (not form_postread): form_filter and signature img need bound rows.
     await users_postdisplay()
 
@@ -67,10 +70,20 @@ async function form_postwrite() {
         db.login(gusername, gtasks_newpassword)
     gtasks_newpassword = false
 
-    //to avoid need full login to get new font/colors
-    exodussetcookie(glogincode, 'EXODUS2', await gds.getx('SCREEN_BODY_COLOR'), 'fc')
-    exodussetcookie(glogincode, 'EXODUS2', await gds.getx('SCREEN_FONT'), 'ff')
-    exodussetcookie(glogincode, 'EXODUS2', await gds.getx('SCREEN_FONT_SIZE'), 'fs')
+    // Durable chrome prefs only after a real Save (not popup Default / dirty preview).
+    var bodyColor = await gds.getx('SCREEN_BODY_COLOR')
+    var screenFont = await gds.getx('SCREEN_FONT')
+    var screenFontSize = await gds.getx('SCREEN_FONT_SIZE')
+    exodussetcookie(glogincode, 'EXODUS2', bodyColor, 'fc')
+    exodussetcookie(glogincode, 'EXODUS2', screenFont, 'ff')
+    exodussetcookie(glogincode, 'EXODUS2', screenFontSize, 'fs')
+    // Commit face for this session (cookie alone would wait for next page load)
+    if (typeof colors_apply_screencolor == 'function')
+        colors_apply_screencolor(bodyColor)
+    else if (typeof exodus_set_style == 'function')
+        exodus_set_style('screencolor', bodyColor)
+    if (typeof exodus_set_style == 'function')
+        exodus_set_style('screenfont', screenFont, screenFontSize)
 
     return true
 

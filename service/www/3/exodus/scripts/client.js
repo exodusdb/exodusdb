@@ -6518,7 +6518,8 @@ function exodusconfirm_startevent(event) {
 		return false
 	}
 
-	//POSITIVE = F9 or Enter or (Space if not text input) or some initial
+	//POSITIVE = F9 or Enter/Ctrl+Enter or (Space if not text input) or some initial
+	// Ctrl+Enter is keycode 13 with ctrlKey — same commit path as Enter
 	if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
 		window.setTimeout(exodus_confirm_function1_sync, 1)
 		return false
@@ -6882,11 +6883,14 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		}
 		gexodusconfirmletters[buttonn] = letter
 
-		//title
+		//title — first button also accepts Ctrl+Enter (same as Enter / F9)
 		html += ' title="Press '
 		if (letter)
 			html += letter + ' or '
-		html += buttonfunckey + '"'
+		html += buttonfunckey
+		if (buttonn == 1)
+			html += ' or Ctrl+Enter'
+		html += '"'
 
 		//set the button number
 		html += ' exodusbuttonnumber="' + nbuttons + '"'

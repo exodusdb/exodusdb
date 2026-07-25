@@ -1,0 +1,167 @@
+/* Colour fields + continuum popup (loaded with colors.js).
+ * Not in global.css — colour UI is optional (only forms that load colors.js).
+ */
+
+/* Colour dict fields: normal text (tab) + swatch (click = F7 popup) */
+.exodus-color-field-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    box-sizing: border-box;
+    vertical-align: middle;
+    max-width: 100%;
+}
+.exodus-color-field-wrap > input.exodus-color-text,
+.exodus-color-field-wrap > span.exodus-color-text {
+    flex: 0 1 auto;
+    min-width: 4ch;
+    box-sizing: border-box;
+}
+/* Swatch: not tabbable; click opens HSL popup (same as F7).
+ * Size in rem/px — never em with font-size:0 (that collapses to 0×0). */
+button.exodus-native-color,
+.exodus-native-color {
+    flex: 0 0 auto;
+    display: inline-block;
+    width: 2.7rem;
+    height: 1.35rem;
+    min-width: 2.7rem;
+    min-height: 1.35rem;
+    padding: 0;
+    margin: 0;
+    border: 2px solid var(--exodus-form-border, #888);
+    border-radius: 0.3rem;
+    vertical-align: middle;
+    cursor: pointer;
+    box-sizing: border-box;
+    font-size: 12px; /* non-zero so any em fallbacks still size */
+    line-height: 1;
+    overflow: hidden;
+    background-color: #ccc;
+    background-image:
+        linear-gradient(45deg, #ccc 25%, transparent 25%),
+        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ccc 75%),
+        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+button.exodus-native-color:focus {
+    outline: none;
+    border-color: var(--exodus-field-focus-color, #4a90d9);
+    box-shadow:
+        0 0 0 2px var(--exodus-field-focus-color, #4a90d9),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+/* Colour popup — 16×16 hue/sat grid + brightness strip; above #uiblockerdiv */
+.exodus-color-popup {
+    position: absolute;
+    z-index: 1002;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45em;
+    min-width: 14em;
+    padding: 10px 12px;
+}
+.exodus-color-popup[style*="block"] {
+    display: flex !important;
+}
+.exodus-color-popup-continuum {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0.35em;
+    /* --exodus-color-n / --exodus-color-cell set by colors_popup_set_n */
+    --exodus-color-n: 16;
+    --exodus-color-cell: 0.85em;
+}
+/* N×N flush cells: columns = hue, rows = saturation (high sat at top) */
+.exodus-color-popup-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--exodus-color-n), var(--exodus-color-cell));
+    grid-template-rows: repeat(var(--exodus-color-n), var(--exodus-color-cell));
+    gap: 0;
+    border: 1px solid var(--exodus-calendar-border, #888);
+    flex: 0 0 auto;
+}
+/* N brightness steps for current hue/sat (light at top), flush */
+.exodus-color-popup-bright {
+    display: grid;
+    grid-template-columns: calc(var(--exodus-color-cell) * 1.3);
+    grid-template-rows: repeat(var(--exodus-color-n), var(--exodus-color-cell));
+    gap: 0;
+    border: 1px solid var(--exodus-calendar-border, #888);
+    flex: 0 0 auto;
+}
+/* Tab focus on the N / N×N panes (cells stay tabIndex -1) */
+.exodus-color-popup-grid:focus,
+.exodus-color-popup-bright:focus {
+    outline: 2px solid var(--exodus-calendar-accent, #06c);
+    outline-offset: 1px;
+}
+.exodus-color-popup-nlabel {
+    font-size: 0.75em;
+    opacity: 0.75;
+    text-align: center;
+    user-select: none;
+}
+.exodus-color-cell {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    cursor: crosshair;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 0;
+    display: block;
+}
+.exodus-color-cell-selected {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 1px #000;
+    z-index: 1;
+    position: relative;
+}
+/* Hex field = top preview strip (background set inline to the current colour) */
+.exodus-color-popup-hex {
+    box-sizing: border-box;
+    width: 100%;
+    height: 1.75em;
+    margin: 0;
+    padding: 0.2em 0.4em;
+    border: 1px solid var(--exodus-calendar-border, #888);
+    border-radius: 0.25rem;
+    font: inherit;
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+    text-align: center;
+    letter-spacing: 0.02em;
+    color: #111;
+    background: var(--exodus-form-face, #fdf5e6);
+}
+.exodus-color-popup-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35em;
+    justify-content: center;
+}
+.exodus-color-popup-actions button {
+    font: inherit;
+    font-size: 0.85em;
+    padding: 0.2em 0.55em;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    border: 1px solid var(--exodus-calendar-border, #888);
+    background: var(--exodus-form-face, #fdf5e6);
+    color: inherit;
+}
+.exodus-color-popup-actions button:focus {
+    outline: none;
+    border-bottom: var(--exodus-field-focus-underline);
+}

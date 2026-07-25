@@ -728,19 +728,31 @@ async function formfunctions_onload() {
 
             }
 
-            //convert to select element
+            //convert by conversion attribute
             if (element.getAttribute('exodusconversion')) {
+
+                var exodusconversion = element.getAttribute('exodusconversion')
 
                 //conversion is a routine eg [NUMBER] [DATE]
                 if (
-                    typeof (element.getAttribute('exodusconversion')) == 'string'
+                    typeof exodusconversion == 'string'
                     &&
-                    element.getAttribute('exodusconversion').slice(0, 1) == '['
+                    exodusconversion.slice(0, 1) == '['
                 ) {
                     //do nothing
                 }
 
-                //conversion is an array of options
+                // magic "color": keep bound text INPUT; swatch chrome installed later
+                else if (
+                    typeof exodusconversion == 'string'
+                    &&
+                    exodusconversion.toLowerCase() == 'color'
+                ) {
+                    // mark only — colors_install_swatch after popup icon so wrap order is sane
+                    element.setAttribute('data-exodus-color-pending', '1')
+                }
+
+                //conversion is an array of options → SELECT
                 else {
 
                     //convert element to a SELECT
@@ -988,6 +1000,13 @@ async function formfunctions_onload() {
             //use the data field name as the id and name of the element
             //NB the name appears to be lost on databinding table rows
             element.id = fieldname
+
+            // conversion "color": text + swatch after id is set (swatch id = field_swatch)
+            if (element.getAttribute('data-exodus-color-pending') == '1') {
+                element.removeAttribute('data-exodus-color-pending')
+                if (typeof colors_install_swatch == 'function')
+                    colors_install_swatch(element)
+            }
 
             //NAME attribute cannot be set at run time on elements dynamically
             // created with the createElement method
@@ -2160,6 +2179,12 @@ function form_digit_accesskey_capture_keydown(event) {
     if (!event.altKey || event.ctrlKey || event.metaKey)
         return
 
+    // Colour popup owns the keyboard (confirm-style); do not activate form accesskeys
+    if (typeof colors_popup_is_open == 'function' && colors_popup_is_open()) {
+        form_digit_accesskey_cancel_event(event)
+        return
+    }
+
     var digit = form_accesskey_digit_from_event(event)
     if (!digit)
         return
@@ -2690,8 +2715,10 @@ async function document_onkeydown(event) {
 
     //document_onkeydown also occurs in non-form windows not using dbform.js - like upload.htm etc
 
-    // Popup isolation (secondary to gblockevents + modal). Contract: null / true / false.
-    // Confirm: client.js helpers. Colour: colors.js when loaded. Calendar: form_closepopups later.
+    // Popup isolation at document keydown (secondary to gblockevents + modal).
+    // Same contract as starteventhandler helpers: null / true / false.
+    // Confirm always available (client.js); colour only if colors.js loaded.
+    // Calendar: Esc handled later via form_closepopups — no calendar helper yet.
     if (typeof exodusconfirm_document_keydown == 'function') {
         var confKey = exodusconfirm_document_keydown(event)
         if (confKey === true)
@@ -4094,8 +4121,10 @@ function form_scroll_viewport_capture_keydown(event) {
     if (keycode == 40 && t && t.tagName == 'SELECT')
         return
 
-    // Confirm dialog owns keyboard
+    // Confirm / colour popup own the keyboard
     if (typeof $$ == 'function' && $$('exodusconfirmdiv'))
+        return
+    if (typeof colors_popup_is_open == 'function' && colors_popup_is_open())
         return
 
     form_scroll_viewport(keycode)
@@ -7075,6 +7104,10 @@ function setvalue2(element, value) {
 
                     setexoduslink(element, value)
                     element.value = value
+                    // colour fields: keep swatch in step with bound text
+                    if (element.getAttribute('data-exodus-color-field') == '1'
+                        && typeof colors_sync_swatch == 'function')
+                        colors_sync_swatch(element)
                     break
                 }
 
@@ -7330,6 +7363,10 @@ async function setdefault(element, donotupdate) {
 
     if (typeof element == 'string')
         element = document.getElementById(element)
+
+    // colour swatch is paint-only chrome — never invent a stored default into it
+    if (element && element.type == 'color')
+        return true
 
     //cannot update anything but key field if not locked or save button not enabled
     if (element.getAttribute('exodusfieldno') != 0 && gKeyNodes && (!glocked || saverecord.getAttribute('disabled'))) {
@@ -9509,8 +9546,13 @@ async function form_popcalendar2() {
 
 }
 
-//drop down any "modal" popup divs
-//return true if any closed or false if none
+// Drop form-owned popup chrome (not OS dialogs, not exodusconfirm).
+// Return true if any closed (so Esc does not continue to field-undo / close record).
+//
+// Calendar-class popups: owned DOM + form_closepopups. Confirm uses its own
+// modal stack (blockmodalui / resolvePendingConfirm) — not listed here.
+// Future: optional calendar_popup_is_open() helper for symmetry with colour;
+// do not change calendar “stray key hides” product behaviour casually.
 async function form_closepopups() {
 
     var anyclosed = false
@@ -9525,6 +9567,22 @@ async function form_closepopups() {
         }
         anyclosed = true
 
+    }
+
+    // colour popup (colors.js) — calendar-class: owned DOM, Esc dismisses first
+    if (typeof colors_popup != 'undefined' && colors_popup && colors_popup._showing
+        && typeof colors_popup_hide == 'function') {
+        try {
+            if (typeof colors_popup_cancel == 'function')
+                await colors_popup_cancel()
+            else
+                colors_popup_hide()
+        }
+        catch (e) {
+            if (gusername == 'EXODUS')
+                await exodusnote('couldnt drop colour popup\n' + e.description)
+        }
+        anyclosed = true
     }
 
     return anyclosed
