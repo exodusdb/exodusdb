@@ -16,8 +16,12 @@ async function dict_USERS() {
 
  di=dict[++din]=dictrec('USER_ID','F',0)
  di.required=true
- if (gusername!='EXODUS')
-  di.defaultvalue='gusername'
+ // Default / open own user for everyone (including EXODUS).
+ // gparameters.key is the normal form-init path to opendoc (see dbform after form_postinit).
+ di.defaultvalue='gusername'
+ if (typeof gparameters != 'undefined' && gparameters && !gparameters.key
+  && typeof gusername == 'string' && gusername)
+  gparameters.key = gusername
  di.invalidcharacters='*'
  if (await exodussecurity('AUTHORISATION ACCESS')) {
   updateallowed=gusers_authorisation_update
