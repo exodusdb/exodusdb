@@ -761,14 +761,14 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
     box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
 }
 
-/* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size / glyph) */
+/* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size / glyph).
+ * Sort column imgs are text-height glyphs — exclude from toolbar square box. */
 .graphicbutton img,
 .menubutton img,
 img[isexoduspopup="1"],
 img[isexoduslink="1"],
 img[exodustype="B"],
-img[exodusonclick],
-img[id^="sortbutton_"],
+img[exodusonclick]:not([id^="sortbutton_"]),
 img[id^="insertrowbutton"],
 img[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);
@@ -781,11 +781,30 @@ img[id^="deleterowbutton"] {
 .exodus-icon[isexoduspopup="1"],
 .exodus-icon[isexoduslink="1"],
 .exodus-icon[exodusonclick],
-.exodus-icon[id^="sortbutton_"],
 .exodus-icon[id^="insertrowbutton"],
 .exodus-icon[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);
     width: var(--exodus-ui-icon-size);
+    cursor: pointer;
+}
+/*
+ * Column sort: full-bleed twin-triangle SVG as plain <img>.
+ * height 1cap = capital height of the title font (not 1em/1rem: the em-square
+ * is taller than letter ink, so full-bleed art at 1em always looks bigger than
+ * “Date/Time”). 1em fallback where cap is unsupported. Width from 10×14 art.
+ * Tune vertical-align here (baseline / middle / text-bottom).
+ */
+img[id^="sortbutton_"] {
+    height: 1em;
+    height: 1cap;
+    width: auto;
+    aspect-ratio: 10 / 14;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    box-sizing: content-box;
+    object-fit: contain;
+    vertical-align: baseline;
     cursor: pointer;
 }
 /*
@@ -1568,12 +1587,16 @@ SPAN.calendar-date-committed[contenteditable] {
     background-color: #303a5a;
 }
 
-/* Sort icon: align with column title text (default img alignment sits too high) */
+/* Sort icon in thead: same cap-height box; override vertical-align here if needed */
 TABLE[exodusgroupno] > thead th img[id^="sortbutton_"],
 TABLE[exodusgroupno] > thead td img[id^="sortbutton_"],
 TABLE.exodustable[exodusgroupno] > thead th img[id^="sortbutton_"],
 TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
-    vertical-align: text-bottom;
+    height: 1em;
+    height: 1cap;
+    width: auto;
+    aspect-ratio: 10 / 14;
+    vertical-align: baseline;
 }
 
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,

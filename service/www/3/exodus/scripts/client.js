@@ -74,27 +74,26 @@ var gthemecookiekey = 'EXODUStheme'
 
 function exodus_sortimage(order) {
 
-	// order: '' (neutral), 'up', or 'down' — monochrome sort chevrons
+	// order: '' (neutral), 'up', or 'down'
+	// Painted SVG <img> (not mono mask): keeps fill-opacity for inactive chevron,
+	// and sorttable still reads clickedelement.src for up/down. Same host element
+	// as before — id / exodusonclick / sorttableelementid unchanged.
 	var name = 'smallsort' + (order || '')
-	return exodus_icon_spec(name + '.svg', 'darkgrey')
+	if (gisdarktheme)
+		name += '_darkmode'
+	return gimagetheme + name + '.svg'
 }
 
 function exodus_refresh_sortimages() {
 
-	document.querySelectorAll('img[id^="sortbutton_"], .exodus-icon[id^="sortbutton_"]').forEach(el => {
+	document.querySelectorAll('img[id^="sortbutton_"]').forEach(img => {
 		var order = ''
-		var src = el.getAttribute('src') || el.style.getPropertyValue('--exodus-icon-mask') || ''
+		var src = img.getAttribute('src') || ''
 		if (src.indexOf('up') >= 0)
 			order = 'up'
 		else if (src.indexOf('down') >= 0)
 			order = 'down'
-		var spec = exodus_sortimage(order)
-		if (el.classList && el.classList.contains('exodus-icon'))
-			exodus_icon_apply(el, spec)
-		else if (el.tagName == 'IMG') {
-			// still painted path (should not happen after mono conversion)
-			el.src = gimagetheme + spec.mask
-		}
+		img.src = exodus_sortimage(order)
 	})
 }
 
