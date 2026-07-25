@@ -1,13 +1,18 @@
-<svg width="16" height="16" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M2.25 1h7.5L13.75 6v8.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V1z"
-        fill="#e4e4e0" stroke="none"/>
+        fill="#e4e4e0"/>
   <path d="M9.75 1v4.2c0 .44.36.8.8.8H13.75"
-        fill="#d0d0cc" stroke="none"/>
-  <g transform="translate(8,8.25) scale(0.84,0.90) translate(-8,-8)">
-    <image width="16" height="16" x="0" y="0" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAqFBMVEVHcEymi1FFQEg7OUoiLUoKFi8vL0Y2OEkZJ0gxMUWZkph9TC2FTylQT1+Dg4uIfINhYXC0T19lS1oAAAB0R1h1STB6VmSNeEx1STFLP1Ggh1NqY2+GQFJeT1KdhlOIcEZ9WWX4xTv/uAj/nQCijnr/mQDedQzWmha2p6fr5uCXj3/ZdHanWGSuYx7jeAvh2NPleQn/cnPvg4LnegmhgmTMcRK3bXLFsa/0piK3AAAAIXRSTlMA6FOIIRE+TRcv77fC9szVkfOJBKarrOivSeTPysrk5ee0azDmAAAAdUlEQVQY02NgQALCDKhAUkyIA5nPrmCkLcKKxOfSMDMUZEPw5VX0NXRkWOB8OUV1E3NpTjhfSlFJ2VQWzmdiBPKNeVD5BjwsKHw9bjifTVxRSVUNwWcQ0FJXVZNAuJGVT1NFVxTJzWy8XPzMyH7gZGbnYMADAB0cCP61TUqxAAAAAElFTkSuQmCC"/>
+        fill="#d0d0cc"/>
+  <path d="M2.25 1h7.5L13.75 6v8.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V1z"
+        fill="none" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
+  <path d="M9.75 1v4.2c0 .44.36.8.8.8H13.75"
+        fill="none" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
+  <g transform="translate(8.15,8.45) rotate(-40) scale(0.82,0.96) translate(-8,-8)">
+    <rect x="6.6" y="1.75" width="2.8" height="1.65" rx="0.4" fill="#e85a7a" stroke="#111" stroke-width="0.5"/>
+    <rect x="6.6" y="3.2" width="2.8" height="1.05" fill="#c4c4c4" stroke="#111" stroke-width="0.45"/>
+    <path d="M6.6 4.15h2.8v7.05H6.6z" fill="#f5c542" stroke="#111" stroke-width="0.5" stroke-linejoin="round"/>
+    <path d="M8 4.2v6.9" stroke="#d4a020" stroke-width="0.35"/>
+    <path d="M6.6 11.2L8 14.35L9.4 11.2Z" fill="#e8c99a" stroke="#111" stroke-width="0.5" stroke-linejoin="round"/>
+    <path d="M7.35 12.95L8 14.35L8.65 12.95Z" fill="#1a1a1a"/>
   </g>
-  <path d="M2.25 1h7.5L13.75 6v8.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V1z"
-        fill="none" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
-  <path d="M9.75 1v4.2c0 .44.36.8.8.8H13.75"
-        fill="none" stroke="#b8b8b4" stroke-width="0.75" stroke-linejoin="round"/>
 </svg>
