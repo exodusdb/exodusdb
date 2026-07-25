@@ -1427,70 +1427,42 @@ input[type=checkbox]:focus-visible {
     background-color: lightgrey;
 }
 
-/* ========== Theme toggle (top-right menubar) ========== */
-.toggle_button {
-    position: relative;
-    width: 44px;
-    height: 22px;
-    background: #e1e1e1;
-    border-radius: 50px;
-    overflow: hidden;
-    transition: background 0.4s;
-    cursor: pointer;
-    flex-shrink: 0;
-    box-sizing: border-box;
-}
-.knob {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    /* Center in 22px track (not top:2px only — sun/moon sat low) */
-    top: 50%;
-    left: 2px;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    border-radius: 50%;
-    box-shadow: none;
-    transition: transform 0.4s ease;
+/* ========== Theme toggle (top-right menubar): sun/moon icon only, no slider ========== */
+.theme_button {
+    float: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: translateY(-50%);
-    z-index: 2;
+    margin: 0;
+    padding: 0;
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    box-sizing: content-box;
     line-height: 0;
-    box-sizing: border-box;
+    cursor: pointer;
+    flex-shrink: 0;
 }
-input:checked + .toggle_button { background: #3b3b3b; }
-/* Slide + keep vertical center */
-input:checked + .toggle_button .knob { transform: translate(21px, -50%); }
-.toggle_button svg,
-.toggle_button img {
-    /* Fill the 18px knob; other menubar icons are ~1.325em (~21px) */
+.theme_button:focus,
+.theme_button:focus-visible,
+.theme_button:active {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+/* Exact 18×18 sub-icons from the old slider knob — do not retint or reskin */
+.theme_button img {
     width: 18px;
     height: 18px;
     display: block;
     margin: 0;
     padding: 0;
-    vertical-align: middle;
-}
-input:not(:checked) + .toggle_button .knob img {
-    filter: drop-shadow(0 0 0.6px rgba(120, 80, 0, 0.55)) drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.18));
-}
-input:checked + .toggle_button .knob img {
-    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.2));
-}
-#theme_toggle { display: none; }
-/* Theme toggle: flex child of .exodus_menubar_trailing (gap owns horizontal space) */
-.theme_button {
-    float: none;
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    line-height: 0;
-    cursor: pointer;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    object-fit: contain;
 }
 
 /* ========== Dark mode (light mode rules above stay unchanged) ========== */

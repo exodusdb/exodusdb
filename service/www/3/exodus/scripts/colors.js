@@ -5,13 +5,12 @@ function colors_apply_screencolor(value) {
 	if (typeof exodus_set_style != 'function')
 		return
 	if (typeof gisdarktheme != 'undefined' && gisdarktheme) {
-		var toggle = document.getElementById('theme_toggle')
-		if (toggle) {
-			toggle.checked = false
-			toggle.dispatchEvent(new Event('change'))
-		}
 		if (typeof theme_toggle == 'function')
 			theme_toggle('default')
+		if (typeof exodussetcookie == 'function' && typeof gthemecookiekey != 'undefined')
+			exodussetcookie('', gthemecookiekey, '', 'dt', true)
+		if (typeof exodus_sync_theme_btn_icon == 'function')
+			exodus_sync_theme_btn_icon()
 	}
 	exodus_set_style('screencolor', value == null ? '' : String(value))
 }

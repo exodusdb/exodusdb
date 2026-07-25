@@ -1618,6 +1618,20 @@ function theme_toggle_title(dark) {
 	return dark ? 'Switch to light mode' : 'Switch to dark mode'
 }
 
+// Menubar theme control: same knob sub-icons as the old slider (toggle_sun / toggle_moon).
+// Show current mode: sun in light, moon in dark (same as knob.innerHTML before).
+// Optional img/btn: required while building the control (not in document yet — getElementById fails).
+function exodus_sync_theme_btn_icon(img, btn) {
+
+	img = img || document.getElementById('theme_toggle_icon')
+	btn = btn || document.getElementById('theme_toggle_btn')
+	if (!img)
+		return
+	img.src = gimagetheme + (gisdarktheme ? 'toggle_moon.svg' : 'toggle_sun.svg')
+	if (btn)
+		btn.title = theme_toggle_title(gisdarktheme)
+}
+
 function exodus_swap_tool_icons() {
 
 	// Static toolbar icons (e.g. reports.htm add/delete/refresh/play). SVG masks are
@@ -1719,38 +1733,37 @@ function exodus_menubar_trailing_cluster() {
 
 function add_theme_toggle_btn() {
 
-	// Interactive theme toggle: hidden checkbox + styled label (with SVGs + CSS animation).
-	const label = document.createElement('label');
-	label.title = theme_toggle_title(gisdarktheme);
+	// Simple sun/moon button (no slider track — sun lost contrast on the grey track).
+	var btn = document.createElement('span')
+	btn.id = 'theme_toggle_btn'
+	btn.className = 'theme_button'
+	btn.setAttribute('role', 'button')
+	btn.tabIndex = 0
+	btn.title = theme_toggle_title(gisdarktheme)
 
-	const input = document.createElement('input');
-	input.type = 'checkbox';
-	input.id = 'theme_toggle';
-	input.checked = gisdarktheme;
+	var img = document.createElement('img')
+	img.id = 'theme_toggle_icon'
+	img.alt = ''
+	img.width = 18
+	img.height = 18
+	btn.appendChild(img)
+	// Pass nodes: not in document yet, so getElementById would leave src empty (empty box)
+	exodus_sync_theme_btn_icon(img, btn)
 
-	const toggle_button_element = document.createElement('div');
-	toggle_button_element.className = 'toggle_button';
-
-	const knob = document.createElement('div');
-	knob.className = 'knob';
-
-	const sun_svg = `<img src="${gimagetheme}toggle_sun.svg" alt="" width="18" height="18" style="display:block;margin:0;padding:0">`
-	const moon_svg = `<img src="${gimagetheme}toggle_moon.svg" alt="" width="18" height="18" style="display:block;margin:0;padding:0">`
-
-	knob.innerHTML = gisdarktheme ? moon_svg : sun_svg;
-
-	toggle_button_element.appendChild(knob);
-	label.appendChild(input);
-	label.appendChild(toggle_button_element);
-
-	input.addEventListener('change', () => {
-		knob.innerHTML = input.checked ? moon_svg : sun_svg;
+	function flip() {
 		theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
 		exodussetcookie('', gthemecookiekey, (gisdarktheme ? 1 : ''), 'dt', true)
-		label.title = theme_toggle_title(gisdarktheme)
-	});
+		exodus_sync_theme_btn_icon(img, btn)
+	}
+	btn.addEventListener('click', flip)
+	btn.addEventListener('keydown', function (e) {
+		if (e.key == 'Enter' || e.key == ' ') {
+			e.preventDefault()
+			flip()
+		}
+	})
 
-	return label;
+	return btn
 }
 
 function exodus_global_css_link() {
@@ -2154,10 +2167,8 @@ async function clientfunctions_windowonload() {
 		// Session | theme | logout: one trailing flex cluster (equal gap)
 		var trailing = exodus_menubar_trailing_cluster()
 
-		//button to theme toggle
-		var button = add_theme_toggle_btn()
-		button.classList.add('theme_button')
-		trailing.appendChild(button)
+		//button to theme toggle (sun/moon icon; no slider)
+		trailing.appendChild(add_theme_toggle_btn())
 
 		//button to logout
 		var temp2 = document.createElement('span')
