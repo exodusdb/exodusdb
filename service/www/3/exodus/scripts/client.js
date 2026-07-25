@@ -6391,7 +6391,7 @@ function exodusconfirm_ok_image() {
 }
 // Decide Cancel: red X mask
 function exodusconfirm_cancel_image() {
-	return exodus_icon_html(exodus_icon_spec('cross_mono.svg', 'red'))
+	return exodus_icon_html(exodus_icon_spec('cross.svg', 'red'))
 }
 // Confirm Yes/OK (positive) — Save label uses menubar tray icon (tick.svg), else check
 function exodusconfirm_yes_image(buttontext) {
@@ -6403,7 +6403,7 @@ function exodusconfirm_yes_image(buttontext) {
 }
 // Confirm No: orange X if Cancel also shown, else red X
 function exodusconfirm_no_image(hasCancelButton) {
-	return exodus_icon_html(exodus_icon_spec('cross_mono.svg', hasCancelButton ? 'orange' : 'red'))
+	return exodus_icon_html(exodus_icon_spec('cross.svg', hasCancelButton ? 'orange' : 'red'))
 }
 // Confirm Cancel (Esc) — red U-turn
 function exodusconfirm_back_image() {

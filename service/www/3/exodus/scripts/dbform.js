@@ -88,7 +88,7 @@ gsaveimage = exodus_icon_spec('tick.svg', 'green')
 gsavegreyimage = exodus_icon_spec('tick.svg', 'lightgrey') // inactive Save
 // Painted multi-colour (overlapping sheets) — not a single CSS tint
 gcopyimage = gimagetheme + (gisdarktheme ? 'copy_darkmode.svg' : 'copy.svg')
-gcloseimage = exodus_icon_spec('cross_mono.svg', 'red')
+gcloseimage = exodus_icon_spec('cross.svg', 'red')
 greleaseimage = exodus_icon_spec('lock.svg', 'blue') // was #1E97CC
 geditimage = gimagetheme + 'pencil_edit.svg' // painted multicolour
 gdeleteimage = gimagetheme + 'form_delete.svg' // painted multicolour

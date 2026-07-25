@@ -336,11 +336,10 @@ BODY
     --exodus-informbutton-border: #cccccc;
     --exodus-informbutton-border-style: outset;
     --exodus-informbutton-color: inherit;
-    /* Toolbar/field icons — one place to retune ALL menubar/form icons together:
-       --exodus-ui-icon-size  = outer box (scales with text)
-       --exodus-ui-icon-glyph = fraction of that box the art may fill (1 = edge-to-edge).
-       1 = fill the box (no CSS inset); 0.875 = 14/16 ≈ one unit inset on a 16 canvas.
-       SVGs are full-bleed 16×16; CSS owns the shared inset (img padding / mask-size). */
+    /* Toolbar/field icons (see AGENTS.md § Menubar / form icons):
+       --exodus-ui-icon-size  = ONE scale for all (outer box, with text).
+       --exodus-ui-icon-glyph = 1 always (fill box). SVGs full-bleed 16×16;
+       perceptually large glyphs pad inside the SVG file, not here. */
     --exodus-ui-icon-size: 1.325em;
     --exodus-ui-icon-glyph: 1;
     /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
