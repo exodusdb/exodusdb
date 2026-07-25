@@ -78,10 +78,10 @@ function form_apply_input_field_width(element) {
     element.style.maxWidth = w
 }
 
-// Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Edit/Delete.
+// Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Open/Edit/Delete.
 // (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
 gnewimage = gimagetheme + 'form_add.svg' // painted multicolour — excluded from mask tint
-gopenimage = exodus_icon_spec('open.svg', 'orange') // was #d25300
+gopenimage = gimagetheme + 'open.svg' // painted page + magnifier
 gfindimage = exodus_icon_spec('zoom.svg', 'darkgrey')
 gcalendarimage = exodus_icon_spec('calendar.svg', 'darkgrey')
 gsaveimage = exodus_icon_spec('tick.svg', 'green')
@@ -106,9 +106,10 @@ gpreviousimage = exodus_icon_spec('resultset_previous.svg', 'blue')
 gspacerimage = gimagetheme + 'blank.svg'
 gblankimage = gimagetheme + 'blank.svg'
 
-// Painted New/Edit/Delete only need DM twin files
+// Painted New/Open/Edit/Delete need DM twin files
 if (gisdarktheme) {
 	gnewimage = gimagetheme + 'form_add_darkmode.svg'
+	gopenimage = gimagetheme + 'open_darkmode.svg'
 	gdeleteimage = gimagetheme + 'form_delete_darkmode.svg'
 	geditimage = gimagetheme + 'pencil_edit_darkmode.svg'
 	gthemeimage = gimagetheme + 'theme_button_darkmode.svg'
