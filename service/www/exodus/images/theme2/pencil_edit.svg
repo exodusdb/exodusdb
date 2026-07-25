@@ -1,14 +1,14 @@
 <svg width="16" height="16" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Same slim page as New; pencil slightly narrower + more vertical -->
-  <path d="M3.25 1.1h6.4L12.75 4.9v9a0.9 0.9 0 0 1-0.9 0.9H4.15a0.9 0.9 0 0 1-0.9-0.9V1.1z"
+  <!-- Same full-height slim page; pencil only slightly narrower/more vertical -->
+  <path d="M2.25 1h7.5L13.75 6v8.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V1z"
         fill="#ffffff" stroke="none"/>
-  <path d="M9.65 1.1v3c0 .4.32.72.72.72H12.75"
+  <path d="M9.75 1v4.2c0 .44.36.8.8.8H13.75"
         fill="#e8f0f4" stroke="none"/>
-  <g transform="translate(8,8.35) scale(0.72,0.86) translate(-8,-8)">
+  <g transform="translate(8,8.25) scale(0.84,0.90) translate(-8,-8)">
     <image width="16" height="16" x="0" y="0" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAqFBMVEVHcEymi1FFQEg7OUoiLUoKFi8vL0Y2OEkZJ0gxMUWZkph9TC2FTylQT1+Dg4uIfINhYXC0T19lS1oAAAB0R1h1STB6VmSNeEx1STFLP1Ggh1NqY2+GQFJeT1KdhlOIcEZ9WWX4xTv/uAj/nQCijnr/mQDedQzWmha2p6fr5uCXj3/ZdHanWGSuYx7jeAvh2NPleQn/cnPvg4LnegmhgmTMcRK3bXLFsa/0piK3AAAAIXRSTlMA6FOIIRE+TRcv77fC9szVkfOJBKarrOivSeTPysrk5ee0azDmAAAAdUlEQVQY02NgQALCDKhAUkyIA5nPrmCkLcKKxOfSMDMUZEPw5VX0NXRkWOB8OUV1E3NpTjhfSlFJ2VQWzmdiBPKNeVD5BjwsKHw9bjifTVxRSVUNwWcQ0FJXVZNAuJGVT1NFVxTJzWy8XPzMyH7gZGbnYMADAB0cCP61TUqxAAAAAElFTkSuQmCC"/>
   </g>
-  <path d="M3.25 1.1h6.4L12.75 4.9v9a0.9 0.9 0 0 1-0.9 0.9H4.15a0.9 0.9 0 0 1-0.9-0.9V1.1z"
+  <path d="M2.25 1h7.5L13.75 6v8.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V1z"
         fill="none" stroke="#005276" stroke-width="0.75" stroke-linejoin="round"/>
-  <path d="M9.65 1.1v3c0 .4.32.72.72.72H12.75"
+  <path d="M9.75 1v4.2c0 .44.36.8.8.8H13.75"
         fill="none" stroke="#005276" stroke-width="0.75" stroke-linejoin="round"/>
 </svg>
