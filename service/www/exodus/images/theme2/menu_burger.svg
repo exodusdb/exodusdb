@@ -1,4 +1,5 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Monochrome mask: three bars (no transform scale that clips in some mask paths) -->
-  <path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="#000" stroke-width="1.75" stroke-linecap="round"/>
+  <!-- Standard 3-bar menu. Bars at 3/8/13 (~1u pad top/bottom) for height with siblings;
+       width 2.5..13.5 unchanged — still reads as a normal hamburger. -->
+  <path d="M2.5 3h11M2.5 8h11M2.5 13h11" stroke="#000" stroke-width="1.85" stroke-linecap="round"/>
 </svg>
