@@ -1,8 +1,8 @@
-<svg width="16" height="16" viewBox="1 0.5 14 15.5" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- same page as form_add; large red minus (legacy #f0002a) -->
-  <path d="M1.5 1h8.2L14.5 6v8.5a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V1z"
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Same slim page as form_add; smaller red minus -->
+  <path d="M3.25 1.1h6.4L12.75 4.9v9a0.9 0.9 0 0 1-0.9 0.9H4.15a0.9 0.9 0 0 1-0.9-0.9V1.1z"
         fill="#ffffff" stroke="#005276" stroke-width="0.75" stroke-linejoin="round"/>
-  <path d="M9.7 1v4.2c0 .44.36.8.8.8H14.5"
+  <path d="M9.65 1.1v3c0 .4.32.72.72.72H12.75"
         fill="#e8f0f4" stroke="#005276" stroke-width="0.75" stroke-linejoin="round"/>
-  <rect x="3.15" y="6.75" width="9.7" height="2.9" rx="1.45" fill="#f0002a"/>
+  <rect x="4.55" y="7.15" width="6.9" height="1.9" rx="0.95" fill="#f0002a"/>
 </svg>
