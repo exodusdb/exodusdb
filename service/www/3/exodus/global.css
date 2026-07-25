@@ -232,26 +232,35 @@ TABLE[exodusgroupno] > thead {
  * exodus_set_form_head_direction() from Rec.601 body luma (threshold 128).
  *
  *   deeper (light bodies, default):
- *     Perceptual shade — same hue/chroma, slightly lower OKLCH L.
- *     Fallback line = plain form face if oklch(from) unsupported.
+ *     Richer, not a grey shade. Absolute C+ is uneven: cyan has sRGB headroom
+ *     (huge step) while yellow/blue sit on the gamut edge (almost no step).
+ *     So pull C toward a modest target (only upward): low-C faces gain more,
+ *     high-C cyan barely moves. Tiny L dip (~0.02) frees gamut so yellows can
+ *     actually take the extra C (pure L-hold + C+ clips on those hues).
+ *     Fallback = plain form face if oklch(from) unsupported.
  *
  *   lighter (dark bodies):
  *     Tint toward white (color-mix). Do NOT raise OKLCH L alone: saturated
- *     sRGB colours (e.g. #ff20ff, #ff4060) already sit on the gamut edge so
- *     L+ clips and the step is invisible.
+ *     sRGB colours already sit on the gamut edge so L+ clips invisible.
  *
- * Tune: L steps 0.04 / 0.06; white mix 88% / 82% face (plain / exodustable).
- * DM: fixed greys further below (ignore data-form-head).
+ * Tune deeper (half strength): L-0.009/-0.011; C toward 0.13/0.14 at 27.5%/32.5%.
+ * white mix 88% / 82% face. DM: fixed greys (ignore data-form-head).
  */
 TABLE[exodusgroupno] > thead th,
 TABLE[exodusgroupno] > thead td {
     background-color: var(--exodus-form-face);
-    background-color: oklch(from var(--exodus-form-face) calc(l - 0.04) c h);
+    background-color: oklch(from var(--exodus-form-face)
+        calc(l - 0.009)
+        calc(c + max(0, 0.13 - c) * 0.275)
+        h);
 }
 TABLE.exodustable[exodusgroupno] > thead th,
 TABLE.exodustable[exodusgroupno] > thead td {
     background-color: var(--exodus-form-face);
-    background-color: oklch(from var(--exodus-form-face) calc(l - 0.06) c h);
+    background-color: oklch(from var(--exodus-form-face)
+        calc(l - 0.011)
+        calc(c + max(0, 0.14 - c) * 0.325)
+        h);
 }
 :root[data-form-head="lighter"] TABLE[exodusgroupno] > thead th,
 :root[data-form-head="lighter"] TABLE[exodusgroupno] > thead td {
