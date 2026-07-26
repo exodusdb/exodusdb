@@ -2166,25 +2166,22 @@ async function clientfunctions_windowonload() {
 
 		var ctrlalt = isMac ? 'Ctrl' : 'Alt'
 
-		//insert buttons in reverse order
-
-		//button to refresh (clear cache)
-		if (typeof gshowrefreshcachebutton == 'undefined' || gshowrefreshcachebutton) {
-			var temp2 = document.createElement('span')
-			temp2.classList.add('refresh_wrapper')
-			temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Database Cache. ' + ctrlalt + '+R', 'X')
-			//document.body.insertBefore(temp2, document.body.firstChild)
-			gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-			//if no dbform
-			if (typeof gdictfilename == 'undefined')
-				addeventlistener(temp2, 'click', 'refreshcache_onclick')
-		}
-
-		// Session | theme | logout: one trailing flex cluster (equal gap)
+		// Trailing cluster: theme | refresh | logout (equal gap)
 		var trailing = exodus_menubar_trailing_cluster()
 
 		//button to theme toggle (sun/moon icon; no slider)
 		trailing.appendChild(add_theme_toggle_btn())
+
+		//button to refresh (clear cache) — left of logout
+		if (typeof gshowrefreshcachebutton == 'undefined' || gshowrefreshcachebutton) {
+			var refresh_span = document.createElement('span')
+			refresh_span.classList.add('refresh_wrapper')
+			refresh_span.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '', 'Refresh the Database Cache. ' + ctrlalt + '+R', 'X')
+			trailing.appendChild(refresh_span)
+			//if no dbform
+			if (typeof gdictfilename == 'undefined')
+				addeventlistener(refresh_span, 'click', 'refreshcache_onclick')
+		}
 
 		//button to logout
 		var temp2 = document.createElement('span')
@@ -5167,9 +5164,13 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
 	//tx+='<br />'
 
-	tx += '<span id=' + id + 'button' + '_label>'
-	tx += name
-	tx += '</span>'
+	// Empty string label = icon-only (still keep title + accesskey). Omit the span so
+	// CSS does not reserve space for an empty label.
+	if (name !== '' && name != null) {
+		tx += '<span id=' + id + 'button' + '_label>'
+		tx += name
+		tx += '</span>'
+	}
 
 	tx += '</' + tagname + '>'
 

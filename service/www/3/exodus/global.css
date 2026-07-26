@@ -302,7 +302,7 @@ TABLE[exodusgroupno] > thead {
  *
  *   deeper (light bodies, default) — OKLCH relative color (CSS Color 5):
  *     l' = l × 0.97
- *     c' = c × 1.5 + 0.025   (floor so pale/default cream gains real saturation)
+ *     c' = c × 1.35 + 0.015  (floor so pale/default cream gains saturation)
  *     h' = h
  *     Multiply-only chroma failed on low-c faces (looked greyer, not richer).
  *     Fallback = plain form face if oklch(from) unsupported.
@@ -319,7 +319,7 @@ TABLE[exodusgroupno] > thead td,
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
         calc(l * 0.97)
-        calc(c * 1.5 + 0.025)
+        calc(c * 1.35 + 0.015)
         h);
 }
 TABLE.exodustable[exodusgroupno] > thead th,
@@ -327,7 +327,7 @@ TABLE.exodustable[exodusgroupno] > thead td {
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
         calc(l * 0.96)
-        calc(c * 1.55 + 0.03)
+        calc(c * 1.4 + 0.018)
         h);
 }
 :root[data-form-head="lighter"] TABLE[exodusgroupno] > thead th,
