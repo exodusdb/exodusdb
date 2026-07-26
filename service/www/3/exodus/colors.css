@@ -187,15 +187,15 @@ button.exodus-native-color:focus {
     /* OKLCH relative: same as form th / sticky thead (chroma floor for pale faces) */
     background-color: var(--exodus-color-monitor-face, #808080);
     background-color: oklch(from var(--exodus-color-monitor-face, #808080)
-        calc(l * 0.97)
-        calc(c * 1.35 + 0.015)
+        calc(l * 0.985)
+        calc(c * 1.175 + 0.0075)
         h);
     color: #111;
     -webkit-text-fill-color: currentColor;
 }
 /* Standard tint — match :root[data-form-head=lighter] group thead */
 .exodus-color-popup-hex-thead[data-monitor-head="lighter"] {
-    background-color: color-mix(in oklch, var(--exodus-color-monitor-face, #808080) 80%, white);
+    background-color: color-mix(in oklch, var(--exodus-color-monitor-face, #808080) 90%, white);
 }
 .exodus-color-popup-actions {
     display: flex;

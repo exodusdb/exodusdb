@@ -47,17 +47,16 @@ TABLE.exodusform > tbody > tr > th,
 TABLE.exodusform > thead > tr > th,
 TABLE.exodusform > tr > th {
     background-color: var(--exodus-form-face);
-    /* Pale faces (default cream) have tiny c — multiply alone looks only darker;
-     * add a chroma floor so the tint reads more saturated, not greyer. */
+    /* Pale faces: mild L drop + small chroma floor (half the prior delta from face). */
     background-color: oklch(from var(--exodus-form-face)
-        calc(l * 0.97)
-        calc(c * 1.35 + 0.015)
+        calc(l * 0.985)
+        calc(c * 1.175 + 0.0075)
         h);
 }
 :root[data-form-head="lighter"] TABLE.exodusform > tbody > tr > th,
 :root[data-form-head="lighter"] TABLE.exodusform > thead > tr > th,
 :root[data-form-head="lighter"] TABLE.exodusform > tr > th {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 80%, white);
+    background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform > tbody > tr > th,
 :root[data-theme="dark_mode"] TABLE.exodusform > thead > tr > th,
@@ -301,14 +300,12 @@ TABLE[exodusgroupno] > thead {
  * exodus_set_form_head_direction() from Rec.601 body luma (threshold 128).
  *
  *   deeper (light bodies, default) — OKLCH relative color (CSS Color 5):
- *     l' = l × 0.97
- *     c' = c × 1.35 + 0.015  (floor so pale/default cream gains saturation)
+ *     l' = l × 0.985
+ *     c' = c × 1.175 + 0.0075  (half prior delta from face)
  *     h' = h
- *     Multiply-only chroma failed on low-c faces (looked greyer, not richer).
  *     Fallback = plain form face if oklch(from) unsupported.
  *
- *   lighter (dark bodies) — standard tint:
- *     color-mix(in oklch, face %, white) — do not raise OKLCH L alone (clips).
+ *   lighter (dark bodies) — color-mix face 90% / white (half prior mix).
  *
  * exodustable heads a step stronger. DM: fixed greys (ignore data-form-head).
  */
@@ -318,27 +315,27 @@ TABLE[exodusgroupno] > thead td,
 .exodusconfirmdiv #decide_table1 > thead td {
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
-        calc(l * 0.97)
-        calc(c * 1.35 + 0.015)
+        calc(l * 0.985)
+        calc(c * 1.175 + 0.0075)
         h);
 }
 TABLE.exodustable[exodusgroupno] > thead th,
 TABLE.exodustable[exodusgroupno] > thead td {
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
-        calc(l * 0.96)
-        calc(c * 1.4 + 0.018)
+        calc(l * 0.98)
+        calc(c * 1.2 + 0.009)
         h);
 }
 :root[data-form-head="lighter"] TABLE[exodusgroupno] > thead th,
 :root[data-form-head="lighter"] TABLE[exodusgroupno] > thead td,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 80%, white);
+    background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
 :root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead th,
 :root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 75%, white);
+    background-color: color-mix(in oklch, var(--exodus-form-face) 87.5%, white);
 }
 
 TABLE
@@ -433,12 +430,15 @@ BODY
     /*
      * Monochrome icon tints (CSS mask + black SVG). Change tone once per role;
      * no per-file colour, no _darkmode twin for these shapes.
-     * Multicolour icons (New/Edit/Delete, theme, company, …) stay painted SVGs.
+     * Multicolour icons (New/Open/Edit/Delete, theme, company, …) stay painted
+     * SVGs — but any pure-red glyph in them (e.g. Delete minus) must use the
+     * same hex as --exodus-icon-red for that theme.
      * darkgrey/neutral track default text (--exodus-textcolor LM/DM).
      * lightgrey stays muted (inactive Save).
+     * orange = secondary negative (confirm No when Cancel also shown).
      */
     --exodus-icon-green: #22b014;
-    --exodus-icon-red: #9c1516;
+    --exodus-icon-red: #9c1516; /* sole 16×16 red — LM */
     --exodus-icon-orange: #e04510;
     --exodus-icon-blue: #1e97cc;
     --exodus-icon-darkgrey: var(--exodus-textcolor);
@@ -1576,7 +1576,7 @@ input[type=checkbox]:focus-visible {
     --exodus-informbutton-color: #ffffff;
     /* Monochrome icon tints (DM); darkgrey/neutral inherit text via LM token chain */
     --exodus-icon-green: #3ec848;
-    --exodus-icon-red: #ff442a;
+    --exodus-icon-red: #ff442a; /* sole 16×16 red — DM (matches painted Delete minus) */
     --exodus-icon-orange: #ff7a40;
     --exodus-icon-blue: #6aa3e8;
     --exodus-icon-darkgrey: var(--exodus-textcolor);
