@@ -5421,9 +5421,13 @@ function exoduswrapformpanes() {
 
 /*
  * Pane owns outer T/B: mark first/last *content* row (display != none, not an
- * empty spacer <tr></tr>). Runs after formfunctions_onload (postinit showhide
- * already applied). Only direct child forms of .exodusformpane. Multi-form
- * pane: only the last form gets edge-bottom so the rule between forms stays.
+ * empty spacer). Runs after formfunctions_onload (postinit showhide already
+ * applied). Only direct child forms of .exodusformpane. Multi-form pane: only
+ * the last form gets edge-bottom so the rule between forms stays.
+ *
+ * Spacers: bare <tr></tr> (joblist Format) or cells with no element children
+ * and no text (costestimateprint trailing <tr><td colspan="2"></td></tr>).
+ * Empty-cell spacers are display:none so they do not draw a bottom strip.
  */
 function exodus_mark_form_edge_rows() {
 
@@ -5447,10 +5451,29 @@ function exodus_mark_form_edge_rows() {
 				tr.classList.remove('exodus-form-edge-bottom')
 				if (tr.style.display == 'none')
 					continue
-				// Empty spacer rows (joblist Format ends with bare <tr></tr>)
-				// count as "visible" for display but are not a real grid edge.
-				if (!tr.cells || !tr.cells.length)
+				// Empty spacer: no cells, or only empty cells (no kids, no text).
+				var spacer = !tr.cells || !tr.cells.length
+				if (!spacer) {
+					spacer = true
+					for (var ci = 0; ci < tr.cells.length; ci++) {
+						var cell = tr.cells[ci]
+						if (cell.children && cell.children.length) {
+							spacer = false
+							break
+						}
+						var tx = (cell.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, '')
+						if (tx) {
+							spacer = false
+							break
+						}
+					}
+				}
+				if (spacer) {
+					// Hide empty-cell trailers so they do not paint a false bottom band.
+					if (tr.cells && tr.cells.length)
+						tr.style.display = 'none'
 					continue
+				}
 				if (!firstRow)
 					firstRow = tr
 				lastRow = tr
