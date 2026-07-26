@@ -5,6 +5,8 @@
  *                        are wrapped by exoduswrapformpanes() in client.js.
  * 2. TABLE.exodusform  — no table border (never competes with the pane).
  * 3. Direct form cells — full lightgrey borders = the internal grid.
+ *    Prompt cells may be th or td; data cells stay td. Sticky richer tint is
+ *    only TABLE[exodusgroupno] > thead (and decide), not all form th.
  * 4. Outer cell edges  — stripped so only *inner* lines remain (see below).
  * Nested tables / .exodustable / [exodusgroupno] are not this grid.
  */
@@ -23,8 +25,9 @@ TABLE.exodusform
     font-style: var(--exodus-form-label-font-style);
 }
 
-/* Internal grid: every direct form cell (label|value rows) */
+/* Internal grid: every direct form cell (prompt th or td | value td) */
 .exodusform > tbody > tr > td,
+.exodusform > tbody > tr > th,
 .exodusform > thead > tr > th,
 .exodusform > thead > tr > td,
 .exodusform > tr > td,
@@ -34,6 +37,40 @@ TABLE.exodusform
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
 }
+
+/*
+ * Prompt th on the outer form grid — same richer face as sticky group thead
+ * (OKLCH relative; data-form-head lighter; DM fixed head grey).
+ * Data cells stay plain td (form face only). Sticky position stays on thead.
+ */
+TABLE.exodusform > tbody > tr > th,
+TABLE.exodusform > thead > tr > th,
+TABLE.exodusform > tr > th {
+    background-color: var(--exodus-form-face);
+    background-color: oklch(from var(--exodus-form-face)
+        calc(l * 0.95)
+        calc(c * 1.3)
+        h);
+}
+:root[data-form-head="lighter"] TABLE.exodusform > tbody > tr > th,
+:root[data-form-head="lighter"] TABLE.exodusform > thead > tr > th,
+:root[data-form-head="lighter"] TABLE.exodusform > tr > th {
+    background-color: color-mix(in oklch, var(--exodus-form-face) 80%, white);
+}
+:root[data-theme="dark_mode"] TABLE.exodusform > tbody > tr > th,
+:root[data-theme="dark_mode"] TABLE.exodusform > thead > tr > th,
+:root[data-theme="dark_mode"] TABLE.exodusform > tr > th {
+    background-color: #303a5a;
+}
+
+/*
+ * Section title rows use a real <h2> in a full-width prompt th.
+ * There is no project h2 rule (never was): size/weight/margin are browser UA.
+ *   Chromium/Firefox html.css: h2 { font-size: 1.5em; font-weight: bold;
+ *     margin-block: 0.83em; }  (em relative to parent; parent th is 1rem here)
+ * Cell face = prompt th tint; italic = TABLE.exodusform inheritance.
+ * Do not re-specify size/margin here unless deliberately diverging from UA.
+ */
 
 /* Prompt/label text — all form cells; bound inputs/spans reset to normal below */
 TABLE.exodusform td,
@@ -58,6 +95,24 @@ TABLE.exodustable tr,
 TABLE[exodusgroupno] td,
 TABLE[exodusgroupno] th,
 TABLE[exodusgroupno] tr {
+    vertical-align: top;
+}
+
+/*
+ * Help / reference tables (e.g. helpkeyboard crosstab).
+ * Face and border follow form theme tokens so day/night stays readable.
+ * Do not use fixed pastel backgrounds (#ffffcc etc.).
+ */
+TABLE.exodus-help-table {
+    border-collapse: collapse;
+    background-color: var(--exodus-form-face, #fdf5e6);
+    border: 1px solid var(--exodus-form-border, #d0d0d0);
+    text-align: left;
+}
+TABLE.exodus-help-table td,
+TABLE.exodus-help-table th {
+    border: 1px solid var(--exodus-form-border, #d0d0d0);
+    padding: 0.25em 0.5em;
     vertical-align: top;
 }
 
@@ -142,7 +197,9 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
  * so pre-wrap DETAILS/DESCRIPTION can fold within the screen (was max-content
  * alone, which grew the table to the full unwrapped text run). */
 TABLE.exodusform > tbody > tr > td > TABLE.exodustable:not([width]),
-TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]) {
+TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE.exodustable:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE[exodusgroupno]:not([width]) {
     width: min(max-content, 100%);
     max-width: 100%;
     box-sizing: border-box;
@@ -187,10 +244,11 @@ TABLE.exodusform TABLE.exodustable th {
     max-width: 100%; /* with pane max-width:100%, caps line grids so text folds */
 }
 /*
- * No outer cell borders (pane is the frame). Four edges of the cell grid:
- *   left  = first column,  right = last column
- *   top   = first row, or the row after a display:none row (hidden leading Mode rows)
- *   bottom = last row
+ * No outer cell borders (pane is the frame).
+ *   L/R — first/last column (structural)
+ *   T/B — .exodus-form-edge-* from exodus_mark_form_edge_rows() (first/last
+ *         row with display != none). Do not use :last-child for bottom: hidden
+ *         trailer rows leave the last *visible* row with a false grid edge.
  */
 .exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr > :first-child,
 .exodusformpane > TABLE.exodusform > tr > :first-child {
@@ -200,16 +258,12 @@ TABLE.exodusform TABLE.exodustable th {
 .exodusformpane > TABLE.exodusform > tr > :last-child {
     border-right: none;
 }
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr:first-child > *,
-.exodusformpane > TABLE.exodusform > tr:first-child > *,
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr[style*="display: none"] + tr > *,
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr[style*="display:none"] + tr > *,
-.exodusformpane > TABLE.exodusform > tr[style*="display: none"] + tr > *,
-.exodusformpane > TABLE.exodusform > tr[style*="display:none"] + tr > * {
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr.exodus-form-edge-top > *,
+.exodusformpane > TABLE.exodusform > tr.exodus-form-edge-top > * {
     border-top: none;
 }
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr:last-child > *,
-.exodusformpane > TABLE.exodusform > tr:last-child > * {
+.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr.exodus-form-edge-bottom > *,
+.exodusformpane > TABLE.exodusform > tr.exodus-form-edge-bottom > * {
     border-bottom: none;
 }
 
@@ -291,16 +345,7 @@ TABLE
     border-width: 0px;
 }
 
-@media print
-{
-    TABLE.exodusform
-    {
-        display: block;
-    }
-    TABLE[exodusgroupno] > thead {
-        position: static;
-    }
-}
+/* Print styles live at end of this file (must follow DM !important screen rules). */
 
 /* Browser default (toolbar/system size); user SCREEN_FONT_SIZE is % on <html> via exodus_set_style */
 HTML {
@@ -1538,10 +1583,13 @@ input[type=checkbox]:focus-visible {
     --radio-ring-color: #d4ccc0;
 }
 
+/* Screen only — print block at EOF forces black-on-white for paper */
+@media screen {
 :root[data-theme="dark_mode"],
 :root[data-theme="dark_mode"] BODY {
     background: var(--exodus-page-bg) !important;
     color: #ffffff;
+}
 }
 
 :root[data-theme="dark_mode"] .exodusformpane {
@@ -1588,9 +1636,11 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 }
 
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,
-:root[data-theme="dark_mode"] .exodusform > tbody > tr > thead,
+:root[data-theme="dark_mode"] .exodusform > tbody > tr > th,
 :root[data-theme="dark_mode"] .exodusform > thead > tr > th,
-:root[data-theme="dark_mode"] .exodusform > thead > tr > td {
+:root[data-theme="dark_mode"] .exodusform > thead > tr > td,
+:root[data-theme="dark_mode"] .exodusform > tr > td,
+:root[data-theme="dark_mode"] .exodusform > tr > th {
     border-color: #5a6090 !important;
 }
 
@@ -1861,9 +1911,103 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     color: var(--exodus-calendar-select-color);
 }
 
-/*must be last*/
+/*must be last (except print — print must beat DM !important screen rules)*/
 
 .demotext
 {
     display: none;
+}
+
+/*
+ * Print only (@media print) — does not change screen LM/DM.
+ * Paper is always pure white + black ink. Must beat DM rules such as
+ * TABLE.exodusform { background:#28304a !important } (higher specificity than *).
+ * Pre-existing: form display:block, unstick thead. Menubar hidden on paper.
+ */
+@media print {
+    /* Original framework print behaviour */
+    TABLE.exodusform {
+        display: block;
+    }
+    TABLE[exodusgroupno] > thead {
+        position: static;
+    }
+
+    #exodus_menu {
+        display: none !important;
+    }
+
+    :root,
+    :root[data-theme="dark_mode"] {
+        --exodus-page-bg: #ffffff;
+        --exodus-form-face: #ffffff;
+        --exodus-form-border: #333333;
+        --exodus-textcolor: #000000;
+        color-scheme: only light;
+    }
+
+    HTML, BODY,
+    :root[data-theme="dark_mode"],
+    :root[data-theme="dark_mode"] HTML,
+    :root[data-theme="dark_mode"] BODY {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    /* Explicit selectors: beat DM form/pane !important greys (not a * free-for-all) */
+    TABLE.exodusform,
+    TABLE.exodusform td,
+    TABLE.exodusform th,
+    .exodusformpane,
+    TABLE.exodus-help-table,
+    TABLE.exodus-help-table td,
+    TABLE.exodus-help-table th,
+    :root[data-theme="dark_mode"] TABLE.exodusform,
+    :root[data-theme="dark_mode"] TABLE.exodusform td,
+    :root[data-theme="dark_mode"] TABLE.exodusform th,
+    :root[data-theme="dark_mode"] .exodusformpane,
+    :root[data-theme="dark_mode"] TABLE.exodus-help-table,
+    :root[data-theme="dark_mode"] TABLE.exodus-help-table td,
+    :root[data-theme="dark_mode"] TABLE.exodus-help-table th {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+    }
+
+    TABLE.exodus-help-table,
+    TABLE.exodus-help-table td,
+    TABLE.exodus-help-table th,
+    :root[data-theme="dark_mode"] TABLE.exodus-help-table,
+    :root[data-theme="dark_mode"] TABLE.exodus-help-table td,
+    :root[data-theme="dark_mode"] TABLE.exodus-help-table th {
+        border-color: #333333 !important;
+    }
+
+    h1, h2, h3, b, strong, p, div, span, a,
+    :root[data-theme="dark_mode"] h1,
+    :root[data-theme="dark_mode"] h2,
+    :root[data-theme="dark_mode"] h3,
+    :root[data-theme="dark_mode"] b,
+    :root[data-theme="dark_mode"] strong,
+    :root[data-theme="dark_mode"] p,
+    :root[data-theme="dark_mode"] div,
+    :root[data-theme="dark_mode"] span,
+    :root[data-theme="dark_mode"] a {
+        color: #000000 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    BR {
+        min-height: 0 !important;
+    }
+
+    HTML, BODY {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }

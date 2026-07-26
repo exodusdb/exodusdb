@@ -39,6 +39,7 @@ div.exodusformpane          ← outer rounded frame (owns the outside edge)
 - Inserted by `exoduswrapformpanes()` / merged by `exoduscoalesceformpanes()` (sibling panes separated only by `<br>` merge into one shell).
 - Centered pages: `div[align="center"] > .exodusformpane { width: max-content; margin: auto; }` — pane sizes to **content**, not viewport.
 - Pane **strips** outer table border and removes **last row cell** bottom borders so the pane border is the only bottom edge.
+- **Manual side-by-side** (layout table with two+ form columns): table cells default to middle vertical-align — set `vertical-align: top` on that layout row (or cells) in the HTM. Not a pane/wrap concern.
 
 ### Grid borders live on **`td`**, not **`tr`**
 
@@ -126,7 +127,7 @@ element.style.whiteSpace = 'pre-wrap';
 
 | File | Role |
 |------|------|
-| `global.css` | Form face, pane shell, td grid, embedded host-cell rules, pane edge stripping |
+| `global.css` | Form face, pane shell, td/th grid, embedded host-cell rules, pane edge stripping |
 | `scripts/dbform.js` | Dict bind, group tables, span min-width, insert/delete row, `form_filter` |
 | `scripts/db.js` | `exodus_dict_text`, `dictrec`, dict helpers |
 | `scripts/client.js` | `exoduswrapformpanes`, `exoduscoalesceformpanes`, `exodusclear_embeddedtable_hostborders` |
@@ -134,9 +135,13 @@ element.style.whiteSpace = 'pre-wrap';
 
 **Vertical alignment** — `global.css` sets `vertical-align: top` on all `TABLE.exodusform`, `TABLE.exodustable`, and `TABLE[exodusgroupno]` cells and rows (including nested tables). Do not add inline `valign` or `vertical-align` in HTM unless a page needs a deliberate exception.
 
-**Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exodustable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
+**Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td|th` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exodustable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
 
 **Label italic** — all `TABLE.exodusform td/th` use `--exodus-form-label-font-style` (default italic), including nested label tables. Bound data fields (`INPUT`/`SPAN.clsRequired` etc.) reset to `--exodus-form-data-font-style` (normal). Do not set `font-style: normal` on nested-table padding rules.
+
+**Prompt cells (`th`)** — Human prompt text is `th` (outer grid *and* nested plain header layout tables). Data/controls stay in `td`. Outer-grid borders treat `th` like prompt `td`. Direct outer-grid prompt `th` also use the same richer face background as sticky group thead (OKLCH / lighter mix / DM `#303a5a`); nested layout `th` stay un-tinted until a later style pass. Sticky *position* stays on `TABLE[exodusgroupno] > thead` (and decide). Do not invent `exohlabel` / `exovlabel` classes.
+
+**Section title rows** — Long forms (agency/system/timesheet configuration, …) use a full-width prompt `th` whose main content is an `h2` (optional hidden key input ok). No project `h2` stylesheet — size/weight/margins are browser UA (`1.5em` bold, `~0.83em` block margin). Cell face = prompt `th` tint; italic inherits from the form. Do not put a nested data table in the same cell as the section `h2`.
 
 ---
 
