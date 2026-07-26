@@ -1054,12 +1054,14 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     padding: 0;
 }
 
+/* Menu | form tools: same rhythm as New|Open (4px+4px). Refresh no longer sits between them. */
 .hamburger_menu {
     float: left;
     max-width: 65px;
     padding-left: 5px;
-    padding-right: 10px;
-    border-right: 0.2px solid var(--exodus-smallerbordercolor);
+    padding-right: 4px;
+    margin-right: 4px;
+    border-right: 1px solid var(--exodus-smallerbordercolor);
 }
 
 /* Right menubar cluster: session | theme | refresh | logout */
