@@ -134,9 +134,11 @@ Calendar.prototype.create = function() {
 	// Create the top-level div element
 	this._calDiv = document.createElement("div");
 	this._calDiv.className = "calendar";
-	this._calDiv.style.position = "absolute";
+	// fixed: place in viewport coords (modal scroll-lock does not shift us)
+	this._calDiv.style.position = "fixed";
 	this._calDiv.style.display = "none";
-	this._calDiv.style.zIndex = "400";
+	// Above #uiblockerdiv (1000) and menu (999); match colour popup
+	this._calDiv.style.zIndex = "1002";
 	//exodus to allow focus so keyevents get triggered
 	this._calDiv.tabIndex=1
 	
@@ -624,6 +626,294 @@ Calendar.prototype._update = function() {
 	}
 }
 
+// Modal shield — same contract as colours popup / confirm:
+// blockmodalui (#uiblockerdiv over form+menu) + form_blockevents.
+Calendar.prototype._modal_on = function() {
+	if (this._modalOn)
+		return;
+	this._modalOn = true;
+	if (typeof blockmodalui_sync == 'function')
+		blockmodalui_sync();
+	if (typeof form_blockevents == 'function')
+		form_blockevents(true, 'calendar');
+};
+
+Calendar.prototype._modal_off = function() {
+	if (!this._modalOn)
+		return;
+	this._modalOn = false;
+	if (typeof form_blockevents == 'function')
+		form_blockevents(false, 'calendar');
+	if (typeof unblockmodalui_sync == 'function')
+		unblockmodalui_sync();
+};
+
+// Viewport union of the date field and its calendar icon (id + '_popup').
+// We must not cover this rectangle (user must still see/use the control).
+Calendar.prototype._base_rect = function(element) {
+	if (!element)
+		return null;
+	var els = [element];
+	if (element.id) {
+		var icon = document.getElementById(element.id + '_popup');
+		if (icon)
+			els.push(icon);
+	}
+	var left = Infinity;
+	var top = Infinity;
+	var right = -Infinity;
+	var bottom = -Infinity;
+	for (var i = 0; i < els.length; i++) {
+		var r = els[i].getBoundingClientRect();
+		if (r.width <= 0 && r.height <= 0)
+			continue;
+		if (r.left < left)
+			left = r.left;
+		if (r.top < top)
+			top = r.top;
+		if (r.right > right)
+			right = r.right;
+		if (r.bottom > bottom)
+			bottom = r.bottom;
+	}
+	if (!(left < right && top < bottom)) {
+		var r0 = element.getBoundingClientRect();
+		return { left: r0.left, top: r0.top, right: r0.right, bottom: r0.bottom };
+	}
+	return { left: left, top: top, right: right, bottom: bottom };
+};
+
+Calendar.prototype._rects_overlap = function(a, b) {
+	return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+};
+
+/*
+ * Quadrant placement (viewport halves), without covering the date field/icon.
+ *
+ * Horizontal:
+ *   left half  → fully to the RIGHT of base (field+icon)
+ *   right half → fully to the LEFT of base
+ *   if preferred side does not fit fully, try the other side
+ *
+ * Vertical (while beside — no cover if horizontally clear):
+ *   top half    → align tops; keep fully on-screen
+ *   bottom half → align bottoms (grows upward); keep fully on-screen
+ *
+ * If still overlapping the base (narrow width):
+ *   bottom half → prefer ABOVE the base (never open below — that falls off)
+ *   top half    → prefer BELOW the base
+ *
+ * Final step always clamps the popup fully into the viewport.
+ */
+Calendar.prototype._place = function(element) {
+	var div = this._calDiv;
+	if (!div || !element)
+		return;
+	div.style.display = 'block';
+	void div.offsetHeight;
+
+	var ar = this._base_rect(element);
+	if (!ar)
+		return;
+
+	var w = div.offsetWidth || 0;
+	var h = div.offsetHeight || 0;
+	var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+	var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+	try {
+		if (window.visualViewport) {
+			if (window.visualViewport.width)
+				vw = window.visualViewport.width;
+			if (window.visualViewport.height)
+				vh = window.visualViewport.height;
+		}
+	} catch (e) { }
+	if (!w || !h || !vw || !vh)
+		return;
+
+	var midX = vw / 2;
+	var midY = vh / 2;
+	var ax = (ar.left + ar.right) / 2;
+	var ay = (ar.top + ar.bottom) / 2;
+	var gap = 4;
+	var pad = 4;
+	var minL = pad;
+	var minT = pad;
+	var maxR = vw - pad;
+	var maxB = vh - pad;
+	var bottomHalf = ay >= midY;
+	var leftHalf = ax < midX;
+
+	function fitsRight() {
+		return ar.right + gap + w <= maxR;
+	}
+	function fitsLeft() {
+		return ar.left - gap - w >= minL;
+	}
+	function fitsBelow() {
+		return ar.bottom + gap + h <= maxB;
+	}
+	function fitsAbove() {
+		return ar.top - gap - h >= minT;
+	}
+	function popupRect(l, t) {
+		return { left: l, top: t, right: l + w, bottom: t + h };
+	}
+	function clampOnScreen(l, t) {
+		if (l + w > maxR)
+			l = maxR - w;
+		if (l < minL)
+			l = minL;
+		if (t + h > maxB)
+			t = maxB - h;
+		if (t < minT)
+			t = minT;
+		return { left: l, top: t };
+	}
+
+	var leftPos;
+	var topPos;
+
+	// --- Horizontal: fully beside the base ---
+	if (leftHalf) {
+		if (fitsRight())
+			leftPos = ar.right + gap;
+		else if (fitsLeft())
+			leftPos = ar.left - gap - w;
+		else
+			leftPos = minL; // will stack vertically if this overlaps
+	} else {
+		if (fitsLeft())
+			leftPos = ar.left - gap - w;
+		else if (fitsRight())
+			leftPos = ar.right + gap;
+		else
+			leftPos = minL;
+	}
+
+	// --- Vertical while aiming to sit beside ---
+	if (!bottomHalf) {
+		// Top half: align tops, grow down — but never past maxB
+		topPos = ar.top;
+	} else {
+		// Bottom half: align bottoms, grow up — never past minT
+		topPos = ar.bottom - h;
+	}
+
+	var c = clampOnScreen(leftPos, topPos);
+	leftPos = c.left;
+	topPos = c.top;
+
+	// --- If we cover the field/icon, stack clear of it (half decides direction) ---
+	if (this._rects_overlap(popupRect(leftPos, topPos), ar)) {
+		// Prefer the vertical direction that stays on-screen for this half
+		if (bottomHalf) {
+			// Bottom of screen: open ABOVE (below would fall off)
+			if (fitsAbove())
+				topPos = ar.top - gap - h;
+			else if (fitsBelow())
+				topPos = ar.bottom + gap;
+			else
+				// more room above the field than below it into the pad edge
+				topPos = (ar.top - minT) >= (maxB - ar.bottom)
+					? Math.max(minT, ar.top - gap - h)
+					: ar.bottom + gap;
+		} else {
+			// Top of screen: open BELOW
+			if (fitsBelow())
+				topPos = ar.bottom + gap;
+			else if (fitsAbove())
+				topPos = ar.top - gap - h;
+			else
+				topPos = (maxB - ar.bottom) >= (ar.top - minT)
+					? ar.bottom + gap
+					: Math.max(minT, ar.top - gap - h);
+		}
+		// Stacked: keep left aligned to base when possible
+		leftPos = ar.left;
+		c = clampOnScreen(leftPos, topPos);
+		leftPos = c.left;
+		topPos = c.top;
+
+		// Clamp can pull us back over the field — force vertical clearance
+		if (this._rects_overlap(popupRect(leftPos, topPos), ar)) {
+			if (bottomHalf || fitsAbove()) {
+				// stay above base even if the top clips slightly past minT
+				topPos = ar.top - gap - h;
+			} else {
+				topPos = ar.bottom + gap;
+			}
+			leftPos = ar.left;
+			// Horizontal only clamp — do not pull top back over the field
+			if (leftPos + w > maxR)
+				leftPos = maxR - w;
+			if (leftPos < minL)
+				leftPos = minL;
+			// Keep fully on-screen vertically without re-covering base:
+			// if above base, top may be < minT (clip top of popup); if below, bottom may > maxB
+			if (topPos + h <= ar.top) {
+				// above base: may clamp top down only while staying above ar.top
+				if (topPos < minT)
+					topPos = minT;
+				if (topPos + h > ar.top - gap)
+					topPos = ar.top - gap - h; // keep clear; allow top < minT
+			} else if (topPos >= ar.bottom) {
+				// below base
+				if (topPos + h > maxB)
+					topPos = maxB - h;
+				if (topPos < ar.bottom + gap)
+					topPos = ar.bottom + gap;
+			}
+		}
+	}
+
+	// Hard guarantee: fully inside the viewport (bottom-left must not hang off)
+	if (leftPos + w > maxR)
+		leftPos = maxR - w;
+	if (leftPos < minL)
+		leftPos = minL;
+	if (topPos + h > maxB)
+		topPos = maxB - h;
+	if (topPos < minT)
+		topPos = minT;
+
+	// If that clamp covered the control, clear it again (bottom half → above)
+	if (this._rects_overlap(popupRect(leftPos, topPos), ar)) {
+		if (bottomHalf) {
+			topPos = ar.top - gap - h;
+			if (topPos + h > maxB)
+				topPos = maxB - h;
+			// allow top < minT rather than covering the field
+			if (topPos + h > ar.top - gap)
+				topPos = ar.top - gap - h;
+		} else {
+			topPos = ar.bottom + gap;
+			if (topPos < minT)
+				topPos = minT;
+			if (topPos + h > maxB)
+				topPos = maxB - h;
+			if (topPos < ar.bottom + gap)
+				topPos = ar.bottom + gap;
+		}
+		if (leftPos + w > maxR)
+			leftPos = maxR - w;
+		if (leftPos < minL)
+			leftPos = minL;
+	}
+
+	// position:fixed → viewport coords (no scroll offset)
+	div.style.left = Math.round(leftPos) + 'px';
+	div.style.top = Math.round(topPos) + 'px';
+
+	if (this._underDiv) {
+		this._underDiv.style.position = 'fixed';
+		this._underDiv.style.left = div.style.left;
+		this._underDiv.style.top = div.style.top;
+		this._underDiv.style.width = w + 'px';
+		this._underDiv.style.height = h + 'px';
+	}
+};
+
 Calendar.prototype.show = function(element) {
 	if (!element || !this._calDiv)
 		return;
@@ -631,13 +921,10 @@ Calendar.prototype.show = function(element) {
 	//exodus — always re-anchor when reused across fields
 	this._element = element;
 
-	var p = getPoint(element);
-	this._calDiv.style.top = (p.y + element.offsetHeight + 1) + "px";
-	this._calDiv.style.left = p.x + "px";
-
 	if (!this._showing) {
 		this._calDiv.style.display = "block";
 		this._showing = true;
+		this._modal_on();
 		
 		/* -------- */
 		if ( this._bw.ie6 ) {
@@ -650,7 +937,7 @@ Calendar.prototype.show = function(element) {
 	 
 	    	//paste iframe under the modal
 		     var underDiv = this._calDiv.cloneNode(false); 
-		     underDiv.style.zIndex="390";
+		     underDiv.style.zIndex="1001";
 		     underDiv.style.margin = "0px";
 		     underDiv.style.padding = "0px";
 		     underDiv.style.display = "block";
@@ -664,6 +951,9 @@ Calendar.prototype.show = function(element) {
 		/* -------- */
 	}
 
+	//exodus — quadrant place; never cover field + calendar icon
+	this._place(element);
+
 	this._calDiv.focus();
 };
 
@@ -676,6 +966,7 @@ Calendar.prototype.hide = function() {
 			this._element.focus()
 		
 		this._showing = false;
+		this._modal_off();
 		if( this._bw.ie6 ) {
 		    if( this._underDiv )
 		    // this._underDiv.removeNode(true);

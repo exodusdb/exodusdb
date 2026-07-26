@@ -1047,6 +1047,11 @@ function modalblock_create() {
 		if ($$('exodusconfirmdiv')) {
 			window.setTimeout(exodus_confirm_outside_click_sync, 10)
 		}
+		// Date picker: click outside (on modal shield) dismisses without commit
+		else if (typeof calendar_checkInDatePicker != 'undefined' && calendar_checkInDatePicker
+			&& calendar_checkInDatePicker._showing) {
+			calendar_checkInDatePicker.hide()
+		}
 		// Colour popup: kill OS spectrum immediately (sync) — do not queue on Gate A
 		else if (typeof colors_popup != 'undefined' && colors_popup && colors_popup._showing
 			&& typeof colors_popup_cancel == 'function') {
