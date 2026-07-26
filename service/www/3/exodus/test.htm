@@ -69,6 +69,8 @@ async function test_run(cmdcode) {
     cmd='SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML'
  else
     cmd=cmdcode
+ // custom box (and pasted text) has literal \r; request fields need real CR
+ cmd=String(cmd).replace(/\\r/g,'\r')
     
  //timer1=new exodustimer()
  timer=new Date
@@ -82,7 +84,7 @@ async function test_run(cmdcode) {
 
     $count.innerText=i+1
     
-    if (cmd=='TEST')
+    if (cmdcode=='TEST')
         db.request=cmd+'\r'+(i+1)
     else
         db.request=cmd
@@ -127,7 +129,7 @@ async function test_run(cmdcode) {
   
  }//i
  
- //$last_request.innerText=dbrequest.replace(/\\r/g,'\\r')
+ $last_request.innerText=dbrequest.replace(/\r/g,'\\r')
  $last_data_sent.innerText=dbdatasent
  $last_response.innerText=db.response
  $last_data_received.innerText=db.data

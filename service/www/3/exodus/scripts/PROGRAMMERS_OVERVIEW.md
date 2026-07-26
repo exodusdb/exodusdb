@@ -193,11 +193,16 @@ Key functions:
 
 Dialogs are the primary navigation/composition mechanism.
 
-## 4. Database Access
+## 4. Database Access (`exodusdblink` / XMLHTTP)
+
+`client.js` provides `exodusdblink`: browser pages set `db.request` (and optional `db.data`), then `await db.send()`. Transport is XMLHTTP to `scripts/xhttp.php` in normal browser mode (file mode is legacy).
+
+**Field separators are the real CR character** (ASCII 13). In JS source that is the two-character escape `\r` inside a string literal:
 
 ```js
 var db = new exodusdblink();   // auto-picks XMLHTTP or file mode
 
+// Real CR between fields — not the two characters backslash + "r"
 db.request = 'EXECUTE\rGENERAL\rMYCOMMAND\rparam1\rparam2';
 db.data    = 'optional payload (multivalue ok)';
 
@@ -209,11 +214,21 @@ var resultData = db.data;
 var message    = db.response;
 ```
 
-Common patterns seen in the code:
-- `EXECUTE\rGENERAL\r...`
-- Direct backend file operations (the backend decides based on the request string).
+HTML attributes and text inputs do **not** interpret `\r`. A value like `SELECT\rCURRENCIES\r…` typed in a box is literal backslash-r and arrives as one unknown request unless you convert first, e.g. `cmd.replace(/\\r/g, '\r')` (see `test.htm` custom command). Prefer building requests in JS with real `\r` escapes, as the rest of the framework does.
 
-Login / logout helpers exist on the dblink object.
+Typical request shapes (same CR separators throughout):
+
+| Shape | Example use |
+|--------|-------------|
+| `SELECT\rfile\rsortselect\rcollist\rXML` | Dropdowns, app lists (`general.js` currencies, etc.) |
+| `SELECT\rfile\rsortselect\rcollist\rXML\rmaxnrecs` | Optional 6th field = max records |
+| `CACHE\rSELECT\rfile\rsort\rcollist\rXML\rmaxnrecs` | `exodusfilepopup` (CACHE prefix is stripped server-side) |
+| `SELECT\rfile\r\rRECORD` | Read records by key list in `db.data` |
+| `EXECUTE\rmodule\rcommand\r…` | Backend programs |
+| `READ\rfile\rkey` / `CACHE\rREAD\r…` | Single record |
+| `LOGIN\r…`, `TEST`, `LOOPBACK`, `KEEPALIVE` | Session / probes |
+
+On success `db.send()` is truthy; `db.data` holds the body (often XML for SELECT), `db.response` holds the status/message. Login / logout helpers exist on the dblink object.
 
 Cookies are used heavily for dataset, username, globals (`exodusgetcookie2`, `exodussetcookie`).
 
