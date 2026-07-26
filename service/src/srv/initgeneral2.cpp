@@ -410,16 +410,8 @@ nextuser:
 		href = "../exodus/helpkeyboard.htm";
 		call menusubs("ADDITEM", menutx, item, href);
 
-		item = "Browser _Reset";
-		href = "http://www.neosys.com/ie.htm";
-		call menusubs("ADDITEM", menutx, item, href);
-
 		item = "System Speed _Test";
 		href = "../exodus/test.htm";
-		call menusubs("ADDITEM", menutx, item, href);
-
-		item = "EXODUS _Help Desk";
-		href = "http://www.neosys.com/help";
 		call menusubs("ADDITEM", menutx, item, href);
 
 		item	= "_About";
