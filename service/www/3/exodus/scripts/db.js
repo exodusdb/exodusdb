@@ -205,7 +205,9 @@ function exodus_dict_time(di,mode,otherid,params) {
   di.conversion='[TIME'+params+']'
  }
  
- di.align='R'
+ // Left always (header and line-grid columns). Not amounts — R looked odd on short times.
+ // Callers may still set di.align after.
+ di.align='L'
  di.length=5 
  if (mode&&otherid) {
 
