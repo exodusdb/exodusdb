@@ -1924,7 +1924,8 @@ var ExoProgram::elapsedtimetext(in timestamp1, in timestamp2) const {
 				secs = secs.round(0);
 			} else {
 				//secs = (secs.oconv("MD40P")) + 0;
-				secs = secs.round(6) + 0;
+				// ≥ 10ms: round to ms (3 d.p. on seconds). < 10ms: leave 6 d.p. as before.
+				secs = secs.round(secs >= 0.01 ? 3 : 6) + 0;
 				if (secs.starts(".")) {
 					secs.prefixer("0");
 				}
