@@ -1062,22 +1062,37 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     border-right: 0.2px solid var(--exodus-smallerbordercolor);
 }
 
-.refresh_wrapper {
-    float: left;
-    padding-left: 8px;
-}
-
-/* Right menubar cluster: one float:right flex row — equal gap session|theme|logout */
+/* Right menubar cluster: session | theme | refresh | logout */
 .exodus_menubar_trailing {
     float: right;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 0; /* per-item margins below — not equal */
     margin-right: 10px;
     margin-left: 10px;
 }
 
+/* Database name + username: first flex child of .exodus_menubar_trailing */
+.exodus_menubar_session {
+    float: none;
+    margin: 0 10px 0 0; /* keep session → theme a bit open */
+    line-height: var(--exodus-ui-icon-size, 1.325em);
+    white-space: nowrap;
+    color: inherit;
+}
+
+/* theme → refresh tight; refresh → logout a touch more open */
+.exodus_menubar_trailing > .theme_button {
+    margin-right: 4px;
+}
+.exodus_menubar_trailing .refresh_wrapper {
+    float: none;
+    margin: 0 6px 0 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
 .logout_wrapper {
     float: none;
     margin: 0;
@@ -1087,20 +1102,12 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     align-items: center;
 }
 
-/* Strip menubutton horizontal chrome inside the cluster so gap is the only spacing */
-.exodus_menubar_trailing .logout_wrapper .menubutton {
+/* Strip menubutton chrome so margins alone set spacing */
+.exodus_menubar_trailing .logout_wrapper .menubutton,
+.exodus_menubar_trailing .refresh_wrapper .menubutton {
     margin: 0 !important;
     padding-left: 0.25em !important;
     padding-right: 0.25em !important;
-}
-
-/* Database name + username: first flex child of .exodus_menubar_trailing */
-.exodus_menubar_session {
-    float: none;
-    margin: 0;
-    line-height: var(--exodus-ui-icon-size, 1.325em);
-    white-space: nowrap;
-    color: inherit;
 }
 .exodus_menubar_session_test {
     color: red;
@@ -1510,10 +1517,10 @@ input[type=checkbox]:focus-visible {
     border: none !important;
     box-shadow: none !important;
 }
-/* Exact 18×18 sub-icons from the old slider knob — do not retint or reskin */
+/* Same outer box as menubar 16×16 full-bleed SVGs (--exodus-ui-icon-size) */
 .theme_button img {
-    width: 18px;
-    height: 18px;
+    width: var(--exodus-ui-icon-size);
+    height: var(--exodus-ui-icon-size);
     display: block;
     margin: 0;
     padding: 0;
