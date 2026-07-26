@@ -57,7 +57,7 @@ button.exodus-native-color:focus {
 
 /* Colour popup — 16×16 hue/sat grid + brightness strip; above #uiblockerdiv */
 .exodus-color-popup {
-    position: absolute;
+    position: fixed; /* viewport coords — same as date calendar place */
     z-index: 1002;
     display: none;
     flex-direction: column;
@@ -128,22 +128,74 @@ button.exodus-native-color:focus {
     z-index: 1;
     position: relative;
 }
-/* Hex field = top preview strip (background set inline to the current colour) */
-.exodus-color-popup-hex {
+/*
+ * Colour monitor stack (face + sticky-thead tint).
+ * --exodus-color-monitor-face is set by colors_popup_sync_chrome.
+ * Must not depend on form-face / DM field chrome for the sample fill.
+ */
+.exodus-color-popup-monitor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 100%;
+    gap: 0;
+    box-sizing: border-box;
+}
+/* Face sample — double previous height (was 1.75em) */
+.exodus-color-popup-hex,
+:root[data-theme="dark_mode"] .exodus-color-popup INPUT.exodus-color-popup-hex,
+:root[data-theme="dark_mode"] INPUT.exodus-color-popup-hex {
     box-sizing: border-box;
     width: 100%;
-    height: 1.75em;
+    height: 3.5em;
     margin: 0;
-    padding: 0.2em 0.4em;
-    border: 1px solid var(--exodus-calendar-border, #888);
-    border-radius: 0.25rem;
+    padding: 0.35em 0.4em;
+    border: 1px solid #888;
+    border-bottom: none; /* join thead; black split is on thead top */
+    border-radius: 0.25rem 0.25rem 0 0;
     font: inherit;
     font-family: ui-monospace, monospace;
     font-size: 0.9em;
     text-align: center;
     letter-spacing: 0.02em;
+    background-color: var(--exodus-color-monitor-face, #808080);
+    background-image: none;
+    color: #fff;
+    -webkit-text-fill-color: currentColor;
+    box-shadow: none;
+    outline: none;
+}
+/* Same-size block under face: sticky thead (keep in sync with global.css) */
+.exodus-color-popup-hex-thead {
+    box-sizing: border-box;
+    width: 100%;
+    height: 3.5em;
+    margin: 0;
+    padding: 0.35em 0.4em;
+    border: 1px solid #888;
+    border-top: 1px solid #000; /* thin split under face sample */
+    border-radius: 0 0 0.25rem 0.25rem;
+    font: inherit;
+    font-family: ui-monospace, monospace;
+    font-size: 0.75em;
+    text-align: center;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    /* OKLCH relative: same hue, slightly deeper + stronger (CSS Color 5) */
+    background-color: var(--exodus-color-monitor-face, #808080);
+    background-color: oklch(from var(--exodus-color-monitor-face, #808080)
+        calc(l * 0.95)
+        calc(c * 1.3)
+        h);
     color: #111;
-    background: var(--exodus-form-face, #fdf5e6);
+    -webkit-text-fill-color: currentColor;
+}
+/* Standard tint — match :root[data-form-head=lighter] group thead */
+.exodus-color-popup-hex-thead[data-monitor-head="lighter"] {
+    background-color: color-mix(in oklch, var(--exodus-color-monitor-face, #808080) 80%, white);
 }
 .exodus-color-popup-actions {
     display: flex;

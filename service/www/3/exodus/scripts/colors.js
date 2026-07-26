@@ -1,17 +1,11 @@
 
 // Apply LM form face for the current session (stylesheet + --exodus-form-face).
 // Cookie "fc" is NOT written here — only users form_postwrite after a real save.
+// Never touches day/night: only form load and the theme button may theme_toggle.
+// In DM, exodus_set_style('screencolor') already no-ops face paint — do not force LM.
 function colors_apply_screencolor(value) {
 	if (typeof exodus_set_style != 'function')
 		return
-	if (typeof gisdarktheme != 'undefined' && gisdarktheme) {
-		if (typeof theme_toggle == 'function')
-			theme_toggle('default')
-		if (typeof exodussetcookie == 'function' && typeof gthemecookiekey != 'undefined')
-			exodussetcookie('', gthemecookiekey, '', 'dt', true)
-		if (typeof exodus_sync_theme_btn_icon == 'function')
-			exodus_sync_theme_btn_icon()
-	}
 	exodus_set_style('screencolor', value == null ? '' : String(value))
 }
 
@@ -266,6 +260,8 @@ var colors_popup = {
 	_continuum: null,
 	_nLabel: null,
 	_hexInput: null,
+	_monitor: null,
+	_hexThead: null,
 	_n: 16, // continuum resolution (1..32)
 	_hi: 0, // 0..n-1 hue index
 	_si: 15, // 0..n-1 sat index (full sat default)
@@ -450,6 +446,30 @@ function colors_popup_set_from_hex(hex, exact) {
 		colors_popup_sync_chrome()
 }
 
+// Contrast text for a #rrggbb sample (Rec. 601 luma).
+function colors_popup_monitor_text_color(hex) {
+	try {
+		var r = parseInt(hex.slice(1, 3), 16)
+		var g = parseInt(hex.slice(3, 5), 16)
+		var b = parseInt(hex.slice(5, 7), 16)
+		return (0.299 * r + 0.587 * g + 0.114 * b) >= 140 ? '#111' : '#fff'
+	} catch (e) {
+		return '#111'
+	}
+}
+
+// Sticky-thead head direction for this face (same threshold as exodus_set_form_head_direction).
+function colors_popup_monitor_head_direction(hex) {
+	try {
+		var r = parseInt(hex.slice(1, 3), 16)
+		var g = parseInt(hex.slice(3, 5), 16)
+		var b = parseInt(hex.slice(5, 7), 16)
+		return (0.299 * r + 0.587 * g + 0.114 * b) >= 128 ? 'deeper' : 'lighter'
+	} catch (e) {
+		return 'deeper'
+	}
+}
+
 // hexOverride: show this value instead of continuum snap (open-from-field seed).
 function colors_popup_sync_chrome(hexOverride) {
 	var hex = hexOverride
@@ -457,19 +477,27 @@ function colors_popup_sync_chrome(hexOverride) {
 		: colors_popup_current_hex()
 	colors_popup._hex = hex
 	var inp = colors_popup._hexInput
+	var thead = colors_popup._hexThead
+	var mon = colors_popup._monitor
 	if (!inp)
 		return
 	inp.value = hex
-	// Merged preview strip: fill is the colour; text contrasts for readability
-	inp.style.backgroundColor = hex
-	try {
-		var r = parseInt(hex.slice(1, 3), 16)
-		var g = parseInt(hex.slice(3, 5), 16)
-		var b = parseInt(hex.slice(5, 7), 16)
-		// Rec. 601 luma — dark text on light swatches, light text on dark
-		inp.style.color = (0.299 * r + 0.587 * g + 0.114 * b) >= 140 ? '#111' : '#fff'
-	} catch (e) {
-		inp.style.color = '#111'
+	var textCol = colors_popup_monitor_text_color(hex)
+	var headDir = colors_popup_monitor_head_direction(hex)
+	// Face sample — own fill; beat theme INPUT rules
+	if (mon)
+		mon.style.setProperty('--exodus-color-monitor-face', hex)
+	inp.style.setProperty('background-color', hex, 'important')
+	inp.style.setProperty('background-image', 'none', 'important')
+	inp.style.setProperty('color', textCol, 'important')
+	inp.style.setProperty('-webkit-text-fill-color', textCol, 'important')
+	// Thead-tint sample under face (CSS oklch / color-mix matches global sticky thead)
+	if (thead) {
+		thead.setAttribute('data-monitor-head', headDir)
+		thead.style.setProperty('color', textCol, 'important')
+		thead.style.setProperty('-webkit-text-fill-color', textCol, 'important')
+		thead.textContent = 'thead'
+		thead.title = 'Sticky column-head tint of this face (' + headDir + ')'
 	}
 }
 
@@ -1088,16 +1116,24 @@ function colors_popup_create() {
 	div.setAttribute('role', 'dialog')
 	div.setAttribute('aria-label', 'Colour')
 
-	// Display-only hex strip (continuum pick only — no typing)
+	// Face + sticky-thead monitor (continuum pick only — no typing)
+	var monitor = document.createElement('div')
+	monitor.className = 'exodus-color-popup-monitor'
 	var hexInput = document.createElement('input')
 	hexInput.type = 'text'
 	hexInput.className = 'exodus-color-popup-hex'
 	hexInput.readOnly = true
 	hexInput.tabIndex = -1
 	hexInput.spellcheck = false
-	hexInput.title = 'Hex colour (preview)'
-	hexInput.setAttribute('aria-label', 'Hex colour')
+	hexInput.title = 'Form face colour (hex)'
+	hexInput.setAttribute('aria-label', 'Form face colour')
 	hexInput.setAttribute('aria-readonly', 'true')
+	var hexThead = document.createElement('div')
+	hexThead.className = 'exodus-color-popup-hex-thead'
+	hexThead.setAttribute('aria-label', 'Sticky thead tint of this face')
+	hexThead.textContent = 'thead'
+	monitor.appendChild(hexInput)
+	monitor.appendChild(hexThead)
 
 	var continuum = document.createElement('div')
 	continuum.className = 'exodus-color-popup-continuum'
@@ -1136,7 +1172,7 @@ function colors_popup_create() {
 	row.appendChild(btnClear)
 	row.appendChild(btnCancel)
 
-	div.appendChild(hexInput)
+	div.appendChild(monitor)
 	div.appendChild(continuum)
 	div.appendChild(nLabel)
 	div.appendChild(row)
@@ -1147,6 +1183,8 @@ function colors_popup_create() {
 
 	colors_popup._div = div
 	colors_popup._preview = hexInput
+	colors_popup._monitor = monitor
+	colors_popup._hexThead = hexThead
 	colors_popup._continuum = continuum
 	colors_popup._nLabel = nLabel
 	colors_popup._grid = grid
@@ -1311,15 +1349,24 @@ function colors_popup_base_rect(field) {
 	return { left: left, top: top, right: right, bottom: bottom }
 }
 
-// Place relative to the base element by screen half:
-//   top half  → popup top  = element top;   bottom half → popup bottom = element bottom
-//   left half → popup left = element left;  right half  → popup fully left of element
-//     (popup's right edge is gap-left of the base's left edge — no overlay)
+// Same placement contract as Calendar.prototype._place (date picker):
+//   left half  → fully RIGHT of base (field+swatch+F7 icon)
+//   right half → fully LEFT of base
+//   top half   → align tops; bottom half → align bottoms (grows up)
+//   if still over base: stack above (bottom half) or below (top half)
+//   stay fully on-screen; position:fixed (viewport coords)
+function colors_popup_rects_overlap(a, b) {
+	return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+}
+
 function colors_popup_place(field) {
 	var div = colors_popup._div
 	if (!div || !field)
 		return
 	div.style.display = 'block'
+	div.style.position = 'fixed'
+	void div.offsetHeight
+
 	var ar = colors_popup_base_rect(field)
 	if (!ar)
 		return
@@ -1342,41 +1389,157 @@ function colors_popup_place(field) {
 	var midY = vh / 2
 	var ax = (ar.left + ar.right) / 2
 	var ay = (ar.top + ar.bottom) / 2
-	// Clear the F7 icon + margin; double a typical icon (~16) for long-term safety
-	var gap = 32
+	var gap = 4
 	var pad = 4
-	var left
-	var top
+	var minL = pad
+	var minT = pad
+	var maxR = vw - pad
+	var maxB = vh - pad
+	var bottomHalf = ay >= midY
+	var leftHalf = ax < midX
 
-	// Horizontal
-	if (ax < midX) {
-		// Left half: align lefts
-		left = ar.left
-		if (left + w > vw - pad)
-			left = Math.max(pad, vw - pad - w)
-	} else {
-		// Right half: entirely to the left of the base (no overlay of field or F7)
-		left = ar.left - w - gap
-		// If that runs off the left edge, pin to pad — still not forced over the base
-		if (left < pad)
-			left = pad
+	function fitsRight() {
+		return ar.right + gap + w <= maxR
+	}
+	function fitsLeft() {
+		return ar.left - gap - w >= minL
+	}
+	function fitsBelow() {
+		return ar.bottom + gap + h <= maxB
+	}
+	function fitsAbove() {
+		return ar.top - gap - h >= minT
+	}
+	function popupRect(l, t) {
+		return { left: l, top: t, right: l + w, bottom: t + h }
+	}
+	function clampOnScreen(l, t) {
+		if (l + w > maxR)
+			l = maxR - w
+		if (l < minL)
+			l = minL
+		if (t + h > maxB)
+			t = maxB - h
+		if (t < minT)
+			t = minT
+		return { left: l, top: t }
 	}
 
-	// Vertical
-	if (ay < midY) {
-		top = ar.top
-		if (top + h > vh - pad)
-			top = Math.max(pad, vh - pad - h)
+	var leftPos
+	var topPos
+
+	// Horizontal: fully beside base
+	if (leftHalf) {
+		if (fitsRight())
+			leftPos = ar.right + gap
+		else if (fitsLeft())
+			leftPos = ar.left - gap - w
+		else
+			leftPos = minL
 	} else {
-		top = ar.bottom - h
-		if (top < pad)
-			top = pad
+		if (fitsLeft())
+			leftPos = ar.left - gap - w
+		else if (fitsRight())
+			leftPos = ar.right + gap
+		else
+			leftPos = minL
 	}
 
-	var scrollX = window.pageXOffset || document.documentElement.scrollLeft || 0
-	var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0
-	div.style.left = Math.round(left + scrollX) + 'px'
-	div.style.top = Math.round(top + scrollY) + 'px'
+	// Vertical while beside
+	if (!bottomHalf)
+		topPos = ar.top
+	else
+		topPos = ar.bottom - h
+
+	var c = clampOnScreen(leftPos, topPos)
+	leftPos = c.left
+	topPos = c.top
+
+	// Covering field/swatch/icon → stack clear of it
+	if (colors_popup_rects_overlap(popupRect(leftPos, topPos), ar)) {
+		if (bottomHalf) {
+			if (fitsAbove())
+				topPos = ar.top - gap - h
+			else if (fitsBelow())
+				topPos = ar.bottom + gap
+			else
+				topPos = (ar.top - minT) >= (maxB - ar.bottom)
+					? Math.max(minT, ar.top - gap - h)
+					: ar.bottom + gap
+		} else {
+			if (fitsBelow())
+				topPos = ar.bottom + gap
+			else if (fitsAbove())
+				topPos = ar.top - gap - h
+			else
+				topPos = (maxB - ar.bottom) >= (ar.top - minT)
+					? ar.bottom + gap
+					: Math.max(minT, ar.top - gap - h)
+		}
+		leftPos = ar.left
+		c = clampOnScreen(leftPos, topPos)
+		leftPos = c.left
+		topPos = c.top
+
+		if (colors_popup_rects_overlap(popupRect(leftPos, topPos), ar)) {
+			if (bottomHalf || fitsAbove())
+				topPos = ar.top - gap - h
+			else
+				topPos = ar.bottom + gap
+			leftPos = ar.left
+			if (leftPos + w > maxR)
+				leftPos = maxR - w
+			if (leftPos < minL)
+				leftPos = minL
+			if (topPos + h <= ar.top) {
+				if (topPos < minT)
+					topPos = minT
+				if (topPos + h > ar.top - gap)
+					topPos = ar.top - gap - h
+			} else if (topPos >= ar.bottom) {
+				if (topPos + h > maxB)
+					topPos = maxB - h
+				if (topPos < ar.bottom + gap)
+					topPos = ar.bottom + gap
+			}
+		}
+	}
+
+	// Fully inside viewport
+	if (leftPos + w > maxR)
+		leftPos = maxR - w
+	if (leftPos < minL)
+		leftPos = minL
+	if (topPos + h > maxB)
+		topPos = maxB - h
+	if (topPos < minT)
+		topPos = minT
+
+	// Clamp re-cover → force clear (bottom half → above)
+	if (colors_popup_rects_overlap(popupRect(leftPos, topPos), ar)) {
+		if (bottomHalf) {
+			topPos = ar.top - gap - h
+			if (topPos + h > maxB)
+				topPos = maxB - h
+			if (topPos + h > ar.top - gap)
+				topPos = ar.top - gap - h
+		} else {
+			topPos = ar.bottom + gap
+			if (topPos < minT)
+				topPos = minT
+			if (topPos + h > maxB)
+				topPos = maxB - h
+			if (topPos < ar.bottom + gap)
+				topPos = ar.bottom + gap
+		}
+		if (leftPos + w > maxR)
+			leftPos = maxR - w
+		if (leftPos < minL)
+			leftPos = minL
+	}
+
+	div.style.left = Math.round(leftPos) + 'px'
+	div.style.top = Math.round(topPos) + 'px'
 }
 
 // Snapshot live form face (--exodus-form-face / cookie) for cancel restore.
