@@ -221,54 +221,68 @@ TABLE[exodusgroupno] > thead {
     position: sticky;
     top: var(--exodus-sticky-top, 0);
     z-index: 11;
+    /* bottom edge while stuck (border-collapse drops cell bottoms under scroll) */
+    box-shadow: 0 1px 0 lightgrey;
+}
+/* Decide list: sticky in dialog scroll, not page menubar offset */
+.exodusconfirmdiv #decide_table1 > thead {
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    box-shadow: 0 1px 0 lightgrey;
+}
+:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead,
+:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead {
+    box-shadow: 0 1px 0 #5a6090;
 }
 /*
  * LM sticky thead tint (from form body / --exodus-form-face)
  * ----------------------------------------------------------
- * Goal: subliminal contrast between body and column heads for any
- * SCREEN_BODY_COLOR. Not SCREEN_HEAD_COLOR (unused — see colors.js).
+ * Common UI pattern: same hue, slightly stronger (richer + a touch deeper).
+ * Not SCREEN_HEAD_COLOR (unused — see colors.js).
  *
  * Switch: <html data-form-head="deeper"|"lighter"> set by
  * exodus_set_form_head_direction() from Rec.601 body luma (threshold 128).
  *
- *   deeper (light bodies, default):
- *     Richer, not a grey shade. Absolute C+ is uneven: cyan has sRGB headroom
- *     (huge step) while yellow/blue sit on the gamut edge (almost no step).
- *     So pull C toward a modest target (only upward): low-C faces gain more,
- *     high-C cyan barely moves. Tiny L dip (~0.02) frees gamut so yellows can
- *     actually take the extra C (pure L-hold + C+ clips on those hues).
+ *   deeper (light bodies, default) — OKLCH relative color (CSS Color 5):
+ *     l' = l × 0.95   (slightly deeper)
+ *     c' = c × 1.3    (slightly stronger chroma — even across hues)
+ *     h' = h
+ *     Standard “richer variant of this colour”; gamut mapping is the browser’s.
  *     Fallback = plain form face if oklch(from) unsupported.
  *
- *   lighter (dark bodies):
- *     Tint toward white (color-mix). Do NOT raise OKLCH L alone: saturated
- *     sRGB colours already sit on the gamut edge so L+ clips invisible.
+ *   lighter (dark bodies) — standard tint:
+ *     color-mix(in oklch, face %, white) — do not raise OKLCH L alone (clips).
  *
- * Tune deeper (half strength): L-0.009/-0.011; C toward 0.13/0.14 at 27.5%/32.5%.
- * white mix 88% / 82% face. DM: fixed greys (ignore data-form-head).
+ * exodustable heads a step stronger. DM: fixed greys (ignore data-form-head).
  */
 TABLE[exodusgroupno] > thead th,
-TABLE[exodusgroupno] > thead td {
+TABLE[exodusgroupno] > thead td,
+.exodusconfirmdiv #decide_table1 > thead th,
+.exodusconfirmdiv #decide_table1 > thead td {
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
-        calc(l - 0.009)
-        calc(c + max(0, 0.13 - c) * 0.275)
+        calc(l * 0.95)
+        calc(c * 1.3)
         h);
 }
 TABLE.exodustable[exodusgroupno] > thead th,
 TABLE.exodustable[exodusgroupno] > thead td {
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
-        calc(l - 0.011)
-        calc(c + max(0, 0.14 - c) * 0.325)
+        calc(l * 0.94)
+        calc(c * 1.35)
         h);
 }
 :root[data-form-head="lighter"] TABLE[exodusgroupno] > thead th,
-:root[data-form-head="lighter"] TABLE[exodusgroupno] > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 88%, white);
+:root[data-form-head="lighter"] TABLE[exodusgroupno] > thead td,
+:root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
+:root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td {
+    background-color: color-mix(in oklch, var(--exodus-form-face) 80%, white);
 }
 :root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead th,
 :root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 82%, white);
+    background-color: color-mix(in oklch, var(--exodus-form-face) 75%, white);
 }
 
 TABLE
@@ -1422,15 +1436,7 @@ input[type=checkbox]:focus-visible {
 }
 /* Type (info/critical/warning/question): icon only — no face/border tint */
 
-.exodusconfirmdiv #decide_table1 > thead {
-    position: sticky;
-    top: 0;
-    z-index: 11;
-}
-.exodusconfirmdiv #decide_table1 > thead th,
-.exodusconfirmdiv #decide_table1 > thead td {
-    background-color: var(--exodusconfirm-face);
-}
+/* decide thead sticky + tint: shared with TABLE[exodusgroupno] > thead above */
 
 .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
     background-color: lightgrey;
@@ -1558,12 +1564,14 @@ SPAN.calendar-date-committed[contenteditable] {
     color: var(--exodus-calendar-today-color);
 }
 
+/* DM sticky head: lift off form face (#28304a). Same step for all group tables —
+ * was only on .exodustable, so reports/journals (exodusform+groupno) looked flat. */
 :root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead th,
-:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead td {
-    background-color: #28304a;
-}
+:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead td,
 :root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead th,
-:root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead td {
+:root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead td,
+:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead th,
+:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead td {
     background-color: #303a5a;
 }
 
@@ -1632,8 +1640,9 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
     border-color: #646ca8;
 }
 
-/* Bare BUTTON only — .graphicbutton uses --exodus-informbutton-* like .exodusbutton */
-:root[data-theme="dark_mode"] BUTTON:not(.exodusbutton):not(.exodustab) {
+/* Bare BUTTON only — .graphicbutton uses --exodus-informbutton-* like .exodusbutton.
+ * Continuum swatches are <button class="exodus-color-cell"> for a11y, not chrome. */
+:root[data-theme="dark_mode"] BUTTON:not(.exodusbutton):not(.exodustab):not(.exodus-color-cell) {
     background-color: var(--exodus-informbutton-bg);
     border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
     color: var(--exodus-informbutton-color);
