@@ -1274,38 +1274,19 @@ input[type=checkbox]:focus-visible {
     align-items: stretch;
     overflow: hidden;
 }
-/* Outer shell table fills the dialog; cells use flex display for reliable scroll */
+/* Outer shell: icon + prompt column (divs — not a table, so option <tr> hit-testing stays local) */
 .exodusconfirm_layout {
-    border-collapse: collapse;
-    border-spacing: 0;
-    border: none;
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
     height: 100%;
     display: flex;
-}
-.exodusconfirm_layout > tbody {
-    display: flex;
-    flex: 1 1 auto;
-    min-height: 0;
-    width: 100%;
-}
-.exodusconfirm_layout > tbody > tr {
-    display: flex;
-    flex: 1 1 auto;
-    min-height: 0;
-    width: 100%;
+    flex-direction: row;
     align-items: stretch;
-}
-.exodusconfirm_layout td,
-.exodusconfirm_layout th {
-    border: none;
 }
 .exodusconfirm_iconcol {
     width: var(--exodusconfirm-iconcol-width);
     flex: 0 0 auto;
-    vertical-align: top;
     padding: 0.35em 12px 0 2px; /* match question top air */
     white-space: nowrap;
 }
@@ -1313,7 +1294,6 @@ input[type=checkbox]:focus-visible {
     flex: 1 1 auto;
     min-width: 0;
     min-height: 0;
-    vertical-align: top;
     text-align: left;
     display: flex;
     flex-direction: column;

@@ -957,6 +957,11 @@ function modalblock_onwheel(event) {
 	if (gmodalblockdepth <= 0)
 		return
 
+	// Ctrl/Cmd+wheel is browser zoom (same as Ctrl+/- keys). Never steal it.
+	// After zoom, decide popups reflow via visualViewport resize (see fit_decide).
+	if (event.ctrlKey || event.metaKey)
+		return
+
 	var scrollpane = modalblock_scrollpane_under(event)
 	if (scrollpane) {
 		var delta = event.deltaY
@@ -964,11 +969,13 @@ function modalblock_onwheel(event) {
 			return
 		var atTop = scrollpane.scrollTop <= 0
 		var atBottom = scrollpane.scrollTop + scrollpane.clientHeight >= scrollpane.scrollHeight - 1
+		// Edge of scrollable body: stop page behind from scrolling
 		if ((delta < 0 && atTop) || (delta > 0 && atBottom))
 			event.preventDefault()
 		return
 	}
 
+	// Wheel over modal chrome / shield: block page scroll only
 	event.preventDefault()
 
 }
@@ -5578,9 +5585,28 @@ function getmaxwindow_sync() {
 // other targets stay cancelled. Modal work uses #uiblockerdiv separately.
 var gblockevents
 
-// Browser chrome keys (zoom…): early *sync capture* keydown — not Gate A, not
+// ---------------------------------------------------------------------------
+// Browser chrome vs app events (modal / form open)
+//
+// LEFT TO THE BROWSER (do not preventDefault):
+//   • Ctrl/Cmd + / - / 0          zoom in/out/reset (keydown capture below)
+//   • Ctrl/Cmd + wheel            zoom (modalblock_onwheel returns early)
+//   • Ctrl/Cmd + C when allowed   copy (confirm/colour startevent true)
+//
+// TAKEN BY APP while modal (gmodalblockdepth / gblockevents):
+//   • plain wheel                 page scroll blocked; confirm body may scroll
+//   • touchmove outside scroll    blocked
+//   • form keydown/click path     blocked (startevent swallow) except above
+//
+// PRODUCT-SPECIFIC (popup owns the gesture):
+//   • colours Ctrl+wheel          continuum resolution N (colors.js — blocks zoom
+//                                 over that popup by design)
+//   • decide type-to-filter etc.  on #exodusconfirmdiv only
+//
+// Browser zoom keys: early *sync capture* keydown — not Gate A, not
 // document_onkeydown. Stops propagation without preventDefault so the browser
-// still acts and our complex key path never runs. Install once from client init.
+// still acts. Install once from client init.
+// ---------------------------------------------------------------------------
 var gexodus_browser_chrome_keydown_installed = false
 
 function exodus_is_browser_chrome_keydown(event) {
@@ -5709,24 +5735,13 @@ function starteventhandler(eventfunctionname, functionx) {
 				// ---------------------------------------------------------------
 				// Popup isolation while gblockevents (modal / exclusive UI).
 				//
-				// Mental model: starteventhandler is a *dispatcher*, not the home
-				// of each product’s key map. Each popup implements the same
-				// contract when its script is present:
-				//   null  — that popup is not open; try next / fall through
-				//   true  — allow browser default; do not run form key logic
-				//   false — caller must exoduscancelevent (swallow form shortcuts)
-				//
-				// Order: confirm first (almost always loaded), then colour
-				// (colors.js only when needed). Calendar keys live on its div
-				// (calendar.js); Esc closes via form_closepopups — left as-is.
-				//
-				// Future (slow steps, not a big bang):
-				//   - Keep decide’s own decide_document_onkeydown until a calm
-				//     pass can fold decide vs plain confirm inside confirm helper
-				//   - Optional calendar_popup_is_open / document_keydown for
-				//     symmetry only if form path grows; do not change hide-on-key
-				//   - Capture-phase (Alt+digit, Alt+arrows): thin *_is_open() only
-				//   - Do not invent one mega-popup_onkeydown for all products
+				// Popups own their DOM events (confirm/decide, colours, calendar).
+				// Form path only asks: is a popup open? Then swallow form keys.
+				// Contract when a *startevent helper is present:
+				//   null  — that popup is not open
+				//   true  — allow browser default (e.g. copy); no form logic
+				//   false — swallow (exoduscancelevent)
+				// Calendar: keys on its div; form uses form_closepopups for Esc.
 				// ---------------------------------------------------------------
 			} else if (typeof exodusconfirm_startevent == 'function') {
 				var confEv = exodusconfirm_startevent(event)
@@ -6624,8 +6639,18 @@ function exodusconfirm_startevent(event) {
 	if (event.type == 'copy')
 		return true
 
+	// Decide lists: keys/clicks live on the popup (decide_document_on*).
+	// Form path only swallows — do not also run Yes/No/Enter here (dual close).
+	if ($$('decide_table1')) {
+		if (event.type != 'keydown')
+			return false
+		if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
+			return true
+		return false
+	}
+
 	if (event.type != 'keydown')
-		// non-keydown falls through to generic skip (same as before: no return → cancel)
+		// non-keydown: block form handlers while confirm is open
 		return false
 
 	//allow keyboard Ctrl+c to copy error message text etc.
@@ -6635,9 +6660,8 @@ function exodusconfirm_startevent(event) {
 	var keycode = event.keyCode ? event.keyCode : event.which
 	var keyletter = String.fromCharCode(keycode).toUpperCase()
 	var istextinput = !!$$('exodusconfirmdiv_textinput')
-	var isdecide = !!$$('decide_table1')
 	var active = document.activeElement
-	// focused yes/no/cancel graphicbutton (not decide Select/Cancel)
+	// focused yes/no/cancel graphicbutton
 	var focusedConfirmBtn = null
 	if (active) {
 		if (active.id == 'positivebutton' || active.id == 'negativebutton' || active.id == 'cancelbutton')
@@ -6651,14 +6675,14 @@ function exodusconfirm_startevent(event) {
 
 	logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
 
-	// Tab: cycle text field and buttons (decide has its own keydown handler)
-	if (keycode == 9 && !isdecide) {
+	// Tab: cycle text field and buttons
+	if (keycode == 9) {
 		exodusconfirm_focus_cycle(!!event.shiftKey)
 		return false
 	}
 
 	// Arrow keys: same cycle as Tab when focus is on a footer button
-	if (!isdecide && focusedConfirmBtn
+	if (focusedConfirmBtn
 		&& (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)) {
 		exodusconfirm_focus_cycle(keycode == 37 || keycode == 38)
 		return false
@@ -6675,27 +6699,26 @@ function exodusconfirm_startevent(event) {
 		return false
 	}
 
-	//POSITIVE = F9 or Enter/Ctrl+Enter or (Space if not text input) or some initial
-	// Ctrl+Enter is keycode 13 with ctrlKey — same commit path as Enter
+	//POSITIVE = F9 or Enter/Ctrl+Enter or (Space if not text input) or access letter
 	if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
 		window.setTimeout(exodus_confirm_function1_sync, 1)
 		return false
 	}
 
-	//CANCEL = Esc or some initial
+	//CANCEL = Esc or access letter
 	if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
 		window.setTimeout(exodus_confirm_function3_sync, 1)
 		return false
 	}
 
-	//NEGATIVE = F8 or some initial
+	//NEGATIVE = F8 or access letter
 	if (keycode == 119 || keyletter == gexodusconfirmletters[2]) {
 		window.setTimeout(exodus_confirm_function2_sync, 1)
 		return false
 	}
 
-	// Home/End: first/last focusable (decide lists use decide_document_onkeydown)
-	if ((keycode == 36 || keycode == 35) && !isdecide) {
+	// Home/End: first/last focusable
+	if (keycode == 36 || keycode == 35) {
 		exodusconfirm_focus_endpoint(keycode == 36)
 		return false
 	}
@@ -6704,7 +6727,7 @@ function exodusconfirm_startevent(event) {
 	if (istextinput)
 		return true
 
-	// Other keys while confirm up (same as fall-through → cancel before)
+	// Other keys while confirm up
 	return false
 }
 
@@ -7123,21 +7146,18 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				<div class="exodusconfirm_scrollhint" id="exodusconfirm_scrollhint">&#9660;</div>\
 			</div>'
 
+	// Div shell (not table): option rows are the only <tr>s, so click hit-testing is local.
 	var html = '\
-		<table class="exodusconfirm_layout">\
-		<tr>\
-			<td class="exodusconfirm_iconcol">\
-				'+ imagehtml + '\
-			</td>\
-			<td class="exodusconfirm_promptcol">\
+		<div class="exodusconfirm_layout">\
+			<div class="exodusconfirm_iconcol">'+ imagehtml + '</div>\
+			<div class="exodusconfirm_promptcol">\
 				<div class="exodusconfirm_promptstack">\
 					<div class="exodusconfirm_body">'+ bodyinner + '</div>\
 					'+ scrollhinthtml + '\
 					<div class="exodusconfirm_footer">'+ footerhtml + '</div>\
 				</div>\
-			</td>\
-		</tr>\
-		</table>'
+			</div>\
+		</div>'
 
 	//finally create the div body
 	div.innerHTML = html
@@ -7714,11 +7734,19 @@ async function decide_onload(decide_args) {
 
 	}
 
+	// Footer actions: only close the popup (popup-local; form path is blocked).
 	var okbutton = $$('decide_okbutton')
-	okbutton.onclick = decide_ok_onclick_sync
-
+	okbutton.onclick = function (event) {
+		exoduscancelevent(getevent(event))
+		decide_close(decide_getreturnvalues())
+		return false
+	}
 	var cancelbutton = $$('decide_cancelbutton')
-	cancelbutton.onclick = decide_cancel_onclick_sync
+	cancelbutton.onclick = function (event) {
+		exoduscancelevent(getevent(event))
+		decide_close('')
+		return false
+	}
 
 	//autoselect only one option
 	if (singlereturnvalue) {
@@ -7933,7 +7961,8 @@ async function decide_onload(decide_args) {
 		if (!element)
 			element = event.target
 		element.checked = true
-		decide_ok_onclick_sync()
+		decide_last_option_element = element
+		decide_close(element.getAttribute('decide_returnvalue'))
 		return exoduscancelevent(event)
 	}
 
@@ -7969,22 +7998,19 @@ async function decide_onload(decide_args) {
 		return
 	}
 
+	// Option-row click only (tbody rows carry decide_row). Footer uses its own handlers.
 	function decide_document_onclick(event, forceCheck) {
 		event = getevent(event)
-
-		// Checkbox input uses its own mouseup handler; ignore bubbled click (was
-		// passing false as 'checking' and undoing the selection).
-		// Allow dblclick through with forceCheck so it matches row dblclick behaviour.
 		if (event.target && event.target.type == 'checkbox' && typeof forceCheck !== 'boolean')
 			return exoduscancelevent(event)
 
 		var trtag = getancestor(event.target, 'tr')
-		var element
-		if (!trtag || !(element = trtag.getElementsByTagName('input')[0])) {
-			element = document.getElementsByName('decide_selection')[0]
-			client_focuson(element)
+		if (!trtag || trtag.getAttribute('decide_row') == null)
 			return
-		}
+
+		var element = trtag.getElementsByTagName('input')[0]
+		if (!element)
+			return
 
 		if (decide_returnmany) {
 			if (typeof forceCheck === 'boolean')
@@ -7997,13 +8023,12 @@ async function decide_onload(decide_args) {
 
 		decide_last_option_element = element
 		client_focuson(element)
-
 		return exoduscancelevent(event)
 	}
 
 	function decide_document_ondblclick(event) {
 		decide_document_onclick(event, true)
-		decide_ok_onclick_sync()
+		decide_close(decide_getreturnvalues())
 		return exoduscancelevent(event)
 	}
 
@@ -8022,7 +8047,6 @@ async function decide_onload(decide_args) {
 					returnvalues = returnvalue
 					break
 				}
-
 				if (returnvalue) {
 					var rank = Number(ranks[ii].innerText) - 1
 					returnvalues[rank] = returnvalue
@@ -8030,30 +8054,45 @@ async function decide_onload(decide_args) {
 			}
 		}
 
-		if (!returnvalues.length)
-			returnvalues = ''
+		// Nothing checked: last focused / first visible option
+		if (!decide_returnmany && (returnvalues === '' || returnvalues == null
+			|| (typeof returnvalues == 'object' && !returnvalues.length))) {
+			var fallback = decide_last_option_element
+			if (!fallback || decide_selection_row_hidden(fallback)) {
+				fallback = null
+				for (ii = 0; ii < selection2.length; ii++) {
+					if (!decide_selection_row_hidden(selection2[ii])) {
+						fallback = selection2[ii]
+						break
+					}
+				}
+			}
+			if (fallback) {
+				fallback.checked = true
+				returnvalues = fallback.getAttribute('decide_returnvalue')
+			}
+		}
 
-		//remove empty array values
-		returnvalues = returnvalues.exodustrim('')
+		if (returnvalues == null || returnvalues === ''
+			|| (typeof returnvalues == 'object' && !returnvalues.length))
+			returnvalues = ''
+		else if (typeof returnvalues == 'object' && returnvalues.exodustrim)
+			returnvalues = returnvalues.exodustrim('')
 
 		return returnvalues
+	}
 
+	// Only exit from the decide popup
+	function decide_close(value) {
+		resolvePendingConfirm(value, 'decide_close')
 	}
 
 	function decide_ok_onclick_sync() {
-
-		var returnvalues = decide_getreturnvalues()
-
-		//return exoduswindowclose(returnvalues)
-		//exodus_resume(returnvalues, 'decide_ok_onclick_sync')
-		resolvePendingConfirm(returnvalues, 'decide_ok_onclick_sync')
-
+		decide_close(decide_getreturnvalues())
 	}
 
 	function decide_cancel_onclick_sync() {
-		//return exoduswindowclose('')
-		//exodus_resume('', 'decide_ok_onclick_sync')
-		resolvePendingConfirm('', 'decide_ok_onclick_sync')
+		decide_close('')
 	}
 
 	//purely to suppress any automatic checkbox ticking by the browser
