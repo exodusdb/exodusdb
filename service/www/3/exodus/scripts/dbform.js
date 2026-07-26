@@ -8363,6 +8363,23 @@ async function readonlydocmsg() {
         return await exodusinvalid('Please open a document first')
 }
 
+// True if any bound F field on this group data row has non-blank text.
+// Same cell.text test as validateall() empty-row detection.
+function form_group_row_has_data(datarow) {
+
+	if (!datarow)
+		return false
+	for (var propname in datarow) {
+		var cell = datarow[propname]
+		var element = cell && cell.element
+		if (!element || element.getAttribute('exodustype') != 'F')
+			continue
+		if (cell.text && (typeof cell.text != 'string' || cell.text.replace(/ *$/, '')))
+			return true
+	}
+	return false
+}
+
 //'''''''''''
 //'INSERT ROW
 //'''''''''''
@@ -8408,20 +8425,22 @@ async function form_insertrow(event, append) {
     //if (nrows==1)
     //     append=true
 
-    //option to insert AFTER if clicking the one row or clicking the penultimate row of many
+    // Before/After: ask on single, penultimate, or last row of many — but only if
+    // the current line has data. Blank line → always Before (no prompt).
     if (typeof append == 'undefined') {
-        //clicking on the final row of multiple rows always adds AFTER/BELOW since most common and natural
-        if (nrows > 1 && rown == nrows - 1)
-            grecn++
-        //clicking a single row OR clicking the penultimate row
-        else if (nrows == 1 || rown == nrows - 2) {
-            var defaultchoice = (nrows == 1) ? 2 : 1
-            // default_icons false: Before/After are alternatives, not Yes/No
-            var choice = await exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel', null, null, null, false)
-            if (!choice)
-                return false
-            if (choice == 2)
-                grecn++//AFTER/BELOW
+        var askbeforeafter = (nrows == 1 || rown == nrows - 1 || rown == nrows - 2)
+        if (askbeforeafter) {
+            var grouprows = gds.data['group' + groupno]
+            var rowdata = grouprows && grouprows[rown]
+            if (form_group_row_has_data(rowdata)) {
+                // default_icons false: Before/After are alternatives, not Yes/No
+                var choice = await exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel', null, null, null, false)
+                if (!choice)
+                    return false
+                if (choice == 2)
+                    grecn++//AFTER/BELOW
+            }
+            // empty: grecn unchanged = Before
         }
     }
 
