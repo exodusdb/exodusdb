@@ -2212,6 +2212,11 @@ async function clientfunctions_windowonload() {
 			gmenuonloader = exodussetinterval('menuonload()', 100)
 		}
 
+		// Form pages use dbform document_onkeydown for Alt+letter. Pure client pages
+		// (helpkeyboard, backup, …) need only the top-bar subset.
+		if (typeof gdictfilename == 'undefined')
+			exodus_menubar_ensure_keydown()
+
 	}
 
 	//execute any custom window onload function
@@ -5015,14 +5020,68 @@ function menuchangeoption(menu, newmenuoption) {
 }
 
 /*
- * Add a flat menubar tool (non-form pages, help, …).
- * Builds menubuttonhtml → await id_onclick(event). Places left of the
- * trailing cluster (theme/logout) when present. Safe after standard tools
- * exist; from formfunctions_onload use setTimeout(0) so Menu/Refresh land first.
- *
- * Without dbform, exodusonclick is never dispatched — same as Refresh/Logout:
- * wire click when there is no gdictfilename.
+ * Non-form pages (no dbform document_onkeydown): Alt+M/G/R + tools that used
+ * menubuttonhtml accesskey (e.g. Print Alt+P → id_onclick).
  */
+var gexodus_menubar_keydown_installed = false
+
+function exodus_menubar_ensure_keydown() {
+
+	if (gexodus_menubar_keydown_installed || typeof gdictfilename != 'undefined')
+		return
+	gexodus_menubar_keydown_installed = true
+	addeventlistener(document, 'keydown', 'exodus_menubar_keydown')
+}
+
+async function exodus_menubar_keydown(event) {
+
+	event = getevent(event)
+	if (!event || !event.altKey || event.shiftKey || event.ctrlKey)
+		return true
+	var t = event.target
+	if (t && (t.tagName == 'INPUT' || t.tagName == 'TEXTAREA' || t.tagName == 'SELECT' || t.isContentEditable))
+		return true
+	var keycode = event.keyCode ? event.keyCode : event.which
+
+	if (keycode == 77 && $$('menubutton') && typeof menuonmouseover == 'function') {
+		exoduscancelevent(event)
+		window.scrollTo(0, 0)
+		exodussettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
+		return false
+	}
+	if (keycode == 71 && typeof exoduslogout_onclick == 'function') {
+		exoduscancelevent(event)
+		await exoduslogout_onclick()
+		return false
+	}
+	if (keycode == 82 && typeof refreshcache_onclick == 'function') {
+		exoduscancelevent(event)
+		await refreshcache_onclick()
+		return false
+	}
+	// accesskey button under bar → id_onclick (menubutton id ends in "button")
+	if (keycode < 65 || keycode > 90)
+		return true
+	var bar = gexodus_menubar || document.getElementById('exodus_menu')
+	if (!bar)
+		return true
+	var letter = String.fromCharCode(keycode)
+	var ak = bar.querySelector('button[accesskey="' + letter + '"],button[accesskey="' + letter.toLowerCase() + '"]')
+	if (!ak || !ak.parentNode)
+		return true
+	var mb = ak.parentNode.querySelector('.menubutton[id$="button"]')
+	if (!mb || !mb.id)
+		return true
+	var fn = window[mb.id.slice(0, -6) + '_onclick']
+	if (typeof fn != 'function')
+		return true
+	exoduscancelevent(event)
+	await fn(event)
+	return false
+}
+
+// Non-form menubar tool. id → await id_onclick. setTimeout(0) from formfunctions_onload
+// if standard Menu/Refresh are not on the bar yet.
 function exodus_menubar_add_button(id, imagesrc, name, title, accesskey) {
 
 	if (!gexodus_menubar)
@@ -5034,11 +5093,11 @@ function exodus_menubar_add_button(id, imagesrc, name, title, accesskey) {
 		gexodus_menubar.insertBefore(wrap, trail)
 	else
 		gexodus_menubar.appendChild(wrap)
-	// Non-form pages: attribute alone is inert (dbform document_onclick missing)
 	if (typeof gdictfilename == 'undefined')
 		addeventlistener(wrap, 'click', id + '_onclick')
 	if (typeof adjust_bodymargin == 'function')
 		adjust_bodymargin()
+	exodus_menubar_ensure_keydown()
 	return wrap
 }
 

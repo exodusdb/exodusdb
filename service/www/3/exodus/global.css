@@ -345,7 +345,23 @@ TABLE
     border-width: 0px;
 }
 
-/* Print styles live at end of this file (must follow DM !important screen rules). */
+/* Print: keep form tables printable; hide fixed menubar; paper is white (DM screen CSS is @media screen only). */
+@media print {
+    TABLE.exodusform {
+        display: block;
+    }
+    TABLE[exodusgroupno] > thead {
+        position: static;
+    }
+    #exodus_menu {
+        display: none !important;
+    }
+    HTML, BODY {
+        background: #fff !important;
+        color: #000 !important;
+        margin-top: 0 !important;
+    }
+}
 
 /* Browser default (toolbar/system size); user SCREEN_FONT_SIZE is % on <html> via exodus_set_style */
 HTML {

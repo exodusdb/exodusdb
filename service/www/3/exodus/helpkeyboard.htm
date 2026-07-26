@@ -2,57 +2,193 @@
 <html lang="en">
 <head>
     <title>EXODUS Keyboard Shortcuts</title>
-    <link rel="stylesheet" type="text/css" href="global.css" />
+    <!-- client.js: top menubar, day/night theme, global.css / face cookies -->
+    <script type="text/javascript" src="scripts/client.js"></script>
+    <script type="text/javascript">
+        // Standard menubar tools are added after formfunctions_onload — defer Print.
+        async function formfunctions_onload() {
+            window.setTimeout(function () {
+                if (typeof exodus_menubar_add_button == 'function')
+                    exodus_menubar_add_button(
+                        'helpkeyboard_print',
+                        typeof gprintimage != 'undefined' ? gprintimage : null,
+                        '<u>P</u>rint',
+                        'Print this page',
+                        'P')
+            }, 0)
+            return true
+        }
+        // Blank white document (themed page CSS fights print; this does not).
+        async function helpkeyboard_print_onclick(event) {
+            var src = document.getElementById('helpkeyboard_print_content')
+            var w = window.open('', '_blank')
+            if (!w || !src) {
+                window.print()
+                return
+            }
+            var css = [
+                '@page { margin: 0.5in; }',
+                'html, body { background: #fff; color: #000; margin: 0; font: 11pt verdana,sans-serif; }',
+                'table { border-collapse: collapse; width: 100%; }',
+                'td, th { border: 1px solid #333; padding: 0.25em 0.5em; vertical-align: top; }'
+            ].join('\n')
+            w.document.open()
+            w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>')
+            w.document.write(document.title || 'Print')
+            w.document.write('</title><style>' + css + '</style></head><body>')
+            w.document.write(src.innerHTML)
+            w.document.write('</body></html>')
+            w.document.close()
+            w.focus()
+            w.setTimeout(function () { w.print(); w.close() }, 50)
+        }
+    </script>
 </head>
 <body>
+    <div align="center">
+    <div id="helpkeyboard_print_content" style="text-align: left; max-width: 56em; margin: 0 auto">
     <h1>
         EXODUS Keyboard Shortcuts</h1>
     <h2>
         General</h2>
-    <b>Ctrl+Enter</b> or <b>F9</b> - SAVE/YES/START - Commit any screen or popup<br />
-    <b>Esc</b> or <b>F8</b> - CANCEL/NO/STOP - Close any document or popup<br />
-    <b>F2</b> - EDIT - Edit the current field instead of replacing it<br />
-    <b>Alt+M</b> - MENU - Open the menu. Press letters or cursor keys to select menu
-    items<br />
-    <b>F7</b> - POPUP - Options for the current item<br />
-    <b>F6</b> - LINK - Open related screen for current item
+    <table class="exodus-help-table">
+        <tr>
+            <th>Keys</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><b>Ctrl+Enter</b> or <b>F9</b></td>
+            <td>Save/Yes/Start</td>
+            <td>Commit any screen or popup</td>
+        </tr>
+        <tr>
+            <td><b>Esc</b> or <b>F8</b></td>
+            <td>Cancel/No/Stop</td>
+            <td>Close any document or popup</td>
+        </tr>
+        <tr>
+            <td><b>F2</b></td>
+            <td>Edit/Home/End</td>
+            <td>Edit the current field instead of replacing it</td>
+        </tr>
+        <tr>
+            <td><b>Alt+M</b></td>
+            <td><u>M</u>enu</td>
+            <td>Open the menu. Press letters or cursor keys to select menu items</td>
+        </tr>
+        <tr>
+            <td><b>F7</b></td>
+            <td>Popup</td>
+            <td>Options for the current item</td>
+        </tr>
+        <tr>
+            <td><b>F6</b></td>
+            <td>Link</td>
+            <td>Open related screen for current item</td>
+        </tr>
+    </table>
     <h2>
         Documents</h2>
-    <b>Alt+N</b> - NEW - Start a new document
-    <br />
-    <b>Alt+O</b> - OPEN/SEARCH - Open an existing document - Search/Browse/List
-    <br />
-    <b>Alt+C</b> - CLOSE - Close the current document
-    <br />
-    <b>Alt+E</b> - EDIT/RELEASE - Edit document/Release document to other users
-    <br />
-    <b>Alt+P</b> - PRINT - Print/Send the current document.
-    <br />
-    <b>Alt+L</b> - LIST - Get a list of the documents.
-    <br />
-    <b>Alt+Home</b> - HOME - Move to the first field on the document
-    <br />
-    <b>Alt+End</b> - END - Move to the last field on the document
-    <br />
-    <b>Alt+↑ Alt+↓ Alt+← Alt+→</b> - SCROLL PAGE - Pan the window about one screen (wide/tall forms). Alt+↓ on a drop-down still opens options.
-    <br />
-    <b>Alt+0 Alt+1</b> etc. - BUTTON0-9 - Special buttons per form
+    <table class="exodus-help-table">
+        <tr>
+            <th>Keys</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><b>Alt+N</b></td>
+            <td><u>N</u>ew</td>
+            <td>Start a new document</td>
+        </tr>
+        <tr>
+            <td><b>Alt+O</b></td>
+            <td><u>O</u>pen/Search</td>
+            <td>Open an existing document — Search/Browse/List</td>
+        </tr>
+        <tr>
+            <td><b>Alt+C</b></td>
+            <td><u>C</u>lose</td>
+            <td>Close the current document</td>
+        </tr>
+        <tr>
+            <td><b>Alt+E</b></td>
+            <td><u>E</u>dit/R<u>e</u>lease</td>
+            <td>Edit document / Release document to other users</td>
+        </tr>
+        <tr>
+            <td><b>Alt+P</b></td>
+            <td><u>P</u>rint/Send</td>
+            <td>Print/Send the current document</td>
+        </tr>
+        <tr>
+            <td><b>Alt+L</b></td>
+            <td><u>L</u>ist</td>
+            <td>Get a list of the documents</td>
+        </tr>
+        <tr>
+            <td><b>Alt+Home</b></td>
+            <td>Home</td>
+            <td>Move to the first field on the document</td>
+        </tr>
+        <tr>
+            <td><b>Alt+End</b></td>
+            <td>End</td>
+            <td>Move to the last field on the document</td>
+        </tr>
+        <tr>
+            <td><b>Alt+↑ Alt+↓ Alt+← Alt+→</b></td>
+            <td>Scroll Page</td>
+            <td>Pan the window about one screen (wide/tall forms). Alt+↓ on a drop-down still opens options</td>
+        </tr>
+        <tr>
+            <td><b>Alt+0 Alt+1</b> etc.</td>
+            <td>Button 0–9</td>
+            <td>Special buttons per form</td>
+        </tr>
+    </table>
     <h2>
         Rows and Columns in Tables</h2>
-    <b>Ctrl+Insert or Ctrl+I</b> - INSERT ROW - Insert a new row
-    <br />
-    <b>Ctrl+Delete or Ctrl+D</b> - DELETE ROW - Delete the current row (or Ctrl+Shift+D)
-    <br />
-    <b>Alt+Y</b> - COPY DOWN - Duplicate the data from the same column in the row above
-    <br />
-    <b>Ctrl+G</b> - GO TO - Go to line number xx/Show current line number
-    <br />
-    <b>Ctrl+Home</b> - FIRST ROW/COLUMN - Go to the first row and column in a table
-    <br />
-    <b>Ctrl+End</b> - LAST ROW/COLUMN - Go to the last row and column in a table
+    <table class="exodus-help-table">
+        <tr>
+            <th>Keys</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><b>Ctrl+Insert</b> or <b>Ctrl+I</b></td>
+            <td><u>I</u>nsert Row</td>
+            <td>Insert a new row</td>
+        </tr>
+        <tr>
+            <td><b>Ctrl+Delete</b> or <b>Ctrl+D</b></td>
+            <td><u>D</u>elete Row</td>
+            <td>Delete the current row (or Ctrl+Shift+D)</td>
+        </tr>
+        <tr>
+            <td><b>Alt+Y</b></td>
+            <td>Cop<u>y</u> Down</td>
+            <td>Duplicate the data from the same column in the row above</td>
+        </tr>
+        <tr>
+            <td><b>Ctrl+G</b></td>
+            <td><u>G</u>o To</td>
+            <td>Go to line number xx / Show current line number</td>
+        </tr>
+        <tr>
+            <td><b>Ctrl+Home</b></td>
+            <td>First Row/Column</td>
+            <td>Go to the first row and column in a table</td>
+        </tr>
+        <tr>
+            <td><b>Ctrl+End</b></td>
+            <td>Last Row/Column</td>
+            <td>Go to the last row and column in a table</td>
+        </tr>
+    </table>
     <h2>
         Crosstab of keyboard shortcuts</h2>
-    <table cellspacing="1" cellpadding="1" style="background-color: #ffffcc">
+    <table class="exodus-help-table">
         <tr>
             <td>
                 <strong>Key</strong></td>
@@ -626,5 +762,7 @@
     </table>
     <p>
         * Standard Browser Keys</p>
+    </div>
+    </div>
 </body>
 </html>
