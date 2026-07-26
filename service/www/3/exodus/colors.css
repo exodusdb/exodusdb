@@ -184,11 +184,11 @@ button.exodus-native-color:focus {
     align-items: center;
     justify-content: center;
     user-select: none;
-    /* OKLCH relative: same hue, slightly deeper + stronger (CSS Color 5) */
+    /* OKLCH relative: same as form th / sticky thead (chroma floor for pale faces) */
     background-color: var(--exodus-color-monitor-face, #808080);
     background-color: oklch(from var(--exodus-color-monitor-face, #808080)
-        calc(l * 0.95)
-        calc(c * 1.3)
+        calc(l * 0.97)
+        calc(c * 1.35 + 0.015)
         h);
     color: #111;
     -webkit-text-fill-color: currentColor;
