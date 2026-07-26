@@ -1,10 +1,6 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<!-- 14x14 expand icon centred in 16x16 canvas (matches delete.svg visual size) -->
-<rect x="2" y="2" width="12" height="12" fill="white"/>
-<rect x="1" y="1" width="14" height="1" fill="#000"/>
-<rect x="1" y="14" width="14" height="1" fill="#000"/>
-<rect x="1" y="1" width="1" height="14" fill="#000"/>
-<rect x="14" y="1" width="1" height="14" fill="#000"/>
-<rect x="4" y="7" width="8" height="2" fill="#000"/>
-<rect x="7" y="4" width="2" height="8" fill="#000"/>
+  <!-- Monochrome mask: square + plus. Same darkgrey as F6/F7/print; stroke 1.5
+       matches application_form so a closed square does not read heavier/darker. -->
+  <rect x="1.75" y="1.75" width="12.5" height="12.5" stroke="#000" stroke-width="1.5" fill="none"/>
+  <path d="M8 4.75v6.5M4.75 8h6.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
 </svg>
