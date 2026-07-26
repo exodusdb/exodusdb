@@ -8,7 +8,8 @@ async function changelog_pop_number(many) {
 
 async function changelog_list() {
 
- await windowopen('../general/whatsnew.htm')
+ // Same folder as changelog.htm (not general/ — that path 404s)
+ await windowopen('whatsnew.htm')
  return true
 }
 
