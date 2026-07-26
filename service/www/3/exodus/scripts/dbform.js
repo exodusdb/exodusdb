@@ -80,39 +80,36 @@ function form_apply_input_field_width(element) {
 
 // Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Open/Edit/Delete.
 // (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
-gnewimage = gimagetheme + 'form_add.svg' // painted multicolour — excluded from mask tint
-gopenimage = gimagetheme + 'open.svg' // painted page + magnifier
-gfindimage = exodus_icon_spec('zoom.svg', 'darkgrey')
-gcalendarimage = exodus_icon_spec('calendar.svg', 'darkgrey')
-gsaveimage = exodus_icon_spec('tick.svg', 'green')
-gsavegreyimage = exodus_icon_spec('tick.svg', 'lightgrey') // inactive Save
+gnewimage = gimagetheme + 'record-new.svg' // painted multicolour — excluded from mask tint
+gopenimage = gimagetheme + 'record-open.svg' // painted page + magnifier
+gfindimage = exodus_icon_spec('field-find.svg', 'darkgrey')
+gcalendarimage = exodus_icon_spec('field-date.svg', 'darkgrey')
+gsaveimage = exodus_icon_spec('record-save.svg', 'green')
+gsavegreyimage = exodus_icon_spec('record-save.svg', 'lightgrey') // inactive Save
 // Painted multi-colour (overlapping sheets) — not a single CSS tint
-gcopyimage = gimagetheme + (gisdarktheme ? 'copy_darkmode.svg' : 'copy.svg')
-gcloseimage = exodus_icon_spec('cross.svg', 'red')
-greleaseimage = exodus_icon_spec('lock.svg', 'blue') // was #1E97CC
-geditimage = gimagetheme + 'pencil_edit.svg' // painted multicolour
-gdeleteimage = gimagetheme + 'form_delete.svg' // painted multicolour
-glistimage = exodus_icon_spec('table.svg', 'darkgrey')
-gprintsendimage = exodus_icon_spec('printer.svg', 'darkgrey')
-ginsertrowimage = exodus_icon_spec('add.svg', 'green')
-gdeleterowimage = exodus_icon_spec('delete.svg', 'red')
-gexpandrowimage = exodus_icon_spec('smallexpand.svg', 'darkgrey')
+gcopyimage = gimagetheme + (gisdarktheme ? 'record-copy_darkmode.svg' : 'record-copy.svg')
+gcloseimage = exodus_icon_spec('record-close.svg', 'red')
+greleaseimage = exodus_icon_spec('record-release.svg', 'blue') // was #1E97CC
+geditimage = gimagetheme + 'record-edit.svg' // painted multicolour
+gdeleteimage = gimagetheme + 'record-delete.svg' // painted multicolour
+glistimage = exodus_icon_spec('file-list.svg', 'darkgrey')
+gprintsendimage = exodus_icon_spec('file-print.svg', 'darkgrey')
+ginsertrowimage = exodus_icon_spec('row-insert.svg', 'green')
+gdeleterowimage = exodus_icon_spec('row-delete.svg', 'red')
+gexpandrowimage = exodus_icon_spec('row-expand.svg', 'darkgrey')
 gsortimage = exodus_sortimage()
-glinkimage = exodus_icon_spec('application_form.svg', 'darkgrey')
-gfirstimage = exodus_icon_spec('resultset_first.svg', 'blue')
-glastimage = exodus_icon_spec('resultset_last.svg', 'blue')
-gnextimage = exodus_icon_spec('resultset_next.svg', 'blue')
-gpreviousimage = exodus_icon_spec('resultset_previous.svg', 'blue')
-gspacerimage = gimagetheme + 'blank.svg'
-gblankimage = gimagetheme + 'blank.svg'
-
+glinkimage = exodus_icon_spec('field-link.svg', 'darkgrey')
+gfirstimage = exodus_icon_spec('nav-first.svg', 'blue')
+glastimage = exodus_icon_spec('nav-last.svg', 'blue')
+gnextimage = exodus_icon_spec('nav-next.svg', 'blue')
+gpreviousimage = exodus_icon_spec('nav-prev.svg', 'blue')
 // Painted New/Open/Edit/Delete need DM twin files
 if (gisdarktheme) {
-	gnewimage = gimagetheme + 'form_add_darkmode.svg'
-	gopenimage = gimagetheme + 'open_darkmode.svg'
-	gdeleteimage = gimagetheme + 'form_delete_darkmode.svg'
-	geditimage = gimagetheme + 'pencil_edit_darkmode.svg'
-	gthemeimage = gimagetheme + 'theme_button_darkmode.svg'
+	gnewimage = gimagetheme + 'record-new_darkmode.svg'
+	gopenimage = gimagetheme + 'record-open_darkmode.svg'
+	gdeleteimage = gimagetheme + 'record-delete_darkmode.svg'
+	geditimage = gimagetheme + 'record-edit_darkmode.svg'
+	gthemeimage = gimagetheme + 'shell-theme_darkmode.svg'
 }
 
 // document.getElementsByTagName('BODY').onload=window_onload

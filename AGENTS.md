@@ -71,18 +71,12 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 - **SVG assets are full-bleed 16×16** (art to the edges of the viewBox). Default: no empty border in the file. Do **not** add per-file `scale(…)` wrappers or per-control CSS padding/mask hacks for mass.
 - **Exception — perceptually large glyphs** (dense shapes that read oversized next to siblings, e.g. solid X / Close): may include **padding in the SVG** (e.g. 2 units inset on a 16 canvas). That is the only place for that inset — not CSS.
 - **`--exodus-ui-icon-glyph` stays `1`** (fill the outer box). Painted `<img>` padding and mono `mask-size` both follow it; do not use glyph as a per-icon mass control.
-- Colours stay in the SVGs; overall display size does not.
+- **Naming:** `role[-variant].svg` (kebab-case). Families: `shell-*`, `record-*`, `file-*`, `nav-*`, `row-*`, `field-*`, `confirm-*`, `media-*`, `sort*`, `dialog-*`, `login-*`, `theme-*`. Mono masks = one file + CSS tint; painted multi = optional `_darkmode` twin only.
+- Colours for mono stay in CSS (`--exodus-icon-*`); painted multi keep fill in the SVG.
 
-### Raster → SVG migration (multi-turn)
+### Still raster / webp (page chrome, not toolbar icons)
 
-**Menubar / form chrome:** already SVG (menu, refresh, logout, theme, company, New…nav, zoom, calendar, row add/delete). Delete obsolete PNG/GIF twins only when no HTM/JS refs remain.
-
-**Next batches (in order):**
-1. Login: `eye.png` / `eye-slash.png` (+ index.html)
-2. Dialog chrome: `xpinfo.gif`, `xpquestion.gif`, `xpwarning.gif`, `xpcritical.gif`
-3. Leftover form GIF: `smallopen.gif` if still referenced
-4. Neosys page icons: `play.png`, `pencil.png`, `page_copy.png`, address/detail icons, logos as needed
-5. Purge unused rasters after refs are gone
+Address detail PNGs, logos (`exoduslogo.webp`, `login.webp`, …). Toolbar/actions are SVG under the role-based names above.
 
 ### Deferred: framework mental model write-up
 

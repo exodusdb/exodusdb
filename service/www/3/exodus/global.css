@@ -846,6 +846,14 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
     box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
 }
 
+/* Layout spacer = icon width (replaces old transparent spacer images). */
+.exodus-icon-spacer {
+    display: inline-block;
+    width: var(--exodus-ui-icon-size);
+    height: 1px;
+    vertical-align: middle;
+}
+
 /* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size / glyph).
  * Sort column imgs are text-height glyphs — exclude from toolbar square box. */
 .graphicbutton img,
@@ -1233,8 +1241,8 @@ input[type=checkbox] {
 input[type=checkbox]:checked {
     background-color:var(--radio-color);
     border: 0px;
-    /* U+2714 / &#10004; heavy check mark glyph (checkbox_tick.svg) */
-    background-image: url("../../exodus/images/theme2/checkbox_tick.svg");
+    /* U+2714 heavy check mark glyph */
+    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
     background-size: 100%;
     background-clip: padding-box;
     background-position: center;
@@ -1754,7 +1762,7 @@ TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
 
 :root[data-theme="dark_mode"] input[type=checkbox]:checked {
     background-color: var(--radio-color);
-    background-image: url("../../exodus/images/theme2/checkbox_tick.svg");
+    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
     background-size: 90%;
 }
 

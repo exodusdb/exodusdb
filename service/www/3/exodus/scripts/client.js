@@ -60,14 +60,14 @@ function exodus_is_icon_spec(x) {
 	return !!(x && typeof x == 'object' && x.mask)
 }
 
-var gmenuimage = exodus_icon_spec('menu_burger.svg', 'darkgrey')
-var glogoutimage = exodus_icon_spec('logout.svg', 'red')
-var gloginimage = exodus_icon_spec('login.svg', 'green')
-var grefreshimage = exodus_icon_spec('refresh.svg', 'green')
-var gprintimage = exodus_icon_spec('printer.svg', 'darkgrey')
-var gthemeimage = gimagetheme + 'theme_button.svg' // painted sun/moon chrome
+var gmenuimage = exodus_icon_spec('shell-menu.svg', 'darkgrey')
+var glogoutimage = exodus_icon_spec('shell-logout.svg', 'red')
+var gloginimage = exodus_icon_spec('shell-login.svg', 'green')
+var grefreshimage = exodus_icon_spec('shell-refresh.svg', 'green')
+var gprintimage = exodus_icon_spec('file-print.svg', 'darkgrey')
+var gthemeimage = gimagetheme + 'shell-theme.svg' // painted sun/moon chrome
 // company icon uses a patterned SVG — keep painted (LM/DM twins)
-var gcompanyimage = gimagetheme + 'formpage_companies.svg'
+var gcompanyimage = gimagetheme + 'shell-company.svg'
 
 var gisdarktheme
 // LM/DM preference cookie — global per browser (not glogincode / dataset / user)
@@ -79,7 +79,7 @@ function exodus_sortimage(order) {
 	// Painted SVG <img> (not mono mask): keeps fill-opacity for inactive chevron,
 	// and sorttable still reads clickedelement.src for up/down. Same host element
 	// as before — id / exodusonclick / sorttableelementid unchanged.
-	var name = 'smallsort' + (order || '')
+	var name = (order == 'up') ? 'sort-up' : (order == 'down') ? 'sort-down' : 'sort'
 	if (gisdarktheme)
 		name += '_darkmode'
 	return gimagetheme + name + '.svg'
@@ -1634,7 +1634,7 @@ function theme_toggle_title(dark) {
 	return dark ? 'Switch to light mode' : 'Switch to dark mode'
 }
 
-// Menubar theme control: same knob sub-icons as the old slider (toggle_sun / toggle_moon).
+// Menubar theme control: theme-sun / theme-moon glyph inside shell-theme host.
 // Show current mode: sun in light, moon in dark (same as knob.innerHTML before).
 // Optional img/btn: required while building the control (not in document yet — getElementById fails).
 function exodus_sync_theme_btn_icon(img, btn) {
@@ -1643,22 +1643,26 @@ function exodus_sync_theme_btn_icon(img, btn) {
 	btn = btn || document.getElementById('theme_toggle_btn')
 	if (!img)
 		return
-	img.src = gimagetheme + (gisdarktheme ? 'toggle_moon.svg' : 'toggle_sun.svg')
+	img.src = gimagetheme + (gisdarktheme ? 'theme-moon.svg' : 'theme-sun.svg')
 	if (btn)
 		btn.title = theme_toggle_title(gisdarktheme)
 }
 
 function exodus_swap_tool_icons() {
 
-	// Static toolbar icons (e.g. reports.htm add/delete/refresh/play). SVG masks are
-	// black monochrome; convert to tinted .exodus-icon spans (size/v-align with menubar).
-	var colors = { add: 'green', delete: 'red', refresh: 'green', play: 'green', pause: 'blue' }
-	for (var base of ['add', 'delete', 'refresh', 'play', 'pause']) {
-		// Match /add.svg not form_add.svg (slash before basename)
-		var sel = 'img[src*="/' + base + '.svg"], img[src*="/' + base + '.png"], '
-			+ 'img[src*="/' + base + '_darkmode.svg"], img[src*="/' + base + '_darkmode.png"]'
+	// Static toolbar icons (e.g. reports.htm). Mono masks → tinted .exodus-icon spans.
+	var tools = [
+		{ file: 'row-insert.svg', color: 'green' },
+		{ file: 'row-delete.svg', color: 'red' },
+		{ file: 'shell-refresh.svg', color: 'green' },
+		{ file: 'media-play.svg', color: 'green' },
+		{ file: 'media-pause.svg', color: 'blue' }
+	]
+	for (var ti = 0; ti < tools.length; ti++) {
+		var tool = tools[ti]
+		var sel = 'img[src*="/' + tool.file + '"]'
 		document.querySelectorAll(sel).forEach(function (img) {
-			var span = exodus_set_icon_element(img, exodus_icon_spec(base + '.svg', colors[base]))
+			var span = exodus_set_icon_element(img, exodus_icon_spec(tool.file, tool.color))
 			if (span && span.style)
 				span.style.cursor = 'pointer'
 		})
@@ -1689,17 +1693,17 @@ function exodus_set_theme_icons() {
 
 	// Monochrome icons: colours come from CSS vars (no path swap).
 	// Painted multi-colour: New/Open/Edit/Delete, Copy, theme, company
-	gthemeimage = gimagetheme + (gisdarktheme ? 'theme_button_darkmode.svg' : 'theme_button.svg')
-	gcompanyimage = gimagetheme + (gisdarktheme ? 'formpage_companies_darkmode.svg' : 'formpage_companies.svg')
+	gthemeimage = gimagetheme + (gisdarktheme ? 'shell-theme_darkmode.svg' : 'shell-theme.svg')
+	gcompanyimage = gimagetheme + (gisdarktheme ? 'shell-company_darkmode.svg' : 'shell-company.svg')
 	if (typeof gcopyimage != 'undefined')
-		gcopyimage = gimagetheme + (gisdarktheme ? 'copy_darkmode.svg' : 'copy.svg')
+		gcopyimage = gimagetheme + (gisdarktheme ? 'record-copy_darkmode.svg' : 'record-copy.svg')
 	if (typeof gnewimage != 'undefined') {
-		gnewimage = gimagetheme + (gisdarktheme ? 'form_add_darkmode.svg' : 'form_add.svg')
-		gdeleteimage = gimagetheme + (gisdarktheme ? 'form_delete_darkmode.svg' : 'form_delete.svg')
-		geditimage = gimagetheme + (gisdarktheme ? 'pencil_edit_darkmode.svg' : 'pencil_edit.svg')
+		gnewimage = gimagetheme + (gisdarktheme ? 'record-new_darkmode.svg' : 'record-new.svg')
+		gdeleteimage = gimagetheme + (gisdarktheme ? 'record-delete_darkmode.svg' : 'record-delete.svg')
+		geditimage = gimagetheme + (gisdarktheme ? 'record-edit_darkmode.svg' : 'record-edit.svg')
 	}
 	if (typeof gopenimage != 'undefined')
-		gopenimage = gimagetheme + (gisdarktheme ? 'open_darkmode.svg' : 'open.svg')
+		gopenimage = gimagetheme + (gisdarktheme ? 'record-open_darkmode.svg' : 'record-open.svg')
 	if (typeof gsortimage != 'undefined')
 		gsortimage = exodus_sortimage()
 	exodus_update_auth_button()
@@ -6584,27 +6588,27 @@ function exodus_set_icon_element(el, specOrUrl) {
 
 // Decide Select: green check (mask)
 function exodusconfirm_ok_image() {
-	return exodus_icon_html(exodus_icon_spec('check.svg', 'green'))
+	return exodus_icon_html(exodus_icon_spec('confirm-ok.svg', 'green'))
 }
 // Decide Cancel: red X mask
 function exodusconfirm_cancel_image() {
-	return exodus_icon_html(exodus_icon_spec('cross.svg', 'red'))
+	return exodus_icon_html(exodus_icon_spec('record-close.svg', 'red'))
 }
-// Confirm Yes/OK (positive) — Save label uses menubar tray icon (tick.svg), else check
+// Confirm Yes/OK (positive) — Save label uses menubar tray icon (record-save.svg), else check
 function exodusconfirm_yes_image(buttontext) {
 	var plain = String(buttontext == null ? '' : buttontext).replace(/<[^>]*>/g, '')
 	plain = plain.replace(/\s+/g, ' ').trim()
 	if (plain.toLowerCase() == 'save')
-		return exodus_icon_html(exodus_icon_spec('tick.svg', 'green'))
+		return exodus_icon_html(exodus_icon_spec('record-save.svg', 'green'))
 	return exodusconfirm_ok_image()
 }
 // Confirm No: orange X if Cancel also shown, else red X
 function exodusconfirm_no_image(hasCancelButton) {
-	return exodus_icon_html(exodus_icon_spec('cross.svg', hasCancelButton ? 'orange' : 'red'))
+	return exodus_icon_html(exodus_icon_spec('record-close.svg', hasCancelButton ? 'orange' : 'red'))
 }
 // Confirm Cancel (Esc) — red U-turn
 function exodusconfirm_back_image() {
-	return exodus_icon_html(exodus_icon_spec('goback.svg', 'red'))
+	return exodus_icon_html(exodus_icon_spec('confirm-back.svg', 'red'))
 }
 
 function exodusconfirm_focusable_elements() {
@@ -6997,19 +7001,19 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		// Dark faces need brighter discs than light-mode XP colours (else info/question vanish).
 		var xpdm = (typeof gisdarktheme != 'undefined' && gisdarktheme) ? '_darkmode' : ''
 		if (imagesrc == 'critical') {
-			imagesrc = 'xpcritical' + xpdm + '.svg'
+			imagesrc = 'dialog-critical' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_critical')
 		}
 		if (imagesrc == 'warning') {
-			imagesrc = 'xpwarning' + xpdm + '.svg'
+			imagesrc = 'dialog-warning' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_warning')
 		}
 		if (imagesrc == 'info') {
-			imagesrc = 'xpinfo' + xpdm + '.svg'
+			imagesrc = 'dialog-info' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_info')
 		}
 		if (imagesrc == 'question1') {
-			imagesrc = 'xpquestion' + xpdm + '.svg'
+			imagesrc = 'dialog-question' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_question1')
 		}
 		if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {

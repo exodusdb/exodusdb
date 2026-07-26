@@ -49,7 +49,7 @@ async function formfunctions_onload() {
     $$('logindiv').style.display = ''
 
     // Warm both eye assets (open + slash) so first click is not blocked on fetch
-    ;['eye.svg', 'eye-slash.svg'].forEach(function (name) {
+    ;['login-eye.svg', 'login-eye-slash.svg'].forEach(function (name) {
         var img = new Image()
         img.src = '../exodus/images/theme2/' + name
     })
@@ -420,7 +420,7 @@ function showpassword_sync() {
 		currpasswordelement.parentNode.insertBefore(gsavedpasswordelement,currpasswordelement)
 		currpasswordelement.parentNode.removeChild(currpasswordelement)
 		gsavedpasswordelement=null
-		showpasswordelement.src = '../exodus/images/theme2/eye-slash.svg'
+		showpasswordelement.src = '../exodus/images/theme2/login-eye-slash.svg'
 		return true
 
 	} else {
@@ -449,7 +449,7 @@ function showpassword_sync() {
 		parent.insertBefore(el, gsavedpasswordelement);
 		//gsavedpasswordelement.parentNode.removeChild(gsavedpasswordelement)
 		parent.removeChild(gsavedpasswordelement);
-		showpasswordelement.src = '../exodus/images/theme2/eye.svg'
+		showpasswordelement.src = '../exodus/images/theme2/login-eye.svg'
 		return false
 	}
 }
