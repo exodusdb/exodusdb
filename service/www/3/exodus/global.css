@@ -713,12 +713,12 @@ TEXTAREA:focus {
     padding: 0.15em 0.3em;
 }
 
-/* Empty type-S: nbsp strut (height) + 1ch solid half-contrast line (dotted = editable) */
+/* Empty type-S: nbsp strut (height) + 1ch solid subliminal line (was 50% of dot; half again) */
 TABLE.exodusform SPAN.clsReadOnly:empty::before {
     content: "\00a0";
     display: inline-block;
     width: 1ch;
-    border-bottom: 2.5px solid color-mix(in srgb, var(--exodus-dotcolor) 50%, transparent);
+    border-bottom: 2.5px solid color-mix(in srgb, var(--exodus-dotcolor) 33%, transparent);
 }
 
 #menudiv > button[accesskey="M"] {
