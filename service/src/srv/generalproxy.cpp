@@ -613,10 +613,10 @@ badsetcodepage:
 
 	} else if (mode == "ABOUT") {
 		perform("ABOUT");
-		// transfer @user4 to data
-		// response='OK'
-		msg_.move(response_);
-		response_.prefixer("OK ");
+		// ABOUT sets data_ (and note → USER4); prefer data_ for clean client display
+		if (not data_)
+			msg_.move(data_);
+		response_ = "OK";
 
 	} else if (mode == "UTIL") {
 		perform("UTIL");
