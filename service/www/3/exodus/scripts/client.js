@@ -64,6 +64,7 @@ var gmenuimage = exodus_icon_spec('menu_burger.svg', 'darkgrey')
 var glogoutimage = exodus_icon_spec('logout.svg', 'red')
 var gloginimage = exodus_icon_spec('login.svg', 'green')
 var grefreshimage = exodus_icon_spec('refresh.svg', 'green')
+var gprintimage = exodus_icon_spec('printer.svg', 'darkgrey')
 var gthemeimage = gimagetheme + 'theme_button.svg' // painted sun/moon chrome
 // company icon uses a patterned SVG — keep painted (LM/DM twins)
 var gcompanyimage = gimagetheme + 'formpage_companies.svg'
@@ -356,13 +357,16 @@ function exodus_client_init() {
 	// Do NOT !important borders here: that permanently blocks focus underline in global.css
 	// (SPANs were fine; INPUT/SELECT stuck on dotted rest style).
 	if (gisdarktheme) {
+		// @media screen only — must not win over @media print (white paper + light text = blank)
 		document.writeln('<style id="exodus_dm_flashguard">'
+			+ '@media screen{'
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
 			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#28304a!important}'
 			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),'
 			+ ':root[data-theme=dark_mode] SELECT:not(.loginfield),'
 			+ ':root[data-theme=dark_mode] TEXTAREA{'
 			+ 'background-color:transparent!important;color:#fff!important}'
+			+ '}'
 			+ '</style>')
 	}
 
@@ -5010,6 +5014,34 @@ function menuchangeoption(menu, newmenuoption) {
 
 }
 
+/*
+ * Add a flat menubar tool (non-form pages, help, …).
+ * Builds menubuttonhtml → await id_onclick(event). Places left of the
+ * trailing cluster (theme/logout) when present. Safe after standard tools
+ * exist; from formfunctions_onload use setTimeout(0) so Menu/Refresh land first.
+ *
+ * Without dbform, exodusonclick is never dispatched — same as Refresh/Logout:
+ * wire click when there is no gdictfilename.
+ */
+function exodus_menubar_add_button(id, imagesrc, name, title, accesskey) {
+
+	if (!gexodus_menubar)
+		add_exodus_menubar()
+	var wrap = document.createElement('span')
+	wrap.innerHTML = menubuttonhtml(id, imagesrc, name, title, accesskey)
+	var trail = gexodus_menubar.querySelector('.exodus_menubar_trailing')
+	if (trail)
+		gexodus_menubar.insertBefore(wrap, trail)
+	else
+		gexodus_menubar.appendChild(wrap)
+	// Non-form pages: attribute alone is inert (dbform document_onclick missing)
+	if (typeof gdictfilename == 'undefined')
+		addeventlistener(wrap, 'click', id + '_onclick')
+	if (typeof adjust_bodymargin == 'function')
+		adjust_bodymargin()
+	return wrap
+}
+
 function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
 	var tagname = 'span'
@@ -5317,6 +5349,52 @@ function exoduswrapformpanes() {
 
 	exoduscoalesceformpanes()
 	exodusclear_embeddedtable_hostborders()
+	exodus_mark_form_edge_rows()
+}
+
+/*
+ * Pane owns outer T/B: mark first/last *content* row (display != none, not an
+ * empty spacer <tr></tr>). Runs after formfunctions_onload (postinit showhide
+ * already applied). Only direct child forms of .exodusformpane. Multi-form
+ * pane: only the last form gets edge-bottom so the rule between forms stays.
+ */
+function exodus_mark_form_edge_rows() {
+
+	var panes = document.getElementsByClassName('exodusformpane')
+	for (var panen = 0; panen < panes.length; panen++) {
+		var forms = []
+		var kids = panes[panen].children
+		for (var kidn = 0; kidn < kids.length; kidn++) {
+			var kid = kids[kidn]
+			if (kid.tagName == 'TABLE' && kid.className
+				&& (' ' + kid.className + ' ').indexOf(' exodusform ') >= 0)
+				forms.push(kid)
+		}
+		for (var fi = 0; fi < forms.length; fi++) {
+			var rows = forms[fi].rows
+			var firstRow = null
+			var lastRow = null
+			for (var rown = 0; rows && rown < rows.length; rown++) {
+				var tr = rows[rown]
+				tr.classList.remove('exodus-form-edge-top')
+				tr.classList.remove('exodus-form-edge-bottom')
+				if (tr.style.display == 'none')
+					continue
+				// Empty spacer rows (joblist Format ends with bare <tr></tr>)
+				// count as "visible" for display but are not a real grid edge.
+				if (!tr.cells || !tr.cells.length)
+					continue
+				if (!firstRow)
+					firstRow = tr
+				lastRow = tr
+			}
+			if (firstRow)
+				firstRow.classList.add('exodus-form-edge-top')
+			// last form in pane only — intermediate forms keep bottom as separator
+			if (fi == forms.length - 1 && lastRow)
+				lastRow.classList.add('exodus-form-edge-bottom')
+		}
+	}
 }
 
 function exodusclear_embeddedtable_hostborders() {
@@ -5330,7 +5408,8 @@ function exodusclear_embeddedtable_hostborders() {
 		if (!isgroup && !isexodustable)
 			continue
 		var hostcell = tablex.parentNode
-		if (!hostcell || hostcell.tagName != 'TD')
+		// Outer grid prompt cells may be th; data cells are td
+		if (!hostcell || (hostcell.tagName != 'TD' && hostcell.tagName != 'TH'))
 			continue
 		if ((' ' + hostcell.className + ' ').indexOf(' exodusembeddedtable ') < 0)
 			hostcell.className += (hostcell.className ? ' ' : '') + 'exodusembeddedtable'
