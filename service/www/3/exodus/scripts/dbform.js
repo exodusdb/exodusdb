@@ -80,18 +80,18 @@ function form_apply_input_field_width(element) {
 
 // Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Open/Edit/Delete.
 // (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
-gnewimage = gimagetheme + 'record-new.svg' // painted multicolour — excluded from mask tint
-gopenimage = gimagetheme + 'record-open.svg' // painted page + magnifier
+gnewimage = gimagetheme + 'record-new_lm.svg' // painted multicolour — excluded from mask tint
+gopenimage = gimagetheme + 'record-open_lm.svg' // painted page + magnifier
 gfindimage = exodus_icon_spec('field-find.svg', 'darkgrey')
 gcalendarimage = exodus_icon_spec('field-date.svg', 'darkgrey')
 gsaveimage = exodus_icon_spec('record-save.svg', 'green')
 gsavegreyimage = exodus_icon_spec('record-save.svg', 'lightgrey') // inactive Save
 // Painted multi-colour (overlapping sheets) — not a single CSS tint
-gcopyimage = gimagetheme + (gisdarktheme ? 'record-copy_darkmode.svg' : 'record-copy.svg')
+gcopyimage = gimagetheme + (gisdarktheme ? 'record-copy_dm.svg' : 'record-copy_lm.svg')
 gcloseimage = exodus_icon_spec('record-close.svg', 'red')
 greleaseimage = exodus_icon_spec('record-release.svg', 'blue') // was #1E97CC
-geditimage = gimagetheme + 'record-edit.svg' // painted multicolour
-gdeleteimage = gimagetheme + 'record-delete.svg' // painted multicolour
+geditimage = gimagetheme + 'record-edit_lm.svg' // painted multicolour
+gdeleteimage = gimagetheme + 'record-delete_lm.svg' // painted multicolour
 glistimage = exodus_icon_spec('file-list.svg', 'darkgrey')
 gprintsendimage = exodus_icon_spec('file-print.svg', 'darkgrey')
 ginsertrowimage = exodus_icon_spec('row-insert.svg', 'green')
@@ -105,11 +105,11 @@ gnextimage = exodus_icon_spec('nav-next.svg', 'blue')
 gpreviousimage = exodus_icon_spec('nav-prev.svg', 'blue')
 // Painted New/Open/Edit/Delete need DM twin files
 if (gisdarktheme) {
-	gnewimage = gimagetheme + 'record-new_darkmode.svg'
-	gopenimage = gimagetheme + 'record-open_darkmode.svg'
-	gdeleteimage = gimagetheme + 'record-delete_darkmode.svg'
-	geditimage = gimagetheme + 'record-edit_darkmode.svg'
-	gthemeimage = gimagetheme + 'shell-theme_darkmode.svg'
+	gnewimage = gimagetheme + 'record-new_dm.svg'
+	gopenimage = gimagetheme + 'record-open_dm.svg'
+	gdeleteimage = gimagetheme + 'record-delete_dm.svg'
+	geditimage = gimagetheme + 'record-edit_dm.svg'
+	gthemeimage = gimagetheme + 'shell-theme_dm.svg'
 }
 
 // document.getElementsByTagName('BODY').onload=window_onload

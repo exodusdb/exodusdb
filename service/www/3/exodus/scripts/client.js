@@ -65,9 +65,9 @@ var glogoutimage = exodus_icon_spec('shell-logout.svg', 'red')
 var gloginimage = exodus_icon_spec('shell-login.svg', 'green')
 var grefreshimage = exodus_icon_spec('shell-refresh.svg', 'green')
 var gprintimage = exodus_icon_spec('file-print.svg', 'darkgrey')
-var gthemeimage = gimagetheme + 'shell-theme.svg' // painted sun/moon chrome
+var gthemeimage = gimagetheme + 'shell-theme_lm.svg' // painted sun/moon chrome
 // company icon uses a patterned SVG — keep painted (LM/DM twins)
-var gcompanyimage = gimagetheme + 'shell-company.svg'
+var gcompanyimage = gimagetheme + 'shell-company_lm.svg'
 
 var gisdarktheme
 // LM/DM preference cookie — global per browser (not glogincode / dataset / user)
@@ -80,8 +80,7 @@ function exodus_sortimage(order) {
 	// and sorttable still reads clickedelement.src for up/down. Same host element
 	// as before — id / exodusonclick / sorttableelementid unchanged.
 	var name = (order == 'up') ? 'sort-up' : (order == 'down') ? 'sort-down' : 'sort'
-	if (gisdarktheme)
-		name += '_darkmode'
+	name += (gisdarktheme ? '_dm' : '_lm')
 	return gimagetheme + name + '.svg'
 }
 
@@ -1693,17 +1692,17 @@ function exodus_set_theme_icons() {
 
 	// Monochrome icons: colours come from CSS vars (no path swap).
 	// Painted multi-colour: New/Open/Edit/Delete, Copy, theme, company
-	gthemeimage = gimagetheme + (gisdarktheme ? 'shell-theme_darkmode.svg' : 'shell-theme.svg')
-	gcompanyimage = gimagetheme + (gisdarktheme ? 'shell-company_darkmode.svg' : 'shell-company.svg')
+	gthemeimage = gimagetheme + (gisdarktheme ? 'shell-theme_dm.svg' : 'shell-theme_lm.svg')
+	gcompanyimage = gimagetheme + (gisdarktheme ? 'shell-company_dm.svg' : 'shell-company_lm.svg')
 	if (typeof gcopyimage != 'undefined')
-		gcopyimage = gimagetheme + (gisdarktheme ? 'record-copy_darkmode.svg' : 'record-copy.svg')
+		gcopyimage = gimagetheme + (gisdarktheme ? 'record-copy_dm.svg' : 'record-copy_lm.svg')
 	if (typeof gnewimage != 'undefined') {
-		gnewimage = gimagetheme + (gisdarktheme ? 'record-new_darkmode.svg' : 'record-new.svg')
-		gdeleteimage = gimagetheme + (gisdarktheme ? 'record-delete_darkmode.svg' : 'record-delete.svg')
-		geditimage = gimagetheme + (gisdarktheme ? 'record-edit_darkmode.svg' : 'record-edit.svg')
+		gnewimage = gimagetheme + (gisdarktheme ? 'record-new_dm.svg' : 'record-new_lm.svg')
+		gdeleteimage = gimagetheme + (gisdarktheme ? 'record-delete_dm.svg' : 'record-delete_lm.svg')
+		geditimage = gimagetheme + (gisdarktheme ? 'record-edit_dm.svg' : 'record-edit_lm.svg')
 	}
 	if (typeof gopenimage != 'undefined')
-		gopenimage = gimagetheme + (gisdarktheme ? 'record-open_darkmode.svg' : 'record-open.svg')
+		gopenimage = gimagetheme + (gisdarktheme ? 'record-open_dm.svg' : 'record-open_lm.svg')
 	if (typeof gsortimage != 'undefined')
 		gsortimage = exodus_sortimage()
 	exodus_update_auth_button()
@@ -6998,8 +6997,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			imagesrc = 'question1'
 	}
 	if (imagesrc) {
-		// Dark faces need brighter discs than light-mode XP colours (else info/question vanish).
-		var xpdm = (typeof gisdarktheme != 'undefined' && gisdarktheme) ? '_darkmode' : ''
+		// Painted dialog discs: _lm / _dm twins (DM brighter so info/question stay visible).
+		var xpdm = (typeof gisdarktheme != 'undefined' && gisdarktheme) ? '_dm' : '_lm'
 		if (imagesrc == 'critical') {
 			imagesrc = 'dialog-critical' + xpdm + '.svg'
 			div.classList.add('exodusconfirm_critical')
