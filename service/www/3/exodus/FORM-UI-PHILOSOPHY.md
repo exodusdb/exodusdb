@@ -18,7 +18,7 @@ Common transforms:
 | Source HTM | After `dbform.js` |
 |------------|-------------------|
 | `<input id="FIELD">` with dict `align='T'` | Contenteditable `<span>` (flowing text) |
-| Nested `<table>` with `exodusgroupno` fields | `TABLE[exodusgroupno]` / `#exodusgroupN` |
+| Nested `<table>` with `exogroupno` fields | `TABLE[exogroupno]` / `#exogroupN` |
 | Top-level `TABLE.exodusform` | Often wrapped in `div.exodusformpane` by `exoduswrapformpanes()` in `client.js` |
 
 **Implication:** inline styles on `<input>` in HTM (e.g. `max-width`) are often **discarded** when the field becomes a `<span>`. Dict properties and page CSS must target the **final** element (`.exodusid_FIELD`, column `td` classes, etc.).
@@ -31,7 +31,7 @@ Common transforms:
 div.exodusformpane          ← outer rounded frame (owns the outside edge)
   TABLE.exodusform          ← grid; table element border stripped inside pane
     tr / td                 ← cell grid lines (td borders, not tr)
-      TABLE[exodusgroupno]  ← embedded repeating group (nested)
+      TABLE[exogroupno]  ← embedded repeating group (nested)
 ```
 
 ### Pane (`exodusformpane`)
@@ -56,9 +56,9 @@ div.exodusformpane          ← outer rounded frame (owns the outside edge)
 **If lighter row separators are needed:** style **`td`** on non-last rows only, e.g.  
 `.exodusformpane > table.exodusform > tbody > tr:not(:last-child) > td { border-bottom-color: #f0f0f0; }`
 
-### Embedded groups (`TABLE[exodusgroupno]` inside a form cell)
+### Embedded groups (`TABLE[exogroupno]` inside a form cell)
 
-- Host cell gets `border: none` and `padding: 0` via `:has(> TABLE[exodusgroupno])` in `global.css`.
+- Host cell gets `border: none` and `padding: 0` via `:has(> TABLE[exogroupno])` in `global.css`.
 - `exodusclear_embeddedtable_hostborders()` in `client.js` also clears inline borders on host cell/row.
 - Inner group table often has **no** `exodusform` class and **no** `<thead>` (e.g. ledgerprint account picker).
 - Inner cells are **not** direct children of the outer grid — they do **not** get the outer `> tbody > tr > td` border rule unless you add rules explicitly.
@@ -94,7 +94,7 @@ element.style.whiteSpace = 'pre-wrap';
 | | Top-level group (e.g. authorisation Users) | Embedded group (e.g. ledgerprint accounts) |
 |---|--------------------------------------------|-----------------------------------------------|
 | Position | Direct child of pane / centered div | Nested in outer form `td` |
-| Class | `TABLE.exodusform` + `exodusgroupno` | Often only `exodusid_exodusgroupN` |
+| Class | `TABLE.exodusform` + `exogroupno` | Often only `exodusid_exogroupN` |
 | Headings | Usually has `<thead>` | Often **no** `<thead>` |
 | Width / centering | `max-content` pane | Host cell `border: none`; width from content |
 | Typical width issue | Span `min-width` × many columns | Less common; border/row-separator issues more common |
@@ -105,7 +105,7 @@ element.style.whiteSpace = 'pre-wrap';
 
 1. **Inspect the element that owns the line or width** — Styles panel → winning `border-bottom` / `min-width` rule and **which stylesheet**.
 2. **Read page-local `<style>` in the `.htm`** — bare `tr` / `table` selectors are a frequent root cause.
-3. **Compare source HTM vs Elements panel** — ids, tag names (`input` vs `span`), `exodusgroupno`, pane wrapper.
+3. **Compare source HTM vs Elements panel** — ids, tag names (`input` vs `span`), `exogroupno`, pane wrapper.
 4. **Check dict** — `align`, `length`, `groupno`, `exodus_dict_text()` vs plain input.
 5. **Pane coalescence** — two tables with only `<br>` between them become **one** pane; tabs/panels prevent that.
 6. **Prefer root cause** — remove conflicting page CSS or use the dict/HTM knob; do not stack global suppressions.
@@ -133,13 +133,13 @@ element.style.whiteSpace = 'pre-wrap';
 | `scripts/client.js` | `exoduswrapformpanes`, `exoduscoalesceformpanes`, `exodusclear_embeddedtable_hostborders` |
 | `template.htm` | Minimal form page pattern |
 
-**Vertical alignment** — `global.css` sets `vertical-align: top` on all `TABLE.exodusform`, `TABLE.exodustable`, and `TABLE[exodusgroupno]` cells and rows (including nested tables). Do not add inline `valign` or `vertical-align` in HTM unless a page needs a deliberate exception.
+**Vertical alignment** — `global.css` sets `vertical-align: top` on all `TABLE.exodusform`, `TABLE.exotable`, and `TABLE[exogroupno]` cells and rows (including nested tables). Do not add inline `valign` or `vertical-align` in HTM unless a page needs a deliberate exception.
 
-**Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td|th` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exodustable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
+**Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td|th` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exotable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
 
 **Label italic** — all `TABLE.exodusform td/th` use `--exodus-form-label-font-style` (default italic), including nested label tables. Bound data fields (`INPUT`/`SPAN.clsRequired` etc.) reset to `--exodus-form-data-font-style` (normal). Do not set `font-style: normal` on nested-table padding rules.
 
-**Prompt cells (`th`)** — Human prompt text is `th` (outer grid *and* nested plain header layout tables). Data/controls stay in `td`. Outer-grid borders treat `th` like prompt `td`. Direct outer-grid prompt `th` also use the same richer face background as sticky group thead (OKLCH / lighter mix / DM `#303a5a`); nested layout `th` stay un-tinted until a later style pass. Sticky *position* stays on `TABLE[exodusgroupno] > thead` (and decide). Do not invent `exohlabel` / `exovlabel` classes.
+**Prompt cells (`th`)** — Human prompt text is `th` (outer grid *and* nested plain header layout tables). Data/controls stay in `td`. Outer-grid borders treat `th` like prompt `td`. Direct outer-grid prompt `th` also use the same richer face background as sticky group thead (OKLCH / lighter mix / DM `#303a5a`); nested layout `th` stay un-tinted until a later style pass. Sticky *position* stays on `TABLE[exogroupno] > thead` (and decide). Do not invent `exohlabel` / `exovlabel` classes.
 
 **Section title rows** — Long forms (agency/system/timesheet configuration, …) use a full-width prompt `th` whose main content is an `h2` (optional hidden key input ok). No project `h2` stylesheet — size/weight/margins are browser UA (`1.5em` bold, `~0.83em` block margin). Cell face = prompt `th` tint; italic inherits from the form. Do not put a nested data table in the same cell as the section `h2`.
 

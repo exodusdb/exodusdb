@@ -1327,7 +1327,7 @@ x1exit:
 				// nth child style column justification in case <col> doesnt work like on FF
 				if (align) {
 					// works per table if the table is assigned a class (.maintable) here
-					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" _EOL;
+					style ^= "table.exotable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" _EOL;
 				}
 
 			} else {
@@ -1363,7 +1363,7 @@ x1exit:
 			htmlcode ^= clientmark ^ _EOL;
 		}
 
-		htmlcode ^= "<table class=\"exodustable\"";
+		htmlcode ^= "<table class=\"exotable\"";
 		htmlcode ^= " cellspacing=\"0\"";
 		htmlcode ^= " style=\"font-size:66%";
 		htmlcode ^= ";page-break-after:avoid";

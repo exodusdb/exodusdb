@@ -517,18 +517,18 @@ async function formfunctions_onload() {
 
         //NB inserting elements within the loop means that the same element
         //may be processed more than once so ensure skip on 2ndtime
-        //  if(typeof element.getAttribute('exodusgroupno')=='undefined'&&element.tagName!='OPTION'&&element.name!=''&&typeof element.name!='undefined')
+        //  if(typeof element.getAttribute('exogroupno')=='undefined'&&element.tagName!='OPTION'&&element.name!=''&&typeof element.name!='undefined')
         //element.name ... gives error "class does not support automation"
-        //  if(typeof element.getAttribute('exodusgroupno')=='undefined'&&element.name&&element.tagName!='OPTION'&&element.name!=''&&typeof element.name!='undefined')
-        //  if(typeof element.getAttribute('exodusgroupno')=='undefined'&&element.tagName!='OPTION'&&element.name!=''&&typeof element.name!='undefined')
+        //  if(typeof element.getAttribute('exogroupno')=='undefined'&&element.name&&element.tagName!='OPTION'&&element.name!=''&&typeof element.name!='undefined')
+        //  if(typeof element.getAttribute('exogroupno')=='undefined'&&element.tagName!='OPTION'&&element.name!=''&&typeof element.name!='undefined')
         var fieldname = element.id
         if (!fieldname)
             continue
 
-        //if (typeof element.getAttribute('exodusgroupno')=='undefined'
+        //if (typeof element.getAttribute('exogroupno')=='undefined'
         //    &&element.tagName!='OPTION'
         //    &&(fieldname=element.name))
-        if (element.getAttribute('exodusgroupno') == null && element.tagName != 'OPTION') {
+        if (element.getAttribute('exogroupno') == null && element.tagName != 'OPTION') {
             //locate the dictionary item otherwise skip the field
             var dictitem = gro.dictitem(fieldname)
             if (!dictitem) {
@@ -1011,8 +1011,8 @@ async function formfunctions_onload() {
             //element.name=element.name
 
             //group no
-            //var groupno=parseInt(element.getAttribute('exodusgroupno'),10)
-            var groupno = Number(element.getAttribute('exodusgroupno'))
+            //var groupno=parseInt(element.getAttribute('exogroupno'),10)
+            var groupno = Number(element.getAttribute('exogroupno'))
 
             //align
             //right align parent TD/TH if in columns (groupn>0)
@@ -1263,12 +1263,12 @@ async function formfunctions_onload() {
                 //prevent group 0 element in rows of a multivalued table
                 //while (tablex)
                 //{
-                // if (Number(tablex.getAttribute('exodusgroupno'))) systemerror('formfunction_onload()',exodusquote(element.name)+' is not multivalued and cannot be in a multivalued TABLE')
+                // if (Number(tablex.getAttribute('exogroupno'))) systemerror('formfunction_onload()',exodusquote(element.name)+' is not multivalued and cannot be in a multivalued TABLE')
                 // tablex=getancestor(tablex,'TABLE')
                 //}
 
                 //prevent group 0 element in rows of a multivalued table
-                if (rowx && Number(rowx.getAttribute('exodusgroupno')))
+                if (rowx && Number(rowx.getAttribute('exogroupno')))
                     systemerror('formfunction_onload()', exodusquote(element.name) + ' is not multivalued and cannot be in a multivalued TABLE')
 
                 datasrcelements[datasrcelements.length] = element
@@ -1294,7 +1294,7 @@ async function formfunctions_onload() {
                         element2 = exodus_apply_sort_icon(element2, '') || element2
                     titleelement.insertBefore(element2, null)
 
-                    element2.id = 'sortbutton_' + Number(element.getAttribute('exodusgroupno'))
+                    element2.id = 'sortbutton_' + Number(element.getAttribute('exogroupno'))
                     element2.title = 'Sort by ' + element.getAttribute('exodustitle')
                     //addeventlistener(element2, 'click', 'sorttable')
                     element2.setAttribute('exodusonclick', 'await sorttable(event)')
@@ -1349,12 +1349,12 @@ async function formfunctions_onload() {
                 }
 
                 //table already bound and used for group elements
-                if (Number(tablex.getAttribute('exodusgroupno'))) {
+                if (Number(tablex.getAttribute('exogroupno'))) {
 
                     //check that all fields in same table have same group no
                     //zzz should also check that the table has no other name in subtables
-                    if (Number(tablex.getAttribute('exodusgroupno')) != groupno) {
-                        systemerror('formfunctions_onload()', element.name + ' is in group ' + groupno + ' but the table has already been bound to group ' + Number(tablex.getAttribute('exodusgroupno')))
+                    if (Number(tablex.getAttribute('exogroupno')) != groupno) {
+                        systemerror('formfunctions_onload()', element.name + ' is in group ' + groupno + ' but the table has already been bound to group ' + Number(tablex.getAttribute('exogroupno')))
                         return
                     }
 
@@ -1398,9 +1398,9 @@ async function formfunctions_onload() {
                     gtables[groupno] = []
                     gtables[groupno][0] = screenfn
                     gtables[groupno].tableelement = tablex
-                    tablex.setAttribute('exodusgroupno', groupno)
+                    tablex.setAttribute('exogroupno', groupno)
                     tablex.setAttribute('name', 'group' + groupno)
-                    tablex.id = 'exodusgroup' + groupno
+                    tablex.id = 'exogroup' + groupno
                     datasrcelements[datasrcelements.length] = tablex
                     tablex.setAttribute('exodusdependents', '')
 
@@ -1437,7 +1437,7 @@ async function formfunctions_onload() {
                     addeventlistener(tablex, 'readystatechange', 'tablex_onreadystatechange')
 
                     //mark group in row to allow check/prevent group0 in same row
-                    rowx.setAttribute('exodusgroupno', groupno)
+                    rowx.setAttribute('exogroupno', groupno)
 
                     //add insert and delete row buttons at the first column in the tbody
 
@@ -1488,12 +1488,12 @@ async function formfunctions_onload() {
                     pgupdownbuttons.width = '1%'
 
                     var t = '&nbsp;'
-                    t += '<button id=exodusgroup' + groupno + 'showall class=exodusbutton'
+                    t += '<button id=exogroup' + groupno + 'showall class=exodusbutton'
                     t += ' style=display:none exodusonclick="await form_filter(\'unfilter\',' + groupno + ')"'
                     t += '>Show All</button>'
 
                     if (groupno == 1 && typeof gallowfilter != 'undefined' && gallowfilter) {
-                        t += '<input id="exodusgroup' + groupno + 'filter"'
+                        t += '<input id="exogroup' + groupno + 'filter"'
                         t += ' class="clsNotRequired"'
                         t += ' onblur="form_filter_onblur_sync(' + groupno + ',this)"'
                         t += ' onfocus="form_filter_onfocus_sync(' + groupno + ',this)"'
@@ -1579,9 +1579,9 @@ async function formfunctions_onload() {
                     field2.setAttribute('exodusdependents', deps)
 
                     if (
-                        Number(field2.getAttribute('exodusgroupno'))
+                        Number(field2.getAttribute('exogroupno'))
                         &&
-                        Number(field.getAttribute('exodusgroupno')) != Number(field2.getAttribute('exodusgroupno'))
+                        Number(field.getAttribute('exogroupno')) != Number(field2.getAttribute('exogroupno'))
                     ) {
                         var tablex = getancestor(field2, 'TABLE')
                         var deps = tablex.getAttribute('exodusdependents')
@@ -2262,7 +2262,7 @@ async function setfirstlastelement(element) {
 
 async function setfirstlastcolumn(groupno) {
 
-    var tablex = $$('exodusgroup' + groupno)
+    var tablex = $$('exogroup' + groupno)
     if (!tablex)
         await exodusinvalid('await setfirstlastcolumn() table' + groupno + ' is missing')
 
@@ -2494,11 +2494,11 @@ async function tablex_onreadystatechange(event) {
 
     if (event.target.readyState != 'complete') return
 
-    //login('tablex_onreadystatechange ' + Number(event.target.getAttribute('exodusgroupno')))
+    //login('tablex_onreadystatechange ' + Number(event.target.getAttribute('exogroupno')))
 
     await newrecordfocus()
 
-    //logout('tablex_onreadystatechange ' + Number(event.target.getAttribute('exodusgroupno')))
+    //logout('tablex_onreadystatechange ' + Number(event.target.getAttribute('exogroupno')))
 
 }
 
@@ -3204,7 +3204,7 @@ async function document_onkeydown2(event) {
     }
 
     //get groupno otherwise return
-    ggroupno = element.getAttribute('exodusgroupno')
+    ggroupno = element.getAttribute('exogroupno')
 
     //the rest of the keys are only when located on a exodus data entry field
     if (typeof ggroupno == 'undefined' || ggroupno == null) {
@@ -3393,10 +3393,10 @@ async function document_onkeydown2(event) {
     if (keycode == 13 && (element.tagName != 'TEXTAREA' || event.ctrlKey || event.shiftKey)) {
 
         //ctrl+enter or enter with single field is ok/save record
-        //if (event.ctrlKey||(gfields.length==1&&Number(gfields[0].getAttribute('exodusgroupno'))))
+        //if (event.ctrlKey||(gfields.length==1&&Number(gfields[0].getAttribute('exogroupno'))))
         if (event.ctrlKey
             || (
-                !Number(element.getAttribute('exodusgroupno'))
+                !Number(element.getAttribute('exogroupno'))
                 && gfinalinputelement
                 && gfinalinputelement.id == gstartelement.id
             )
@@ -3792,7 +3792,7 @@ function form_getlastinputcolscreenfn(tablex) {
     return form_getfirstinputcolscreenfn(tablex, true)
 }
 function form_getfirstinputcolscreenfn(tablex, last) {
-    var groupno = tablex.getAttribute('exodusgroupno')
+    var groupno = tablex.getAttribute('exogroupno')
     var sfns = gtables[groupno]
     var sfn
     for (var ii = 0; ii < sfns.length; ++ii) {
@@ -3856,7 +3856,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
     // if (!element) return
     var elementtabindex = nextelement ? nextelement.tabIndex : 999999999999
 
-    var origgroupno = nextelement.getAttribute('exodusgroupno')
+    var origgroupno = nextelement.getAttribute('exogroupno')
 
     var scope = scopex
     if (!scope)
@@ -3948,7 +3948,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
         }
 
         //skip undesired group
-        if (notgroupno !== '' && Number(nextelement.getAttribute('exodusgroupno')) == notgroupno) {
+        if (notgroupno !== '' && Number(nextelement.getAttribute('exogroupno')) == notgroupno) {
             //console.log('SKIP '+nextid+' is group '+notgroupno)
             continue
         }
@@ -4017,7 +4017,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
 
     //if arrived on last column and row of a table using up then focus on the first column last row
     if (direction < 0) {
-        var nextgroupno = nextelement.getAttribute('exodusgroupno')
+        var nextgroupno = nextelement.getAttribute('exogroupno')
         if (nextgroupno != origgroupno && nextgroupno != 0) {
             if (gtables[nextgroupno]) {
                 var tablex = gtables[nextgroupno].tablex
@@ -4662,8 +4662,8 @@ async function changepage(pagen) {
     if (gKeyNodes && closerecord.getAttribute('disabled')) return false
 
     var tablex = getancestor(window.event.target, 'TABLE')
-    //if (tablex!=null&&typeof(tablex.getAttribute('exodusgroupno'))!='undefined')
-    if (tablex != null && Number(tablex.getAttribute('exodusgroupno'))) {
+    //if (tablex!=null&&typeof(tablex.getAttribute('exogroupno'))!='undefined')
+    if (tablex != null && Number(tablex.getAttribute('exogroupno'))) {
         switch (pagen) {
             case 0: { tablex.firstPage(); break }
             case -1: { tablex.previousPage(); break }
@@ -5429,10 +5429,10 @@ async function resetsortimages(groupno) {
         return
     }
 
-    // Scope to this multivalue table only (TABLE#exodusgroupN). Column headers
+    // Scope to this multivalue table only (TABLE#exogroupN). Column headers
     // and sort icons live in that thead. Do not touch other groups/forms.
     // All columns in the group share id sortbutton_N — query all twins in-scope.
-    var tablex = document.getElementById('exodusgroup' + groupno)
+    var tablex = document.getElementById('exogroup' + groupno)
     if (!tablex)
         return
     var elements = tablex.querySelectorAll('[id="sortbutton_' + groupno + '"]')
@@ -5679,7 +5679,7 @@ async function validateall(mode) {
             && mode != 'filldefaults'
             && !nrowsfound
             && rowrequired
-            && exodusenabledandvisible($$('exodusgroup' + groupno))
+            && exodusenabledandvisible($$('exogroup' + groupno))
         ) {
             var missingelement = rows[0][firstcolumnname].element
             await exodusinvalid('At least one ' + missingelement.getAttribute('exodustitle') + ' is required.')
@@ -6122,10 +6122,10 @@ async function document_onfocus(event) {
 
         //check specific group if >0
         //var elements
-        //if (Number(element.getAttribute('exodusgroupno')))
+        //if (Number(element.getAttribute('exogroupno')))
         //{
         // elements=getancestor(element,'TR').all
-        // if (!(await checkrequired(elements,element,Number(element.getAttribute('exodusgroupno')))))
+        // if (!(await checkrequired(elements,element,Number(element.getAttribute('exogroupno')))))
         //  return false //logout('document_onfocus'+' '+elementid+' a prior element is visible and required but is blank (2)')
         //}
 
@@ -6339,9 +6339,9 @@ async function validateupdate() {
 
     //check for prior required fields if a grouped element
     var elements
-    if (Number(gpreviouselement.getAttribute('exodusgroupno'))) {
+    if (Number(gpreviouselement.getAttribute('exogroupno'))) {
         elements = getancestor(gpreviouselement, 'TR').getElementsByTagName('*')
-        if (!(await checkrequired(elements, gpreviouselement, Number(gpreviouselement.getAttribute('exodusgroupno'))))) {
+        if (!(await checkrequired(elements, gpreviouselement, Number(gpreviouselement.getAttribute('exogroupno'))))) {
             setvalue(gpreviouselement, gpreviousvalue)
             return false //logout('validateupdate ' + id + ' a prior element is visible and required but is blank')
         }
@@ -6387,7 +6387,7 @@ async function validateupdate() {
     //if reply is an array use replace all rows
     var multiplegvalue = false
     if (typeof (gvalue) == 'object') {
-        if (gvalue.length > 1 && Number(gpreviouselement.getAttribute('exodusgroupno'))) {
+        if (gvalue.length > 1 && Number(gpreviouselement.getAttribute('exogroupno'))) {
             multiplegvalue = true
 
             var elementid = gpreviouselement.id
@@ -6397,7 +6397,7 @@ async function validateupdate() {
             element = $$(elementid)
             if (element && element[0])
                 element = element[0]
-            focusdirection(1, element, Number(gpreviouselement.getAttribute('exodusgroupno')))
+            focusdirection(1, element, Number(gpreviouselement.getAttribute('exogroupno')))
 
         }
         else {
@@ -6569,16 +6569,16 @@ async function checkrequired(elements, element, groupno) {
 
         //skip elements not in desired group
         //must be after detection of foundelement above
-        if (Number(element2.getAttribute('exodusgroupno')) != groupno)
+        if (Number(element2.getAttribute('exogroupno')) != groupno)
             continue
 
-        if (Number(element2.getAttribute('exodusgroupno')) == groupno) {
+        if (Number(element2.getAttribute('exogroupno')) == groupno) {
             if (((!foundelement && element2.tabIndex <= element.tabIndex) || (element2.tabIndex != -1 && element2.tabIndex < element.tabIndex))) {
                 //if (element&&element2.getAttribute('exodusrequired')&&gds.getcells(element2,grecn)[0].text=='')
                 //if (element&&element2.getAttribute('exodusrequired')&&getvalue(element2)=='')
-                //if (element&&(!Number(element.getAttribute('exodusgroupno'))||element2.getAttribute('exodusrequired'))&&getvalue(element2)=='')
+                //if (element&&(!Number(element.getAttribute('exogroupno'))||element2.getAttribute('exodusrequired'))&&getvalue(element2)=='')
                 if (element
-                    && ((gds.isnewrecord && !Number(element2.getAttribute('exodusgroupno')))
+                    && ((gds.isnewrecord && !Number(element2.getAttribute('exogroupno')))
                         || element2.getAttribute('exodusrequired'))
                     && getvalue(element2) == '') {
 
@@ -6601,7 +6601,7 @@ async function checkrequired(elements, element, groupno) {
                             await exodusinvalid(element2.getAttribute('exodustitle') + ' is required..')
 
                         focuson(element2)
-                        //if (!(Number(element2.getAttribute('exodusgroupno'))))
+                        //if (!(Number(element2.getAttribute('exogroupno'))))
                         // focuson(element2)
                         return false
 
@@ -6688,7 +6688,7 @@ function getvalue(element, recn) {
         //get first one only
         if (!element.tagName) {
             //element = element[0]
-            if (element[0].getAttribute('exodusgroupno')) {
+            if (element[0].getAttribute('exogroupno')) {
                 if (typeof recn == 'undefined') recn = getrecn()
             }
             else recn = 0
@@ -6873,7 +6873,7 @@ function exodussetreadonly(elements, msg, options, recn) {
     if (!(isNaN(+elementx))) {
         var elements = []
         for (var ii = 0; ii < gfields.length; ii++) {
-            if (Number(gfields[ii].getAttribute('exodusgroupno')) == elementx
+            if (Number(gfields[ii].getAttribute('exogroupno')) == elementx
                 && Number(gfields[ii].getAttribute('exodusfieldno'))
                 && (!(exodussetreadonly(gfields[ii].id, msg, options, recn))))
                 return false
@@ -7245,7 +7245,7 @@ function getradiocheckboxelements(element) {
 
     var scope
     var elements
-    if (Number(element.getAttribute('exodusgroupno'))) {
+    if (Number(element.getAttribute('exogroupno'))) {
         var scope = getancestor(element, 'TR')
         if (!scope) {
             return systemerror('getradiocheckboxelements', element.id + ' has no parentNode')
@@ -7523,7 +7523,7 @@ async function validate(element) {
     //extract global info
 
     //group number
-    ggroupno = Number(element.getAttribute('exodusgroupno'))
+    ggroupno = Number(element.getAttribute('exogroupno'))
 
     grecn = getrecn(element)
 
@@ -8056,7 +8056,7 @@ async function form_deleterow(event, element) {
     var row = getancestor(element, 'TR')
     var tablex = getancestor(row, 'TABLE')
     grows = tablex.tBodies[0].getElementsByTagName('tr')
-    var groupno = Number(tablex.getAttribute('exodusgroupno'))
+    var groupno = Number(tablex.getAttribute('exogroupno'))
 
     if (groupno == 0)
         return false //logout('deleterow group 0')
@@ -8069,7 +8069,7 @@ async function form_deleterow(event, element) {
     //make sure any previous data entered is valid EXCEPT if on the current line benig deleted
     if
         (gpreviouselement
-        && (Number(gpreviouselement.getAttribute('exodusgroupno')) != groupno
+        && (Number(gpreviouselement.getAttribute('exogroupno')) != groupno
             || getrecn(gpreviouselement) != rown)
         && !(await validateupdate())
     )
@@ -8166,11 +8166,11 @@ async function deleterows(groupnoorelement, rowns) {
 
     var groupno = groupnoorelement
     if (typeof groupno == 'object') {
-        groupno = groupno.getAttribute('exodusgroupno')
+        groupno = groupno.getAttribute('exogroupno')
         if (!groupno && groupnoorelement[0] && groupnoorelement[0].getAttribute)
-            groupno = groupnoorelement[0].getAttribute('exodusgroupno')
+            groupno = groupnoorelement[0].getAttribute('exogroupno')
         if (!groupno && groupnoorelement.parentNode.getAttribute)
-            groupno = groupnoorelementparenNode.getAttribute('exodusgroupno')
+            groupno = groupnoorelementparenNode.getAttribute('exogroupno')
     }
 
     var rows = gds.data['group' + groupno]
@@ -8197,11 +8197,11 @@ async function deleteallrows(groupnoorelement, fromrecn) {
 
     var groupno = groupnoorelement
     if (typeof groupno == 'object') {
-        groupno = groupno.getAttribute('exodusgroupno')
+        groupno = groupno.getAttribute('exogroupno')
         if (!groupno && groupnoorelement[0] && groupnoorelement[0].getAttribute)
-            groupno = groupnoorelement[0].getAttribute('exodusgroupno')
+            groupno = groupnoorelement[0].getAttribute('exogroupno')
         if (!groupno && groupnoorelement.parentNode.getAttribute)
-            groupno = groupnoorelementparenNode.getAttribute('exodusgroupno')
+            groupno = groupnoorelementparenNode.getAttribute('exogroupno')
     }
 
     if (!fromrecn)
@@ -8266,7 +8266,7 @@ async function insertallrows2(elements, values, fromrecn) {
 
     assertelement(element, 'insertallrows', 'element')
 
-    var groupno = Number(element.getAttribute('exodusgroupno'))
+    var groupno = Number(element.getAttribute('exogroupno'))
 
     //if (elements.length == 1)
     //await deleteallrows(element, fromrecn)
@@ -8347,7 +8347,7 @@ async function insertallrows2(elements, values, fromrecn) {
 }
 
 function exodusaddrow(groupno) {
-    var tablex = $$('exodusgroup' + groupno)
+    var tablex = $$('exogroup' + groupno)
     if (!tablex || tablex.getAttribute('noinsertrow'))
         return false
     gds.addrow(groupno)
@@ -8412,7 +8412,7 @@ async function form_insertrow(event, append) {
         return false
 
     //var tbodies = tablex.tBodies
-    var groupno = Number(tablex.getAttribute('exodusgroupno'))
+    var groupno = Number(tablex.getAttribute('exogroupno'))
     if (groupno == 0)
         return false
 
@@ -8829,7 +8829,7 @@ async function exoduspopup(event, element) {
     //update the element multiple selections qqq
     //if reply is an array use replace all rows
     if (reply.length > 1
-        && Number(element.getAttribute('exodusgroupno'))
+        && Number(element.getAttribute('exogroupno'))
         && typeof (reply) == 'object') {
         //var elementid = element.id
 
@@ -8854,7 +8854,7 @@ async function exoduspopup(event, element) {
         element = $$(elementid)
         if (element && element[0])
             element = element[0]
-        focusdirection(1, element, Number(element.getAttribute('exodusgroupno')))
+        focusdirection(1, element, Number(element.getAttribute('exogroupno')))
 
         //logout('exoduspopup - insert all rows')
         return true
@@ -8938,7 +8938,7 @@ async function exoduspopup2(element) {
 
         //allow multiple selection if element is in a group with only one input column
         var multipleselection = false
-        var elgroupno = Number(element.getAttribute('exodusgroupno'))
+        var elgroupno = Number(element.getAttribute('exogroupno'))
         if (elgroupno) {
             var tableelement = gtables[elgroupno].tableelement
             var multipleselection = tableelement && tableelement.getAttribute('exoduslastinputcolscreenfn') == tableelement.getAttribute('exodusfirstinputcolscreenfn')
@@ -9159,7 +9159,7 @@ function getrecn(element) {
     //returns null if element not part of a table
 
     var recn
-    if (element.getAttribute && !(Number(element.getAttribute('exodusgroupno')))) {
+    if (element.getAttribute && !(Number(element.getAttribute('exogroupno')))) {
         recn = null
     }
     else {
@@ -9343,9 +9343,13 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     }
 
     //get the table rows
-    var tablex = $$('exodusgroup' + groupno)
-    if (!tablex)
-        return await exodusinvalid(colid + ' is not part of a table')
+    var tablex = $$('exogroup' + groupno)
+    if (!tablex) {
+        // systemerror (not exodusinvalid): full stack — usually table never bound (exogroupno / id)
+        systemerror('form_filter', String(colid) + ' is not part of a table'
+            + ' (mode=' + mode + ' groupno=' + groupno + ' id=exogroup' + groupno + ')')
+        return false
+    }
     grows = tablex.tBodies[0].rows
 
     //unfilter and exit (not tested or used anywhere)
@@ -9361,8 +9365,8 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     }
 
     //get the show all button
-    var tablexshowall = $$('exodusgroup' + groupno + 'showall')
-    var tablexfilter = $$('exodusgroup' + groupno + 'filter')
+    var tablexshowall = $$('exogroup' + groupno + 'showall')
+    var tablexfilter = $$('exogroup' + groupno + 'filter')
     if (!tablexshowall) {
         //syserror('await form_filter()','Cannot find showall button, are you missing a thead?')
         return true
@@ -9379,7 +9383,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         }
         //hide the show all buttons (can be two - in THEAD and TFOOT)
         //tablexshowall.style.display='none'
-        showhide('exodusgroup' + groupno + 'showall', false)
+        showhide('exogroup' + groupno + 'showall', false)
         if (typeof tablexfilter != 'undefined' && tablexfilter)
             tablexfilter.size = 3
         await calcfields()
@@ -9398,7 +9402,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         values = gds.data['group' + groupno]
 
         //turn filtervalues into a case insensitive regular expression
-        filtervalues = document.getElementById('exodusgroup' + groupno + 'filter').value.split(' ')
+        filtervalues = document.getElementById('exogroup' + groupno + 'filter').value.split(' ')
         for (var ii = 0; ii < filtervalues.length; ++ii) {
             filtervalues[ii] = filtervalues[ii].replace(/([\\,\^,\$,\*,\+,\?,\.,\(,\),\|,\{,\},\[,\]])/g, "\\$1")//convert metacharacters to real characters
             filtervalues[ii] = new RegExp(filtervalues[ii], 'gi')
@@ -9727,8 +9731,10 @@ async function copyrecord_onclick() {
 function copydictitem(dictitem, element) {
 
     for (var propertyname in dictitem) {
-        if (typeof element['exodus' + propertyname] == 'undefined' && typeof dictitem[propertyname] != 'undefined') {
-            //element['exodus'+propertyname]=dictitem[propertyname]
+        // Usual attr = "exodus"+property. Exception: groupno → exogroupno (pairs with table id exogroupN).
+        var attr = propertyname == 'groupno' ? 'exogroupno' : ('exodus' + propertyname)
+        if (typeof element[attr] == 'undefined' && typeof dictitem[propertyname] != 'undefined') {
+            //element[attr]=dictitem[propertyname]
             //use setAttribute because only msie will clone expando properties and needed for row cloning
             //store false as "" otherwise since attributed are stored as strings it becomes "false"
             //which does not evaluate to false
@@ -9736,7 +9742,7 @@ function copydictitem(dictitem, element) {
             if (value === false || value === null)
                 value = ''
             else
-                element.setAttribute('exodus' + propertyname, value)
+                element.setAttribute(attr, value)
         }
     }
 
@@ -9977,12 +9983,12 @@ function form_copypaste_getcols(event, pasting) {
     var tablex = getancestor(selection.anchorNode, 'TABLE')
     if (!tablex)
         return false
-    var groupn = tablex.getAttribute('exodusgroupno')
+    var groupn = tablex.getAttribute('exogroupno')
     if (groupn < 1)
         return false
 
     //only copy/paste on rows - get groupn or quit
-    //var groupn=element.getAttribute('exodusgroupno')
+    //var groupn=element.getAttribute('exogroupno')
     //if (groupn<1)
     //    return false
 

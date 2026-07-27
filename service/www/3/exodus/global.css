@@ -6,9 +6,9 @@
  * 2. TABLE.exodusform  — no table border (never competes with the pane).
  * 3. Direct form cells — full lightgrey borders = the internal grid.
  *    Prompt cells may be th or td; data cells stay td. Sticky richer tint is
- *    only TABLE[exodusgroupno] > thead (and decide), not all form th.
+ *    only TABLE[exogroupno] > thead (and decide), not all form th.
  * 4. Outer cell edges  — stripped so only *inner* lines remain (see below).
- * Nested tables / .exodustable / [exodusgroupno] are not this grid.
+ * Nested tables / .exotable / [exogroupno] are not this grid.
  */
 /*must be first in order to customise screen form color*/
 TABLE.exodusform
@@ -79,9 +79,9 @@ TABLE.exodusform th {
     font-style: var(--exodus-form-label-font-style);
 }
 
-/* Plain nested tables in cells (code + name pickers) — not group/exodustable */
-TABLE.exodusform TABLE:not([exodusgroupno]):not(.exodustable) td,
-TABLE.exodusform TABLE:not([exodusgroupno]):not(.exodustable) th {
+/* Plain nested tables in cells (code + name pickers) — not group/exotable */
+TABLE.exodusform TABLE:not([exogroupno]):not(.exotable) td,
+TABLE.exodusform TABLE:not([exogroupno]):not(.exotable) th {
     padding-top: var(--exodus-form-nested-cell-padding-y);
     padding-bottom: var(--exodus-form-nested-cell-padding-y);
     padding-left: var(--exodus-form-nested-cell-padding-left);
@@ -90,12 +90,12 @@ TABLE.exodusform TABLE:not([exodusgroupno]):not(.exodustable) th {
 TABLE.exodusform td,
 TABLE.exodusform th,
 TABLE.exodusform tr,
-TABLE.exodustable td,
-TABLE.exodustable th,
-TABLE.exodustable tr,
-TABLE[exodusgroupno] td,
-TABLE[exodusgroupno] th,
-TABLE[exodusgroupno] tr {
+TABLE.exotable td,
+TABLE.exotable th,
+TABLE.exotable tr,
+TABLE[exogroupno] td,
+TABLE[exogroupno] th,
+TABLE[exogroupno] tr {
     vertical-align: top;
 }
 
@@ -197,10 +197,10 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
 /* Embedded line grid: hug content when short, but never wider than host/pane
  * so pre-wrap DETAILS/DESCRIPTION can fold within the screen (was max-content
  * alone, which grew the table to the full unwrapped text run). */
-TABLE.exodusform > tbody > tr > td > TABLE.exodustable:not([width]),
-TABLE.exodusform > tbody > tr > td > TABLE[exodusgroupno]:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE.exodustable:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE[exodusgroupno]:not([width]) {
+TABLE.exodusform > tbody > tr > td > TABLE.exotable:not([width]),
+TABLE.exodusform > tbody > tr > td > TABLE[exogroupno]:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE.exotable:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]) {
     width: min(max-content, 100%);
     max-width: 100%;
     box-sizing: border-box;
@@ -210,28 +210,28 @@ TABLE.exodusform > tbody > tr > th > TABLE[exodusgroupno]:not([width]) {
    (border-bottom etc.). Do not border:none here — that dropped inner grid lines.
    max-width + min-width:0 so nested min(max-content, 100%) can resolve against the
    pane (default min-width:auto keeps the cell at unwrapped text width). */
-TABLE.exodusform > tbody > tr > td:has(> TABLE[exodusgroupno]),
-TABLE.exodusform > tbody > tr > td:has(> TABLE.exodustable),
-TABLE.exodusform > tbody > tr > th:has(> TABLE[exodusgroupno]),
-TABLE.exodusform > tbody > tr > th:has(> TABLE.exodustable),
-TABLE.exodusform > thead > tr > td:has(> TABLE[exodusgroupno]),
-TABLE.exodusform > thead > tr > td:has(> TABLE.exodustable),
-TABLE.exodusform > thead > tr > th:has(> TABLE[exodusgroupno]),
-TABLE.exodusform > thead > tr > th:has(> TABLE.exodustable),
-TABLE.exodusform > tr > td:has(> TABLE[exodusgroupno]),
-TABLE.exodusform > tr > td:has(> TABLE.exodustable),
-TABLE.exodusform > tr > th:has(> TABLE[exodusgroupno]),
-TABLE.exodusform > tr > th:has(> TABLE.exodustable) {
+TABLE.exodusform > tbody > tr > td:has(> TABLE[exogroupno]),
+TABLE.exodusform > tbody > tr > td:has(> TABLE.exotable),
+TABLE.exodusform > tbody > tr > th:has(> TABLE[exogroupno]),
+TABLE.exodusform > tbody > tr > th:has(> TABLE.exotable),
+TABLE.exodusform > thead > tr > td:has(> TABLE[exogroupno]),
+TABLE.exodusform > thead > tr > td:has(> TABLE.exotable),
+TABLE.exodusform > thead > tr > th:has(> TABLE[exogroupno]),
+TABLE.exodusform > thead > tr > th:has(> TABLE.exotable),
+TABLE.exodusform > tr > td:has(> TABLE[exogroupno]),
+TABLE.exodusform > tr > td:has(> TABLE.exotable),
+TABLE.exodusform > tr > th:has(> TABLE[exogroupno]),
+TABLE.exodusform > tr > th:has(> TABLE.exotable) {
     padding: 0;
     max-width: 100%;
     min-width: 0;
 }
 
-/* Group/exodustable line grids (costs, jobs, schedules, …) */
-TABLE.exodusform TABLE[exodusgroupno] td,
-TABLE.exodusform TABLE[exodusgroupno] th,
-TABLE.exodusform TABLE.exodustable td,
-TABLE.exodusform TABLE.exodustable th {
+/* Group/exotable line grids (costs, jobs, schedules, …) */
+TABLE.exodusform TABLE[exogroupno] td,
+TABLE.exodusform TABLE[exogroupno] th,
+TABLE.exodusform TABLE.exotable td,
+TABLE.exodusform TABLE.exotable th {
     padding-top: var(--exodus-form-nested-cell-padding-y);
     padding-bottom: var(--exodus-form-nested-cell-padding-y);
     padding-left: var(--exodus-form-nested-cell-padding-left);
@@ -268,11 +268,11 @@ TABLE.exodusform TABLE.exodustable th {
     border-bottom: none;
 }
 
-/* Multirow tables (exodusgroupno): sticky column headings while scrolling */
-TABLE.exodusform[exodusgroupno] {
+/* Multirow tables (exogroupno): sticky column headings while scrolling */
+TABLE.exodusform[exogroupno] {
     padding-top: 0;
 }
-TABLE[exodusgroupno] > thead {
+TABLE[exogroupno] > thead {
     position: sticky;
     top: var(--exodus-sticky-top, 0);
     z-index: 11;
@@ -286,7 +286,7 @@ TABLE[exodusgroupno] > thead {
     z-index: 11;
     box-shadow: 0 1px 0 lightgrey;
 }
-:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead,
+:root[data-theme="dark_mode"] TABLE[exogroupno] > thead,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead {
     box-shadow: 0 1px 0 #5a6090;
 }
@@ -307,10 +307,10 @@ TABLE[exodusgroupno] > thead {
  *
  *   lighter (dark bodies) — color-mix face 90% / white (half prior mix).
  *
- * exodustable heads a step stronger. DM: fixed greys (ignore data-form-head).
+ * exotable heads a step stronger. DM: fixed greys (ignore data-form-head).
  */
-TABLE[exodusgroupno] > thead th,
-TABLE[exodusgroupno] > thead td,
+TABLE[exogroupno] > thead th,
+TABLE[exogroupno] > thead td,
 .exodusconfirmdiv #decide_table1 > thead th,
 .exodusconfirmdiv #decide_table1 > thead td {
     background-color: var(--exodus-form-face);
@@ -319,22 +319,22 @@ TABLE[exodusgroupno] > thead td,
         calc(c * 1.175 + 0.0075)
         h);
 }
-TABLE.exodustable[exodusgroupno] > thead th,
-TABLE.exodustable[exodusgroupno] > thead td {
+TABLE.exotable[exogroupno] > thead th,
+TABLE.exotable[exogroupno] > thead td {
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
         calc(l * 0.98)
         calc(c * 1.2 + 0.009)
         h);
 }
-:root[data-form-head="lighter"] TABLE[exodusgroupno] > thead th,
-:root[data-form-head="lighter"] TABLE[exodusgroupno] > thead td,
+:root[data-form-head="lighter"] TABLE[exogroupno] > thead th,
+:root[data-form-head="lighter"] TABLE[exogroupno] > thead td,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td {
     background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
-:root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead th,
-:root[data-form-head="lighter"] TABLE.exodustable[exodusgroupno] > thead td {
+:root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead th,
+:root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead td {
     background-color: color-mix(in oklch, var(--exodus-form-face) 87.5%, white);
 }
 
@@ -349,7 +349,7 @@ TABLE
     TABLE.exodusform {
         display: block;
     }
-    TABLE[exodusgroupno] > thead {
+    TABLE[exogroupno] > thead {
         position: static;
     }
     #exodus_menu {
@@ -1470,7 +1470,7 @@ input[type=checkbox]:focus-visible {
 }
 /* Type (info/critical/warning/question): icon only — no face/border tint */
 
-/* decide thead sticky + tint: shared with TABLE[exodusgroupno] > thead above */
+/* decide thead sticky + tint: shared with TABLE[exogroupno] > thead above */
 
 .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
     background-color: lightgrey;
@@ -1599,11 +1599,11 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 
 /* DM sticky head: lift off form face (#28304a). Same step for all group tables —
- * was only on .exodustable, so reports/journals (exodusform+groupno) looked flat. */
-:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead th,
-:root[data-theme="dark_mode"] TABLE[exodusgroupno] > thead td,
-:root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead th,
-:root[data-theme="dark_mode"] TABLE.exodustable[exodusgroupno] > thead td,
+ * was only on .exotable, so reports/journals (exodusform+groupno) looked flat. */
+:root[data-theme="dark_mode"] TABLE[exogroupno] > thead th,
+:root[data-theme="dark_mode"] TABLE[exogroupno] > thead td,
+:root[data-theme="dark_mode"] TABLE.exotable[exogroupno] > thead th,
+:root[data-theme="dark_mode"] TABLE.exotable[exogroupno] > thead td,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead td {
     background-color: #303a5a;
@@ -1903,7 +1903,7 @@ SPAN.calendar-date-committed[contenteditable] {
     TABLE.exodusform {
         display: block;
     }
-    TABLE[exodusgroupno] > thead {
+    TABLE[exogroupno] > thead {
         position: static;
     }
 

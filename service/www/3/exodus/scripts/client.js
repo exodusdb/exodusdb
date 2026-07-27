@@ -4525,7 +4525,7 @@ async function sorttable(event, order) {
 	}
 
 	//get the table rows
-	var tablex = $$('exodusgroup' + groupno)
+	var tablex = $$('exogroup' + groupno)
 	if (tablex)
 		var tablerows = tablex.tBodies[0].rows
 
@@ -5520,13 +5520,13 @@ function exodus_mark_form_edge_rows() {
 
 function exodusclear_embeddedtable_hostborders() {
 
-	// Static exodustable / embedded group tables: strip inline borders on the host row/cell
+	// Static exotable / embedded group tables: strip inline borders on the host row/cell
 	var tables = document.getElementsByTagName('TABLE')
 	for (var tablen = 0; tablen < tables.length; tablen++) {
 		var tablex = tables[tablen]
-		var isgroup = Number(tablex.getAttribute('exodusgroupno'))
-		var isexodustable = tablex.className && (' ' + tablex.className + ' ').indexOf(' exodustable ') >= 0
-		if (!isgroup && !isexodustable)
+		var isgroup = Number(tablex.getAttribute('exogroupno'))
+		var isexotable = tablex.className && (' ' + tablex.className + ' ').indexOf(' exotable ') >= 0
+		if (!isgroup && !isexotable)
 			continue
 		var hostcell = tablex.parentNode
 		// Outer grid prompt cells may be th; data cells are td
@@ -6592,7 +6592,7 @@ function exodus_set_icon_element(el, specOrUrl) {
 			span.id = el.id
 		// keep common attributes used on field chrome / static toolbar buttons
 		;['title', 'isexoduspopup', 'isexoduslink', 'exodusonclick', 'exodustype',
-			'accesskey', 'exodusgroupno', 'style', 'class'].forEach(function (n) {
+			'accesskey', 'exogroupno', 'style', 'class'].forEach(function (n) {
 			if (n == 'class' || n == 'style')
 				return
 			var v = el.getAttribute && el.getAttribute(n)

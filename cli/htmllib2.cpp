@@ -761,20 +761,20 @@ td.nx {border-top:none;border-bottom:none}
 .vbottom {vertical-align:bottom}
 .num {text-align:right;mso-number-format:General;white-space:nowrap;}
 
-table.exodustable {
+table.exotable {
  margin:0px;
  padding:0px;
  //border-spacing:0px;
  border-collapse:collapse;}
 
-table.exodustable th {
+table.exotable th {
  //background-color:#ffff80;
  background-color:#fff099;
  padding:2px;
  border:1px solid #808080;}
 
 @media screen{
- table.exodustable > thead th {
+ table.exotable > thead th {
   top: 0;
   z-index: 2;
   position: sticky;
@@ -782,19 +782,19 @@ table.exodustable th {
   outline-offset: -0.5px;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);}}
 
-table.exodustable > tbody > tr > td {
+table.exotable > tbody > tr > td {
  //background-color:#ffffc0;
  background-color:#fdf5e6;
  padding:2px;
  border:1px solid #d3d3d3;}
 
-table.exodustable > tbody > tr > td:first-child {
+table.exotable > tbody > tr > td:first-child {
  border-left:1px solid #808080}
 
-table.exodustable > tbody > tr > td:last-child {
+table.exotable > tbody > tr > td:last-child {
  border-right:1px solid #808080}
 
-table.exodustable hr {height:0px; border:0px; border-top:1px solid #d3d3d3}
+table.exotable hr {height:0px; border:0px; border-top:1px solid #d3d3d3}
 
 table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top; border-collapse:collapse; border:0px;}
 
@@ -803,7 +803,7 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 </style>
 
 <style type="text/css" media="print">
- /*.exodustable {}*/
+ /*.exotable {}*/
  /* #Header, #Footer { display: none !important; } */
  .noprint {display:none}
 </style>
@@ -910,14 +910,14 @@ td.nx {border-top:none;border-bottom:none}
 .acenter {text-align:center}
 .nobr {white-space:nowrap;}
 .num {text-align:right;mso-number-format:General}
-//.exodustable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
-.exodustable {background-color:#fdf5e6; border-width:2px; border-collapse:collapse; padding:1px}
+//.exotable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
+.exotable {background-color:#fdf5e6; border-width:2px; border-collapse:collapse; padding:1px}
 .hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
 .pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
 </style>
 
 <style type="text/css" media="print">
-.exodustable {}
+.exotable {}
 .noprint {display:none}
 </style>
 

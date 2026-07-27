@@ -394,7 +394,7 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
  params+=','+minimum+','+maximum
  dicti.conversion='[NUMBER,'+params+']'
  // Header/single fields: left (same as dates — see exodus_dict_date).
- // Multivalued (groupno > 0, line-grid / exodustable): right, like classic amount columns.
+ // Multivalued (groupno > 0, line-grid / exotable): right, like classic amount columns.
  // Call after dictrec so di.groupno is already set. Callers may still set di.align after.
  if (Number(dicti.groupno) > 0)
   dicti.align = 'R'

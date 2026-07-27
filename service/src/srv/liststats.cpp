@@ -148,7 +148,7 @@ func main() {
 		tx = "<H1 align=center>EXODUS USAGE STATISTICS</H1>";
 		gosub printtx();
 
-		tx = "<table border=1 class=exodustable";
+		tx = "<table border=1 class=exotable";
 		tx ^= " CELLSPACING=0 CELLPADDING=2 ALIGN=CENTER";
 		tx ^= " STYLE=\"font-size:66%\"";
 		tx ^= ">";

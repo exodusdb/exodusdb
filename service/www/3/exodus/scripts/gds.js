@@ -212,7 +212,7 @@ function gds_getcells(dbelementordbelementid, recn) {
     if (typeof (dbelementordbelementid) == 'object') {
         if (dbelementordbelementid.tagName) {
             dictid = dbelementordbelementid.id
-            groupno = Number(dbelementordbelementid.getAttribute('exodusgroupno'))
+            groupno = Number(dbelementordbelementid.getAttribute('exogroupno'))
         }
         else {
             dictid = dbelementordbelementid.name
@@ -233,7 +233,7 @@ function gds_getcells(dbelementordbelementid, recn) {
         //if (dbelement)
         //{
         // dictid=dbelementordbelementid
-        // groupno=Number(dbelement.getAttribute('exodusgroupno'))
+        // groupno=Number(dbelement.getAttribute('exogroupno'))
         //}
         //else
 
@@ -627,7 +627,7 @@ function gds_createrow(group) {
 ////////
 function gds_addrow(groupno, newdatarow) {
 
-    var tablex = $$('exodusgroup' + groupno)
+    var tablex = $$('exogroup' + groupno)
     //if (!tablex) return false
 
     //get the group
@@ -681,7 +681,7 @@ function setupnewrow(newrow) {
 ///////////
 function gds_insertrow(groupno, rown) {
 
-    var tablex = $$('exodusgroup' + groupno)
+    var tablex = $$('exogroup' + groupno)
     if (!tablex) return
 
     //get the group
@@ -720,7 +720,7 @@ function gds_blankrow(groupno, rown) {
     var group = this.data['group' + groupno]
 
     //get the table and row
-    var tablex = $$('exodusgroup' + groupno)
+    var tablex = $$('exogroup' + groupno)
     if (!tablex) return false
     var formrow = tablex.tBodies[0].getElementsByTagName('TR')[rown]
     if (!formrow) return false
@@ -790,7 +790,7 @@ function gds_deleterow(groupno, rown1, rown2) {
     if (typeof rown2 == 'undefined') rown2 = rown1
 
     //get the table and row
-    var tablex = $$('exodusgroup' + groupno)
+    var tablex = $$('exogroup' + groupno)
     if (!tablex)
         return
 
@@ -881,7 +881,7 @@ async function gds_bind(datasource, elements, rownx) {
             //default immediately for radio/checkbox and dropdown
             //or if literal default (starts with " or ')
             //do not default immediately for lines to avoid problem described in await validateall()
-            if (!(Number(element.getAttribute('exodusgroupno'))) && element.getAttribute('exodusdefaultvalue')) {
+            if (!(Number(element.getAttribute('exogroupno'))) && element.getAttribute('exodusdefaultvalue')) {
                 var ischeckbox
                 if (dataitem.text == ''
                     &&
@@ -969,7 +969,8 @@ async function gds_bind(datasource, elements, rownx) {
     async function gds_bindgroup(datasource, propname) {
         //alert('bindgroup')
         //locate the table element otherwise it is not required to be bound on screen
-        var tablex = $$('exodus' + propname)
+        // propname is data key "groupN"; table id matches every other site: 'exogroup'+N
+        var tablex = $$('exogroup' + propname.slice(5))
         if (!tablex)
             return
 
