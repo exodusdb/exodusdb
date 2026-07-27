@@ -1,3 +1,4 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M4 0.75v14.5L12.8 8 4 0.75z" fill="#000"/>
+  <!-- Right chevron; equal outer L/R pad 3.6 (mirror of nav-prev) -->
+  <path d="M3.6 0.75v14.5L12.4 8 3.6 0.75z" fill="#000"/>
 </svg>
