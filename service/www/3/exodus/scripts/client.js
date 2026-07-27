@@ -1560,6 +1560,12 @@ async function windowopen(url, parameters, style) {
 		if (typeof result == 'undefined' && window.navigator.appVersion.indexOf('Safari') >= 0)
 			throw (url)
 
+		// Empty url → about:blank. Some browsers pair dark canvas with black text
+		// under prefers-color-scheme: dark (broken default contrast). Fix the blank
+		// document once; callers just write content.
+		if (!url)
+			exodus_ensure_readable_blank(result)
+
 		return result
 
 	}
@@ -1568,6 +1574,25 @@ async function windowopen(url, parameters, style) {
 		return false
 	}
 
+}
+
+// Readable defaults for a blank document (about:blank or raw window.open()).
+// Use system Canvas/CanvasText so light and dark both contrast — not hard-coded
+// light, and not a debug-only patch on individual dump sites.
+function exodus_ensure_readable_blank(win) {
+	if (!win || !win.document)
+		return
+	try {
+		var doc = win.document
+		if (doc.documentElement)
+			doc.documentElement.style.colorScheme = 'light dark'
+		var body = doc.body
+		if (!body)
+			return
+		body.style.backgroundColor = 'Canvas'
+		body.style.color = 'CanvasText'
+	} catch (e) {
+	}
 }
 
 //wrapper function to replace window.open()
@@ -4179,7 +4204,9 @@ function showcache() {
 	}
 	if (html) {
 		var win = window.open()
-		win.document.body.innerHTML = '<table>' + html + '</table>'
+		exodus_ensure_readable_blank(win)
+		if (win && win.document && win.document.body)
+			win.document.body.innerHTML = '<table>' + html + '</table>'
 	}
 
 }
