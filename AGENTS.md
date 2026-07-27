@@ -19,11 +19,28 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 | Pane wrap | `service/www/3/exodus/scripts/client.js` (`exoduswrapformpanes`) |
 | Dev docs (HTML) | `service/www/exodus/doc/forms.htm` |
 
-## Git / commits
+## Quality model (debt allowed → clean on **review** / **squash**)
 
-- **Commit after each completed turn** of substantive work so history is easy to bisect/backtrack. Prefer small, descriptive commits over large batches.
-- **Do not push** unless the user asks.
-- Squash only when the user asks.
+Exodus is **production** shared code. Wrong event/gate/popup changes cost **~10×** later. Net speed = allow discovery, force cleanup at named gates.
+
+### While building
+
+- **KISS at the seam:** one more case on the real machine (walker, startevent, icon map). Not a new parallel policy.
+- **Blast radius first** on `client.js` / `dbform.js` / Gate A / confirm-decide / focus: smallest change; name what else can break; never “fix” by swallowing whole key classes.
+- **Technical debt is allowed for discovery** — thrash, try A then B, short WIP. Keep it local and reversible.
+- **Checkpoint commits** after turns are fine (bisect). They are **not** a claim the path is finished. Do **not** push unless asked.
+
+### Quality gates (user need not re-explain)
+
+| User says | Do this |
+|-----------|---------|
+| **`review`** (plain: “review”, “review changes”, “review this”) | **Primary gate.** Scope net work (uncommitted + unpushed, or area just discussed). Check **KISS + maintainability + blast radius**. **Fix cheap debt** same turn. Report: checked / fixed / open. Commit fixes if substantive. |
+| **squash** / related / big-bang / clean history | Run the **same gate**, fix debt, **then** rewrite history so the surviving commit is the clean outcome. |
+| Formal **`/review`** skill, PR #, “PR review” | Read-only subagent / GitHub path only — not the plain **`review`** gate. |
+
+**DRY is secondary and often loses to KISS.** True identical contract in many places → one seam. Similar-looking code with small differences → **prefer local copies** plus a short comment (`// Similar: pathA, pathB`) over a shared helper that papers over tiny differences. Parallel sites stay independently maintainable without a search-and-hope abstraction; false DRY (confirm vs decide Esc) is anti-KISS and high blast radius.
+
+Plain **`review`** / **squash** must not wait for the user to also say “KISS” or “clean up debt.”
 
 ## Principles (short)
 
