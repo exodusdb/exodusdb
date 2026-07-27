@@ -310,11 +310,18 @@ TABLE[exogroupno] > thead {
  * exotable heads a step stronger. DM: fixed greys (ignore data-form-head).
  */
 TABLE[exogroupno] > thead th,
-TABLE[exogroupno] > thead td,
-.exodusconfirmdiv #decide_table1 > thead th,
-.exodusconfirmdiv #decide_table1 > thead td {
+TABLE[exogroupno] > thead td {
     background-color: var(--exodus-form-face);
     background-color: oklch(from var(--exodus-form-face)
+        calc(l * 0.985)
+        calc(c * 1.175 + 0.0075)
+        h);
+}
+/* Decide heads: same OKLCH step, but from popup shell (not form-face) */
+.exodusconfirmdiv #decide_table1 > thead th,
+.exodusconfirmdiv #decide_table1 > thead td {
+    background-color: var(--exodus-popup-face);
+    background-color: oklch(from var(--exodus-popup-face)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
@@ -328,10 +335,12 @@ TABLE.exotable[exogroupno] > thead td {
         h);
 }
 :root[data-form-head="lighter"] TABLE[exogroupno] > thead th,
-:root[data-form-head="lighter"] TABLE[exogroupno] > thead td,
+:root[data-form-head="lighter"] TABLE[exogroupno] > thead td {
+    background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
+}
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
+    background-color: color-mix(in oklch, var(--exodus-popup-face) 90%, white);
 }
 :root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead th,
 :root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead td {
@@ -412,12 +421,20 @@ BODY
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
     --exodus-form-data-font-size: 1rem; /* INPUT and display SPANs share this */
-    /* Normal buttons: .exodusbutton + .graphicbutton (unbound form actions, confirm) */
+    /*
+     * LM buttons: form-face with a light neutral lift so hue shows through
+     * on form body, th, and page-bg (not a pure grey slab).
+     * First line = fallback if color-mix/oklch unsupported.
+     */
     --exodus-informbutton-bg: #f0f0f0;
-    --exodus-informbutton-hover-bg: #ffffff;
-    --exodus-informbutton-hover-border: #aaaaaa;
+    --exodus-informbutton-bg: color-mix(in oklch, var(--exodus-form-face) 72%, white);
+    --exodus-informbutton-hover-bg: #f5f5f5;
+    --exodus-informbutton-hover-bg: color-mix(in oklch, var(--exodus-form-face) 58%, white);
     --exodus-informbutton-border: #cccccc;
-    --exodus-informbutton-border-style: outset;
+    --exodus-informbutton-border: color-mix(in oklch, var(--exodus-form-face) 55%, #888888);
+    --exodus-informbutton-hover-border: #bbbbbb;
+    --exodus-informbutton-hover-border: color-mix(in oklch, var(--exodus-form-face) 45%, #666666);
+    --exodus-informbutton-border-style: solid;
     --exodus-informbutton-color: inherit;
     /* Toolbar/field icons (see AGENTS.md § Menubar / form icons):
        --exodus-ui-icon-size  = ONE scale for all (outer box, with text).
@@ -432,7 +449,7 @@ BODY
      * so neutral/darkgrey are visibly the same token as body text.
      */
     --exodus-icon-green: #22b014;
-    --exodus-icon-red: #9c1516; /* sole 16×16 red — LM */
+    --exodus-icon-red: #ad1a1b; /* sole 16×16 red — LM */
     --exodus-icon-orange: #e04510; /* also confirm No when Cancel is shown */
     --exodus-icon-blue: #1e97cc;
 }
@@ -495,7 +512,7 @@ BODY
 BUTTON
 {
     cursor: pointer;
-    background-color: #F0F0F0;
+    background-color: var(--exodus-informbutton-bg);
     border-radius:0.3rem;
 }
 
@@ -954,17 +971,24 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     margin-right: 4px;
 }
 
+/* Record nav: more air on the left so the group reads separate from New/Open… */
 #exodus_menu #formbuttonsdiv .exodus_recordnav_group {
-    margin-left: 4px;
+    margin-left: 12px;
+    margin-right: 4px;
 }
 
-/* First/prev/n-of-m/next/last: one flex row so the text centers with icon buttons
-   (menubar or under-form actions). */
+/*
+ * First | prev | n of m | next | last — one flex row, ONE gap between items.
+ * Spacing is layout (gap), not per-button margins, first/last hacks, or SVG insets.
+ * Do NOT put !important on display — setgkeys() uses inline display:none when
+ * gkeys.length <= 1; stylesheet !important would force them always visible.
+ */
 .exodus_recordnav_group {
     float: left;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
+    gap: 0.15em; /* equal air between every control (icons and n-of-m) */
 }
 
 .exodus_recordnav_group > span {
@@ -972,10 +996,6 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     align-items: center;
 }
 
-/* All record-nav controls share one height (icon + former 5px+5px pad) and
-   flex-center their content so "n of m" sits on the same midline as the chevrons.
-   Do NOT put !important on display — setgkeys() uses inline display:none when
-   gkeys.length <= 1; stylesheet !important would force them always visible. */
 .exodus_recordnav_group .menubutton,
 .exodus_recordnav_group .graphicbutton {
     float: none !important;
@@ -984,42 +1004,24 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     justify-content: center;
     box-sizing: border-box !important;
     height: calc(var(--exodus-ui-icon-size) + 10px) !important;
-    margin-top: 0.125em !important;
-    margin-bottom: 0.125em !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding: 0 0.2em !important;
+    margin: 0.125em 0 !important; /* no L/R — gap owns horizontal */
+    padding: 0 !important;        /* icon hit target = icon box; n-of-m pads itself */
+    /* beat #exodus_menu .menubutton { gap: 0.25em } so no phantom icon/label gap */
+    gap: 0 !important;
 }
 
-.exodus_recordnav_group > span:first-child .menubutton,
-.exodus_recordnav_group > span:first-child .graphicbutton {
-    margin-left: 2px !important;
+/* Icon-only nav: kill the usual label gap after the mask (no text sibling). */
+.exodus_recordnav_group .menubutton .exodus-icon,
+.exodus_recordnav_group .graphicbutton .exodus-icon,
+.exodus_recordnav_group .menubutton > img,
+.exodus_recordnav_group .graphicbutton > img {
+    margin-inline-end: 0 !important;
 }
 
-.exodus_recordnav_group > span:last-child .menubutton,
-.exodus_recordnav_group > span:last-child .graphicbutton {
-    margin-right: 2px !important;
-}
-
+/* "n of m" — equal text pad; outer spacing still from group gap */
 .exodus_recordnav_group #selectrecordbutton {
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    gap: 0;
-}
-
-/* No spacer img — height comes from the shared button height above.
-   Prefer visibility/size collapse over display so setgkeys display:none on the
-   parent button remains the only visibility switch. */
-.exodus_recordnav_group #selectrecordbutton > img {
-    position: absolute;
-    width: 0 !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: 0 !important;
-    overflow: hidden;
-    opacity: 0;
-    pointer-events: none;
+    padding-left: 0.3em !important;
+    padding-right: 0.3em !important;
 }
 
 .exodus_recordnav_group #selectrecordbutton_label {
@@ -1136,7 +1138,8 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     --fail-color: #ffa0a0;
     --warning-color: #FF3403;
     --exodus-page-bg: #f9f9f9;
-    /* Calendar shell uses form face (same token as TABLE.exodusform / confirm) */
+    /* All DOMUI popup shells (confirm/decide, calendar, colour continuum) */
+    --exodus-popup-face: var(--exodus-form-face);
     --exodus-calendar-border: #4444cc;
     --exodus-calendar-color: #000000;
     --exodus-calendar-header-color: #000000;
@@ -1245,8 +1248,6 @@ input[type=checkbox]:focus-visible {
 /* Shell: one-row two-col table — icon | (title + options + ▼ + buttons).
    Everything in col2 shares one left edge; no spacer/padding alignment hacks. */
 .exodusconfirmdiv {
-    /* Same face as form pane / TABLE.exodusform */
-    --exodusconfirm-face: var(--exodus-form-face);
     --exodusconfirm-iconcol-width: 4.3em;
     z-index: 1001;
     position: fixed;
@@ -1257,7 +1258,7 @@ input[type=checkbox]:focus-visible {
     margin: auto;
     inset: 0;
     text-align: left;
-    background: var(--exodusconfirm-face);
+    background: var(--exodus-popup-face);
     border: 2px solid #666666;
     border-radius: 10px;
     padding: 10px;
@@ -1549,7 +1550,7 @@ input[type=checkbox]:focus-visible {
     --exodus-form-data-font-style: normal;
     --exodus-form-data-font-size: 1rem;
     --exodus-textarea-border: #6070b8;
-    /* Normal buttons (exodusbutton + graphicbutton): themed face, not near-black */
+    /* Normal buttons (exodusbutton + graphicbutton): fixed DM face (not form-mix) */
     --exodus-informbutton-bg: #354060;
     --exodus-informbutton-hover-bg: #455880;
     --exodus-informbutton-hover-border: #9898f8;
@@ -1682,8 +1683,7 @@ SPAN.calendar-date-committed[contenteditable] {
 
 :root[data-theme="dark_mode"] .exodusconfirmdiv {
     --exodusconfirm-border: #b8a99a;
-    --exodusconfirm-face: var(--exodus-form-face);
-    background: var(--exodusconfirm-face);
+    /* face: --exodus-popup-face → form-face */
     border: 2px solid var(--exodusconfirm-border);
     color: #ffffff;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
@@ -1747,10 +1747,10 @@ SPAN.calendar-date-committed[contenteditable] {
     background: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* ========== Date picker popup (calendar.js) — face = form via --exodus-form-face ========== */
+/* ========== Date picker popup (calendar.js); colour continuum reuses .calendar ========== */
 .calendar {
     text-align: center;
-    background: var(--exodus-form-face);
+    background: var(--exodus-popup-face);
     color: var(--exodus-calendar-color);
     border: 2px solid var(--exodus-calendar-border);
     border-radius: 10px;
@@ -1772,7 +1772,7 @@ SPAN.calendar-date-committed[contenteditable] {
     top: 0;
     z-index: 12;
     flex: 0 0 auto;
-    background: var(--exodus-form-face);
+    background: var(--exodus-popup-face);
     color: var(--exodus-calendar-header-color);
     padding: 2px 0 6px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);

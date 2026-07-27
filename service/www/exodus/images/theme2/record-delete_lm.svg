@@ -5,5 +5,5 @@
   <path d="M9.75 1v4.2c0 .44.36.8.8.8H13.75"
         fill="#e8f0f4" stroke="#005276" stroke-width="0.75" stroke-linejoin="round"/>
   <!-- minus: same red as mono icon-red token (LM) -->
-  <rect x="3.85" y="6.95" width="8.3" height="2.4" rx="1.2" fill="#9c1516"/>
+  <rect x="3.85" y="6.95" width="8.3" height="2.4" rx="1.2" fill="#ad1a1b"/>
 </svg>
