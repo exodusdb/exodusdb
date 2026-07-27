@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+  <!-- Same placement as sort.svg. Up strong / down dim. -->
+  <g transform="translate(0 3) scale(0.607143)">
+    <path d="M5 0L10 5.5H0L5 0Z" fill="#000"/>
+    <path d="M5 14L0 8.5H10L5 14Z" fill="#000" fill-opacity="0.25"/>
+  </g>
+</svg>

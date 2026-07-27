@@ -75,25 +75,43 @@ var gthemecookiekey = 'EXODUStheme'
 
 function exodus_sortimage(order) {
 
-	// order: '' (neutral), 'up', or 'down'
-	// Painted SVG <img> (not mono mask): keeps fill-opacity for inactive chevron,
-	// and sorttable still reads clickedelement.src for up/down. Same host element
-	// as before — id / exodusonclick / sorttableelementid unchanged.
-	var name = (order == 'up') ? 'sort-up' : (order == 'down') ? 'sort-down' : 'sort'
-	name += (gisdarktheme ? '_dm' : '_lm')
-	return gimagetheme + name + '.svg'
+	// Standard 16×16 mono masks (same box/tint as other toolbar icons).
+	// Dim chevron = fill-opacity in SVG; order via data-sort-order.
+	var name = (order == 'up') ? 'sort-up.svg' : (order == 'down') ? 'sort-down.svg' : 'sort.svg'
+	return exodus_icon_spec(name, 'darkgrey')
+}
+
+function exodus_sort_order_of(el) {
+	if (!el)
+		return ''
+	var d = el.getAttribute && el.getAttribute('data-sort-order')
+	if (d === 'up' || d === 'down')
+		return d
+	if (d === '')
+		return ''
+	var blob = (el.src || '')
+	try {
+		if (el.style)
+			blob += ' ' + (el.style.maskImage || '') + ' ' + (el.style.webkitMaskImage || '')
+	} catch (e) { }
+	if (blob.indexOf('sort-up') >= 0)
+		return 'up'
+	if (blob.indexOf('sort-down') >= 0)
+		return 'down'
+	return ''
+}
+
+function exodus_apply_sort_icon(el, order) {
+	el = exodus_set_icon_element(el, exodus_sortimage(order))
+	if (el && el.setAttribute)
+		el.setAttribute('data-sort-order', order || '')
+	return el
 }
 
 function exodus_refresh_sortimages() {
 
-	document.querySelectorAll('img[id^="sortbutton_"]').forEach(img => {
-		var order = ''
-		var src = img.getAttribute('src') || ''
-		if (src.indexOf('up') >= 0)
-			order = 'up'
-		else if (src.indexOf('down') >= 0)
-			order = 'down'
-		img.src = exodus_sortimage(order)
+	document.querySelectorAll('.exodus-icon[id^="sortbutton_"], img[id^="sortbutton_"]').forEach(function (el) {
+		exodus_apply_sort_icon(el, exodus_sort_order_of(el))
 	})
 }
 
@@ -4432,11 +4450,10 @@ async function sorttable(event, order) {
 
 		//var clickedelement = document.getElementsByName('sortbutton_' + groupno)[0]
 
-		//check if reverting from reverse to normal
-		up2down = clickedelement.src.indexOf('up') >= 0
-
-		//decide the order image
-		var order = (clickedelement.src.indexOf('down') >= 0) ? 'up' : 'down'
+			// Cycle: neutral/down → up → down (data-sort-order or mask URL)
+		var cur = exodus_sort_order_of(clickedelement)
+		up2down = (cur == 'up')
+		var order = (cur == 'down') ? 'up' : 'down'
 	}
 	catch (e) {
 		if (typeof order == 'unassigned')
@@ -4536,7 +4553,7 @@ async function sorttable(event, order) {
 	//change the sort image now confirmed
 	try {
 		await resetsortimages(groupno)
-		exodus_set_icon_element(clickedelement, exodus_sortimage(order))
+		exodus_apply_sort_icon(clickedelement, order)
 	} catch (e) { }
 
 	//reorder data and table rows
@@ -6530,7 +6547,17 @@ function exodus_icon_apply(el, spec) {
 	if (!el || !exodus_is_icon_spec(spec))
 		return
 	var id = el.id
-	el.className = 'exodus-icon exodus-icon-' + (spec.color || 'darkgrey')
+	// Keep framework id→class map (exodusid_*) so $$() still finds multi-id groups
+	// (e.g. all sortbutton_N). Do not wipe className wholesale.
+	var keep = ''
+	if (el.className) {
+		var parts = String(el.className).split(/\s+/)
+		for (var pi = 0; pi < parts.length; pi++) {
+			if (parts[pi].indexOf('exodusid_') === 0)
+				keep += (keep ? ' ' : '') + parts[pi]
+		}
+	}
+	el.className = (keep ? keep + ' ' : '') + 'exodus-icon exodus-icon-' + (spec.color || 'darkgrey')
 	if (id)
 		el.id = id
 	var abs = exodus_icon_abs_url(spec.mask)

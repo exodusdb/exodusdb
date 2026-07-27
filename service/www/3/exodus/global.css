@@ -428,22 +428,13 @@ BODY
     /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
     --exodus-check-size: 1.3125em;
     /*
-     * Monochrome icon tints (CSS mask + black SVG). Change tone once per role;
-     * no per-file colour, no _darkmode twin for these shapes.
-     * Multicolour icons (New/Open/Edit/Delete, theme, company, …) stay painted
-     * SVGs — but any pure-red glyph in them (e.g. Delete minus) must use the
-     * same hex as --exodus-icon-red for that theme.
-     * darkgrey/neutral track default text (--exodus-textcolor LM/DM).
-     * lightgrey stays muted (inactive Save).
-     * orange = secondary negative (confirm No when Cancel also shown).
+     * Role tints only (mono masks). Greys live next to --exodus-textcolor below
+     * so neutral/darkgrey are visibly the same token as body text.
      */
     --exodus-icon-green: #22b014;
     --exodus-icon-red: #9c1516; /* sole 16×16 red — LM */
-    --exodus-icon-orange: #e04510;
+    --exodus-icon-orange: #e04510; /* also confirm No when Cancel is shown */
     --exodus-icon-blue: #1e97cc;
-    --exodus-icon-darkgrey: var(--exodus-textcolor);
-    --exodus-icon-lightgrey: #b0b0b0;
-    --exodus-icon-neutral: var(--exodus-icon-darkgrey);
 }
 
 /*
@@ -854,14 +845,13 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
     vertical-align: middle;
 }
 
-/* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size / glyph).
- * Sort column imgs are text-height glyphs — exclude from toolbar square box. */
+/* Scale fixed-pixel SVG/PNG icons with text (see --exodus-ui-icon-size / glyph). */
 .graphicbutton img,
 .menubutton img,
 img[isexoduspopup="1"],
 img[isexoduslink="1"],
 img[exodustype="B"],
-img[exodusonclick]:not([id^="sortbutton_"]),
+img[exodusonclick],
 img[id^="insertrowbutton"],
 img[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);
@@ -878,26 +868,6 @@ img[id^="deleterowbutton"] {
 .exodus-icon[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);
     width: var(--exodus-ui-icon-size);
-    cursor: pointer;
-}
-/*
- * Column sort: full-bleed twin-triangle SVG as plain <img>.
- * height 1cap = capital height of the title font (not 1em/1rem: the em-square
- * is taller than letter ink, so full-bleed art at 1em always looks bigger than
- * “Date/Time”). 1em fallback where cap is unsupported. Width from 10×14 art.
- * Tune vertical-align here (baseline / middle / text-bottom).
- */
-img[id^="sortbutton_"] {
-    height: 1em;
-    height: 1cap;
-    width: auto;
-    aspect-ratio: 10 / 14;
-    padding: 0;
-    margin: 0;
-    border: 0;
-    box-sizing: content-box;
-    object-fit: contain;
-    vertical-align: baseline;
     cursor: pointer;
 }
 /*
@@ -1139,6 +1109,10 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     --text-color: #D4D4D4;
     --link-color: #006;
     --exodus-textcolor: #000000;
+    /* Mono chrome icons = body text (one source; DM only reassigns --exodus-textcolor) */
+    --exodus-icon-neutral: var(--exodus-textcolor);
+    --exodus-icon-darkgrey: var(--exodus-icon-neutral);
+    --exodus-icon-lightgrey: color-mix(in srgb, var(--exodus-icon-neutral) 42%, transparent);
     --exodus-menubkgcolor: linear-gradient(to bottom, #f0f0f0, #ffffff);
     --exodus-smallerbordercolor: #d8d8d8;
     --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
@@ -1554,7 +1528,7 @@ input[type=checkbox]:focus-visible {
     --exodus-calendar-button-bg: #6a5e50;
     --exodus-calendar-button-color: #ffffff;
     --exodus-calendar-button-border: #a8957c;
-    --exodus-textcolor: #ffffff;
+    --exodus-textcolor: #ffffff; /* greys: --exodus-icon-neutral → this (see LM :root) */
     --exodus-menubkgcolor: linear-gradient(to top, #303a5a, #1a2035);
     --exodus-smallerbordercolor: #5058a0;
     --exodus-menuboxshadow: #000 0px 1px 10px;
@@ -1582,14 +1556,11 @@ input[type=checkbox]:focus-visible {
     --exodus-informbutton-border: #7070e0;
     --exodus-informbutton-border-style: solid;
     --exodus-informbutton-color: #ffffff;
-    /* Monochrome icon tints (DM); darkgrey/neutral inherit text via LM token chain */
+    /* Role tints only (DM). Greys stay var(--exodus-textcolor) from LM :root. */
     --exodus-icon-green: #3ec848;
     --exodus-icon-red: #ff442a; /* sole 16×16 red — DM (matches painted Delete minus) */
     --exodus-icon-orange: #ff7a40;
     --exodus-icon-blue: #6aa3e8;
-    --exodus-icon-darkgrey: var(--exodus-textcolor);
-    --exodus-icon-lightgrey: #707070;
-    --exodus-icon-neutral: var(--exodus-icon-darkgrey);
     --bg-color: #1e1e1e;
     --h-color: #ffffff;
     --text-color: #fdfdfd;
@@ -1636,18 +1607,6 @@ SPAN.calendar-date-committed[contenteditable] {
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead td {
     background-color: #303a5a;
-}
-
-/* Sort icon in thead: same cap-height box; override vertical-align here if needed */
-TABLE[exodusgroupno] > thead th img[id^="sortbutton_"],
-TABLE[exodusgroupno] > thead td img[id^="sortbutton_"],
-TABLE.exodustable[exodusgroupno] > thead th img[id^="sortbutton_"],
-TABLE.exodustable[exodusgroupno] > thead td img[id^="sortbutton_"] {
-    height: 1em;
-    height: 1cap;
-    width: auto;
-    aspect-ratio: 10 / 14;
-    vertical-align: baseline;
 }
 
 :root[data-theme="dark_mode"] .exodusform > tbody > tr > td,

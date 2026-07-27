@@ -1290,6 +1290,8 @@ async function formfunctions_onload() {
                 if (1 && (titleelement = $$(element.id + '_title'))) {
 
                     var element2 = exodus_create_icon_element(gsortimage)
+                    if (typeof exodus_apply_sort_icon == 'function')
+                        element2 = exodus_apply_sort_icon(element2, '') || element2
                     titleelement.insertBefore(element2, null)
 
                     element2.id = 'sortbutton_' + Number(element.getAttribute('exodusgroupno'))
@@ -5427,11 +5429,17 @@ async function resetsortimages(groupno) {
         return
     }
 
-    var elements = $$('sortbutton_' + groupno)
-    if (elements && elements.tagName)
-        elements = [elements]
-    if (elements) {
-        for (elementn = 0; elementn < elements.length; elementn++)
+    // Scope to this multivalue table only (TABLE#exodusgroupN). Column headers
+    // and sort icons live in that thead. Do not touch other groups/forms.
+    // All columns in the group share id sortbutton_N — query all twins in-scope.
+    var tablex = document.getElementById('exodusgroup' + groupno)
+    if (!tablex)
+        return
+    var elements = tablex.querySelectorAll('[id="sortbutton_' + groupno + '"]')
+    for (var elementn = 0; elementn < elements.length; elementn++) {
+        if (typeof exodus_apply_sort_icon == 'function')
+            exodus_apply_sort_icon(elements[elementn], '')
+        else
             exodus_set_icon_element(elements[elementn], gsortimage)
     }
 
