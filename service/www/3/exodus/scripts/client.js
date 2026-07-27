@@ -936,6 +936,8 @@ function uiblocker_waitcancel_dialog() {
 var gmodalblockdepth = 0
 var gmodalblock_savedoverflow
 var gmodalblock_capturebound
+// Set while a decide list is open; wheel over options moves selection/focus (classic list).
+var gdecide_onwheel = null
 
 function modalblock_scrollpane_under(event) {
 
@@ -960,6 +962,15 @@ function modalblock_onwheel(event) {
 	// After zoom, decide popups reflow via visualViewport resize (see fit_decide).
 	if (event.ctrlKey || event.metaKey)
 		return
+
+	// Decide list: wheel = next/prev option (radio checks; multi only moves focus).
+	// Runs before body scroll so the list behaves like a classic listbox, not a free scroller.
+	if (typeof gdecide_onwheel == 'function' && gdecide_onwheel(event)) {
+		event.preventDefault()
+		if (event.stopPropagation)
+			event.stopPropagation()
+		return
+	}
 
 	var scrollpane = modalblock_scrollpane_under(event)
 	if (scrollpane) {
@@ -5622,6 +5633,7 @@ var gblockevents
 //
 // TAKEN BY APP while modal (gmodalblockdepth / gblockevents):
 //   • plain wheel                 page scroll blocked; confirm body may scroll
+//                                 (decide list: option step via gdecide_onwheel)
 //   • touchmove outside scroll    blocked
 //   • form keydown/click path     blocked (startevent swallow) except above
 //
@@ -5629,6 +5641,7 @@ var gblockevents
 //   • colours Ctrl+wheel          continuum resolution N (colors.js — blocks zoom
 //                                 over that popup by design)
 //   • decide type-to-filter etc.  on #exodusconfirmdiv only
+//   • decide plain wheel          radio: check+focus next/prev; multi: focus only
 //
 // Browser zoom keys: early *sync capture* keydown — not Gate A, not
 // document_onkeydown. Stops propagation without preventDefault so the browser
@@ -6667,12 +6680,24 @@ function exodusconfirm_startevent(event) {
 		return true
 
 	// Decide lists: keys/clicks live on the popup (decide_document_on*).
-	// Form path only swallows — do not also run Yes/No/Enter here (dual close).
+	// Form path only swallows for most keys — not Esc: when focus is outside
+	// #exodusconfirmdiv the popup never sees keydown (bubble never reaches it).
+	// Esc must cancel here. When focus is inside, decide_document_onkeydown runs
+	// first, stopPropagation, and may clear type-filter before cancel; we never
+	// double-fire. resolvePendingConfirm is idempotent if both somehow run.
 	if ($$('decide_table1')) {
 		if (event.type != 'keydown')
 			return false
 		if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
 			return true
+		var dkey = event.keyCode ? event.keyCode : event.which
+		if (dkey == 27) {
+			// Same value as decide_cancel_onclick_sync / outside-click leave
+			window.setTimeout(function () {
+				resolvePendingConfirm('', 'exodusconfirm_startevent Esc decide')
+			}, 1)
+			return false
+		}
 		return false
 	}
 
@@ -7433,6 +7458,7 @@ function cancel_backpage_event(event) {
 // Decide shell is mounted before rows are built; remove it before exodusinvalid
 // so the pale list popup does not sit behind the invalid dialog.
 async function decide_fail_no_options() {
+	gdecide_onwheel = null
 	var shell = $$('exodusconfirmdiv')
 	if (shell)
 		exodusremovenode(shell)
@@ -7816,6 +7842,26 @@ async function decide_onload(decide_args) {
 	addeventlistener(exodusconfirmdiv, 'mouseover', decide_document_onmouseover)
 	addeventlistener(exodusconfirmdiv, 'mouseout', decide_document_onmouseout)
 
+	// Wheel over the option table: step like Up/Down (modalblock_onwheel calls this).
+	gdecide_onwheel = function decide_onwheel(event) {
+		if (!event || event.ctrlKey || event.metaKey)
+			return false
+		var table = $$('decide_table1')
+		if (!table)
+			return false
+		var t = event.target
+		if (!(t === table || (table.contains && table.contains(t))))
+			return false
+		var delta = event.deltaY
+		if (!delta && event.detail)
+			delta = event.detail
+		if (!delta)
+			return false
+		var direction = delta > 0 ? 1 : -1
+		// Radio: check + focus; multi-select: focus only (classic listbox)
+		return decide_move_option(direction, 1, !decide_returnmany)
+	}
+
 	//returning undefined indicates that we need to yield and wait for decide_ok_onclick_sync etc to resume
 	//returning false indicates some problem
 	//returning anything else indicates that there is only one option
@@ -8111,7 +8157,117 @@ async function decide_onload(decide_args) {
 
 	// Only exit from the decide popup
 	function decide_close(value) {
+		gdecide_onwheel = null
 		resolvePendingConfirm(value, 'decide_close')
+	}
+
+	// direction ±1, steps (1 or 10), selectRadio: check for single-select (arrow/wheel, not PgUp/Dn)
+	function decide_move_option(direction, steps, selectRadio) {
+		var selections = document.getElementsByName('decide_selection')
+		if (!selections || !selections.length)
+			return false
+
+		var element = null
+		var active = document.activeElement
+		if (active && active.name == 'decide_selection' && !decide_selection_row_hidden(active))
+			element = active
+		else if (decide_last_option_element
+			&& decide_last_option_element.name == 'decide_selection'
+			&& !decide_selection_row_hidden(decide_last_option_element))
+			element = decide_last_option_element
+		else {
+			for (var ci = 0; ci < selections.length; ci++) {
+				if (selections[ci].checked && !decide_selection_row_hidden(selections[ci])) {
+					element = selections[ci]
+					break
+				}
+			}
+			if (!element) {
+				for (var vi = 0; vi < selections.length; vi++) {
+					if (!decide_selection_row_hidden(selections[vi])) {
+						element = selections[vi]
+						break
+					}
+				}
+			}
+		}
+		if (!element)
+			return false
+
+		var n = -1
+		for (var si = 0; si < selections.length; si++) {
+			if (selections[si] == element) {
+				n = si
+				break
+			}
+		}
+		if (n < 0)
+			return false
+
+		var startn = n
+		var stepped = 0
+		var guard = 0
+		var lastVisible = null
+		var newelement = element
+		while (guard++ <= selections.length) {
+			n += direction
+			if (n < 0)
+				n = selections.length - 1
+			if (n >= selections.length)
+				n = 0
+			if (n == startn && stepped == 0 && guard > 1)
+				break
+			newelement = selections[n]
+			if (!newelement || decide_selection_row_hidden(newelement))
+				continue
+			if (newelement == element && stepped == 0)
+				continue
+			stepped++
+			lastVisible = newelement
+			if (stepped >= steps)
+				break
+		}
+		if (!stepped || !lastVisible)
+			return false
+		newelement = lastVisible
+
+		var newoptionno = newelement.getAttribute('decide_optionno')
+		var scrollpane = exodusconfirm_scrollpane()
+		var newn = -1
+		for (si = 0; si < selections.length; ++si) {
+			if (selections[si] == newelement) {
+				newn = si
+				break
+			}
+		}
+		if (scrollpane) {
+			if (newn == 0 || newoptionno == 1)
+				scrollpane.scrollTop = 0
+			else if (newn == (selections.length - 1))
+				scrollpane.scrollTop = scrollpane.scrollHeight
+			else {
+				try {
+					var tr = getancestor(newelement, 'tr')
+					if (tr && tr.scrollIntoView)
+						tr.scrollIntoView({ block: 'nearest' })
+				} catch (e) { }
+			}
+		}
+
+		decide_last_option_element = newelement
+		try {
+			newelement.focus()
+			if (newelement.select)
+				newelement.select()
+		} catch (e2) {
+			client_focuson(newelement)
+		}
+
+		// Single-select: move the radio with focus (arrow/wheel). Multi: focus only.
+		if (selectRadio && !decide_returnmany)
+			newelement.checked = true
+
+		return true
 	}
 
 	function decide_ok_onclick_sync() {
@@ -8554,6 +8710,7 @@ async function decide_onload(decide_args) {
 
 		//pgup 33/pgdn 34/down 40/up 38/backspace 8 keys (Tab is handled above)
 		// Step by *visible* rows only (display:none filter skips); PgUp/PgDn = 10 visible.
+		// Wheel uses the same decide_move_option path (radio check; multi focus only).
 		if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 8) {
 
 			var direction
@@ -8569,14 +8726,9 @@ async function decide_onload(decide_args) {
 					steps = 10
 			}
 
-			var startn = n
-			var newelement = element
-			var stepped = 0
-			var guard = 0
-			var lastVisible = null
-
+			// Ctrl+PgUp/Dn: first/last visible (not via decide_move_option steps)
 			if (toEnd) {
-				// Ctrl+PgDn / Ctrl+PgUp: last or first visible
+				var lastVisible = null
 				if (direction > 0) {
 					for (var j = 0; j < selections.length; j++) {
 						if (!decide_selection_row_hidden(selections[j]))
@@ -8592,59 +8744,29 @@ async function decide_onload(decide_args) {
 				}
 				if (!lastVisible || lastVisible == element)
 					return exoduscancelevent(event)
-				newelement = lastVisible
-			} else {
-				while (guard++ <= selections.length) {
-					n += direction
-					if (n < 0) n = selections.length - 1
-					if (n >= selections.length) n = 0
-					// full wrap with no other visible
-					if (n == startn && stepped == 0 && guard > 1)
-						break
-					newelement = selections[n]
-					if (!newelement || decide_selection_row_hidden(newelement))
-						continue
-					if (newelement == element && stepped == 0)
-						continue
-					stepped++
-					lastVisible = newelement
-					if (stepped >= steps)
-						break
+				decide_last_option_element = lastVisible
+				try {
+					lastVisible.focus()
+					if (lastVisible.select)
+						lastVisible.select()
+				} catch (e3) {
+					client_focuson(lastVisible)
 				}
-				if (!stepped || !lastVisible)
-					return exoduscancelevent(event)
-				newelement = lastVisible
-			}
-
-			//scroll to the top or bottom if on the first or last option
-			var newoptionno = newelement.getAttribute('decide_optionno')
-			var scrollpane = exodusconfirm_scrollpane()
-			var newn = -1
-			for (si = 0; si < selections.length; ++si) {
-				if (selections[si] == newelement) {
-					newn = si
-					break
-				}
-			}
-			if (newn == 0 || newoptionno == 1)
-				scrollpane.scrollTop = 0
-			else if (newn == (selections.length - 1))
-				scrollpane.scrollTop = scrollpane.scrollHeight
-
-			decide_last_option_element = newelement
-			newelement.focus()
-			newelement.select()
-
-			// Backspace (no filter): move up and uncheck only — never check
-			if (keycode == 8 && decide_returnmany) {
-				if (newelement.checked)
-					decide_checkbox_select(event, newelement, false)
+				// PgUp/Dn: scan without changing radio (historical)
 				return exoduscancelevent(event)
 			}
 
-			//select new radio button if pressing up/down (but not pgup/pgdn so they can scan multi-page options without changing the currently selected option)
-			if (!decide_returnmany && keycode != 33 && keycode != 34)
-				newelement.checked = true
+			// Up/Down (and faked from Space): radio checks; multi focus only
+			// Backspace: move up then uncheck if multi
+			var selectRadio = !decide_returnmany && keycode != 8
+			if (!decide_move_option(direction, steps, selectRadio))
+				return exoduscancelevent(event)
+
+			if (keycode == 8 && decide_returnmany) {
+				var cur = decide_last_option_element
+				if (cur && cur.checked)
+					decide_checkbox_select(event, cur, false)
+			}
 
 			return exoduscancelevent(event)
 
