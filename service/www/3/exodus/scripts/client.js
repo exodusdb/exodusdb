@@ -6033,12 +6033,14 @@ async function exodus_begin_run(asyncHandler, location, event) {
 	exodus_flight_log('TAKEOFF #' + n + ' "' + location + '"')
 
 	form_blockevents(true, location)
-	// Focus/activate (document_onfocus): keep form_blockevents for re-entry, but do
-	// not mount #uiblockerdiv. A full-viewport overlay mid-click closes native
-	// <select> lists (first click opens then snaps shut; second works because
-	// focus already held). Real dialogs/db waits call blockmodalui themselves.
+	// Keep form_blockevents for re-entry, but skip #uiblockerdiv + overflow:hidden for:
+	//   focus/activate — full-viewport overlay mid-click closes native <select>
+	//   background     — exodus_begin_if_idle (expression2 every 250ms, keepalive, relock);
+	//                    overflow lock was flashing page scrollbars (mediadiary wide forms).
+	// Real dialogs/db waits still call blockmodalui themselves.
 	var etype = event && event.type
-	var modalblock = !(etype == 'focus' || etype == 'focusin' || etype == 'activate')
+	var modalblock = !(etype == 'focus' || etype == 'focusin' || etype == 'activate'
+		|| etype == 'background')
 	if (modalblock)
 		blockmodalui_sync()
 
@@ -6077,9 +6079,11 @@ function startAsyncFlow(asyncHandler, location, event) {
 	return exodus_begin(asyncHandler, location, event)
 }
 
-// Optional background work (keepalive, relock): Gate A only when idle.
+// Optional background work (expression2, keepalive, relock): Gate A only when idle.
 // Skip if busy — form/lock state may be wrong later; missing a tick is fine.
 // Public API #2 of 3 (see block above exodus_begin_waitcancel).
+// Passes type 'background' so exodus_begin_run does not mount #uiblockerdiv /
+// overflow:hidden (expression2 ticks every 250ms were thrashing page scrollbars).
 function exodus_begin_if_idle(asyncHandler, location) {
 	location = location || 'background'
 	if (g_exodus_flow) {
@@ -6093,7 +6097,7 @@ function exodus_begin_if_idle(asyncHandler, location) {
 		exodus_flight_log('SKIP "' + location + '" (db.requesting)')
 		return Promise.resolve(null)
 	}
-	return exodus_begin(asyncHandler, location)
+	return exodus_begin(asyncHandler, location, { type: 'background' })
 }
 
 // Internal bridge from *_sync / HTML attribute handlers — not a fourth gate.
