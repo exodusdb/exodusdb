@@ -47,6 +47,7 @@ Plain **`review`** / **squash** must not wait for the user to also say “KISS�
 - HTM is a **seed**; dbform rewrites the DOM (e.g. `align='T'` → contenteditable `<span>` with `min-width = exoduslength × 7`).
 - **Pane** owns the outer edge; **grid borders** belong on **`td`**, not `tr`. Do not use page `tr { border-bottom }` on `exodusform` pages.
 - **Embedded groups** live in host cells (`:has(> TABLE[exogroupno])`); a line “under” a group is often the **outer** row, not the inner table.
+- **Unbound modal Cancel / Esc / close:** always assume discard if dirty — no “Discard data or instructions entered?”. Bound dialogs still confirm. Unlock still runs when locked (`gKeyNodes`).
 - Prefer **dict** / **HTM column class** / **page-local CSS** over global `!important` hacks.
 - Find **root cause** (page `<style>`, inline dbform styles, pane rules) before adding suppressions.
 - **Craftsmanship:** obvious local fix over thoughtless scaffolding (see global `~/.grok/AGENTS.md` change style §5).

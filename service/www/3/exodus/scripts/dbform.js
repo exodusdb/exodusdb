@@ -4602,8 +4602,9 @@ async function closerecord_onclick() {
     //if (window.dialogArguments)
     {
 
-        //user confirms or cancels
-        if (gchangesmade) {
+        // Dirty leave: bound dialogs still confirm. Unbound modals always assume
+        // Discard (Cancel / Esc / close) — no "Discard data or instructions entered?"
+        if (gchangesmade && (gKeyNodes || !window.dialogArguments)) {
             var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
             if (response != 2) return false
         }
