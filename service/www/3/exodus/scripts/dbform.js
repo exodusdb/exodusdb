@@ -82,8 +82,9 @@ function form_apply_input_field_width(element) {
 // (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
 gnewimage = gimagetheme + 'record-new_lm.svg' // painted multicolour — excluded from mask tint
 gopenimage = gimagetheme + 'record-open_lm.svg' // painted page + magnifier
-gfindimage = exodus_icon_spec('field-find.svg', 'darkgrey')
-gcalendarimage = exodus_icon_spec('field-date.svg', 'darkgrey')
+// F7/F6 field chrome: same grey as body text (--exodus-icon-neutral)
+gfindimage = exodus_icon_spec('field-find.svg', 'neutral')
+gcalendarimage = exodus_icon_spec('field-date.svg', 'neutral')
 gsaveimage = exodus_icon_spec('record-save.svg', 'green')
 gsavegreyimage = exodus_icon_spec('record-save.svg', 'lightgrey') // inactive Save
 // Painted multi-colour (overlapping sheets) — not a single CSS tint
@@ -98,7 +99,7 @@ ginsertrowimage = exodus_icon_spec('row-insert.svg', 'green')
 gdeleterowimage = exodus_icon_spec('row-delete.svg', 'red')
 gexpandrowimage = exodus_icon_spec('row-expand.svg', 'darkgrey')
 gsortimage = exodus_sortimage()
-glinkimage = exodus_icon_spec('field-link.svg', 'darkgrey')
+glinkimage = exodus_icon_spec('field-link.svg', 'neutral')
 gfirstimage = exodus_icon_spec('nav-first.svg', 'blue')
 glastimage = exodus_icon_spec('nav-last.svg', 'blue')
 gnextimage = exodus_icon_spec('nav-next.svg', 'blue')
@@ -1674,14 +1675,14 @@ async function formfunctions_onload() {
         if (tt2)
             buttonhtml += menubuttonhtml2('listrecord', glistimage, '<u>L</u>ist', 'List the current file. ' + AltorCtrl + '+L', 'L')
 
-        //NAVIGATION multirecord — one floated group so they wrap together, not one-by-one
+        //NAVIGATION multirecord — one group; CSS gap owns spacing (icon-only: empty label)
         buttonhtml += '<span class="exodus_recordnav_group">'
-        buttonhtml += menubuttonhtml2('firstrecord', gfirstimage, ' ', 'Open the first document. ' + AltorCtrl + '+{', '{')
-        buttonhtml += menubuttonhtml2('previousrecord', gpreviousimage, ' ', 'Open the previous document. ' + AltorCtrl + '+[', '[')
-        // No spacer img — CSS shares height with icon nav and centers the "n of m" label
+        buttonhtml += menubuttonhtml2('firstrecord', gfirstimage, '', 'Open the first document. ' + AltorCtrl + '+{', '{')
+        buttonhtml += menubuttonhtml2('previousrecord', gpreviousimage, '', 'Open the previous document. ' + AltorCtrl + '+[', '[')
+        // Text only ("n of m"); CSS gap matches icon buttons — no spacer img
         buttonhtml += menubuttonhtml2('selectrecord', '', ' ', 'Select document. ' + AltorCtrl + '+^', '^')
-        buttonhtml += menubuttonhtml2('nextrecord', gnextimage, ' ', 'Open the next document. ' + AltorCtrl + '+]', ']')
-        buttonhtml += menubuttonhtml2('lastrecord', glastimage, ' ', 'Open the last document. ' + AltorCtrl + '+}', '}')
+        buttonhtml += menubuttonhtml2('nextrecord', gnextimage, '', 'Open the next document. ' + AltorCtrl + '+]', ']')
+        buttonhtml += menubuttonhtml2('lastrecord', glastimage, '', 'Open the last document. ' + AltorCtrl + '+}', '}')
         buttonhtml += '</span>'
 
     }
@@ -4602,11 +4603,12 @@ async function closerecord_onclick() {
     //if (window.dialogArguments)
     {
 
-        // Dirty leave: bound dialogs still confirm. Unbound modals always assume
-        // Discard (Cancel / Esc / close) — no "Discard data or instructions entered?"
-        if (gchangesmade && (gKeyNodes || !window.dialogArguments)) {
+        // Dirty leave: Discard / Cancel (default for unbound + any form on this branch).
+        // No modal exception — heavy modals (certify) need the Q; light ones can opt out later.
+        if (gchangesmade) {
             var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
             if (response != 2) return false
+            setchangesmade(false)// discard chosen — avoid a second Q in closedoc
         }
 
         var returnvalue = ''
@@ -5162,6 +5164,16 @@ async function saveandorcleardoc_body(mode) {
     //otherwise the db is updated without the last entry!!!
     //if (save&&!(await validateupdate()))
     // return false //logout('saveandorcleardoc - invalidateupdate failed')
+
+    // Unbound / unlocked dirty clear (F8, Esc→CLOSE on parameter forms): no lock,
+    // so the glocked Save/Discard path never runs — still ask before wipe.
+    if (!glocked && gchangesmade && clear) {
+        var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
+        if (response != 2) {
+            focusongpreviouselement()
+            return false
+        }
+    }
 
     //if anything updated then option to save
     if (glocked
@@ -8991,11 +9003,12 @@ async function exoduspopup2(element) {
         if (typeof reply == 'object') {
 
             if (reply.length > 1 && reply.length <= 50) {
-                var openall = 2
+                // Always One for now (skip One/Many confirm). Restore prompt to re-enable Many.
+                var openall = 1
                 // default_icons false: One/Many are alternatives, not Yes/No
-                openall = await exodusconfirm('Open all in one tab?', 1, 'One', 'Many', '', null, null, null, false)
-                if (!openall)
-                    return false
+                //openall = await exodusconfirm('Open all in one tab?', 1, 'One', 'Many', '', null, null, null, false)
+                //if (!openall)
+                //    return false
                 if (openall == 2) {
                     //open 2nd and subsequent keys in tabs
                     for (var keyn = 1; keyn <= reply.length; ++keyn) {
