@@ -7681,7 +7681,9 @@ async function validate(element) {
         value = value.replace(/\"/g, '\\"')
         value = value.replace(/[\x0D]/g, '\\r')
         value = value.replace(/[\x0A]/g, '\\n')
-        var expression = convarray[0] + '(' + '"ICONV","' + value + '","' + convarray.slice(1) + '")'
+        // all options after the function name (e.g. NDECS,CURRENCY) — not only [1]
+        var convopts = convarray.slice(1).join(',')
+        var expression = convarray[0] + '(' + '"ICONV","' + value + '","' + convopts + '")'
 
         gmsg = ''
         ivalue = await exodusevaluate(expression, 'await validate(' + element.id + ') iconv');
@@ -7822,7 +7824,9 @@ async function validateoconv(element, ivalue) {
     ivalue = ivalue.replace(/\"/g, '\\"')
     ivalue = ivalue.replace(/[\x0D]/g, '\\r')
     ivalue = ivalue.replace(/[\x0A]/g, '\\n')
-    var expression = convarray[0] + '(' + '"OCONV","' + ivalue + '","' + convarray[1] + '")'
+    // all options after the function name (must include CURRENCY when present)
+    var convopts = convarray.slice(1).join(',')
+    var expression = convarray[0] + '(' + '"OCONV","' + ivalue + '","' + convopts + '")'
 
     gmsg = ''
     var ovalue = await exodusevaluate(expression);

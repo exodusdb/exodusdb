@@ -387,6 +387,8 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
  //BASE which indicated base format
  //NDECS in which case gndecs or getrecord('NDECS') used
  //append a Z for suppression of zeroes
+ //CURRENCY (or UNIT) — amount+unit internal values e.g. 1042.00USD
+ //  (may combine: 'NDECS,CURRENCY' or 'CURRENCY')
 
  //minimum can be "POSITIVE" or a number
  if (typeof minimum=='undefined') minimum=''
@@ -1026,11 +1028,17 @@ function addfield(rec,fieldname,fieldtext) {
          temp=temp.replace(/\n/g,tm).replace(/\r/g,'')
 
          //check dates and numbers are numeric
+         // NUMBER,CURRENCY stores amount+unit e.g. 1042.00USD — peel unit for the check
          if (typeof conversion=='string') {
 
           if (conversion.match(numberdateconvs)) {
 
-           if (!(exodusnum(temp))) {
+           var checktemp=temp
+           if (/CURRENCY|UNIT/i.test(conversion)) {
+            var um=String(checktemp).match(/^([-+]?[0-9.]+)([A-Za-z]+)$/)
+            if (um) checktemp=um[1]
+           }
+           if (!(exodusnum(checktemp))) {
 
             alert(name+' '+exodusquote(temp)+' is not a '+conversion.slice(1,-1).toLowerCase()+'.')
             return 0

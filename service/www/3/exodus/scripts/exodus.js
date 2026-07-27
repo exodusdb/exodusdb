@@ -797,10 +797,11 @@ function exodusconvarray(functionx, mode, value, params) {
     return result
 }
 
-// Display-only NUMBER OCONV extras (set by number_oconv_begin around bind/setx).
-// ICONV / editable input path is historical — do not change it.
+// NUMBER OCONV display extras (set by number_oconv_begin around bind/setx).
 //   • Display (SPAN, SELECT, …) → MD/MC + thousands when BASEFMT ends with ,
-//   • Editable INPUT/TEXTAREA/contenteditable + bare .exodusoconv → no extras
+//   • Editable INPUT/TEXTAREA/contenteditable + bare .exodusoconv → no thousands
+// CURRENCY in params: peel/reattach trailing unit (e.g. 1042.00USD) on ICONV and OCONV
+// so internal amount+unit and external 1,042.00USD round-trip via bind/validate.
 var gnumber_oconv_display = false
 
 function number_oconv_wants_display_format(el) {
@@ -825,10 +826,15 @@ function number_oconv_end() {
 function NUMBER(mode, value, params) {
 
     /*
-     * Display-only OCONV extras when gnumber_oconv_display (bind/setx to SPAN etc.):
-     *   • MD/MC decimal from gbasefmt; thousands if BASEFMT ends with ,
-     *   • Peel/reattach trailing currency unit (e.g. 1897.50USD)
-     * ICONV is historical only — no unit peel, no new input behaviour.
+     * params (comma-separated; CURRENCY flag may appear in any slot):
+     *   decimals | NDECS | BASE | nZ — decimal places (params[0] after flag strip)
+     *   POSITIVE | min — params[1]
+     *   max — params[2]
+     *   CURRENCY (or UNIT) — amount+unit internal (1042.00USD); external may group
+     *
+     * Display OCONV (gnumber_oconv_display): thousands when BASEFMT ends with ,
+     *   and peels unit even without CURRENCY (legacy display of amount+unit F fields).
+     * ICONV peels unit only when CURRENCY is set (plain NUMBER still rejects "100USD").
      */
 
     gmsg=''
@@ -853,11 +859,29 @@ function NUMBER(mode, value, params) {
     if (value == '')
         return value
 
-    // Display OCONV only: peel trailing currency/unit before numeric work; reattach later
+    var paramsStr = String(params == null ? '' : params)
+    // Detect flag on raw string too (avoids missing CURRENCY if param slots shift)
+    var allowCurrency = /(?:^|,)\s*(CURRENCY|UNIT)\s*(?:,|$)/i.test(paramsStr)
+    params = paramsStr.split(',')
+    var paramsFiltered = []
+    for (var pi = 0; pi < params.length; pi++) {
+        var pt = String(params[pi]).toUpperCase().replace(/\s/g, '')
+        if (pt == 'CURRENCY' || pt == 'UNIT') {
+            allowCurrency = true
+            continue
+        }
+        paramsFiltered.push(params[pi])
+    }
+    params = paramsFiltered
+
+    // Peel trailing unit before numeric work. Display OCONV: always (legacy).
+    // ICONV: only with CURRENCY so plain NUMBER inputs stay strict.
     var unitSuffix = ''
-    if (mode != 'ICONV' && gnumber_oconv_display) {
+    var peelUnit = allowCurrency || (mode != 'ICONV' && gnumber_oconv_display)
+    if (peelUnit) {
         try {
-            var um = String(value).match(/^([-+]?[0-9.]+)([A-Za-z]+)$/)
+            // Internal 1042.00USD or external 1,042.00USD / 1.042,00EUR
+            var um = String(value).match(/^([-+]?[0-9.,]+)([A-Za-z]+)$/)
             if (um) {
                 value = um[1]
                 unitSuffix = um[2]
@@ -868,24 +892,50 @@ function NUMBER(mode, value, params) {
     //accept comma as decimal point - use exceptions for speed since usually string but might not be
     // historical ICONV (validate / editable NUMBER fields) — leave as-is
     if (mode == 'ICONV') {
-        if (gbasefmt.substr(0, 2) != 'MC') {
-            try {
-                value = value.replace(gthousands_regex,'')
-                value = value.replace(/,/gi, '.')
+        try {
+            if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC') {
+                // European: . thousands, , decimal
+                value = String(value).replace(/\./g, '').replace(/,/g, '.')
             }
-            catch (e) { }
+            else {
+                // MD / default: , thousands (and/or gthousands_regex), . decimal
+                if (typeof gthousands_regex != 'undefined' && gthousands_regex)
+                    value = String(value).replace(gthousands_regex, '')
+                else
+                    value = String(value).replace(/,/g, '')
+            }
         }
+        catch (e) { }
     }
 
-    params = params.split(',')
-
     //prevent reformatting
-    if (params[0] == '')
+    if (params[0] == '' || typeof params[0] == 'undefined')
         params[0] = value.toString().replace(/[^0-9.]/gi, '').exodusfield('.', 2, 1).length.toString()
 
     //if cannot parseFloat then is deemed not a number
     //value = parseFloat(value)
     //if (isNaN(value)) return null
+    if (!(exodusnum(value))) {
+        // Last chance peel: value still has unit (peel missed) but CURRENCY requested
+        if (allowCurrency && !unitSuffix) {
+            try {
+                var um2 = String(value).match(/^([-+]?[0-9.,]+)([A-Za-z]+)$/)
+                if (um2) {
+                    var tryv = um2[1]
+                    if (mode == 'ICONV') {
+                        if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC')
+                            tryv = tryv.replace(/\./g, '').replace(/,/g, '.')
+                        else
+                            tryv = tryv.replace(/,/g, '')
+                    }
+                    if (exodusnum(tryv)) {
+                        value = tryv
+                        unitSuffix = um2[2]
+                    }
+                }
+            } catch (e2) { }
+        }
+    }
     if (!(exodusnum(value))) {
         gmsg=value+' cannot be understood as a number'
         return null
@@ -965,6 +1015,9 @@ function NUMBER(mode, value, params) {
             gmsg = value+' number is too large'
             return null
         }
+        // internal form keeps unit: 1042.00USD
+        if (unitSuffix)
+            result += unitSuffix
 
     }
 
@@ -990,6 +1043,10 @@ function NUMBER(mode, value, params) {
                 result += decsep + decpart
             if (unitSuffix)
                 result += unitSuffix
+        }
+        else if (unitSuffix) {
+            // CURRENCY OCONV without display chrome: keep unit on plain number
+            result += unitSuffix
         }
     }
 
