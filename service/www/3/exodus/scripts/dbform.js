@@ -6981,11 +6981,17 @@ function exodussetreadonly(elements, msg, options, recn) {
         if (options && options.indexOf('BGCOLOR') >= 0) {
             if (!elementx.getAttribute('oldbgcolor'))
                 elementx.setAttribute('oldbgcolor', elementx.style.backgroundColor)
-            //elementx.style.backgroundColor='#ffffc0'
-            var newbgcolor = elementx.parentNode.style.backgroundColor
-            if (!newbgcolor)
-                // newbgcolor=document.styleSheets[0].rules[0].style.backgroundColor
-                newbgcolor = '#f6f6f6'
+            // Blend with host cell; never hardcode #f6f6f6 (looks white in dark mode).
+            var newbgcolor = elementx.parentNode && elementx.parentNode.style
+                ? elementx.parentNode.style.backgroundColor : ''
+            if (!newbgcolor && elementx.parentNode && typeof getComputedStyle != 'undefined') {
+                try {
+                    newbgcolor = getComputedStyle(elementx.parentNode).backgroundColor
+                } catch (e) { }
+            }
+            if (!newbgcolor || newbgcolor === 'transparent'
+                || newbgcolor === 'rgba(0, 0, 0, 0)')
+                newbgcolor = 'transparent'
             elementx.style.backgroundColor = newbgcolor
 
             //spans have no type
@@ -7000,7 +7006,14 @@ function exodussetreadonly(elements, msg, options, recn) {
 
                 if (!elementx.hasAttribute('oldbordercolor'))
                     elementx.setAttribute('oldbordercolor', elementx.style.borderColor)
-                elementx.style.borderColor = '#dddddd'
+                // Match form border token when present; else leave empty (no light-grey hardcode)
+                var bcol = ''
+                try {
+                    if (typeof getComputedStyle != 'undefined')
+                        bcol = getComputedStyle(document.documentElement)
+                            .getPropertyValue('--exodus-form-border').trim()
+                } catch (e2) { }
+                elementx.style.borderColor = bcol || 'currentColor'
             }
 
         }
@@ -7011,7 +7024,12 @@ function exodussetreadonly(elements, msg, options, recn) {
         if (options && options.indexOf('BORDER') >= 0) {
             if (!elementx.hasAttribute('oldborderstyle'))
                 elementx.setAttribute('oldborderstyle', elementx.style.borderStyle)
+            // Field chrome is border-bottom underline; clear both so INPUT and SPAN
+            // lose the data-field mark (style alone can leave bottom longhand visible).
+            if (!elementx.hasAttribute('oldborderbottom'))
+                elementx.setAttribute('oldborderbottom', elementx.style.borderBottom)
             elementx.style.borderStyle = 'none'
+            elementx.style.borderBottom = 'none'
         }
 
     }
@@ -7043,6 +7061,8 @@ function exodussetreadonly(elements, msg, options, recn) {
 
         if (elementx.hasAttribute('oldborderstyle'))
             elementx.style.borderStyle = elementx.getAttribute('oldborderstyle')
+        if (elementx.hasAttribute('oldborderbottom'))
+            elementx.style.borderBottom = elementx.getAttribute('oldborderbottom')
 
     }
 
