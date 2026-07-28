@@ -4731,8 +4731,22 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 	// SQL WHERE - excludes calculated fields if doing stage 1 of a two stage sort/select
 	//TODO when doing stage2, skip "WITH/WITHOUT xxx" of stage1 fields
-	if (whereclause)
+	//
+	// FTS only (*_XREF → to_tsvector): createindex() builds PARTIAL GIN indexes
+	//   WHERE left(key,1) <> '%' OR right(key,1) <> '%'
+	// Postgres uses that GIN only when the query implies the same predicate.
+	// Without it, WITH …XREF seq-scans large files (e.g. accounts BANK ~3s).
+	// Do NOT add this for non-FTS WITH — other SELECTs must keep prior semantics.
+	if (whereclause) {
+		// Parenthesize the existing WHERE: multi-WITH defaults to OR, and
+		// "A or B AND pred" is not "(A or B) AND pred".
+		if (whereclause.contains("to_tsvector(")) {
+			whereclause =
+				"(" ^ whereclause ^ ")\n AND (left(" ^ actualfilename ^
+				".key,1) <> '%' OR right(" ^ actualfilename ^ ".key,1) <> '%')";
+		}
 		sql ^= " \nWHERE \n" ^ whereclause;
+	}
 
 	// SQL ORDER - suppressed if doing stage 1 of a two stage sort/select
 	if (orderclause and not calc_fields)
