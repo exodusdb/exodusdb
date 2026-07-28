@@ -136,7 +136,10 @@ TABLE.exodus-help-table th {
     vertical-align: top;
     text-align: left;
     box-sizing: border-box;
-    /* No max-width: forms often exceed the viewport; page scrolls (HTML default). */
+    /* Follow contents exactly — border always encloses every form in the pane
+     * (journals multi-col line grid, etc.). Do not max-width/overflow the pane;
+     * the page scrolls if the shell is wider than the window. */
+    width: max-content;
     background-color: var(--exodus-form-face);
     border: 1px solid var(--exodus-form-border);
     border-radius: var(--exodus-form-radius);
@@ -254,6 +257,31 @@ TABLE.exodusform TABLE.exotable th {
     border: none;
     border-radius: 0;
     box-sizing: border-box;
+    /*
+     * Soft ceiling at the viewport — not on the pane.
+     * Pane stays width:max-content and still follows this table, so the border
+     * encloses the form. Flexible columns (ITEM_DESCRIPTION) get a real width
+     * budget and can fold once the form would otherwise exceed the screen.
+     * (Clamping the pane itself made wide journals grids stick out of the frame.)
+     */
+    max-width: calc(100vw - 2rem);
+}
+
+/*
+ * Flowing text (align=T → contenteditable span).
+ * Fold inside the cell once the form table is at its viewport ceiling.
+ * min-width remains the dict length floor (inline from dbform).
+ */
+SPAN.clsRequired[contenteditable],
+SPAN.clsNotRequired[contenteditable] {
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+TABLE.exotable td:has(> span[contenteditable]),
+TABLE[exogroupno] td:has(> span[contenteditable]),
+TABLE.exodusform td:has(> span[contenteditable]) {
+    min-width: 0;
 }
 /*
  * No outer cell borders (pane is the frame).

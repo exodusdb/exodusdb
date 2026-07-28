@@ -38,7 +38,8 @@ div.exodusformpane          ← outer rounded frame (owns the outside edge)
 
 - Inserted by `exoduswrapformpanes()` (one shell per sibling *run* of top-level forms with only `<br>`/whitespace between; same rules as coalesce). Pre-authored panes left alone; `exoduscoalesceformpanes()` still merges those if needed.
 - **No flash of bare/wrong layout:** until `html.exodus-panes-ready` (set after wrap), `TABLE.exodusform` / `.exodusformpane` use `visibility: hidden` (`global.css`). Forms stay measurable during onload; first paint is not an unmerged narrow shell.
-- Centered pages: `div[align="center"] > .exodusformpane { width: max-content; margin: auto; }` — pane sizes to **content**, not viewport.
+- Pane: `width: max-content` only — **follow contents**; border encloses every form. Do not `max-width` / `overflow-x` the **pane**.
+- Form tables inside the pane may use `max-width: calc(100vw − …)` so flexible text columns wrap when the form would exceed the screen; the pane still tracks that (capped) table width.
 - Pane **strips** outer table border and removes **last row cell** bottom borders so the pane border is the only bottom edge.
 - **Manual side-by-side** (layout table with two+ form columns): table cells default to middle vertical-align — set `vertical-align: top` on that layout row (or cells) in the HTM. Not a pane/wrap concern.
 - **Do not** author page-local `exodusformpane` wrappers just to avoid flash — framework handles reveal.
@@ -74,10 +75,13 @@ When a line appears “under” an embedded group, inspect the **parent outer `<
 Set by `exodus_dict_text()` in `db.js`. `dbform.js` converts `INPUT` → `SPAN` and applies:
 
 ```javascript
-element.style.minWidth = (exoduslength * 7) + 'px';
+element.style.minWidth = spanlen + 'ch';  // length floor (ch)
 element.style.display = 'block';  // unless link/popup
 element.style.whiteSpace = 'pre-wrap';
+element.style.overflowWrap = 'break-word';
 ```
+
+**Framework width model:** pane = content width (always). Soft-cap **form tables** at ~viewport (`max-width: calc(100vw − 2rem)`), not the pane. Contenteditable: `max-width: 100%` of cell + `overflow-wrap`. No HTM hard-coded widths for this.
 
 **Width symptoms:** a table looks “too wide” or “stuck left” because **column minimums** sum above the viewport, not because the pane chooses `width: 100%`. `margin: auto` cannot center content wider than the viewport.
 
@@ -85,9 +89,9 @@ element.style.whiteSpace = 'pre-wrap';
 
 1. **Dict** — `di.length` (lowers min-width floor; keeps flowing).
 2. **HTM** — `class` on the column `td` (thead + template tbody row; cloned rows inherit).
-3. **Page-local CSS** — cap column: `table-layout: fixed` + `td` width + `min-width: 0 !important` on `.exodusid_FIELD` spans (must override dbform inline `min-width`).
+3. **Page-local CSS** — only if a page needs a tighter cap: `table-layout: fixed` + column width + `min-width: 0 !important` on `.exodusid_FIELD` (must override dbform inline `min-width`).
 
-**Avoid:** `max-width` on HTM `<input>` only; commenting out `exodus_dict_text()` to “shrink” a field; global `!important` churn in `global.css` when a page/dict fix exists.
+**Avoid:** `max-width` on HTM `<input>` only; commenting out `exodus_dict_text()` to “shrink” a field; page `!important` that fights the global 100% pane cap without a reason.
 
 ---
 
