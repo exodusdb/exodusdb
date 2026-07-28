@@ -435,9 +435,16 @@ BUTTON:focus, SPAN:focus
 
 /* Data-field focus underline: single block after resting rules (end of field chrome). */
 
+/* Page canvas: set on html too so hard-refresh never shows bare white before body.
+   LM: theme_toggle removes data-theme — do not use prefers-color-scheme here
+   (that painted black/white text for DM OS + Exodus day). DM flash: firstpaint
+   sets data-theme=dark_mode + flashguard; full rules under :root[data-theme=dark_mode]. */
+html {
+    background: var(--exodus-page-bg, #f9f9f9);
+}
 BODY
 {
-    background: var(--exodus-page-bg);
+    background: var(--exodus-page-bg, #f9f9f9);
     color: #000000;
 }
 

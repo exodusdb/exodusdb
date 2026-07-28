@@ -73,6 +73,49 @@ var gisdarktheme
 // LM/DM preference cookie — global per browser (not glogincode / dataset / user)
 var gthemecookiekey = 'EXODUStheme'
 
+// First paint: apply EXODUStheme/dt before the rest of this file parses and before
+// body HTML is reached. Hard refresh otherwise flashes browser-default white
+// (especially with OS + Exodus both in night mode). Full theme_toggle runs later.
+;(function exodus_theme_firstpaint() {
+	try {
+		var dark = false
+		var raw = document.cookie || ''
+		var cookies = raw.split('; ')
+		for (var i = 0; i < cookies.length; i++) {
+			var eq = cookies[i].indexOf('=')
+			if (eq < 0)
+				continue
+			var name = cookies[i].slice(0, eq)
+			if (name !== 'EXODUStheme' && name !== gthemecookiekey)
+				continue
+			var crumbs = cookies[i].slice(eq + 1).split('&')
+			for (var j = 0; j < crumbs.length; j++) {
+				var kv = crumbs[j].split('=')
+				if (kv[0] === 'dt' && kv[1] && kv[1] !== '0') {
+					dark = true
+					break
+				}
+			}
+			break
+		}
+		if (!dark)
+			return
+		var html = document.documentElement
+		html.setAttribute('data-theme', 'dark_mode')
+		html.style.colorScheme = 'dark'
+		html.style.background = '#000'
+		// Style block before body exists — stops white canvas on hard refresh
+		var st = document.createElement('style')
+		st.id = 'exodus_dm_firstpaint'
+		st.textContent = '@media screen{'
+			+ 'html[data-theme=dark_mode],html[data-theme=dark_mode] body{background:#000!important;color:#fff}'
+			+ '}'
+		var head = document.head || document.getElementsByTagName('head')[0]
+		if (head)
+			head.insertBefore(st, head.firstChild)
+	} catch (e) { }
+})()
+
 function exodus_sortimage(order) {
 
 	// Standard 16×16 mono masks (same box/tint as other toolbar icons).
@@ -1888,6 +1931,15 @@ function theme_toggle(theme = 'default') {
 		gisdarktheme = false
 		html.removeAttribute('data-theme')
 		html.style.removeProperty('--exodus-cardcolor')
+		// Drop firstpaint DM inline (color-scheme / black bg) so LM is not stuck dark
+		html.style.removeProperty('color-scheme')
+		html.style.removeProperty('background')
+		var fp = document.getElementById('exodus_dm_firstpaint')
+		if (fp && fp.parentNode)
+			fp.parentNode.removeChild(fp)
+		var fg = document.getElementById('exodus_dm_flashguard')
+		if (fg && fg.parentNode)
+			fg.parentNode.removeChild(fg)
 		// Restore LM screencolor on stylesheet rule + --exodus-form-face for .exodusformpane
 		if (exodus_global_css_link())
 			exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
