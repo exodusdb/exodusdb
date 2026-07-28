@@ -9,7 +9,15 @@
  *    only TABLE[exogroupno] > thead (and decide), not all form th.
  * 4. Outer cell edges  — stripped so only *inner* lines remain (see below).
  * Nested tables / .exotable / [exogroupno] are not this grid.
+ *
+ * Until html.exodus-panes-ready (set after wrap+coalesce): keep forms out of
+ * sight so bare tables / per-form shells never flash before the final pane.
+ * visibility (not display:none) so onload can still measure layout.
  */
+html:not(.exodus-panes-ready) TABLE.exodusform,
+html:not(.exodus-panes-ready) .exodusformpane {
+	visibility: hidden;
+}
 /*must be first in order to customise screen form color*/
 TABLE.exodusform
 {

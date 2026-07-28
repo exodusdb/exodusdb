@@ -2197,11 +2197,15 @@ async function clientfunctions_windowonload() {
 	// wire_exodus_bodymargin runs again from there.
 	wire_exodus_bodymargin()
 
-	//trigger formfunctions_onload
-	if (typeof formfunctions_onload == 'function')
-		await formfunctions_onload()
-
-	exoduswrapformpanes()
+	//trigger formfunctions_onload; wrap panes; only then reveal forms
+	// (html:not(.exodus-panes-ready) keeps bare/unmerged layout invisible — global.css).
+	try {
+		if (typeof formfunctions_onload == 'function')
+			await formfunctions_onload()
+		exoduswrapformpanes()
+	} finally {
+		exodus_reveal_form_panes()
+	}
 
 	// Unbound form actions under the form: form_keep runs once inside formfunctions_onload,
 	// but wrap/pane padding can push the bar below the fold *after* that check.
@@ -5446,30 +5450,106 @@ function exoduscoalesceformpanes() {
 	}
 }
 
+function exodus_is_wrappable_exodusform(tablex) {
+
+	// Top-level TABLE.exodusform not already inside a pane (or nested in another form).
+	if (!tablex || !tablex.className || (' ' + tablex.className + ' ').indexOf(' exodusform ') < 0)
+		return false
+	if (exodusform_is_inside_exodusform(tablex))
+		return false
+	var parent = tablex.parentNode
+	if (!parent)
+		return false
+	if (parent.className && (' ' + parent.className + ' ').indexOf(' exodusformpane ') >= 0)
+		return false
+	return true
+}
+
+function exodus_reveal_form_panes() {
+
+	// Allow painting after wrap+coalesce (pairs with global.css html:not(.exodus-panes-ready)).
+	try {
+		document.documentElement.classList.add('exodus-panes-ready')
+	} catch (e) { }
+}
+
 function exoduswrapformpanes() {
 
-	// Wrap top-level TABLE.exodusform in a rounded shell (see global.css .exodusformpane).
+	// One pane per sibling *run* of top-level forms (same rules as coalesce:
+	// only <br>/whitespace between). Build each shell in a single step.
+	// Pre-authored .exodusformpane shells are left alone; coalesce still merges
+	// those if they sit with only br/ws between them.
+	// Caller reveals via exodus_reveal_form_panes() after this returns.
 	var tables = document.getElementsByTagName('TABLE')
-	for (var tablen = 0; tablen < tables.length; tablen++) {
-		var tablex = tables[tablen]
-		if (!tablex.className || (' ' + tablex.className + ' ').indexOf(' exodusform ') < 0)
-			continue
-		if (exodusform_is_inside_exodusform(tablex))
-			continue
-		var parent = tablex.parentNode
-		if (!parent || parent.className && (' ' + parent.className + ' ').indexOf(' exodusformpane ') >= 0)
-			continue
+	var candidates = []
+	var tablen
+	for (tablen = 0; tablen < tables.length; tablen++) {
+		if (exodus_is_wrappable_exodusform(tables[tablen]))
+			candidates.push(tables[tablen])
+	}
 
-		var pane = document.createElement('div')
-		pane.className = 'exodusformpane'
+	var parents = []
+	var ci
+	for (ci = 0; ci < candidates.length; ci++) {
+		var p = candidates[ci].parentNode
+		if (p && parents.indexOf(p) < 0)
+			parents.push(p)
+	}
 
-		if (tablex.style && tablex.style.display) {
-			pane.style.display = tablex.style.display
-			tablex.style.display = ''
+	function is_run_sep(node) {
+		return node && (
+			(node.nodeType == 1 && node.tagName == 'BR')
+			|| (node.nodeType == 3 && !String(node.nodeValue).replace(/\s/g, ''))
+		)
+	}
+
+	for (var parentn = 0; parentn < parents.length; parentn++) {
+		var parentx = parents[parentn]
+		var node = parentx.firstChild
+		var runforms = []
+		var runseps = []
+		var seps = []
+
+		function flushrun() {
+			if (!runforms.length)
+				return
+			var pane = document.createElement('div')
+			pane.className = 'exodusformpane'
+			var first = runforms[0]
+			if (first.style && first.style.display) {
+				pane.style.display = first.style.display
+				first.style.display = ''
+			}
+			parentx.insertBefore(pane, first)
+			for (var runn = 0; runn < runforms.length; runn++) {
+				if (runn > 0) {
+					for (var sepn = 0; sepn < runseps[runn].length; sepn++)
+						pane.appendChild(runseps[runn][sepn])
+				}
+				pane.appendChild(runforms[runn])
+			}
+			runforms = []
+			runseps = []
 		}
 
-		parent.insertBefore(pane, tablex)
-		pane.appendChild(tablex)
+		while (node) {
+			var next = node.nextSibling
+			if (node.nodeType == 1 && node.tagName == 'TABLE'
+				&& candidates.indexOf(node) >= 0) {
+				runforms.push(node)
+				runseps.push(seps)
+				seps = []
+			}
+			else if (runforms.length && is_run_sep(node)) {
+				seps.push(node)
+			}
+			else {
+				flushrun()
+				seps = []
+			}
+			node = next
+		}
+		flushrun()
 	}
 
 	exoduscoalesceformpanes()

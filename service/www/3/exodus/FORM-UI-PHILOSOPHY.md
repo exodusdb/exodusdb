@@ -36,10 +36,12 @@ div.exodusformpane          ← outer rounded frame (owns the outside edge)
 
 ### Pane (`exodusformpane`)
 
-- Inserted by `exoduswrapformpanes()` / merged by `exoduscoalesceformpanes()` (sibling panes separated only by `<br>` merge into one shell).
+- Inserted by `exoduswrapformpanes()` (one shell per sibling *run* of top-level forms with only `<br>`/whitespace between; same rules as coalesce). Pre-authored panes left alone; `exoduscoalesceformpanes()` still merges those if needed.
+- **No flash of bare/wrong layout:** until `html.exodus-panes-ready` (set after wrap), `TABLE.exodusform` / `.exodusformpane` use `visibility: hidden` (`global.css`). Forms stay measurable during onload; first paint is not an unmerged narrow shell.
 - Centered pages: `div[align="center"] > .exodusformpane { width: max-content; margin: auto; }` — pane sizes to **content**, not viewport.
 - Pane **strips** outer table border and removes **last row cell** bottom borders so the pane border is the only bottom edge.
 - **Manual side-by-side** (layout table with two+ form columns): table cells default to middle vertical-align — set `vertical-align: top` on that layout row (or cells) in the HTM. Not a pane/wrap concern.
+- **Do not** author page-local `exodusformpane` wrappers just to avoid flash — framework handles reveal.
 
 ### Grid borders live on **`td`**, not **`tr`**
 
