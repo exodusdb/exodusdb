@@ -5812,22 +5812,23 @@ function starteventhandler(eventfunctionname, functionx) {
 		//if (gblockevents||uiblockerdiv) {
 		if (gblockevents) {
 
+			// Always deliver unload (TODO: own gcurrentevent path).
 			if (event.type == 'unload' || event.type == 'beforeunload') {
-				//always call unloadevents
-				//TODO create a new gcurrentevent?
+				// fall through to unblocked path below? currently cancelled like others
+			}
 
-				// ---------------------------------------------------------------
-				// Popup isolation while gblockevents (modal / exclusive UI).
-				//
-				// Popups own their DOM events (confirm/decide, colours, calendar).
-				// Form path only asks: is a popup open? Then swallow form keys.
-				// Contract when a *startevent helper is present:
-				//   null  — that popup is not open
-				//   true  — allow browser default (e.g. copy); no form logic
-				//   false — swallow (exoduscancelevent)
-				// Calendar: keys on its div; form uses form_closepopups for Esc.
-				// ---------------------------------------------------------------
-			} else if (typeof exodusconfirm_startevent == 'function') {
+			// ---------------------------------------------------------------
+			// Popup isolation while gblockevents (modal / exclusive UI).
+			//
+			// Popups own their DOM events (confirm/decide, colours, calendar).
+			// Form path only asks: is a popup open? Then swallow form keys.
+			// Contract when a *startevent helper is present:
+			//   null  — that popup is not open
+			//   true  — allow browser default (e.g. copy); no form logic
+			//   false — swallow (exoduscancelevent)
+			// Calendar: keys on its div; form uses form_closepopups for Esc.
+			// ---------------------------------------------------------------
+			if (typeof exodusconfirm_startevent == 'function') {
 				var confEv = exodusconfirm_startevent(event)
 				if (confEv === true)
 					return true
@@ -6713,44 +6714,71 @@ function exodusconfirm_focus_endpoint(first) {
 	return true
 }
 
-// Isolation while #exodusconfirmdiv is open (starteventhandler gblockevents path).
+// ---------------------------------------------------------------------------
+// Plain confirm key ownership (OK / Yes-No / text input — not decide lists)
 //
-// Strategy: product key policy lives next to the UI, not in the generic
-// onkeydown switchboard. Same contract as colors_popup_startevent:
-//   null  — confirm not open
-//   true  — allow (e.g. type in text field, copy)
-//   false — block form path (caller exoduscancelevent)
-//
-// Confirm also uses blockmodalui + form_blockevents while open — isolation is
-// not document_onkeydown alone. Decide lists keep decide_document_onkeydown on
-// the div; do not rip that out in a drive-by.
-//
-// Return null = no confirm; true = allow; false = caller should exoduscancelevent.
-// Extracted from starteventhandler only — behaviour unchanged.
+// ONE path: capture-phase document keydown while the shell is open.
+// Independent of gblockevents / starteventhandler / document_onkeydown.
+// Decide lists keep decide_document_onkeydown on the div + Esc via startevent.
+// ---------------------------------------------------------------------------
+var gexodusconfirm_plain_keydown_capture = false
+
+function exodusconfirm_install_plain_keydown() {
+	if (gexodusconfirm_plain_keydown_capture)
+		return
+	document.addEventListener('keydown', exodusconfirm_plain_keydown, true)
+	gexodusconfirm_plain_keydown_capture = true
+}
+
+function exodusconfirm_uninstall_plain_keydown() {
+	if (!gexodusconfirm_plain_keydown_capture)
+		return
+	document.removeEventListener('keydown', exodusconfirm_plain_keydown, true)
+	gexodusconfirm_plain_keydown_capture = false
+}
+
+// Capture-phase: handle keys for plain confirm before form/Gate A sees them.
+function exodusconfirm_plain_keydown(event) {
+
+	var conf = document.getElementById('exodusconfirmdiv')
+	if (!conf || (conf.classList && conf.classList.contains('exodusconfirm_decide')))
+		return
+
+	var r = exodusconfirm_keymap(event)
+	if (r === null || r === true)
+		return
+	// Handled or swallow — do not let form path see this key
+	if (event.stopImmediatePropagation)
+		event.stopImmediatePropagation()
+	if (event.stopPropagation)
+		event.stopPropagation()
+	if (event.preventDefault)
+		event.preventDefault()
+}
+
+// Isolation for form path while confirm/decide is open (gblockevents / document_onkeydown).
+// Plain confirm keys are already handled in capture (above); this only:
+//   - swallows form shortcuts while any confirm is up
+//   - Esc-cancels decide when focus is outside the popup
+// Return null = no confirm; true = allow browser; false = swallow form path.
 function exodusconfirm_startevent(event) {
 
-	var confirmdiv = $$('exodusconfirmdiv')
+	var confirmdiv = document.getElementById('exodusconfirmdiv')
 	if (!confirmdiv)
 		return null
 
-	// allow mouse right click, copy of error message text etc.
 	if (event.type == 'copy')
 		return true
 
-	// Decide lists: keys/clicks live on the popup (decide_document_on*).
-	// Form path only swallows for most keys — not Esc: when focus is outside
-	// #exodusconfirmdiv the popup never sees keydown (bubble never reaches it).
-	// Esc must cancel here. When focus is inside, decide_document_onkeydown runs
-	// first, stopPropagation, and may clear type-filter before cancel; we never
-	// double-fire. resolvePendingConfirm is idempotent if both somehow run.
-	if ($$('decide_table1')) {
+	// Decide: keys on the popup div; form path only swallows (Esc if focus outside).
+	if (document.getElementById('decide_table1')
+		|| (confirmdiv.classList && confirmdiv.classList.contains('exodusconfirm_decide'))) {
 		if (event.type != 'keydown')
 			return false
 		if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
 			return true
 		var dkey = event.keyCode ? event.keyCode : event.which
 		if (dkey == 27) {
-			// Same value as decide_cancel_onclick_sync / outside-click leave
 			window.setTimeout(function () {
 				resolvePendingConfirm('', 'exodusconfirm_startevent Esc decide')
 			}, 1)
@@ -6759,19 +6787,33 @@ function exodusconfirm_startevent(event) {
 		return false
 	}
 
+	// Plain confirm: capture handler owns keys; form path only swallows.
 	if (event.type != 'keydown')
-		// non-keydown: block form handlers while confirm is open
+		return false
+	if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
+		return true
+	return false
+}
+
+// Shared key map for plain confirm (OK/Yes/No/text). Used by capture handler.
+// null = not our event type / not open; true = allow browser (type/copy);
+// false = action taken or swallow.
+function exodusconfirm_keymap(event) {
+
+	if (!document.getElementById('exodusconfirmdiv'))
+		return null
+	if (event.type != 'keydown')
 		return false
 
-	//allow keyboard Ctrl+c to copy error message text etc.
-	if (event.ctrlKey && event.which == 67)
+	// Ctrl+C copy of message text
+	if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
 		return true
 
 	var keycode = event.keyCode ? event.keyCode : event.which
 	var keyletter = String.fromCharCode(keycode).toUpperCase()
-	var istextinput = !!$$('exodusconfirmdiv_textinput')
+	var textel = document.getElementById('exodusconfirmdiv_textinput')
+	var istextinput = !!textel
 	var active = document.activeElement
-	// focused yes/no/cancel graphicbutton
 	var focusedConfirmBtn = null
 	if (active) {
 		if (active.id == 'positivebutton' || active.id == 'negativebutton' || active.id == 'cancelbutton')
@@ -6783,22 +6825,20 @@ function exodusconfirm_startevent(event) {
 		}
 	}
 
-	logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
-
 	// Tab: cycle text field and buttons
 	if (keycode == 9) {
 		exodusconfirm_focus_cycle(!!event.shiftKey)
 		return false
 	}
 
-	// Arrow keys: same cycle as Tab when focus is on a footer button
+	// Arrows on footer buttons: cycle
 	if (focusedConfirmBtn
 		&& (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)) {
 		exodusconfirm_focus_cycle(keycode == 37 || keycode == 38)
 		return false
 	}
 
-	// Space/Enter on a focused confirm button activates that button
+	// Space/Enter on a focused confirm button
 	if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
 		if (focusedConfirmBtn.id == 'negativebutton')
 			window.setTimeout(exodus_confirm_function2_sync, 1)
@@ -6809,49 +6849,41 @@ function exodusconfirm_startevent(event) {
 		return false
 	}
 
-	//POSITIVE = F9 or Enter/Ctrl+Enter or (Space if not text input) or access letter
-	if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32) || keyletter == gexodusconfirmletters[1]) {
+	// POSITIVE: F9, Enter, Space (not in text field), access letter
+	if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32)
+		|| (gexodusconfirmletters && keyletter == gexodusconfirmletters[1])) {
 		window.setTimeout(exodus_confirm_function1_sync, 1)
 		return false
 	}
 
-	//CANCEL = Esc or access letter
-	if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
+	// CANCEL: Esc, access letter
+	if (keycode == 27 || (gexodusconfirmletters && keyletter == gexodusconfirmletters[3])) {
 		window.setTimeout(exodus_confirm_function3_sync, 1)
 		return false
 	}
 
-	//NEGATIVE = F8 or access letter
-	if (keycode == 119 || keyletter == gexodusconfirmletters[2]) {
+	// NEGATIVE: F8, access letter
+	if (keycode == 119 || (gexodusconfirmletters && keyletter == gexodusconfirmletters[2])) {
 		window.setTimeout(exodus_confirm_function2_sync, 1)
 		return false
 	}
 
-	// Home/End: first/last focusable
+	// Home/End
 	if (keycode == 36 || keycode == 35) {
 		exodusconfirm_focus_endpoint(keycode == 36)
 		return false
 	}
 
-	// Allow keyboard typing for text popups
+	// Typing in text field
 	if (istextinput)
 		return true
 
-	// Other keys while confirm up
 	return false
 }
 
-// document_onkeydown defense (secondary to gblockevents + modal).
-// Keys inside confirm skip form handler; outside cancelled. null = no confirm.
-// Prefer starteventhandler path under load; this is the belt when that path is not hit.
+// document_onkeydown belt: swallow form keys while confirm open (capture already acted).
 function exodusconfirm_document_keydown(event) {
-
-	var confirmdiv = $$('exodusconfirmdiv')
-	if (!confirmdiv)
-		return null
-	if (confirmdiv.contains(event.target))
-		return true
-	return false
+	return exodusconfirm_startevent(event)
 }
 
 // Tab / Shift+Tab within the open confirm (not decide lists — those have their own handler).
@@ -7362,10 +7394,16 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	blockmodalui_sync()
 	form_blockevents(true, 'exodusconfirm2')
+	// Plain confirm: capture keydown owns Enter/Esc (not the form gblockevents maze).
+	// Decide lists use decide_document_onkeydown on the div instead.
+	if (!decide_args)
+		exodusconfirm_install_plain_keydown()
 	var response
 	try {
 		response = await confirmPromise
 	} finally {
+		if (!decide_args)
+			exodusconfirm_uninstall_plain_keydown()
 		gpendingConfirmResolve = null
 		gpendingConfirmOwner = null
 		gexodusconfirmdefaultbutton = null

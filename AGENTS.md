@@ -84,6 +84,30 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 - **Same gesture:** focus runs *before* the click of that click. Cancelling that click → SELECT focus-only on first press. Allow native SELECT activation through while blocked; still do not start a new flight.
 - **Do not blur+refocus** a control that already holds `document.activeElement` (closes open listboxes). `focuson` / `focuson2` only re-assert when focus was lost.
 
+### DOMUI events while a popup is open (strategy)
+
+`#exodusconfirmdiv` and other exclusive UI are **product-owned** for the shell lifetime. Do not re-grow a three-path maze (startevent + document_onkeydown “belt” + div handler all half-implementing Enter).
+
+**Ownership (code in `client.js`):**
+
+| Product | Open signal | Key owner | Form path role |
+|--------|-------------|-----------|----------------|
+| **Plain confirm** (OK, Yes/No, text, invalid, Wait) | `#exodusconfirmdiv` without `.exodusconfirm_decide` | **Document capture** while open: `exodusconfirm_install_plain_keydown` → `exodusconfirm_keymap` (install in `exodusconfirm2`, uninstall in `finally`) | **Swallow only** (`exodusconfirm_startevent` does not reimplement OK/Cancel) |
+| **Decide list** | `.exodusconfirm_decide` / `#decide_table1` | **Handlers on the confirm div** (`decide_document_on*`) | Swallow; **Esc** if focus is outside (bubble never reaches the div) |
+| **Colour / calendar** | product open flags | Product helpers / handlers on their DOM | Form isolates; do not invent a second key map in `starteventhandler` |
+
+**Rules:**
+
+1. **Name the owner first** (capture, div, or product helper). Install for shell open; uninstall in `finally`.
+2. **Form path while exclusive UI / `gblockevents`:** isolate only — helper contract `null` / `true` / `false` (not open / allow browser e.g. Ctrl+C / swallow form logic). **Never** “sort of” dismiss OK from the form switchboard.
+3. **No second belt** that returns `true` when focus is inside the dialog without acting (that made Enter a no-op).
+4. **Browser keeps** Ctrl/Cmd ±/0 and Ctrl/Cmd+wheel unless a product deliberately owns them (capture zoom path stays non-`preventDefault`).
+5. **`resolvePendingConfirm` is idempotent** — safe if a dual path double-fires once; do not rely on that instead of single ownership.
+6. **False DRY:** confirm vs decide Esc/Enter are allowed to differ (focus often outside decide). Prefer local clear paths over one mega-`popup_onkeydown`.
+7. Prefer **delete a path** over adding another when two handlers do the same job.
+
+Smoke when touching this: OK-only invalid Enter+click; Yes/No; text input Enter/Esc; decide arrows/Select/Esc; Wait/Cancel if easy.
+
 ### Menubar / form icons (theme2)
 
 - **One scale for all:** `--exodus-ui-icon-size` in `global.css` is the **only** size knob (outer box; scales with text). Retune once → all menubar/form icons.
@@ -97,9 +121,9 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 
 Address detail PNGs, logos (`exoduslogo.webp`, `login.webp`, …). Toolbar/actions are SVG under the role-based names above.
 
-### Deferred: framework mental model write-up
+### Deferred: fuller Gate A/B + form-validation narrative
 
-User asked (2026-07) for a stored **end-to-end mental model** of Gate A/B, focus, form validation, and DOM events so future work is not terra nullius / spaghetti. **Remind the user** to run that analysis session when they have bandwidth; do not invent parallel “AI patch” layers meanwhile. Natural home: extend `PROGRAMMERS_OVERVIEW.md` §3 (or a short sibling) from real call paths, not speculation.
+**DOMUI key ownership while a popup is open** is recorded above (and implemented in `client.js`). Still optional later: a longer end-to-end write-up of Gate A/B, focus, and `validateupdate` in `PROGRAMMERS_OVERVIEW.md` §3 from real call paths — not a second conflicting strategy. Do not invent parallel “AI patch” layers meanwhile.
 
 ## Neosys modules
 
