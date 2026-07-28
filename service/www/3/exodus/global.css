@@ -940,6 +940,13 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SE
 TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
     margin-left: var(--exodus-form-nested-cell-padding-left);
 }
+/* Column sort chevrons are appended after title text — leave a little air. */
+:is(.exodus-icon, img)[id^="sortbutton_"] {
+    margin-left: 0.35em;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
 /* Mask icons inside buttons: size box already set; keep tint on menubar hover */
 .graphicbutton .exodus-icon,
 .menubutton .exodus-icon {
