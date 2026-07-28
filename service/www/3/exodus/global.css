@@ -969,6 +969,12 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     display: inline-flex;
     align-items: center;
     gap: 0.25em;
+    box-sizing: border-box;
+}
+
+/* Same 2px box as face buttons; stroke invisible so Menu lines up with Save/OK. */
+#exodus_menu .menubutton {
+    border: 2px solid transparent;
 }
 
 #exodus_menu .menubutton,
