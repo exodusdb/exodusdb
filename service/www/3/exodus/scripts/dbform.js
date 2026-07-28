@@ -339,7 +339,7 @@ function form_move_action_buttons_to_top() {
             topbar.parentNode.removeChild(topbar)
     }
 
-    // Mark relocated so CSS can show a clear Refresh|actions gap (not for native top bars)
+    // Mark relocated so CSS can add spacing after Menu (not for native top bars)
     topbar.classList.add('exodus_formbuttons_relocated')
 
     gexodus_menubar.insertBefore(topbar, gexodus_menubar.firstChild)

@@ -994,12 +994,11 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     flex-wrap: wrap;
 }
 
-/* Wide Refresh|actions separator only when the bar was relocated from under the
-   form (off-screen). Native top placement (bound New/Open…) keeps normal spacing. */
+/* Extra air when actions were moved up from under the form (unbound).
+   No vertical rule — reads as an unwanted separator after Menu. */
 #exodus_menu #formbuttonsdiv.exodus_formbuttons_relocated {
     margin-left: 8px;
-    padding-left: 14px;
-    border-left: 1px solid var(--exodus-smallerbordercolor);
+    padding-left: 8px;
 }
 
 /* Form chrome in menubar: bound tools (menubutton) + unbound actions (graphicbutton) */
@@ -1074,13 +1073,13 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
 }
 
 /* Menu | form tools: keep air after the Menu rule (New|Open stay 4px; this needs more). */
+/* Menu button: spacing only — no vertical rule (reads as an extra separator). */
 .hamburger_menu {
     float: left;
     max-width: 65px;
     padding-left: 5px;
     padding-right: 10px;
     margin-right: 8px;
-    border-right: 1px solid var(--exodus-smallerbordercolor);
 }
 
 /* Right menubar cluster: session | theme | refresh | logout */
