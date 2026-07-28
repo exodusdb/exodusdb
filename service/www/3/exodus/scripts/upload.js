@@ -1,5 +1,9 @@
 // Copyright NEOSYS All Rights Reserved.
 
+// Light modal: close without Discard/Cancel dirty leave.
+if (typeof gparameters != 'undefined')
+	gparameters.discardable = true
+
 var gimageextensions=['gif','jpg','jpeg','png','tif','tiff','bmp']
 var gvideoextensions=['mpg','mpeg','avi','mov','mp4','3gp']
 var gaudioextensions=['mp3','wav','mid','midi']

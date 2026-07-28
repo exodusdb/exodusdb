@@ -4611,12 +4611,14 @@ async function closerecord_onclick() {
     //if (window.dialogArguments)
     {
 
-        // Dirty leave: Discard / Cancel (default for unbound + any form on this branch).
-        // No modal exception — heavy modals (certify) need the Q; light ones can opt out later.
+        // Dirty leave: Discard / Cancel by default. Light modals set gparameters.discardable
+        // to skip (search, agencyfilter, settings, upload, schedulefind/print, consolidation).
         if (gchangesmade) {
-            var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
-            if (response != 2) return false
-            setchangesmade(false)// discard chosen — avoid a second Q in closedoc
+            if (!gparameters.discardable) {
+                var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
+                if (response != 2) return false
+            }
+            setchangesmade(false)// discard chosen / discardable — avoid a second Q in closedoc
         }
 
         var returnvalue = ''
@@ -5174,8 +5176,9 @@ async function saveandorcleardoc_body(mode) {
     // return false //logout('saveandorcleardoc - invalidateupdate failed')
 
     // Unbound / unlocked dirty clear (F8, Esc→CLOSE on parameter forms): no lock,
-    // so the glocked Save/Discard path never runs — still ask before wipe.
-    if (!glocked && gchangesmade && clear) {
+    // so the glocked Save/Discard path never runs — still ask before wipe unless
+    // gparameters.discardable (light criteria/settings modals).
+    if (!glocked && gchangesmade && clear && !gparameters.discardable) {
         var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
         if (response != 2) {
             focusongpreviouselement()
