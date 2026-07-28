@@ -1533,17 +1533,18 @@ async function formfunctions_onload() {
                     }
 
                     //locate the TFOOT element in the parents
+                    // Spacer only (column align with thead Show All cell) — must be td,
+                    // not th, or TABLE.exodusform th prompt face tints the footing lead-in.
                     var tfx = tablex.getElementsByTagName('tfoot')[0]
                     if (tfx) {
-                        pgupdownbuttons = pgupdownbuttons.cloneNode(true)
-                        pgupdownbuttons.innerHTML = '&nbsp;'
-
-                        //allow for multiple rows in thead
                         var tfxr = tfx.getElementsByTagName('tr')[0]
-                        var tfxrd = tfxr.firstChild
-                        tfxr.insertBefore(pgupdownbuttons, tfxrd)
-                        pgupdownbuttons.rowSpan = tfx.rows.length
-
+                        if (tfxr) {
+                            var footspacer = document.createElement('td')
+                            footspacer.width = '1%'
+                            footspacer.innerHTML = '&nbsp;'
+                            tfxr.insertBefore(footspacer, tfxr.firstChild)
+                            footspacer.rowSpan = tfx.rows.length
+                        }
                     }
 
                 }

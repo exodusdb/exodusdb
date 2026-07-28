@@ -5,8 +5,8 @@
  *                        are wrapped by exoduswrapformpanes() in client.js.
  * 2. TABLE.exodusform  — no table border (never competes with the pane).
  * 3. Direct form cells — full lightgrey borders = the internal grid.
- *    Prompt cells may be th or td; data cells stay td. Sticky richer tint is
- *    only TABLE[exogroupno] > thead (and decide), not all form th.
+ *    Prompt cells are th (face tint: TABLE.exodusform th); data cells stay td.
+ *    Sticky group thead has its own richer rules (TABLE[exogroupno] > thead).
  * 4. Outer cell edges  — stripped so only *inner* lines remain (see below).
  * Nested tables / .exotable / [exogroupno] are not this grid.
  *
@@ -47,14 +47,13 @@ TABLE.exodusform
 }
 
 /*
- * Prompt th on the outer form grid — same richer face as sticky group thead
- * (OKLCH relative; data-form-head lighter; DM fixed head grey).
- * Data cells stay plain td (form face only). Sticky position stays on thead.
+ * Prompt th — every th under TABLE.exodusform (nested strips included).
+ * Same richer face as sticky group thead (OKLCH; data-form-head; DM).
+ * Data cells must stay plain td. Group sticky thead has its own rules.
+ * TABLE.exodus-fieldstrip is optional markup for side-by-side strips; face is
+ * the same (kept so strips outside a form table still tint).
  */
-TABLE.exodusform > tbody > tr > th,
-TABLE.exodusform > thead > tr > th,
-TABLE.exodusform > tr > th,
-/* Nested field-strip prompts — same face tint, no outer form grid chrome */
+TABLE.exodusform th,
 TABLE.exodus-fieldstrip th {
     background-color: var(--exodus-form-face);
     /* Pale faces: mild L drop + small chroma floor (half the prior delta from face). */
@@ -64,15 +63,11 @@ TABLE.exodus-fieldstrip th {
         h);
     white-space: nowrap;
 }
-:root[data-form-head="lighter"] TABLE.exodusform > tbody > tr > th,
-:root[data-form-head="lighter"] TABLE.exodusform > thead > tr > th,
-:root[data-form-head="lighter"] TABLE.exodusform > tr > th,
+:root[data-form-head="lighter"] TABLE.exodusform th,
 :root[data-form-head="lighter"] TABLE.exodus-fieldstrip th {
     background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
-:root[data-theme="dark_mode"] TABLE.exodusform > tbody > tr > th,
-:root[data-theme="dark_mode"] TABLE.exodusform > thead > tr > th,
-:root[data-theme="dark_mode"] TABLE.exodusform > tr > th,
+:root[data-theme="dark_mode"] TABLE.exodusform th,
 :root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th {
     background-color: #303a5a;
 }

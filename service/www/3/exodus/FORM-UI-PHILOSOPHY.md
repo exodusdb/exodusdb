@@ -145,7 +145,7 @@ element.style.overflowWrap = 'break-word';
 
 **Label italic** — all `TABLE.exodusform td/th` use `--exodus-form-label-font-style` (default italic), including nested label tables. Bound data fields (`INPUT`/`SPAN.clsRequired` etc.) reset to `--exodus-form-data-font-style` (normal). Do not set `font-style: normal` on nested-table padding rules.
 
-**Prompt cells (`th`)** — Human prompt text is `th` (outer grid *and* nested plain header layout tables). Data/controls stay in `td`. Outer-grid borders treat `th` like prompt `td`. Direct outer-grid prompt `th` also use the same richer face background as sticky group thead (OKLCH / lighter mix / DM `#303a5a`); nested layout `th` stay un-tinted until a later style pass. Sticky *position* stays on `TABLE[exogroupno] > thead` (and decide). Do not invent `exohlabel` / `exovlabel` classes.
+**Prompt cells (`th`)** — Human prompt text is `th` (outer grid *and* nested header strips). Data/controls stay in `td` (never put `datafld` / bound inputs in `th`). All `TABLE.exodusform th` use the same richer face as sticky group thead (OKLCH / lighter mix / DM `#303a5a`). Optional `TABLE.exodus-fieldstrip` is layout only (side-by-side strips); face is the same rule. Sticky *position* stays on `TABLE[exogroupno] > thead` (and decide). Do not invent `exohlabel` / `exovlabel` classes.
 
 **Section title rows** — Long forms (agency/system/timesheet configuration, …) use a full-width prompt `th` whose main content is an `h2` (optional hidden key input ok). No project `h2` stylesheet — size/weight/margins are browser UA (`1.5em` bold, `~0.83em` block margin). Cell face = prompt `th` tint; italic inherits from the form. Do not put a nested data table in the same cell as the section `h2`.
 
