@@ -10,6 +10,11 @@ libraryinit()
 
 var foundkeys;
 
+// selectbtree — wrapper: index/XREF search via btreeextract → active select list.
+//
+// TODO: if btreeextract ever normalises plain words as product policy, callers
+// here may drop legacy WORD]&WORD] decoration. Until then keep decoration.
+
 func main(in filename, in indexid, in texts0, io msg) {
 
 	var texts  = texts0;

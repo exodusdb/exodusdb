@@ -1,15 +1,26 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <sysmsg.h>
+
 #include <service_common.h>
 
+// btreeextract — legacy name for "find record keys matching index terms".
+//
+// Uses SELECT (not a hand-rolled btree walk). Fields ending XREF go through
+// Exodus FTS (to_tsvector/tsquery); createindex builds matching GIN indexes.
+//
+// Call protocol (unchanged):
+//   cmd   = FIELDNAME VM searchterms FM
+//   terms = legacy "WORD]&WORD]" (callers still decorate that way)
+//   hits  = VM-separated keys (capped below)
+//
+// TODO: optional one-place term normalise (]& / & / spaces / plain words) if
+// product wants callers to pass plain text only — do not change call sites
+// until that is an explicit decision.
+// TODO: document FTS vs non-XREF successive SELECT in man/notes if needed.
+
 func main(in cmd, in filename, in /*dictfile*/, out hits) {
-
-	// replacement for simple btree.extract functions using SELECT command
-	// which is slower but perhaps more portable and works without btree indexes
-
-	// eg cmd contains "SEQUENCE.XREF" VM XYZ]&ABC] FM
-	// finds records which contain words starting with XYZ *AND* ABC
 
 	// separate cursor
 	var	 v69;
@@ -19,9 +30,10 @@ func main(in cmd, in filename, in /*dictfile*/, out hits) {
 
 	hits = "";
 
-	// defeat compiler warning of unused
-//	if (false)
-//		printx(dictfile);
+	// Cap only here (not in vardb). SELECT maxhits+1 so we can tell LIMIT
+	// truncation from an exact maxhits result. Callers look for "maximum" in msg_.
+	var maxhits	  = 10000;
+	var selectmax = maxhits + 1;
 
 	// XREF should be able to do it all in one go
 	let fieldname = cmd.f(1, 1);
@@ -30,41 +42,51 @@ func main(in cmd, in filename, in /*dictfile*/, out hits) {
 
 		parts = cmd.f(1).remove(1, 1);
 
-		// XREF sql was implemented as STARTING so ] was not required
+		// XREF was implemented as STARTING so ] was not required
 		parts.converter("]", "");
 
-		let selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(parts) ^ " (S)";
+		var selectcmd =
+			"SELECT " ^ selectmax ^ " " ^ filename
+			^ " WITH " ^ fieldname ^ " " ^ quote(parts) ^ " (S)";
 		select(selectcmd);
 
 		// otherwise do successive selects each one reducing the list
 	} else {
-		let nparts = parts.fcount("&");
-		// parts.outputl("parts=");
+		var nparts = parts.fcount("&");
 		for (const var partn : range(1, nparts)) {
-			let part	  = parts.field("&", partn);
-			let selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
-			// selectcmd.outputl("selectcmd=");
-			// call safeselect(select);
+			var part	  = parts.field("&", partn);
+			var selectcmd =
+				"SELECT " ^ selectmax ^ " " ^ filename
+				^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
 			select(selectcmd);
-			// /BREAK;
 			if (not LISTACTIVE)
 				break;
-
-		}  // partn;
+		}
 	}
 
 	// turn the select list into a string of fields
+	var capped = false;
 	if (LISTACTIVE) {
 		hits = "";
+		var n = 0;
 nextrec:
 		var key;
 		if (readnext(key)) {
-			if (hits.len() + key.len() < maxstrsize_ - 30) {
+			n += 1;
+			// Keep at most maxhits; (maxhits+1)th key means SQL/list was truncated
+			if (n <= maxhits and hits.len() + key.len() < maxstrsize_ - 30) {
 				hits ^= key ^ VM;
 				goto nextrec;
 			}
+			capped = true;
 		}
-		hits.popper();
+		if (hits)
+			hits.popper();
+		if (capped) {
+			// "maximum" token for selectbtree / LISTSCHED / AGENCY.SUBS rewrite
+			msg_ = "maximum " ^ maxhits ^ " " ^ filename ^ " keys for " ^ fieldname;
+			call sysmsg(msg_, "BTREEEXTRACT");
+		}
 	}
 
 	clearselect();
