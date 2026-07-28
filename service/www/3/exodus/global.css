@@ -1510,9 +1510,13 @@ input[type=checkbox]:focus-visible {
     height: calc(2 * var(--exodus-ui-icon-size));
     width: auto;
 }
-/* Text-input popups: extra gap between underlined field and footer buttons */
+/* Text-input popups: air after prompt, and between field and OK/Cancel */
 .exodusconfirmdiv.exodusconfirm_textinput .exodusconfirm_body {
-    padding-bottom: 8px;
+    padding-bottom: 10px;
+}
+.exodusconfirmdiv.exodusconfirm_textinput #exodusconfirmdiv_textinput {
+    display: block;
+    margin-top: 0.75em;
 }
 .exodusconfirmdiv .statementclass {
     color: #000000;
