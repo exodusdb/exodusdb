@@ -5930,6 +5930,15 @@ function starteventhandler(eventfunctionname, functionx) {
 				return true
 			}
 
+			// Plain arrows while a keydown flight is still airborne (key-repeat):
+			// do not preventDefault — otherwise caret movement is swallowed and
+			// fields feel unresponsive. Form field-to-field nav waits for idle.
+			if (event.type == 'keydown' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+				var blockedkey = event.keyCode ? event.keyCode : event.which
+				if (blockedkey == 37 || blockedkey == 38 || blockedkey == 39 || blockedkey == 40)
+					return true
+			}
+
 			logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
 
 			return exoduscancelevent(event)
@@ -6114,14 +6123,19 @@ async function exodus_begin_run(asyncHandler, location, event) {
 	exodus_flight_log('TAKEOFF #' + n + ' "' + location + '"')
 
 	form_blockevents(true, location)
-	// Keep form_blockevents for re-entry, but skip #uiblockerdiv + overflow:hidden for:
+	// Keep form_blockevents for re-entry (strict one plane), but skip #uiblockerdiv +
+	// overflow:hidden for high-frequency chrome that must not thrash page scroll:
 	//   focus/activate — full-viewport overlay mid-click closes native <select>
-	//   background     — exodus_begin_if_idle (expression2 every 250ms, keepalive, relock);
-	//                    overflow lock was flashing page scrollbars (mediadiary wide forms).
+	//   background     — exodus_begin_if_idle (expression2 every 250ms, keepalive, relock)
+	//   keydown/keypress/keyup — arrow/caret; key-repeat must not lock overflow
+	//   input/change — every keystroke / SELECT change is not a user-wait dialog
 	// Real dialogs/db waits still call blockmodalui themselves.
+	// Second takeoff while airborne still systemerrors (queue_max 0) — unchanged.
 	var etype = event && event.type
 	var modalblock = !(etype == 'focus' || etype == 'focusin' || etype == 'activate'
-		|| etype == 'background')
+		|| etype == 'background'
+		|| etype == 'keydown' || etype == 'keypress' || etype == 'keyup'
+		|| etype == 'input' || etype == 'change')
 	if (modalblock)
 		blockmodalui_sync()
 

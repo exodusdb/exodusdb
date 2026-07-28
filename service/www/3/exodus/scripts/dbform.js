@@ -3567,10 +3567,8 @@ async function document_onkeydown2(event) {
 
         //handle left/right normally if not all text selected
         if (element.maxLength != 1 && element.tagName.match(gtexttagnames) && element.type != 'button' && element.type != 'checkbox') {
-            if (!onkeydown_allisselected(element)) {
-                console.log('exiting onkeydown normally because not all text is selected')
+            if (!onkeydown_allisselected(element))
                 return
-            }
 
         }
 
