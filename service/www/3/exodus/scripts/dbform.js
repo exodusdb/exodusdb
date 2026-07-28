@@ -9911,10 +9911,62 @@ async function form_postread_noteifdeleted(descending) {
     return true
 }
 
+// Sync: copy selected text from INPUT/TEXTAREA as text/plain only.
+// Must run before any await — clipboardData is only valid during the event, and
+// browser default often also fills text/html with the <input> markup (worse when
+// a popup icon wraps the field, e.g. CLIENT_CODE). Returns true if handled.
+function form_copy_text_field_sync(event) {
+    event = getevent(event)
+    var el = event.target
+    if (!el || !el.tagName)
+        return false
+    if (el.tagName != 'INPUT' && el.tagName != 'TEXTAREA')
+        return false
+    if (el.tagName == 'INPUT') {
+        var typ = (el.type || 'text').toLowerCase()
+        if (typ != 'text' && typ != 'search' && typ != 'tel' && typ != 'url'
+            && typ != 'password' && typ != 'email' && typ != 'number')
+            return false
+    }
+    var start
+    var end
+    try {
+        start = el.selectionStart
+        end = el.selectionEnd
+    } catch (e) {
+        return false
+    }
+    if (typeof start != 'number' || typeof end != 'number' || start === end)
+        return false
+    var text = String(el.value || '').slice(start, end)
+    var clip = event.clipboardData || window.clipboardData
+    if (!clip || !clip.setData)
+        return false
+    try {
+        // IE uses 'Text'; modern browsers 'text/plain'
+        if (window.clipboardData && clip === window.clipboardData)
+            clip.setData('Text', text)
+        else {
+            clip.setData('text/plain', text)
+            // Prefer plain when paste targets check HTML first (Word, mail, etc.)
+            clip.setData('text/html', text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;'))
+        }
+    } catch (e) {
+        return false
+    }
+    return exoduscancelevent(event) || true
+}
+
 async function document_oncopy(event) {
 
     event = getevent(event)
-    var element = event.target
+
+    // Before any await: plain field selection → text only (not <input> HTML).
+    if (form_copy_text_field_sync(event))
+        return false
 
     //choose
     //form_oncopy if present
