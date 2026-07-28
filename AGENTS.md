@@ -28,7 +28,7 @@ Exodus is **production** shared code. Wrong event/gate/popup changes cost **~10�
 - **KISS at the seam:** one more case on the real machine (walker, startevent, icon map). Not a new parallel policy.
 - **Blast radius first** on `client.js` / `dbform.js` / Gate A / confirm-decide / focus: smallest change; name what else can break; never “fix” by swallowing whole key classes.
 - **Technical debt is allowed for discovery** — thrash, try A then B, short WIP. Keep it local and reversible.
-- **Checkpoint commits** after turns are fine (bisect). They are **not** a claim the path is finished. Do **not** push unless asked.
+- **Commit freely** after substantive turns (small, descriptive; easy to bisect). Checkpoints are **not** a claim the path is finished. Do **not** push unless asked.
 
 ### Quality gates (user need not re-explain)
 
@@ -61,6 +61,19 @@ Set **`gparameters.key`** before dbform’s post-init open (dict build or `form_
 - **Do not edit framework code** (`dbform.js`, `client.js`, core form/event/gate machinery) unless the user has **explicitly instructed that in the last few turns** of this conversation.
 - Prefer fixing product code (`colors.js`, page dicts/HTM, `users.js`, etc.). If a bug looks framework-wide, **say so and wait** — do not “fix” it by changing F7, `gpreviousvalue`, `validateupdate`, or popup contracts.
 - Popup cancel without `validateupdate` is **standard Exodus practice**; product popups must not break that (e.g. do not wipe mid-edit field text to paper over face-preview bugs).
+
+## Service C++ (compile + deploy to live)
+
+Editing `.cpp` under `service/src/` or `~/neosys/src/` is **not** enough. Live `serve_*` loads **`.so` plugins** from live lib dirs (`LD_LIBRARY_PATH` typically includes `/usr/local/live/lib` and `$EXO_HOME/lib`).
+
+| Step | Command / note |
+|------|----------------|
+| **1. Compile** | From the source directory: `compile foo.cpp` (installs to `$EXO_HOME/lib` e.g. `~/lib/libfoo.so`). Compile every library you changed (and dependents if needed). |
+| **2. Deploy to live** | `cd ~/exodus/service && ./copyall CONFIRM` — rsync `~/bin,lib,dat,inc` → `~/live` and `/usr/local/{bin,lib,…}` → `/usr/local/live` with **`--whole-file`** so `dlopen` sees real updates. Without `CONFIRM` = dry run only. |
+| **3. Do not** | Hand-copy a single `.so` as the primary path (easy to miss a dir). Do not claim “live” after compile-only. |
+
+- **Web (JS/CSS/HTM)** is separate: served from the tree / merge paths; no `copyall` for browser assets.
+- After `./copyall CONFIRM`, live services pick up new libs (script also touches live dirs so listen restarts when configured). If behaviour still looks old, check which `serve_*` unit and its `LD_LIBRARY_PATH`.
 
 ## Light framework changes (dbform / client)
 
