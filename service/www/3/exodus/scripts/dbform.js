@@ -1853,8 +1853,16 @@ async function formfunctions_onload() {
     //if form has a custom postinit routine
     if (typeof form_postinit == 'function') {
         //login('form_postinit before')
-        await exodusevaluate('await form_postinit()', 'form_functions()');
+        var postinitok = await exodusevaluate('await form_postinit()', 'form_functions()');
         //logout('form_postinit after')
+
+        // Explicit false = abort (e.g. Cancel on a setup prompt). Do not set ginitok
+        // or continue load — otherwise the form appears ready with empty/wrong data.
+        if (postinitok === false) {
+            if (window.dialogArguments || (typeof gisdialog != 'undefined' && gisdialog))
+                exoduswindowclose()
+            return false
+        }
 
         //reverse the effect of any setvalue commands in postinit
         setchangesmade(false)
