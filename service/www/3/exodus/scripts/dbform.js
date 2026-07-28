@@ -845,9 +845,13 @@ async function formfunctions_onload() {
 
             //allow excess spaces in EXODUS data using pre-wrap
             //"Sequences of whitespace are preserved. Lines are broken at newline characters, at <br>, and as necessary to fill line boxes."
+            // overflow-wrap: long tokens fold once the form table is at its soft
+            // viewport cap (global.css: TABLE.exodusform max-width calc(100vw-2rem);
+            // contenteditable max-width 100% of cell). Pane stays width:max-content.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 try {
                     element.style.whiteSpace = 'pre-wrap'
+                    element.style.overflowWrap = 'break-word'
                 } catch (e) {
                     try {
                         //pre-wrap above errors before IEv8+ XP/Win2003
@@ -2436,7 +2440,11 @@ async function newrecordfocus() {
     //do this BEFORE setting gpreviouselement as setdefault will overwrite it
     if (!gKeyNodes || glocked) {
         //check group 0 always
-        await checkrequired(gfields, element, 0)
+        // If a prior required is empty, checkrequired focuses it and must win —
+        // do not fall through and schedule focus on `element` (e.g. VOUCHER_DATE
+        // after Bank/Cash missing), which re-triggers the same required message.
+        if (!(await checkrequired(gfields, element, 0)))
+            return
     }
 
     //required so that if still focused on an element AFTER loading the record
@@ -6054,18 +6062,6 @@ async function document_onfocus(event) {
     // //element.onclick=onclickradiocheckbox
     // addeventlistener(element,'click','onclickradiocheckbox')
 
-    ///log('if arrived on a readonly field by tab (or enter as tab)\nthen skip forwards (or backwards) to the next field')
-    if (gkeycode == 9 || gkeycode == 13) {
-        ///log('but only if normal tabindex because focusnext doesnt work otherwise')
-        if (element.getAttribute('exodusreadonly') && element.tabIndex == 999) {
-            if (event.shiftKey)
-                focusprevious(element)
-            else
-                focusnext(element)
-            return false //logout('document_onfocus')
-        }
-    }
-
     ///log('no validation/update except changing exodus elements:' + element.getAttribute('exodustype'))
     if (!(element.getAttribute('exodustype'))) {
         //logout('document_onfocus')
@@ -6161,6 +6157,22 @@ async function document_onfocus(event) {
             //exodussettimeout('await opendoc()',100)
             await opendoc(nextkey)
             return false //logout('document_onfocus' + ' ' + exodusquote(elementid) + ' new record')
+        }
+    }
+
+    // Tab/Enter landed on a readonly field: after prior-required + new-record
+    // checks above, skip to the next (or previous) editable field. Must not run
+    // before those checks — click/tab on e.g. autonumber VOUCHER_NO must still
+    // enforce Bank/Cash required and opendoc.
+    if (gkeycode == 9 || gkeycode == 13) {
+        if (element.getAttribute('exodusreadonly')
+            && (element.tabIndex == 999 || element.tabIndex == -1
+                || element.getAttribute('oldtabindex'))) {
+            if (event.shiftKey)
+                focusprevious(element)
+            else
+                focusnext(element)
+            return false //logout('document_onfocus')
         }
     }
     ///log('there is no new record so setup current element')
@@ -6537,6 +6549,23 @@ async function earlyupdate() {
 
 }
 
+// Tab order for "is this field before that one?" in checkrequired.
+// exodussetreadonly sets tabIndex -1 (saved oldtabindex); without restoring
+// that sequence, focusing a readonly field (e.g. autonumber VOUCHER_NO) made
+// no prior field look "before" it — skipped required checks and opendoc side effects.
+function form_effective_tabindex(el) {
+    if (!el)
+        return 999
+    var t = Number(el.tabIndex)
+    if (t == -1 || isNaN(t)) {
+        var ot = el.getAttribute('oldtabindex')
+        if (ot != null && ot !== '' && !isNaN(Number(ot)))
+            return Number(ot)
+        return 999
+    }
+    return t
+}
+
 async function checkrequired(elements, element, groupno) {
 
     //check the given elements with the given group number
@@ -6545,6 +6574,7 @@ async function checkrequired(elements, element, groupno) {
 
     grecn = getrecn(element)
 
+    var element_tab = form_effective_tabindex(element)
     var foundelement = false
     for (var ii = 0; ii < elements.length; ii++) {
         var element2 = elements[ii]
@@ -6586,7 +6616,9 @@ async function checkrequired(elements, element, groupno) {
             continue
 
         if (Number(element2.getAttribute('exogroupno')) == groupno) {
-            if (((!foundelement && element2.tabIndex <= element.tabIndex) || (element2.tabIndex != -1 && element2.tabIndex < element.tabIndex))) {
+            var element2_tab = form_effective_tabindex(element2)
+            // form_effective_tabindex never returns -1 (maps to oldtabindex or 999)
+            if ((!foundelement && element2_tab <= element_tab) || (element2_tab < element_tab)) {
                 //if (element&&element2.getAttribute('exodusrequired')&&gds.getcells(element2,grecn)[0].text=='')
                 //if (element&&element2.getAttribute('exodusrequired')&&getvalue(element2)=='')
                 //if (element&&(!Number(element.getAttribute('exogroupno'))||element2.getAttribute('exodusrequired'))&&getvalue(element2)=='')
@@ -6610,8 +6642,15 @@ async function checkrequired(elements, element, groupno) {
                             return true
 
                         //put up a message unless is the first column of a row
-                        if (true || !(element2.getAttribute('exodusisfirstinputcolumn')))
+                        if (true || !(element2.getAttribute('exodusisfirstinputcolumn'))) {
+                            // Focus the missing field *before* the dialog so confirm
+                            // close restores here (not the field the user clicked).
+                            // Avoids a one-shot suppress flag and double "is required".
+                            form_focus_noscroll(element2)
+                            setgpreviouselement(element2)
+                            gonfocuselement = element2
                             await exodusinvalid(element2.getAttribute('exodustitle') + ' is required..')
+                        }
 
                         focuson(element2)
                         //if (!(Number(element2.getAttribute('exogroupno'))))
