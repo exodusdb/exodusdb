@@ -45,22 +45,27 @@ TABLE.exodusform
  */
 TABLE.exodusform > tbody > tr > th,
 TABLE.exodusform > thead > tr > th,
-TABLE.exodusform > tr > th {
+TABLE.exodusform > tr > th,
+/* Nested field-strip prompts — same face tint, no outer form grid chrome */
+TABLE.exodus-fieldstrip th {
     background-color: var(--exodus-form-face);
     /* Pale faces: mild L drop + small chroma floor (half the prior delta from face). */
     background-color: oklch(from var(--exodus-form-face)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
+    white-space: nowrap;
 }
 :root[data-form-head="lighter"] TABLE.exodusform > tbody > tr > th,
 :root[data-form-head="lighter"] TABLE.exodusform > thead > tr > th,
-:root[data-form-head="lighter"] TABLE.exodusform > tr > th {
+:root[data-form-head="lighter"] TABLE.exodusform > tr > th,
+:root[data-form-head="lighter"] TABLE.exodus-fieldstrip th {
     background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform > tbody > tr > th,
 :root[data-theme="dark_mode"] TABLE.exodusform > thead > tr > th,
-:root[data-theme="dark_mode"] TABLE.exodusform > tr > th {
+:root[data-theme="dark_mode"] TABLE.exodusform > tr > th,
+:root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th {
     background-color: #303a5a;
 }
 
@@ -123,7 +128,7 @@ TABLE.exodus-help-table th {
     vertical-align: top;
     text-align: left;
     box-sizing: border-box;
-    max-width: 100%; /* stay within viewport so line-grid text can fold */
+    /* No max-width: forms often exceed the viewport; page scrolls (HTML default). */
     background-color: var(--exodus-form-face);
     border: 1px solid var(--exodus-form-border);
     border-radius: var(--exodus-form-radius);
@@ -135,7 +140,6 @@ TABLE.exodus-help-table th {
 div[align="center"] > .exodusformpane {
     display: block;
     width: max-content;
-    max-width: 100%;
     margin: var(--exodus-form-pane-margin) auto;
 }
 /* Unbound form OK/List + Close bar (dbform.js #formbuttonsdiv) and inline action rows */
@@ -242,7 +246,6 @@ TABLE.exodusform TABLE.exotable th {
     border: none;
     border-radius: 0;
     box-sizing: border-box;
-    max-width: 100%; /* with pane max-width:100%, caps line grids so text folds */
 }
 /*
  * No outer cell borders (pane is the frame).
