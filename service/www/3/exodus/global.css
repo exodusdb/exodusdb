@@ -585,6 +585,18 @@ P
     line-height: 1.5em;
 }
 
+/* Help lists in form tables: UA default padding (~40px) sits far right of
+   neighbouring <p> text. Keep a small marker gutter only. */
+TABLE.exodusform ul,
+TABLE.exodusform ol {
+    margin: 0.35em 0 0.75em 0;
+    padding-left: 1.35em;
+    line-height: 1.5em;
+}
+TABLE.exodusform li {
+    margin: 0.2em 0;
+}
+
 PRE
 {
     padding-right: 5pt;
