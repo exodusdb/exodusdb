@@ -141,7 +141,7 @@ element.style.overflowWrap = 'break-word';
 
 **Vertical alignment** — `global.css` sets `vertical-align: top` on all `TABLE.exodusform`, `TABLE.exotable`, and `TABLE[exogroupno]` cells and rows (including nested tables). Do not add inline `valign` or `vertical-align` in HTM unless a page needs a deliberate exception.
 
-**Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-*` on direct `exodusform > tr > td|th` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exotable** via `--exodus-form-nested-cell-padding-*`. Do not hard-code px padding unless a page truly needs an exception.
+**Cell padding** — em-based in `global.css`, three layers: (1) **outer grid** `--exodus-form-cell-padding-x/y` on direct `exodusform > tr > td|th` (ledgerprint, filters); (2) **plain nested tables** and (3) **group/exotable** via `--exodus-form-nested-cell-padding-x/y`. Horizontal is **equal L/R** (split of the old all-left inset) so content is not jammed against the right cell border. Do not hard-code px padding unless a page truly needs an exception.
 
 **Label italic** — all `TABLE.exodusform td/th` use `--exodus-form-label-font-style` (default italic), including nested label tables. Bound data fields (`INPUT`/`SPAN.clsRequired` etc.) reset to `--exodus-form-data-font-style` (normal). Do not set `font-style: normal` on nested-table padding rules.
 

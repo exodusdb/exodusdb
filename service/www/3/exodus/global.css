@@ -41,7 +41,9 @@ TABLE.exodusform
 .exodusform > tr > td,
 .exodusform > tr > th {
     border: 1px solid lightgrey;
-    padding-left: var(--exodus-form-cell-padding-left);
+    /* Equal L/R: was all left (0.5em); share so text is not jammed on the right border */
+    padding-left: var(--exodus-form-cell-padding-x);
+    padding-right: var(--exodus-form-cell-padding-x);
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
 }
@@ -92,7 +94,8 @@ TABLE.exodusform TABLE:not([exogroupno]):not(.exotable) td,
 TABLE.exodusform TABLE:not([exogroupno]):not(.exotable) th {
     padding-top: var(--exodus-form-nested-cell-padding-y);
     padding-bottom: var(--exodus-form-nested-cell-padding-y);
-    padding-left: var(--exodus-form-nested-cell-padding-left);
+    padding-left: var(--exodus-form-nested-cell-padding-x);
+    padding-right: var(--exodus-form-nested-cell-padding-x);
 }
 /* Top alignment throughout forms and line grids (nested tables inherit) */
 TABLE.exodusform td,
@@ -244,7 +247,8 @@ TABLE.exodusform TABLE.exotable td,
 TABLE.exodusform TABLE.exotable th {
     padding-top: var(--exodus-form-nested-cell-padding-y);
     padding-bottom: var(--exodus-form-nested-cell-padding-y);
-    padding-left: var(--exodus-form-nested-cell-padding-left);
+    padding-left: var(--exodus-form-nested-cell-padding-x);
+    padding-right: var(--exodus-form-nested-cell-padding-x);
 }
 .exodusformpane > TABLE.exodusform {
     margin: 0;
@@ -455,10 +459,14 @@ BODY
     --exodus-form-border: #d0d0d0;
     --exodus-form-pane-padding: 0.375em;
     --exodus-form-pane-margin: 0.125em;
-    --exodus-form-cell-padding-left: 0.5em;
+    /* Horizontal: equal L/R (was all in left — 0.5em / nested 0.3em) */
+    --exodus-form-cell-padding-x: 0.25em;
     --exodus-form-cell-padding-y: 0.35em;
-    --exodus-form-nested-cell-padding-left: 0.3em;
+    --exodus-form-nested-cell-padding-x: 0.15em;
     --exodus-form-nested-cell-padding-y: 0.2em;
+    /* Aliases: older rules / popup icon gap after find/link */
+    --exodus-form-cell-padding-left: var(--exodus-form-cell-padding-x);
+    --exodus-form-nested-cell-padding-left: var(--exodus-form-nested-cell-padding-x);
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
     --exodus-form-data-font-size: 1rem; /* INPUT and display SPANs share this */
@@ -941,18 +949,18 @@ img[id^="deleterowbutton"] {
     cursor: pointer;
 }
 /*
- * Find/link icons sit left of the data field inside the cell. Cell padding-left
+ * Find/link icons sit left of the data field inside the cell. Cell padding-x
  * already applies before the first icon; replicate that pad after the last chrome
  * icon so the field keeps the same left inset (icons must not consume it).
  * Only adjacent data controls — not intermediate wrapper spans when both icons exist.
  */
 TABLE.exodusform :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly),
 TABLE.exodusform :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
-    margin-left: var(--exodus-form-cell-padding-left);
+    margin-left: var(--exodus-form-cell-padding-x);
 }
 TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly),
 TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
-    margin-left: var(--exodus-form-nested-cell-padding-left);
+    margin-left: var(--exodus-form-nested-cell-padding-x);
 }
 /* Column sort chevrons are appended after title text — leave a little air. */
 :is(.exodus-icon, img)[id^="sortbutton_"] {
