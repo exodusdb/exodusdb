@@ -3363,6 +3363,13 @@ async function document_onkeydown2(event) {
         }
     }
 
+    // Tab as data when conversion is [INDENTED] (e.g. chart ACCOUNT_NAME indent).
+    // Shift+Tab still navigates. Before last-row empty first-col skip so blank rows indent.
+    if (keycode == 9 && !event.ctrlKey && !event.altKey && !event.shiftKey
+        && form_try_insert_tab_char(element)) {
+        return exoduscancelevent(event)
+    }
+
     //tab or down or enter on first or last col of LAST row is special
     if ((ggroupno > 0) && grecn == (rs.length - 1)) {
         if ((keycode == 9 || keycode == 13 || keycode == 40) && !event.shiftKey && !event.ctrlKey && !tablex.getAttribute('noinsertrow')) {
@@ -7413,6 +7420,42 @@ async function getdefault(element) {
     //logout('getdefault ' + element.id + ' ' + defaultvalue)
     return defaultvalue
 
+}
+
+// Tab-as-data for fields with exodusconversion [INDENTED] (leading-indent display).
+// Returns true if Tab was consumed as a character insert.
+function form_try_insert_tab_char(element) {
+    if (!element)
+        return false
+    var conv = element.getAttribute('exodusconversion') || ''
+    if (conv.slice(0, 1) != '[')
+        return false
+    var convname = conv.slice(1, -1).split(',')[0].toUpperCase()
+    if (convname != 'INDENTED')
+        return false
+    if (element.getAttribute('exodusreadonly') || element.disabled
+        || element.getAttribute('disabled') != null)
+        return false
+    if (element.tagName != 'INPUT' && element.tagName != 'TEXTAREA')
+        return false
+    var start
+    var end
+    try {
+        start = element.selectionStart
+        end = element.selectionEnd
+    } catch (e) {
+        return false
+    }
+    if (typeof start != 'number' || typeof end != 'number')
+        return false
+    var v = element.value || ''
+    element.value = v.slice(0, start) + '\t' + v.slice(end)
+    var pos = start + 1
+    try {
+        element.setSelectionRange(pos, pos)
+    } catch (e) { }
+    setchangesmade(true)
+    return true
 }
 
 //var gautofitwindowpending

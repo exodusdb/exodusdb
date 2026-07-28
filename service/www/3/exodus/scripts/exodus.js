@@ -823,6 +823,36 @@ function number_oconv_end() {
     gnumber_oconv_display = false
 }
 
+// Leading indent: storage uses spaces; display/edit uses tabs (visible width).
+// OCONV: leading spaces → tabs only.
+// ICONV: every tab → space (leading indent + any mid-string tabs).
+// Pair with di.conversion='[INDENTED]' so dbform Tab key inserts '\t' (see form_try_insert_tab_char).
+function INDENTED(mode, value, params) {
+
+    if (typeof value == 'object')
+        return exodusconvarray(INDENTED, mode, value, params)
+
+    if (value === '' || value == null)
+        return value === null || typeof value == 'undefined' ? value : ''
+
+    value = value.toString()
+
+    // can handle multivalues
+    if (value.indexOf(fm) + 1)
+        return exodusconvarray(INDENTED, mode, value.split(fm), params).join(fm)
+    if (value.indexOf(vm) + 1)
+        return exodusconvarray(INDENTED, mode, value.split(vm), params).join(vm)
+    if (value.indexOf(sm) + 1)
+        return exodusconvarray(INDENTED, mode, value.split(sm), params).join(sm)
+
+    if (mode == 'ICONV')
+        // all tabs → spaces (file format never keeps tab characters)
+        return value.replace(/\t/g, ' ')
+
+    // OCONV: leading spaces → tabs only (screen indent)
+    return value.replace(/^ +/, function (m) { return '\t'.repeat(m.length) })
+}
+
 function NUMBER(mode, value, params) {
 
     /*
