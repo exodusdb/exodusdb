@@ -7196,7 +7196,8 @@ function exodusconfirm_keymap(event) {
 		return false
 	}
 
-	// Space/Enter on a focused confirm button
+	// Space/Enter: only when a footer button is focused (highlighted).
+	// No focused button → do not press any (default is prefocus only, not a silent target).
 	if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
 		if (focusedConfirmBtn.id == 'negativebutton')
 			window.setTimeout(exodus_confirm_function2_sync, 1)
@@ -7207,12 +7208,20 @@ function exodusconfirm_keymap(event) {
 		return false
 	}
 
-	// POSITIVE: F9, Enter, Space (not in text field), access letter
-	if (keycode == 120 || keycode == 13 || (!istextinput && keycode == 32)
+	// Text-input field: Enter = OK (historical confirm.htm), even when no button focused
+	if (keycode == 13 && istextinput && active && active.id == 'exodusconfirmdiv_textinput') {
+		window.setTimeout(exodus_confirm_function1_sync, 1)
+		return false
+	}
+
+	// F9 / first-button access letter always positive (OK/Yes) — explicit, not Enter
+	if (keycode == 120
 		|| (gexodusconfirmletters && keyletter == gexodusconfirmletters[1])) {
 		window.setTimeout(exodus_confirm_function1_sync, 1)
 		return false
 	}
+
+	// Bare Enter/Space with nothing focused: swallow, do not invent a button press
 
 	// CANCEL: Esc, access letter
 	if (keycode == 27 || (gexodusconfirmletters && keyletter == gexodusconfirmletters[3])) {
@@ -7277,6 +7286,8 @@ function exodusconfirm_focus_cycle(reverse) {
 }
 
 // Explicit default only: 1 / 2 / 3. Empty, 0, or omitted → no prefocus.
+// Button numbers: 1=positive (OK/Yes), 2=negative (No), 3=cancel (Cancel).
+// OK/Cancel dialogs have no negative: default 2 means Cancel (Windows MB_OKCANCEL).
 function exodusconfirm_has_default_button(defaultbuttonn) {
 	var n=Number(defaultbuttonn)
 	return n===1||n===2||n===3
@@ -7288,7 +7299,7 @@ function exodusconfirm_default_button_element(defaultbuttonn) {
 		return null
 	var defn=Number(defaultbuttonn)
 	if (defn==2)
-		return $$('negativebutton')||null
+		return $$('negativebutton') || $$('cancelbutton') || null
 	if (defn==3)
 		return $$('cancelbutton')||null
 	return $$('positivebutton')||null
