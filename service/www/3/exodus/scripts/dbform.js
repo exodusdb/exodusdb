@@ -121,6 +121,42 @@ var gkeycode
 // Set by focusdirection only: +1 forward/right, -1 back/left, 0 = click/unknown.
 // Consumed once by scrollintoview on land (document_onfocus).
 var gfocus_nav_hdir = 0
+// Opt-in focus/scroll diagnostics: __form_scroll_log=1, ?scrolllog=1, or localStorage.
+function form_scroll_log_on() {
+	try {
+		if (window.__form_scroll_log === 1 || window.__form_scroll_log === true)
+			return true
+		if (window.__form_scroll_log === 0 || window.__form_scroll_log === false)
+			return false
+		if (/(?:^|[?&])scrolllog=1(?:&|$)/.test(String(location.search || '')))
+			return true
+		if (window.localStorage && localStorage.getItem('gform_scroll_log') == '1')
+			return true
+	} catch (e) { }
+	return false
+}
+function form_scroll_log_msg() {
+	if (!form_scroll_log_on())
+		return
+	var a = ['[form-scroll]']
+	for (var i = 0; i < arguments.length; i++)
+		a.push(arguments[i])
+	try {
+		console.log.apply(console, a)
+	} catch (e) {
+		try { console.log(a.join(' ')) } catch (e2) { }
+	}
+}
+function form_scroll_el_label(el) {
+	if (!el)
+		return '(null)'
+	var t = el.type || ''
+	var id = el.id || ''
+	var v = (t == 'radio' || t == 'checkbox') ? (el.value || '') : ''
+	return (el.tagName || '?') + (t ? '[' + t + ']' : '') + '#' + id
+		+ (v !== '' ? '="' + v + '"' : '')
+		+ (el.checked ? '(checked)' : '')
+}
 var gdictfilename
 
 var gparameters
@@ -4072,6 +4108,10 @@ function focusdirection(direction, element, notgroupno, scopex) {
 
     //found it. focus on it
     //console.log('focusdirection ' + nextelement.tagName + ' ' + nextelement.id)
+    form_scroll_log_msg('focusdirection', direction > 0 ? '+1' : '-1',
+        'from', form_scroll_el_label(element),
+        'to', form_scroll_el_label(nextelement),
+        'hdir=', gfocus_nav_hdir, 'gkeycode=', gkeycode)
     focuson(nextelement)
 
 }
@@ -4216,12 +4256,16 @@ function scrollintoview_top_cover(element, cell) {
     } catch (e) { }
 
     // Hit-test: is the cell centre covered by something outside the field/cell?
+    // Only when the probe intersects the viewport. Clamping Y into the viewport
+    // for fully off-screen cells (e.g. radio below NOTES) false-positives the
+    // row/thead just above as an "overlay" and inflates topCover to ~cell.top.
     try {
         var probe = cell || element
         var pr = probe.getBoundingClientRect()
         var vw = window.innerWidth || document.documentElement.clientWidth || 0
         var vh = window.innerHeight || document.documentElement.clientHeight || 0
-        if (vw && vh && pr.width > 0 && pr.height > 0) {
+        if (vw && vh && pr.width > 0 && pr.height > 0
+            && pr.bottom > 0 && pr.top < vh) {
             var cx = Math.min(Math.max(pr.left + pr.width / 2, 0), vw - 1)
             var cy = Math.min(Math.max(pr.top + Math.min(pr.height / 2, 8), 0), vh - 1)
             var hit = document.elementFromPoint(cx, cy)
@@ -4280,10 +4324,14 @@ function element_is_visually_clear(element, x, y) {
  *   free band. Consumes gfocus_nav_hdir.
  */
 function scrollintoview(element) {
-    if (!element || !element.getBoundingClientRect)
+    if (!element || !element.getBoundingClientRect) {
+        form_scroll_log_msg('scrollintoview skip: no element/rect')
         return
-    if (!element.tagName || !element.tagName.match(gdatatagnames))
+    }
+    if (!element.tagName || !element.tagName.match(gdatatagnames)) {
+        form_scroll_log_msg('scrollintoview skip: not data tag', form_scroll_el_label(element))
         return
+    }
 
     var hdir = gfocus_nav_hdir
     gfocus_nav_hdir = 0
@@ -4304,9 +4352,10 @@ function scrollintoview(element) {
     try {
         cell = typeof getancestor === 'function' ? getancestor(element, ' TD TH ') : null
     } catch (e) { }
+    var elR = element.getBoundingClientRect()
     var r = (cell && cell.getBoundingClientRect)
         ? cell.getBoundingClientRect()
-        : element.getBoundingClientRect()
+        : elR
 
     var vw = window.innerWidth || document.documentElement.clientWidth || 0
     var vh = window.innerHeight || document.documentElement.clientHeight || 0
@@ -4354,13 +4403,34 @@ function scrollintoview(element) {
 
     // --- vertical: always min-fit under sticky covers (not only when fully off-screen) ---
     var dy = 0
+    var topPad = 0
+    var bottomPad = vh
+    var vAvail = 0
+    var fullyIn = true
     if (vh) {
-        var topPad = scrollintoview_top_cover(element, cell) + pad
-        var bottomPad = vh - pad
+        topPad = scrollintoview_top_cover(element, cell) + pad
+        bottomPad = vh - pad
         var h = r.bottom - r.top
-        var vAvail = bottomPad - topPad
+        vAvail = bottomPad - topPad
+        // Off-screen targets (e.g. radio below NOTES on bookings): sticky/hit-test
+        // can inflate top cover to ~cell.top so free band collapses (vAvail<=0) and
+        // we never scroll. Fall back to menubar-only cover.
+        if (vAvail <= 0) {
+            var menubarOnly = 0
+            try {
+                menubarOnly = parseFloat(
+                    window.getComputedStyle(document.documentElement)
+                        .getPropertyValue('--exodus-sticky-top')
+                ) || 0
+            } catch (e) { }
+            topPad = menubarOnly + pad
+            vAvail = bottomPad - topPad
+            form_scroll_log_msg('scrollintoview topPad fallback menubar',
+                Math.round(topPad), 'vAvail=', Math.round(vAvail))
+        }
+        fullyIn = (r.top >= topPad && r.bottom <= bottomPad)
 
-        if (vAvail > 0 && !(r.top >= topPad && r.bottom <= bottomPad)) {
+        if (vAvail > 0 && !fullyIn) {
             if (hdir < 0) {
                 // Up / back: prefer top edge clear of sticky headings
                 if (h <= vAvail) {
@@ -4391,6 +4461,13 @@ function scrollintoview(element) {
         }
     }
 
+    form_scroll_log_msg('scrollintoview', form_scroll_el_label(element),
+        'hdir=', hdir, 'pageY=', Math.round(pageY),
+        'el.top/bot=', Math.round(elR.top) + '/' + Math.round(elR.bottom),
+        'cell.top/bot=', Math.round(r.top) + '/' + Math.round(r.bottom),
+        'vh=', vh, 'topPad=', Math.round(topPad), 'bottomPad=', Math.round(bottomPad),
+        'fullyIn=', fullyIn, 'dx/dy=', Math.round(dx) + '/' + Math.round(dy))
+
     if (dx || dy)
         window.scrollBy(dx, dy)
 
@@ -4401,14 +4478,37 @@ function scrollintoview(element) {
                 ? cell.getBoundingClientRect()
                 : element.getBoundingClientRect()
             var topPad2 = scrollintoview_top_cover(element, cell) + pad
+            if (vh - pad - topPad2 <= 0) {
+                var menubar2 = 0
+                try {
+                    menubar2 = parseFloat(
+                        window.getComputedStyle(document.documentElement)
+                            .getPropertyValue('--exodus-sticky-top')
+                    ) || 0
+                } catch (e) { }
+                topPad2 = menubar2 + pad
+            }
             if (r2.top < topPad2)
                 window.scrollBy(0, r2.top - topPad2)
             else if (!element_is_visually_clear(element)
                 && !(cell && element_is_visually_clear(cell))) {
                 var cover2 = scrollintoview_top_cover(element, cell)
+                if (vh - pad - cover2 <= 0) {
+                    try {
+                        cover2 = parseFloat(
+                            window.getComputedStyle(document.documentElement)
+                                .getPropertyValue('--exodus-sticky-top')
+                        ) || 0
+                    } catch (e) { cover2 = 0 }
+                }
                 if (r2.top < cover2 + pad)
                     window.scrollBy(0, r2.top - (cover2 + pad))
             }
+            form_scroll_log_msg('scrollintoview after', form_scroll_el_label(element),
+                'pageY=', Math.round(window.pageYOffset || 0),
+                'el.top/bot=', Math.round(element.getBoundingClientRect().top)
+                    + '/' + Math.round(element.getBoundingClientRect().bottom),
+                'active=', form_scroll_el_label(document.activeElement))
         } catch (e) { }
     }
 }
@@ -6400,8 +6500,13 @@ function focuson2() {
     try {
         // Never blur() to "force" focus — that closes a native <select> opened on click.
         // preventScroll: native focus scroll jumps mid-viewport; scrollintoview owns axes.
-        if (document.activeElement != focusonelement)
+        var needFocus = document.activeElement != focusonelement
+        if (needFocus)
             form_focus_noscroll(focusonelement)
+        form_scroll_log_msg('focuson2', form_scroll_el_label(focusonelement),
+            'needFocus=', needFocus,
+            'activeNow=', form_scroll_el_label(document.activeElement),
+            'hdir=', gfocus_nav_hdir)
 
         // Text selection only — not SELECT (no .select() listbox contract).
         if (focusonelement.tagName != 'SELECT'
@@ -6411,7 +6516,9 @@ function focuson2() {
             focusonelement.select()
 
     }
-    catch (e) { }
+    catch (e) {
+        form_scroll_log_msg('focuson2 error', e && (e.message || e))
+    }
 
 }
 
@@ -6419,6 +6526,12 @@ function focuson2() {
 //'ON FOCUS
 //'''''''''
 function document_onfocus_sync(event) {
+    try {
+        var t = event && (event.target || event.srcElement)
+        form_scroll_log_msg('document_onfocus_sync', form_scroll_el_label(t),
+            'gblockevents=', typeof gblockevents != 'undefined' ? gblockevents : '?',
+            'gfocus_nav_hdir=', gfocus_nav_hdir)
+    } catch (e) { }
     var eventhandlerx = starteventhandler('exoduscode', document_onfocus)
     return eventhandlerx(event)
 }
@@ -6494,7 +6607,12 @@ async function document_onfocus(event) {
     // addeventlistener(element,'click','onclickradiocheckbox')
 
     ///log('no validation/update except changing exodus elements:' + element.getAttribute('exodustype'))
+    form_scroll_log_msg('document_onfocus enter', form_scroll_el_label(element),
+        'exodustype=', element.getAttribute('exodustype'),
+        'hdir=', gfocus_nav_hdir, 'gkeycode=', gkeycode,
+        'prev=', form_scroll_el_label(gpreviouselement))
     if (!(element.getAttribute('exodustype'))) {
+        form_scroll_log_msg('document_onfocus EXIT no exodustype', form_scroll_el_label(element))
         //logout('document_onfocus')
         return
     }
@@ -6502,6 +6620,7 @@ async function document_onfocus(event) {
     ///log('quit if opening')
     if (gopening) {
         console.log('gopening still!')
+        form_scroll_log_msg('document_onfocus EXIT gopening')
         //ignore this until fix resuming after ok/cancel
         //logout('document_onfocus')
         return exoduscancelevent(event)
@@ -6512,14 +6631,19 @@ async function document_onfocus(event) {
 
     ///log('quit if refocussing')
     if (element == gonfocuselement) {
+        form_scroll_log_msg('document_onfocus EXIT re-focus same gonfocuselement',
+            form_scroll_el_label(element))
         //  if (await setdefault(element))  if (element.tagName!='TEXTAREA') element.select()
         return false //logout('document_onfocus')
     }
     gonfocuselement = element
 
     ///log('quit if refocussing on gpreviouselement')
-    if (gpreviouselement && element == gpreviouselement)
+    if (gpreviouselement && element == gpreviouselement) {
+        form_scroll_log_msg('document_onfocus EXIT same gpreviouselement',
+            form_scroll_el_label(element))
         return false //logout('document_onfocus')
+    }
 
     //dont validate update if clicked popup
     //if (element&&element.id==(gpreviouselement.id+'_popup'))
@@ -6528,13 +6652,19 @@ async function document_onfocus(event) {
     ///log('check if changed element')
     if (element != gpreviouselement) {
         ///log('validate/update previous data entry ' + (gpreviouselement ? gpreviouselement.id : ''))
-        if (!(await validateupdate()))
+        if (!(await validateupdate())) {
+            form_scroll_log_msg('document_onfocus EXIT validateupdate failed',
+                'prev=', form_scroll_el_label(gpreviouselement),
+                'active=', form_scroll_el_label(document.activeElement))
             return false //logout('document_onfocus')
+        }
     }
 
     ///log('quit if we are not focused on a proper element')
-    if (!elementid)
+    if (!elementid) {
+        form_scroll_log_msg('document_onfocus EXIT no elementid')
         return false //logout('document_onfocus')
+    }
 
     ///log('OK. Now previous element is valid')
 
@@ -6542,13 +6672,17 @@ async function document_onfocus(event) {
     grecn = getrecn(element)
 
     ///log('quit if not exodus data entry field')
-    if (!element.tagName.match(gdatatagnames))
+    if (!element.tagName.match(gdatatagnames)) {
+        form_scroll_log_msg('document_onfocus EXIT not data tag', element.tagName)
         return false //logout('document_onfocus')
+    }
 
     ///log('check key fields')
     if (gKeyNodes && !glocked) {
-        if (!(await checkrequired(gKeyNodes, element, 0)))
+        if (!(await checkrequired(gKeyNodes, element, 0))) {
+            form_scroll_log_msg('document_onfocus EXIT checkrequired keys')
             return false //logout('document_onfocus' + ' ' + elementid + ' is required but is blank (0)')
+        }
     }
 
     ///log('check no required fields are missing in prior data')
@@ -6557,8 +6691,10 @@ async function document_onfocus(event) {
     {
 
         ///log('check no missing data in group 0 always')
-        if (!(await checkrequired(gfields, element, 0)))
+        if (!(await checkrequired(gfields, element, 0))) {
+            form_scroll_log_msg('document_onfocus EXIT checkrequired group0')
             return false //logout('document_onfocus' + ' ' + elementid + ' a prior element is visible and required but is blank (1)')
+        }
 
         //check specific group if >0
         //var elements
@@ -6586,6 +6722,7 @@ async function document_onfocus(event) {
         //if (key&&(gloaded&&key!=gkey)||(!gloaded))
         {
             //exodussettimeout('await opendoc()',100)
+            form_scroll_log_msg('document_onfocus EXIT opendoc', nextkey)
             await opendoc(nextkey)
             return false //logout('document_onfocus' + ' ' + exodusquote(elementid) + ' new record')
         }
@@ -6599,6 +6736,8 @@ async function document_onfocus(event) {
         if (element.getAttribute('exodusreadonly')
             && (element.tabIndex == 999 || element.tabIndex == -1
                 || element.getAttribute('oldtabindex'))) {
+            form_scroll_log_msg('document_onfocus EXIT readonly skip to next',
+                form_scroll_el_label(element))
             if (event.shiftKey)
                 focusprevious(element)
             else
@@ -6613,6 +6752,7 @@ async function document_onfocus(event) {
     // Update gmodalblock_savedoverflow so Gate A unblock does not restore the
     // pre-focus scroll and undo this home (blockmodalui save/restore on every flight).
     if (element == gstartelement || element.getAttribute('exodusfieldno') === '0') {
+        form_scroll_log_msg('document_onfocus scroll home key field', form_scroll_el_label(element))
         window.scrollTo(0, 0)
         if (typeof gmodalblock_savedoverflow != 'undefined' && gmodalblock_savedoverflow) {
             gmodalblock_savedoverflow.x = 0
@@ -6620,6 +6760,8 @@ async function document_onfocus(event) {
         }
         gfocus_nav_hdir = 0
     } else {
+        form_scroll_log_msg('document_onfocus → scrollintoview', form_scroll_el_label(element),
+            'hdir=', gfocus_nav_hdir)
         scrollintoview(element)
     }
 

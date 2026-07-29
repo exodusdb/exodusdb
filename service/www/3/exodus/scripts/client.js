@@ -3267,7 +3267,6 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 
 			//log(action + ' ' + (new Date() - timesent) + 'ms')
 			//window.status = ''
-			console.log('');
 
 			//force an error if ignoreresult since ignoreresult ignores all errors or success
 			if (ignoreresult)
@@ -4402,6 +4401,9 @@ function wstatus(msg) {
 	//needs Tools, Internet Options, Security, Trusted Sites, Sites, Add, Close, OK
 	//or "Allow scripting to update status bar"
 	//window.status = msg
+	// Skip empty — old status-bar clear; console spam only
+	if (msg == null || msg === '')
+		return
 	console.log(msg);
 }
 
@@ -4867,7 +4869,6 @@ async function sorttable(event, order) {
 	}
 
 	//window.status = ''
-	console.log('')
 }
 
 //******//
@@ -5649,9 +5650,23 @@ function exodusform_is_inside_exodusform(tablex) {
 	return false
 }
 
+// Nodes that may sit between sibling forms without ending a pane run.
+// HTML comments used to break wrap/coalesce (bookings multi-section HTM).
+function exodus_is_formpane_run_sep(node) {
+	if (!node)
+		return false
+	if (node.nodeType == 8) // Comment
+		return true
+	if (node.nodeType == 3 && !String(node.nodeValue).replace(/\s/g, ''))
+		return true
+	if (node.nodeType == 1 && node.tagName == 'BR')
+		return true
+	return false
+}
+
 function exoduscoalesceformpanes() {
 
-	// Merge sibling .exodusformpane shells (only <br>/whitespace between) into one rounded frame.
+	// Merge sibling .exodusformpane shells (only br/ws/comment between) into one rounded frame.
 	// A plain <span></span> between panes keeps separate shells (schedules.htm).
 	var panes = document.getElementsByClassName('exodusformpane')
 	var parents = []
@@ -5692,8 +5707,7 @@ function exoduscoalesceformpanes() {
 				runseps.push(seps)
 				seps = []
 			}
-			else if (runpanes.length && (node.nodeType == 1 && node.tagName == 'BR'
-				|| node.nodeType == 3 && !String(node.nodeValue).replace(/\s/g, ''))) {
+			else if (runpanes.length && exodus_is_formpane_run_sep(node)) {
 				seps.push(node)
 			}
 			else {
@@ -5733,9 +5747,9 @@ function exodus_reveal_form_panes() {
 function exoduswrapformpanes() {
 
 	// One pane per sibling *run* of top-level forms (same rules as coalesce:
-	// only <br>/whitespace between). Build each shell in a single step.
+	// only br/ws/comment between). Build each shell in a single step.
 	// Pre-authored .exodusformpane shells are left alone; coalesce still merges
-	// those if they sit with only br/ws between them.
+	// those if they sit with only br/ws/comment between them.
 	// Caller reveals via exodus_reveal_form_panes() after this returns.
 	var tables = document.getElementsByTagName('TABLE')
 	var candidates = []
@@ -5751,13 +5765,6 @@ function exoduswrapformpanes() {
 		var p = candidates[ci].parentNode
 		if (p && parents.indexOf(p) < 0)
 			parents.push(p)
-	}
-
-	function is_run_sep(node) {
-		return node && (
-			(node.nodeType == 1 && node.tagName == 'BR')
-			|| (node.nodeType == 3 && !String(node.nodeValue).replace(/\s/g, ''))
-		)
 	}
 
 	for (var parentn = 0; parentn < parents.length; parentn++) {
@@ -5797,7 +5804,7 @@ function exoduswrapformpanes() {
 				runseps.push(seps)
 				seps = []
 			}
-			else if (runforms.length && is_run_sep(node)) {
+			else if (runforms.length && exodus_is_formpane_run_sep(node)) {
 				seps.push(node)
 			}
 			else {
