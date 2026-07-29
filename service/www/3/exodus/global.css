@@ -1010,9 +1010,9 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SE
 TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
     margin-left: var(--exodus-form-nested-cell-padding-x);
 }
-/* Column sort chevrons are appended after title text — leave a little air. */
+/* Column sort chevrons after title text — tight to label (margin, not glyph pad). */
 :is(.exodus-icon, img)[id^="sortbutton_"] {
-    margin-left: 0.35em;
+    margin-left: 0.15em;
     cursor: pointer;
     vertical-align: middle;
 }
@@ -1235,7 +1235,7 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     /* Mono chrome icons = body text (one source; DM only reassigns --exodus-textcolor) */
     --exodus-icon-neutral: var(--exodus-textcolor);
     --exodus-icon-darkgrey: var(--exodus-icon-neutral);
-    --exodus-icon-lightgrey: color-mix(in srgb, var(--exodus-icon-neutral) 42%, transparent);
+    --exodus-icon-lightgrey: color-mix(in srgb, var(--exodus-icon-neutral) 32%, transparent);
     --exodus-menubkgcolor: linear-gradient(to bottom, #f0f0f0, #ffffff);
     --exodus-smallerbordercolor: #d8d8d8;
     --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;

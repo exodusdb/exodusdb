@@ -1328,6 +1328,12 @@ async function formfunctions_onload() {
                 var titleelement
                 if (1 && (titleelement = $$(element.id + '_title'))) {
 
+                    // Drop trailing text whitespace so the chevron sits on the label
+                    // (pretty-printed HTM often leaves "\n  " after the title words).
+                    var tlast = titleelement.lastChild
+                    if (tlast && tlast.nodeType == 3)
+                        tlast.nodeValue = String(tlast.nodeValue).replace(/\s+$/, '')
+
                     var element2 = exodus_create_icon_element(gsortimage)
                     if (typeof exodus_apply_sort_icon == 'function')
                         element2 = exodus_apply_sort_icon(element2, '') || element2

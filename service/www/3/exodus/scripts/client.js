@@ -118,10 +118,10 @@ var gthemecookiekey = 'EXODUStheme'
 
 function exodus_sortimage(order) {
 
-	// Standard 16×16 mono masks (same box/tint as other toolbar icons).
-	// Dim chevron = fill-opacity in SVG; order via data-sort-order.
+	// Unsorted chevron: lightgrey (secondary). Active up/down: text colour.
 	var name = (order == 'up') ? 'sort-up.svg' : (order == 'down') ? 'sort-down.svg' : 'sort.svg'
-	return exodus_icon_spec(name, 'darkgrey')
+	var color = (order == 'up' || order == 'down') ? 'darkgrey' : 'lightgrey'
+	return exodus_icon_spec(name, color)
 }
 
 function exodus_sort_order_of(el) {
