@@ -47,6 +47,7 @@ Plain **`review`** / **squash** must not wait for the user to also say “KISS�
 - HTM is a **seed**; dbform rewrites the DOM (e.g. `align='T'` → contenteditable `<span>` with `min-width = exoduslength × 7`).
 - **Pane** owns the outer edge; **grid borders** belong on **`td`**, not `tr`. Do not use page `tr { border-bottom }` on `exodusform` pages.
 - **Embedded groups** live in host cells (`:has(> TABLE[exogroupno])`); a line “under” a group is often the **outer** row, not the inner table.
+- **Multivalue rows (`groupno > 0`):** `cloneNode` copies **attributes**, not **listeners**. Do not attach `input`/`change` only on the template row — use **document/table delegation** or attributes the form already re-reads. See FORM-UI-PHILOSOPHY § “Multivalue rows”.
 - **Dirty leave (Cancel / Esc / F8-clear):** default **Discard / Cancel** when `gchangesmade` for unbound forms too (no modal exception). Bound locked leave still uses Save/Discard/Cancel on the record. Later: per-form opt-out for light dialogs (e.g. settings) if needed.
 - Prefer **dict** / **HTM column class** / **page-local CSS** over global `!important` hacks.
 - Find **root cause** (page `<style>`, inline dbform styles, pane rules) before adding suppressions.

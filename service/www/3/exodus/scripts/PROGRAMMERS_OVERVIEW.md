@@ -384,6 +384,7 @@ Helpers:
 - Match input `id`s exactly to dictionary codes.
 - Field 0 is special (key).
 - Use groups in the dictionary for multivalue sets.
+- **MV row clone:** `cloneNode` keeps attributes, not `addEventListener` handlers. Prefer document/table **delegation** (or attributes) over per-element listeners on group fields — see FORM-UI-PHILOSOPHY § Multivalue rows.
 - The framework does a lot of auto-wiring — follow the template patterns.
 - 128 character combined path+filename limit (enforced in upload handling).
 - Internal paths/filenames passed around are generally not considered confidential.

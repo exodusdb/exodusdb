@@ -214,8 +214,10 @@ TABLE.exodusform > tbody > tr > td > TABLE.exotable:not([width]),
 TABLE.exodusform > tbody > tr > td > TABLE[exogroupno]:not([width]),
 TABLE.exodusform > tbody > tr > th > TABLE.exotable:not([width]),
 TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]) {
-    width: min(max-content, 100%);
+    /* max-content hug; 100% cap when host is narrower. min() needs a fallback. */
+    width: max-content;
     max-width: 100%;
+    width: min(max-content, 100%);
     box-sizing: border-box;
 }
 
@@ -389,6 +391,52 @@ TABLE
 {
     border-collapse: collapse;
     border-width: 0px;
+}
+
+/* Find-as-you-type suggest — float above the form (not form-face parchment).
+   max-height/max-width also set in form_typeahead_place from available viewport. */
+.exodus_typeahead {
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #6a7a94;
+    border-radius: 3px;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+        0 4px 6px rgba(0, 0, 0, 0.12),
+        0 12px 28px rgba(0, 0, 0, 0.18);
+    max-height: 28em;
+    overflow: auto;
+    font-size: 0.95rem;
+}
+:root[data-theme="dark_mode"] .exodus_typeahead {
+    background: #151a2a;
+    color: #e8eaf0;
+    border-color: #7a88b0;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 4px 8px rgba(0, 0, 0, 0.35),
+        0 14px 32px rgba(0, 0, 0, 0.55);
+}
+.exodus_typeahead_table {
+    border-collapse: collapse;
+}
+/* Prefer readable columns; place() widens the panel toward the right edge */
+.exodus_typeahead_table td {
+    padding: 0.25em 0.6em;
+    max-width: 40ch;
+    vertical-align: top;
+    white-space: nowrap;
+}
+.exodus_typeahead_table tr[data-ta-row] {
+    cursor: pointer;
+}
+.exodus_typeahead_table tr.exodus_typeahead_focus td,
+.exodus_typeahead_table tr[data-ta-row]:hover td {
+    background: #d6e4f7;
+}
+:root[data-theme="dark_mode"] .exodus_typeahead_table tr.exodus_typeahead_focus td,
+:root[data-theme="dark_mode"] .exodus_typeahead_table tr[data-ta-row]:hover td {
+    background: #2f3d62;
 }
 
 /* Print: keep form tables printable; hide fixed menubar; paper is white (DM screen CSS is @media screen only). */

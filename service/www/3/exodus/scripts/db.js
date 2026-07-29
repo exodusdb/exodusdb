@@ -442,7 +442,7 @@ function exodusrecord(dictarray,filename) {
  var ngroups=0
  var nfields=0
 
- var validpropnames = /(^sequence$)|(^openfunction$)|(^dropdown$)|(^test$)|(^name$)|(^type$)|(^fieldno$)|(^title$)|(^groupno$)|(^keypart$)|(^conversion$)|(^functioncode$)|(^length$)|(^align$)|(^wordsep$)|(^wordno$)|(^nwords$)|(^validation$)|(^popup$)|(^conversion$)|(^checkbox$)|(^radio$)|(^horizontal$)|(^required$)|(^rowrequired$)|(^unique$)|(^nonuniquewarning$)|(^defaultvalue$)|(^validcharacters$)|(^invalidcharacters$)|(^display$)|(^lowercase$)|(^readonly$)|(^maxlength$)|(^printfunction$)|(^listfunction$)|(^filename$)|(^rows$)|(^noinsertrow$)|(^nodeleterow$)|(^allowemptyrows$)|(^copyable$)|(^link$)|(^nochangeswarning$)|(^allowduplicatefieldno$)|(^allowcursor$)|(^afterupdate$)|(^image$)/
+ var validpropnames = /(^sequence$)|(^openfunction$)|(^dropdown$)|(^test$)|(^name$)|(^type$)|(^fieldno$)|(^title$)|(^groupno$)|(^keypart$)|(^conversion$)|(^functioncode$)|(^length$)|(^align$)|(^wordsep$)|(^wordno$)|(^nwords$)|(^validation$)|(^popup$)|(^onchange$)|(^conversion$)|(^checkbox$)|(^radio$)|(^horizontal$)|(^required$)|(^rowrequired$)|(^unique$)|(^nonuniquewarning$)|(^defaultvalue$)|(^validcharacters$)|(^invalidcharacters$)|(^display$)|(^lowercase$)|(^readonly$)|(^maxlength$)|(^printfunction$)|(^listfunction$)|(^filename$)|(^rows$)|(^noinsertrow$)|(^nodeleterow$)|(^allowemptyrows$)|(^copyable$)|(^link$)|(^nochangeswarning$)|(^allowduplicatefieldno$)|(^allowcursor$)|(^afterupdate$)|(^image$)/
  
  //parse the dict array to get the number of fields and number of groups etc.
  for (var dictn=0;dictn<this.dict.length;dictn++) {
@@ -566,6 +566,14 @@ function exodusrecord(dictarray,filename) {
 
      throw(new Error(0, 'validation parameter is only valid for "F" type in '+name))
    }
+
+   // onchange = find-as-you-type expression (string) or function.
+   // Must not use bare typeof onchange != 'undefined' inside with(): that
+   // resolves to window.onchange (null) when the dict item has no property.
+   if ((typeof onchange == 'string' || typeof onchange == 'function') && type != 'F') {
+
+     throw(new Error(0, 'onchange parameter is only valid for "F" type in '+name))
+   }
     
    //function code
    if(typeof functioncode=='string'&&functioncode) {
@@ -588,6 +596,14 @@ function exodusrecord(dictarray,filename) {
     var globalfunctionname=filename+'_'+name+'_function'
     window[globalfunctionname]=validation
     validation=globalfunctionname+'()'
+   }
+
+   // live find-as-you-type → store string expression (copydictitem → exodusonchange)
+   if (typeof onchange == 'function') {
+
+    var globalonchangename=filename+'_'+name+'_onchange'
+    window[globalonchangename]=onchange
+    onchange=globalonchangename+'()'
    }
  
    //display or not function code

@@ -784,10 +784,8 @@ async function formfunctions_onload() {
             ) {
                 setdisabledandhidden(element, true)
             }
-            //onchange for non-select elements (ie9+)
-            else if (element.tagName != 'SELECT' && typeof element.oninput != 'undefined') {
-                addeventlistener(element, 'input', 'form_oninput')
-            }
+            // form_oninput is document-delegated (see gform_oninput_delegated below).
+            // Per-element listeners are lost on gds cloneNode for multivalue rows.
 
             //add some events - done on document.body now
             //if (element.tagName.match(gdatatagnames))
@@ -1900,6 +1898,13 @@ async function formfunctions_onload() {
 
     addeventlistener(document, 'copy', 'document_oncopy')
 
+    // input: document-level so multivalue row cloneNode still gets form_oninput
+    // (attributes copy; listeners do not). Install once per page.
+    if (!gform_oninput_delegated) {
+        gform_oninput_delegated = true
+        addeventlistener(document, 'input', 'form_oninput')
+    }
+
     //record based forms
     if (gKeyNodes) {
         if (gparameters.key) {
@@ -2876,6 +2881,11 @@ async function document_onkeydown2(event) {
     gkeycode = keycode
     if (gstepping)
         wstatus(gkeycode)
+
+    // Find-as-you-type panel: Esc / arrows / Enter before form navigation
+    var taKey = form_typeahead_keydown(event)
+    if (taKey === false)
+        return exoduscancelevent(event)
 
     // Alt+0…9: handled in form_digit_accesskey_capture_keydown (native capture,
     // outside Gate A). Not repeated here — preventDefault must not wait on async.
@@ -5559,23 +5569,427 @@ async function deletedoc() {
 
 }
 
+// Debounced dict.onchange (find-as-you-type). Not full validate — side-effects stay on blur.
+var gform_onchange_timer = null
+var gform_onchange_seq = 0
+var gform_onchange_element = null
+var gform_oninput_delegated = false
+// Private link for quiet typeahead I/O only — leave-field validate keeps main db.
+var gform_typeahead_db = null
+
+function form_typeahead_dblink() {
+    if (!gform_typeahead_db && typeof exodusdblink == 'function') {
+        gform_typeahead_db = new exodusdblink()
+        // Quiet: no blockmodalui on send (avoids scroll-to-top every key)
+        gform_typeahead_db.quiet = true
+    }
+    return gform_typeahead_db || db
+}
+
+// Drop an in-flight typeahead send so a newer query can use the private link.
+function form_typeahead_dblink_reset() {
+    var tdb = gform_typeahead_db
+    if (!tdb)
+        return
+    try {
+        if (tdb.requesting && tdb.XMLHTTP)
+            tdb.XMLHTTP.abort()
+    } catch (e) { }
+    tdb.requesting = false
+    tdb.request = ''
+}
+
 async function form_oninput(event) {
     event = getevent(event)
 
-    if (gchangesmade)
+    var element = event.target
+    if (!element || !element.getAttribute)
+        return true
+    // Document-delegated: only bound form fields (attrs survive row cloneNode)
+    if (element.getAttribute('exodusfieldno') == null && !element.getAttribute('exodusonchange'))
+        return true
+    if (element.tagName == 'SELECT')
         return true
 
     //changing key fields does not cause gchangesmade
-    var fn = Number(event.target.getAttribute('exodusfieldno'))
-    if (!fn)
-        return true
+    var fn = Number(element.getAttribute('exodusfieldno'))
+    if (fn && !gchangesmade) {
+        //remember this element so pressing escape can cancel gchangesmade
+        //removed in onfocus
+        gelementthatjustcalledsetchangesmade = element
+        setchangesmade(true)
+    }
 
-    //remember this element so pressing escape can cancel gchangesmade
-    //removed in onfocus
-    gelementthatjustcalledsetchangesmade = event.target
-    setchangesmade(true)
+    // optional live onchange (e.g. brand_code_onchange) — debounced
+    var onchangexpr = element.getAttribute('exodusonchange')
+    if (onchangexpr) {
+        gform_onchange_element = element
+        if (gform_onchange_timer)
+            window.clearTimeout(gform_onchange_timer)
+        gform_onchange_timer = window.setTimeout(function () {
+            gform_onchange_timer = null
+            form_run_onchange(element, onchangexpr)
+        }, 200)
+    }
+
     return true
 }
+
+async function form_run_onchange(element, onchangexpr) {
+
+    if (!element || !onchangexpr)
+        return
+    // stale timer after focus moved
+    if (gform_onchange_element !== element)
+        return
+    if (document.activeElement !== element)
+        return
+
+    var seq = ++gform_onchange_seq
+    var text = getvalue(element)
+    if (text == null)
+        text = ''
+    text = text.toString()
+    if (!element.getAttribute('exoduslowercase'))
+        text = text.toUpperCase()
+    // keep field display in sync for search (matches validate uppercase)
+    if (getvalue(element) != text)
+        setvalue(element, text)
+
+    if (!String(text).replace(/^\s+|\s+$/g, '')) {
+        form_typeahead_hide()
+        return
+    }
+
+    gvalue = text
+    // do not set gpreviouselement here — leave-field validate owns that
+    // one quiet request at a time on the private link
+    form_typeahead_dblink_reset()
+    var ok
+    try {
+        ok = await exodusevaluate(onchangexpr, 'form_run_onchange ' + element.id)
+    } catch (e) {
+        console.log('form_run_onchange', element.id, e)
+        return
+    }
+    if (seq != gform_onchange_seq)
+        return
+    return ok
+}
+
+// ---------------------------------------------------------------------------
+// Find-as-you-type suggest panel (non-modal; not exodusdecide)
+// Panel is fixed in the viewport but re-anchored on scroll/resize so it stays
+// glued under the field (window or nested overflow scroll).
+// ---------------------------------------------------------------------------
+var gform_typeahead_div = null
+var gform_typeahead_element = null
+var gform_typeahead_returncoln = 0
+var gform_typeahead_rows = []
+var gform_typeahead_focusn = -1
+var gform_typeahead_mousedown = false
+var gform_typeahead_scroll_listening = false
+
+function form_typeahead_ensure() {
+
+    if (gform_typeahead_div)
+        return gform_typeahead_div
+    var div = document.createElement('div')
+    div.id = 'exodus_typeahead'
+    div.className = 'exodus_typeahead'
+    div.style.display = 'none'
+    div.onmousedown = function () {
+        gform_typeahead_mousedown = true
+    }
+    div.onmouseup = function () {
+        gform_typeahead_mousedown = false
+    }
+    // Wheel scrolls the panel (max-height overflow), not the page under fixed chrome.
+    // passive:false so preventDefault works; stopPropagation keeps document handlers off.
+    div.addEventListener('wheel', form_typeahead_onwheel, { capture: true, passive: false })
+    document.body.appendChild(div)
+    gform_typeahead_div = div
+    return div
+}
+
+function form_typeahead_onwheel(event) {
+
+    event = getevent(event)
+    var el = gform_typeahead_div
+    if (!el || el.style.display == 'none')
+        return true
+    var dy = 0
+    if (event.deltaY != null)
+        dy = event.deltaY
+    else if (event.wheelDelta != null)
+        dy = -event.wheelDelta
+    else if (event.detail != null)
+        dy = event.detail * 16
+    if (!dy)
+        return true
+    // Always keep wheel with the panel while pointer is over it
+    if (event.stopPropagation)
+        event.stopPropagation()
+    var maxScroll = el.scrollHeight - el.clientHeight
+    if (maxScroll > 0) {
+        var next = el.scrollTop + dy
+        if (next < 0)
+            next = 0
+        if (next > maxScroll)
+            next = maxScroll
+        el.scrollTop = next
+    }
+    if (event.preventDefault)
+        event.preventDefault()
+    return false
+}
+
+function form_typeahead_scroll_sync() {
+
+    if (!gform_typeahead_div || gform_typeahead_div.style.display == 'none')
+        return
+    if (!gform_typeahead_element)
+        return
+    // Field scrolled out of view → hide rather than float orphaned
+    var r = gform_typeahead_element.getBoundingClientRect()
+    if (r.bottom < 0 || r.top > window.innerHeight || r.right < 0 || r.left > window.innerWidth) {
+        form_typeahead_hide()
+        return
+    }
+    form_typeahead_place(gform_typeahead_element, gform_typeahead_div)
+}
+
+function form_typeahead_listen_scroll(on) {
+
+    if (on && !gform_typeahead_scroll_listening) {
+        // capture: nested overflow panes scroll without bubbling
+        window.addEventListener('scroll', form_typeahead_scroll_sync, true)
+        window.addEventListener('resize', form_typeahead_scroll_sync, true)
+        gform_typeahead_scroll_listening = true
+    }
+    else if (!on && gform_typeahead_scroll_listening) {
+        window.removeEventListener('scroll', form_typeahead_scroll_sync, true)
+        window.removeEventListener('resize', form_typeahead_scroll_sync, true)
+        gform_typeahead_scroll_listening = false
+    }
+}
+
+function form_typeahead_hide() {
+
+    form_typeahead_listen_scroll(false)
+    if (gform_typeahead_div)
+        gform_typeahead_div.style.display = 'none'
+    gform_typeahead_element = null
+    gform_typeahead_rows = []
+    gform_typeahead_focusn = -1
+}
+
+function form_typeahead_place(element, div) {
+
+    if (!element || !div)
+        return
+    var r = element.getBoundingClientRect()
+    var margin = 8
+    // fixed + live scroll sync keeps the panel under the field as the page moves
+    div.style.position = 'fixed'
+    div.style.left = Math.max(4, r.left) + 'px'
+    div.style.top = (r.bottom + 2) + 'px'
+    // Grow with content: at least the field width; up to remaining space right/down
+    div.style.minWidth = Math.max(r.width, 280) + 'px'
+    var maxW = Math.max(280, window.innerWidth - Math.max(4, r.left) - margin)
+    div.style.maxWidth = maxW + 'px'
+    var maxH = Math.max(120, window.innerHeight - (r.bottom + 2) - margin)
+    div.style.maxHeight = maxH + 'px'
+    div.style.zIndex = 10050
+}
+
+// cols: [[id,title],…] or [id,…]; rows: [[cell,…],…]; returncoln: 0-based col to write on pick
+function form_typeahead_show(element, cols, rows, returncoln) {
+
+    if (!element || !rows || !rows.length) {
+        form_typeahead_hide()
+        return
+    }
+    if (typeof returncoln == 'undefined' || returncoln == null || returncoln === '')
+        returncoln = 0
+
+    // Cap DOM size — huge ACCOUNTLIST (name search) freezes the page
+    var maxrows = 20
+    if (rows.length > maxrows)
+        rows = rows.slice(0, maxrows)
+
+    var div = form_typeahead_ensure()
+    gform_typeahead_element = element
+    gform_typeahead_returncoln = Number(returncoln)
+    gform_typeahead_rows = rows
+    // No row selected until user arrows or clicks (plain Enter = normal field leave)
+    gform_typeahead_focusn = -1
+
+    // No column headers — values only.
+    // col[0] may be a numeric field index into the row (same as exodusdecide / ACCOUNTLIST).
+    var html = '<table class="exodus_typeahead_table" cellspacing="0" cellpadding="0"><tbody>'
+    for (var r = 0; r < rows.length; r++) {
+        html += '<tr data-ta-row="' + r + '">'
+        var row = rows[r]
+        for (var c2 = 0; c2 < cols.length; c2++) {
+            var coldef = cols[c2]
+            var cell = ''
+            if (row) {
+                if (typeof coldef == 'object' && coldef != null
+                    && (typeof coldef[0] == 'number'
+                        || (typeof coldef[0] == 'string' && coldef[0] !== ''
+                            && String(Number(coldef[0])) === String(coldef[0]))))
+                    cell = row[Number(coldef[0])]
+                else
+                    cell = row[c2]
+            }
+            if (cell == null)
+                cell = ''
+            html += '<td>' + HTMLEncode(String(cell)) + '</td>'
+        }
+        html += '</tr>'
+    }
+    html += '</tbody></table>'
+    div.innerHTML = html
+    form_typeahead_place(element, div)
+    div.style.display = ''
+    form_typeahead_listen_scroll(true)
+
+    var trs = div.getElementsByTagName('tr')
+    for (var i = 0; i < trs.length; i++) {
+        if (trs[i].getAttribute('data-ta-row') == null)
+            continue
+        trs[i].onmouseover = form_typeahead_row_hover
+        trs[i].onmousedown = form_typeahead_row_pick
+    }
+}
+
+function form_typeahead_row_hover(event) {
+
+    event = getevent(event)
+    var tr = event.target
+    while (tr && tr.tagName != 'TR')
+        tr = tr.parentNode
+    if (!tr || tr.getAttribute('data-ta-row') == null)
+        return
+    form_typeahead_set_focus(Number(tr.getAttribute('data-ta-row')))
+}
+
+function form_typeahead_row_pick(event) {
+
+    event = getevent(event)
+    if (event.preventDefault)
+        event.preventDefault()
+    var tr = event.target
+    while (tr && tr.tagName != 'TR')
+        tr = tr.parentNode
+    if (!tr || tr.getAttribute('data-ta-row') == null)
+        return false
+    form_typeahead_apply(Number(tr.getAttribute('data-ta-row')))
+    return false
+}
+
+function form_typeahead_set_focus(n) {
+
+    var div = gform_typeahead_div
+    if (!div)
+        return
+    var trs = div.querySelectorAll('tr[data-ta-row]')
+    if (n < 0)
+        n = 0
+    if (n >= trs.length)
+        n = trs.length - 1
+    gform_typeahead_focusn = n
+    for (var i = 0; i < trs.length; i++) {
+        if (i == n)
+            trs[i].classList.add('exodus_typeahead_focus')
+        else
+            trs[i].classList.remove('exodus_typeahead_focus')
+    }
+    if (trs[n] && trs[n].scrollIntoView)
+        trs[n].scrollIntoView({ block: 'nearest' })
+}
+
+// Mouse/keyboard pick: set value and focusnext only.
+// Validation is normal leave-field via gpreviouselement (same as Tab/Enter).
+function form_typeahead_apply(n) {
+
+    var element = gform_typeahead_element
+    var rows = gform_typeahead_rows
+    if (!element || !rows || !rows[n])
+        return
+    var coln = gform_typeahead_returncoln
+    var val = rows[n][coln]
+    if (val == null)
+        val = ''
+    if (gform_onchange_timer) {
+        window.clearTimeout(gform_onchange_timer)
+        gform_onchange_timer = null
+    }
+    gform_onchange_seq++
+    setvalue(element, val)
+    form_typeahead_hide()
+    focusnext(element)
+}
+
+// Esc dismiss; arrows / Home / End move highlight; Enter only applies if user has moved highlight.
+// Plain Enter (no arrow selection): hide list and let normal Enter / focusnext run.
+function form_typeahead_keydown(event) {
+
+    if (!gform_typeahead_div || gform_typeahead_div.style.display == 'none')
+        return null
+    // With modifiers, leave Home/End to form (ctrl+home first row, etc.)
+    if (event.ctrlKey || event.altKey || event.metaKey)
+        return null
+    var keycode = event.keyCode ? event.keyCode : event.which
+    if (keycode == 27) {
+        form_typeahead_hide()
+        return false
+    }
+    if (keycode == 40) {
+        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn + 1)
+        return false
+    }
+    if (keycode == 38) {
+        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn - 1)
+        return false
+    }
+    // Home → first row; End → last (form_typeahead_set_focus clamps)
+    if (keycode == 36) {
+        form_typeahead_set_focus(0)
+        return false
+    }
+    if (keycode == 35) {
+        form_typeahead_set_focus(999999)
+        return false
+    }
+    if (keycode == 13) {
+        if (gform_typeahead_focusn >= 0) {
+            form_typeahead_apply(gform_typeahead_focusn)
+            return false
+        }
+        form_typeahead_hide()
+        return null
+    }
+    return null
+}
+
+// Hide when focus leaves the field (unless mousedown on list).
+// Re-focus also drops the panel so a stale list (old INC after INCO) is not shown again.
+;(function form_typeahead_blur_install() {
+    if (typeof document == 'undefined' || !document.addEventListener)
+        return
+    document.addEventListener('focusin', function (event) {
+        if (!gform_typeahead_element)
+            return
+        if (gform_typeahead_mousedown)
+            return
+        if (gform_typeahead_div && gform_typeahead_div.contains(event.target))
+            return
+        // leave field or return to it — drop panel; typing re-arms search
+        form_typeahead_hide()
+    }, true)
+})()
 
 async function form_onchangeselect(event) {
 
@@ -6377,8 +6791,16 @@ async function validateupdate() {
         return true
     }
 
-    //log('User/setdefault changed ' + id + '\nfrom ' + exodusquote(gpreviousvalue) + '\nto ' + exodusquote(newvalue))
+    // Leave-field validate owns the UI — drop typeahead panel and cancel pending search
+    if (gform_onchange_timer) {
+        window.clearTimeout(gform_onchange_timer)
+        gform_onchange_timer = null
+    }
+    gform_onchange_seq++
+    form_typeahead_dblink_reset()
+    form_typeahead_hide()
 
+    //log('User/setdefault changed ' + id + '\nfrom ' + exodusquote(gpreviousvalue) + '\nto ' + exodusquote(newvalue))
     //check for prior required fields if a grouped element
     var elements
     if (Number(gpreviouselement.getAttribute('exogroupno'))) {
@@ -10091,6 +10513,8 @@ async function document_onpaste(event) {
     //only supporting form_paste in first column
     if (!element.getAttribute('exodusisfirstinputcolumn')) {
         //perform normal paste before any yielding is done which loses it
+        // paste Gate A skips following input — re-run form_oninput after insert
+        window.setTimeout(function () { void form_oninput({ target: element }) }, 0)
         return true
     }
 
@@ -10105,9 +10529,10 @@ async function document_onpaste(event) {
     text = text.replace(/\r\n/g, '\n')
 
     //only supporting form_paste with multiple lines of paste (col header plus min one line)
-    if (text.indexOf('\n') < 0)
+    if (text.indexOf('\n') < 0) {
+        window.setTimeout(function () { void form_oninput({ target: element }) }, 0)
         return true
-
+    }
     //use form_onpaste_generic if form_onpaste not defined
     if (typeof form_onpaste == 'undefined')
         form_onpaste = form_onpaste_generic

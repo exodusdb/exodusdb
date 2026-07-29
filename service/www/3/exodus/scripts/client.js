@@ -3120,7 +3120,9 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 		if (gasynchronous) {
 
 			// KEEPALIVE/RELOCK must not touch modal state or overwrite an in-flight request.
-			if (!ignoreresult) {
+			// quiet: typeahead private dblink — no modal shield (overflow:hidden
+			// clamps scroll to 0,0 then restore = jump every keystroke).
+			if (!ignoreresult && !this.quiet) {
 				gchildwin = { lazy: true }
 				//xhttp reference for in-dom Wait/Cancel on uiblockerdiv click (uiblocker_waitcancel_dialog)
 				gchildwin.xhttp = xhttp
@@ -3721,6 +3723,209 @@ function rearray(array) {
 
 	return rearray
 
+}
+
+// Quiet find-as-you-type (non-modal). Framework only — no app knowledge.
+//
+//   await exodus_typeahead(request, cols)
+//   await exodus_typeahead(request, cols, coln)   // optional pick column (default 0)
+//
+// request — full db.request string (caller builds module/file/val/select/cmd)
+// cols    — same shape as exodusdecide: [[fieldn|id, title], ...] or 'ID NAME'
+//           numeric fieldn maps into the row like decide (e.g. ACCOUNTLIST)
+// coln    — data field index (or dict id string) written on pick; default 0
+//
+// Response auto-detected: /ACCOUNTLIST/, XML <RECORD>, or FM/VM multi-hit.
+// Uses private typeahead dblink when available (form_typeahead_dblink).
+// Quiet: no decide/invalid. Empty/fail → hide. Returns true always.
+async function exodus_typeahead(request, cols, coln) {
+
+	if (typeof form_typeahead_show != 'function' || typeof form_typeahead_hide != 'function')
+		return true
+
+	if (request == null || request === '' || !cols) {
+		form_typeahead_hide()
+		return true
+	}
+
+	// empty typed key → no search (caller usually embeds gvalue in request)
+	var key = (typeof gvalue != 'undefined' && gvalue != null) ? String(gvalue) : ''
+	key = key.replace(/^\s+|\s+$/g, '')
+	if (!key) {
+		form_typeahead_hide()
+		return true
+	}
+
+	if (typeof cols == 'string')
+		cols = cols.split(' ')
+	if (!cols || !cols.length) {
+		form_typeahead_hide()
+		return true
+	}
+	var normcols = []
+	var colids = []
+	for (var c = 0; c < cols.length; c++) {
+		var col = cols[c]
+		if (typeof col == 'string')
+			col = [col, col]
+		normcols[c] = col
+		colids[c] = col[0]
+	}
+
+	var rcoln = coln
+	if (typeof rcoln == 'string') {
+		var matched = false
+		for (var i = 0; i < colids.length; i++) {
+			if (colids[i] == rcoln) {
+				if (typeof colids[i] == 'number'
+					|| (typeof colids[i] == 'string' && colids[i] !== ''
+						&& String(Number(colids[i])) === String(colids[i])))
+					rcoln = Number(colids[i])
+				else
+					rcoln = i
+				matched = true
+				break
+			}
+		}
+		if (!matched)
+			rcoln = 0
+	}
+	if (rcoln == null || typeof rcoln == 'undefined' || rcoln === '')
+		rcoln = 0
+	rcoln = Number(rcoln)
+	if (isNaN(rcoln))
+		rcoln = 0
+
+	// Snapshot so a slower older request (INC) cannot overwrite a newer one (INCO)
+	var keyAtStart = key
+	var el = (typeof gform_onchange_element != 'undefined') ? gform_onchange_element : null
+	var seqAtStart = (typeof gform_onchange_seq != 'undefined') ? gform_onchange_seq : 0
+
+	var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
+	tdb.request = String(request)
+	if (!(await tdb.send()) || !tdb.data) {
+		// only hide if we are still the active search
+		if (typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq)
+			form_typeahead_hide()
+		return true
+	}
+
+	// Superseded by newer typeahead or leave-field validate
+	if (typeof gform_onchange_seq != 'undefined' && seqAtStart != gform_onchange_seq)
+		return true
+
+	// Focus left (e.g. Enter → validate/invalid): do not overlay the panel
+	if (!el || document.activeElement !== el) {
+		form_typeahead_hide()
+		return true
+	}
+
+	// Field text moved on since this search (e.g. INC response after user typed INCO)
+	var now = (typeof getvalue == 'function') ? getvalue(el) : null
+	if (now != null) {
+		now = String(now).replace(/^\s+|\s+$/g, '')
+		if (!el.getAttribute || !el.getAttribute('exoduslowercase'))
+			now = now.toUpperCase()
+		if (now !== keyAtStart)
+			return true
+	}
+
+	var rows = exodus_typeahead_parserows(tdb.data, colids)
+	// Master files (supplier/vehicle/…): drop stopped from quiet list only.
+	// Exact key still validates on Enter if allowed. Brand typeahead uses SELECT WITH STOPPED EQ "".
+	if (rows && rows.length) {
+		var stopi = -1
+		for (var si = 0; si < colids.length; si++) {
+			if (colids[si] == 'STOPPED') {
+				stopi = si
+				break
+			}
+		}
+		if (stopi >= 0) {
+			var kept = []
+			for (var ri = 0; ri < rows.length; ri++) {
+				var cell = rows[ri] ? rows[ri][stopi] : ''
+				if (cell != null && String(cell).replace(/^\s+|\s+$/g, '') !== '')
+					continue
+				kept.push(rows[ri])
+			}
+			rows = kept
+		}
+	}
+	if (!rows || !rows.length) {
+		form_typeahead_hide()
+		return true
+	}
+
+	form_typeahead_show(el, normcols, rows, rcoln)
+	return true
+}
+
+// Parse quiet typeahead payload → array of row arrays (auto-detect shape).
+// /ACCOUNTLIST/  — prefix then FM rows / VM cells (e.g. FINDACCOUNT multi-hit)
+// XML            — <RECORD> / group1
+// else           — FM rows / VM cells (VAL multi-hit); fm+fm exact body → []
+function exodus_typeahead_parserows(data, colids) {
+
+	if (data == null || data === '')
+		return []
+	data = String(data)
+
+	var alist = data.indexOf('/ACCOUNTLIST/')
+	if (alist >= 0) {
+		data = data.substr(alist + 13)
+		var sepA = (typeof fm != 'undefined') ? fm : '\x1E'
+		var vsepA = (typeof vm != 'undefined') ? vm : '\x1D'
+		var linesA = data.split(sepA)
+		var outA = []
+		for (var ja = 0; ja < linesA.length; ja++) {
+			if (linesA[ja] == null || linesA[ja] === '')
+				continue
+			outA[outA.length] = linesA[ja].split(vsepA)
+		}
+		return outA
+	}
+
+	// Single-record payload (RM) — not a pick list
+	if (typeof rm != 'undefined' && data.indexOf(rm) >= 0)
+		return []
+
+	if (data.indexOf('<RECORD>') >= 0 || data.indexOf('<records') >= 0) {
+		if (typeof exodusxml2obj != 'function')
+			return []
+		var obj = exodusxml2obj(data)
+		if (!obj || !obj.group1 || !obj.group1.length)
+			return []
+		var rows = []
+		for (var i = 0; i < obj.group1.length; i++) {
+			var rec = obj.group1[i]
+			var row = []
+			for (var c = 0; c < colids.length; c++) {
+				var cell = rec[colids[c]]
+				if (cell && typeof cell == 'object' && cell.text != null)
+					row[c] = cell.text
+				else if (cell != null && typeof cell != 'object')
+					row[c] = cell
+				else
+					row[c] = ''
+			}
+			rows[rows.length] = row
+		}
+		return rows
+	}
+
+	if (typeof fm != 'undefined' && data.indexOf(fm + fm) >= 0)
+		return []
+	var sep = (typeof fm != 'undefined') ? fm : '\x1E'
+	var vsep = (typeof vm != 'undefined') ? vm : '\x1D'
+	var lines = data.split(sep)
+	var out = []
+	for (var j = 0; j < lines.length; j++) {
+		if (lines[j] == null || lines[j] === '')
+			continue
+		out[out.length] = lines[j].split(vsep)
+	}
+	return out
 }
 
 async function exodusdecide2(question, data, cols, returncoln, defaultreply, many) {
@@ -7184,6 +7389,63 @@ function exodusconfirm_unbind_scroll_hints() {
 	}
 }
 
+// Popup is temporary chrome: remember where the user was, restore after close.
+// Raw .focus / setSelectionRange only — no form validate, no client_focuson chain.
+function exodusconfirm_capture_invoker() {
+
+	var ae = document.activeElement
+	if (!ae || ae === document.body || ae === document.documentElement)
+		return null
+	// already inside a confirm (nested / re-entry) — leave alone
+	try {
+		if (ae.closest && ae.closest('#exodusconfirmdiv'))
+			return null
+	} catch (e) { }
+	var saved = { el: ae, start: null, end: null }
+	try {
+		if (typeof ae.selectionStart == 'number') {
+			saved.start = ae.selectionStart
+			saved.end = ae.selectionEnd
+		}
+	} catch (e2) { }
+	return saved
+}
+
+function exodusconfirm_release_invoker(saved) {
+
+	if (!saved || !saved.el)
+		return
+	// Drop pending client_focuson into confirm chrome that is about to vanish
+	if (gclient_focuson_element) {
+		try {
+			if (!document.body.contains(gclient_focuson_element)
+				|| (gclient_focuson_element.closest
+					&& gclient_focuson_element.closest('#exodusconfirmdiv')))
+				gclient_focuson_element = undefined
+		} catch (e) {
+			gclient_focuson_element = undefined
+		}
+	}
+	var el = saved.el
+	var start = saved.start
+	var end = saved.end
+	// Same 1ms delay as client_focuson so we run after any pending focus-into-button
+	window.setTimeout(function () {
+		try {
+			if (!el || !el.focus || !document.body.contains(el) || el.disabled)
+				return
+			if (el.closest && el.closest('#exodusconfirmdiv'))
+				return
+			el.focus()
+			if (typeof start == 'number' && typeof el.setSelectionRange == 'function') {
+				try {
+					el.setSelectionRange(start, end)
+				} catch (e2) { }
+			}
+		} catch (e3) { }
+	}, 1)
+}
+
 async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc, default_icons) {
 
 	//performs "in-window" questions, selections and inputs
@@ -7191,6 +7453,9 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	//exodusconfirm: questions (yes/no/cancel) and one line inputs
 	//exodusdecide/exodusdecide2: selections
 	// default_icons: role icons on Yes/No/Cancel-style buttons (default true; false for multi-choice labels)
+
+	// Capture before any focus into the popup shell
+	var invoker_focus = exodusconfirm_capture_invoker()
 
 	if (typeof default_icons == 'undefined')
 		default_icons = true
@@ -7500,6 +7765,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		if (typeof response != 'undefined') {
 			if (div && div.parentNode)
 				exodusremovenode(div)
+			exodusconfirm_release_invoker(invoker_focus)
 			return response
 		}
 
@@ -7557,6 +7823,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		unblockmodalui_sync()
 		exodusconfirm_unbind_scroll_hints()
 		exodusremovenode(div)
+		exodusconfirm_release_invoker(invoker_focus)
 	}
 
 	// Text input (exodusinput): string for OK — including empty '' — false for Cancel.
