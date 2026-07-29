@@ -3727,22 +3727,33 @@ function rearray(array) {
 // Quiet find-as-you-type (non-modal). Framework only — no app knowledge.
 //
 //   await exodus_typeahead(request, cols)
-//   await exodus_typeahead(request, cols, coln)   // optional pick column (default 0)
+//   await exodus_typeahead(request, cols, coln)
+//   await exodus_typeahead(request, cols, coln, options)
 //
-// request — full db.request string (caller builds module/file/val/select/cmd)
+// request — full db.request string (caller builds module/file/val/select/cmd);
+//           omit when options.rows or options.data supplies the list
 // cols    — same shape as exodusdecide: [[fieldn|id, title], ...] or 'ID NAME'
-//           numeric fieldn maps into the row like decide (e.g. ACCOUNTLIST)
 // coln    — data field index (or dict id string) written on pick; default 0
+// options —
+//   wordstart  true → keep only rows where any word in any cell starts with key
+//              (master files that SELECT all then filter client-side)
+//   rows       prebuilt [[cell,…],…] — skip send/parse (e.g. DEFINITIONS taxes)
+//   data       raw response string — skip send, parse only (e.g. pre-filtered multi-hit)
+//   filter     function(rows, key) → rows — extra filter after parse / wordstart
 //
+// Always: STOPPED column drop, prefer_prefix, form_typeahead_show.
 // Response auto-detected: /ACCOUNTLIST/, XML <RECORD>, or FM/VM multi-hit.
-// Uses private typeahead dblink when available (form_typeahead_dblink).
 // Quiet: no decide/invalid. Empty/fail → hide. Returns true always.
-async function exodus_typeahead(request, cols, coln) {
+async function exodus_typeahead(request, cols, coln, options) {
 
 	if (typeof form_typeahead_show != 'function' || typeof form_typeahead_hide != 'function')
 		return true
 
-	if (request == null || request === '' || !cols) {
+	if (!options || typeof options != 'object')
+		options = {}
+	var hasrows = options.rows && options.rows.length
+	var hasdata = options.data != null && options.data !== ''
+	if ((!request && !hasrows && !hasdata) || !cols) {
 		form_typeahead_hide()
 		return true
 	}
@@ -3800,13 +3811,21 @@ async function exodus_typeahead(request, cols, coln) {
 	var el = (typeof gform_onchange_element != 'undefined') ? gform_onchange_element : null
 	var seqAtStart = (typeof gform_onchange_seq != 'undefined') ? gform_onchange_seq : 0
 
-	var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
-	tdb.request = String(request)
-	if (!(await tdb.send()) || !tdb.data) {
-		// only hide if we are still the active search
-		if (typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq)
-			form_typeahead_hide()
-		return true
+	var rows
+	if (hasrows) {
+		rows = options.rows
+	} else if (hasdata) {
+		rows = exodus_typeahead_parserows(options.data, colids)
+	} else {
+		var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
+		tdb.request = String(request)
+		if (!(await tdb.send()) || !tdb.data) {
+			// only hide if we are still the active search
+			if (typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq)
+				form_typeahead_hide()
+			return true
+		}
+		rows = exodus_typeahead_parserows(tdb.data, colids)
 	}
 
 	// Superseded by newer typeahead or leave-field validate
@@ -3829,7 +3848,6 @@ async function exodus_typeahead(request, cols, coln) {
 			return true
 	}
 
-	var rows = exodus_typeahead_parserows(tdb.data, colids)
 	// Master files (supplier/vehicle/…): drop stopped from quiet list only.
 	// Exact key still validates on Enter if allowed. Brand typeahead uses SELECT WITH STOPPED EQ "".
 	if (rows && rows.length) {
@@ -3851,6 +3869,19 @@ async function exodus_typeahead(request, cols, coln) {
 			rows = kept
 		}
 	}
+	// Master SELECT-all then filter: code/name word starts with typed key
+	if (options.wordstart)
+		rows = exodus_typeahead_wordstart(rows, keyAtStart)
+	if (typeof options.filter == 'function')
+		rows = options.filter(rows, keyAtStart) || []
+	// Prefer only identity cells: row[0], row[1], pick col. Do not scan
+	// supplier/market/… — vehicle market "SA" was scrambling name order.
+	var pcols = [0]
+	if (rows[0] && rows[0].length > 1)
+		pcols.push(1)
+	if (rcoln > 1)
+		pcols.push(rcoln)
+	rows = exodus_typeahead_prefer_prefix(rows, keyAtStart, pcols)
 	if (!rows || !rows.length) {
 		form_typeahead_hide()
 		return true
@@ -3858,6 +3889,89 @@ async function exodus_typeahead(request, cols, coln) {
 
 	form_typeahead_show(el, normcols, rows, rcoln)
 	return true
+}
+
+// Keep rows where any whitespace-word in any cell starts with key (code prefix + name words).
+function exodus_typeahead_wordstart(rows, key) {
+	if (!rows || !rows.length)
+		return rows || []
+	if (key == null || key === '')
+		return rows
+	var ku = String(key).replace(/^\s+|\s+$/g, '').toUpperCase()
+	if (!ku)
+		return rows
+	var kept = []
+	for (var i = 0; i < rows.length; i++) {
+		var row = rows[i]
+		if (!row)
+			continue
+		var hit = false
+		for (var c = 0; c < row.length; c++) {
+			var cell = String(row[c] == null ? '' : row[c]).toUpperCase()
+			cell = cell.replace(/^\s+|\s+$/g, '')
+			if (!cell)
+				continue
+			var words = cell.split(/\s+/)
+			for (var w = 0; w < words.length; w++) {
+				if (words[w] && words[w].indexOf(ku) === 0) {
+					hit = true
+					break
+				}
+			}
+			if (hit)
+				break
+		}
+		if (hit)
+			kept.push(row)
+	}
+	return kept
+}
+
+// Promote rows where a key cell starts with typed key.
+// colns — optional list of row indices to test (default: all cells).
+// Callers/typeahead pass [0, pick] so market/supplier/etc. do not reorder.
+function exodus_typeahead_prefer_prefix(rows, key, colns) {
+	if (!rows || rows.length <= 1 || key == null || key === '')
+		return rows
+	var ku = String(key).replace(/^\s+|\s+$/g, '').toUpperCase()
+	if (!ku)
+		return rows
+	var prefer = []
+	var rest = []
+	for (var pri = 0; pri < rows.length; pri++) {
+		var prow = rows[pri]
+		var phit = false
+		if (prow) {
+			var idxs
+			if (colns && colns.length) {
+				idxs = colns
+			} else {
+				idxs = []
+				for (var ai = 0; ai < prow.length; ai++)
+					idxs.push(ai)
+			}
+			for (var ii = 0; ii < idxs.length; ii++) {
+				var pci = Number(idxs[ii])
+				if (isNaN(pci) || pci < 0)
+					continue
+				// cols may use field-index ids (ACCOUNTLIST); resolve via row length
+				var pcell = prow[pci]
+				if (pcell == null && prow.length && pci >= prow.length)
+					continue
+				pcell = String(pcell == null ? '' : pcell)
+				pcell = pcell.replace(/^\s+|\s+$/g, '').toUpperCase()
+				if (pcell.indexOf(ku) === 0) {
+					phit = true
+					break
+				}
+			}
+		}
+		if (phit)
+			prefer.push(prow)
+		else
+			rest.push(prow)
+	}
+	return prefer.concat(rest)
 }
 
 // Parse quiet typeahead payload → array of row arrays (auto-detect shape).

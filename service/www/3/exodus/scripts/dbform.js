@@ -5919,8 +5919,9 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     if (typeof returncoln == 'undefined' || returncoln == null || returncoln === '')
         returncoln = 0
 
-    // Cap DOM size — huge ACCOUNTLIST (name search) freezes the page
-    var maxrows = 20
+    // Cap DOM size — huge ACCOUNTLIST freezes the page. Match server SELECT
+    // caps (typeahead uses up to 1000); old 20 hid e.g. SAUDI* under A–P noise.
+    var maxrows = 1000
     if (rows.length > maxrows)
         rows = rows.slice(0, maxrows)
 
