@@ -1133,10 +1133,14 @@ dictrecexit:
 		ignorewords(1, -1) = word;
 
 	} else {
+		// Column/dict word not found. Only offer interactive replace on a real TTY;
+		// otherwise print and abort (scripts/pipes must not hang on "Replace with?").
 		tt = word.quote() ^ " is an unrecognized word.";
-		if (isterminal(0)) {
-			tt ^= " Replace with? (Enter to cancel):";
+		if (not isterminal(0)) {
+			call note(tt);
+			abort();
 		}
+		tt ^= " Replace with? (Enter to cancel):";
 		let oldword = word;
 		call note(tt, "RCE", word);
 		if (word == oldword or word == "\x1B") {

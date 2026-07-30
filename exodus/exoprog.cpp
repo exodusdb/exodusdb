@@ -666,8 +666,10 @@ void ExoProgram::note(in msg, in options, io response) const {
 	let origresponse = response.assigned() ? response : "";
 
 	//R=Reply required in response
+	// Only prompt when not batch (SYSTEM<33>) and stdin is a terminal.
+	// Otherwise leave response as given (caller decides default/abort).
 	if (options.contains("R")) {
-		if (interactive) {
+		if (interactive and var().isterminal(0)) {
 
 			//one space after the prompt
 			//std::cout << " ";
@@ -690,7 +692,7 @@ void ExoProgram::note(in msg, in options, io response) const {
 			std::cout << std::endl;
 		} else {
 
-			//input=output if not interactive
+			//input=output if not interactive / no TTY
 			response = origresponse;
 		}
 
