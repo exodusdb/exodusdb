@@ -4457,6 +4457,15 @@ function exodusgetdropdown(element, mode) {
 	return selectedvalues
 }
 
+// One-line text prompt (OK / Cancel). See AGENTS.md HIGH PRIORITY confirm/exodusinput.
+// DO NOT change return values without grepping every exodusinput caller:
+//   OK → string (may be ''); Cancel → false
+// WRONG when empty OK is intentional (e.g. material code "OK if not known"):
+//   if (!reply) { /* default path */ }   // Cancel takes default path → "no records found"
+// RIGHT:
+//   if (typeof reply != 'string') return …  // Cancel only
+//   // reply is string, maybe ''
+// Similar: media.js media_pop_materials, allocation2.js filtertext.
 async function exodusinput(question, text, texthidden) {
 	if (!text) text = ''
 	return await exodusconfirm(question, '', 'OK', '', 'Cancel', text, texthidden)
@@ -7210,6 +7219,7 @@ function exodusconfirm_uninstall_plain_keydown() {
 }
 
 // Capture-phase: handle keys for plain confirm before form/Gate A sees them.
+// AGENTS.md HIGH PRIORITY: typing needs capture true AND startevent true (both).
 function exodusconfirm_plain_keydown(event) {
 
 	var conf = document.getElementById('exodusconfirmdiv')
@@ -7217,8 +7227,11 @@ function exodusconfirm_plain_keydown(event) {
 		return
 
 	var r = exodusconfirm_keymap(event)
+	// true = typing/copy: leave default action; do not stopPropagation (target needs key)
 	if (r === null || r === true)
 		return
+	// WRONG: also preventDefault when r === true — kills character insertion
+	// if (event.preventDefault) event.preventDefault()
 	// Handled or swallow — do not let form path see this key
 	if (event.stopImmediatePropagation)
 		event.stopImmediatePropagation()
@@ -7259,10 +7272,16 @@ function exodusconfirm_startevent(event) {
 		return false
 	}
 
-	// Plain confirm: capture handler owns keys; form path only swallows.
+	// Plain confirm while gblockevents: form path only swallows — capture owns Esc/Enter.
 	if (event.type != 'keydown')
 		return false
 	if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
+		return true
+	// WRONG (broke all typing in exodusinput — material code prompt etc.):
+	// return false
+	// RIGHT: when focus is the text field, allow browser (capture already left key un-cancelled).
+	var textel = document.getElementById('exodusconfirmdiv_textinput')
+	if (textel && document.activeElement === textel)
 		return true
 	return false
 }
@@ -7310,8 +7329,26 @@ function exodusconfirm_keymap(event) {
 		return false
 	}
 
+	// Text field focused (no modifiers): type freely. Enter/F9=OK, Esc=Cancel.
+	// Pair with startevent text-field return true (both required for typing).
+	if (istextinput && active && active.id == 'exodusconfirmdiv_textinput'
+		&& !event.altKey && !event.ctrlKey && !event.metaKey) {
+		if (keycode == 13 || keycode == 120) {
+			window.setTimeout(exodus_confirm_function1_sync, 1)
+			return false
+		}
+		if (keycode == 27) {
+			window.setTimeout(exodus_confirm_function3_sync, 1)
+			return false
+		}
+		// Tab already handled above
+		// WRONG: fall through to bare O/C access letters below
+		return true
+	}
+
 	// Space/Enter: only when a footer button is focused (highlighted).
-	// No focused button → do not press any (default is prefocus only, not a silent target).
+	// WRONG: bare Enter always positive (silent OK with no highlight)
+	// if (keycode == 13 || keycode == 32) { … function1 … }
 	if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
 		if (focusedConfirmBtn.id == 'negativebutton')
 			window.setTimeout(exodus_confirm_function2_sync, 1)
@@ -7322,29 +7359,28 @@ function exodusconfirm_keymap(event) {
 		return false
 	}
 
-	// Text-input field: Enter = OK (historical confirm.htm), even when no button focused
-	if (keycode == 13 && istextinput && active && active.id == 'exodusconfirmdiv_textinput') {
-		window.setTimeout(exodus_confirm_function1_sync, 1)
-		return false
-	}
+	// Access letters: Alt+letter only.
+	// WRONG: bare letter (clashes with typing O/C/Y/N in material codes etc.)
+	// var accessLetter = gexodusconfirmletters && keyletter
+	var accessLetter = event.altKey && gexodusconfirmletters && keyletter
 
-	// F9 / first-button access letter always positive (OK/Yes) — explicit, not Enter
+	// F9 / Alt+first-button letter always positive (OK/Yes) — not bare Enter
 	if (keycode == 120
-		|| (gexodusconfirmletters && keyletter == gexodusconfirmletters[1])) {
+		|| (accessLetter && keyletter == gexodusconfirmletters[1])) {
 		window.setTimeout(exodus_confirm_function1_sync, 1)
 		return false
 	}
 
 	// Bare Enter/Space with nothing focused: swallow, do not invent a button press
 
-	// CANCEL: Esc, access letter
-	if (keycode == 27 || (gexodusconfirmletters && keyletter == gexodusconfirmletters[3])) {
+	// CANCEL: Esc always; letter only with Alt
+	if (keycode == 27 || (accessLetter && keyletter == gexodusconfirmletters[3])) {
 		window.setTimeout(exodus_confirm_function3_sync, 1)
 		return false
 	}
 
-	// NEGATIVE: F8, access letter
-	if (keycode == 119 || (gexodusconfirmletters && keyletter == gexodusconfirmletters[2])) {
+	// NEGATIVE: F8; letter only with Alt
+	if (keycode == 119 || (accessLetter && keyletter == gexodusconfirmletters[2])) {
 		window.setTimeout(exodus_confirm_function2_sync, 1)
 		return false
 	}
@@ -7354,10 +7390,6 @@ function exodusconfirm_keymap(event) {
 		exodusconfirm_focus_endpoint(keycode == 36)
 		return false
 	}
-
-	// Typing in text field
-	if (istextinput)
-		return true
 
 	return false
 }
@@ -7726,8 +7758,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' class="graphicbutton"'
 		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
 
-		// Hotkey letter: explicit <u>X</u> (or <i>X</i>), else first letter of plain label.
-		// Callers often pass 'Before' without markup; underline that letter for display.
+		// Hotkey letter for Alt+letter only (see keymap accessLetter = event.altKey && …).
+		// WRONG: bare letter as hotkey — blocks typing in text-input confirms.
 		var letter
 		var marked = String(buttontext).match(/<[uU]>(.)<\/[uU]>/)
 		if (!marked)
@@ -7736,7 +7768,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			letter = marked[1]
 			// Normalise <i> hotkey markup to underline for display
 			buttontext = String(buttontext).replace(/<[iI]>(.)<\/[iI]>/, '<u>$1</u>')
-		} else if (!istextinput) {
+		} else {
 			letter = String(buttontext).replace(/<[^>]*>/g, '').charAt(0)
 			// Auto-underline first character when label is plain text (e.g. Before/After/Cancel)
 			if (letter && String(buttontext).charAt(0).toUpperCase() == letter.toUpperCase())
@@ -7748,10 +7780,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		}
 		gexodusconfirmletters[buttonn] = letter
 
-		//title — first button also accepts Ctrl+Enter (same as Enter / F9)
+		// title must match keymap (Alt+letter, not bare letter)
+		// WRONG: html += ' title="Press ' + letter + ' or '
 		html += ' title="Press '
 		if (letter)
-			html += letter + ' or '
+			html += 'Alt+' + letter + ' or '
 		html += buttonfunckey
 		if (buttonn == 1)
 			html += ' or Ctrl+Enter'
@@ -7958,8 +7991,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		exodusconfirm_release_invoker(invoker_focus)
 	}
 
-	// Text input (exodusinput): string for OK — including empty '' — false for Cancel.
-	// Do not use if (!response): empty string is a valid OK (e.g. "press enter for all").
+	// Text input: OK → string (incl. ''); Cancel → false.
+	// WRONG: return '' or 0 on Cancel — callers cannot tell empty OK from cancel.
 	if (istextinput) {
 		if (typeof response == 'string')
 			return response

@@ -168,6 +168,21 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 
 Smoke when touching this: OK-only invalid Enter+click; Yes/No; text input Enter/Esc; decide arrows/Select/Esc; Wait/Cancel if easy.
 
+### HIGH PRIORITY — confirm / `exodusinput` (do not flip-flop)
+
+These were broken and fixed together. Treat as **one contract**. If you change one line, re-check the whole smoke list. Prefer **commented-out wrong code** next to the fix over silent perfection.
+
+| Rule | Wrong (do not restore) | Right |
+|------|------------------------|--------|
+| **Typing while `gblockevents`** | Capture allows key (`keymap` true) but bubble `startevent` always `false` → `preventDefault` kills characters | Capture: no `preventDefault` when typing. Bubble: `startevent` **true** if focus is `#exodusconfirmdiv_textinput` |
+| **Access letters** | Bare O/C/Y/N activates buttons | **Alt+letter** only; bare letters type in text field |
+| **Enter** | Bare Enter always OK | Enter OK only: focused footer button, or text field Enter/F9; no silent target |
+| **`exodusinput` return** | Cancel and empty OK both “falsy” | OK → `string` (may `''`); Cancel → `false`. Empty-OK paths: `typeof x == 'string'` / `x === false` — **never** `if (!x)` when empty means continue |
+
+**Smoke (mandatory if you touch confirm/input):** text-input confirm — type letters including O/C; Cancel aborts (no follow-on search); empty OK does the “blank means all/default” path if any; Alt+O / Alt+C; Esc; Enter in field.
+
+**Code:** `client.js` — `exodusinput`, `exodusconfirm_plain_keydown`, `exodusconfirm_startevent`, `exodusconfirm_keymap`. Call-site example: `media.js` `media_pop_materials`.
+
 ### Menubar / form icons (theme2)
 
 - **One scale for all:** `--exodus-ui-icon-size` in `global.css` is the **only** size knob (outer box; scales with text). Retune once → all menubar/form icons.
