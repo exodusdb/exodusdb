@@ -378,7 +378,15 @@ function form_move_action_buttons_to_top() {
     // Mark relocated so CSS can add spacing after Menu (not for native top bars)
     topbar.classList.add('exodus_formbuttons_relocated')
 
-    gexodus_menubar.insertBefore(topbar, gexodus_menubar.firstChild)
+    // Order: Menu | form actions (List/…) | trailing. Never left of Menu.
+    // Race: form_keep / rAF often runs *after* client.js inserts .hamburger_menu;
+    // insertBefore(firstChild) then put List left of Menu. Always park after Menu
+    // when present; if Menu is added later it still insertBefore(firstChild) itself.
+    var menu = gexodus_menubar.querySelector('.hamburger_menu')
+    if (menu)
+        gexodus_menubar.insertBefore(topbar, menu.nextSibling)
+    else
+        gexodus_menubar.insertBefore(topbar, gexodus_menubar.firstChild)
     form_place_menubar_session()
 
     if (typeof adjust_bodymargin == 'function')
@@ -1864,9 +1872,10 @@ async function formfunctions_onload() {
             setdisabledandhidden(closerecord, true)
         }
         else {
-            //closerecord.value='Cancel'
-            setgraphicbutton(closerecord, 'Cancel')
-            closerecord.title = 'Cancel and exit. Esc'
+            // Same accesskey C as bound Close (menubuttonhtml2 … 'C'); show it on the face + tip.
+            var AltorCtrl = (typeof isMac != 'undefined' && isMac) ? 'Ctrl' : 'Alt'
+            setgraphicbutton(closerecord, '<u>C</u>ancel')
+            closerecord.title = 'Cancel and exit. ' + AltorCtrl + '+C or Esc'
             setdisabledandhidden(closerecord, false)
         }
 

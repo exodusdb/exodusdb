@@ -7897,6 +7897,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		// $$ may return a NodeList if multiple matches — use the real input element
 		if (textinput && !textinput.tagName && textinput.length)
 			textinput = textinput[0]
+		// type=password before value; focus later (after blockmodal) — early focus
+		// flashes then loses to pending form client_focuson / browser type-change.
 		if (texthidden)
 			textinput.type = 'password'
 		textinput.value = text == null ? '' : String(text)
@@ -7916,8 +7918,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			}
 			return true
 		}
-		// Text-input mode: always start in the field (Tab among field/buttons is separate)
-		textinput.focus()
+		// Focus applied after shell is fully open (see below). Do not focus here.
 	} else if (!decide_args) {
 		// Prefocus only an explicit default (1/2/3). No default → nothing focused;
 		// first Tab lands on the first button via exodusconfirm_focus_cycle.
@@ -7984,6 +7985,33 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	// Decide lists use decide_document_onkeydown on the div instead.
 	if (!decide_args)
 		exodusconfirm_install_plain_keydown()
+
+	// Text-input confirm (exodusinput / password): keep caret in the field.
+	// CHANGE LOG:
+	// 1) Immediate textinput.focus() right after insert → flash then steal by pending
+	//    form client_focuson (1ms) or layout/scroll/blockmodal.
+	// 2) Focus after blockmodal + cancel pending client_focuson + reassert at 1ms/50ms.
+	if (istextinput) {
+		if (typeof gclient_focuson_element != 'undefined')
+			gclient_focuson_element = undefined
+		var exodusconfirm_park_text_focus = function () {
+			try {
+				var el = document.getElementById('exodusconfirmdiv_textinput')
+				if (!el || !document.getElementById('exodusconfirmdiv'))
+					return
+				// already typing — leave selection alone
+				if (document.activeElement === el)
+					return
+				el.focus()
+				if (el.value && el.type != 'password' && typeof el.select == 'function')
+					el.select()
+			} catch (e) { }
+		}
+		exodusconfirm_park_text_focus()
+		window.setTimeout(exodusconfirm_park_text_focus, 1)
+		window.setTimeout(exodusconfirm_park_text_focus, 50)
+	}
+
 	var response
 	try {
 		response = await confirmPromise
