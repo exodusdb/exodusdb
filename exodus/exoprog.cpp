@@ -771,19 +771,19 @@ var exoprog_callsmf(const Callable& callable, const ExoProgram& exoprog) {
 		nrvo = e.message;
 	}
 
-	// Abort
+	// Abort — return false so callers can write: if (not perform(...)) abort(lasterror());
 	catch (const ExoAbort& e) {
-		var::setlasterror("ExoAbort:" ^ e.message);
+		var::setlasterror(e.message);
 		exoprog.note(e.message);
-		nrvo = "";
+		nrvo = false;
 	}
 
 	// AbortAll
 	catch (const ExoAbortAll& e) {
 		// similar to abort for the time being
 		// maybe it should abort multiple levels of perform/execute?
-		var::setlasterror("ExoAbortAll:" ^ e.message);
-		nrvo = "";
+		var::setlasterror(e.message);
+		nrvo = false;
 	}
 
 	// We break into debugger at point of VarError exception construction

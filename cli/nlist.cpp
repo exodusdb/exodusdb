@@ -1938,7 +1938,9 @@ x2bexit:
 
 	printfile.osclose();
 
-	return "";
+	// Truthy so callers can use: if (not perform("nlist ...")) abort(lasterror());
+	// (empty string is falsy in toBool and would look like abort)
+	return true;
 }
 
 subr getquotedword() {

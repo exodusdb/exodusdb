@@ -24,16 +24,17 @@ func main() {
 		}
 
 		// Change list into nlist in order to call the nlist library
-		let result = perform("n" ^ SENTENCE);
+		// perform returns false on abort (see ExoProgram::perform / exoprog_callsmf)
+		if (not perform("n" ^ SENTENCE)) {
+			if (listid)
+				deletelist("default");
+			abort(lasterror());
+		}
 
 		if (listid)
 			deletelist("default");
 
-		// perform catches ExoAbort, notes the message, and returns "". Surface as CLI error.
-		if (lasterror().starts("ExoAbort"))
-			return 1;
-
-		return result;
+		return 0;
 	}
 
 	//////////////////////////////////////////
