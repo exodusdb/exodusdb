@@ -165,15 +165,20 @@ func main() {
 			var basefilename = field(filename, OSSLASH, -1);
 			basefilename = basefilename.field(".", fcount(basefilename, ".") - 1);
 
-			var progtype;
+			var progtype = "";
 			var question = "1=Command line program, 2=Callable function or subroutine";
 			question ^= "\n" ^ basefilename.quote() ^ " does not exist. Create what? (1-2) ";
 			while (true) {
 
 				if (basefilename.lcase().starts("dict."))
 					progtype = 5;
-				else
-					if (not progtype.input(question)) {}
+				else {
+					// One key (no Enter). Enter/Esc/empty cancels like previous empty input.
+					printx(question);
+					osflush();
+					progtype.inputn(1);
+					printl();
+				}
 
 				if (progtype == 2)      progtype = "classlib";
 				else if (progtype == 3)	progtype = "main";
@@ -181,6 +186,7 @@ func main() {
 				else if (progtype == 1) progtype = "class";
 				else if (progtype == 5)	progtype = "dict";
 				else
+					// Enter (\r/\n), Esc, or any other key → cancel
 					abort("");
 				break;
 			}
