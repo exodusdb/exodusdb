@@ -29,6 +29,10 @@ func main() {
 		if (listid)
 			deletelist("default");
 
+		// perform catches ExoAbort, notes the message, and returns "". Surface as CLI error.
+		if (lasterror().starts("ExoAbort"))
+			return 1;
+
 		return result;
 	}
 
@@ -73,15 +77,12 @@ func main() {
 	// Add any options and NOPAGE option
 	oscmd ^= "{N"^ OPTIONS ^ "}";
 
-	// Pipe into pager
-	oscmd ^= " | pager --chop-long-lines --quit-if-one-screen";
+	// Pipe into pager. pipefail so a failing list is not masked by pager exit 0.
+	oscmd = "set -o pipefail; " ^ oscmd ^ " | pager --chop-long-lines --quit-if-one-screen";
 
-	// osshell
-	var result = osshell(oscmd);
-	var lasterrorx = lasterror();
-
-	if (not result)
-		abort(lasterrorx);
+	// osshell — child already printed any error (e.g. unrecognized word)
+	if (not osshell(oscmd))
+		return 1;
 
 	return 0;
 }
