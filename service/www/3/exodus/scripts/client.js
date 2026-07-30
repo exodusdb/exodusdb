@@ -7359,12 +7359,18 @@ function exodusconfirm_keymap(event) {
 		return false
 	}
 
-	// Access letters: Alt+letter only.
-	// WRONG: bare letter (clashes with typing O/C/Y/N in material codes etc.)
-	// var accessLetter = gexodusconfirmletters && keyletter
-	var accessLetter = event.altKey && gexodusconfirmletters && keyletter
+	// Access letters — CHANGE LOG (do not flip-flop; AGENTS HIGH PRIORITY):
+	// 1) Bare O/C/Y/N always → broke typing in text-input confirms (material code etc.).
+	// 2) Alt+letter only always → pure button OK/Cancel needed Alt+C (wrong for no-input).
+	// 3) Split: pure button popup → bare letter (and Alt+ still ok);
+	//           text-input confirm → Alt+letter only (bare letters type; text field path
+	//           above already returns true when focus is the input).
+	// WRONG: var accessLetter = gexodusconfirmletters && keyletter  // always bare
+	// WRONG: var accessLetter = event.altKey && gexodusconfirmletters && keyletter  // always Alt
+	var accessLetter = gexodusconfirmletters && keyletter
+		&& (!istextinput || event.altKey)
 
-	// F9 / Alt+first-button letter always positive (OK/Yes) — not bare Enter
+	// F9 / first-button letter: always positive (OK/Yes) — not bare Enter
 	if (keycode == 120
 		|| (accessLetter && keyletter == gexodusconfirmletters[1])) {
 		window.setTimeout(exodus_confirm_function1_sync, 1)
@@ -7373,13 +7379,13 @@ function exodusconfirm_keymap(event) {
 
 	// Bare Enter/Space with nothing focused: swallow, do not invent a button press
 
-	// CANCEL: Esc always; letter only with Alt
+	// CANCEL: Esc always; letter per accessLetter rules above
 	if (keycode == 27 || (accessLetter && keyletter == gexodusconfirmletters[3])) {
 		window.setTimeout(exodus_confirm_function3_sync, 1)
 		return false
 	}
 
-	// NEGATIVE: F8; letter only with Alt
+	// NEGATIVE: F8; letter per accessLetter rules above
 	if (keycode == 119 || (accessLetter && keyletter == gexodusconfirmletters[2])) {
 		window.setTimeout(exodus_confirm_function2_sync, 1)
 		return false
@@ -7758,8 +7764,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' class="graphicbutton"'
 		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
 
-		// Hotkey letter for Alt+letter only (see keymap accessLetter = event.altKey && …).
-		// WRONG: bare letter as hotkey — blocks typing in text-input confirms.
+		// Hotkey letter: pure button = bare letter; text-input confirm = Alt+letter only.
+		// (See exodusconfirm_keymap accessLetter CHANGE LOG — do not flip-flop.)
 		var letter
 		var marked = String(buttontext).match(/<[uU]>(.)<\/[uU]>/)
 		if (!marked)
@@ -7780,11 +7786,14 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		}
 		gexodusconfirmletters[buttonn] = letter
 
-		// title must match keymap (Alt+letter, not bare letter)
-		// WRONG: html += ' title="Press ' + letter + ' or '
+		// Tooltip matches keymap: bare letter when no text field; Alt+ when text-input.
 		html += ' title="Press '
-		if (letter)
-			html += 'Alt+' + letter + ' or '
+		if (letter) {
+			if (istextinput)
+				html += 'Alt+' + letter + ' or '
+			else
+				html += letter + ' or '
+		}
 		html += buttonfunckey
 		if (buttonn == 1)
 			html += ' or Ctrl+Enter'
