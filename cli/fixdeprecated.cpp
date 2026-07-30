@@ -51,14 +51,13 @@ func main() {
 		if (not osshell(headercmd))
 			abort(lasterror());
 
-		// Pipe the compiler output into another process of this command
-		// F = Force recompilation to generate any deprecation warning messages
-//		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {" ^ OPTIONS ^ "}";
-		let pipedcmd = compilecmd ^ " {F} |& " ^ EXECPATH ^ " {" ^ OPTIONS ^ "}";
+		// Pipe compiler stdout+stderr into another process of this command (stdin mode).
+		// F = Force recompilation to generate deprecation warnings (they go to stderr).
+		// 2>&1 | is POSIX /bin/sh (not bash |&).
+		let pipedcmd = compilecmd ^ " {F} 2>&1 | " ^ EXECPATH.squote() ^ " {" ^ OPTIONS ^ "}";
 		if (verbose)
 			TRACE(pipedcmd)
-		if (not osshell("bash -c " ^ pipedcmd.squote()))
-//			abort(lasterror());
+		if (not osshell(pipedcmd))
 			abort(1);
 
 		// Optionally recompile all requested files after updating in order to gain parallelism

@@ -43,9 +43,8 @@ func main() {
 
 	var oscmd = "";
 
-	// Prepare a bash command
-	// Reconstruct the list command into a format suitable for processing by bash
-	// If word has any bash special characters or spaces
+	// Reconstruct the list command for bash (see bash -c below).
+	// If word has any shell special characters or spaces
 	// then escape any single quotes and wrap in single quotes
 	for (var word : COMMAND) {
 
@@ -59,8 +58,7 @@ func main() {
 			let word2 = word.convert(R"( `~!@#$%^&*(){}[]:;'"|<>?\)" to "");
 			if (word2.len() < word.len()) {
 
-				// Single quotes inside single quotes can be represented as '"'"' for bash
-				// The leading and trailng aingle quotes in '"'"' terminate and resume the single quoted string
+				// Single quotes inside single quotes: '"'"'
 				// so 'abc'"'"'def' is actually abc'def
 				word.replacer("'", R"('"'"')");
 
@@ -78,8 +76,12 @@ func main() {
 	// Add any options and NOPAGE option
 	oscmd ^= "{N"^ OPTIONS ^ "}";
 
-	// Pipe into pager. pipefail so a failing list is not masked by pager exit 0.
+	// Stream list into pager (keeps concurrency / low latency; no full temp file).
+	// pipefail so a failing list is not masked by pager exit 0.
+	// osshell uses system() → /bin/sh (usually bash but could be dash);
+	// dash has no pipefail, so run the pipeline under bash -c explicitly.
 	oscmd = "set -o pipefail; " ^ oscmd ^ " | pager --chop-long-lines --quit-if-one-screen";
+	oscmd = "bash -c " ^ oscmd.squote();
 
 	// osshell — child already printed any error (e.g. unrecognized word)
 	if (not osshell(oscmd))
