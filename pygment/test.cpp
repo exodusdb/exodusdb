@@ -146,7 +146,7 @@ libraryinit()
 
 function main() {
 	printl("f1 says 'Hello World!'");
-	return 0;
+	return 1; // Return value/Success
 }
 
 libraryexit()
@@ -182,7 +182,7 @@ func main() {
     printl(arg3);
 
     if (123 > 
-    return 0;
+    return 0; // exit status
   }
 
 func func1(in arg1, in arg2) {

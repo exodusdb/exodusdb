@@ -194,7 +194,9 @@ func main() {
 				blankfile ^= "program() {\n";
 				blankfile ^= "\tprintl(\"" ^ basefilename ^ " says 'Hello World!'\");\n";
 				if (progtype == "mainlib")
-					blankfile ^= "\treturn 0;\n";
+					blankfile ^= "\treturn 1; // Return value/Success\n";
+				else
+					blankfile ^= "\treturn 0; // exit status\n";
 				blankfile ^= "}\n";
 				if (progtype == "mainlib")
 					blankfile.replacer("program()", "function " ^ basefilename ^ "()");
@@ -211,7 +213,11 @@ func main() {
 				//	blankfile^="/*in arg1, out arg2*/";
 				blankfile ^= ") {\n";
 				blankfile ^= "\tprintl(\"" ^ basefilename ^ " says 'Hello World!'\");\n";
-				blankfile ^= "\treturn 0;\n";
+				// program: OS exit status (0 = success). library/perform: truthy success for if (not perform)
+				if (progtype == "classlib")
+					blankfile ^= "\treturn 1; // Return value/Success\n";
+				else
+					blankfile ^= "\treturn 0; // exit status\n";
 				blankfile ^= "}\n";
 				blankfile ^= "\n}; // programexit()";
 				blankfile ^= "\n";

@@ -67,7 +67,7 @@ public:                                                             \
 //
 // func main() {
 //     println("Hello World");
-//     return 0;
+//     return 0; // exit status
 // }
 //
 // }; // programexit()
