@@ -551,7 +551,7 @@ func main() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunreachable-code"
 		try {
-			stop();
+			stop(); // throws ExoStop (bare); must not return
 			throw VarError("Uncaught error ExoStop");
 			//std::unreachable();
 		} catch (ExoStop& e) {

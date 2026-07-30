@@ -760,14 +760,13 @@ var exoprog_callsmf(const Callable& callable, const ExoProgram& exoprog) {
 //			// if return "" is missing then default ANS to ""
 //			ANS = "";
 
-	// Stop
+	// Stop — normal success; message is stop()'s argument (default ExoStopSentinel).
 	catch (const ExoStop& e) {
 		// stop is normal way of stopping a perform
 		// functions can call it to terminate the whole "program"
 		// without needing to setup chains of returns
 		// to exit from nested functions
 		var::setlasterror("");
-		// TODO: Return ANS if e.message is ""
 		nrvo = e.message;
 	}
 
@@ -2684,8 +2683,14 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 	// Handle result and exit status
 	if (!result.assigned())
 		result = 101;
-	if (!result.empty() && result.isnum())
+	// stop() / stop(ExoStopSentinel): success exit 0 (not used as a process status code).
+	// See ExoStopSentinel for why this value. Other numeric results become process exit
+	// status. abort()/abortall set a default exit_status above; a numeric message overrides it.
+	if (result == ExoStopSentinel) {
+		exit_status = 0;
+	} else if (!result.empty() && result.isnum()) {
 		exit_status = result;
+	}
 	if (!result.isnum()) {
 		if (exit_status)
 			result.errputl(caught);

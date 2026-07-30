@@ -15,7 +15,7 @@ func main() {
 	// Easy way to skip testing since it it quite sensitive
 	if (osfile("test_output.freepass")) {
 		outputl("Test passed.");
-		stop();
+		return 0;
 	}
 
 	let filename1 = "t_stdout.txt";
@@ -24,7 +24,7 @@ func main() {
 	// 1. GENERATE OUTPUT and quit
 	if (COMMAND.contains("GENERATE")) {
 		generate();
-		stop();
+		return 0;
 	}
 
 	// 2. Self run to capture stdout and stderr
@@ -87,7 +87,7 @@ func main() {
 
 	outputl("Test passed.");
 
-	stop();
+	return 0;
 }
 
 subr generate() {

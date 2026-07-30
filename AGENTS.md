@@ -63,14 +63,60 @@ Set **`gparameters.key`** before dbform’s post-init open (dict build or `form_
 - Prefer fixing product code (`colors.js`, page dicts/HTM, `users.js`, etc.). If a bug looks framework-wide, **say so and wait** — do not “fix” it by changing F7, `gpreviousvalue`, `validateupdate`, or popup contracts.
 - Popup cancel without `validateupdate` is **standard Exodus practice**; product popups must not break that (e.g. do not wipe mid-edit field text to paper over face-preview bugs).
 
-## Service C++ (compile + deploy to live)
+## Build and install (basic exodus lib / CLI)
 
-Editing `.cpp` under `service/src/` or `~/neosys/src/` is **not** enough. Live `serve_*` loads **`.so` plugins** from live lib dirs (`LD_LIBRARY_PATH` typically includes `/usr/local/live/lib` and `$EXO_HOME/lib`).
+Core library, CLI tools, and tests live under `~/exodus` (this tree). They are **not** the service/neosys `.so` plugins.
+
+**Do not skip tests before install.** Alias **`m`** is the full cycle; prefer it, or run the same steps by hand in order from `~/exodus/build`:
+
+| Step | Command | What it does |
+|------|---------|----------------|
+| **1. Build** | `ninja` | Compile lib/cli (and gendoc post-build side effects such as refreshing `var.1` / `testing_var.h.cpp` when gendoc is linked). |
+| **2. Test** | `CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=\`nproc\` ninja test` | Run the test suite. **Required before install** — do not `ninja install` after a failed or skipped test run. |
+| **3. Install** | `ninja install` | Install lib/cli into the prefix (typically `/usr/local`). Only after step 2 passes. |
+
+One-liner (same as alias **`m`**):
+
+```bash
+(cd /root/exodus/build && ninja && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` ninja test && ninja install)
+```
+
+| Optional | Command / note |
+|----------|----------------|
+| **Docs** | From `~/exodus/build`: **`ninja doc`** (or `ninja gendoc`). Regenerates `exodus/var.1` (man) and `exodus/var.htm` (HTML) via `cli/gendoc` + `doc/gendoc_helper.sh`. **Not** part of default `ninja` / `m`; see `doc/README.md`. |
+| **Header doc pipeline** | gendoc only picks up **contiguous `//` comments immediately before a public function declaration** (plus section titles like `///// Section :`), not arbitrary comments elsewhere in the header. Those blocks → **pseudo-markdown** → **man** (`var.1`) / **HTML** (`var.htm`). Labels (`param:` / `return:` / …), `* ` bullets. Backticked examples are extracted into **`test/testing_var.h.cpp`** and must **compile and run**. Odd backtick counts abort gendoc. |
+| **Header doc audience** | Those pre-function doc comments are **for app programmers using the library**, not library-maintainer notes. Must be **readable at a glance**. Omit anything not instantly clear; **gloss over complexity** so the main point lands. Cross-link: e.g. perform `return` only says it is main’s return or what stop()/abort() determine — details live on stop/abort. Prefer prose `//` over backticks for control-flow that is hard to run as tests. |
+
+After a successful **build → test → install**, the basic package is on the install path. That alone does **not** rebuild or redeploy service/neosys application libraries.
+
+## C++ style: prefer `var` member functions (FYI)
+
+Free functions in `exofuncs.h` (`quote`, `squote`, `oconv`, `osshell`, …) mostly **forward to members**. The library and apps are written in a **member-first** style because `var` is used heavily in chains and the same names exist on both sides.
+
+**Prefer members** in service, neosys, cli, and new tests:
+
+| Prefer | Avoid (when a receiver is already a `var`) |
+|--------|--------------------------------------------|
+| `x.quote()` / `x.squote()` | `quote(x)` / `squote(x)` |
+| `x.oconv(fmt)` | `oconv(x, fmt)` |
+| `x.field(sep, n)` | `field(x, sep, n)` |
+| `cmd.osshell()` | `osshell(cmd)` |
+
+**Survey (approx. live `.cpp` call sites, free vs `.member`):** members dominate for `quote`, `field`, `len`, `trim`, `ucase`/`lcase` in service and neosys. Free `oconv`/`iconv` remain common in neosys (Basic-heritage / multi-arg expressions). Free `osshell` is still common for string literals (`osshell("which …")`); use `cmd.osshell()` when the command is already in a `var`. Tests mix both more freely.
+
+Mutators follow the same idea: **`x.squoter()`** (in place) vs **`x.squote()`** (returns a new quoted `var`). Prefer the form that matches local style in the file you are editing.
+
+Do **not** mass-convert free calls for style alone; use members for **new** code and when touching a line.
+
+## Service / neosys C++ (compile + deploy to live)
+
+Editing `.cpp` under `service/src/` or `~/neosys/src/` (or their `.dat` sources) is **not** enough for live. Live `serve_*` loads **`.so` plugins** from live lib dirs (`LD_LIBRARY_PATH` typically includes `/usr/local/live/lib` and `$EXO_HOME/lib`).
 
 | Step | Command / note |
 |------|----------------|
-| **1. Compile** | From the source directory: `compile foo.cpp` (installs to `$EXO_HOME/lib` e.g. `~/lib/libfoo.so`). Compile every library you changed (and dependents if needed). |
-| **2. Deploy to live** | `cd ~/exodus/service && ./copyall CONFIRM` — rsync `~/bin,lib,dat,inc` → `~/live` and `/usr/local/{bin,lib,…}` → `/usr/local/live` with **`--whole-file`** so `dlopen` sees real updates. Without `CONFIRM` = dry run only. |
+| **1a. One file** | From the source directory: `compile foo.cpp` (installs to `$EXO_HOME/lib` e.g. `~/lib/libfoo.so`). Compile every library you changed (and dependents if needed). |
+| **1b. Everything** | **`~/exodus/service/src/compall`** builds all **exodus service** `.cpp` + installs/syncs **`.dat`**. **`~/neosys/compall`** runs that plus **`~/neosys/src/compall`** (all neosys). Required for a full rebuild of application libs/dat after broad changes or a fresh tree (not covered by alias `m`). |
+| **2. Deploy to live** | **`cd ~/exodus/service && ./copyall CONFIRM`** — required to fully deploy: rsync `~/bin,lib,dat,inc` → `~/live` and `/usr/local/{bin,lib,…}` → `/usr/local/live` with **`--whole-file`** so `dlopen` sees real updates, and touch live dirs so **`_live` services** restart/reload. Without `CONFIRM` = dry run only. |
 | **3. Do not** | Hand-copy a single `.so` as the primary path (easy to miss a dir). Do not claim “live” after compile-only. |
 
 - **Web (JS/CSS/HTM)** is separate: served from the tree / merge paths; no `copyall` for browser assets.

@@ -41,7 +41,7 @@ func main() {
 //		self_test(-1);
 
 		printl("Test passed.");
-		stop();
+		return 0;
 
 	}
 

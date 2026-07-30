@@ -34,6 +34,12 @@
 
 namespace exo {
 
+// Default for stop() / stop(ExoStopSentinel). Under perform/execute the value is returned
+// (truthy). Outside perform, run_main maps it to process exit status 0.
+// Chosen as a mid-range float usable in calculations without overflowing, outside common
+// human numbers, so it is unlikely that a real program needs perform() to return this value.
+inline constexpr double ExoStopSentinel = 837'294'651'078'392e99;
+
 // Template to reset a range of objects to their default-constructed state
 template<typename T>
 void reset_range(T& first, T& last);
@@ -289,35 +295,19 @@ ND	bool hasnext();
 	///// Perform/Execute/Run:
 	//////////////////////////
 
-	// Run an Exodus program/library.
-	// Creates a new instance of an Exodus program library function object and calls its main() function using a command-like syntax, similar to that of running an OS executable program, and passes its arguments through the COMMAND and OPTIONS variables.
-	// A performed program/library's main function should have no arguments otherwise they appear unassigned and a segfault or core dump may occur.
-	// The Exodus program class member variables of a performed or executed program/library are all, as might be expected, initially unassigned unless specifically initialised inline. Note that this is not the same as calling a program library function (using function call syntax and round brackets funcx()), where the program/library/function's member variables are initially unassigned but retain their state between calls.
-	// command_line: Used to initialise the COMMAND, SENTENCE and OPTIONS environment variables of the performed exodus program/library. Analogous to passing function arguments. The first word of command_line is used as the name of the program/library to be loaded and run.
-	// return: Whatever the program returns from main() or passes as an argument to stop(). If the program aborts then it returns false and lasterror() holds the abort message (also noted). Example: if (not perform(cmd)) abort(lasterror()); The return value may be ignored so there is no need to wrap perform statements in if clauses to avoid compiler warnings.
-	// throw: All the various runtime errors based on VarError e.g. VarUnassigned.
-	// environment: The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched (actually restored) in the calling program.
-	// * COMMAND, OPTIONS, SENTENCE.
-	// * RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
-	// * ID, RECORD, MV, DICT initialised to "".
-	// * LEVEL is incremented by one.
-	// * All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
-	// * CURSOR Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() where the executed program/library gets its own private active select list, initially inactive.
-	// Exodus program/library/functions may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library. See library.h for more info.
+	// Run an Exodus program/library by name using a command line (like an OS program).
+	// command_line: First word is the program/library name; the rest become COMMAND and OPTIONS.
+	// return: Whatever the program returns from main(), or what stop()/abort() determine. See stop() and abort().
 	var  perform(in command_line);
 
-	// Run an exodus program/library.
-	// Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
+	// Like perform() but the callee does not share the caller's active select list.
 	var  execute(in command_line);
 
-	// Close the current program and perform another one.
-	// Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.
+	// End this program and start another (environment carries forward).
 	[[noreturn]]
 	void chain(in command_line);
 
-	// Check if a lib exists.
-	// Can be checked before perform/execute to avoid errors.
-	// Currently it does not check if the library is actually loadable.
+	// Check if a library file exists.
 	// return: osfile info.
 	var  libinfo(in libname);
 
@@ -325,20 +315,15 @@ ND	bool hasnext();
 	///// Program termination :
 	///////////////////////////
 
-	// Stop the current exodus program/library normally.
-	// Either return to the performing or executing parent exodus program/library, or exit to the OS if none.
-	// result: Optional. It will be used as the return value of a parent program's perform() or execute() function, or if none, and therefore returning to the OS, it will be output to stdout if non-numeric or, if numeric, used as the exit status.
+	// Finish successfully. Under perform/execute the value is returned (default ExoStopSentinel is truthy). As a main program: default exits 0; other numbers become the exit status; other text is printed.
 	[[noreturn]]
-	void stop(in result = "") const;
+	void stop(in result = ExoStopSentinel) const;
 
-	// Abort the current exodus program/library.
-	// Similar to stop but if exiting to the OS then the default exit status is 1.
-	// message: Optional. If exiting to the OS then it will be output to stderr or, if numeric, used as the exit status.
+	// Finish with failure. Under perform/execute: returns false, sets lasterror(), and notes the message. As a main program: exit status 1.
 	[[noreturn]]
 	void abort(in message = "") const;
 
-	// Abort the current exodus program/library.
-	// Similar to abort but if exiting to the OS then the default exit status is 2.
+	// Like abort() but does not note the message under perform/execute, and exit status 2 as a main program.
 	[[noreturn]]
 	void abortall(in message = "") const;
 

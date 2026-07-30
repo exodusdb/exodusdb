@@ -236,7 +236,7 @@ func main() {
 			if (not fileinfo_new) {
 				if (not is_new_record)
 					abort("Could not read local copy after editing " ^ temposfilename);
-				stop();
+				return 0;
 			}
 
 			//osfile has been edited
@@ -261,7 +261,7 @@ func main() {
 						if (not dbfile.deleterecord(ID))
 							abort(lasterror());
 						printl(dbfilename, ID, "deleted.");
-						stop();
+						return 0;
 					}
 				}
 

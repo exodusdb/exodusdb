@@ -11,7 +11,7 @@ func main() {
 	printl("test_regress says 'Hello World!'");
 
 	//TRACE(var("") lt var("A"));  //is true (1)
-	//stop();
+	//return 0;
 
 	var filenames = COMMAND.remove(1);
 
@@ -373,7 +373,7 @@ func onefile(in filename, in maxndifferences) {
 			default:
 				ndifferences += 1;
 				printl(line, "Unknown function");
-				stop();
+				return 0;
 				//std::unreachable();
 		}
 

@@ -164,7 +164,8 @@ func main() {
 	// Pass 2
 	main2(false);
 
-	stop();
+	// CLI success (bare stop() is also exit 0; return 0 is equivalent).
+	return 0;
 }
 
 func main2(in pass1) {

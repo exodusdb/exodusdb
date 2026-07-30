@@ -112,7 +112,7 @@ if (not osread(all_code_matches from COMMAND(2)))
 	// Pass 2
 	main2(false);
 
-	stop();
+	return 0;
 }
 
 func main2(in pass1) {
@@ -729,7 +729,7 @@ src = all_code_matches.split();
 				// html
 				thread_local rex field_rex {R"__([^\x1e]+\x1e)__"};
 //oswrite(comments on "x");
-//stop();
+//return 0;
 				comments.replacer(R"__((^|\x1e)([a-zA-Z0-9_.]+):(\s*))__"_rex, "\x1e<em>$2:</em>$3");
 				// Replace all xxxxxxxx^ with <p>xxxxxxx</p>\n
 				comments.replacer(field_rex, "<p>$&</p>\n");
