@@ -319,15 +319,17 @@ TABLE[exogroupno] > thead {
     /* bottom edge while stuck (border-collapse drops cell bottoms under scroll) */
     box-shadow: 0 1px 0 lightgrey;
 }
-/* Decide list: sticky in dialog scroll, not page menubar offset */
-.exodusconfirmdiv #decide_table1 > thead {
+/* Decide list + typeahead: sticky in panel scroll, not page menubar offset */
+.exodusconfirmdiv #decide_table1 > thead,
+.exodus_typeahead_table > thead {
     position: sticky;
     top: 0;
     z-index: 11;
     box-shadow: 0 1px 0 lightgrey;
 }
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead,
-:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead {
+:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead,
+:root[data-theme="dark_mode"] .exodus_typeahead_table > thead {
     box-shadow: 0 1px 0 #5a6090;
 }
 /*
@@ -357,9 +359,10 @@ TABLE[exogroupno] > thead td {
         calc(c * 1.175 + 0.0075)
         h);
 }
-/* Decide heads: same OKLCH step, but from popup shell (not form-face) */
+/* Decide + typeahead heads: same OKLCH step from popup shell (not form-face) */
 .exodusconfirmdiv #decide_table1 > thead th,
-.exodusconfirmdiv #decide_table1 > thead td {
+.exodusconfirmdiv #decide_table1 > thead td,
+.exodus_typeahead_table > thead th {
     background-color: var(--exodus-popup-face);
     background-color: oklch(from var(--exodus-popup-face)
         calc(l * 0.985)
@@ -379,7 +382,8 @@ TABLE.exotable[exogroupno] > thead td {
     background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
-:root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td {
+:root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td,
+:root[data-form-head="lighter"] .exodus_typeahead_table > thead th {
     background-color: color-mix(in oklch, var(--exodus-popup-face) 90%, white);
 }
 :root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead th,
@@ -393,50 +397,55 @@ TABLE
     border-width: 0px;
 }
 
-/* Find-as-you-type suggest — float above the form (not form-face parchment).
-   max-height/max-width also set in form_typeahead_place from available viewport. */
+/* Find-as-you-type: same shell face/border/shadow language as .exodusconfirmdiv
+   (popup UI), not a separate white card. max-height/max-width also set in
+   form_typeahead_place from available viewport. */
 .exodus_typeahead {
-    background: #ffffff;
-    color: #1a1a1a;
-    border: 1px solid #6a7a94;
-    border-radius: 3px;
-    box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
-        0 4px 6px rgba(0, 0, 0, 0.12),
-        0 12px 28px rgba(0, 0, 0, 0.18);
+    background: var(--exodus-popup-face);
+    color: inherit;
+    border: 2px solid #666666;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
     max-height: 28em;
     overflow: auto;
-    font-size: 0.95rem;
+    font-size: inherit;
+    padding: 4px;
 }
 :root[data-theme="dark_mode"] .exodus_typeahead {
-    background: #151a2a;
-    color: #e8eaf0;
     border-color: #7a88b0;
-    box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-        0 4px 8px rgba(0, 0, 0, 0.35),
-        0 14px 32px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
 }
 .exodus_typeahead_table {
     border-collapse: collapse;
+    width: auto;
+    max-width: 100%;
 }
-/* Prefer readable columns; place() widens the panel toward the right edge */
+/* Column air + fold long cells (brand/description) — same idea as decide_datacol */
+.exodus_typeahead_table th,
 .exodus_typeahead_table td {
-    padding: 0.25em 0.6em;
-    max-width: 40ch;
+    padding: 0.25em 0.5em;
+    max-width: 22em;
     vertical-align: top;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
+.exodus_typeahead_table th {
+    font-weight: bold;
+    text-align: left;
+}
+/* thead tint/sticky: shared with decide (#decide_table1 > thead) above */
 .exodus_typeahead_table tr[data-ta-row] {
     cursor: pointer;
 }
+/* Row highlight: match decide_row_hover */
 .exodus_typeahead_table tr.exodus_typeahead_focus td,
 .exodus_typeahead_table tr[data-ta-row]:hover td {
-    background: #d6e4f7;
+    background-color: lightgrey;
 }
 :root[data-theme="dark_mode"] .exodus_typeahead_table tr.exodus_typeahead_focus td,
 :root[data-theme="dark_mode"] .exodus_typeahead_table tr[data-ta-row]:hover td {
-    background: #2f3d62;
+    background-color: rgba(255, 255, 255, 0.18);
 }
 
 /* Print: keep form tables printable; hide fixed menubar; paper is white (DM screen CSS is @media screen only). */
@@ -1731,7 +1740,8 @@ SPAN.calendar-date-committed[contenteditable] {
 :root[data-theme="dark_mode"] TABLE.exotable[exogroupno] > thead th,
 :root[data-theme="dark_mode"] TABLE.exotable[exogroupno] > thead td,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead th,
-:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead td {
+:root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead td,
+:root[data-theme="dark_mode"] .exodus_typeahead_table > thead th {
     background-color: #303a5a;
 }
 

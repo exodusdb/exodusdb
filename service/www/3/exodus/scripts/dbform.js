@@ -5932,9 +5932,22 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     // No row selected until user arrows or clicks (plain Enter = normal field leave)
     gform_typeahead_focusn = -1
 
-    // No column headers — values only.
     // col[0] may be a numeric field index into the row (same as exodusdecide / ACCOUNTLIST).
-    var html = '<table class="exodus_typeahead_table" cellspacing="0" cellpadding="0"><tbody>'
+    // col[1] is the title when col is [id, title, …].
+    var html = '<table class="exodus_typeahead_table" cellspacing="0" cellpadding="0">'
+    html += '<thead><tr class="exodus_typeahead_head">'
+    for (var c0 = 0; c0 < cols.length; c0++) {
+        var coldef0 = cols[c0]
+        var title = ''
+        if (typeof coldef0 == 'object' && coldef0 != null && coldef0[1] != null && coldef0[1] !== '')
+            title = coldef0[1]
+        else if (typeof coldef0 == 'string')
+            title = coldef0
+        else if (typeof coldef0 == 'object' && coldef0 != null && coldef0[0] != null)
+            title = coldef0[0]
+        html += '<th>' + HTMLEncode(String(title)) + '</th>'
+    }
+    html += '</tr></thead><tbody>'
     for (var r = 0; r < rows.length; r++) {
         html += '<tr data-ta-row="' + r + '">'
         var row = rows[r]
@@ -5962,10 +5975,9 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     div.style.display = ''
     form_typeahead_listen_scroll(true)
 
-    var trs = div.getElementsByTagName('tr')
+    // Only data rows (data-ta-row); header has no pick/hover handlers
+    var trs = div.querySelectorAll('tr[data-ta-row]')
     for (var i = 0; i < trs.length; i++) {
-        if (trs[i].getAttribute('data-ta-row') == null)
-            continue
         trs[i].onmouseover = form_typeahead_row_hover
         trs[i].onmousedown = form_typeahead_row_pick
     }
@@ -6039,8 +6051,12 @@ function form_typeahead_apply(n) {
     focusnext(element)
 }
 
-// Esc dismiss; arrows / Home / End move highlight; Enter only applies if user has moved highlight.
+// Esc dismiss; arrows / PgUp/PgDn / Home / End move highlight;
+// Enter only applies if user has moved highlight.
 // Plain Enter (no arrow selection): hide list and let normal Enter / focusnext run.
+// PgUp/PgDn step by a fixed page of rows (viewport auto-count is unreliable with wrapping cells).
+var gform_typeahead_pagesize = 10
+
 function form_typeahead_keydown(event) {
 
     if (!gform_typeahead_div || gform_typeahead_div.style.display == 'none')
@@ -6059,6 +6075,15 @@ function form_typeahead_keydown(event) {
     }
     if (keycode == 38) {
         form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn - 1)
+        return false
+    }
+    // Page Down / Page Up — fixed step (gform_typeahead_pagesize)
+    if (keycode == 34) {
+        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn + gform_typeahead_pagesize)
+        return false
+    }
+    if (keycode == 33) {
+        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn - gform_typeahead_pagesize)
         return false
     }
     // Home → first row; End → last (form_typeahead_set_focus clamps)
