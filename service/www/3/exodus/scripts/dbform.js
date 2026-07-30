@@ -3908,6 +3908,55 @@ function focusnext(element, scope) {
     focusdirection(1, element, '', scope)
 }
 
+// Radios of one field: Tab lands once (checked, else first). Arrows still change value (browser).
+function form_radio_group_members(radio) {
+	if (!radio || radio.type != 'radio')
+		return null
+	try {
+		if (typeof getradiocheckboxelements == 'function')
+			return getradiocheckboxelements(radio)
+	} catch (e) { }
+	if (radio.name) {
+		var byname = document.getElementsByName(radio.name)
+		if (byname && byname.length)
+			return byname
+	}
+	return [radio]
+}
+
+function form_radio_same_group(a, b) {
+	if (!a || !b || a.type != 'radio' || b.type != 'radio')
+		return false
+	var members = form_radio_group_members(a)
+	if (!members)
+		return !!(a.name && b.name && a.name == b.name)
+	for (var i = 0; i < members.length; i++) {
+		if (members[i] == b)
+			return true
+	}
+	return false
+}
+
+// When Tab/focus lands on a radio group: checked option, else first option.
+function form_radio_tab_target(radio) {
+	if (!radio || radio.type != 'radio')
+		return radio
+	var members = form_radio_group_members(radio)
+	if (!members || !members.length)
+		return radio
+	var first = null
+	for (var i = 0; i < members.length; i++) {
+		var el = members[i]
+		if (!el || el.type != 'radio')
+			continue
+		if (!first)
+			first = el
+		if (el.checked)
+			return el
+	}
+	return first || radio
+}
+
 function focusdirection(direction, element, notgroupno, scopex) {
     //currently required sourceIndex which is msie only
     //if (!document.body.sourceIndex)
@@ -4084,6 +4133,13 @@ function focusdirection(direction, element, notgroupno, scopex) {
             continue
         }
 
+        // Tab: one stop per radio group — skip sibling options of the field we are leaving
+        if (element && element.type == 'radio' && nextelement.type == 'radio'
+            && form_radio_same_group(element, nextelement)) {
+            //console.log('SKIP '+nextid+' same radio group as current')
+            continue
+        }
+
         if (nextelement == element)
             continue
 
@@ -4111,6 +4167,10 @@ function focusdirection(direction, element, notgroupno, scopex) {
             }
         }
     }
+
+    // Arriving on a radio group: checked option, else first (not whichever DOM order hit first)
+    if (nextelement && nextelement.type == 'radio')
+        nextelement = form_radio_tab_target(nextelement)
 
     //found it. focus on it
     //console.log('focusdirection ' + nextelement.tagName + ' ' + nextelement.id)
@@ -6498,6 +6558,10 @@ function focuson(element) {
     //use the first if more than one
     if (typeof element == 'object' && !element.tagName && element.length > 0)
         element = element[0]
+
+    // Radio group: focus checked (else first), not always [0]
+    if (element && element.type == 'radio')
+        element = form_radio_tab_target(element)
 
     ///log(element.id + ' ' + element.outerHTML)
 
