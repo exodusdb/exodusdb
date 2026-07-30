@@ -580,6 +580,15 @@ func main() {
 //		}
 #pragma GCC diagnostic pop
 
+		// perform() returns false on abort (does not throw to the caller)
+		// and sets lasterror(). Needs libtestcommandlib.so (built with tests).
+		if (libinfo("testcommandlib")) {
+			assert(perform("testcommandlib ok"));
+			assert(lasterror() eq "");
+			assert(not perform("testcommandlib (A)"));
+			assert(lasterror() eq "testcommandlib aborted for test");
+		}
+
 //		if (uncaught) {
 //			TRACE(uncaught)
 //			assert(uncaught eq "");

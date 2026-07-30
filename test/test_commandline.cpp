@@ -47,7 +47,9 @@ func main() {
     assert(osshellread(execdir ^ "testcommandline '(' a b ')'") eq "testcommandline ( a b )\ntestcommandline^(^a^b^)\n\n");
 
 	if (libinfo("testcommandlib")) {
-		perform("testcommandlib a b c (xyz)");
+		// Success: truthy return, lasterror cleared
+		assert(perform("testcommandlib a b c (xyz)"));
+		assert(lasterror() eq "");
 		//if (not oswrite(USER1 on "x"))
 		//	loglasterror();
 		TRACE(USER1)
@@ -55,6 +57,10 @@ func main() {
 		//assert(USER1 eq "testcommandlib a b c (xyz)\ntestcommandlib^a^b^c\nxyz\n");
 		//assert(USER1 eq "testcommandlib a b c (xyz)\ntestcommandlib a b c\nxyz\n");
 		assert(USER1 eq "testcommandlib a b c (xyz)\ntestcommandlib^a^b^c\nxyz\n"_var);
+
+		// Abort: perform returns false and sets lasterror (message also noted)
+		assert(not perform("testcommandlib (A)"));
+		assert(lasterror() eq "testcommandlib aborted for test");
 	}
 
 	printl(elapsedtimetext());
