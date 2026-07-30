@@ -1978,6 +1978,14 @@ async function formfunctions_onload() {
         if (gparameters.defaultrevstr)
             gro.defaultrevstr = gparameters.defaultrevstr
 
+        // Framework open prefill (this flight only):
+        // 1) cleardoc — empty load, then gparameters keys that match dict fields via setx
+        // 2) filldefaults — dict defaultvalue into empty required cells
+        // 3) calcfields / updatedisplay
+        // That sequence is complete when the awaits below return. We do not detect
+        // later custom work (e.g. leave-field validation that expands SCHEDULE_NO);
+        // that is outside this open path. Same idea as setchangesmade(false) after
+        // form_postinit and after record cleardoc: machine-filled open is not a user edit.
         await cleardoc()
 
         await validateall('filldefaults')
@@ -1985,6 +1993,11 @@ async function formfunctions_onload() {
         grecn = null
         await calcfields()
         await updatedisplay()
+
+        // Unbound save stays enabled (setchangesmade: savebuttonactive || !gKeyNodes).
+        // Forms that need dirty after open call setchangesmade(true) themselves
+        // (e.g. draft keep after preview write).
+        setchangesmade(false)
 
     }
 
