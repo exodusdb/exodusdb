@@ -170,26 +170,33 @@ func main() {
 			question ^= "\n" ^ basefilename.quote() ^ " does not exist. Create what? (1-2) ";
 			while (true) {
 
-				if (basefilename.lcase().starts("dict."))
+				if (basefilename.lcase().starts("dict.")) {
 					progtype = 5;
-				else {
-					// One key (no Enter). Enter/Esc/empty cancels like previous empty input.
-					printx(question);
-					osflush();
-					progtype.inputn(1);
-					printl();
+					break;
 				}
 
-				if (progtype == 2)      progtype = "classlib";
-				else if (progtype == 3)	progtype = "main";
-				else if (progtype == 4)	progtype = "mainlib";
-				else if (progtype == 1) progtype = "class";
-				else if (progtype == 5)	progtype = "dict";
-				else
-					// Enter (\r/\n), Esc, or any other key → cancel
+				// One key (no Enter). Enter cancels. Other keys re-prompt.
+				printx(question);
+				osflush();
+				progtype.inputn(1);
+				printl();
+
+				if (progtype == "1") {
+					progtype = "class";
+					break;
+				}
+				if (progtype == "2") {
+					progtype = "classlib";
+					break;
+				}
+				// Enter (CR/LF) or empty → cancel (same as before)
+				if (progtype == "" or progtype == "\r" or progtype == "\n")
 					abort("");
-				break;
+				// any other key → ask again
 			}
+
+			if (progtype == 5)
+				progtype = "dict";
 
 			newfile = true;
 			var blankfile = "";
