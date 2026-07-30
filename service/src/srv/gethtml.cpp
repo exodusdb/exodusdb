@@ -24,16 +24,23 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 	//
 	//  letterhead = perform("gethtml");
 	//
-	// nlist PERFORMs gethtml (via printtx.hpp) when service lib list.cpp performs nlist.
+	// On success perform returns this main()'s return value = letterhead HTML
+	// (also left in ANS). On abort perform returns false and sets lasterror().
+	// perform is not "bool only" — false is only the abort signal.
 	//
-	// nlist does not perform, nor calls, gethtml when cli list.cpp command line calls nlist.
+	// Path that still uses perform:
+	//   service list → perform nlist (cli lib, no gethtml.h) → printtx stub
+	//   → perform("gethtml") when APPLICATION is set.
 	//
-	// 2. CALL
+	// Direct cli list has no APPLICATION → stub leaves letterhead empty.
+	//
+	// 2. CALL (usual app/service path)
 	//
 	//  call gethtml(mode, letterhead, compcode, qr_text);
 	//
-	// Lots of service and application code CALLs gethtml directly
-	// or indirectly via included printtx.hpp
+	// Service/neosys compile with ~/inc/gethtml.h, so printtx.hpp includes
+	// the real callable and uses call gethtml("HEAD", letterhead, "") —
+	// not perform. Most letterheads never go through perform at all.
 	//
 
 	// TODO what about letterhead with vehicle logos?
@@ -258,8 +265,8 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 		letterhead.replacer("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
 	}
 
-	// Also return letterhead in ANS in case gethtml was performed, not called.
-	//if (mode0.unassigned()) {
+	// Performed: return letterhead as perform()'s result (and ANS).
+	// Callers: letterhead = perform("gethtml");  // string on success, false on abort
 	if (performed) {
 		ANS = letterhead;
 		return ANS;

@@ -4,21 +4,33 @@
 #include <exodus/htmllib2.h>
 
 //////////////////////////////////////////////////////////////
-// gethtml2, sendmail and xselect will found in the ~/inc  dir
-// when using printtx.hpp in service programs but will not
-// be available when building cli/list.cpp library
+// gethtml / sendmail / xselect
+//
+// Service and neosys builds have headers under ~/inc, so
+// __has_include succeeds and call gethtml(...) is used (real path).
+//
+// cli nlist is built without those headers, so the stubs below are
+// compiled in. Service list still PERFORMs nlist; nlist then hits this
+// stub, which PERFORMs gethtml when APPLICATION is set.
+//
+// perform() returns the performed program's main() result on success
+// (gethtml returns the letterhead HTML string). perform() returns
+// *false only on abort* — it is not "always bool".
 //////////////////////////////////////////////////////////////
 
 #if __has_include(<gethtml.h>)
 #	include <gethtml.h>
 #	define EXO_HAS_GETHTML
 #else
-//subroutine gethtml(in mode0, out html_letterhead, in compcode0="", in qr_text="") {
+// Stub only when gethtml.h is absent (cli nlist). See comments above.
 subroutine gethtml(in, out html_letterhead, in = "", in = "") {
-	if (APPLICATION)
-		html_letterhead = perform("gethtml");
-	else
-		html_letterhead = "";
+	html_letterhead = "";
+	if (APPLICATION) {
+		// Success: letterhead HTML. Abort: false → leave empty.
+		let r = perform("gethtml");
+		if (r)
+			html_letterhead = r;
+	}
 	return;
 }
 #endif
