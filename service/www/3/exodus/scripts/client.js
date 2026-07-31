@@ -3818,33 +3818,24 @@ async function exodus_typeahead(request, cols, coln, options) {
 		rows = exodus_typeahead_parserows(options.data, colids)
 	} else {
 		var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
-		// All typeahead server I/O is cacheable by full request string (same key ⇒ same list).
-		// Callers may omit CACHE\r; enforce here so FINDACCOUNT/VAL.* are not re-hit every key.
+		// No client CACHE\r for typeahead: stale gcache (incl. opener.gcache) held
+		// leave-field exact-key full records → parse [] and never re-hit server.
+		// Debounce + typeahead_limitn keep load down; server may still cache.
 		var req = String(request)
-		if (req.slice(0, 6) != 'CACHE\r')
-			req = 'CACHE\r' + req
-		var bare = req.slice(6) // request key without CACHE\r (same as send()'s request2)
+		if (req.slice(0, 6) == 'CACHE\r')
+			req = req.slice(6)
+		// Drop any leftover client cache for this request so a rare CACHE caller
+		// (or opener gcache) cannot force a stale empty list.
+		if (typeof deletecache == 'function')
+			deletecache(req)
 		tdb.request = req
-		if (!(await tdb.send()) || !tdb.data) {
+		if (!(await tdb.send()) || tdb.data == null || tdb.data === '') {
 			// only hide if we are still the active search
 			if (typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq)
 				form_typeahead_hide()
 			return true
 		}
 		rows = exodus_typeahead_parserows(tdb.data, colids)
-		// Stale CACHE: leave-field/exact-key VAL used to short-circuit to a full record
-		// (fm+fm) which parse as []. That body stays in gcache under the typeahead
-		// request → paste full key never hits server and list stays empty. Bust and retry.
-		if ((!rows || !rows.length) && typeof deletecache == 'function') {
-			deletecache(bare)
-			tdb.request = bare
-			if ((await tdb.send()) && tdb.data) {
-				rows = exodus_typeahead_parserows(tdb.data, colids)
-				// re-cache multi-hit under the CACHE key so later keys stay fast
-				if (rows && rows.length && typeof writecache == 'function')
-					writecache(bare, tdb.data)
-			}
-		}
 	}
 
 	// Superseded by newer typeahead or leave-field validate
