@@ -120,12 +120,15 @@ Exodus “English” **SELECT** criteria (sortselect / listen `SELECT` request f
 
 Same idea as existing patterns that use **`AND WITH`** / **`AND WITHOUT`** (media/jobs cmds). `%SELECTLIST%` + only a trailing `WITHOUT` (agencyproxy multi-hit after btreeextract) is fine — there is no prior `WITH` predicate in that sortselect string.
 
-**XREF multi-word decoration (SELECT vs VAL/btreeextract):**
+**XREF multi-word (SELECT English vs VAL/btreeextract):**
 
-| Path | Multi-word form | Why |
-|------|-----------------|-----|
-| **SELECT** `WITH …XREF "…"` | spaces → **`&`** only (`HOR&I`) | FTS builds `(HOR:*&I:*)`. Do **not** use `]&` — `HOR]&I]` becomes illegal `(HOR:*:*&I:*)`. |
-| **VAL / btreeextract** | spaces → **`]&`** + trailing **`]`** | btreeextract strips `]` then SELECT; same decoration as classic. |
+| Path | Multi-word form | FTS result |
+|------|-----------------|------------|
+| **SELECT** English | `WITH TEXT.XREF "HOR" "I"` (separate quoted words) | getword → multi-value → `(HOR:*)\|(I:*)` (OR of prefixes). **Do not invent** `]&` or mash into one quoted string. |
+| **SELECT** AND within one term | `WITH TEXT.XREF "HOR&I"` | `(HOR:*&I:*)` (AND of prefixes) when you need both words |
+| **VAL / btreeextract** | spaces → **`]&`** + trailing **`]`** | btreeextract strips `]` first; not for listen `SELECT` sortselect |
+
+Avoid `WITH …XREF "HOR]&I]"` on SELECT — becomes illegal `(HOR:*:*&I:*)`.
 
 STATUS and other TEXT fields (e.g. ISSUED) are already in agency TEXT.XREF content for jobs/estimates.
 
