@@ -107,6 +107,19 @@ House pattern: **S-type full-text field + `.XREF`** (clients/brands **`SEQUENCE`
 
 **Accounts** use **`UPPERCASE_NAME` / `UPPERCASE_NAME.XREF`** (FINDACCOUNT). External keys: name + `@ID` + ledger + currency + f10; **`.` internal keys return empty** (twin external record is the search hit).
 
+### SELECT English: `WITH` / `WITHOUT` join with **AND**
+
+Exodus “English” **SELECT** criteria (sortselect / listen `SELECT` request field) do **not** default to **AND** between successive clauses. Adjacent **`WITH` / `WITHOUT`** pieces can generate SQL **without** an `AND` between predicates → Postgres syntax error (e.g. `… @@ tsquery(…) dict_…_YEAR_PERIOD … NOT BETWEEN …` with nothing between the two expressions).
+
+**Always spell the join explicitly** when combining filters:
+
+| Prefer | Avoid |
+|--------|--------|
+| `WITH TEXT.XREF "HOR]" AND WITHOUT YEAR_PERIOD BETWEEN "80.01" AND "99.99"` | `WITH TEXT.XREF "HOR]" WITHOUT YEAR_PERIOD BETWEEN "80.01" AND "99.99"` |
+| `WITH … AND WITH STOPPED EQ ""` | bare second `WITH` when AND is required |
+
+Same idea as existing patterns that use **`AND WITH`** / **`AND WITHOUT`** (media/jobs cmds). `%SELECTLIST%` + only a trailing `WITHOUT` (agencyproxy multi-hit after btreeextract) is fine — there is no prior `WITH` predicate in that sortselect string.
+
 ### Dat deploy (same effort as C++)
 
 Changing `src/dat/dict.*` is **not** live until:
