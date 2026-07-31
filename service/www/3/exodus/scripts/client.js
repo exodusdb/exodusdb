@@ -7022,6 +7022,25 @@ function exodusconfirm_scrollpane() {
 	return div && (div.querySelector('.exodusconfirm_body') || div)
 }
 
+// Scroll a table row into view below a sticky thead (scrollIntoView nearest
+// can leave the focused radio/row under sticky colheads on wheel/Up/Home).
+function exodus_scroll_row_below_sticky_thead(tr, scrollpane, thead) {
+	if (!tr || !scrollpane)
+		return
+	if (!thead) {
+		var table = getancestor(tr, 'table')
+		thead = table && table.tHead
+	}
+	var headH = thead ? thead.offsetHeight : 0
+	var paneRect = scrollpane.getBoundingClientRect()
+	var trRect = tr.getBoundingClientRect()
+	var topLimit = paneRect.top + headH
+	if (trRect.top < topLimit)
+		scrollpane.scrollTop -= (topLimit - trRect.top)
+	else if (trRect.bottom > paneRect.bottom)
+		scrollpane.scrollTop += (trRect.bottom - paneRect.bottom)
+}
+
 function exodusconfirm_footerwrap(content) {
 	// Buttons only — left edge shared via one-row two-col shell (icon | everything).
 	return content

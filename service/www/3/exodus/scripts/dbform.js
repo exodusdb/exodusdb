@@ -6094,8 +6094,13 @@ function form_typeahead_set_focus(n) {
         else
             trs[i].classList.remove('exodus_typeahead_focus')
     }
-    if (trs[n] && trs[n].scrollIntoView)
-        trs[n].scrollIntoView({ block: 'nearest' })
+    // Keep highlight below sticky thead (same helper as decide)
+    if (trs[n]) {
+        if (typeof exodus_scroll_row_below_sticky_thead == 'function')
+            exodus_scroll_row_below_sticky_thead(trs[n], gform_typeahead_div)
+        else if (trs[n].scrollIntoView)
+            trs[n].scrollIntoView({ block: 'nearest' })
+    }
 }
 
 // Mouse/keyboard pick: set value and focusnext only.
