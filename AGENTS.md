@@ -120,6 +120,15 @@ Exodus “English” **SELECT** criteria (sortselect / listen `SELECT` request f
 
 Same idea as existing patterns that use **`AND WITH`** / **`AND WITHOUT`** (media/jobs cmds). `%SELECTLIST%` + only a trailing `WITHOUT` (agencyproxy multi-hit after btreeextract) is fine — there is no prior `WITH` predicate in that sortselect string.
 
+**XREF multi-word decoration (SELECT vs VAL/btreeextract):**
+
+| Path | Multi-word form | Why |
+|------|-----------------|-----|
+| **SELECT** `WITH …XREF "…"` | spaces → **`&`** only (`HOR&I`) | FTS builds `(HOR:*&I:*)`. Do **not** use `]&` — `HOR]&I]` becomes illegal `(HOR:*:*&I:*)`. |
+| **VAL / btreeextract** | spaces → **`]&`** + trailing **`]`** | btreeextract strips `]` then SELECT; same decoration as classic. |
+
+STATUS and other TEXT fields (e.g. ISSUED) are already in agency TEXT.XREF content for jobs/estimates.
+
 ### Dat deploy (same effort as C++)
 
 Changing `src/dat/dict.*` is **not** live until:
