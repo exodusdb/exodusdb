@@ -3823,6 +3823,7 @@ async function exodus_typeahead(request, cols, coln, options) {
 		var req = String(request)
 		if (req.slice(0, 6) != 'CACHE\r')
 			req = 'CACHE\r' + req
+		var bare = req.slice(6) // request key without CACHE\r (same as send()'s request2)
 		tdb.request = req
 		if (!(await tdb.send()) || !tdb.data) {
 			// only hide if we are still the active search
@@ -3831,6 +3832,19 @@ async function exodus_typeahead(request, cols, coln, options) {
 			return true
 		}
 		rows = exodus_typeahead_parserows(tdb.data, colids)
+		// Stale CACHE: leave-field/exact-key VAL used to short-circuit to a full record
+		// (fm+fm) which parse as []. That body stays in gcache under the typeahead
+		// request → paste full key never hits server and list stays empty. Bust and retry.
+		if ((!rows || !rows.length) && typeof deletecache == 'function') {
+			deletecache(bare)
+			tdb.request = bare
+			if ((await tdb.send()) && tdb.data) {
+				rows = exodus_typeahead_parserows(tdb.data, colids)
+				// re-cache multi-hit under the CACHE key so later keys stay fast
+				if (rows && rows.length && typeof writecache == 'function')
+					writecache(bare, tdb.data)
+			}
+		}
 	}
 
 	// Superseded by newer typeahead or leave-field validate
@@ -8891,11 +8905,14 @@ async function decide_onload(decide_args) {
 		resolvePendingConfirm(value, 'decide_close')
 	}
 
-	// direction ±1, steps (1 or 10), selectRadio: check for single-select (arrow/wheel, not PgUp/Dn)
-	function decide_move_option(direction, steps, selectRadio) {
+	// direction ±1, steps (1 or 10), selectRadio: check for single-select (arrows).
+	// wrap: true = Up/Down cycle ends (default); false = wheel/PgUp/PgDn stop at ends.
+	function decide_move_option(direction, steps, selectRadio, wrap) {
 		var selections = document.getElementsByName('decide_selection')
 		if (!selections || !selections.length)
 			return false
+		if (typeof wrap == 'undefined' || wrap == null)
+			wrap = true
 
 		var element = null
 		var active = document.activeElement
@@ -8941,10 +8958,16 @@ async function decide_onload(decide_args) {
 		var newelement = element
 		while (guard++ <= selections.length) {
 			n += direction
-			if (n < 0)
+			if (n < 0) {
+				if (!wrap)
+					break
 				n = selections.length - 1
-			if (n >= selections.length)
+			}
+			if (n >= selections.length) {
+				if (!wrap)
+					break
 				n = 0
+			}
 			if (n == startn && stepped == 0 && guard > 1)
 				break
 			newelement = selections[n]
@@ -9486,10 +9509,11 @@ async function decide_onload(decide_args) {
 				return exoduscancelevent(event)
 			}
 
-			// Up/Down (and faked from Space): radio checks; multi focus only
-			// Backspace: move up then uncheck if multi
+			// Up/Down (and faked from Space): radio checks; multi focus only; wrap ends.
+			// PgUp/PgDn: no wrap (wheel same). Backspace: move up then uncheck if multi.
 			var selectRadio = !decide_returnmany && keycode != 8
-			if (!decide_move_option(direction, steps, selectRadio))
+			var wrap = !(keycode == 33 || keycode == 34)
+			if (!decide_move_option(direction, steps, selectRadio, wrap))
 				return exoduscancelevent(event)
 
 			if (keycode == 8 && decide_returnmany) {
