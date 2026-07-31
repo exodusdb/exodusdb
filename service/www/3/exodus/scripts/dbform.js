@@ -5774,10 +5774,14 @@ function form_typeahead_dblink() {
         gform_typeahead_db = new exodusdblink()
         // Quiet: no blockmodalui on send (avoids scroll-to-top every key)
         gform_typeahead_db.quiet = true
-        // Do NOT force CACHE\r here. Stale gcache (incl. opener.gcache after
-        // "hard refresh" of a child form) used to return leave-field exact-key
-        // bodies so paste of a full key never hit the server. Typeahead always
-        // goes to the network (debounced; typeahead_limitn caps the list).
+        // Typeahead I/O is client-cacheable by full request string (gcache cleared
+        // on refresh / Alt+R). exodus_typeahead also prefixes CACHE\r.
+        var _ta_send = gform_typeahead_db.send
+        gform_typeahead_db.send = async function form_typeahead_send(data) {
+            if (this.request && String(this.request).slice(0, 6) != 'CACHE\r')
+                this.request = 'CACHE\r' + this.request
+            return await _ta_send.call(this, data)
+        }
     }
     return gform_typeahead_db || db
 }

@@ -3818,18 +3818,12 @@ async function exodus_typeahead(request, cols, coln, options) {
 		rows = exodus_typeahead_parserows(options.data, colids)
 	} else {
 		var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
-		// No client CACHE\r for typeahead: stale gcache (incl. opener.gcache) held
-		// leave-field exact-key full records → parse [] and never re-hit server.
-		// Debounce + typeahead_limitn keep load down; server may still cache.
+		// Client CACHE by full request string (gcache cleared on page refresh / Alt+R).
 		var req = String(request)
-		if (req.slice(0, 6) == 'CACHE\r')
-			req = req.slice(6)
-		// Drop any leftover client cache for this request so a rare CACHE caller
-		// (or opener gcache) cannot force a stale empty list.
-		if (typeof deletecache == 'function')
-			deletecache(req)
+		if (req.slice(0, 6) != 'CACHE\r')
+			req = 'CACHE\r' + req
 		tdb.request = req
-		if (!(await tdb.send()) || tdb.data == null || tdb.data === '') {
+		if (!(await tdb.send()) || !tdb.data) {
 			// only hide if we are still the active search
 			if (typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq)
 				form_typeahead_hide()
