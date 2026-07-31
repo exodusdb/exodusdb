@@ -5816,40 +5816,19 @@ async function form_oninput(event) {
         setchangesmade(true)
     }
 
-    form_schedule_onchange(element)
-    return true
-}
-
-// Paste: ensure typeahead runs after value is applied (input alone can miss some browsers).
-async function form_onpaste(event) {
-    event = getevent(event)
-    var element = event.target
-    if (!element || !element.getAttribute)
-        return true
-    if (element.getAttribute('exodusfieldno') == null && !element.getAttribute('exodusonchange'))
-        return true
-    if (element.tagName == 'SELECT')
-        return true
-    // After paste, value is updated; schedule same debounced path.
-    window.setTimeout(function () {
-        form_schedule_onchange(element)
-    }, 0)
-    return true
-}
-
-function form_schedule_onchange(element) {
-    if (!element || !element.getAttribute)
-        return
+    // optional live onchange (e.g. brand_code_onchange) — debounced
     var onchangexpr = element.getAttribute('exodusonchange')
-    if (!onchangexpr)
-        return
-    gform_onchange_element = element
-    if (gform_onchange_timer)
-        window.clearTimeout(gform_onchange_timer)
-    gform_onchange_timer = window.setTimeout(function () {
-        gform_onchange_timer = null
-        form_run_onchange(element, onchangexpr)
-    }, 200)
+    if (onchangexpr) {
+        gform_onchange_element = element
+        if (gform_onchange_timer)
+            window.clearTimeout(gform_onchange_timer)
+        gform_onchange_timer = window.setTimeout(function () {
+            gform_onchange_timer = null
+            form_run_onchange(element, onchangexpr)
+        }, 200)
+    }
+
+    return true
 }
 
 async function form_run_onchange(element, onchangexpr) {
@@ -10825,8 +10804,15 @@ async function document_onpaste(event) {
     //standardise on \n
     text = text.replace(/\r\n/g, '\n')
 
-    //only supporting form_paste with multiple lines of paste (col header plus min one line)
-    if (text.indexOf('\n') < 0) {
+    // Single value paste (incl. trailing newline from Excel/clipboard) → normal
+    // insert + typeahead. Multi-line import needs ≥2 non-empty lines.
+    var nonempty = 0
+    var parts = text.split('\n')
+    for (var pi = 0; pi < parts.length; pi++) {
+        if (String(parts[pi]).replace(/^\s+|\s+$/g, '') !== '')
+            nonempty++
+    }
+    if (nonempty < 2) {
         window.setTimeout(function () { void form_oninput({ target: element }) }, 0)
         return true
     }
