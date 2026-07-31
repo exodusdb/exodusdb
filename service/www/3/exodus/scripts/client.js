@@ -8588,8 +8588,8 @@ async function decide_onload(decide_args) {
 		if (!delta)
 			return false
 		var direction = delta > 0 ? 1 : -1
-		// Radio: check + focus; multi-select: focus only (classic listbox)
-		return decide_move_option(direction, 1, !decide_returnmany)
+		// Radio: check + focus; multi-select: focus only. No wrap (arrows wrap).
+		return decide_move_option(direction, 1, !decide_returnmany, false)
 	}
 
 	//returning undefined indicates that we need to yield and wait for decide_ok_onclick_sync etc to resume
