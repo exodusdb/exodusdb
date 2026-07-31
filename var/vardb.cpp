@@ -4422,7 +4422,13 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 					// Multivalues are searched using "OR" which is the | pipe character in ts_query syntax
 					// words separated by spaces (or & characters) are searched for uing "AND" which is & in ts_query syntax
+					//
+					// getword() builds multi-value as SQL-quoted fields: 'HOR' FM 'I'
+					// (English: WITH TEXT.XREF "HOR" "I"). unquoter() on the whole string
+					// only strips the outer quotes → HOR' FM 'I → illegal (HOR':*)|('I:*).
+					// Same as calc_fields: peel 'FM' joints then unquote once.
 					var values="";
+					value.replacer("'" _FM "'", FM);
 					value.unquoter();
 					value.converter(VM,FM);
 					for (var partvalue : value) {
