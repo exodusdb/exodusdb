@@ -6214,6 +6214,7 @@ function form_typeahead_apply(n) {
 // Esc dismiss; arrows / PgUp/PgDn / Home / End move highlight;
 // Enter only applies if user has moved highlight.
 // Plain Enter (no arrow selection): hide list and let normal Enter / focusnext run.
+// Up/Down wrap (top↔bottom), same as decide list arrows. PgUp/PgDn clamp.
 // PgUp/PgDn step by a fixed page of rows (viewport auto-count is unreliable with wrapping cells).
 var gform_typeahead_pagesize = 10
 
@@ -6229,15 +6230,22 @@ function form_typeahead_keydown(event) {
         form_typeahead_hide()
         return false
     }
-    if (keycode == 40) {
-        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn + 1)
+    var nrows = gform_typeahead_rows ? gform_typeahead_rows.length : 0
+    // Down / Up — wrap at ends (no selection yet → first row)
+    if (keycode == 40 || keycode == 38) {
+        if (!nrows)
+            return false
+        var n = gform_typeahead_focusn
+        if (n < 0)
+            n = 0
+        else if (keycode == 40)
+            n = (n + 1) % nrows
+        else
+            n = (n - 1 + nrows) % nrows
+        form_typeahead_set_focus(n)
         return false
     }
-    if (keycode == 38) {
-        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn - 1)
-        return false
-    }
-    // Page Down / Page Up — fixed step (gform_typeahead_pagesize)
+    // Page Down / Page Up — fixed step (gform_typeahead_pagesize); clamp at ends
     if (keycode == 34) {
         form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn + gform_typeahead_pagesize)
         return false
