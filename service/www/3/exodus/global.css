@@ -409,6 +409,8 @@ TABLE
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
     max-height: 28em;
     overflow: auto;
+    /* Normal wheel scrolls the list only; do not chain to page (decide steps options instead) */
+    overscroll-behavior: contain;
     font-size: inherit;
     padding: 4px;
 }

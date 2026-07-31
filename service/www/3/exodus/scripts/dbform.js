@@ -5904,44 +5904,11 @@ function form_typeahead_ensure() {
     div.onmouseup = function () {
         gform_typeahead_mousedown = false
     }
-    // Wheel scrolls the panel (max-height overflow), not the page under fixed chrome.
-    // passive:false so preventDefault works; stopPropagation keeps document handlers off.
-    div.addEventListener('wheel', form_typeahead_onwheel, { capture: true, passive: false })
+    // Wheel = normal overflow scroll only (CSS overscroll-behavior: contain).
+    // No JS option-stepping (decide does that). No custom scrollTop.
     document.body.appendChild(div)
     gform_typeahead_div = div
     return div
-}
-
-function form_typeahead_onwheel(event) {
-
-    event = getevent(event)
-    var el = gform_typeahead_div
-    if (!el || el.style.display == 'none')
-        return true
-    var dy = 0
-    if (event.deltaY != null)
-        dy = event.deltaY
-    else if (event.wheelDelta != null)
-        dy = -event.wheelDelta
-    else if (event.detail != null)
-        dy = event.detail * 16
-    if (!dy)
-        return true
-    // Always keep wheel with the panel while pointer is over it
-    if (event.stopPropagation)
-        event.stopPropagation()
-    var maxScroll = el.scrollHeight - el.clientHeight
-    if (maxScroll > 0) {
-        var next = el.scrollTop + dy
-        if (next < 0)
-            next = 0
-        if (next > maxScroll)
-            next = maxScroll
-        el.scrollTop = next
-    }
-    if (event.preventDefault)
-        event.preventDefault()
-    return false
 }
 
 function form_typeahead_scroll_sync() {
