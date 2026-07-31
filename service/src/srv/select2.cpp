@@ -314,7 +314,6 @@ nocommon:
 ////////
 nextrec:
 	// //////
-	// if recn then if recn>=maxnrecs then goto nomore
 
 	if (givenkeys) {
 
@@ -509,6 +508,25 @@ nextrec:
 	} else {
 		datax ^= row;
 		dataptr += row.len();
+	}
+
+	// Cap kept rows (AUTHORISED already applied). SELECT "N file" maxnrecs only
+	// limits the SQL select list; %SELECTLIST% / given-keys need this recn check
+	// (typeahead_limitn via agencyproxy allownew 00).
+	if (maxnrecs and recn >= maxnrecs) {
+		if (xml and linkfilename2) {
+			var tt = "</records>";
+			if (not osbwrite(tt, linkfile2, dataptr)) {
+				abort(lasterror());
+			}
+			linkfile2.osclose();
+			var().osflush();
+		} else if (linkfilename2) {
+			linkfile2.osclose();
+			var().osflush();
+		}
+		gosub exit();
+		return 0;
 	}
 
 	// get next if output to file or space for more data
