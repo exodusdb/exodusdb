@@ -906,16 +906,16 @@ async function formfunctions_onload() {
             }
 
             //allow for data entry in SPAN elements (unless hidden)
-            // min-width = length × 1 average char (CSS ch = width of "0"); no max from length.
+            // Align-T free text (contenteditable): fill the cell and wrap at the
+            // form soft ceiling (global.css max-width). Do NOT set min-width to
+            // full exoduslength — length 80 DESCRIPTION forced the form table
+            // max-content to ~page width. Length stays as maxlength/UI hint only.
+            // (INPUT width rules above do not apply to SPANs.)
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
-                var spanlen = parseInt(element.getAttribute('exoduslength'), 10)
-                var minwidth = spanlen > 0 ? spanlen + 'ch' : ''
                 //buggy and not necessary on msie7
                 //dont set display block if there is a link or popup so that the image stays to the left of the field
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
-                    if (minwidth)
-                        element.style.minWidth = minwidth
                     //element.multiLine=true
                     //element.style.display = 'inline-block'
                     //perhaps we ought to be using <div>
@@ -923,21 +923,17 @@ async function formfunctions_onload() {
                     if (element.getAttribute('exoduspopup') || element.getAttribute('exoduslink')) {
                         element.style.display = 'inline-block'
                         //                      element.style.float='left'
-                    } else
+                    } else {
                         element.style.display = 'block'
+                        element.style.width = '100%'
+                        element.style.boxSizing = 'border-box'
+                    }
                     //element.style.float='left'
                 }
 
                 if (!(element.getAttribute('exodusreadonly'))) {
                     element.contentEditable = 'true'
                     //element.contentEditable = true
-                    //fixed width in msie but buggy in ff?
-                    if (isMSIE && minwidth) {
-                        //setting minWidth only causes problem in plan/schedule dates and extras entry
-                        //setting width only causes problem almost everywhere that span data entry has no size initially
-                        element.style.minWidth = minwidth
-                        element.style.Width = minwidth
-                    }
                     if (!(element.getAttribute('tabindex')))
                         element.setAttribute('tabindex', 999)
                 }

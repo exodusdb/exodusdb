@@ -271,7 +271,8 @@ TABLE.exodusform TABLE.exotable th {
 /*
  * Flowing text (align=T → contenteditable span).
  * Fold inside the cell once the form table is at its viewport ceiling.
- * min-width remains the dict length floor (inline from dbform).
+ * Do not min-width to dict length (dbform used to set Nch — DESCRIPTION 80
+ * forced form max-content to page width). width 100% from dbform fills cell.
  */
 SPAN.clsRequired[contenteditable],
 SPAN.clsNotRequired[contenteditable] {
