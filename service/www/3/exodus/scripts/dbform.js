@@ -3300,9 +3300,16 @@ async function document_onkeydown2(event) {
 
     //the rest of the keys are only when located on a exodus data entry field
     if (typeof ggroupno == 'undefined' || ggroupno == null) {
-        // Focused form action button (e.g. unbound OK/Cancel at bottom): Enter/Space activate
-        // it like a native button. Does not run when focus is on a data field (has groupno).
-        if ((keycode == 13 || keycode == 32) && !event.ctrlKey && !event.altKey) {
+        // Ctrl/Cmd+Enter: always Save/OK, never press the focused button (menubar List,
+        // Reconcile, form Cancel, …). Same shortcut as Enter on a data field with Ctrl.
+        if (keycode == 13 && (event.ctrlKey || event.metaKey) && !event.altKey) {
+            if (saverecord && !saverecord.getAttribute('disabled'))
+                await saverecord_onclick()
+            return exoduscancelevent(event)
+        }
+        // Focused form action button (e.g. unbound OK/Cancel at bottom): bare Enter/Space
+        // activate it like a native button. Not when Ctrl/Alt (see above for Ctrl+Enter).
+        if ((keycode == 13 || keycode == 32) && !event.ctrlKey && !event.metaKey && !event.altKey) {
             if (await form_activate_focused_action_button(event, element))
                 return exoduscancelevent(event)
         }
