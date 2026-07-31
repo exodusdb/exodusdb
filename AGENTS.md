@@ -2,7 +2,7 @@
 
 ## Live remotecall (login + post)
 
-To hit live backends (VAL/SELECT/typeahead) with a real session: **`~/test.exodus.sh`** + skill **`exodus-remotecall`** (`.grok/skills/exodus-remotecall/`). Password only via passfile; never load/log it. Global `~/.grok/AGENTS.md` has the same rule.
+Skill **`exodus-remotecall`**: **`.grok/skills/exodus-remotecall/scripts/test.exodus.sh`** (login + post via xhttp.php). Password only via passfile; never load/log it. Global `~/.grok/AGENTS.md` has the same rule.
 
 ## Form / web UI work (read first)
 
