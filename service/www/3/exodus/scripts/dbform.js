@@ -5777,6 +5777,15 @@ function form_typeahead_dblink() {
         gform_typeahead_db = new exodusdblink()
         // Quiet: no blockmodalui on send (avoids scroll-to-top every key)
         gform_typeahead_db.quiet = true
+        // Every typeahead send is client-cacheable by full request string.
+        // Helpers (ledger/exec/client-order/filtered VAL) set tdb.request themselves;
+        // exodus_typeahead also prefixes CACHE — belt-and-braces here for all paths.
+        var _ta_send = gform_typeahead_db.send
+        gform_typeahead_db.send = async function form_typeahead_send(data) {
+            if (this.request && String(this.request).slice(0, 6) != 'CACHE\r')
+                this.request = 'CACHE\r' + this.request
+            return await _ta_send.call(this, data)
+        }
     }
     return gform_typeahead_db || db
 }
@@ -6008,11 +6017,13 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     if (typeof returncoln == 'undefined' || returncoln == null || returncoln === '')
         returncoln = 0
 
-    // Cap DOM size — huge ACCOUNTLIST freezes the page. Match server SELECT
-    // caps (typeahead uses up to 1000); old 20 hid e.g. SAUDI* under A–P noise.
-    var maxrows = 1000
-    if (rows.length > maxrows)
-        rows = rows.slice(0, maxrows)
+    // Cap display only — do not change backend tools (FINDACCOUNT/VAL/GETACC).
+    // SELECT typeahead requests pass the same typeahead_limitn as maxnrecs.
+    // rg typeahead_limitn for mass-update. Exact-N hit may mean server truncated.
+    var typeahead_limitn = 100
+    var truncated = rows.length >= typeahead_limitn
+    if (rows.length > typeahead_limitn)
+        rows = rows.slice(0, typeahead_limitn)
 
     var div = form_typeahead_ensure()
     gform_typeahead_element = element
@@ -6059,7 +6070,13 @@ function form_typeahead_show(element, cols, rows, returncoln) {
         html += '</tr>'
     }
     html += '</tbody></table>'
+    if (truncated)
+        html += '<div class="exodus_typeahead_truncated">Showing first ' + typeahead_limitn + ' — type more to narrow</div>'
     div.innerHTML = html
+    if (truncated)
+        div.classList.add('exodus_typeahead_is_truncated')
+    else
+        div.classList.remove('exodus_typeahead_is_truncated')
     form_typeahead_place(element, div)
     div.style.display = ''
     form_typeahead_listen_scroll(true)

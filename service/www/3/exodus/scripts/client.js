@@ -3818,7 +3818,12 @@ async function exodus_typeahead(request, cols, coln, options) {
 		rows = exodus_typeahead_parserows(options.data, colids)
 	} else {
 		var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
-		tdb.request = String(request)
+		// All typeahead server I/O is cacheable by full request string (same key ⇒ same list).
+		// Callers may omit CACHE\r; enforce here so FINDACCOUNT/VAL.* are not re-hit every key.
+		var req = String(request)
+		if (req.slice(0, 6) != 'CACHE\r')
+			req = 'CACHE\r' + req
+		tdb.request = req
 		if (!(await tdb.send()) || !tdb.data) {
 			// only hide if we are still the active search
 			if (typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq)
@@ -3874,13 +3879,19 @@ async function exodus_typeahead(request, cols, coln, options) {
 		rows = exodus_typeahead_wordstart(rows, keyAtStart)
 	if (typeof options.filter == 'function')
 		rows = options.filter(rows, keyAtStart) || []
-	// Prefer only identity cells: row[0], row[1], pick col. Do not scan
-	// supplier/market/… — vehicle market "SA" was scrambling name order.
+	// Prefer rows whose identity cells start with key: pick col (the key/code
+	// written on choose), plus first two cells (code+name). Always include the
+	// pick key so name-heavy lists still rank e.g. G12 → G123. Do not scan
+	// market/supplier/… — vehicle market "SA" was scrambling name order.
 	var pcols = [0]
 	if (rows[0] && rows[0].length > 1)
 		pcols.push(1)
-	if (rcoln > 1)
-		pcols.push(rcoln)
+	// Always include pick col (even when 0 — already in list; when >1, add it)
+	if (rcoln != null && !isNaN(Number(rcoln))) {
+		var rc = Number(rcoln)
+		if (rc >= 0 && pcols.indexOf(rc) < 0)
+			pcols.push(rc)
+	}
 	rows = exodus_typeahead_prefer_prefix(rows, keyAtStart, pcols)
 	if (!rows || !rows.length) {
 		form_typeahead_hide()
@@ -3891,7 +3902,10 @@ async function exodus_typeahead(request, cols, coln, options) {
 	return true
 }
 
-// Keep rows where any whitespace-word in any cell starts with key (code prefix + name words).
+// Keep rows where any cell matches typed key as:
+//   • whole-cell prefix (account/ledger codes: G12 → G123), or
+//   • any whitespace-word prefix (names: "DUBAI" in "DUBAI FZ").
+// Covers both code keys and name search in one filter.
 function exodus_typeahead_wordstart(rows, key) {
 	if (!rows || !rows.length)
 		return rows || []
@@ -3911,6 +3925,11 @@ function exodus_typeahead_wordstart(rows, key) {
 			cell = cell.replace(/^\s+|\s+$/g, '')
 			if (!cell)
 				continue
+			// whole cell prefix (codes without spaces)
+			if (cell.indexOf(ku) === 0) {
+				hit = true
+				break
+			}
 			var words = cell.split(/\s+/)
 			for (var w = 0; w < words.length; w++) {
 				if (words[w] && words[w].indexOf(ku) === 0) {

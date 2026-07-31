@@ -415,6 +415,24 @@ TABLE
     border-color: #7a88b0;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
 }
+/* Hit typeahead_limitn — emphasize bottom edge + footer (form_typeahead_show) */
+.exodus_typeahead.exodus_typeahead_is_truncated {
+    border-bottom-width: 4px;
+    border-bottom-color: #c60;
+}
+:root[data-theme="dark_mode"] .exodus_typeahead.exodus_typeahead_is_truncated {
+    border-bottom-color: #e8a040;
+}
+.exodus_typeahead_truncated {
+    padding: 0.35em 0.5em 0.15em;
+    font-size: 0.9em;
+    opacity: 0.9;
+    border-top: 1px solid #999;
+    text-align: center;
+}
+:root[data-theme="dark_mode"] .exodus_typeahead_truncated {
+    border-top-color: #7a88b0;
+}
 .exodus_typeahead_table {
     border-collapse: collapse;
     width: auto;

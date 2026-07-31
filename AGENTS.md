@@ -89,6 +89,34 @@ One-liner (same as alias **`m`**):
 
 After a successful **build → test → install**, the basic package is on the install path. That alone does **not** rebuild or redeploy service/neosys application libraries.
 
+## Service data path: syncdat / dict2sql / initgeneral / indexes
+
+Deploying **dictionary records, pgsql functions, and btree/XREF indexes** is a **service** concern (CLI + `initgeneral`, not module HTM).
+
+| Step | What |
+|------|------|
+| **Service startup** | e.g. `serve_*` → `perform("initgeneral LOGIN")` (and related serve paths). |
+| **`syncdat`** | Invoked from **`initgeneral`** (`osshell("syncdat")`) and install. Scans `dat/` (dict trees), writes changed `dict.*` records into the DB. |
+| **`dict2sql`** | **`syncdat` shells `dict2sql`** for dict items with `/*pgsql…*/` (and generates FTS/XREF helpers where needed). Installs/replaces Postgres dict functions. **If that field’s function body changed and it was indexed, `dict2sql` reindexes** (`deleteindex` + **`createindex`**). |
+| **`createindex`** | Builds the physical index. For **`…XREF` / full text**, uses **GIN** on `to_tsvector(…, dict_…_xref(key,data))` (expression from the dict — not a hand-maintained wrapper you edit for every base-field change). |
+| **App init (`initacc`, `initagency`, …)** | Called from **`initgeneral`** via `systemsubs`. May **`createindex` when an index is missing** only. |
+
+### Full-text / typeahead
+
+House pattern: **S-type full-text field + `.XREF`** (clients/brands **`SEQUENCE` / `SEQUENCE.XREF`**). Typeahead and FIND* should use that **indexed** path only.
+
+**Accounts** use **`UPPERCASE_NAME` / `UPPERCASE_NAME.XREF`** (FINDACCOUNT). External keys: name + `@ID` + ledger + currency + f10; **`.` internal keys return empty** (twin external record is the search hit).
+
+### Dat deploy (same effort as C++)
+
+Changing `src/dat/dict.*` is **not** live until:
+
+1. **`cd ~/neosys/src && ./compall dat`** (or full `compall`) — rsync dat → `~/dat`, `syncdat dat`, touch `~/dat`  
+2. **`cd ~/exodus/service && ./copyall CONFIRM`** — rsync `~/dat` → `~/live/dat`, restart **`_live`** services  
+3. Services run **initgeneral → syncdat → dict2sql** (and **createindex** when dict2sql reindexes) against each `EXO_DATA`
+
+Do **not** invent app-level “force reindex stamps” for formula changes — that is **syncdat/dict2sql/createindex** on startup after dat is live.
+
 ## C++ style: prefer `var` member functions (FYI)
 
 Free functions in `exofuncs.h` (`quote`, `squote`, `oconv`, `osshell`, …) mostly **forward to members**. The library and apps are written in a **member-first** style because `var` is used heavily in chains and the same names exist on both sides.
