@@ -460,6 +460,15 @@ TABLE
     cursor: pointer;
 }
 /* Row highlight: match decide_row_hover */
+/* Miss tint: quiet no-match (and no-grow while class on). Leave-field still validates. */
+:is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_miss {
+    color: #c00;
+    font-weight: bold;
+}
+:root[data-theme="dark_mode"] :is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_miss {
+    color: #f66;
+}
+
 .exodus_typeahead_table tr.exodus_typeahead_focus td,
 .exodus_typeahead_table tr[data-ta-row]:hover td {
     background-color: lightgrey;

@@ -2943,6 +2943,10 @@ async function document_onkeydown2(event) {
     if (gstepping)
         wstatus(gkeycode)
 
+    // Miss-tinted field: no additional character entry (class is the marker)
+    if (form_miss_tint_keydown(event) === false)
+        return exoduscancelevent(event)
+
     // Find-as-you-type panel: Esc / arrows / Enter before form navigation
     var taKey = form_typeahead_keydown(event)
     if (taKey === false)
@@ -3267,6 +3271,8 @@ async function document_onkeydown2(event) {
                 //restore the original value
                 //get from datasource
                 setvalue(element, gpreviousvalue)
+                // setvalue2 clears miss; cancel pending quiet search so it cannot re-tint
+                form_typeahead_cancel()
 
                 //if reverting element that setchangesmade then revert that too
                 if (element == gelementthatjustcalledsetchangesmade)
@@ -5540,6 +5546,9 @@ async function cleardoc() {
 
     //login('cleardoc')
 
+    // Drop quiet typeahead (panel + miss tint) before fields are wiped
+    form_typeahead_reset()
+
     if (gKeyNodes && !(await unlockdoc()))
         return false //logout('cleardoc - unlockdoc failed')
 
@@ -5857,6 +5866,7 @@ async function form_run_onchange(element, onchangexpr) {
         setvalue(element, text)
 
     if (!String(text).replace(/^\s+|\s+$/g, '')) {
+        form_typeahead_set_miss(element, false)
         form_typeahead_hide()
         return
     }
@@ -5939,6 +5949,81 @@ function form_typeahead_listen_scroll(on) {
         window.removeEventListener('resize', form_typeahead_scroll_sync, true)
         gform_typeahead_scroll_listening = false
     }
+}
+
+// Miss tint (.exotypeahead_miss): bold red + no grow while class is on.
+// Class is the only marker (no parallel global). Typeahead is one producer;
+// clear via class scan. Leave-field validation unchanged.
+function form_is_miss_tinted(el) {
+    return !!(el && el.classList && el.classList.contains('exotypeahead_miss'))
+}
+
+function form_typeahead_clear_miss() {
+    var list = document.getElementsByClassName('exotypeahead_miss')
+    // live HTMLCollection — remove from the end
+    for (var i = list.length - 1; i >= 0; i--)
+        list[i].classList.remove('exotypeahead_miss')
+}
+
+function form_typeahead_set_miss(el, miss) {
+    if (miss) {
+        if (!el || !el.classList)
+            return
+        form_typeahead_clear_miss()
+        el.classList.add('exotypeahead_miss')
+        return
+    }
+    if (!el) {
+        form_typeahead_clear_miss()
+        return
+    }
+    if (el.classList)
+        el.classList.remove('exotypeahead_miss')
+}
+
+// While miss-tinted: block insert keys; BS/Delete/nav free.
+// Returns false to cancel the key, null to leave alone.
+function form_miss_tint_keydown(event) {
+    var el = event && event.target
+    if (!form_is_miss_tinted(el))
+        return null
+    if (event.ctrlKey || event.metaKey || event.altKey)
+        return null
+    var key = event.key
+    if (!key)
+        return null
+    if (key === 'Backspace' || key === 'Delete' || key === 'Tab' || key === 'Escape'
+        || key === 'Enter' || key === 'Home' || key === 'End'
+        || key === 'ArrowLeft' || key === 'ArrowRight'
+        || key === 'ArrowUp' || key === 'ArrowDown'
+        || key === 'PageUp' || key === 'PageDown')
+        return null
+    // Non-character keys (F1…, dead keys as multi-char names, …)
+    if (key.length !== 1)
+        return null
+    // Replace a selection — not "additional" entry
+    try {
+        if (typeof el.selectionStart === 'number' && el.selectionEnd > el.selectionStart)
+            return null
+    } catch (e) { }
+    return false
+}
+
+// Stop pending quiet search and drop the panel (does not touch miss tint).
+function form_typeahead_cancel() {
+    if (gform_onchange_timer) {
+        window.clearTimeout(gform_onchange_timer)
+        gform_onchange_timer = null
+    }
+    gform_onchange_seq++
+    form_typeahead_dblink_reset()
+    form_typeahead_hide()
+}
+
+// Record boundary: drop quiet search, panel, and any miss tint.
+function form_typeahead_reset() {
+    form_typeahead_cancel()
+    form_typeahead_clear_miss()
 }
 
 function form_typeahead_hide() {
@@ -6121,6 +6206,7 @@ function form_typeahead_apply(n) {
     }
     gform_onchange_seq++
     setvalue(element, val)
+    form_typeahead_set_miss(element, false)
     form_typeahead_hide()
     focusnext(element)
 }
@@ -6859,15 +6945,12 @@ async function document_onfocus(event) {
 
     ///log('scroll to top left if the key field')
     // Strict === '0': loose == 0 also matches missing attribute (null).
-    // Update gmodalblock_savedoverflow so Gate A unblock does not restore the
-    // pre-focus scroll and undo this home (blockmodalui save/restore on every flight).
+    // modalblock_note_scroll_home: unpin must not restore pre-home scroll.
     if (element == gstartelement || element.getAttribute('exodusfieldno') === '0') {
         form_scroll_log_msg('document_onfocus scroll home key field', form_scroll_el_label(element))
         window.scrollTo(0, 0)
-        if (typeof gmodalblock_savedoverflow != 'undefined' && gmodalblock_savedoverflow) {
-            gmodalblock_savedoverflow.x = 0
-            gmodalblock_savedoverflow.y = 0
-        }
+        if (typeof modalblock_note_scroll_home == 'function')
+            modalblock_note_scroll_home()
         gfocus_nav_hdir = 0
     } else {
         form_scroll_log_msg('document_onfocus → scrollintoview', form_scroll_el_label(element),
@@ -7040,17 +7123,13 @@ async function validateupdate() {
     //    newvalue = newvalue.toUpperCase()
     if (newvalue == gpreviousvalue) {
         //logout('validateupdate - gpreviousvalue:' + gpreviousvalue + ' same as newvalue:' + newvalue)
+        // Value is the committed original — end quiet typeahead including miss tint.
+        form_typeahead_reset()
         return true
     }
 
-    // Leave-field validate owns the UI — drop typeahead panel and cancel pending search
-    if (gform_onchange_timer) {
-        window.clearTimeout(gform_onchange_timer)
-        gform_onchange_timer = null
-    }
-    gform_onchange_seq++
-    form_typeahead_dblink_reset()
-    form_typeahead_hide()
+    // Leave-field validate owns the UI — cancel quiet search/panel (miss stays until pass/restore)
+    form_typeahead_cancel()
 
     //log('User/setdefault changed ' + id + '\nfrom ' + exodusquote(gpreviousvalue) + '\nto ' + exodusquote(newvalue))
     //check for prior required fields if a grouped element
@@ -7186,6 +7265,8 @@ async function validateupdate() {
     //if (gautofitwindow)
     //    exodussettimeout('exodusautofitwindow()', 1)
 
+    // Quiet miss was for live typeahead only; committed value is accepted.
+    form_typeahead_clear_miss()
     return true
 
 }
@@ -7863,6 +7944,9 @@ function setvalue2(element, value) {
 
     //unprotected (faster) core of setvalue()
     value = value.toString()
+    // Writing a miss-tinted field (Esc restore, setx, pick, …) drops the class
+    if (form_is_miss_tinted(element))
+        form_typeahead_set_miss(element, false)
 
     switch (element.tagName) {
         case 'INPUT': {
@@ -10750,6 +10834,19 @@ async function document_onpaste(event) {
 
     event = getevent(event)
     var element = event.target
+
+    // Miss tint: no paste unless replacing a selection (same as typed insert)
+    if (form_is_miss_tinted(element)) {
+        var missPasteOk = false
+        try {
+            missPasteOk = typeof element.selectionStart === 'number'
+                && element.selectionEnd > element.selectionStart
+        } catch (e) { }
+        if (!missPasteOk) {
+            exoduscancelevent(event)
+            return false
+        }
+    }
 
     //prevent paste into readonly
     var msg = element.getAttribute('exodusreadonly')

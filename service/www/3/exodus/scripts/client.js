@@ -995,7 +995,8 @@ function uiblocker_waitcancel_dialog() {
 }
 
 var gmodalblockdepth = 0
-var gmodalblock_savedoverflow
+// Body pin while modal is open: { position, top, left, width, x, y }
+var gmodalblock_pin = null
 var gmodalblock_capturebound
 // Set while a decide list is open; wheel over options moves selection/focus (classic list).
 var gdecide_onwheel = null
@@ -1105,18 +1106,11 @@ function modalblock_create() {
 	document.body.insertBefore(blocker, null)
 
 	// Gate A mounts this on non-focus flights. Focus/activate skips it (native
-	// <select> would close under the overlay). overflow:hidden on html/body can
-	// clamp the viewport to the top — save and restore scroll when locking.
-	// Scroll lock itself is still needed so the page cannot move under confirms.
-	gmodalblock_savedoverflow = {
-		body: document.body.style.overflow,
-		html: document.documentElement.style.overflow,
-		x: window.pageXOffset || 0,
-		y: window.pageYOffset || 0
-	}
-	document.body.style.overflow = 'hidden'
-	document.documentElement.style.overflow = 'hidden'
-	window.scrollTo(gmodalblock_savedoverflow.x, gmodalblock_savedoverflow.y)
+	// <select> would close under the overlay).
+	// Scroll hold: pin body position:fixed at -scroll (overflow:hidden jumps to 0,0).
+	// Width = clientWidth px only — not 100%+left+right (that painted a right white band).
+	// Wheel/touch capture still blocks gestures under the shield.
+	modalblock_pin_body()
 	modalblock_bind_capture()
 
 	//keep focus off parent window and on child window or exodusdiv
@@ -1187,17 +1181,54 @@ function modalblock_destroy() {
 		//console.log('parent window ui unblocked')
 	}
 
-	if (gmodalblock_savedoverflow) {
-		var sx = gmodalblock_savedoverflow.x || 0
-		var sy = gmodalblock_savedoverflow.y || 0
-		document.body.style.overflow = gmodalblock_savedoverflow.body
-		document.documentElement.style.overflow = gmodalblock_savedoverflow.html
-		gmodalblock_savedoverflow = null
-		window.scrollTo(sx, sy)
-	}
-
+	modalblock_unpin_body()
 	modalblock_unbind_capture()
 
+}
+
+// Pin body so the form stays visually at (sx,sy) while popup/db wait is up.
+// window.scrollY may read 0 while pinned — restore real scroll on unpin.
+function modalblock_pin_body() {
+	var sx = window.pageXOffset || document.documentElement.scrollLeft || 0
+	var sy = window.pageYOffset || document.documentElement.scrollTop || 0
+	var layoutW = document.documentElement.clientWidth
+	gmodalblock_pin = {
+		position: document.body.style.position,
+		top: document.body.style.top,
+		left: document.body.style.left,
+		width: document.body.style.width,
+		x: sx,
+		y: sy
+	}
+	document.body.style.position = 'fixed'
+	document.body.style.top = (-sy) + 'px'
+	document.body.style.left = (-sx) + 'px'
+	document.body.style.width = layoutW + 'px'
+}
+
+function modalblock_unpin_body() {
+	if (!gmodalblock_pin)
+		return
+	var sx = gmodalblock_pin.x || 0
+	var sy = gmodalblock_pin.y || 0
+	document.body.style.position = gmodalblock_pin.position
+	document.body.style.top = gmodalblock_pin.top
+	document.body.style.left = gmodalblock_pin.left
+	document.body.style.width = gmodalblock_pin.width
+	gmodalblock_pin = null
+	window.scrollTo(sx, sy)
+}
+
+// Key-field home while a modal pin is active: remember 0,0 for unpin + move pin.
+function modalblock_note_scroll_home() {
+	if (!gmodalblock_pin)
+		return
+	gmodalblock_pin.x = 0
+	gmodalblock_pin.y = 0
+	if (document.body.style.position == 'fixed') {
+		document.body.style.top = '0px'
+		document.body.style.left = '0px'
+	}
 }
 
 function blockmodalui_sync() {
@@ -3120,8 +3151,8 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 		if (gasynchronous) {
 
 			// KEEPALIVE/RELOCK must not touch modal state or overwrite an in-flight request.
-			// quiet: typeahead private dblink — no modal shield (overflow:hidden
-			// clamps scroll to 0,0 then restore = jump every keystroke).
+			// quiet: typeahead private dblink — no modal shield (scroll lock
+			// pins body; still pointless thrash every keystroke).
 			if (!ignoreresult && !this.quiet) {
 				gchildwin = { lazy: true }
 				//xhttp reference for in-dom Wait/Cancel on uiblockerdiv click (uiblocker_waitcancel_dialog)
@@ -3743,7 +3774,7 @@ function rearray(array) {
 //
 // Always: STOPPED column drop, prefer_prefix, form_typeahead_show.
 // Response auto-detected: /ACCOUNTLIST/, XML <RECORD>, or FM/VM multi-hit.
-// Quiet: no decide/invalid. Empty/fail → hide. Returns true always.
+// Quiet: no decide/invalid. Empty/fail → hide (+ optional miss tint). Returns true always.
 async function exodus_typeahead(request, cols, coln, options) {
 
 	if (typeof form_typeahead_show != 'function' || typeof form_typeahead_hide != 'function')
@@ -3751,17 +3782,24 @@ async function exodus_typeahead(request, cols, coln, options) {
 
 	if (!options || typeof options != 'object')
 		options = {}
-	var hasrows = options.rows && options.rows.length
+	// Explicit rows: [] is a deliberate miss (e.g. post-filter emptied the list)
+	var hasExplicitRows = Object.prototype.hasOwnProperty.call(options, 'rows')
 	var hasdata = options.data != null && options.data !== ''
-	if ((!request && !hasrows && !hasdata) || !cols) {
+	if ((!request && !hasExplicitRows && !hasdata) || !cols) {
 		form_typeahead_hide()
 		return true
 	}
+
+	var el = (typeof gform_onchange_element != 'undefined') ? gform_onchange_element : null
+	var setMiss = typeof form_typeahead_set_miss == 'function'
+		? form_typeahead_set_miss
+		: function () { }
 
 	// empty typed key → no search (caller usually embeds gvalue in request)
 	var key = (typeof gvalue != 'undefined' && gvalue != null) ? String(gvalue) : ''
 	key = key.replace(/^\s+|\s+$/g, '')
 	if (!key) {
+		setMiss(el, false)
 		form_typeahead_hide()
 		return true
 	}
@@ -3808,12 +3846,24 @@ async function exodus_typeahead(request, cols, coln, options) {
 
 	// Snapshot so a slower older request (INC) cannot overwrite a newer one (INCO)
 	var keyAtStart = key
-	var el = (typeof gform_onchange_element != 'undefined') ? gform_onchange_element : null
 	var seqAtStart = (typeof gform_onchange_seq != 'undefined') ? gform_onchange_seq : 0
 
+	function stillActive() {
+		return typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq
+	}
+
+	// Quiet miss: hide list, tint field; only if this search is still current.
+	function missOut() {
+		if (!stillActive())
+			return true
+		setMiss(el, true)
+		form_typeahead_hide()
+		return true
+	}
+
 	var rows
-	if (hasrows) {
-		rows = options.rows
+	if (hasExplicitRows) {
+		rows = options.rows || []
 	} else if (hasdata) {
 		rows = exodus_typeahead_parserows(options.data, colids)
 	} else {
@@ -3823,20 +3873,17 @@ async function exodus_typeahead(request, cols, coln, options) {
 		if (req.slice(0, 6) != 'CACHE\r')
 			req = 'CACHE\r' + req
 		tdb.request = req
-		if (!(await tdb.send()) || !tdb.data) {
-			// only hide if we are still the active search
-			if (typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq)
-				form_typeahead_hide()
-			return true
-		}
+		if (!(await tdb.send()) || !tdb.data)
+			return missOut()
 		rows = exodus_typeahead_parserows(tdb.data, colids)
 	}
 
 	// Superseded by newer typeahead or leave-field validate
-	if (typeof gform_onchange_seq != 'undefined' && seqAtStart != gform_onchange_seq)
+	if (!stillActive())
 		return true
 
-	// Focus left (e.g. Enter → validate/invalid): do not overlay the panel
+	// Focus left (e.g. Enter → validate/invalid): do not overlay the panel.
+	// Keep miss tint if any — leave-field validation owns the final answer.
 	if (!el || document.activeElement !== el) {
 		form_typeahead_hide()
 		return true
@@ -3892,11 +3939,10 @@ async function exodus_typeahead(request, cols, coln, options) {
 			pcols.push(rc)
 	}
 	rows = exodus_typeahead_prefer_prefix(rows, keyAtStart, pcols)
-	if (!rows || !rows.length) {
-		form_typeahead_hide()
-		return true
-	}
+	if (!rows || !rows.length)
+		return missOut()
 
+	setMiss(el, false)
 	form_typeahead_show(el, normcols, rows, rcoln)
 	return true
 }
@@ -7643,7 +7689,11 @@ function exodusconfirm_release_invoker(saved) {
 				return
 			if (el.closest && el.closest('#exodusconfirmdiv'))
 				return
-			el.focus()
+			try {
+				el.focus({ preventScroll: true })
+			} catch (e0) {
+				el.focus()
+			}
 			if (typeof start == 'number' && typeof el.setSelectionRange == 'function') {
 				try {
 					el.setSelectionRange(start, end)
@@ -8039,7 +8089,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				// already typing — leave selection alone
 				if (document.activeElement === el)
 					return
-				el.focus()
+				try {
+					el.focus({ preventScroll: true })
+				} catch (e0) {
+					el.focus()
+				}
 				if (el.value && el.type != 'password' && typeof el.select == 'function')
 					el.select()
 			} catch (e) { }
@@ -9005,8 +9059,8 @@ async function decide_onload(decide_args) {
 			else {
 				try {
 					var tr = getancestor(newelement, 'tr')
-					if (tr && tr.scrollIntoView)
-						tr.scrollIntoView({ block: 'nearest' })
+					if (tr)
+						exodus_scroll_row_below_sticky_thead(tr, scrollpane)
 				} catch (e) { }
 			}
 		}
@@ -9071,10 +9125,17 @@ async function decide_onload(decide_args) {
 			return false
 		idx=Array.prototype.indexOf.call(selection2,newelement)
 		var scrollpane=exodusconfirm_scrollpane()
-		if (idx==0||newelement.getAttribute('decide_optionno')==1)
-			scrollpane.scrollTop=0
-		else if (idx==selection2.length-1)
-			scrollpane.scrollTop=scrollpane.scrollHeight
+		if (scrollpane) {
+			if (idx==0||newelement.getAttribute('decide_optionno')==1)
+				scrollpane.scrollTop=0
+			else if (idx==selection2.length-1)
+				scrollpane.scrollTop=scrollpane.scrollHeight
+			else {
+				var trEnd = getancestor(newelement, 'tr')
+				if (trEnd)
+					exodus_scroll_row_below_sticky_thead(trEnd, scrollpane)
+			}
+		}
 		decide_last_option_element = newelement
 		newelement.focus()
 		newelement.select()
