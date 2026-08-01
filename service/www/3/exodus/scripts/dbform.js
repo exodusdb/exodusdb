@@ -184,6 +184,12 @@ if (gparameters.readonlymode)
 var gonfocuselement
 var gpreviouselement = null
 var gnextelement = null
+// Radio/checkbox Esc: value when focus first entered the field (survives live click-validate).
+// Not a twin of gpreviousvalue — only Esc while still on that field/group.
+// Touched clear on Esc: same as text — gelementthatjustcalledsettouched
+// (set after live click commit only when form was untouched before that click).
+var g_radio_arrival_anchor = null
+var g_radio_arrival_value = ''
 var gdependents = []
 var gKeyNodes = false//init will get an array of key nodes if any
 // Form OK/Cancel/Save/custom actions: 'top' menubar or 'bottom' under the form.
@@ -209,8 +215,8 @@ var gformdigitaccesskeys = null
 var gformdigitaccesskey_capture_installed = false
 // Alt+arrows viewport pan — also capture/sync (Gate A modal block undoes scrollBy).
 var gform_scroll_viewport_capture_installed = false
-var gchangesmade = false//set true in validateupdate exit and delete row (not insert row)
-var gelementthatjustcalledsetchangesmade
+var gtouched = false//set true in validateupdate exit and delete row (not insert row)
+var gelementthatjustcalledsettouched
 var gallowsavewithoutchanges = false//allows locked records (with keys) to be saved anyway
 var glocked = false//true means record is locked and available for edit
 var grelockingdoc = false
@@ -1911,7 +1917,7 @@ async function formfunctions_onload() {
         }
 
         //reverse the effect of any setvalue commands in postinit
-        setchangesmade(false)
+        settouched(false)
 
     }
 
@@ -1990,7 +1996,7 @@ async function formfunctions_onload() {
         // 3) calcfields / updatedisplay
         // That sequence is complete when the awaits below return. We do not detect
         // later custom work (e.g. leave-field validation that expands SCHEDULE_NO);
-        // that is outside this open path. Same idea as setchangesmade(false) after
+        // that is outside this open path. Same idea as settouched(false) after
         // form_postinit and after record cleardoc: machine-filled open is not a user edit.
         await cleardoc()
 
@@ -2000,10 +2006,10 @@ async function formfunctions_onload() {
         await calcfields()
         await updatedisplay()
 
-        // Unbound save stays enabled (setchangesmade: savebuttonactive || !gKeyNodes).
-        // Forms that need dirty after open call setchangesmade(true) themselves
+        // Unbound save stays enabled (settouched: savebuttonactive || !gKeyNodes).
+        // Forms that need touched after open call settouched(true) themselves
         // (e.g. draft keep after preview write).
-        setchangesmade(false)
+        settouched(false)
 
     }
 
@@ -2457,6 +2463,9 @@ function setgpreviouselement(element, value) {
     if (!element) {
         gpreviouselement = null
         gpreviousvalue = ''
+        // Clear radio group arrival (left form / no previous field)
+        g_radio_arrival_anchor = null
+        g_radio_arrival_value = ''
         return
     }
 
@@ -2601,7 +2610,7 @@ async function printsendrecord_onclick(event) {
     printfunction = printfunction.replace(/%KEY%/gi, gkey)
     //alert('DEBUG: saoc')
     await validateupdate()
-    if (gchangesmade && !(await saveandorcleardoc('PRINT'))) {
+    if (gtouched && !(await saveandorcleardoc('PRINT'))) {
         focusongpreviouselement()
         return
     }
@@ -2623,7 +2632,7 @@ async function listrecord_onclick(event) {
     await validateupdate()
     listfunction = listfunction.replace(/%KEY%/gi, gkey)
 
-    if (gchangesmade && !(await saveandorcleardoc('PRINT'))) {
+    if (gtouched && !(await saveandorcleardoc('PRINT'))) {
         focusongpreviouselement()
         return
     }
@@ -2654,7 +2663,7 @@ function window_onbeforeunload2_sync(event) {
         return '!!! WAITING FOR REQUEST TO COMPLETE !!!'
 
         //persuade user to cancel unload if any unsaved changes
-    } else if (glocked && gchangesmade) {
+    } else if (glocked && gtouched) {
         if (event.preventDefault)
             event.preventDefault()
         return '!!! YOU HAVE NOT SAVED YOUR DATA !!!'
@@ -3255,7 +3264,62 @@ async function document_onkeydown2(event) {
         }
 
         //if changing current field then let system use it to 'undo' changes
-        if (element.name && element == gpreviouselement) {
+        // Radio: same group as gpreviouselement counts even if focus is another member
+        var escSameField = element.name && (
+            element == gpreviouselement
+            || (element.type == 'radio' && gpreviouselement
+                && form_radio_same_group(element, gpreviouselement))
+            || (element.type == 'checkbox' && gpreviouselement
+                && gpreviouselement.type == 'checkbox' && element.id == gpreviouselement.id)
+        )
+        // Esc: restore radio/checkbox to arrival value (not last click). Live click-validate unchanged.
+        // (Same idea as text Esc + gpreviousvalue, but live validate advances gpreviousvalue.)
+        var escArrival = g_radio_arrival_anchor && (
+            (element.type == 'radio'
+                && form_radio_same_group(element, g_radio_arrival_anchor))
+            || (element.type == 'checkbox' && g_radio_arrival_anchor.type == 'checkbox'
+                && element.id == g_radio_arrival_anchor.id)
+        )
+        if (escArrival) {
+            value = getvalue(element)
+            if (value != g_radio_arrival_value) {
+                // value = current (last live choice); after setvalue, getvalue is arrival
+                setvalue(element, g_radio_arrival_value)
+                // Do not setgpreviouselement — that would wipe gpreviousvalue / clear arrival.
+                // Keep gpreviousvalue as last choice so validateupdate commits restore + layout.
+                if (!gpreviouselement
+                    || (element.type == 'radio'
+                        && !form_radio_same_group(element, gpreviouselement))
+                    || (element.type == 'checkbox'
+                        && (gpreviouselement.type != 'checkbox'
+                            || element.id != gpreviouselement.id)))
+                    gpreviouselement = element
+                // Same as text Esc: clear touched only if this control "just" touched the form.
+                // Capture before validateupdate (which nulls gelementthatjustcalledsettouched).
+                var clearTouched = gelementthatjustcalledsettouched
+                    && (element == gelementthatjustcalledsettouched
+                        || (element.type == 'radio'
+                            && form_radio_same_group(element, gelementthatjustcalledsettouched))
+                        || (element.type == 'checkbox'
+                            && gelementthatjustcalledsettouched.type == 'checkbox'
+                            && element.id == gelementthatjustcalledsettouched.id))
+                if (gpreviousvalue != g_radio_arrival_value) {
+                    if (!(await validateupdate())) {
+                        // Validation failed: put UI back to live choice (gds unchanged)
+                        setvalue(element, value)
+                        return exoduscancelevent(event)
+                    }
+                    // Like text Esc after uncommitted type — undo of that sole touch source
+                    if (clearTouched)
+                        settouched(false)
+                }
+                // Focus follows restored control (radio: form_radio_tab_target via focuson)
+                focuson(element)
+                form_typeahead_cancel()
+                return exoduscancelevent(event)
+            }
+            // at arrival — fall through to closerecord
+        } else if (escSameField) {
 
             value = getvalue(element)
 
@@ -3274,9 +3338,9 @@ async function document_onkeydown2(event) {
                 // setvalue2 clears miss; cancel pending quiet search so it cannot re-tint
                 form_typeahead_cancel()
 
-                //if reverting element that setchangesmade then revert that too
-                if (element == gelementthatjustcalledsetchangesmade)
-                    setchangesmade(false)
+                //if reverting element that settouched then revert that too
+                if (element == gelementthatjustcalledsettouched)
+                    settouched(false)
 
                 //prevent normal esc handling
                 exoduscancelevent(event)
@@ -3590,11 +3654,24 @@ async function document_onkeydown2(event) {
         return exoduscancelevent(event)
     }
 
+    // Horizontal radio: Up/Down = Shift+Enter / Enter (dbform field leave).
+    // Prefer Enter over Tab: Enter is fully defined here (focusdirection +
+    // gkeycode 13 skips form-action buttons); Tab is browser-adjacent.
+    // Same-group skip still applies so any option leaves the group as one stop.
+    // Left/Right stay browser option change.
+    if (element.type == 'radio' && element.getAttribute('exodushorizontal')
+        && (keycode == 38 || keycode == 40)
+        && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+        gkeycode = 13
+        focusdirection(keycode == 38 ? -1 : 1, element)
+        return exoduscancelevent(event)
+    }
+
     //all remaining key events are related to loaded records
     if (gKeyNodes && closerecord.getAttribute('disabled'))
         return true
 
-    //left arrow, right arrow, up arrow, down arrow on radio or SELECT all handled by browser
+    // Arrow keys on radio/SELECT: leave to browser (horizontal Up/Down already handled)
     if (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40) {
         if (element.type && element.type == 'radio')
             return true
@@ -4153,10 +4230,17 @@ function focusdirection(direction, element, notgroupno, scopex) {
             continue
         }
 
-        //left/right/up/down keys skip over SELECT or radio buttons because they cannot be prevented from changing its value if pressed again
-        if ((gkeycode == 37 || gkeycode == 39 || gkeycode == 38 || gkeycode == 40) && (nextelement.tagName == 'SELECT' || nextelement.type == 'radio')) {
-            //console.log('SKIP '+nextid+' cursor keys skip over SELECT or radio items')
-            continue
+        // Cursor keys skip SELECT / radio — browser would change value if pressed again.
+        // Exception: Up/Down may land on horizontal radios (options are Left/Right only;
+        // Up/Down field-nav — pairs with keydown early-return exception).
+        if ((gkeycode == 37 || gkeycode == 39 || gkeycode == 38 || gkeycode == 40)
+            && (nextelement.tagName == 'SELECT' || nextelement.type == 'radio')) {
+            if (!(nextelement.type == 'radio'
+                && nextelement.getAttribute('exodushorizontal')
+                && (gkeycode == 38 || gkeycode == 40))) {
+                //console.log('SKIP '+nextid+' cursor keys skip over SELECT or radio items')
+                continue
+            }
         }
 
         //enter key skips over buttons to avoid pressing them on the next press
@@ -4756,7 +4840,7 @@ async function saverecord_onclick() {
 
         if (!(await exodusevaluateall('await form_write()', 'await saverecord_onclick()')))
             return false
-        setchangesmade(false)
+        settouched(false)
 
         if (typeof (form_postwrite) == 'function') {
             await exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
@@ -4815,7 +4899,7 @@ async function unbound_form_write() {
         await exodusinvalid(db.response)
         return false
     }
-    setchangesmade(false)
+    settouched(false)
     if (db.response.slice(0, 3) == 'OK ') {
         await exodusnote(db.response.slice(3))
     }
@@ -4835,12 +4919,12 @@ async function closerecord_onclick() {
 
         // Dirty leave: Discard / Cancel by default. Light modals set gparameters.discardable
         // to skip (search, agencyfilter, settings, upload, schedulefind/print, consolidation).
-        if (gchangesmade) {
+        if (gtouched) {
             if (!gparameters.discardable) {
                 var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
                 if (response != 2) return false
             }
-            setchangesmade(false)// discard chosen / discardable — avoid a second Q in closedoc
+            settouched(false)// discard chosen / discardable — avoid a second Q in closedoc
         }
 
         var returnvalue = ''
@@ -4848,7 +4932,7 @@ async function closerecord_onclick() {
         //clear the document so user is not asked again in onunload
         if (gKeyNodes) {
             gwindowunloading = true
-            if (!gchangesmade)
+            if (!gtouched)
                 returnvalue = 'ACCESS ' + gkey
             await cleardoc()
         }
@@ -5171,8 +5255,8 @@ async function opendoc2(newkey0) {
     gds.dictitem = gro.dictitem
 
     //if record created/updated in form_postread
-    //form_postread should set setchangesmade(true) to allow save without user edits
-    setchangesmade(false)
+    //form_postread should set settouched(true) to allow save without user edits
+    settouched(false)
     //gpreviouselement = null
     //gpreviousvalue = ''
     setgpreviouselement(null)
@@ -5301,7 +5385,7 @@ async function closedoc(mode) {
 async function saveandunlockdoc() {
     if (!(await validateupdate()))
         return false
-    if (gchangesmade && !(await savedoc()))
+    if (gtouched && !(await savedoc()))
         return false
     if (!(await unlockdoc()))
         return false
@@ -5336,7 +5420,7 @@ async function savedoc_body(mode) {
     if (!(await validateupdate()))
         return false
 
-    if (gKeyNodes && (!gchangesmade || !glocked) && !gallowsavewithoutchanges) {
+    if (gKeyNodes && (!gtouched || !glocked) && !gallowsavewithoutchanges) {
         await exodusinvalid('Nothing to be saved.\n\nPlease enter or change some data first or just click Close')
         return false
     }
@@ -5397,10 +5481,10 @@ async function saveandorcleardoc_body(mode) {
     //if (save&&!(await validateupdate()))
     // return false //logout('saveandorcleardoc - invalidateupdate failed')
 
-    // Unbound / unlocked dirty clear (F8, Esc→CLOSE on parameter forms): no lock,
+    // Unbound / unlocked touched clear (F8, Esc→CLOSE on parameter forms): no lock,
     // so the glocked Save/Discard path never runs — still ask before wipe unless
     // gparameters.discardable (light criteria/settings modals).
-    if (!glocked && gchangesmade && clear && !gparameters.discardable) {
+    if (!glocked && gtouched && clear && !gparameters.discardable) {
         var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
         if (response != 2) {
             focusongpreviouselement()
@@ -5410,7 +5494,7 @@ async function saveandorcleardoc_body(mode) {
 
     //if anything updated then option to save
     if (glocked
-        && (gchangesmade
+        && (gtouched
             || (gallowsavewithoutchanges
                 && !clear && mode != 'OPEN' && mode != 'RELEASE'
             )
@@ -5522,7 +5606,7 @@ async function saveandorcleardoc_body(mode) {
     }
 
     //reset
-    setchangesmade(false)
+    settouched(false)
 
     //logout('saveandorcleardoc ok')
 
@@ -5553,7 +5637,7 @@ async function cleardoc() {
         return false //logout('cleardoc - unlockdoc failed')
 
     //disable the buttons
-    setchangesmade(false)
+    settouched(false)
     if (gKeyNodes) {
         setdisabledandhidden(saverecord, true)
         setdisabledandhidden(editreleaserecord, true)
@@ -5577,7 +5661,7 @@ async function cleardoc() {
         //gkey=''
         //gkeyexternal=''
         gloaded = false
-        setchangesmade(false)
+        settouched(false)
         document.title = gdoctitle
 
         //get an empty record and load it
@@ -5652,7 +5736,7 @@ async function cleardoc() {
                 }
         }
 
-        setchangesmade(false)
+        settouched(false)
 
     }
 
@@ -5820,13 +5904,13 @@ async function form_oninput(event) {
     if (element.tagName == 'SELECT')
         return true
 
-    //changing key fields does not cause gchangesmade
+    //changing key fields does not cause gtouched
     var fn = Number(element.getAttribute('exodusfieldno'))
-    if (fn && !gchangesmade) {
-        //remember this element so pressing escape can cancel gchangesmade
+    if (fn && !gtouched) {
+        //remember this element so pressing escape can cancel gtouched
         //removed in onfocus
-        gelementthatjustcalledsetchangesmade = element
-        setchangesmade(true)
+        gelementthatjustcalledsettouched = element
+        settouched(true)
     }
 
     // optional live onchange (e.g. brand_code_onchange) — debounced
@@ -5951,7 +6035,7 @@ function form_typeahead_listen_scroll(on) {
     }
 }
 
-// Miss tint (.exotypeahead_miss): bold red + no grow while class is on.
+// Miss tint (.exotypeahead_miss): bold + Highlight colour; no grow while class is on.
 // Class is the only marker (no parallel global). Typeahead is one producer;
 // clear via class scan. Leave-field validation unchanged.
 function form_is_miss_tinted(el) {
@@ -6185,6 +6269,14 @@ function form_typeahead_set_focus(n) {
             exodus_scroll_row_below_sticky_thead(trs[n], gform_typeahead_div)
         else if (trs[n].scrollIntoView)
             trs[n].scrollIntoView({ block: 'nearest' })
+        // Following row (if any) — or truncation footer after the last data row
+        var follow = trs[n + 1] || div.querySelector('.exodus_typeahead_truncated')
+        if (follow) {
+            var paneRect = div.getBoundingClientRect()
+            var followRect = follow.getBoundingClientRect()
+            if (followRect.bottom > paneRect.bottom)
+                div.scrollTop += (followRect.bottom - paneRect.bottom)
+        }
     }
 }
 
@@ -6231,13 +6323,13 @@ function form_typeahead_keydown(event) {
         return false
     }
     var nrows = gform_typeahead_rows ? gform_typeahead_rows.length : 0
-    // Down / Up — wrap at ends (no selection yet → first row)
+    // Down / Up — wrap at ends. No highlight yet: Down → first, Up → last.
     if (keycode == 40 || keycode == 38) {
         if (!nrows)
             return false
         var n = gform_typeahead_focusn
         if (n < 0)
-            n = 0
+            n = (keycode == 38) ? nrows - 1 : 0
         else if (keycode == 40)
             n = (n + 1) % nrows
         else
@@ -6575,7 +6667,7 @@ async function relockdoc() {
         if (response.toUpperCase().indexOf('EXPIRED') >= 0) {
             stoprelocker()
             glocked = false
-            setchangesmade(false)
+            settouched(false)
             setdisabledandhidden(saverecord, true)
             setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
             setdisabledandhidden(deleterecord, true)
@@ -6936,13 +7028,14 @@ async function document_onfocus(event) {
     // checks above, skip to the next (or previous) editable field. Must not run
     // before those checks — click/tab on e.g. autonumber VOUCHER_NO must still
     // enforce Bank/Cash required and opendoc.
+    // gfocus_nav_hdir: horizontal radio Up spoofs Enter without event.shiftKey.
     if (gkeycode == 9 || gkeycode == 13) {
         if (element.getAttribute('exodusreadonly')
             && (element.tabIndex == 999 || element.tabIndex == -1
                 || element.getAttribute('oldtabindex'))) {
             form_scroll_log_msg('document_onfocus EXIT readonly skip to next',
                 form_scroll_el_label(element))
-            if (event.shiftKey)
+            if (event.shiftKey || gfocus_nav_hdir < 0)
                 focusprevious(element)
             else
                 focusnext(element)
@@ -6974,6 +7067,26 @@ async function document_onfocus(event) {
     //gpreviouselement = element
     //gpreviousvalue = getvalue(gpreviouselement)
     setgpreviouselement(element)
+
+    // Radio/checkbox arrival snapshot — getvalue when focus first enters field/group;
+    // Esc restores it. Leave field → clear (not a twin of gpreviousvalue; click-validate
+    // may advance that).
+    if (element.type == 'radio') {
+        if (!g_radio_arrival_anchor || !form_radio_same_group(element, g_radio_arrival_anchor)) {
+            g_radio_arrival_anchor = element
+            g_radio_arrival_value = getvalue(element)
+        }
+    } else if (element.type == 'checkbox') {
+        if (!g_radio_arrival_anchor || g_radio_arrival_anchor.type != 'checkbox'
+            || g_radio_arrival_anchor.id != element.id) {
+            g_radio_arrival_anchor = element
+            g_radio_arrival_value = getvalue(element)
+        }
+    } else if (g_radio_arrival_anchor) {
+        // Clear arrival (left radio/checkbox field)
+        g_radio_arrival_anchor = null
+        g_radio_arrival_value = ''
+    }
 
     ///log('set the default of the current element')
     await setdefault(element, donotvalidateupdate = true)
@@ -7097,6 +7210,19 @@ async function onclickradiocheckbox(event) {
         //gpreviousvalue = previousvalue
         setgpreviouselement(event.target, previousvalue)
 
+        // Focus lagged click: snapshot pre-click gds value (same as onfocus arrival)
+        if (event.target.type == 'radio'
+            && (!g_radio_arrival_anchor
+                || !form_radio_same_group(event.target, g_radio_arrival_anchor))) {
+            g_radio_arrival_anchor = event.target
+            g_radio_arrival_value = previousvalue
+        } else if (event.target.type == 'checkbox'
+            && (!g_radio_arrival_anchor || g_radio_arrival_anchor.type != 'checkbox'
+                || g_radio_arrival_anchor.id != event.target.id)) {
+            g_radio_arrival_anchor = event.target
+            g_radio_arrival_value = previousvalue
+        }
+
     }
 
     //update immediately
@@ -7105,11 +7231,18 @@ async function onclickradiocheckbox(event) {
     //alert(event.target.getAttribute)
     //alert('onclickradiocheckbox')
     //validate or return to original
+    // Like form_oninput: only mark "this element touched form" if form was untouched.
+    // validateupdate nulls the marker then settouched(true); re-set after so Esc
+    // can clear touched the same way as text Esc (element == gelementthatjustcalled…).
+    var clickWasUntouched = !gtouched
     if (!(await validateupdate())) {
         setvalue(gpreviouselement, gpreviousvalue)
         return
     }
     gpreviousvalue = getvalue(gpreviouselement)
+    if (clickWasUntouched
+        && (event.target.type == 'radio' || event.target.type == 'checkbox'))
+        gelementthatjustcalledsettouched = event.target
 
 }
 
@@ -7180,8 +7313,8 @@ async function validateupdate() {
 
     }
 
-    //pressing escape will no longer cancel gchangesmade
-    gelementthatjustcalledsetchangesmade = null
+    //pressing escape will no longer cancel gtouched
+    gelementthatjustcalledsettouched = null
 
     //update
     ////////
@@ -7258,7 +7391,7 @@ async function validateupdate() {
     //flag record edited
     if (gpreviouselement.getAttribute('exodusfieldno') != 0
         && !gpreviouselement.getAttribute('exodusnochangeswarning')) {
-        setchangesmade(true)
+        settouched(true)
     }
 
     //calculate dependencies
@@ -8227,15 +8360,15 @@ function form_try_insert_tab_char(element) {
     try {
         element.setSelectionRange(pos, pos)
     } catch (e) { }
-    setchangesmade(true)
+    settouched(true)
     return true
 }
 
 //var gautofitwindowpending
-function setchangesmade(value, savebuttonactive) {
-    gchangesmade = value
-    if (!gchangesmade)
-        gelementthatjustcalledsetchangesmade = null
+function settouched(value, savebuttonactive) {
+    gtouched = value
+    if (!gtouched)
+        gelementthatjustcalledsettouched = null
     if (typeof savebuttonactive == 'undefined')
         savebuttonactive = value || !gKeyNodes
     var savebuttonstyle = savebuttonactive ? gsaveimage : gsavegreyimage
@@ -9003,7 +9136,7 @@ async function form_deleterow(event, element) {
     //gpreviousvalue = ''
     setgpreviouselement(null)
 
-    setchangesmade(true)
+    settouched(true)
     //setdisabledandhidden(saverecord,false)
     //setdisabledandhidden(editreleaserecord,false)
 
@@ -9223,7 +9356,7 @@ async function insertallrows2(elements, values, fromrecn) {
 
     //no because often done programmatically which requires no specific work by user
     //popup etc may set it specifically
-    //setchangesmade(true)
+    //settouched(true)
 
     //recalculate any dependents
     var dependentfieldnos = ''
@@ -9389,8 +9522,8 @@ async function form_insertrow(event, append) {
     }
     else {
         gds.insertrow(groupno, grecn)
-        //inserting a row sets gchangesmade, but appending does not
-        setchangesmade(true)
+        //inserting a row sets gtouched, but appending does not
+        settouched(true)
     }
 
     //get new row again
@@ -9743,7 +9876,7 @@ async function exoduspopup(event, element) {
         }
 
         await insertallrows(element, reply, grecn)
-        setchangesmade(true)//should this be done in insertallrows to ensure Save button is enabled in other cases too?
+        settouched(true)//should this be done in insertallrows to ensure Save button is enabled in other cases too?
 
         //focus on next element AFTER table
         element = $$(elementid)
@@ -10596,7 +10729,7 @@ async function form_pop_index(filename, fieldname, many) {
 
 async function copyrecord_onclick() {
 
-    if (!gkey || !glastkey || !gds.isnewrecord || gchangesmade)
+    if (!gkey || !glastkey || !gds.isnewrecord || gtouched)
         return await exodusinvalid('To copy a record you must:\n\n1. Open the record to copy\n2. Start a new record&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n3. Click the Copy button&nbsp;&nbsp;&nbsp;&nbsp;')
 
     //read the record to be copied
@@ -10680,7 +10813,7 @@ async function form_postread_noteifdeleted(descending) {
     await exodusnote(note)
 
     gallowsavewithoutchanges = true
-    setchangesmade(false, true)//change style of Save button
+    settouched(false, true)//change style of Save button
 
     //indicate is deleted
     return true
