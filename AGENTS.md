@@ -31,6 +31,8 @@ Exodus is **production** shared code. Wrong event/gate/popup changes cost **~10�
 
 - **KISS at the seam:** one more case on the real machine (walker, startevent, icon map). Not a new parallel policy.
 - **Blast radius first** on `client.js` / `dbform.js` / Gate A / confirm-decide / focus: smallest change; name what else can break; never “fix” by swallowing whole key classes.
+- **Hard block (global AGENTS):** ask size ↔ change size — small ask → one existing seam; no parallel systems. Simple option in text before heavier path; do not commit thrash as the answer. See `~/.grok/AGENTS.md` “Hard block: ask size ↔ change size”.
+- **One-shot helpers:** do not extract; inline + comment with lost name/intent (global AGENTS).
 - **Technical debt is allowed for discovery** — thrash, try A then B, short WIP. Keep it local and reversible.
 - **Commit freely** after substantive turns (small, descriptive; easy to bisect). Checkpoints are **not** a claim the path is finished. Do **not** push unless asked.
 
@@ -52,10 +54,11 @@ Plain **`review`** / **squash** must not wait for the user to also say “KISS�
 - **Pane** owns the outer edge; **grid borders** belong on **`td`**, not `tr`. Do not use page `tr { border-bottom }` on `exodusform` pages.
 - **Embedded groups** live in host cells (`:has(> TABLE[exogroupno])`); a line “under” a group is often the **outer** row, not the inner table.
 - **Multivalue rows (`groupno > 0`):** `cloneNode` copies **attributes**, not **listeners**. Do not attach `input`/`change` only on the template row — use **document/table delegation** or attributes the form already re-reads. See FORM-UI-PHILOSOPHY § “Multivalue rows”.
-- **Dirty leave (Cancel / Esc / F8-clear):** default **Discard / Cancel** when `gchangesmade` for unbound forms too (no modal exception). Bound locked leave still uses Save/Discard/Cancel on the record. Later: per-form opt-out for light dialogs (e.g. settings) if needed.
+- **Touched leave (Cancel / Esc / F8-clear):** default **Discard / Cancel** when `gtouched` for unbound forms too (no modal exception). Bound locked leave still uses Save/Discard/Cancel on the record. Later: per-form opt-out for light dialogs (e.g. settings) if needed.
 - Prefer **dict** / **HTM column class** / **page-local CSS** over global `!important` hacks.
 - Find **root cause** (page `<style>`, inline dbform styles, pane rules) before adding suppressions.
 - **Craftsmanship:** obvious local fix over thoughtless scaffolding (see global `~/.grok/AGENTS.md` change style §5).
+- **Form edit state wording:** use **touched** / **untouched** (not dirty/clean) in comments and new names. Identifiers: `gtouched`, `settouched()`, `gelementthatjustcalledsettouched` (was `gchangesmade` / `setchangesmade`). Prefer those names at call sites and in docs.
 
 ### Auto-open a record on form load
 
