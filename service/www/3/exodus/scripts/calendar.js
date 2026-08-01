@@ -451,12 +451,22 @@ Calendar.prototype.create = function() {
 		return false;
 	};
 
-	// Wheel = ↑↓ (one week per notch). Skip double-fired events; batch fast scroll in rAF.
+	// Wheel: over month/year SELECT → step that control; else ↑↓ one week per notch.
+	// Skip double-fired events; batch fast day-grid scroll in rAF.
 	function onWheel(e) {
 		if (e == null) e = document.parentWindow.event;
 		var t = e.target || e.srcElement;
+		var overSelect = null;
 		while (t && t != dp._calDiv) {
-			if (t.tagName == 'SELECT' || t.tagName == 'OPTION' || t.tagName == 'BUTTON')
+			if (t.tagName == 'SELECT') {
+				overSelect = t;
+				break;
+			}
+			if (t.tagName == 'OPTION' && t.parentNode && t.parentNode.tagName == 'SELECT') {
+				overSelect = t.parentNode;
+				break;
+			}
+			if (t.tagName == 'BUTTON')
 				return true;
 			t = t.parentNode;
 		}
@@ -470,6 +480,24 @@ Calendar.prototype.create = function() {
 		else if (e.stopPropagation) e.stopPropagation();
 		e.cancelBubble = true;
 		e.returnValue = false;
+
+		// Month / year dropdowns: wheel changes the selection (not day-grid weeks)
+		if (overSelect == dp._monthSelect || overSelect == dp._yearSelect) {
+			var dir = dy > 0 ? 1 : -1;
+			var i = overSelect.selectedIndex + dir;
+			if (i < 0)
+				i = 0;
+			if (i >= overSelect.options.length)
+				i = overSelect.options.length - 1;
+			if (i != overSelect.selectedIndex) {
+				overSelect.selectedIndex = i;
+				if (overSelect == dp._monthSelect)
+					dp.setMonth(Number(overSelect.value));
+				else
+					dp.setYear(Number(overSelect.value));
+			}
+			return false;
+		}
 
 		var now = e.timeStamp || (new Date()).getTime();
 		if (dp._wheelLastTs && (now - dp._wheelLastTs) < 10)
