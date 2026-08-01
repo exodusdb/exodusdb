@@ -413,19 +413,14 @@ function exodus_client_init() {
 		theme_toggle(exodusgetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
 	}
 
-	// Inline dark colours before global.css loads — prevents white face flash only.
-	// Do NOT !important borders here: that permanently blocks focus underline in global.css
-	// (SPANs were fine; INPUT/SELECT stuck on dotted rest style).
+	// Before global.css: page/form face only. No field color/border !important —
+	// that stays after load and blocks focus underline and miss Highlight.
 	if (gisdarktheme) {
 		// @media screen only — must not win over @media print (white paper + light text = blank)
 		document.writeln('<style id="exodus_dm_flashguard">'
 			+ '@media screen{'
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
 			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#28304a!important}'
-			+ ':root[data-theme=dark_mode] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),'
-			+ ':root[data-theme=dark_mode] SELECT:not(.loginfield),'
-			+ ':root[data-theme=dark_mode] TEXTAREA{'
-			+ 'background-color:transparent!important;color:#fff!important}'
 			+ '}'
 			+ '</style>')
 	}
@@ -2816,7 +2811,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 	if (gusername) {
 		var question = 'Your session has timed out\nor been lost to another login or another computer or browser\nor the server has been restarted.'
 		//current work is cleared without option to recover if detect login on another computer or browser
-		if (glocked && gchangesmade)
+		if (glocked && gtouched)
 			question += '\n\nWarning! Your current work on ' + gkey + ' will be lost if you dont resume login.'
 		question += '\n\nResume login as ' + gusername + '?'
 		if (!(await exodusyesno(question, 1))) {
@@ -2826,7 +2821,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 
 			//try to avoid unlocking on exit
 			glocked = false
-			setchangesmade(false)
+			settouched(false)
 			gkey = ''
 			this.requesting = false
 			db.requesting = false
@@ -2994,7 +2989,7 @@ async function exodusdblink_send_byhttp_using_forms(data) {
 		if (lcresponse.indexOf('Please login') >= 0) {
 			//if (lcresponse.indexOf('automatic') >= 0) {
 			//	glocked=false
-			//	gchangesmade=false
+			//	gtouched=false
 			//}
 			if (!(await this.login() )) {
 				this.data = ''
@@ -7399,15 +7394,15 @@ function exodusconfirm_keymap(event) {
 		}
 	}
 
-	// Tab: cycle text field and buttons
+	// Tab: cycle text field and buttons (works even when nothing focused yet)
 	if (keycode == 9) {
 		exodusconfirm_focus_cycle(!!event.shiftKey)
 		return false
 	}
 
-	// Arrows on footer buttons: cycle
-	if (focusedConfirmBtn
-		&& (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)) {
+	// Arrows: same cycle as Tab, unless caret is in the confirm text field
+	if ((keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)
+		&& !(istextinput && active && active.id == 'exodusconfirmdiv_textinput')) {
 		exodusconfirm_focus_cycle(keycode == 37 || keycode == 38)
 		return false
 	}
@@ -7429,17 +7424,23 @@ function exodusconfirm_keymap(event) {
 		return true
 	}
 
-	// Space/Enter: only when a footer button is focused (highlighted).
-	// WRONG: bare Enter always positive (silent OK with no highlight)
-	// if (keycode == 13 || keycode == 32) { … function1 … }
-	if ((keycode == 13 || keycode == 32) && focusedConfirmBtn) {
-		if (focusedConfirmBtn.id == 'negativebutton')
-			window.setTimeout(exodus_confirm_function2_sync, 1)
-		else if (focusedConfirmBtn.id == 'cancelbutton')
-			window.setTimeout(exodus_confirm_function3_sync, 1)
-		else
-			window.setTimeout(exodus_confirm_function1_sync, 1)
-		return false
+	// Space/Enter: footer button focused, or sole OK button (OK-only note/invalid).
+	// WRONG: bare Enter always positive on multi-button (silent OK with no highlight).
+	if (keycode == 13 || keycode == 32) {
+		if (!focusedConfirmBtn
+			&& document.getElementById('positivebutton')
+			&& !document.getElementById('negativebutton')
+			&& !document.getElementById('cancelbutton'))
+			focusedConfirmBtn = document.getElementById('positivebutton')
+		if (focusedConfirmBtn) {
+			if (focusedConfirmBtn.id == 'negativebutton')
+				window.setTimeout(exodus_confirm_function2_sync, 1)
+			else if (focusedConfirmBtn.id == 'cancelbutton')
+				window.setTimeout(exodus_confirm_function3_sync, 1)
+			else
+				window.setTimeout(exodus_confirm_function1_sync, 1)
+			return false
+		}
 	}
 
 	// Access letters — CHANGE LOG (do not flip-flop; AGENTS HIGH PRIORITY):
@@ -8006,12 +8007,6 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 			return true
 		}
 		// Focus applied after shell is fully open (see below). Do not focus here.
-	} else if (!decide_args) {
-		// Prefocus only an explicit default (1/2/3). No default → nothing focused;
-		// first Tab lands on the first button via exodusconfirm_focus_cycle.
-		var defbtn = exodusconfirm_default_button_element(defaultbuttonn)
-		if (defbtn)
-			client_focuson(defbtn)
 	}
 
 	//build rows of decide popup
@@ -8073,11 +8068,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	if (!decide_args)
 		exodusconfirm_install_plain_keydown()
 
-	// Text-input confirm (exodusinput / password): keep caret in the field.
-	// CHANGE LOG:
-	// 1) Immediate textinput.focus() right after insert → flash then steal by pending
-	//    form client_focuson (1ms) or layout/scroll/blockmodal.
-	// 2) Focus after blockmodal + cancel pending client_focuson + reassert at 1ms/50ms.
+	// Text-input confirm: caret in field (after modal lock).
 	if (istextinput) {
 		if (typeof gclient_focuson_element != 'undefined')
 			gclient_focuson_element = undefined
@@ -8086,7 +8077,6 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 				var el = document.getElementById('exodusconfirmdiv_textinput')
 				if (!el || !document.getElementById('exodusconfirmdiv'))
 					return
-				// already typing — leave selection alone
 				if (document.activeElement === el)
 					return
 				try {
@@ -8101,6 +8091,13 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		exodusconfirm_park_text_focus()
 		window.setTimeout(exodusconfirm_park_text_focus, 1)
 		window.setTimeout(exodusconfirm_park_text_focus, 50)
+	} else if (!decide_args) {
+		// Default button, or sole OK (note/invalid) so focus matches Enter behaviour
+		var defbtn = exodusconfirm_default_button_element(defaultbuttonn)
+		if (!defbtn && nbuttons == 1)
+			defbtn = document.getElementById('positivebutton')
+		if (defbtn)
+			client_focuson(defbtn)
 	}
 
 	var response
