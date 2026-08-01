@@ -460,13 +460,10 @@ TABLE
     cursor: pointer;
 }
 /* Row highlight: match decide_row_hover */
-/* Miss tint: quiet no-match (and no-grow while class on). Leave-field still validates. */
+/* Miss tint: quiet no-match (no-grow while class on). Bold + system Highlight. */
 :is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_miss {
-    color: #c00;
+    color: Highlight;
     font-weight: bold;
-}
-:root[data-theme="dark_mode"] :is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_miss {
-    color: #f66;
 }
 
 .exodus_typeahead_table tr.exodus_typeahead_focus td,
@@ -1784,14 +1781,13 @@ SPAN.calendar-date-committed[contenteditable] {
     border-color: #5a6090 !important;
 }
 
-/* Dark mode: colour only — underline/border come from resting rules + theme vars above */
+/* Dark mode: transparent field face; text inherits BODY white. */
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
 :root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect),
 :root[data-theme="dark_mode"] SPAN.clsRequired[contenteditable],
 :root[data-theme="dark_mode"] SPAN.clsNotRequired[contenteditable],
 :root[data-theme="dark_mode"] TEXTAREA {
     background-color: transparent;
-    color: #ffffff;
 }
 
 :root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect) {
