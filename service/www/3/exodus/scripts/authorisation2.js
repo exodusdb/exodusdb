@@ -86,7 +86,7 @@ async function user_setpassword(savemode,element) {
  }
 
  await gds.setx('PASSWORD',grecn,newpassword.toUpperCase())
- setchangesmade(true)
+ settouched(true)
  
  //login with new password after writing if you change your own password
  if (userid==gusername)

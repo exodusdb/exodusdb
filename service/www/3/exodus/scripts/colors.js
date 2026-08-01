@@ -1659,7 +1659,7 @@ async function colors_popup_clear() {
 			colors_popup_hide()
 			return
 		}
-		// Empty bound field (dirty until Save). Always reset face to system
+		// Empty bound field (touched until Save). Always reset face to system
 		// default — even if the field was already "" (store early-return would
 		// skip apply and leave the last hover/click continuum colour on the form).
 		colors_popup_hide()
@@ -2165,8 +2165,8 @@ async function colors_field_store(field, store) {
 				recn = grecn
 			await gds.setx(field.id, recn, store)
 		}
-		if (typeof setchangesmade == 'function')
-			setchangesmade(true)
+		if (typeof settouched == 'function')
+			settouched(true)
 	}
 
 	// Dirty-edit face preview only. Cookie "fc" is written on users form_postwrite

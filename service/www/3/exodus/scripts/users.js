@@ -70,7 +70,7 @@ async function form_postwrite() {
         db.login(gusername, gtasks_newpassword)
     gtasks_newpassword = false
 
-    // Durable chrome prefs only after a real Save (not popup Default / dirty preview).
+    // Durable chrome prefs only after a real Save (not popup Default / touched preview).
     var bodyColor = await gds.getx('SCREEN_BODY_COLOR')
     var screenFont = await gds.getx('SCREEN_FONT')
     var screenFontSize = await gds.getx('SCREEN_FONT_SIZE')

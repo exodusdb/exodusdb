@@ -1,6 +1,6 @@
 // Copyright NEOSYS All Rights Reserved.
 
-// Light modal: close without Discard/Cancel dirty leave.
+// Light modal: close without Discard/Cancel touched leave.
 if (typeof gparameters != 'undefined')
 	gparameters.discardable = true
 

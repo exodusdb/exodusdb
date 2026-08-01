@@ -24,7 +24,7 @@ async function authorisation_changeallemaildomains() {
     var newemails = oldemails.join(fm).exodusswap(olddomain, newdomain).split(fm)
     if (newemails != oldemails) {
         await gds.setx('EMAIL_ADDRESS', null, newemails)
-        setchangesmade(true)
+        settouched(true)
     }
     return true
 }
