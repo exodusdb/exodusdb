@@ -406,23 +406,23 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
 }
 
 // Align T free text: contenteditable SPAN, fold at spaces (lowercase true).
-// size/length is stored only (not used for paint — cell fill). Codes: dict_code.
+// size argument: if passed → set di.length; if omitted → clear di.length
+// (no inherit). Not used for free-text paint. Codes: dict_code.
 // Multi-line: exodus_dict_textarea(di, nrows, size).
-function exodus_dict_text(dicti,size,rows) {
+function exodus_dict_text(dicti, size, rows) {
 
- exodusassertobject(dicti,'exodus_dict_text','dicti')
- if (!dicti.readonly) {
-
-  if (typeof size=='undefined') size=30
-  if (typeof rows=='undefined') rows=1
- }
- dicti.align='T'
- if (typeof size!='undefined' && size)
-  dicti.length=size
- if (typeof rows!='undefined' && rows)
-  dicti.rows=rows
- if (typeof dicti.lowercase=='undefined')
-  dicti.lowercase=true
+ exodusassertobject(dicti, 'exodus_dict_text', 'dicti')
+ dicti.align = 'T'
+ if (typeof size != 'undefined')
+  dicti.length = size
+ else
+  dicti.length = ''
+ if (typeof rows == 'undefined')
+  rows = 1
+ if (rows)
+  dicti.rows = rows
+ if (typeof dicti.lowercase == 'undefined')
+  dicti.lowercase = true
 }
 
 // Multi-line free text (HTML textarea when nrows > 1). Same align T / lowercase

@@ -56,8 +56,8 @@
 <P>params2 can be "POSITIVE" to restrict the entry to positive numbers</P>
 <H4>exodus_dict_text(dictitem,size,rows)</H4>
 <P>Setups up a dictionary item to handle free text (align T, lowercase true)</P>
-<P><EM>size </EM>is stored as length (default 30) but free-text paint fills the
-	cell and does not use it. Cap special columns in the form HTM if needed.</P>
+<P>If <EM>size</EM> is passed, sets di.length; if omitted, clears di.length
+	(no inherit, no default). Free-text paint fills the cell and does not use length.</P>
 <p>
     <em>rows </em>will determine the depth (number of lines) of&nbsp; the data entry
     field. Default value is 1. Prefer <code>exodus_dict_textarea</code> for multi-line fields.</p>
