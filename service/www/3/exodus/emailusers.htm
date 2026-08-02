@@ -55,7 +55,8 @@
             await system_dict_username(di, 'CC_USER_CODE')
 
             di = dict[++din] = dictrec('EMAIL_SUBJECT', 'F', 4)
-            exodus_dict_text(di, 73)
+            di.length = 73
+            exodus_dict_text(di)
             di.required = true
 
             di = dict[++din] = dictrec('EMAIL_MESSAGE', 'F', 5)
