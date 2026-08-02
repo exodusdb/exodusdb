@@ -406,9 +406,10 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
 }
 
 // Align T free text: contenteditable SPAN, fold at spaces (lowercase true).
-// size argument: if passed → set di.length; if omitted → clear di.length
-// (no inherit). Not used for free-text paint. Codes: dict_code.
-// Multi-line: exodus_dict_textarea(di, nrows, size).
+// Paint fills the cell; di.length is a hint not used for free-text paint today.
+// To store length deliberately: pass size here, or set di.length after this call.
+// size omitted → clear di.length (no inherit from dictrec). No default size.
+// Codes: exodus_dict_code. Multi-line: exodus_dict_textarea(di, nrows, size).
 function exodus_dict_text(dicti, size, rows) {
 
  exodusassertobject(dicti, 'exodus_dict_text', 'dicti')
@@ -425,8 +426,7 @@ function exodus_dict_text(dicti, size, rows) {
   dicti.lowercase = true
 }
 
-// Multi-line free text (HTML textarea when nrows > 1). Same align T / lowercase
-// defaults as exodus_dict_text. size is field width (di.length); default 80.
+// Multi-line free text. Passes size into dict_text (default 80) so di.length is set.
 function exodus_dict_textarea(di, nrows, size) {
 
  exodusassertobject(di, 'exodus_dict_textarea', 'di')
@@ -437,8 +437,7 @@ function exodus_dict_textarea(di, nrows, size) {
  exodus_dict_text(di, size, nrows)
 }
 
-// Align T uppercase codes (nowrap, no fold — dictitem.lowercase false).
-// length is field width (di.length); default 30 like exodus_dict_text.
+// Align T uppercase codes (nowrap, no fold). Passes length into dict_text (default 30).
 function exodus_dict_code(di, length) {
 
  exodusassertobject(di, 'exodus_dict_code', 'di')
