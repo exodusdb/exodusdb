@@ -118,9 +118,6 @@ if (gisdarktheme) {
 //form function global variables
 var gpagenrows = 10
 var gkeycode
-// Set by focusdirection only: +1 forward/right, -1 back/left, 0 = click/unknown.
-// Consumed once by scrollintoview on land (document_onfocus).
-var gfocus_nav_hdir = 0
 // Opt-in focus/scroll diagnostics: __form_scroll_log=1, ?scrolllog=1, or localStorage.
 function form_scroll_log_on() {
 	try {
@@ -891,50 +888,43 @@ async function formfunctions_onload() {
 
             }
 
-            //allow excess spaces in EXODUS data using pre-wrap
-            //"Sequences of whitespace are preserved. Lines are broken at newline characters, at <br>, and as necessary to fill line boxes."
-            // overflow-wrap: long tokens fold once the form table is at its soft
-            // viewport cap (global.css: TABLE.exodusform max-width calc(100vw-2rem);
-            // contenteditable max-width 100% of cell). Pane stays width:max-content.
+            // Align-T SPAN white-space from source dictitem (same as align == 'T' above).
+            // lowercase false → codes, nowrap. true/missing → free text, pre-wrap fold.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
+                var noFold = (dictitem.lowercase === false)
                 try {
-                    element.style.whiteSpace = 'pre-wrap'
-                    element.style.overflowWrap = 'break-word'
+                    if (noFold) {
+                        element.style.whiteSpace = 'nowrap'
+                        element.style.overflowWrap = 'normal'
+                    } else {
+                        element.style.whiteSpace = 'pre-wrap'
+                        element.style.overflowWrap = 'break-word'
+                    }
                 } catch (e) {
                     try {
                         //pre-wrap above errors before IEv8+ XP/Win2003
-                        element.style.whiteSpace = 'pre'
-                        element.style.wordWrap = 'break-word'
+                        element.style.whiteSpace = noFold ? 'nowrap' : 'pre'
+                        if (!noFold)
+                            element.style.wordWrap = 'break-word'
                     }
-                    catch (e) {
+                    catch (e2) {
                     }
                 }
             }
 
             //allow for data entry in SPAN elements (unless hidden)
-            // Align-T free text (contenteditable): fill the cell and wrap at the
-            // form soft ceiling (global.css max-width). Do NOT set min-width to
-            // full exoduslength — length 80 DESCRIPTION forced the form table
-            // max-content to ~page width. Length stays as maxlength/UI hint only.
-            // (INPUT width rules above do not apply to SPANs.)
+            // Align-T: fill host cell. Free-text length is NOT used for paint
+            // (no min Nch, no max Nch — dict sizes stay metadata). Cap special
+            // columns in the form HTM if needed. F6/F7 wrap must not change chrome.
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
                 //buggy and not necessary on msie7
-                //dont set display block if there is a link or popup so that the image stays to the left of the field
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
-                    //element.multiLine=true
-                    //element.style.display = 'inline-block'
-                    //perhaps we ought to be using <div>
-                    //chrome and firefox produce different results with inline-block
-                    if (element.getAttribute('exoduspopup') || element.getAttribute('exoduslink')) {
-                        element.style.display = 'inline-block'
-                        //                      element.style.float='left'
-                    } else {
-                        element.style.display = 'block'
-                        element.style.width = '100%'
-                        element.style.boxSizing = 'border-box'
-                    }
-                    //element.style.float='left'
+                    element.style.display = 'block'
+                    element.style.width = '100%'
+                    element.style.maxWidth = '100%'
+                    element.style.minWidth = '0'
+                    element.style.boxSizing = 'border-box'
                 }
 
                 if (!(element.getAttribute('exodusreadonly'))) {
@@ -981,16 +971,21 @@ async function formfunctions_onload() {
                     //add the button right before/after the field
                     element2.id = element.id + '_popup'
 
-                    //ensure popup icon stays to the left of the input field
+                    // F7 wrap: icon + field on one row; field keeps cell-fill (flex 1).
+                    // Do not switch the field to inline-block for popup.
                     var nowrapper = document.createElement('span')
-                    if (element.getAttribute('exodusalign') != 'T')
-                        nowrapper.style.whiteSpace = 'noWrap'
+                    nowrapper.style.display = 'flex'
+                    nowrapper.style.width = '100%'
+                    nowrapper.style.maxWidth = '100%'
+                    nowrapper.style.alignItems = 'flex-start'
                     element = element.parentNode.replaceChild(nowrapper, element)
                     nowrapper.insertBefore(element, null)
                     nowrapper.insertBefore(element2, null)
-
-                    //insertafter(element,element2)
                     element.parentNode.insertBefore(element2, element)
+                    element.style.flex = '1 1 auto'
+                    element.style.width = 'auto'
+                    element.style.minWidth = '0'
+                    element2.style.flexShrink = '0'
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
@@ -1016,16 +1011,20 @@ async function formfunctions_onload() {
                     var element2 = exodus_create_icon_element(glinkimage)
                     //add the button right after the field
 
-                    //ensure popup icon stays to the left of the input field
+                    // F6 wrap: same as F7 — field chrome unchanged, icon beside.
                     var nowrapper = document.createElement('span')
-                    if (element.getAttribute('exodusalign') != 'T')
-                        nowrapper.style.whiteSpace = 'noWrap'
+                    nowrapper.style.display = 'flex'
+                    nowrapper.style.width = '100%'
+                    nowrapper.style.maxWidth = '100%'
+                    nowrapper.style.alignItems = 'flex-start'
                     element = element.parentNode.replaceChild(nowrapper, element)
                     nowrapper.insertBefore(element, null)
                     nowrapper.insertBefore(element2, null)
-
-                    //insertafter(element,element2)
                     element.parentNode.insertBefore(element2, element)
+                    element.style.flex = '1 1 auto'
+                    element.style.width = 'auto'
+                    element.style.minWidth = '0'
+                    element2.style.flexShrink = '0'
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
@@ -2411,12 +2410,14 @@ async function updatedisplay(elements) {
 
         var subelement = subelements[subn]
 
-        //radio elements are surrounded by DIV
-        if ((subelement.type == 'radio' || subelement.type == 'checkbox') && subelement.parentNode.tagName == 'SPAN') subelement = subelement.parentNode
+        //radio elements are surrounded by SPAN
+        if ((subelement.type == 'radio' || subelement.type == 'checkbox') && subelement.parentNode && subelement.parentNode.tagName == 'SPAN')
+            subelement = subelement.parentNode
 
-        //hide parent node if td or th with only one child
-        var parent = subelement.parentNode
-        if (parent.tagName.match(/^(TD)|(TH)$/)) {
+        // Hide td/th if it only has this content (walk past icon wraps — parentNode
+        // alone is the flex wrap SPAN for popup/link fields).
+        var parent = getancestor(subelement, ' TD TH ')
+        if (parent) {
             //IE5.5 why does a TD enclosing a DIV have two childnodes the second being blank???
             var nchildnodes = 0
             for (var ii = 0; ii < parent.childNodes.length; ii++) if (parent.childNodes[ii].tagName) nchildnodes++
@@ -2517,14 +2518,38 @@ async function newrecordfocus() {
             //   assertelement(element,'newrecordfocus','gfirstnonkeyelement')
         }
         else {
+            // Blank keyed form (every new/clear, not only first postinit):
+            // prefer form-set gstartelement when it is a key part (e.g. journals
+            // JOURNAL_NO). Default remains first key node.
             element = gKeyNodes[0]
-            assertelement(element, 'newrecordfocus', 'gKeyNodes[0]')
+            if (gstartelement && gstartelement.id) {
+                for (var si = 0; si < gKeyNodes.length; si++) {
+                    if (gKeyNodes[si].id == gstartelement.id) {
+                        element = gstartelement
+                        break
+                    }
+                }
+            }
+            assertelement(element, 'newrecordfocus', 'gKeyNodes/gstartelement')
         }
     }
 
     //check no required fields are missing in prior data
     //fill in any defaults where possible
     //do this BEFORE setting gpreviouselement as setdefault will overwrite it
+    //
+    // Pre-open multipart key (!gloaded, !glocked): parts live in the DOM for getkey().
+    // When focus starts on a later key part (form gstartelement), paint prior key
+    // defaults onto the DOM only (setdefault donotupdate) — no validateupdate/gds.setx yet.
+    if (gKeyNodes && !glocked && !gloaded) {
+        for (var kn = 0; kn < gKeyNodes.length; kn++) {
+            var keyel = gKeyNodes[kn]
+            if (keyel.id == element.id)
+                break
+            if (getvalue(keyel) == '')
+                await setdefault(keyel, true)
+        }
+    }
     if (!gKeyNodes || glocked) {
         //check group 0 always
         // If a prior required is empty, checkrequired focuses it and must win —
@@ -3665,7 +3690,7 @@ async function document_onkeydown2(event) {
     if (element.type == 'radio' && element.getAttribute('exodushorizontal')
         && (keycode == 38 || keycode == 40)
         && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-        gkeycode = 13
+        // keep gkeycode 38/40 so readonly-skip knows back vs forward
         focusdirection(keycode == 38 ? -1 : 1, element)
         return exoduscancelevent(event)
     }
@@ -3834,13 +3859,9 @@ async function document_onkeydown2(event) {
         var npages = Math.ceil((rs.length) / pagesize)
 
         //pgdn or down arrow
-        // Set gfocus_nav_hdir so scrollintoview prefers the right edge (multirow
-        // uses focuson directly, not focusdirection).
         if (keycode == 34 || (keycode == 40 && !event.ctrlKey && !event.shiftKey && !event.altKey)) {
 
             //ctrl+pgdn sadly not supported since reserved by firefox to change tabs
-            gfocus_nav_hdir = 1
-
             if (rown < nrows - 1) {
                 if (keycode == 40) {
                     if (!grows[rown + 1].exodusfields[id]) {
@@ -3873,7 +3894,6 @@ async function document_onkeydown2(event) {
 
             //ctrl+pgup or up (sadly not since reserved by firefox to change tabs
             //goes to first line of first page
-            gfocus_nav_hdir = -1
             if (event.ctrlKey) {
                 //tablex.firstPage()
                 focuson(grows[0].exodusfields[id])
@@ -4073,9 +4093,6 @@ function focusdirection(direction, element, notgroupno, scopex) {
     //currently required sourceIndex which is msie only
     //if (!document.body.sourceIndex)
     //    return
-
-    // For scrollintoview after focus lands (see document_onfocus)
-    gfocus_nav_hdir = direction > 0 ? 1 : -1
 
     if (typeof notgroupno == 'undefined')
         notgroupno = ''
@@ -4296,7 +4313,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
     form_scroll_log_msg('focusdirection', direction > 0 ? '+1' : '-1',
         'from', form_scroll_el_label(element),
         'to', form_scroll_el_label(nextelement),
-        'hdir=', gfocus_nav_hdir, 'gkeycode=', gkeycode)
+        'gkeycode=', gkeycode)
     focuson(nextelement)
 
 }
@@ -4398,115 +4415,178 @@ function form_scroll_viewport_capture_keydown(event) {
 }
 
 /*
- * Top of "safe" viewport for focus: menubar + sticky/fixed ancestors that
- * actually cover the focused cell (group column headings, etc.).
- * Uses getComputedStyle(position) sticky/fixed, then elementFromPoint if the
- * cell centre is still hit-tested as something other than the field/cell.
+ * Safe viewport band — geometry only (no elementFromPoint).
+ * top = menubar (--exodus-sticky-top) + pad, then raised by any stuck
+ * multirow thead that contains the field (clients brands, journals lines, …).
  */
-function scrollintoview_top_cover(element, cell) {
-    var topCover = 0
+function scrollintoview_viewport(element) {
+    var rem = 16
     try {
-        topCover = parseFloat(
+        rem = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
+    } catch (e) { }
+    var pad = 0.75 * rem
+    var vw = window.innerWidth || document.documentElement.clientWidth || 0
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0
+    var stickyTop = 0
+    try {
+        stickyTop = parseFloat(
             window.getComputedStyle(document.documentElement)
                 .getPropertyValue('--exodus-sticky-top')
         ) || 0
     } catch (e) { }
+    var top = stickyTop + pad
 
-    // Sticky/fixed thead (and other sticky ancestors) above the field
-    try {
-        var node = element
-        while (node && node !== document && node !== document.documentElement) {
-            if (node.nodeType == 1) {
-                var st = window.getComputedStyle(node)
-                var pos = st && st.position
-                if (pos == 'sticky' || pos == 'fixed') {
-                    var nr = node.getBoundingClientRect()
-                    // Only count overlays that sit in the top band (not fixed footers)
-                    if (nr.bottom > topCover && nr.top < (topCover + 1) + nr.height
-                        && nr.top < (window.innerHeight || 0) * 0.5)
-                        topCover = Math.max(topCover, nr.bottom)
-                }
-                // Table thead may be sticky even when walking from a tbody cell
-                if (node.tagName == 'TABLE' && node.tHead) {
-                    var thSt = window.getComputedStyle(node.tHead)
+    // Multirow TABLE[exogroupno] > thead { position:sticky; top: menubar }.
+    // When stuck, free band starts below that thead — otherwise Up leaves the
+    // focused row under the column headings.
+    if (element && typeof getancestor === 'function') {
+        try {
+            var table = getancestor(element, 'TABLE')
+            while (table) {
+                if (table.tHead) {
+                    var thSt = window.getComputedStyle(table.tHead)
                     if (thSt && (thSt.position == 'sticky' || thSt.position == 'fixed')) {
-                        var thr = node.tHead.getBoundingClientRect()
-                        if (thr.bottom > topCover && thr.top < (window.innerHeight || 0) * 0.5)
-                            topCover = Math.max(topCover, thr.bottom)
+                        var thr = table.tHead.getBoundingClientRect()
+                        var stickAt = 0
+                        try {
+                            stickAt = parseFloat(thSt.top)
+                            if (isNaN(stickAt))
+                                stickAt = stickyTop
+                        } catch (e2) {
+                            stickAt = stickyTop
+                        }
+                        // Stuck (or nearly): top sits at CSS sticky offset
+                        if (thr.bottom > 0 && thr.top <= stickAt + 2)
+                            top = Math.max(top, thr.bottom + 0.25 * rem)
                     }
                 }
+                table = table.parentNode
+                    ? getancestor(table.parentNode, 'TABLE')
+                    : null
             }
-            node = node.parentNode
-        }
-    } catch (e) { }
+        } catch (e) { }
+    }
 
-    // Hit-test: is the cell centre covered by something outside the field/cell?
-    // Only when the probe intersects the viewport. Clamping Y into the viewport
-    // for fully off-screen cells (e.g. radio below NOTES) false-positives the
-    // row/thead just above as an "overlay" and inflates topCover to ~cell.top.
-    try {
-        var probe = cell || element
-        var pr = probe.getBoundingClientRect()
-        var vw = window.innerWidth || document.documentElement.clientWidth || 0
-        var vh = window.innerHeight || document.documentElement.clientHeight || 0
-        if (vw && vh && pr.width > 0 && pr.height > 0
-            && pr.bottom > 0 && pr.top < vh) {
-            var cx = Math.min(Math.max(pr.left + pr.width / 2, 0), vw - 1)
-            var cy = Math.min(Math.max(pr.top + Math.min(pr.height / 2, 8), 0), vh - 1)
-            var hit = document.elementFromPoint(cx, cy)
-            if (hit
-                && hit !== element && hit !== cell
-                && !(element.contains && element.contains(hit))
-                && !(cell && cell.contains && cell.contains(hit))
-                && !(hit.contains && (hit.contains(element) || (cell && hit.contains(cell))))
-            ) {
-                var hr = hit.getBoundingClientRect()
-                // Overlay sitting over the top of the cell → push safe top down
-                if (hr.bottom > topCover && hr.top <= pr.top + 2)
-                    topCover = Math.max(topCover, hr.bottom)
-            }
-        }
-    } catch (e) { }
-
-    return topCover
-}
-
-/*
- * True if element centre is hit-tested as itself or a descendant (not overlaid).
- * Optional probe; defaults to centre of element.
- */
-function element_is_visually_clear(element, x, y) {
-    if (!element || !document.elementFromPoint)
-        return true
-    try {
-        var r = element.getBoundingClientRect()
-        var vw = window.innerWidth || document.documentElement.clientWidth || 0
-        var vh = window.innerHeight || document.documentElement.clientHeight || 0
-        if (!vw || !vh || r.width <= 0 || r.height <= 0)
-            return false
-        if (typeof x != 'number')
-            x = r.left + r.width / 2
-        if (typeof y != 'number')
-            y = r.top + r.height / 2
-        x = Math.min(Math.max(x, 0), vw - 1)
-        y = Math.min(Math.max(y, 0), vh - 1)
-        var hit = document.elementFromPoint(x, y)
-        return !!(hit && (hit === element || element.contains(hit) || (hit.contains && hit.contains(element))))
-    } catch (e) {
-        return true
+    return {
+        left: pad,
+        right: vw - pad,
+        top: top,
+        bottom: vh - pad,
+        vw: vw,
+        vh: vh
     }
 }
 
 /*
- * Window scroll after focus (preventScroll on focuson2).
- * gfocus_nav_hdir (from focusdirection / multirow arrows): +1 forward, -1 back, 0 click.
- * Fit the enclosing TD/TH column cell so column titles stay with the field.
- * Horizontal: hard-snap fully left only for first-of-row (~12rem docLeft);
- *   else minimal dx; wide cells pin leading edge by direction.
- * Vertical: minimal dy so the cell is not clipped by viewport edges OR sticky
- *   menubar/column headings (multirow ↑ under sticky thead). Always min-fit;
- *   hdir only chooses which edge to prefer when the cell is taller than the
- *   free band. Consumes gfocus_nav_hdir.
+ * Horizontal target: field's TD/TH + consecutive preceding TH prompts in the row.
+ * Multirow body TDs are not expanded (previous siblings are TDs → pure column).
+ * First focussable column of a multirow: also include the row's first TD
+ * (ins/del buttons) so those stay in the free band — not document left; works
+ * when the table is not at the left of the form.
+ */
+function scrollintoview_hrect(element, cell) {
+    var elR = element.getBoundingClientRect()
+    if (!cell || !cell.getBoundingClientRect)
+        return elR
+    var r = cell.getBoundingClientRect()
+    var left = r.left
+    var right = r.right
+    var p = cell.previousElementSibling
+    while (p && p.tagName == 'TH') {
+        try {
+            var pr = p.getBoundingClientRect()
+            left = Math.min(left, pr.left)
+            right = Math.max(right, pr.right)
+        } catch (e) { }
+        p = p.previousElementSibling
+    }
+    // First focussable field of a multirow → include leading ins/del TD.
+    var groupno = Number(element.getAttribute && element.getAttribute('exogroupno'))
+    if (groupno > 0 && typeof gtables != 'undefined' && gtables[groupno]) {
+        var firstSfn = null
+        try {
+            var tablex = gtables[groupno].tablex || gtables[groupno].tableelement
+            if (tablex && typeof form_getfirstinputcolscreenfn == 'function')
+                firstSfn = form_getfirstinputcolscreenfn(tablex)
+        } catch (e) { }
+        if (firstSfn == null || firstSfn === '' || typeof firstSfn == 'undefined')
+            firstSfn = gtables[groupno][0]
+        var isFirst = element.getAttribute('exodusisfirstinputcolumn')
+            || (gfields[firstSfn]
+                && (element.id == gfields[firstSfn].id
+                    || String(element.getAttribute('exodusscreenfn')) == String(firstSfn)))
+        if (isFirst) {
+            var tr = null
+            try {
+                tr = typeof getancestor === 'function' ? getancestor(element, 'tr') : null
+            } catch (e) { }
+            var btnTd = tr && tr.firstElementChild
+            if (btnTd && btnTd.tagName == 'TD' && btnTd != cell) {
+                try {
+                    var br = btnTd.getBoundingClientRect()
+                    left = Math.min(left, br.left)
+                    right = Math.max(right, br.right)
+                } catch (e) { }
+            }
+        }
+    }
+    return { left: left, right: right, top: r.top, bottom: r.bottom }
+}
+
+/*
+ * Horizontal dx for column rect (TD/TH + preceding prompt TH).
+ *  - Fits in free band → must be fully inside; min-fit if any edge clips.
+ *  - Wider than free band → only require leading edge in band (may clip right).
+ */
+function scrollintoview_dx(r, vp) {
+    if (!r || !vp || !vp.vw)
+        return 0
+    var w = r.right - r.left
+    var avail = vp.right - vp.left
+    if (avail <= 0)
+        return 0
+    if (w <= avail + 0.5) {
+        if (r.left >= vp.left - 0.5 && r.right <= vp.right + 0.5)
+            return 0
+        if (r.left < vp.left)
+            return r.left - vp.left
+        if (r.right > vp.right)
+            return r.right - vp.right
+        return 0
+    }
+    // Oversized: satisfied if start is in the free band
+    if (r.left >= vp.left - 0.5 && r.left < vp.right - 0.5)
+        return 0
+    return r.left - vp.left
+}
+
+/*
+ * Vertical dy for the focused control. Same split as horizontal.
+ */
+function scrollintoview_dy(r, vp) {
+    if (!r || !vp || !vp.vh)
+        return 0
+    var h = r.bottom - r.top
+    var avail = vp.bottom - vp.top
+    if (avail <= 0)
+        return 0
+    if (h <= avail + 0.5) {
+        if (r.top >= vp.top - 0.5 && r.bottom <= vp.bottom + 0.5)
+            return 0
+        if (r.top < vp.top)
+            return r.top - vp.top
+        if (r.bottom > vp.bottom)
+            return r.bottom - vp.bottom
+        return 0
+    }
+    if (r.top >= vp.top - 0.5 && r.top < vp.bottom - 0.5)
+        return 0
+    return r.top - vp.top
+}
+
+/*
+ * Scroll only when geometry says the target is not ok.
+ * Horizontal: column TD/TH (+ prompt TH). Vertical: control.
  */
 function scrollintoview(element) {
     if (!element || !element.getBoundingClientRect) {
@@ -4518,184 +4598,29 @@ function scrollintoview(element) {
         return
     }
 
-    var hdir = gfocus_nav_hdir
-    gfocus_nav_hdir = 0
-
-    // rem-based measures (scale with root font size; avoid fixed px screen assumptions)
-    var rem = 16
-    try {
-        rem = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16
-    } catch (e) { }
-    var pad = 0.75 * rem           // edge air when fitting a clipped cell
-    // Hard-snap fully left only for true first-of-row fields (journal VOUCHER_DATE
-    // docLeft≈108). 20rem (320) also caught VOUCHER_NO (≈243) — too sensitive.
-    var nearDocLeft = 12 * rem     // ~ first field only (~192px at 16px root)
-
-    // Column cell bounds (TD/TH) — titles live in the matching thead column.
-    // Fall back to the control if not in a table cell.
     var cell = null
     try {
         cell = typeof getancestor === 'function' ? getancestor(element, ' TD TH ') : null
     } catch (e) { }
-    var elR = element.getBoundingClientRect()
-    var r = (cell && cell.getBoundingClientRect)
-        ? cell.getBoundingClientRect()
-        : elR
 
-    var vw = window.innerWidth || document.documentElement.clientWidth || 0
-    var vh = window.innerHeight || document.documentElement.clientHeight || 0
-    var pageX = window.pageXOffset || document.documentElement.scrollLeft || 0
-    var pageY = window.pageYOffset || document.documentElement.scrollTop || 0
-    var docLeft = r.left + pageX
+    var vp = scrollintoview_viewport(element)
+    if (!vp.vw || !vp.vh)
+        return
 
-    // --- horizontal ---
-    var dx = 0
-    if (vw) {
-        // Early columns of the form (document left, not viewport left)
-        if (pageX > 0 && docLeft < nearDocLeft) {
-            dx = -pageX
-        } else {
-            var leftPad = pad
-            var rightPad = vw - pad
-            var w = r.right - r.left
-            var avail = vw - 2 * pad
-
-            if (!(r.left >= leftPad && r.right <= rightPad)) {
-                if (hdir > 0) {
-                    if (w <= avail) {
-                        if (r.left < leftPad)
-                            dx = r.left - leftPad
-                        else if (r.right > rightPad)
-                            dx = r.right - rightPad
-                    } else {
-                        dx = r.left - leftPad
-                    }
-                } else if (hdir < 0) {
-                    if (w <= avail) {
-                        if (r.right > rightPad)
-                            dx = r.right - rightPad
-                        else if (r.left < leftPad)
-                            dx = r.left - leftPad
-                    } else {
-                        dx = r.right - rightPad
-                    }
-                } else if (r.right <= 0 || r.left >= vw) {
-                    dx = r.left - leftPad
-                }
-            }
-        }
-    }
-
-    // --- vertical: always min-fit under sticky covers (not only when fully off-screen) ---
-    var dy = 0
-    var topPad = 0
-    var bottomPad = vh
-    var vAvail = 0
-    var fullyIn = true
-    if (vh) {
-        topPad = scrollintoview_top_cover(element, cell) + pad
-        bottomPad = vh - pad
-        var h = r.bottom - r.top
-        vAvail = bottomPad - topPad
-        // Off-screen targets (e.g. radio below NOTES on bookings): sticky/hit-test
-        // can inflate top cover to ~cell.top so free band collapses (vAvail<=0) and
-        // we never scroll. Fall back to menubar-only cover.
-        if (vAvail <= 0) {
-            var menubarOnly = 0
-            try {
-                menubarOnly = parseFloat(
-                    window.getComputedStyle(document.documentElement)
-                        .getPropertyValue('--exodus-sticky-top')
-                ) || 0
-            } catch (e) { }
-            topPad = menubarOnly + pad
-            vAvail = bottomPad - topPad
-            form_scroll_log_msg('scrollintoview topPad fallback menubar',
-                Math.round(topPad), 'vAvail=', Math.round(vAvail))
-        }
-        fullyIn = (r.top >= topPad && r.bottom <= bottomPad)
-
-        if (vAvail > 0 && !fullyIn) {
-            if (hdir < 0) {
-                // Up / back: prefer top edge clear of sticky headings
-                if (h <= vAvail) {
-                    if (r.top < topPad)
-                        dy = r.top - topPad
-                    else if (r.bottom > bottomPad)
-                        dy = r.bottom - bottomPad
-                } else {
-                    dy = r.bottom - bottomPad
-                }
-            } else if (hdir > 0) {
-                // Down / forward: prefer bottom edge
-                if (h <= vAvail) {
-                    if (r.bottom > bottomPad)
-                        dy = r.bottom - bottomPad
-                    else if (r.top < topPad)
-                        dy = r.top - topPad
-                } else {
-                    dy = r.top - topPad
-                }
-            } else {
-                // Click / multirow without dir: same min-fit (fixes ↑ under sticky thead)
-                if (r.top < topPad)
-                    dy = r.top - topPad
-                else if (r.bottom > bottomPad)
-                    dy = r.bottom - bottomPad
-            }
-        }
-    }
+    var rH = scrollintoview_hrect(element, cell)
+    var rV = element.getBoundingClientRect()
+    var dx = scrollintoview_dx(rH, vp)
+    var dy = scrollintoview_dy(rV, vp)
 
     form_scroll_log_msg('scrollintoview', form_scroll_el_label(element),
-        'hdir=', hdir, 'pageY=', Math.round(pageY),
-        'el.top/bot=', Math.round(elR.top) + '/' + Math.round(elR.bottom),
-        'cell.top/bot=', Math.round(r.top) + '/' + Math.round(r.bottom),
-        'vh=', vh, 'topPad=', Math.round(topPad), 'bottomPad=', Math.round(bottomPad),
-        'fullyIn=', fullyIn, 'dx/dy=', Math.round(dx) + '/' + Math.round(dy))
+        'hL/R=', Math.round(rH.left) + '/' + Math.round(rH.right),
+        'vT/B=', Math.round(rV.top) + '/' + Math.round(rV.bottom),
+        'vpL/R=', Math.round(vp.left) + '/' + Math.round(vp.right),
+        'vpT/B=', Math.round(vp.top) + '/' + Math.round(vp.bottom),
+        'dx/dy=', Math.round(dx) + '/' + Math.round(dy))
 
     if (dx || dy)
         window.scrollBy(dx, dy)
-
-    // Second pass: re-measure sticky cover after scroll (thead stick position can lag).
-    if (vh) {
-        try {
-            var r2 = (cell && cell.getBoundingClientRect)
-                ? cell.getBoundingClientRect()
-                : element.getBoundingClientRect()
-            var topPad2 = scrollintoview_top_cover(element, cell) + pad
-            if (vh - pad - topPad2 <= 0) {
-                var menubar2 = 0
-                try {
-                    menubar2 = parseFloat(
-                        window.getComputedStyle(document.documentElement)
-                            .getPropertyValue('--exodus-sticky-top')
-                    ) || 0
-                } catch (e) { }
-                topPad2 = menubar2 + pad
-            }
-            if (r2.top < topPad2)
-                window.scrollBy(0, r2.top - topPad2)
-            else if (!element_is_visually_clear(element)
-                && !(cell && element_is_visually_clear(cell))) {
-                var cover2 = scrollintoview_top_cover(element, cell)
-                if (vh - pad - cover2 <= 0) {
-                    try {
-                        cover2 = parseFloat(
-                            window.getComputedStyle(document.documentElement)
-                                .getPropertyValue('--exodus-sticky-top')
-                        ) || 0
-                    } catch (e) { cover2 = 0 }
-                }
-                if (r2.top < cover2 + pad)
-                    window.scrollBy(0, r2.top - (cover2 + pad))
-            }
-            form_scroll_log_msg('scrollintoview after', form_scroll_el_label(element),
-                'pageY=', Math.round(window.pageYOffset || 0),
-                'el.top/bot=', Math.round(element.getBoundingClientRect().top)
-                    + '/' + Math.round(element.getBoundingClientRect().bottom),
-                'active=', form_scroll_el_label(document.activeElement))
-        } catch (e) { }
-    }
 }
 
 ///////////////////// BUTTON EVENTS /////////////////////////
@@ -6798,14 +6723,13 @@ function focuson2() {
 
     try {
         // Never blur() to "force" focus — that closes a native <select> opened on click.
-        // preventScroll: native focus scroll jumps mid-viewport; scrollintoview owns axes.
+        // preventScroll: native focus scroll jumps mid-viewport; we scroll after focus.
         var needFocus = document.activeElement != focusonelement
         if (needFocus)
             form_focus_noscroll(focusonelement)
         form_scroll_log_msg('focuson2', form_scroll_el_label(focusonelement),
             'needFocus=', needFocus,
-            'activeNow=', form_scroll_el_label(document.activeElement),
-            'hdir=', gfocus_nav_hdir)
+            'activeNow=', form_scroll_el_label(document.activeElement))
 
         // Text selection only — not SELECT (no .select() listbox contract).
         if (focusonelement.tagName != 'SELECT'
@@ -6813,6 +6737,25 @@ function focuson2() {
             && focusonelement.tagName != 'TEXTAREA'
             && focusonelement.select)
             focusonelement.select()
+
+        // Scroll after every programmatic land — not only after document_onfocus
+        // finishes (that path early-exits often and skipped scroll). Same rule as
+        // document_onfocus: key fields home (0,0); others scrollintoview.
+        if (focusonelement.tagName
+            && focusonelement.tagName.match(gdatatagnames)
+            && focusonelement.getAttribute
+            && focusonelement.getAttribute('exodustype')) {
+            if (focusonelement == gstartelement
+                || focusonelement.getAttribute('exodusfieldno') === '0') {
+                form_scroll_log_msg('focuson2 scroll home key field',
+                    form_scroll_el_label(focusonelement))
+                window.scrollTo(0, 0)
+                if (typeof modalblock_note_scroll_home == 'function')
+                    modalblock_note_scroll_home()
+            } else if (typeof scrollintoview == 'function') {
+                scrollintoview(focusonelement)
+            }
+        }
 
     }
     catch (e) {
@@ -6828,8 +6771,7 @@ function document_onfocus_sync(event) {
     try {
         var t = event && (event.target || event.srcElement)
         form_scroll_log_msg('document_onfocus_sync', form_scroll_el_label(t),
-            'gblockevents=', typeof gblockevents != 'undefined' ? gblockevents : '?',
-            'gfocus_nav_hdir=', gfocus_nav_hdir)
+            'gblockevents=', typeof gblockevents != 'undefined' ? gblockevents : '?')
     } catch (e) { }
     var eventhandlerx = starteventhandler('exoduscode', document_onfocus)
     return eventhandlerx(event)
@@ -6908,7 +6850,7 @@ async function document_onfocus(event) {
     ///log('no validation/update except changing exodus elements:' + element.getAttribute('exodustype'))
     form_scroll_log_msg('document_onfocus enter', form_scroll_el_label(element),
         'exodustype=', element.getAttribute('exodustype'),
-        'hdir=', gfocus_nav_hdir, 'gkeycode=', gkeycode,
+        'gkeycode=', gkeycode,
         'prev=', form_scroll_el_label(gpreviouselement))
     if (!(element.getAttribute('exodustype'))) {
         form_scroll_log_msg('document_onfocus EXIT no exodustype', form_scroll_el_label(element))
@@ -7027,18 +6969,16 @@ async function document_onfocus(event) {
         }
     }
 
-    // Tab/Enter landed on a readonly field: after prior-required + new-record
-    // checks above, skip to the next (or previous) editable field. Must not run
-    // before those checks — click/tab on e.g. autonumber VOUCHER_NO must still
-    // enforce Bank/Cash required and opendoc.
-    // gfocus_nav_hdir: horizontal radio Up spoofs Enter without event.shiftKey.
-    if (gkeycode == 9 || gkeycode == 13) {
+    // Tab/Enter/arrows landed on a readonly field: skip to next/previous editable.
+    // Must not run before prior-required + new-record checks above.
+    // Horizontal radio Up keeps gkeycode 38 so back-nav works without a dir flag.
+    if (gkeycode == 9 || gkeycode == 13 || gkeycode == 38 || gkeycode == 40) {
         if (element.getAttribute('exodusreadonly')
             && (element.tabIndex == 999 || element.tabIndex == -1
                 || element.getAttribute('oldtabindex'))) {
             form_scroll_log_msg('document_onfocus EXIT readonly skip to next',
                 form_scroll_el_label(element))
-            if (event.shiftKey || gfocus_nav_hdir < 0)
+            if (event.shiftKey || gkeycode == 38)
                 focusprevious(element)
             else
                 focusnext(element)
@@ -7050,15 +6990,15 @@ async function document_onfocus(event) {
     ///log('scroll to top left if the key field')
     // Strict === '0': loose == 0 also matches missing attribute (null).
     // modalblock_note_scroll_home: unpin must not restore pre-home scroll.
+    // focuson2 applies the same key-home / scrollintoview split for programmatic
+    // focus when this handler early-exits; still run here for click/tab.
     if (element == gstartelement || element.getAttribute('exodusfieldno') === '0') {
         form_scroll_log_msg('document_onfocus scroll home key field', form_scroll_el_label(element))
         window.scrollTo(0, 0)
         if (typeof modalblock_note_scroll_home == 'function')
             modalblock_note_scroll_home()
-        gfocus_nav_hdir = 0
     } else {
-        form_scroll_log_msg('document_onfocus → scrollintoview', form_scroll_el_label(element),
-            'hdir=', gfocus_nav_hdir)
+        form_scroll_log_msg('document_onfocus → scrollintoview', form_scroll_el_label(element))
         scrollintoview(element)
     }
 
@@ -7544,14 +7484,21 @@ async function checkrequired(elements, element, groupno) {
                     && getvalue(element2) == '') {
 
                     //try to set the default
-                    if (!(await setdefault(element2)) && exodusenabledandvisible(element2)) {
+                    // Pre-open key parts (fieldno 0, !gloaded): DOM/getkey path only —
+                    // setdefault donotupdate, still-empty via getvalue not gds.
+                    var keyEntry = gKeyNodes && !gloaded
+                        && element2.getAttribute('exodusfieldno') === '0'
+                    if (!(await setdefault(element2, keyEntry)) && exodusenabledandvisible(element2)) {
                         focuson(element2)
                         return false
                     }
 
                     //if still empty then fail
                     //if (getvalue(element2)=='')
-                    if (element2.getAttribute('exodusrequired') && !element2.getAttribute('exodusreadonly') && gds.getcells(element2, grecn)[0].text == '') {
+                    var stillEmpty = keyEntry
+                        ? (getvalue(element2) == '')
+                        : (gds.getcells(element2, grecn)[0].text == '')
+                    if (element2.getAttribute('exodusrequired') && !element2.getAttribute('exodusreadonly') && stillEmpty) {
 
                         //disabled or invisible elements may be blank and required (even after setdefault)
                         if (element2.disabled || element2.getAttribute('disabled') || !exodusenabledandvisible(element2))
@@ -7559,12 +7506,12 @@ async function checkrequired(elements, element, groupno) {
 
                         //put up a message unless is the first column of a row
                         if (true || !(element2.getAttribute('exodusisfirstinputcolumn'))) {
-                            // Focus the missing field *before* the dialog so confirm
-                            // close restores here (not the field the user clicked).
-                            // Avoids a one-shot suppress flag and double "is required".
-                            form_focus_noscroll(element2)
-                            setgpreviouselement(element2)
-                            gonfocuselement = element2
+                            // Message then focuson only. Do not rewrite
+                            // gpreviouselement/gonfocuselement here: focuson →
+                            // document_onfocus leave-fields the real previous
+                            // (incl. default-painted key) and runs opendoc when
+                            // appropriate. Stealing previous to "suppress re-entry"
+                            // early-exits that path.
                             await exodusinvalid(element2.getAttribute('exodustitle') + ' is required..')
                         }
 
@@ -7936,12 +7883,13 @@ function exodussetreadonly(elements, msg, options, recn) {
         if (options && options.indexOf('BGCOLOR') >= 0) {
             if (!elementx.getAttribute('oldbgcolor'))
                 elementx.setAttribute('oldbgcolor', elementx.style.backgroundColor)
-            // Blend with host cell; never hardcode #f6f6f6 (looks white in dark mode).
-            var newbgcolor = elementx.parentNode && elementx.parentNode.style
-                ? elementx.parentNode.style.backgroundColor : ''
-            if (!newbgcolor && elementx.parentNode && typeof getComputedStyle != 'undefined') {
+            // Blend with host cell (not icon wrap SPAN); never hardcode #f6f6f6.
+            var hostcell = getancestor(elementx, ' TD TH ') || elementx.parentNode
+            var newbgcolor = hostcell && hostcell.style
+                ? hostcell.style.backgroundColor : ''
+            if (!newbgcolor && hostcell && typeof getComputedStyle != 'undefined') {
                 try {
-                    newbgcolor = getComputedStyle(elementx.parentNode).backgroundColor
+                    newbgcolor = getComputedStyle(hostcell).backgroundColor
                 } catch (e) { }
             }
             if (!newbgcolor || newbgcolor === 'transparent'
@@ -9197,11 +9145,15 @@ async function deleterows(groupnoorelement, rowns) {
 
     var groupno = groupnoorelement
     if (typeof groupno == 'object') {
-        groupno = groupno.getAttribute('exogroupno')
+        groupno = groupnoorelement.getAttribute && groupnoorelement.getAttribute('exogroupno')
         if (!groupno && groupnoorelement[0] && groupnoorelement[0].getAttribute)
             groupno = groupnoorelement[0].getAttribute('exogroupno')
-        if (!groupno && groupnoorelement.parentNode.getAttribute)
-            groupno = groupnoorelementparenNode.getAttribute('exogroupno')
+        // Table carries exogroupno; walk past icon wraps (was broken parenNode typo).
+        if (!groupno) {
+            var tablex = getancestor(groupnoorelement[0] || groupnoorelement, 'TABLE')
+            if (tablex)
+                groupno = tablex.getAttribute('exogroupno')
+        }
     }
 
     var rows = gds.data['group' + groupno]
@@ -9228,11 +9180,14 @@ async function deleteallrows(groupnoorelement, fromrecn) {
 
     var groupno = groupnoorelement
     if (typeof groupno == 'object') {
-        groupno = groupno.getAttribute('exogroupno')
+        groupno = groupnoorelement.getAttribute && groupnoorelement.getAttribute('exogroupno')
         if (!groupno && groupnoorelement[0] && groupnoorelement[0].getAttribute)
             groupno = groupnoorelement[0].getAttribute('exogroupno')
-        if (!groupno && groupnoorelement.parentNode.getAttribute)
-            groupno = groupnoorelementparenNode.getAttribute('exogroupno')
+        if (!groupno) {
+            var tablex = getancestor(groupnoorelement[0] || groupnoorelement, 'TABLE')
+            if (tablex)
+                groupno = tablex.getAttribute('exogroupno')
+        }
     }
 
     if (!fromrecn)
@@ -10834,13 +10789,12 @@ function copydictitem(dictitem, element) {
         if (typeof element[attr] == 'undefined' && typeof dictitem[propertyname] != 'undefined') {
             //element[attr]=dictitem[propertyname]
             //use setAttribute because only msie will clone expando properties and needed for row cloning
-            //store false as "" otherwise since attributed are stored as strings it becomes "false"
-            //which does not evaluate to false
+            //store false as "" otherwise since attributes are stored as strings it becomes "false"
+            //which does not evaluate to false — still must setAttribute (was only in else).
             var value = dictitem[propertyname]
             if (value === false || value === null)
                 value = ''
-            else
-                element.setAttribute(attr, value)
+            element.setAttribute(attr, value)
         }
     }
 

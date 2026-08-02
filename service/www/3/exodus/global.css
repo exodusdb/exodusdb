@@ -207,17 +207,19 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
 .exodusformactions .exodusbutton {
     margin: 0.125em 4px;
 }
-/* Embedded line grid: hug content when short, but never wider than host/pane
- * so pre-wrap DETAILS/DESCRIPTION can fold within the screen (was max-content
- * alone, which grew the table to the full unwrapped text run). */
+/*
+ * Embedded line grid (costs/estimates ITEM_DESCRIPTION, journals group lines, …).
+ * Attention/header free text sits in a fieldstrip width=100% and folds under the
+ * form soft ceiling. Row free text lives in this nested table: max-content alone
+ * grows past the screen and never folds. Fill the host cell (host is capped by
+ * form max-width calc(100vw-2rem)) so pre-wrap T spans can wrap.
+ */
 TABLE.exodusform > tbody > tr > td > TABLE.exotable:not([width]),
 TABLE.exodusform > tbody > tr > td > TABLE[exogroupno]:not([width]),
 TABLE.exodusform > tbody > tr > th > TABLE.exotable:not([width]),
 TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]) {
-    /* max-content hug; 100% cap when host is narrower. min() needs a fallback. */
-    width: max-content;
+    width: 100%;
     max-width: 100%;
-    width: min(max-content, 100%);
     box-sizing: border-box;
 }
 
@@ -270,9 +272,8 @@ TABLE.exodusform TABLE.exotable th {
 
 /*
  * Flowing text (align=T → contenteditable span).
- * Fold inside the cell once the form table is at its viewport ceiling.
- * Do not min-width to dict length (dbform used to set Nch — DESCRIPTION 80
- * forced form max-content to page width). width 100% from dbform fills cell.
+ * Fill cell (width 100% from dbform). Free-text dict length is not used for
+ * paint (no min/max Nch). Cap special columns in the form HTM if needed.
  */
 SPAN.clsRequired[contenteditable],
 SPAN.clsNotRequired[contenteditable] {

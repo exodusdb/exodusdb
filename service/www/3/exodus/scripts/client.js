@@ -8732,9 +8732,9 @@ async function decide_onload(decide_args) {
 
 		element.checked = checking
 
-		//var rowtag=getancestor(element,'tr')
-		rowtag = element.parentNode.parentNode
-		rowtag.style.fontWeight = checking ? 'bold' : 'normal'
+		var rowtag = getancestor(element, 'tr')
+		if (rowtag)
+			rowtag.style.fontWeight = checking ? 'bold' : 'normal'
 
 		if (checking) {
 			lastrank++
