@@ -33,9 +33,9 @@
             di.required = true
 
             di = dict[++din] = dictrec('NEW_DATABASE_CODE', 'F', 2)
+			di.length = '25'
 			exodus_dict_text(di,20);	
             di.required = true
-			di.length = '25'
 			di.validation = 'await  database_val_newdatabasecode()'
 
             di = dict[++din] = dictrec('NEW_DATABASE_NAME', 'F', 1)
