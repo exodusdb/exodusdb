@@ -405,6 +405,9 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
 
 }
 
+// Align T free text: contenteditable SPAN, fold at spaces (lowercase true).
+// size/length is stored only (not used for paint — cell fill). Codes: dict_code.
+// Multi-line: exodus_dict_textarea(di, nrows, size).
 function exodus_dict_text(dicti,size,rows) {
 
  exodusassertobject(dicti,'exodus_dict_text','dicti')
@@ -420,6 +423,29 @@ function exodus_dict_text(dicti,size,rows) {
   dicti.rows=rows
  if (typeof dicti.lowercase=='undefined')
   dicti.lowercase=true
+}
+
+// Multi-line free text (HTML textarea when nrows > 1). Same align T / lowercase
+// defaults as exodus_dict_text. size is field width (di.length); default 80.
+function exodus_dict_textarea(di, nrows, size) {
+
+ exodusassertobject(di, 'exodus_dict_textarea', 'di')
+ if (typeof nrows == 'undefined')
+  nrows = 3
+ if (typeof size == 'undefined')
+  size = 80
+ exodus_dict_text(di, size, nrows)
+}
+
+// Align T uppercase codes (nowrap, no fold — dictitem.lowercase false).
+// length is field width (di.length); default 30 like exodus_dict_text.
+function exodus_dict_code(di, length) {
+
+ exodusassertobject(di, 'exodus_dict_code', 'di')
+ if (typeof length == 'undefined')
+  length = 30
+ exodus_dict_text(di, length)
+ di.lowercase = false
 }
 
 function exodusrecord(dictarray,filename) {

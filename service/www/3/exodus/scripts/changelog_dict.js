@@ -43,9 +43,7 @@ async function dict_CHANGELOG() {
  
  di=dict[++din]=dictrec('CHANGELOG_TEXT','F',3)
  di.required=true
- exodus_dict_text(di)
- di.rows=20
- di.length=100
+ exodus_dict_textarea(di, 20, 100)
  
  di=dict[++din]=dictrec('DATE_TIME','F',4)
  exodus_dict_datetimeupdated(di)
