@@ -4738,19 +4738,16 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	// SQL WHERE - excludes calculated fields if doing stage 1 of a two stage sort/select
 	//TODO when doing stage2, skip "WITH/WITHOUT xxx" of stage1 fields
 	//
-	// FTS only (*_XREF → to_tsvector): createindex() builds PARTIAL GIN indexes
+	// createindex() always builds PARTIAL indexes:
 	//   WHERE left(key,1) <> '%' OR right(key,1) <> '%'
-	// Postgres uses that GIN only when the query implies the same predicate.
-	// Without it, WITH …XREF seq-scans large files (e.g. accounts BANK ~3s).
-	// Do NOT add this for non-FTS WITH — other SELECTs must keep prior semantics.
+	// Postgres uses a partial index only when the query implies the same predicate.
+	// Without it: WITH …XREF GIN seq-scans (accounts BANK ~3s); WITH symbolic btree
+	// seq-scans too (ADS VEHICLE_AND_DATE ~1.8s vs <1ms). Parenthesize first so
+	// multi-WITH OR binds as (A or B) AND pred, not A or (B AND pred).
 	if (whereclause) {
-		// Parenthesize the existing WHERE: multi-WITH defaults to OR, and
-		// "A or B AND pred" is not "(A or B) AND pred".
-		if (whereclause.contains("to_tsvector(")) {
-			whereclause =
-				"(" ^ whereclause ^ ")\n AND (left(" ^ actualfilename ^
-				".key,1) <> '%' OR right(" ^ actualfilename ^ ".key,1) <> '%')";
-		}
+		whereclause =
+			"(" ^ whereclause ^ ")\n AND (left(" ^ actualfilename ^
+			".key,1) <> '%' OR right(" ^ actualfilename ^ ".key,1) <> '%')";
 		sql ^= " \nWHERE \n" ^ whereclause;
 	}
 
