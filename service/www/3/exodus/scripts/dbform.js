@@ -6076,30 +6076,146 @@ function form_typeahead_reset() {
 function form_typeahead_hide() {
 
     form_typeahead_listen_scroll(false)
-    if (gform_typeahead_div)
+    if (gform_typeahead_div) {
         gform_typeahead_div.style.display = 'none'
+        gform_typeahead_div.scrollTop = 0
+        gform_typeahead_div.scrollLeft = 0
+    }
     gform_typeahead_element = null
     gform_typeahead_rows = []
     gform_typeahead_focusn = -1
 }
 
+// Free viewport band for typeahead (below sticky menubar).
+function form_typeahead_free_band() {
+
+    var vw = window.innerWidth || document.documentElement.clientWidth || 0
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0
+    var stickyTop = 0
+    try {
+        stickyTop = parseFloat(
+            window.getComputedStyle(document.documentElement)
+                .getPropertyValue('--exodus-sticky-top')
+        ) || 0
+    } catch (e) { }
+    var pad = 4
+    return {
+        left: pad,
+        right: vw - pad,
+        top: stickyTop + pad,
+        bottom: vh - pad,
+        vw: vw,
+        vh: vh
+    }
+}
+
+/*
+ * Always under the field (never flip above / shift off the field).
+ * fixed + live scroll sync keeps the panel under the field as the page moves.
+ */
 function form_typeahead_place(element, div) {
 
     if (!element || !div)
         return
     var r = element.getBoundingClientRect()
     var margin = 8
-    // fixed + live scroll sync keeps the panel under the field as the page moves
+    var band = form_typeahead_free_band()
     div.style.position = 'fixed'
     div.style.left = Math.max(4, r.left) + 'px'
     div.style.top = (r.bottom + 2) + 'px'
-    // Grow with content: at least the field width; up to remaining space right/down
     div.style.minWidth = Math.max(r.width, 280) + 'px'
-    var maxW = Math.max(280, window.innerWidth - Math.max(4, r.left) - margin)
+    var maxW = Math.max(280, (band.right || window.innerWidth) - Math.max(4, r.left) - margin)
     div.style.maxWidth = maxW + 'px'
-    var maxH = Math.max(120, window.innerHeight - (r.bottom + 2) - margin)
+    var maxH = Math.max(120, (band.bottom || window.innerHeight) - (r.bottom + 2) - margin)
     div.style.maxHeight = maxH + 'px'
     div.style.zIndex = 10050
+}
+
+/*
+ * Scroll the *main window only* so the panel (always under the field) can show
+ * ≥ half its preferred size on-screen. Does not reposition the typeahead
+ * relative to the field — only window.scrollBy, then re-place under field.
+ */
+function form_typeahead_scroll_main_into_view(element, div) {
+
+    if (!element || !div || !div.getBoundingClientRect)
+        return
+
+    var margin = 8
+    var gap = 2
+    var minW = 280
+    var preferCap = 28 * 16
+    try {
+        preferCap = 28 * (parseFloat(window.getComputedStyle(div).fontSize) || 16)
+    } catch (e) { }
+
+    var pass
+    for (pass = 0; pass < 3; pass++) {
+        form_typeahead_place(element, div)
+        void div.offsetHeight
+
+        var band = form_typeahead_free_band()
+        if (!(band.vw > 0) || !(band.vh > 0) || band.right <= band.left || band.bottom <= band.top)
+            return
+
+        var fr = element.getBoundingClientRect()
+        var pr = div.getBoundingClientRect()
+        var pw = pr.right - pr.left
+        var ph = pr.bottom - pr.top
+        if (!(pw > 0) || !(ph > 0))
+            return
+
+        // Preferred size from content (not the cramped maxHeight when field is low)
+        var naturalH = Math.min(div.scrollHeight || ph, preferCap)
+        var naturalW = Math.min(Math.max(div.scrollWidth || pw, minW), preferCap * 2)
+        var halfH = Math.max(60, naturalH * 0.5)
+        var halfW = Math.max(minW * 0.5, naturalW * 0.5)
+
+        // Room below field for panel (always opens under field)
+        var spaceBelow = band.bottom - (fr.bottom + gap)
+        var spaceRight = band.right - fr.left - margin
+
+        var dx = 0
+        var dy = 0
+        // scrollBy(+dy): field moves up on screen → more room below for panel
+        if (spaceBelow < halfH - 0.5) {
+            dy = halfH - spaceBelow
+            var maxDy = Math.max(0, fr.top - band.top - 8)
+            if (dy > maxDy)
+                dy = maxDy
+        }
+        if (spaceRight < halfW - 0.5) {
+            dx = halfW - spaceRight
+            var maxDx = Math.max(0, fr.left - band.left - 8)
+            if (dx > maxDx)
+                dx = maxDx
+        }
+
+        // Residual: painted panel still under half in free band
+        var visL = Math.max(pr.left, band.left)
+        var visR = Math.min(pr.right, band.right)
+        var visT = Math.max(pr.top, band.top)
+        var visB = Math.min(pr.bottom, band.bottom)
+        var visW = Math.max(0, visR - visL)
+        var visH = Math.max(0, visB - visT)
+        if (visH < ph * 0.5 - 0.5 && !dy) {
+            if (pr.bottom > band.bottom)
+                dy = pr.bottom - band.bottom
+            else if (pr.top < band.top)
+                dy = pr.top - band.top
+        }
+        if (visW < pw * 0.5 - 0.5 && !dx) {
+            if (pr.right > band.right)
+                dx = pr.right - band.right
+            else if (pr.left < band.left)
+                dx = pr.left - band.left
+        }
+
+        if (!(dx || dy))
+            break
+        window.scrollBy(dx, dy)
+    }
+    form_typeahead_place(element, div)
 }
 
 // cols: [[id,title],…] or [id,…]; rows: [[cell,…],…]; returncoln: 0-based col to write on pick
@@ -6174,6 +6290,14 @@ function form_typeahead_show(element, cols, rows, returncoln) {
         div.classList.remove('exodus_typeahead_is_truncated')
     form_typeahead_place(element, div)
     div.style.display = ''
+    // Must reset AFTER display is visible — scrollTop while display:none is ignored
+    // (reused panel kept PageDown offset across Esc → retype same key).
+    div.scrollTop = 0
+    div.scrollLeft = 0
+    // Scroll main page so ≥ half preferred panel size is usable (v+h)
+    form_typeahead_scroll_main_into_view(element, div)
+    div.scrollTop = 0
+    div.scrollLeft = 0
     form_typeahead_listen_scroll(true)
 
     // Only data rows (data-ta-row); header has no pick/hover handlers
@@ -6181,6 +6305,16 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     for (var i = 0; i < trs.length; i++) {
         trs[i].onmouseover = form_typeahead_row_hover
         trs[i].onmousedown = form_typeahead_row_pick
+    }
+    // After paint: restore list scroll; re-run main into-view once layout settles
+    if (typeof requestAnimationFrame == 'function') {
+        requestAnimationFrame(function () {
+            if (gform_typeahead_div !== div || div.style.display == 'none')
+                return
+            form_typeahead_scroll_main_into_view(element, div)
+            div.scrollTop = 0
+            div.scrollLeft = 0
+        })
     }
 }
 
