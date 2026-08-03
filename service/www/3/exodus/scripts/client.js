@@ -3847,11 +3847,13 @@ async function exodus_typeahead(request, cols, coln, options) {
 		return typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq
 	}
 
-	// Quiet miss: hide list, tint field; only if this search is still current.
+	// Quiet empty/fail: hide list. Miss-tint unless form_field_is_allownew
+	// (single-part key fieldno 0, or EXECUTIVE_CODE).
 	function missOut() {
 		if (!stillActive())
 			return true
-		setMiss(el, true)
+		var allowNew = (typeof form_field_is_allownew == 'function' && form_field_is_allownew(el))
+		setMiss(el, !allowNew)
 		form_typeahead_hide()
 		return true
 	}
