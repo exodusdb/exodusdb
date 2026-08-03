@@ -5963,6 +5963,24 @@ function form_typeahead_listen_scroll(on) {
     }
 }
 
+// Detect create-style allownew for a bound field (for typeahead etc.).
+//  - EXECUTIVE_CODE / BRAND_EXECUTIVE_CODE: always true (for now)
+//  - else true only if fieldno 0 and single-part key (gKeyNodes length 1)
+// Not wired to miss-tint; callers opt in.
+function form_field_is_allownew(el) {
+    if (!el || !el.getAttribute)
+        return false
+    var id = el.id || el.getAttribute('exodusname') || ''
+    if (id == 'EXECUTIVE_CODE' || id == 'BRAND_EXECUTIVE_CODE')
+        return true
+    if (String(el.getAttribute('exodusfieldno')) !== '0')
+        return false
+    // multipart key (e.g. ratecards vehicle+date): not allownew for key parts alone
+    if (typeof gKeyNodes == 'undefined' || !gKeyNodes || gKeyNodes.length !== 1)
+        return false
+    return true
+}
+
 // Miss tint (.exotypeahead_miss): bold + Highlight colour; no grow while class is on.
 // Class is the only marker (no parallel global). Typeahead is one producer;
 // clear via class scan. Leave-field validation unchanged.
