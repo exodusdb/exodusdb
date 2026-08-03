@@ -2277,10 +2277,13 @@ async function clientfunctions_windowonload() {
 
 	//trigger formfunctions_onload; wrap panes; only then reveal forms
 	// (html:not(.exodus-panes-ready) keeps bare/unmerged layout invisible — global.css).
+	// Wide: cleardoc skeleton (bound+unbound) before first record; re-decide after wrap.
 	try {
 		if (typeof formfunctions_onload == 'function')
 			await formfunctions_onload()
 		exoduswrapformpanes()
+		if (typeof form_update_wide_layout == 'function')
+			form_update_wide_layout()
 	} finally {
 		exodus_reveal_form_panes()
 	}
@@ -5926,6 +5929,328 @@ function exodus_reveal_form_panes() {
 	try {
 		document.documentElement.classList.add('exodus-panes-ready')
 	} catch (e) { }
+}
+
+/*
+ * Extreme-wide form auto-class (temp/wide-form-crush).
+ *
+ * When (bound and unbound share the same hooks):
+ *   cleardoc — skeleton decide so multi-col forms (journals) can be wide
+ *     before the first record paints (no crushed→wide flash).
+ *   opendoc — crush decide with content; resize re-runs (skip if geometry unchanged).
+ * What: pane-direct tables after wrap; bare TABLE.exodusform pre-wrap
+ *   (init cleardoc runs before wrap).
+ *
+ * Skeleton: free-text zeroed; fixed-col width vs soft ceiling.
+ * Crush under NARROW: form at ceiling + free-text folding while below its
+ *   exomaxwidth (empty-length free-text gets exomaxwidth=30ch at paint).
+ * Empty-length free-text style max 30ch only when wide (form_table_set_wide).
+ */
+var gform_wide_layout_resize_wired = false
+var gform_wide_crush_slack_px = 32
+// Per decide: raw exomaxwidth string → px (usually one "30ch" value)
+var gform_wide_exomax_px_cache = null
+// Resize skip: last ceiling + form widths + record flag
+var gform_wide_last_geom_snap = ''
+
+function form_table_is_wide(table) {
+	if (!table)
+		return false
+	if (table.classList)
+		return table.classList.contains('exodusform-wide')
+	return (' ' + (table.className || '') + ' ').indexOf(' exodusform-wide ') >= 0
+}
+
+// Class only — no free-text max churn (use during measure).
+function form_table_set_wide_class(table, wide) {
+	if (!table)
+		return
+	if (table.classList) {
+		if (wide)
+			table.classList.add('exodusform-wide')
+		else
+			table.classList.remove('exodusform-wide')
+		return
+	}
+	var has = form_table_is_wide(table)
+	if (wide && !has)
+		table.className = (table.className ? table.className + ' ' : '') + 'exodusform-wide'
+	else if (!wide && has)
+		table.className = (' ' + table.className + ' ').replace(/ exodusform-wide /g, ' ').replace(/^\s+|\s+$/g, '')
+}
+
+// Wide only: style max-width from exomaxwidth (e.g. 30ch); narrow restore 100%.
+function form_table_apply_freetext_wide_max(table, wide) {
+	if (!table || !table.querySelectorAll)
+		return
+	var spans = table.querySelectorAll('SPAN[contenteditable][exomaxwidth]')
+	for (var i = 0; i < spans.length; i++) {
+		var sp = spans[i]
+		var mx = sp.getAttribute('exomaxwidth')
+		if (!mx)
+			continue
+		sp.style.maxWidth = wide ? mx : '100%'
+	}
+}
+
+function form_table_set_wide(table, wide) {
+	if (!table)
+		return
+	form_table_set_wide_class(table, wide)
+	form_table_apply_freetext_wide_max(table, wide)
+}
+
+// Resolve exomaxwidth (e.g. 30ch) to px once per distinct value per decide.
+function form_freetext_exomaxwidth_px(span) {
+	if (!span || !span.getAttribute)
+		return 0
+	var raw = span.getAttribute('exomaxwidth')
+	if (!raw)
+		return 0
+	if (!gform_wide_exomax_px_cache)
+		gform_wide_exomax_px_cache = {}
+	if (gform_wide_exomax_px_cache[raw] != null)
+		return gform_wide_exomax_px_cache[raw]
+	var prev = span.style.maxWidth
+	var px = 0
+	try {
+		span.style.maxWidth = raw
+		px = parseFloat(getComputedStyle(span).maxWidth) || 0
+	} catch (e) { }
+	span.style.maxWidth = prev
+	gform_wide_exomax_px_cache[raw] = px
+	return px
+}
+
+function form_soft_ceiling_px() {
+	var rem = 16
+	try {
+		rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+	} catch (e) { }
+	return Math.max(0, (window.innerWidth || 0) - 2 * rem)
+}
+
+function form_record_is_displayed() {
+	try {
+		if (typeof gkey != 'undefined' && gkey !== null && String(gkey) !== '')
+			return true
+	} catch (e) { }
+	return false
+}
+
+// Open bound record → crush; otherwise (cleardoc, unbound, empty) → skeleton.
+function form_table_wants_wide(table, ceiling) {
+	if (form_record_is_displayed())
+		return form_table_crush_wants_wide(table, ceiling)
+	return form_table_skeleton_wants_wide(table, ceiling)
+}
+
+// Pane-direct after wrap; bare form tables during init cleardoc (pre-wrap).
+function form_wide_layout_tables() {
+	var forms = document.querySelectorAll('.exodusformpane > TABLE.exodusform')
+	if (forms.length)
+		return forms
+	return document.querySelectorAll('TABLE.exodusform')
+}
+
+// Geometry snapshot for resize skip (ceiling + record flag + form widths).
+function form_wide_layout_geom_snap(forms, ceiling) {
+	var parts = [String(Math.round(ceiling)), form_record_is_displayed() ? '1' : '0']
+	for (var i = 0; i < forms.length; i++) {
+		var t = forms[i]
+		if (t.offsetParent === null && t.offsetWidth === 0 && t.offsetHeight === 0)
+			parts.push('x')
+		else
+			parts.push(String(Math.round(t.getBoundingClientRect().width || t.offsetWidth || 0)))
+	}
+	return parts.join(',')
+}
+
+function form_save_span_box(sp) {
+	return {
+		el: sp,
+		maxWidth: sp.style.maxWidth,
+		minWidth: sp.style.minWidth,
+		width: sp.style.width,
+		overflow: sp.style.overflow,
+		whiteSpace: sp.style.whiteSpace,
+		display: sp.style.display
+	}
+}
+
+function form_restore_span_boxes(saved) {
+	for (var sn = 0; sn < saved.length; sn++) {
+		var sv = saved[sn]
+		sv.el.style.maxWidth = sv.maxWidth
+		sv.el.style.minWidth = sv.minWidth
+		sv.el.style.width = sv.width
+		sv.el.style.overflow = sv.overflow
+		sv.el.style.whiteSpace = sv.whiteSpace
+		sv.el.style.display = sv.display
+	}
+}
+
+// Empty form: fixed-column skeleton width (free-text zeroed) vs soft ceiling
+function form_table_skeleton_wants_wide(table, ceiling) {
+	if (!table || !(ceiling > 0))
+		return false
+	var spans = table.querySelectorAll('SPAN[contenteditable], SPAN[exodusalign="T"]')
+	var saved = []
+	var sn
+	for (sn = 0; sn < spans.length; sn++) {
+		var sp = spans[sn]
+		saved.push({
+			el: sp,
+			maxWidth: sp.style.maxWidth,
+			minWidth: sp.style.minWidth,
+			width: sp.style.width,
+			overflow: sp.style.overflow
+		})
+		sp.style.maxWidth = '0'
+		sp.style.minWidth = '0'
+		sp.style.width = '0'
+		sp.style.overflow = 'hidden'
+	}
+	var hadWide = form_table_is_wide(table)
+	var prevMax = table.style.maxWidth
+	var prevWidth = table.style.width
+	var skeleton = 0
+	try {
+		// Class only during measure — no free-text 30ch thrash
+		form_table_set_wide_class(table, false)
+		table.style.maxWidth = 'none'
+		table.style.width = 'max-content'
+		skeleton = table.scrollWidth || table.offsetWidth || 0
+	} finally {
+		table.style.maxWidth = prevMax
+		table.style.width = prevWidth
+		for (sn = 0; sn < saved.length; sn++) {
+			var sv = saved[sn]
+			sv.el.style.maxWidth = sv.maxWidth
+			sv.el.style.minWidth = sv.minWidth
+			sv.el.style.width = sv.width
+			sv.el.style.overflow = sv.overflow
+		}
+		form_table_set_wide_class(table, hadWide)
+	}
+	return skeleton > ceiling
+}
+
+// With record: crush under NARROW. Prefer one layout pass for preferred widths.
+function form_table_crush_wants_wide(table, ceiling) {
+	if (!table || !(ceiling > 0))
+		return false
+	var hadWide = form_table_is_wide(table)
+	var prevMax = table.style.maxWidth
+	var prevWidth = table.style.width
+	var wantWide = false
+	var prefSaved = null
+	try {
+		form_table_set_wide_class(table, false)
+		table.style.maxWidth = ''
+		table.style.width = ''
+		var tableW = table.getBoundingClientRect().width || table.offsetWidth || 0
+		if (tableW >= ceiling - 4) {
+			var spans = table.querySelectorAll('SPAN[contenteditable][exomaxwidth]')
+			var candidates = []
+			var sn
+			for (sn = 0; sn < spans.length; sn++) {
+				var span = spans[sn]
+				var text = (span.innerText || span.textContent || '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '')
+				if (!text || text.length < 2)
+					continue
+				var actual = span.clientWidth || 0
+				if (!(actual > 0))
+					continue
+				var maxPx = form_freetext_exomaxwidth_px(span)
+				if (!(maxPx > 0))
+					continue
+				// Already at content max → normal wrap, not crush
+				if (actual >= maxPx - gform_wide_crush_slack_px)
+					continue
+				candidates.push({ el: span, actual: actual })
+			}
+			if (candidates.length) {
+				// Batch preferred one-line width (one style pass + one layout)
+				prefSaved = []
+				for (sn = 0; sn < candidates.length; sn++) {
+					var sp = candidates[sn].el
+					prefSaved.push(form_save_span_box(sp))
+					sp.style.whiteSpace = 'nowrap'
+					sp.style.display = 'inline-block'
+					sp.style.width = 'max-content'
+					sp.style.maxWidth = 'none'
+					sp.style.minWidth = '0'
+					sp.style.overflow = 'visible'
+				}
+				for (sn = 0; sn < candidates.length; sn++) {
+					var c = candidates[sn]
+					var pref = c.el.scrollWidth || c.el.offsetWidth || 0
+					if (pref > c.actual + gform_wide_crush_slack_px) {
+						wantWide = true
+						break
+					}
+				}
+			}
+		}
+	} finally {
+		if (prefSaved)
+			form_restore_span_boxes(prefSaved)
+		table.style.maxWidth = prevMax
+		table.style.width = prevWidth
+		form_table_set_wide_class(table, hadWide)
+	}
+	return wantWide
+}
+
+// fromResize: skip full decide when ceiling + form widths unchanged
+function form_update_wide_layout(fromResize) {
+
+	var ceiling = form_soft_ceiling_px()
+	if (!(ceiling > 0)) {
+		form_wide_layout_wire_resize()
+		return
+	}
+
+	var forms = form_wide_layout_tables()
+	var snap = form_wide_layout_geom_snap(forms, ceiling)
+	if (fromResize && snap === gform_wide_last_geom_snap) {
+		form_wide_layout_wire_resize()
+		return
+	}
+
+	// Fresh exomaxwidth→px cache for this decide
+	gform_wide_exomax_px_cache = {}
+
+	// cleardoc / empty / unbound → skeleton; open bound record → crush.
+	for (var i = 0; i < forms.length; i++) {
+		var table = forms[i]
+		if (table.offsetParent === null && table.offsetWidth === 0 && table.offsetHeight === 0)
+			continue
+		var hadWide = form_table_is_wide(table)
+		var wantWide = form_table_wants_wide(table, ceiling)
+		if (wantWide !== hadWide)
+			form_table_set_wide(table, wantWide)
+	}
+
+	// Snapshot after decide (class may have changed widths)
+	gform_wide_last_geom_snap = form_wide_layout_geom_snap(forms, ceiling)
+	form_wide_layout_wire_resize()
+}
+
+function form_wide_layout_wire_resize() {
+	if (gform_wide_layout_resize_wired || typeof window == 'undefined' || !window.addEventListener)
+		return
+	gform_wide_layout_resize_wired = true
+	var t = null
+	window.addEventListener('resize', function () {
+		if (t)
+			window.clearTimeout(t)
+		t = window.setTimeout(function () {
+			t = null
+			form_update_wide_layout(true)
+		}, 100)
+	})
 }
 
 function exoduswrapformpanes() {

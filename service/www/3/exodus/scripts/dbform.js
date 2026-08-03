@@ -913,7 +913,9 @@ async function formfunctions_onload() {
             }
 
             //allow for data entry in SPAN elements (unless hidden)
-            // Align-T: fill host cell. Free-text length is NOT used for paint.
+            // Align-T: fill host cell. Layout max-width 100% always (narrow folds in cell).
+            // Empty-length free-text (not codes): set exomaxwidth=30ch — content max for
+            // crush decide and for style max when wide (not applied as layout max in narrow).
             // Popup/link: inline-block so F7/F6 icon can sit beside (not under) the field.
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
                 //buggy and not necessary on msie7
@@ -928,6 +930,12 @@ async function formfunctions_onload() {
                         element.style.maxWidth = '100%'
                         element.style.minWidth = '0'
                         element.style.boxSizing = 'border-box'
+                        // Same seam as "would set max from length but length empty"
+                        var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
+                        if (!(freeLen > 0) && element.getAttribute('exoduslowercase') !== 'false')
+                            element.setAttribute('exomaxwidth', '30ch')
+                        else
+                            element.removeAttribute('exomaxwidth')
                     }
                 }
 
@@ -5260,6 +5268,10 @@ async function opendoc2(newkey0) {
 
     }
 
+    // Crush decide with record bound (cleardoc used skeleton on empty).
+    if (typeof form_update_wide_layout == 'function')
+        form_update_wide_layout()
+
     //logout('opendoc2')
 
     return true
@@ -5676,6 +5688,11 @@ async function cleardoc() {
         grecn = null
         await exodusevaluateall('await form_postdisplay()', 'await formfunctions_onload()');
     }
+
+    // Wide decide for bound and unbound (skeleton on empty). Journals can be
+    // .exodusform-wide before first record paints — avoids crushed→wide flash.
+    if (typeof form_update_wide_layout == 'function')
+        form_update_wide_layout()
 
     //logout('cleardoc')
 

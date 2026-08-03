@@ -262,6 +262,9 @@ TABLE.exodusform TABLE.exotable th {
     box-sizing: border-box;
     /*
      * Soft ceiling at the viewport — not on the pane.
+     * THIS is the “if form would exceed screen, force a width budget” rule:
+     * under that budget, free-text hosts with min-width:0 shrink first
+     * (can look “crushed” on extreme-wide multi-col forms).
      * Pane stays width:max-content and still follows this table, so the border
      * encloses the form. Flexible columns (ITEM_DESCRIPTION) get a real width
      * budget and can fold once the form would otherwise exceed the screen.
@@ -271,9 +274,25 @@ TABLE.exodusform TABLE.exotable th {
 }
 
 /*
+ * Extreme-wide forms (.exodusform-wide) — set by form_update_wide_layout()
+ * (temp/wide-form-crush). When wide: no soft ceiling; free-text hosts
+ * min-width max-content. Empty-length free-text 30ch is set in JS only when
+ * the wide class is applied (form_table_set_wide) — not here, so narrow
+ * never inherits a ch cap.
+ */
+.exodusformpane > TABLE.exodusform.exodusform-wide {
+    max-width: none;
+    width: max-content;
+}
+TABLE.exodusform.exodusform-wide td:has(> span[contenteditable]),
+TABLE.exodusform.exodusform-wide td:has(> span.clsReadOnly),
+TABLE.exodusform.exodusform-wide td:has(> span[exodusalign="T"]) {
+    min-width: max-content;
+}
+
+/*
  * Flowing text (align=T → contenteditable span).
- * Fill cell (width 100% from dbform). Free-text dict length is not used for
- * paint (no min/max Nch). Cap special columns in the form HTM if needed.
+ * Fill cell (width 100% from dbform). No forced ch here.
  */
 SPAN.clsRequired[contenteditable],
 SPAN.clsNotRequired[contenteditable] {
@@ -281,6 +300,7 @@ SPAN.clsNotRequired[contenteditable] {
     max-width: 100%;
     overflow-wrap: break-word;
 }
+/* Allows free-text columns to shrink under the form soft ceiling (with max-width above). */
 TABLE.exotable td:has(> span[contenteditable]),
 TABLE[exogroupno] td:has(> span[contenteditable]),
 TABLE.exodusform td:has(> span[contenteditable]) {
