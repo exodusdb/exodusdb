@@ -913,18 +913,22 @@ async function formfunctions_onload() {
             }
 
             //allow for data entry in SPAN elements (unless hidden)
-            // Align-T: fill host cell. Free-text length is NOT used for paint
-            // (no min Nch, no max Nch — dict sizes stay metadata). Cap special
-            // columns in the form HTM if needed. F6/F7 wrap must not change chrome.
+            // Align-T: fill host cell. Free-text length is NOT used for paint.
+            // Popup/link: inline-block so F7/F6 icon can sit beside (not under) the field.
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
                 //buggy and not necessary on msie7
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
-                    element.style.display = 'block'
-                    element.style.width = '100%'
-                    element.style.maxWidth = '100%'
-                    element.style.minWidth = '0'
-                    element.style.boxSizing = 'border-box'
+                    //dont set display block if there is a link or popup so that the image stays to the left of the field
+                    if (element.getAttribute('exoduspopup') || element.getAttribute('exoduslink')) {
+                        element.style.display = 'inline-block'
+                    } else {
+                        element.style.display = 'block'
+                        element.style.width = '100%'
+                        element.style.maxWidth = '100%'
+                        element.style.minWidth = '0'
+                        element.style.boxSizing = 'border-box'
+                    }
                 }
 
                 if (!(element.getAttribute('exodusreadonly'))) {
@@ -971,21 +975,15 @@ async function formfunctions_onload() {
                     //add the button right before/after the field
                     element2.id = element.id + '_popup'
 
-                    // F7 wrap: icon + field on one row; field keeps cell-fill (flex 1).
-                    // Do not switch the field to inline-block for popup.
+                    // F7 wrap: plain nowrap span (not flex width 100%) so label text
+                    // e.g. "Tax Code :" stays on the same line as icon+field.
                     var nowrapper = document.createElement('span')
-                    nowrapper.style.display = 'flex'
-                    nowrapper.style.width = '100%'
-                    nowrapper.style.maxWidth = '100%'
-                    nowrapper.style.alignItems = 'flex-start'
+                    if (element.getAttribute('exodusalign') != 'T')
+                        nowrapper.style.whiteSpace = 'noWrap'
                     element = element.parentNode.replaceChild(nowrapper, element)
                     nowrapper.insertBefore(element, null)
                     nowrapper.insertBefore(element2, null)
                     element.parentNode.insertBefore(element2, element)
-                    element.style.flex = '1 1 auto'
-                    element.style.width = 'auto'
-                    element.style.minWidth = '0'
-                    element2.style.flexShrink = '0'
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
@@ -1011,20 +1009,14 @@ async function formfunctions_onload() {
                     var element2 = exodus_create_icon_element(glinkimage)
                     //add the button right after the field
 
-                    // F6 wrap: same as F7 — field chrome unchanged, icon beside.
+                    // F6 wrap: same as F7 — hug content, no width 100% line break after labels.
                     var nowrapper = document.createElement('span')
-                    nowrapper.style.display = 'flex'
-                    nowrapper.style.width = '100%'
-                    nowrapper.style.maxWidth = '100%'
-                    nowrapper.style.alignItems = 'flex-start'
+                    if (element.getAttribute('exodusalign') != 'T')
+                        nowrapper.style.whiteSpace = 'noWrap'
                     element = element.parentNode.replaceChild(nowrapper, element)
                     nowrapper.insertBefore(element, null)
                     nowrapper.insertBefore(element2, null)
                     element.parentNode.insertBefore(element2, element)
-                    element.style.flex = '1 1 auto'
-                    element.style.width = 'auto'
-                    element.style.minWidth = '0'
-                    element2.style.flexShrink = '0'
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
