@@ -6652,7 +6652,24 @@ function form_blockevents_hist_push(kind, depth, callername, callinfo) {
 }
 
 // Known long-lived holders of gblockevents (not orphans).
+// Order matters: child modal / dialog wait before raw flight — schedule Book line
+// keeps Gate A open for the whole exodusshowmodaldialog(bookings.htm) session
+// (minutes). That is not a stuck flight; do not long-flight systemerror.
 function exodus_gblockevents_holder() {
+	// Parent awaiting exodusshowmodaldialog close (gpendingDialogResolve set)
+	try {
+		if (typeof gpendingDialogResolve != 'undefined' && gpendingDialogResolve)
+			return 'modal_dialog'
+	} catch (e0) { }
+	// Child window still open (not lazy Wait/Cancel stub)
+	try {
+		if (typeof gchildwin != 'undefined' && gchildwin && !gchildwin.lazy) {
+			if (gchildwin.closed === false)
+				return 'modal_child'
+			if (gchildwin.actual && !gchildwin.actual.closed)
+				return 'modal_child'
+		}
+	} catch (e1) { }
 	if (typeof g_exodus_flow != 'undefined' && g_exodus_flow)
 		return 'flight:' + (g_exodus_flow.location || g_exodus_flow.n)
 	try {
@@ -6720,7 +6737,8 @@ function exodus_gblockevents_heartbeat() {
 	var age = gblockevents_nonzero_since ? (Date.now() - gblockevents_nonzero_since) : 0
 	var holder = exodus_gblockevents_holder()
 	if (holder) {
-		// Legitimate hold: only warn if a single flight never lands.
+		// modal_dialog / modal_child / confirm / colors / calendar: user-held, no warn.
+		// flight: only warn if airborne with no child modal (true hang / never lands).
 		if (holder.indexOf('flight:') == 0
 			&& age >= gblockevents_flight_warn_ms
 			&& !gblockevents_stuck_reported) {
