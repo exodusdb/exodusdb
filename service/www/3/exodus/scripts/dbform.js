@@ -1098,13 +1098,19 @@ async function formfunctions_onload() {
             //length and maxlength
             // INPUT paint width is set later (form_apply_input_field_width) after class/font.
             // Keep size = length only as a weak table hint — not +2, not the painted width.
+            // length 0 = deliberate "no length" (legacy); treat like empty, not systemerror→10.
             if (element.tagName.match(gtexttagnames)) {
                 if (element.size != 1 && element.getAttribute('exoduslength')) {
-                    if (!(parseInt(element.getAttribute('exoduslength')))) {
+                    var lenN = parseInt(element.getAttribute('exoduslength'), 10)
+                    if (lenN === 0) {
+                        element.setAttribute('exoduslength', '')
+                    } else if (!(lenN > 0)) {
                         systemerror('formfunctions_onload()', element.id + '.getAttribute("exoduslength")=' + element.getAttribute('exoduslength') + ' is invalid. 10 used.')
                         element.setAttribute('exoduslength', 10)
+                        element.size = 10
+                    } else {
+                        element.size = lenN
                     }
-                    element.size = parseInt(element.getAttribute('exoduslength'), 10)
                 }
                 if (element.tagName == 'TEXTAREA') {
 
