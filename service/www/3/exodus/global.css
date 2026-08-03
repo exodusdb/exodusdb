@@ -349,6 +349,12 @@ TABLE[exogroupno] > thead {
     z-index: 11;
     box-shadow: 0 1px 0 lightgrey;
 }
+/* Sticky on th + opaque paint: less bleed of body text through/above heads while scrolling */
+.exodus_typeahead_table > thead th {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+}
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead,
 :root[data-theme="dark_mode"] .exodus_typeahead_table > thead {
@@ -433,7 +439,8 @@ TABLE
     /* Normal wheel scrolls the list only; do not chain to page (decide steps options instead) */
     overscroll-behavior: contain;
     font-size: inherit;
-    padding: 4px;
+    /* No top padding: scrolled rows paint in that gap above sticky heads (flicker) */
+    padding: 0 4px 4px 4px;
 }
 :root[data-theme="dark_mode"] .exodus_typeahead {
     border-color: #7a88b0;
@@ -458,7 +465,9 @@ TABLE
     border-top-color: #7a88b0;
 }
 .exodus_typeahead_table {
-    border-collapse: collapse;
+    /* separate: sticky heads paint a solid layer (collapse lets row text bleed) */
+    border-collapse: separate;
+    border-spacing: 0;
     width: auto;
     max-width: 100%;
 }
