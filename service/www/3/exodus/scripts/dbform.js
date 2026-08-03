@@ -1537,6 +1537,10 @@ async function formfunctions_onload() {
                     insertdeletebuttons.innerHTML = t
                     insertdeletebuttons.style.borderRightWidth = '0px'
                     insertdeletebuttons.style.paddingRight = '3px'
+                    // Same shrink as thead chrome col below. Group tables are
+                    // width:100% (global.css free-text fold); without 1% this td
+                    // absorbs free space → variable width vs F7/F6 in next td.
+                    insertdeletebuttons.width = '1%'
 
                     //locate the TR element in the parents
                     var trx = getancestor(element, 'tr')
@@ -1548,7 +1552,6 @@ async function formfunctions_onload() {
                     //add page up/down buttons at the first column in the thead and tfoot
                     var pgupdownbuttons = document.createElement('th')
                     pgupdownbuttons.width = '1%'
-
                     var t = '&nbsp;'
                     t += '<button id=exogroup' + groupno + 'showall class=exodusbutton'
                     t += ' style=display:none exodusonclick="await form_filter(\'unfilter\',' + groupno + ')"'
