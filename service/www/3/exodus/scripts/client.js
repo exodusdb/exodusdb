@@ -2544,8 +2544,13 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 		//select the (deduplicated) records or return systemerror
 		db.request = 'SELECT\r' + filename + '\r\rRECORD'
 		if (!(await db.send(uncachedkeys.join(fm)))) {
-			systemerror(db.response)
+			// Client abort/cancel (typeahead supersede, unload) — not a system failure.
+			// Keep any cached partials already filled above.
 			this.exodusresponse = db.response
+			var r = String(db.response || '')
+			if (r == 'Cancelled' || r.indexOf('Client cancelled') >= 0)
+				return results
+			systemerror(db.response)
 			return []
 		}
 
@@ -3769,8 +3774,12 @@ function rearray(array) {
 //   rows       prebuilt [[cell,…],…] — skip send/parse (e.g. DEFINITIONS taxes)
 //   data       raw response string — skip send, parse only (e.g. pre-filtered multi-hit)
 //   filter     function(rows, key) → rows — extra filter after parse / wordstart
+//   prefer_prefix  default true — promote identity cells starting with key.
+//              Set false when the server already ordered (e.g. schedules/jobs
+//              BY-DSND YEAR_PERIOD). Otherwise SKODA* keys float over newer
+//              SKCLC… rows and quiet list no longer matches F7/validate order.
 //
-// Always: STOPPED column drop, prefer_prefix, form_typeahead_show.
+// Always: STOPPED column drop, prefer_prefix (unless false), form_typeahead_show.
 // Response auto-detected: /ACCOUNTLIST/, XML <RECORD>, or FM/VM multi-hit.
 // Quiet: no decide/invalid. Empty/fail → hide (+ optional miss tint). Returns true always.
 async function exodus_typeahead(request, cols, coln, options) {
@@ -3929,16 +3938,19 @@ async function exodus_typeahead(request, cols, coln, options) {
 	// written on choose), plus first two cells (code+name). Always include the
 	// pick key so name-heavy lists still rank e.g. G12 → G123. Do not scan
 	// market/supplier/… — vehicle market "SA" was scrambling name order.
-	var pcols = [0]
-	if (rows[0] && rows[0].length > 1)
-		pcols.push(1)
-	// Always include pick col (even when 0 — already in list; when >1, add it)
-	if (rcoln != null && !isNaN(Number(rcoln))) {
-		var rc = Number(rcoln)
-		if (rc >= 0 && pcols.indexOf(rc) < 0)
-			pcols.push(rc)
+	// Skip when prefer_prefix === false (server YEAR_PERIOD order for docs).
+	if (options.prefer_prefix !== false) {
+		var pcols = [0]
+		if (rows[0] && rows[0].length > 1)
+			pcols.push(1)
+		// Always include pick col (even when 0 — already in list; when >1, add it)
+		if (rcoln != null && !isNaN(Number(rcoln))) {
+			var rc = Number(rcoln)
+			if (rc >= 0 && pcols.indexOf(rc) < 0)
+				pcols.push(rc)
+		}
+		rows = exodus_typeahead_prefer_prefix(rows, keyAtStart, pcols)
 	}
-	rows = exodus_typeahead_prefer_prefix(rows, keyAtStart, pcols)
 	if (!rows || !rows.length)
 		return missOut()
 
@@ -6520,6 +6532,21 @@ function getmaxwindow_sync() {
 // other targets stay cancelled. Modal work uses #uiblockerdiv separately.
 var gblockevents
 
+// Gate A diagnostics (stuck keyboard / mediadiary-style freezes):
+// always-on ring of block/unblock + callers; heartbeat detects orphan depth
+// (no flight/confirm/colors/calendar) and systemerror + auto-reset to 0.
+// Console: exodus_gblockevents_dump() / exodus_gblockevents_force0()
+var gblockevents_hist = []
+var gblockevents_hist_max = 48
+var gblockevents_nonzero_since = 0
+var gblockevents_skipped_n = 0
+var gblockevents_heartbeat_id = 0
+var gblockevents_stuck_reported = false
+// Orphan depth (no known holder): alert + force clear after this.
+var gblockevents_orphan_ms = 8000
+// Airborne flight this long: systemerror dump only (do not force-clear).
+var gblockevents_flight_warn_ms = 120000
+
 // ---------------------------------------------------------------------------
 // Browser chrome vs app events (modal / form open)
 //
@@ -6588,6 +6615,148 @@ function exodus_ensure_browser_chrome_keydown() {
 	document.addEventListener('keydown', exodus_browser_chrome_keydown_capture, true)
 }
 
+function form_blockevents_stack_snippet() {
+	try {
+		var s = (new Error()).stack
+		if (!s)
+			return ''
+		var lines = s.split('\n')
+		var out = []
+		for (var i = 0; i < lines.length && out.length < 5; i++) {
+			var L = lines[i]
+			if (!L)
+				continue
+			if (L.indexOf('form_blockevents') >= 0)
+				continue
+			if (/^\s*Error\b/.test(L))
+				continue
+			out.push(L.replace(/^\s+at\s+/, '').replace(/^\s+/, ''))
+		}
+		return out.join(' <- ')
+	} catch (e) {
+		return ''
+	}
+}
+
+function form_blockevents_hist_push(kind, depth, callername, callinfo) {
+	gblockevents_hist.push({
+		t: Date.now(),
+		kind: kind,
+		depth: depth,
+		caller: callername || '',
+		info: callinfo == null ? '' : String(callinfo),
+		stack: form_blockevents_stack_snippet()
+	})
+	if (gblockevents_hist.length > gblockevents_hist_max)
+		gblockevents_hist.shift()
+}
+
+// Known long-lived holders of gblockevents (not orphans).
+function exodus_gblockevents_holder() {
+	if (typeof g_exodus_flow != 'undefined' && g_exodus_flow)
+		return 'flight:' + (g_exodus_flow.location || g_exodus_flow.n)
+	try {
+		if (document.getElementById('exodusconfirmdiv'))
+			return 'exodusconfirmdiv'
+	} catch (e) { }
+	try {
+		if (typeof colors_popup != 'undefined' && colors_popup && colors_popup._showing)
+			return 'colors_popup'
+	} catch (e2) { }
+	try {
+		if (typeof calendar_checkInDatePicker != 'undefined'
+			&& calendar_checkInDatePicker && calendar_checkInDatePicker._showing)
+			return 'calendar'
+	} catch (e3) { }
+	return null
+}
+
+function exodus_gblockevents_dump() {
+	var now = Date.now()
+	var age = gblockevents_nonzero_since ? (now - gblockevents_nonzero_since) : 0
+	var lines = []
+	lines.push(
+		'gblockevents=' + (gblockevents || 0)
+		+ ' nonzero_ms=' + age
+		+ ' skipped_events=' + gblockevents_skipped_n
+		+ ' flow=' + (typeof g_exodus_flow != 'undefined' && g_exodus_flow
+			? ('#' + g_exodus_flow.n + ' ' + g_exodus_flow.location) : 'null')
+		+ ' holder=' + (exodus_gblockevents_holder() || 'none')
+		+ ' modaldepth=' + (typeof gmodalblockdepth != 'undefined' ? gmodalblockdepth : '?')
+	)
+	for (var i = 0; i < gblockevents_hist.length; i++) {
+		var r = gblockevents_hist[i]
+		lines.push(
+			(now - r.t) + 'ms ago ' + r.kind + ' depth=' + r.depth
+			+ ' caller=' + (r.caller || '?')
+			+ ' info=' + r.info
+			+ (r.stack ? ' stack=[' + r.stack + ']' : '')
+		)
+	}
+	var text = lines.join('\n')
+	if (typeof console != 'undefined' && console.log)
+		console.log(text)
+	return text
+}
+
+// Manual unlock for console after a freeze (also used by heartbeat).
+function exodus_gblockevents_force0(reason) {
+	var was = gblockevents || 0
+	gblockevents = 0
+	gblockevents_nonzero_since = 0
+	gblockevents_skipped_n = 0
+	gblockevents_stuck_reported = false
+	form_blockevents_hist_push('force0', 0, 'force0', reason || ('was=' + was))
+	if (typeof console != 'undefined' && console.log)
+		console.log('exodus_gblockevents_force0 was=' + was + ' ' + (reason || ''))
+	return was
+}
+
+function exodus_gblockevents_heartbeat() {
+	if (!gblockevents) {
+		gblockevents_stuck_reported = false
+		return
+	}
+	var age = gblockevents_nonzero_since ? (Date.now() - gblockevents_nonzero_since) : 0
+	var holder = exodus_gblockevents_holder()
+	if (holder) {
+		// Legitimate hold: only warn if a single flight never lands.
+		if (holder.indexOf('flight:') == 0
+			&& age >= gblockevents_flight_warn_ms
+			&& !gblockevents_stuck_reported) {
+			gblockevents_stuck_reported = true
+			systemerror(
+				'gblockevents long flight',
+				'Gate A airborne ' + age + 'ms under ' + holder
+				+ ' (no auto-reset — dump for bug report):\n'
+				+ exodus_gblockevents_dump()
+			)
+		}
+		return
+	}
+	// Orphan: depth without flight/confirm/colors/calendar → stuck keys.
+	if (age < gblockevents_orphan_ms || gblockevents_stuck_reported)
+		return
+	gblockevents_stuck_reported = true
+	var dump = exodus_gblockevents_dump()
+	var was = exodus_gblockevents_force0('orphan heartbeat was=' + gblockevents + ' age_ms=' + age)
+	// force0 cleared depth; re-log was in message
+	systemerror(
+		'gblockevents orphan auto-reset',
+		'Gate A stuck at depth ' + was + ' for ' + age + 'ms with no known holder'
+		+ ' (flight/confirm/colors/calendar). Reset to 0 so keyboard works.'
+		+ ' Paste this dump when reporting:\n' + dump
+	)
+}
+
+function form_blockevents_ensure_heartbeat() {
+	if (gblockevents_heartbeat_id)
+		return
+	if (typeof window == 'undefined' || !window.setInterval)
+		return
+	gblockevents_heartbeat_id = window.setInterval(exodus_gblockevents_heartbeat, 2000)
+}
+
 function form_blockevents(truefalse, callinfo) {
 
 	var callername = ''
@@ -6600,15 +6769,28 @@ function form_blockevents(truefalse, callinfo) {
 
 	if (truefalse) {
 		++gblockevents
+		if (gblockevents == 1) {
+			gblockevents_nonzero_since = Date.now()
+			gblockevents_skipped_n = 0
+			gblockevents_stuck_reported = false
+		}
 		logevent('-------->' + gblockevents + '		 block ' + callername + ' ' + callinfo)
+		form_blockevents_hist_push('block', gblockevents, callername, callinfo)
 
 	} else {
 		--gblockevents
 		logevent('		 ' + gblockevents + '<--------unblock ' + callername + ' ' + callinfo)
+		if (gblockevents < 0)
+			gblockevents = 0
+		form_blockevents_hist_push('unblock', gblockevents, callername, callinfo)
+		if (gblockevents == 0) {
+			gblockevents_nonzero_since = 0
+			gblockevents_skipped_n = 0
+			gblockevents_stuck_reported = false
+		}
 	}
 
-	if (gblockevents < 0)
-		gblockevents = 0
+	form_blockevents_ensure_heartbeat()
 
 }
 
@@ -6712,6 +6894,7 @@ function starteventhandler(eventfunctionname, functionx) {
 					return true
 			}
 
+			++gblockevents_skipped_n
 			logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
 
 			return exoduscancelevent(event)
@@ -7241,12 +7424,17 @@ async function exodusinterval_async_sync(command) {
 function systemerror(functionname, e) {
 	if (typeof functionname == 'undefined')
 		functionname = 'undefined'
-	//if error generated by user cancelling a server request then try to ignore the error
-	if (functionname == 'Cancelled')
+	// User/client cancelled or aborted a server request (db.send abort, xhttp .5
+	// "Error: Client cancelled request in EXODUS xhttp.php …"). Not a system failure —
+	// typeahead supersede, unload, Gate A race. Match exact 'Cancelled' or the xhttp text.
+	var fns = String(functionname)
+	if (fns == 'Cancelled' || fns.indexOf('Client cancelled') >= 0)
 		return
 	if (typeof e == 'undefined')
 		e = ''
 	var msg = e.toString()
+	if (msg == 'Cancelled' || msg.indexOf('Client cancelled') >= 0)
+		return
 	//if (e.name)
 	//	msg+='\n'+e.name
 	//if (e.message)
@@ -8606,7 +8794,9 @@ async function decide_onload(decide_args) {
 	//col1.1 vm col1.2 fm col2.1 vm col2.2 etc
 	if (!data && !cols)
 		data = [['Yes'], ['No']]
-	if (data && typeof data == 'string') {
+	if (!data)
+		return await decide_fail_no_options()
+	if (typeof data == 'string') {
 		data = data.split(data.indexOf(fm) + 1 ? fm : ':')
 	}
 	for (ii = 0; ii < data.length; ii++) {
@@ -8626,6 +8816,9 @@ async function decide_onload(decide_args) {
 	//colid vm coltitle fm ... etc one per column
 	if (!cols) {
 		cols = []
+		// Empty first row → no options (not "column N missing")
+		if (!data[0] || !data[0].length)
+			return await decide_fail_no_options()
 		for (var ii = 0; ii < data[0].length; ii++)
 			cols[ii] = [ii, '']
 	}
@@ -8641,6 +8834,21 @@ async function decide_onload(decide_args) {
 			cols[ii] = cols[ii].split(vm)
 	}
 	var ncols = cols.length
+	if (!ncols)
+		return await decide_fail_no_options()
+
+	// Zero options before column checks — empty multi-hit / pending vehicles used to
+	// fall through to "popup column N not in popup data" (e.g. inverted cols with
+	// length-0 arrays, or row data with cols but no real options).
+	var noptions
+	if (decide_inverted) {
+		var firstcolid = cols[0][0]
+		noptions = (data[firstcolid] && data[firstcolid].length) ? data[firstcolid].length : 0
+	} else {
+		noptions = data.length
+	}
+	if (!noptions)
+		return await decide_fail_no_options()
 
 	//decide_returncolid
 	if (typeof decide_returncolid == 'undefined')
