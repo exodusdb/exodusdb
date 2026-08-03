@@ -409,7 +409,7 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
 // Paint fills the cell; di.length is a hint not used for free-text paint today.
 // To store length deliberately: pass length here, or set di.length after this call.
 // length omitted → clear di.length (no inherit from dictrec). No default length.
-// Codes: exodus_dict_code. Multi-line: exodus_dict_textarea(di, nrows, length).
+// Codes: exodus_dict_code. Multi-line: exodus_dict_textarea (separate; does not call this).
 function exodus_dict_text(dicti, length, rows) {
 
  exodusassertobject(dicti, 'exodus_dict_text', 'dicti')
@@ -426,15 +426,23 @@ function exodus_dict_text(dicti, length, rows) {
   dicti.lowercase = true
 }
 
-// Multi-line free text. Passes length into dict_text (default 80) so di.length is set.
+// Multi-line free text (HTML TEXTAREA). Does NOT call dict_text — different length rule:
+//  - length arg provided → set di.length
+//  - length omitted → keep preexisting di.length (do not clear, no default 80)
+// nrows default 3. align T, lowercase true if unset.
 function exodus_dict_textarea(di, nrows, length) {
 
  exodusassertobject(di, 'exodus_dict_textarea', 'di')
  if (typeof nrows == 'undefined')
   nrows = 3
- if (typeof length == 'undefined')
-  length = 80
- exodus_dict_text(di, length, nrows)
+ di.align = 'T'
+ if (nrows)
+  di.rows = nrows
+ if (typeof length != 'undefined')
+  di.length = length
+ // else leave di.length as-is (preexisting)
+ if (typeof di.lowercase == 'undefined')
+  di.lowercase = true
 }
 
 // Align T uppercase codes (nowrap, no fold). Passes length into dict_text (default 30).

@@ -78,10 +78,12 @@
 	Prefer <code>exodus_dict_textarea</code> for multi-line fields.</p>
 <P>Lower case will be allowed</P>
 <H4>exodus_dict_textarea(dictitem,nrows,length)</H4>
-<P>Multi-line free text (HTML textarea when nrows &gt; 1). Calls
-	<code>exodus_dict_text</code> with <em>length</em> (default 80) so
-	<code>di.length</code> is set. Default nrows is 3. Same free-text paint rule
-	(cell fill; length not used for paint today).</P>
+<P>Multi-line free text (HTML textarea). Does <strong>not</strong> call
+	<code>exodus_dict_text</code>. Default <em>nrows</em> is 3.
+	<em>length</em> if passed sets <code>di.length</code>; if omitted, any
+	<strong>preexisting</strong> <code>di.length</code> is kept (no clear, no
+	default 80). Typical: <code>di.length = 60</code> then
+	<code>exodus_dict_textarea(di, 5)</code>, or pass length as the third arg.</P>
 <H4>exodus_dict_code(dictitem,length)</H4>
 <P>Uppercase code fields (align T, lowercase false — nowrap, no fold).
 	Passes <em>length</em> into <code>exodus_dict_text</code> (default 30) so

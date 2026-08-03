@@ -1152,7 +1152,9 @@ async function formfunctions_onload() {
                     }
                     else {
 
-                        element.cols = element.size ? element.size : 30
+                        // Ordinary paint: length → size → cols; no length → keep HTM cols
+                        if (element.size)
+                            element.cols = element.size
                         var exodusrows = element.getAttribute('exodusrows')
                         if (exodusrows && exodusrows > 1)
                             element.rows = exodusrows
