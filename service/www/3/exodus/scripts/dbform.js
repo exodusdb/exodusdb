@@ -7364,9 +7364,28 @@ function focusongpreviouselement2() {
     // gpreviouselement.select()
     //}
 
+    if (!gpreviouselement)
+        return
+
     //dont focus back to checkboxes because that causes instant revalidation thereby causing endless loop if invalid
     if (gpreviouselement.type != 'checkbox')
         form_focus_noscroll(gpreviouselement)
+
+    // Same as focuson2: focus_noscroll then scroll into view (off-screen invalid
+    // fields e.g. analysis code after OK must become visible).
+    if (gpreviouselement.tagName
+        && gpreviouselement.tagName.match(gdatatagnames)
+        && gpreviouselement.getAttribute
+        && gpreviouselement.getAttribute('exodustype')) {
+        if (gpreviouselement == gstartelement
+            || gpreviouselement.getAttribute('exodusfieldno') === '0') {
+            window.scrollTo(0, 0)
+            if (typeof modalblock_note_scroll_home == 'function')
+                modalblock_note_scroll_home()
+        } else if (typeof scrollintoview == 'function') {
+            scrollintoview(gpreviouselement)
+        }
+    }
 
     if (isMac && gpreviouselement.tagName != 'SELECT' && gpreviouselement.tagName != 'TEXTAREA')
         gpreviouselement.select()
