@@ -59,8 +59,12 @@ function form_input_is_period(element) {
 
 // Number / amount as cell text host (same SPAN path as codes), not fixed INPUT box.
 // [NUMBER…] or bare align R with no conversion (journals MAIN_AMOUNT).
+// Never radio/checkbox — settings ALLORONE/CONVERT use align R + radio and must
+// stay INPUT until radio expand (bare R→SPAN destroyed them → init hang).
 function form_dictitem_is_number_text(dictitem) {
     if (!dictitem)
+        return false
+    if (dictitem.radio || dictitem.checkbox)
         return false
     var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
     if (conv.indexOf('[NUMBER') === 0)
@@ -74,6 +78,8 @@ function form_dictitem_is_number_text(dictitem) {
 // INPUT → SPAN: free-text/codes (align T) or numbers (dict_code-style content host).
 function form_dictitem_wants_text_span(dictitem) {
     if (!dictitem)
+        return false
+    if (dictitem.radio || dictitem.checkbox)
         return false
     var al = String(dictitem.align || '').toUpperCase()
     if (al.indexOf('T') === 0)
@@ -105,14 +111,18 @@ function form_apply_input_field_width(element) {
     if (element.size == 1)
         return
     var pureDate = form_input_is_pure_date(element)
+    var isPeriod = form_input_is_period(element)
     var n = parseInt(element.getAttribute('exoduslength'), 10)
-    if (!pureDate && !(n > 0))
+    if (!pureDate && !isPeriod && !(n > 0))
         return
     var sample
     var cacheKey
     if (pureDate) {
         sample = gform_input_width_date_sample
         cacheKey = 'date:' + sample
+    } else if (isPeriod) {
+        sample = gform_input_width_period_sample
+        cacheKey = 'period:' + sample
     } else {
         var ch = form_input_width_char(element)
         sample = ch.repeat(n)
