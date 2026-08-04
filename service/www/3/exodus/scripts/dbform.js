@@ -1100,8 +1100,7 @@ async function formfunctions_onload() {
                 }
             }
 
-            // code and number: same host width policy (floor 6ch, expand freely).
-            // Length is not min-width here (helpers do not own length; rare callers may set it).
+            // code and number: same host width (floor 6ch, expand). length unused.
             if (element.tagName == 'SPAN'
                 && (fieldStyle === 'number' || fieldStyle === 'code')) {
                 element.style.display = 'inline-block'
@@ -1110,7 +1109,8 @@ async function formfunctions_onload() {
                 element.style.boxSizing = 'border-box'
             } else if (element.tagName == 'SPAN' && element.style.display != 'none'
                 && fieldStyle === 'text') {
-                // text: soft max / fill — length is not min-width. Empty length → exomaxwidth 30ch.
+                // text: fill cell. length gates wide soft max only (form_table_set_wide):
+                // empty length → exomaxwidth 30ch; length set → no soft max.
                 var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
                 if (!(freeLen > 0))
                     freeLen = 0
@@ -1125,7 +1125,7 @@ async function formfunctions_onload() {
                         element.style.display = 'block'
                         element.style.width = '100%'
                     } else {
-                        // display free-text / names — same soft max; keep side-by-side with codes
+                        // display free-text / names — keep side-by-side with codes
                         element.style.display = 'inline-block'
                         element.style.verticalAlign = 'top'
                     }
@@ -1238,19 +1238,20 @@ async function formfunctions_onload() {
             }
 
             // Pad-only (di.popup='' and/or di.link='' with no real F7/F6):
-            //   popup only → one F7 slot (e.g. PERIOD under calendar date)
-            //   both → F7+F6 slots so name lines up under code with find+link
-            //     (F6 pad includes icon→field gap that CSS puts after a real F6).
+            //   Real icons get margin-left after the *last* chrome icon → field
+            //   (global.css). Pads must include that gap on the last slot only.
+            //   popup only / link only → icon + cell-padding-x
+            //   both → F7 icon; F6 icon + cell-padding-x
+            //   (e.g. VERSION / SUPP_INV_NO link-only under F7 column was short by
+            //   the missing field gap when pad was bare icon-size.)
             if ((padPopup || padLink) && !popupExpr && !linkExpr) {
                 element = form_field_chrome_ensure_wrap(element, dictitem)
+                var iconW = 'var(--exodus-ui-icon-size)'
+                var iconAndGap = 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-cell-padding-x))'
                 if (padPopup)
-                    form_field_chrome_pad(element, 'var(--exodus-ui-icon-size)', 'middle')
+                    form_field_chrome_pad(element, padLink ? iconW : iconAndGap, 'middle')
                 if (padLink)
-                    form_field_chrome_pad(element,
-                        padPopup
-                            ? 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-cell-padding-x))'
-                            : 'var(--exodus-ui-icon-size)',
-                        'middle')
+                    form_field_chrome_pad(element, iconAndGap, 'middle')
             }
 
             //add image element and hide element
