@@ -23,16 +23,21 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // Sample / glyph choice (first match wins)
 //   pure DATE — measure "11/11/1111" (not length×digit; slashes are narrower)
-//   "8"  digit-ish — PERIOD / TIME / DATE_TIME (NUMBER is SPAN now)
+//   period   — measure "11/1111" (PERIOD_OF_YEAR / YEAR_PERIOD / FINANCIAL_PERIOD)
+//   "8"  digit-ish — TIME / DATE_TIME (NUMBER is SPAN now)
 //   "0"  average  — exoduslowercase is set and not "false"
 //   "M"  max char — codes, keys, uppercase text
 // =============================================================================
-var gform_input_width_digitconv = /^\[(DATE_TIME|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD|TIME)/
+var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
+// PERIOD_OF_YEAR, YEAR_PERIOD, FINANCIAL_PERIOD, YEARPERIOD
+var gform_input_width_periodconv = /\[(PERIOD_OF_YEAR|YEAR_?PERIOD|FINANCIAL_PERIOD)/
 var gform_input_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
 var gform_input_width_cache = {}
 // Sample display date for pure DATE INPUT paint (dd/mm/yyyy style width)
 var gform_input_width_date_sample = '11/11/1111'
+// Sample period display (mm/yyyy or similar)
+var gform_input_width_period_sample = '11/1111'
 
 function form_input_is_pure_date(element) {
     var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
@@ -41,9 +46,15 @@ function form_input_is_pure_date(element) {
     // Calendar popup without DATE_TIME / TIME conversion
     if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0
         && conv.indexOf('DATE_TIME') < 0
-        && !/^\[TIME/.test(conv))
+        && !/^\[TIME/.test(conv)
+        && !gform_input_width_periodconv.test(conv))
         return true
     return false
+}
+
+function form_input_is_period(element) {
+    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    return gform_input_width_periodconv.test(conv)
 }
 
 // Number / amount as cell text host (same SPAN path as codes), not fixed INPUT box.
