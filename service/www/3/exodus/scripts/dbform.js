@@ -34,20 +34,17 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 // ONLY Exodus artifacts — never app modules (Neosys/agency/finance field names,
 // product helpers, or “this looks like a client account”).
 //
-// Allowed inputs to style logic:
-//   - dictitem axes set by Exodus helpers in db.js: align, lowercase, conversion,
-//     length, radio, checkbox, type, groupno, … (exodus_dict_text / _code /
-//     _number / _date / _period / … and raw dictrec)
-//   - DOM exodus* attributes copied from those axes (exodusalign, exodusconversion, …)
-//   - Framework tags/types (INPUT/SPAN, type text/radio, form_pop_calendar)
-//
-// App dicts call helpers to set axes. Paint reacts only to the axes. Behaviour
-// helpers (popup/val/typeahead) are not style — if style is wrong, fix the dict
-// (e.g. exodus_dict_code then behaviour helper that sets length), not special cases here.
-//
-// SPAN min-width from length: codes only (lowercase false / future exodusstyle code).
-// Free-text T uses soft max, not length-as-min. [NUMBER…] floor 6ch. Align L INPUTs:
-// form_apply_input_field_width already paints fixed width from length.
+// Primary axis: di.exostyle → DOM attribute "exostyle" (copydictitem; not exodusexostyle).
+//   set by style helpers only:
+//     exodus_dict_code     → "code"   (uppercase SPAN, min-width from length)
+//     exodus_dict_text     → "text"   (free-text SPAN, soft max / fill)
+//     exodus_dict_textarea → "text"
+//     exodus_dict_number   → "number" (SPAN, floor 6ch)
+// Paint classifies once via form_field_exostyle; host/width/wrap use that — no
+// re-guess from lowercase/align/conversion on later passes.
+// Fallback when exostyle missing: old axes (align T + lowercase, [NUMBER…]) so
+// raw dicts still paint. Behaviour helpers never set exostyle.
+// Align L/R INPUT fixed width: form_apply_input_field_width (length / date sample).
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
@@ -78,35 +75,59 @@ function form_input_is_period(element) {
     return gform_input_width_periodconv.test(conv)
 }
 
-// conversion [NUMBER…] (exodus_dict_number) → content SPAN host, not fixed INPUT.
+// Style class for paint: "code" | "text" | "number" | "".
+// Prefer di.exostyle / attribute exostyle (set by style helpers). Fallback only when
+// missing so unstyled dicts still work — do not invent app knowledge.
+function form_field_exostyle(dictitem, element) {
+    var s = ''
+    if (dictitem && dictitem.exostyle != null && dictitem.exostyle !== '')
+        s = String(dictitem.exostyle)
+    else if (element && element.getAttribute)
+        s = element.getAttribute('exostyle') || ''
+    s = String(s).toLowerCase()
+    if (s === 'code' || s === 'text' || s === 'number')
+        return s
+    // Fallback: axes without style helpers
+    if (dictitem) {
+        if (dictitem.radio || dictitem.checkbox)
+            return ''
+        var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
+        if (conv.indexOf('[NUMBER') === 0)
+            return 'number'
+        var al = String(dictitem.align || '').toUpperCase()
+        if (al.indexOf('T') === 0)
+            return (dictitem.lowercase === false) ? 'code' : 'text'
+    } else if (element && element.getAttribute) {
+        var conv2 = String(element.getAttribute('exodusconversion') || '').toUpperCase()
+        if (conv2.indexOf('[NUMBER') === 0)
+            return 'number'
+        if (String(element.getAttribute('exodusalign') || '').toUpperCase().indexOf('T') === 0) {
+            var lc = element.getAttribute('exoduslowercase')
+            // false stored as ""; truthy = free-text
+            return (lc && lc !== 'false') ? 'text' : 'code'
+        }
+    }
+    return ''
+}
+
+// conversion [NUMBER…] / exostyle number → content SPAN host, not fixed INPUT.
 // radio/checkbox never (expanded later).
 function form_dictitem_is_number_text(dictitem) {
     if (!dictitem)
         return false
     if (dictitem.radio || dictitem.checkbox)
         return false
-    var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
-    return conv.indexOf('[NUMBER') === 0
+    return form_field_exostyle(dictitem, null) === 'number'
 }
 
-// INPUT → SPAN: align T (exodus_dict_text / _code) or [NUMBER…] (exodus_dict_number).
+// INPUT → SPAN: exostyle code|text|number (or fallback align T / [NUMBER…]).
 function form_dictitem_wants_text_span(dictitem) {
     if (!dictitem)
         return false
     if (dictitem.radio || dictitem.checkbox)
         return false
-    var al = String(dictitem.align || '').toUpperCase()
-    if (al.indexOf('T') === 0)
-        return true
-    return form_dictitem_is_number_text(dictitem)
-}
-
-// Free-text allows lowercase; codes do not.
-// copydictitem stores boolean false as "" (never the string "false") so empty/missing
-// attribute means uppercase-only (exodus_dict_code). Truthy "true" = free text.
-function form_element_allows_lowercase(element) {
-    var lc = element.getAttribute('exoduslowercase')
-    return !!(lc && lc !== 'false')
+    var st = form_field_exostyle(dictitem, null)
+    return st === 'code' || st === 'text' || st === 'number'
 }
 
 function form_input_width_char(element) {
@@ -1014,10 +1035,11 @@ async function formfunctions_onload() {
 
             }
 
-            // SPAN white-space: lowercase false or [NUMBER…] → nowrap; else free-text fold.
+            // SPAN host paint — classify once (exostyle); one width policy per class.
+            var fieldStyle = form_field_exostyle(dictitem, element)
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
-                var noFold = (dictitem.lowercase === false)
-                    || form_dictitem_is_number_text(dictitem)
+                // code/number: nowrap; text: free-text fold
+                var noFold = (fieldStyle === 'code' || fieldStyle === 'number')
                 try {
                     if (noFold) {
                         element.style.whiteSpace = 'nowrap'
@@ -1038,19 +1060,14 @@ async function formfunctions_onload() {
                 }
             }
 
-            // [NUMBER…] SPANs: inline-block (min-width applies), floor 6ch, expand freely.
-            if (element.tagName == 'SPAN' && form_dictitem_is_number_text(dictitem)) {
+            if (element.tagName == 'SPAN' && fieldStyle === 'number') {
+                // number: floor 6ch, expand freely
                 element.style.display = 'inline-block'
                 element.style.minWidth = '6ch'
                 element.style.maxWidth = 'none'
                 element.style.boxSizing = 'border-box'
-            }
-
-            // Code SPANs (uppercase-only: empty/false lowercase attr): min-width from length.
-            // Align L that stay INPUT already get length via form_apply_input_field_width.
-            // Future: if an exodusstyle "code" axis appears, treat it the same as uppercase-only.
-            if (element.tagName == 'SPAN' && !form_element_allows_lowercase(element)
-                && !form_dictitem_is_number_text(dictitem)) {
+            } else if (element.tagName == 'SPAN' && fieldStyle === 'code') {
+                // code: min-width from length, expand freely (L INPUT uses form_apply_*)
                 var codeLen = parseInt(element.getAttribute('exoduslength'), 10)
                 if (codeLen > 0) {
                     element.style.display = 'inline-block'
@@ -1058,14 +1075,9 @@ async function formfunctions_onload() {
                     element.style.maxWidth = 'none'
                     element.style.boxSizing = 'border-box'
                 }
-            }
-
-            // Free-text soft max — entry and display the same (stop excluding display).
-            // Free-text = align T + lowercase allowed (not code). Empty length → exomaxwidth 30ch.
-            // Entry F: fill cell. Display (readonly F / type S): same cap, no contenteditable.
-            if (element.tagName == 'SPAN' && element.style.display != 'none'
-                && element.getAttribute('exodusalign') == 'T'
-                && form_element_allows_lowercase(element)) {
+            } else if (element.tagName == 'SPAN' && element.style.display != 'none'
+                && fieldStyle === 'text') {
+                // text: soft max / fill — length is not min-width. Empty length → exomaxwidth 30ch.
                 var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
                 if (!(freeLen > 0))
                     freeLen = 0
@@ -1146,14 +1158,12 @@ async function formfunctions_onload() {
                     //add the button right before/after the field
                     element2.id = element.id + '_popup'
 
-                    // F7 wrap: free-text T owns the cell → flex 100%. Codes/INPUTs hug
+                    // F7 wrap: free-text owns the cell → flex 100%. Codes/INPUTs hug
                     // (inline-flex) so a sibling name SPAN stays on the same line
-                    // (e.g. MARKET_CODE + MARKET_NAME). Not inline-block (zeroed empty free-text).
-                    // Codes: empty lowercase attr (copydictitem false→"") — not free-text.
+                    // (e.g. MARKET_CODE + MARKET_NAME). Uses same exostyle as SPAN paint.
                     var wrapFill = (element.tagName == 'SPAN'
                         && element.getAttribute('exodustype') == 'F'
-                        && element.getAttribute('exodusalign') == 'T'
-                        && form_element_allows_lowercase(element))
+                        && form_field_exostyle(dictitem, element) === 'text')
                     var nowrapper = document.createElement('span')
                     nowrapper.style.display = wrapFill ? 'flex' : 'inline-flex'
                     if (wrapFill) {
@@ -1209,11 +1219,10 @@ async function formfunctions_onload() {
                     var element2 = exodus_create_icon_element(glinkimage)
                     //add the button right after the field
 
-                    // F6 wrap: same hug vs fill rule as F7.
+                    // F6 wrap: same hug vs fill rule as F7 (exostyle text).
                     var wrapFill6 = (element.tagName == 'SPAN'
                         && element.getAttribute('exodustype') == 'F'
-                        && element.getAttribute('exodusalign') == 'T'
-                        && form_element_allows_lowercase(element))
+                        && form_field_exostyle(dictitem, element) === 'text')
                     var nowrapper = document.createElement('span')
                     nowrapper.style.display = wrapFill6 ? 'flex' : 'inline-flex'
                     if (wrapFill6) {
@@ -11289,8 +11298,10 @@ async function copyrecord_onclick() {
 function copydictitem(dictitem, element) {
 
     for (var propertyname in dictitem) {
-        // Usual attr = "exodus"+property. Exception: groupno → exogroupno (pairs with table id exogroupN).
-        var attr = propertyname == 'groupno' ? 'exogroupno' : ('exodus' + propertyname)
+        // Usual attr = "exodus"+property.
+        // Exceptions: groupno → exogroupno (table id exogroupN); exostyle → exostyle (not exodusexostyle).
+        var attr = propertyname == 'groupno' ? 'exogroupno'
+            : (propertyname == 'exostyle' ? 'exostyle' : ('exodus' + propertyname))
         if (typeof element[attr] == 'undefined' && typeof dictitem[propertyname] != 'undefined') {
             //element[attr]=dictitem[propertyname]
             //use setAttribute because only msie will clone expando properties and needed for row cloning

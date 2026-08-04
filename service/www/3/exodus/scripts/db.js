@@ -385,6 +385,8 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
   dicti.align = 'R'
  else
   dicti.align = 'L'
+ // Style axis for dbform paint (not inferred from conversion alone once set).
+ dicti.exostyle = 'number'
 
 }
 
@@ -393,6 +395,7 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
 // To store length deliberately: pass length here, or set di.length after this call.
 // length omitted → clear di.length (no inherit from dictrec). No default length.
 // Codes: exodus_dict_code. Multi-line: exodus_dict_textarea (separate; does not call this).
+// exostyle "text" — dbform free-text host/width (not code).
 function exodus_dict_text(dicti, length, rows) {
 
  exodusassertobject(dicti, 'exodus_dict_text', 'dicti')
@@ -407,12 +410,13 @@ function exodus_dict_text(dicti, length, rows) {
   dicti.rows = rows
  if (typeof dicti.lowercase == 'undefined')
   dicti.lowercase = true
+ dicti.exostyle = 'text'
 }
 
 // Multi-line free text (HTML TEXTAREA). Does NOT call dict_text — different length rule:
 //  - length arg provided → set di.length
 //  - length omitted → keep preexisting di.length (do not clear, no default 80)
-// nrows default 3. align T, lowercase true if unset.
+// nrows default 3. align T, lowercase true if unset. exostyle "text".
 function exodus_dict_textarea(di, nrows, length) {
 
  exodusassertobject(di, 'exodus_dict_textarea', 'di')
@@ -426,9 +430,11 @@ function exodus_dict_textarea(di, nrows, length) {
  // else leave di.length as-is (preexisting)
  if (typeof di.lowercase == 'undefined')
   di.lowercase = true
+ di.exostyle = 'text'
 }
 
 // Align T uppercase codes (nowrap, no fold). Passes length into dict_text (default 30).
+// exostyle "code" after dict_text so paint does not treat as free-text.
 function exodus_dict_code(di, length) {
 
  exodusassertobject(di, 'exodus_dict_code', 'di')
@@ -436,6 +442,7 @@ function exodus_dict_code(di, length) {
   length = 30
  exodus_dict_text(di, length)
  di.lowercase = false
+ di.exostyle = 'code'
 }
 
 function exodusrecord(dictarray,filename) {
@@ -458,7 +465,7 @@ function exodusrecord(dictarray,filename) {
  var ngroups=0
  var nfields=0
 
- var validpropnames = /(^sequence$)|(^openfunction$)|(^dropdown$)|(^test$)|(^name$)|(^type$)|(^fieldno$)|(^title$)|(^groupno$)|(^keypart$)|(^conversion$)|(^functioncode$)|(^length$)|(^align$)|(^wordsep$)|(^wordno$)|(^nwords$)|(^validation$)|(^popup$)|(^onchange$)|(^conversion$)|(^checkbox$)|(^radio$)|(^horizontal$)|(^required$)|(^rowrequired$)|(^unique$)|(^nonuniquewarning$)|(^defaultvalue$)|(^validcharacters$)|(^invalidcharacters$)|(^display$)|(^lowercase$)|(^readonly$)|(^maxlength$)|(^printfunction$)|(^listfunction$)|(^filename$)|(^rows$)|(^noinsertrow$)|(^nodeleterow$)|(^allowemptyrows$)|(^copyable$)|(^link$)|(^nochangeswarning$)|(^allowduplicatefieldno$)|(^allowcursor$)|(^afterupdate$)|(^image$)/
+ var validpropnames = /(^sequence$)|(^openfunction$)|(^dropdown$)|(^test$)|(^name$)|(^type$)|(^fieldno$)|(^title$)|(^groupno$)|(^keypart$)|(^conversion$)|(^functioncode$)|(^length$)|(^align$)|(^wordsep$)|(^wordno$)|(^nwords$)|(^validation$)|(^popup$)|(^onchange$)|(^conversion$)|(^checkbox$)|(^radio$)|(^horizontal$)|(^required$)|(^rowrequired$)|(^unique$)|(^nonuniquewarning$)|(^defaultvalue$)|(^validcharacters$)|(^invalidcharacters$)|(^display$)|(^lowercase$)|(^exostyle$)|(^readonly$)|(^maxlength$)|(^printfunction$)|(^listfunction$)|(^filename$)|(^rows$)|(^noinsertrow$)|(^nodeleterow$)|(^allowemptyrows$)|(^copyable$)|(^link$)|(^nochangeswarning$)|(^allowduplicatefieldno$)|(^allowcursor$)|(^afterupdate$)|(^image$)/
  
  //parse the dict array to get the number of fields and number of groups etc.
  for (var dictn=0;dictn<this.dict.length;dictn++) {
