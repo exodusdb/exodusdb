@@ -249,6 +249,7 @@ async function exodus_val_time(mode,otherid) {
 }
 
 // exodus_dict_period(di,'FROM','PERIOD_TO','[FINANCIAL_PERIOD]')
+// Align: keep preset if already set; else R (amounts-style). Callers may set L before.
 function exodus_dict_period(di,mode,otherperiodid,conversion) {
 
  if (!mode) mode=''
@@ -256,7 +257,8 @@ function exodus_dict_period(di,mode,otherperiodid,conversion) {
  if (!conversion) conversion=''
  exodusassertobject(di,'exodus_dict_period','di')
  di.conversion='[PERIOD_OF_YEAR]'
- di.align='R'
+ if (typeof di.align == 'undefined' || di.align === '' || di.align == null)
+  di.align='R'
  di.length=7
  if (di.type=='F') di.validation='await exodus_val_period("'+mode+'","'+otherperiodid+'")'
 }

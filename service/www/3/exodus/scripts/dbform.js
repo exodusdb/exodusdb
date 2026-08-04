@@ -1124,13 +1124,16 @@ async function formfunctions_onload() {
                     if (entryF) {
                         element.style.display = 'block'
                         element.style.width = '100%'
+                        // Floor so empty hosts in shrink-wrap cells (e.g. search TEXT_XREF)
+                        // do not collapse to zero; freeLen if set, else soft-max default 30ch.
+                        element.style.minWidth = (freeLen > 0 ? freeLen : 30) + 'ch'
                     } else {
                         // display free-text / names — keep side-by-side with codes
                         element.style.display = 'inline-block'
                         element.style.verticalAlign = 'top'
+                        element.style.minWidth = '0'
                     }
                     element.style.maxWidth = '100%'
-                    element.style.minWidth = '0'
                     element.style.boxSizing = 'border-box'
                 }
             }
