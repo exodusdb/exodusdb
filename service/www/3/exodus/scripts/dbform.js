@@ -75,7 +75,21 @@ function form_dictitem_is_number_text(dictitem) {
     return false
 }
 
-// INPUT → SPAN: free-text/codes (align T) or numbers (dict_code-style content host).
+// Account codes (general_dict_acno): [ACCOUNT_NO…] — short keys, not free-text fold.
+function form_dictitem_is_account_code(dictitem) {
+    if (!dictitem || dictitem.radio || dictitem.checkbox)
+        return false
+    var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
+    return conv.indexOf('[ACCOUNT_NO') === 0
+}
+
+// Nowrap content SPAN: amounts, account codes (and dict_code via lowercase false).
+function form_dictitem_is_code_span(dictitem) {
+    return form_dictitem_is_number_text(dictitem)
+        || form_dictitem_is_account_code(dictitem)
+}
+
+// INPUT → SPAN: free-text/codes (align T), numbers, account codes.
 function form_dictitem_wants_text_span(dictitem) {
     if (!dictitem)
         return false
@@ -84,7 +98,7 @@ function form_dictitem_wants_text_span(dictitem) {
     var al = String(dictitem.align || '').toUpperCase()
     if (al.indexOf('T') === 0)
         return true
-    return form_dictitem_is_number_text(dictitem)
+    return form_dictitem_is_code_span(dictitem)
 }
 
 function form_input_width_char(element) {
@@ -734,7 +748,10 @@ async function formfunctions_onload() {
             //   align T — free text / codes (dict_code)
             //   numbers — [NUMBER] or bare align R (same content sizing as codes)
             // Dates/periods/times stay INPUT (sample/digit paint).
-            if (element.tagName == 'INPUT' && form_dictitem_wants_text_span(dictitem)) {
+            // Only text-like inputs — never radio/checkbox (expanded later).
+            if (element.tagName == 'INPUT'
+                && (!element.type || element.type == 'text' || element.type == 'password')
+                && form_dictitem_wants_text_span(dictitem)) {
 
                 //replace original element
                 var newspan = document.createElement('span')
