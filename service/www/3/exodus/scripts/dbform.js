@@ -43,7 +43,11 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // App dicts call helpers to set axes. Paint reacts only to the axes. Behaviour
 // helpers (popup/val/typeahead) are not style — if style is wrong, fix the dict
-// (e.g. exodus_dict_code after a behaviour helper), not special cases here.
+// (e.g. exodus_dict_code then behaviour helper that sets length), not special cases here.
+//
+// SPAN min-width from length: codes only (lowercase false / future exodusstyle code).
+// Free-text T uses soft max, not length-as-min. [NUMBER…] floor 6ch. Align L INPUTs:
+// form_apply_input_field_width already paints fixed width from length.
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
@@ -1032,6 +1036,20 @@ async function formfunctions_onload() {
                 element.style.minWidth = '6ch'
                 element.style.maxWidth = 'none'
                 element.style.boxSizing = 'border-box'
+            }
+
+            // Code SPANs (exodus_dict_code → lowercase false): min-width from length, expand freely.
+            // Align L that stay INPUT already get length via form_apply_input_field_width.
+            // Future: if an exodusstyle "code" axis appears, treat it the same as lowercase false.
+            if (element.tagName == 'SPAN' && dictitem.lowercase === false
+                && !form_dictitem_is_number_text(dictitem)) {
+                var codeLen = parseInt(element.getAttribute('exoduslength'), 10)
+                if (codeLen > 0) {
+                    element.style.display = 'inline-block'
+                    element.style.minWidth = codeLen + 'ch'
+                    element.style.maxWidth = 'none'
+                    element.style.boxSizing = 'border-box'
+                }
             }
 
             // Free-text soft max — entry and display the same (stop excluding display).
