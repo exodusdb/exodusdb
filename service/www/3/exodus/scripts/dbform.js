@@ -12,35 +12,48 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // Scope
 //   INCLUDE  INPUT type text/password (and blank type) with exoduslength, size!=1
+//            pure DATE: always (sample '11/11/1111'), length optional
 //   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA; SELECT
 //
-// Paint width = exoduslength × glyph, measured in the field's computed font
-// (after clsRequired/clsReadOnly). content-box width = minWidth = maxWidth.
+// Paint width = sample measured in the field's computed font (after class/font).
+// content-box width = minWidth = maxWidth.
 // HTML size = length only (table preferred-width hint); never size+2; never size
 // as the painted width.
 //
-// Glyph choice (first match wins)
-//   "8"  digit-ish — exodusconversion matches DATE / NUMBER / PERIOD /
-//        YEAR_PERIOD / FINANCIAL_PERIOD / YEARPERIOD / TIME (leading […),
-//        or contains DATE, or exoduspopup includes form_pop_calendar
+// Sample / glyph choice (first match wins)
+//   pure DATE — measure "11/11/1111" (not length×digit; slashes are narrower)
+//        [DATE] / [DATE,…] only — not DATE_TIME. Or calendar popup alone.
+//   "8"  digit-ish — NUMBER / PERIOD / TIME / DATE_TIME / other *DATE* convs
 //   "0"  average  — exoduslowercase is set and not "false"
-//        (free-text / name-like entry that stayed INPUT, e.g. EXECUTIVE_CODE)
-//   "M"  max char — all other INPUTs (codes, keys, uppercase text)
-//
-// Not used for INPUT width: exodusalign (except T already left this path),
-// groupno, popup except calendar detection above.
+//   "M"  max char — codes, keys, uppercase text
 // =============================================================================
-var gform_input_width_digitconv = /^\[(DATE|NUMBER|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD|TIME)/
+var gform_input_width_digitconv = /^\[(DATE_TIME|NUMBER|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD|TIME)/
+var gform_input_width_puredate = /^\[DATE([,\]]|$)/
 var gform_input_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
 var gform_input_width_cache = {}
+// Sample display date for pure DATE INPUT paint (dd/mm/yyyy style width)
+var gform_input_width_date_sample = '11/11/1111'
+
+function form_input_is_pure_date(element) {
+    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    if (gform_input_width_puredate.test(conv))
+        return true
+    // Calendar popup without DATE_TIME / TIME conversion
+    if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0
+        && conv.indexOf('DATE_TIME') < 0
+        && !/^\[TIME/.test(conv))
+        return true
+    return false
+}
 
 function form_input_width_char(element) {
     var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    // Pure DATE handled by form_apply via sample string — not length×glyph
     if (gform_input_width_digitconv.test(conv))
         return '8'
-    if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0)
-        return '8'
     if (gform_input_width_dateconv.test(conv))
+        return '8'
+    if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0)
         return '8'
     var lc = element.getAttribute('exoduslowercase')
     if (lc && lc !== 'false')
@@ -56,19 +69,29 @@ function form_apply_input_field_width(element) {
         return
     if (element.size == 1)
         return
+    var pureDate = form_input_is_pure_date(element)
     var n = parseInt(element.getAttribute('exoduslength'), 10)
-    if (!(n > 0))
+    if (!pureDate && !(n > 0))
         return
-    var ch = form_input_width_char(element)
+    var sample
+    var cacheKey
+    if (pureDate) {
+        sample = gform_input_width_date_sample
+        cacheKey = 'date:' + sample
+    } else {
+        var ch = form_input_width_char(element)
+        sample = ch.repeat(n)
+        cacheKey = ch + '\t' + n
+    }
     var cs = getComputedStyle(element)
     var font = [cs.fontStyle, cs.fontVariant, cs.fontWeight, cs.fontSize, cs.fontFamily].join(' ').replace(/\s+/g, ' ').trim()
-    var key = font + '\t' + ch + '\t' + n
+    var key = font + '\t' + cacheKey
     var px = gform_input_width_cache[key]
     if (!px) {
         var canvas = document.createElement('canvas')
         var ctx = canvas.getContext('2d')
         ctx.font = font
-        px = Math.ceil(ctx.measureText(ch.repeat(n)).width)
+        px = Math.ceil(ctx.measureText(sample).width)
         gform_input_width_cache[key] = px
     }
     var w = px + 'px'
