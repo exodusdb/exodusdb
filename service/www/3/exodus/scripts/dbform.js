@@ -1239,15 +1239,14 @@ async function formfunctions_onload() {
 
             // Pad-only (di.popup='' and/or di.link='' with no real F7/F6):
             //   Real icons get margin-left after the *last* chrome icon → field
-            //   (global.css). Pads must include that gap on the last slot only.
-            //   popup only / link only → icon + cell-padding-x
-            //   both → F7 icon; F6 icon + cell-padding-x
-            //   (e.g. VERSION / SUPP_INV_NO link-only under F7 column was short by
-            //   the missing field gap when pad was bare icon-size.)
+            //   (global.css: nested fieldstrips use nested-cell-padding-x). Include
+            //   that gap on the last pad slot only — same as F7+padLink above.
+            //   both → F7 icon; F6 icon+gap. one slot → icon+gap.
             if ((padPopup || padLink) && !popupExpr && !linkExpr) {
                 element = form_field_chrome_ensure_wrap(element, dictitem)
                 var iconW = 'var(--exodus-ui-icon-size)'
-                var iconAndGap = 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-cell-padding-x))'
+                // Same gap as real icon margin in nested tables (costs fieldstrips).
+                var iconAndGap = 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-nested-cell-padding-x))'
                 if (padPopup)
                     form_field_chrome_pad(element, padLink ? iconW : iconAndGap, 'middle')
                 if (padLink)
