@@ -189,6 +189,45 @@ function form_apply_input_field_width(element) {
     element.style.maxWidth = w
 }
 
+// F7 / F6 / pad-only: one chrome wrap around the field.
+// Free-text F (exostyle text) fills the cell; codes / type S / INPUT hug.
+// Returns the field element (parent is the wrap). Call once per chrome install.
+function form_field_chrome_ensure_wrap(element, dictitem) {
+    var wrapFill = element.tagName == 'SPAN'
+        && element.getAttribute('exodustype') == 'F'
+        && form_field_exostyle(dictitem, element) === 'text'
+    var wrap = document.createElement('span')
+    wrap.style.display = wrapFill ? 'flex' : 'inline-flex'
+    if (wrapFill) {
+        wrap.style.width = '100%'
+        wrap.style.maxWidth = '100%'
+    }
+    wrap.style.alignItems = 'flex-start'
+    // replaceChild returns the field; re-parent into wrap
+    element = element.parentNode.replaceChild(wrap, element)
+    wrap.insertBefore(element, null)
+    if (wrapFill) {
+        element.style.flex = '1 1 auto'
+        element.style.width = 'auto'
+        element.style.minWidth = '0'
+    }
+    return element
+}
+
+// Empty F7/F6 slot. Inserted immediately before insertBeforeEl (icon or field).
+function form_field_chrome_pad(insertBeforeEl, widthCss, valign) {
+    var pad = document.createElement('span')
+    pad.className = 'exodus-fieldchrome-pad'
+    pad.setAttribute('aria-hidden', 'true')
+    pad.style.display = 'inline-block'
+    pad.style.flexShrink = '0'
+    pad.style.width = widthCss
+    pad.style.height = 'var(--exodus-ui-icon-size)'
+    pad.style.verticalAlign = valign || 'top'
+    insertBeforeEl.parentNode.insertBefore(pad, insertBeforeEl)
+    return pad
+}
+
 // Type S name after a code with F7/F6: move into the prior chrome wrap so they
 // stay on one line (narrow columns / normal fold). Skip if a <br> or other
 // real content is between them (deliberate stack, e.g. Brand + <br> + name).
@@ -1151,49 +1190,19 @@ async function formfunctions_onload() {
                     //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
 
                     element.style.verticalAlign = 'top'
+                    element = form_field_chrome_ensure_wrap(element, dictitem)
 
                     var element2 = exodus_create_icon_element(
                         fieldname.indexOf('DATE') >= 0 ? gcalendarimage : gfindimage
                     )
-                    //add the button right before/after the field
                     element2.id = element.id + '_popup'
-
-                    // F7 wrap: free-text owns the cell → flex 100%. Codes/INPUTs hug
-                    // (inline-flex) so a sibling name SPAN stays on the same line
-                    // (e.g. MARKET_CODE + MARKET_NAME). Uses same exostyle as SPAN paint.
-                    var wrapFill = (element.tagName == 'SPAN'
-                        && element.getAttribute('exodustype') == 'F'
-                        && form_field_exostyle(dictitem, element) === 'text')
-                    var nowrapper = document.createElement('span')
-                    nowrapper.style.display = wrapFill ? 'flex' : 'inline-flex'
-                    if (wrapFill) {
-                        nowrapper.style.width = '100%'
-                        nowrapper.style.maxWidth = '100%'
-                    }
-                    nowrapper.style.alignItems = 'flex-start'
-                    element = element.parentNode.replaceChild(nowrapper, element)
-                    nowrapper.insertBefore(element, null)
-                    nowrapper.insertBefore(element2, null)
                     element.parentNode.insertBefore(element2, element)
-                    if (wrapFill) {
-                        element.style.flex = '1 1 auto'
-                        element.style.width = 'auto'
-                        element.style.minWidth = '0'
-                    }
                     element2.style.flexShrink = '0'
-
-                    // di.link='' → pad F6 slot + icon→field gap (pad sits between F7 and field)
-                    if (padLink) {
-                        var pad6 = document.createElement('span')
-                        pad6.className = 'exodus-fieldchrome-pad'
-                        pad6.setAttribute('aria-hidden', 'true')
-                        pad6.style.display = 'inline-block'
-                        pad6.style.flexShrink = '0'
-                        pad6.style.width = 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-nested-cell-padding-x))'
-                        pad6.style.height = 'var(--exodus-ui-icon-size)'
-                        pad6.style.verticalAlign = 'top'
-                        element.parentNode.insertBefore(pad6, element)
-                    }
+                    // di.link='' → pad F6 slot + icon→field gap (between F7 and field)
+                    if (padLink)
+                        form_field_chrome_pad(element,
+                            'calc(var(--exodus-ui-icon-size) + var(--exodus-form-nested-cell-padding-x))',
+                            'top')
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
@@ -1215,44 +1224,14 @@ async function formfunctions_onload() {
                     //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
 
                     element.style.verticalAlign = 'top'
+                    element = form_field_chrome_ensure_wrap(element, dictitem)
 
                     var element2 = exodus_create_icon_element(glinkimage)
-                    //add the button right after the field
-
-                    // F6 wrap: same hug vs fill rule as F7 (exostyle text).
-                    var wrapFill6 = (element.tagName == 'SPAN'
-                        && element.getAttribute('exodustype') == 'F'
-                        && form_field_exostyle(dictitem, element) === 'text')
-                    var nowrapper = document.createElement('span')
-                    nowrapper.style.display = wrapFill6 ? 'flex' : 'inline-flex'
-                    if (wrapFill6) {
-                        nowrapper.style.width = '100%'
-                        nowrapper.style.maxWidth = '100%'
-                    }
-                    nowrapper.style.alignItems = 'flex-start'
-                    element = element.parentNode.replaceChild(nowrapper, element)
-                    nowrapper.insertBefore(element, null)
-                    nowrapper.insertBefore(element2, null)
                     element.parentNode.insertBefore(element2, element)
-                    if (wrapFill6) {
-                        element.style.flex = '1 1 auto'
-                        element.style.width = 'auto'
-                        element.style.minWidth = '0'
-                    }
                     element2.style.flexShrink = '0'
-
                     // di.popup='' → pad F7 slot before link (e.g. DATELIST)
-                    if (padPopup) {
-                        var pad7 = document.createElement('span')
-                        pad7.className = 'exodus-fieldchrome-pad'
-                        pad7.setAttribute('aria-hidden', 'true')
-                        pad7.style.display = 'inline-block'
-                        pad7.style.flexShrink = '0'
-                        pad7.style.width = 'var(--exodus-ui-icon-size)'
-                        pad7.style.height = 'var(--exodus-ui-icon-size)'
-                        pad7.style.verticalAlign = 'top'
-                        element.parentNode.insertBefore(pad7, element2)
-                    }
+                    if (padPopup)
+                        form_field_chrome_pad(element2, 'var(--exodus-ui-icon-size)', 'top')
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
@@ -1268,52 +1247,16 @@ async function formfunctions_onload() {
             //   popup only → one F7 slot (e.g. PERIOD under calendar date)
             //   both → F7+F6 slots so name lines up under code with find+link
             //     (F6 pad includes icon→field gap that CSS puts after a real F6).
-            // Wrap pads+field like real F7/F6 (inline-flex / free-text flex) so pads
-            // stay glued to the host — not loose siblings that wrap or float apart.
             if ((padPopup || padLink) && !popupExpr && !linkExpr) {
-                var wrapFillPad = (element.tagName == 'SPAN'
-                    && element.getAttribute('exodustype') == 'F'
-                    && form_field_exostyle(dictitem, element) === 'text')
-                var padWrap = document.createElement('span')
-                padWrap.style.display = wrapFillPad ? 'flex' : 'inline-flex'
-                if (wrapFillPad) {
-                    padWrap.style.width = '100%'
-                    padWrap.style.maxWidth = '100%'
-                }
-                padWrap.style.alignItems = 'flex-start'
-                // replaceChild returns the field; re-parent into padWrap
-                element = element.parentNode.replaceChild(padWrap, element)
-                padWrap.insertBefore(element, null)
-                if (wrapFillPad) {
-                    element.style.flex = '1 1 auto'
-                    element.style.width = 'auto'
-                    element.style.minWidth = '0'
-                }
-                if (padPopup) {
-                    var padOnly7 = document.createElement('span')
-                    padOnly7.className = 'exodus-fieldchrome-pad'
-                    padOnly7.setAttribute('aria-hidden', 'true')
-                    padOnly7.style.display = 'inline-block'
-                    padOnly7.style.flexShrink = '0'
-                    padOnly7.style.width = 'var(--exodus-ui-icon-size)'
-                    padOnly7.style.height = 'var(--exodus-ui-icon-size)'
-                    padOnly7.style.verticalAlign = 'middle'
-                    element.parentNode.insertBefore(padOnly7, element)
-                }
-                if (padLink) {
-                    var padOnly6 = document.createElement('span')
-                    padOnly6.className = 'exodus-fieldchrome-pad'
-                    padOnly6.setAttribute('aria-hidden', 'true')
-                    padOnly6.style.display = 'inline-block'
-                    padOnly6.style.flexShrink = '0'
-                    // match F6 icon + margin after last chrome icon → field
-                    padOnly6.style.width = padPopup
-                        ? 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-cell-padding-x))'
-                        : 'var(--exodus-ui-icon-size)'
-                    padOnly6.style.height = 'var(--exodus-ui-icon-size)'
-                    padOnly6.style.verticalAlign = 'middle'
-                    element.parentNode.insertBefore(padOnly6, element)
-                }
+                element = form_field_chrome_ensure_wrap(element, dictitem)
+                if (padPopup)
+                    form_field_chrome_pad(element, 'var(--exodus-ui-icon-size)', 'middle')
+                if (padLink)
+                    form_field_chrome_pad(element,
+                        padPopup
+                            ? 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-cell-padding-x))'
+                            : 'var(--exodus-ui-icon-size)',
+                        'middle')
             }
 
             //add image element and hide element
