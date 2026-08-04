@@ -75,14 +75,9 @@ function form_dictitem_is_number_text(dictitem) {
     return false
 }
 
-// Nowrap content SPAN floor: amounts only. dict_code style = align T + lowercase false
-// (exodus_dict_code) — do not treat conversion [ACCOUNT_NO] as style; that is
-// general_dict_acno (helper). Call exodus_dict_code after acno for code host.
-function form_dictitem_is_code_span(dictitem) {
-    return form_dictitem_is_number_text(dictitem)
-}
-
 // INPUT → SPAN: free-text/codes (align T via dict_text/dict_code) or amounts.
+// Style for account fields = call exodus_dict_code after general_dict_acno — not
+// conversion [ACCOUNT_NO] as a paint category (acno is helper only).
 function form_dictitem_wants_text_span(dictitem) {
     if (!dictitem)
         return false
@@ -1002,11 +997,11 @@ async function formfunctions_onload() {
 
             }
 
-            // SPAN white-space: codes (lowercase false), numbers, account codes → nowrap.
+            // SPAN white-space: dict_code (lowercase false) and amount SPANs → nowrap.
             // Free text (align T, not code) → pre-wrap fold.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 var noFold = (dictitem.lowercase === false)
-                    || form_dictitem_is_code_span(dictitem)
+                    || form_dictitem_is_number_text(dictitem)
                 try {
                     if (noFold) {
                         element.style.whiteSpace = 'nowrap'
@@ -1027,9 +1022,9 @@ async function formfunctions_onload() {
                 }
             }
 
-            // Code-like SPANs (amounts, ACCOUNT_NO): content-sized; inline-block so
-            // min-width applies; floor 6ch for empty cells.
-            if (element.tagName == 'SPAN' && form_dictitem_is_code_span(dictitem)) {
+            // Amount SPANs: content-sized; inline-block so min-width applies; floor 6ch.
+            // dict_code fields get nowrap via lowercase false (no forced 6ch floor).
+            if (element.tagName == 'SPAN' && form_dictitem_is_number_text(dictitem)) {
                 element.style.display = 'inline-block'
                 element.style.minWidth = '6ch'
                 element.style.maxWidth = 'none'
