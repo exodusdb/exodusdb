@@ -78,6 +78,39 @@ function form_apply_input_field_width(element) {
     element.style.maxWidth = w
 }
 
+// Type S name after a code with F7/F6: move into the prior chrome wrap so they
+// stay on one line (narrow columns / normal fold). Skip if a <br> or other
+// real content is between them (deliberate stack, e.g. Brand + <br> + name).
+// Does not invent pads or change free-text fill wraps.
+function form_glue_name_to_prev_code_chrome(nameEl) {
+    if (!nameEl || !nameEl.parentNode)
+        return
+    var prev = nameEl.previousSibling
+    while (prev && prev.nodeType === 3) {
+        if (/\S/.test(prev.nodeValue || ''))
+            return
+        prev = prev.previousSibling
+    }
+    if (!prev || prev.nodeType !== 1)
+        return
+    if (prev.tagName === 'BR')
+        return
+    if (prev.tagName !== 'SPAN')
+        return
+    if (nameEl.parentNode === prev)
+        return
+    // Prior sibling is F7/F6 chrome wrap (icons and/or pad slots)
+    if (!prev.querySelector
+        || !prev.querySelector('[isexoduspopup="1"], [isexoduslink="1"], .exodus-fieldchrome-pad'))
+        return
+    // Keep name on the flex line; allow shrink when the cell is tight
+    if (nameEl.style.display === 'block')
+        nameEl.style.display = ''
+    nameEl.style.flexShrink = '1'
+    nameEl.style.minWidth = '0'
+    prev.appendChild(nameEl)
+}
+
 // Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Open/Edit/Delete.
 // (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
 gnewimage = gimagetheme + 'record-new_lm.svg' // painted multicolour — excluded from mask tint
@@ -913,30 +946,23 @@ async function formfunctions_onload() {
             }
 
             //allow for data entry in SPAN elements (unless hidden)
-            // Align-T: fill host cell. Layout max-width 100% always (narrow folds in cell).
-            // Empty-length free-text (not codes): set exomaxwidth=30ch — content max for
-            // crush decide and for style max when wide (not applied as layout max in narrow).
-            // Popup/link: inline-block so F7/F6 icon can sit beside (not under) the field.
+            // Restored from 9fd7b4fa / 3b4f6495 (semi-working): always fill host cell —
+            // F6/F7 must not switch field to inline-block (that zeroed empty free-text).
+            // Empty free-text: exomaxwidth=30ch for wide-form crush (later addition).
             if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
                 //buggy and not necessary on msie7
                 //if (!isMSIE) {
                 if (!isMSIE && !element.getAttribute('exodusreadonly')) {
-                    //dont set display block if there is a link or popup so that the image stays to the left of the field
-                    if (element.getAttribute('exoduspopup') || element.getAttribute('exoduslink')) {
-                        element.style.display = 'inline-block'
-                    } else {
-                        element.style.display = 'block'
-                        element.style.width = '100%'
-                        element.style.maxWidth = '100%'
-                        element.style.minWidth = '0'
-                        element.style.boxSizing = 'border-box'
-                        // Same seam as "would set max from length but length empty"
-                        var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
-                        if (!(freeLen > 0) && element.getAttribute('exoduslowercase') !== 'false')
-                            element.setAttribute('exomaxwidth', '30ch')
-                        else
-                            element.removeAttribute('exomaxwidth')
-                    }
+                    element.style.display = 'block'
+                    element.style.width = '100%'
+                    element.style.maxWidth = '100%'
+                    element.style.minWidth = '0'
+                    element.style.boxSizing = 'border-box'
+                    var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
+                    if (!(freeLen > 0) && element.getAttribute('exoduslowercase') !== 'false')
+                        element.setAttribute('exomaxwidth', '30ch')
+                    else
+                        element.removeAttribute('exomaxwidth')
                 }
 
                 if (!(element.getAttribute('exodusreadonly'))) {
@@ -951,12 +977,23 @@ async function formfunctions_onload() {
             if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S')
                 element.tabIndex = -1
 
+            // F7/F6 chrome (dict di.popup / di.link → exoduspopup / exoduslink):
+            //   non-empty string → real find/link icon + handler
+            //   di.popup='' / di.link='' → pad that slot (with real other chrome, or alone)
+            //   false/null → suppress (copydictitem: no attribute). Omit → nothing.
+            //   never create a clickable icon for empty string.
+            var popupExpr = element.getAttribute('exoduspopup') || ''
+            var linkExpr = element.getAttribute('exoduslink') || ''
+            // pad only when dict set the property to empty (not when property omitted)
+            var padPopup = element.hasAttribute('exoduspopup') && !popupExpr
+            var padLink = element.hasAttribute('exoduslink') && !linkExpr
+
             //add button before element with popups (and selects to make it clear to users that F7 is available - especially since useful when selecting multivalues)
             if (
                 (
                     element.tagName == 'SELECT'
                     ||
-                    element.getAttribute('exoduspopup')
+                    popupExpr
                 )
                 &&
                 !element.getAttribute('exodusreadonly')
@@ -971,8 +1008,7 @@ async function formfunctions_onload() {
                     element.tagName == 'SELECT'
                 )
             ) {
-                if (typeof element.getAttribute('exoduspopup') == 'string'
-                    || element.tagName == 'SELECT') {
+                if (popupExpr || element.tagName == 'SELECT') {
                     //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
 
                     element.style.verticalAlign = 'top'
@@ -983,15 +1019,43 @@ async function formfunctions_onload() {
                     //add the button right before/after the field
                     element2.id = element.id + '_popup'
 
-                    // F7 wrap: plain nowrap span (not flex width 100%) so label text
-                    // e.g. "Tax Code :" stays on the same line as icon+field.
+                    // F7 wrap: free-text T owns the cell → flex 100%. Codes/INPUTs hug
+                    // (inline-flex) so a sibling name SPAN stays on the same line
+                    // (e.g. MARKET_CODE + MARKET_NAME). Not inline-block (zeroed empty free-text).
+                    var wrapFill = (element.tagName == 'SPAN'
+                        && element.getAttribute('exodustype') == 'F'
+                        && element.getAttribute('exodusalign') == 'T'
+                        && element.getAttribute('exoduslowercase') !== 'false')
                     var nowrapper = document.createElement('span')
-                    if (element.getAttribute('exodusalign') != 'T')
-                        nowrapper.style.whiteSpace = 'noWrap'
+                    nowrapper.style.display = wrapFill ? 'flex' : 'inline-flex'
+                    if (wrapFill) {
+                        nowrapper.style.width = '100%'
+                        nowrapper.style.maxWidth = '100%'
+                    }
+                    nowrapper.style.alignItems = 'flex-start'
                     element = element.parentNode.replaceChild(nowrapper, element)
                     nowrapper.insertBefore(element, null)
                     nowrapper.insertBefore(element2, null)
                     element.parentNode.insertBefore(element2, element)
+                    if (wrapFill) {
+                        element.style.flex = '1 1 auto'
+                        element.style.width = 'auto'
+                        element.style.minWidth = '0'
+                    }
+                    element2.style.flexShrink = '0'
+
+                    // di.link='' → pad F6 slot + icon→field gap (pad sits between F7 and field)
+                    if (padLink) {
+                        var pad6 = document.createElement('span')
+                        pad6.className = 'exodus-fieldchrome-pad'
+                        pad6.setAttribute('aria-hidden', 'true')
+                        pad6.style.display = 'inline-block'
+                        pad6.style.flexShrink = '0'
+                        pad6.style.width = 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-nested-cell-padding-x))'
+                        pad6.style.height = 'var(--exodus-ui-icon-size)'
+                        pad6.style.verticalAlign = 'top'
+                        element.parentNode.insertBefore(pad6, element)
+                    }
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
@@ -1005,7 +1069,7 @@ async function formfunctions_onload() {
             }
 
             //add button before element for link (or after if right justified)
-            if (element.getAttribute('exoduslink')) {
+            if (linkExpr) {
                 if (typeof element.getAttribute('exoduslink') != 'string') {
                     systemerror('formfunction_onload', exodusquote(fieldname) + ' link must be a string')
                 }
@@ -1017,14 +1081,41 @@ async function formfunctions_onload() {
                     var element2 = exodus_create_icon_element(glinkimage)
                     //add the button right after the field
 
-                    // F6 wrap: same as F7 — hug content, no width 100% line break after labels.
+                    // F6 wrap: same hug vs fill rule as F7.
+                    var wrapFill6 = (element.tagName == 'SPAN'
+                        && element.getAttribute('exodustype') == 'F'
+                        && element.getAttribute('exodusalign') == 'T'
+                        && element.getAttribute('exoduslowercase') !== 'false')
                     var nowrapper = document.createElement('span')
-                    if (element.getAttribute('exodusalign') != 'T')
-                        nowrapper.style.whiteSpace = 'noWrap'
+                    nowrapper.style.display = wrapFill6 ? 'flex' : 'inline-flex'
+                    if (wrapFill6) {
+                        nowrapper.style.width = '100%'
+                        nowrapper.style.maxWidth = '100%'
+                    }
+                    nowrapper.style.alignItems = 'flex-start'
                     element = element.parentNode.replaceChild(nowrapper, element)
                     nowrapper.insertBefore(element, null)
                     nowrapper.insertBefore(element2, null)
                     element.parentNode.insertBefore(element2, element)
+                    if (wrapFill6) {
+                        element.style.flex = '1 1 auto'
+                        element.style.width = 'auto'
+                        element.style.minWidth = '0'
+                    }
+                    element2.style.flexShrink = '0'
+
+                    // di.popup='' → pad F7 slot before link (e.g. DATELIST)
+                    if (padPopup) {
+                        var pad7 = document.createElement('span')
+                        pad7.className = 'exodus-fieldchrome-pad'
+                        pad7.setAttribute('aria-hidden', 'true')
+                        pad7.style.display = 'inline-block'
+                        pad7.style.flexShrink = '0'
+                        pad7.style.width = 'var(--exodus-ui-icon-size)'
+                        pad7.style.height = 'var(--exodus-ui-icon-size)'
+                        pad7.style.verticalAlign = 'top'
+                        element.parentNode.insertBefore(pad7, element2)
+                    }
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
@@ -1033,6 +1124,38 @@ async function formfunctions_onload() {
                     //addeventlistener(element2,'click','exoduslink')
                     element2.setAttribute('isexoduslink', '1')
 
+                }
+            }
+
+            // Pad-only (di.popup='' and/or di.link='' with no real F7/F6):
+            //   popup only → one F7 slot (e.g. PERIOD under calendar date)
+            //   both → F7+F6 slots so name lines up under code with find+link
+            //     (F6 pad includes icon→field gap that CSS puts after a real F6).
+            if ((padPopup || padLink) && !popupExpr && !linkExpr) {
+                if (padPopup) {
+                    var padOnly7 = document.createElement('span')
+                    padOnly7.className = 'exodus-fieldchrome-pad'
+                    padOnly7.setAttribute('aria-hidden', 'true')
+                    padOnly7.style.display = 'inline-block'
+                    padOnly7.style.flexShrink = '0'
+                    padOnly7.style.width = 'var(--exodus-ui-icon-size)'
+                    padOnly7.style.height = 'var(--exodus-ui-icon-size)'
+                    padOnly7.style.verticalAlign = 'middle'
+                    element.parentNode.insertBefore(padOnly7, element)
+                }
+                if (padLink) {
+                    var padOnly6 = document.createElement('span')
+                    padOnly6.className = 'exodus-fieldchrome-pad'
+                    padOnly6.setAttribute('aria-hidden', 'true')
+                    padOnly6.style.display = 'inline-block'
+                    padOnly6.style.flexShrink = '0'
+                    // match F6 icon + margin after last chrome icon → field
+                    padOnly6.style.width = padPopup
+                        ? 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-cell-padding-x))'
+                        : 'var(--exodus-ui-icon-size)'
+                    padOnly6.style.height = 'var(--exodus-ui-icon-size)'
+                    padOnly6.style.verticalAlign = 'middle'
+                    element.parentNode.insertBefore(padOnly6, element)
                 }
             }
 
@@ -1046,6 +1169,12 @@ async function formfunctions_onload() {
             //use the data field name as the id and name of the element
             //NB the name appears to be lost on databinding table rows
             element.id = fieldname
+
+            // Type S display next to a code with F7/F6: glue into prior chrome wrap
+            // unless a <br> (or other real content) deliberately separates them.
+            // e.g. MARKET_CODE + MARKET_NAME; Brand uses <br> so stays stacked.
+            if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S')
+                form_glue_name_to_prev_code_chrome(element)
 
             // conversion "color": text + swatch after id is set (swatch id = field_swatch)
             if (element.getAttribute('data-exodus-color-pending') == '1') {
@@ -1819,9 +1948,12 @@ async function formfunctions_onload() {
             if (exodusenabledandvisible(gKeyNodes[keyn])) {
                 //count the number of visible keys
                 nvisiblekeys++
-                //remember the first visible popupfunction
-                if (!popupfunction)
-                    popupfunction = gKeyNodes[keyn].getAttribute('exoduspopup')
+                //remember the first visible non-empty popupfunction ("" is pad-only)
+                if (!popupfunction) {
+                    var keypop = gKeyNodes[keyn].getAttribute('exoduspopup') || ''
+                    if (keypop)
+                        popupfunction = keypop
+                }
             }
         }
         //if no openfunction and only one visible key with a popup function
@@ -10983,6 +11115,13 @@ function copydictitem(dictitem, element) {
             //store false as "" otherwise since attributes are stored as strings it becomes "false"
             //which does not evaluate to false — still must setAttribute (was only in else).
             var value = dictitem[propertyname]
+            // popup/link: false/null = suppress (no icon, no pad) — attribute must be absent.
+            // '' = pad request (hasAttribute + empty). non-empty = real F7/F6.
+            if ((propertyname == 'popup' || propertyname == 'link')
+                && (value === false || value === null)) {
+                element.removeAttribute(attr)
+                continue
+            }
             if (value === false || value === null)
                 value = ''
             element.setAttribute(attr, value)
