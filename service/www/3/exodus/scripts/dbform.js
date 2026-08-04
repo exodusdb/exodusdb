@@ -14,21 +14,20 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //   INCLUDE  INPUT type text/password (and blank type) with exoduslength, size!=1
 //            pure DATE: always (sample '11/11/1111'), length optional
 //   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA; SELECT
-//   EXCLUDE  MV NUMBER (groupno>0): fill cell, nowrap, free expand — no fixed lock
+//   EXCLUDE  NUMBER / bare align-R amounts — become SPAN like codes (see paint)
 //
 // Paint width = sample measured in the field's computed font (after class/font).
-// content-box width = minWidth = maxWidth (except MV numbers).
+// content-box width = minWidth = maxWidth.
 // HTML size = length only (table preferred-width hint); never size+2; never size
 // as the painted width.
 //
 // Sample / glyph choice (first match wins)
-//   MV NUMBER — fill cell + nowrap + right (like code hug/expand, not free-text fold)
 //   pure DATE — measure "11/11/1111" (not length×digit; slashes are narrower)
-//   "8"  digit-ish — header NUMBER / PERIOD / TIME / DATE_TIME / other *DATE*
+//   "8"  digit-ish — PERIOD / TIME / DATE_TIME (NUMBER is SPAN now)
 //   "0"  average  — exoduslowercase is set and not "false"
 //   "M"  max char — codes, keys, uppercase text
 // =============================================================================
-var gform_input_width_digitconv = /^\[(DATE_TIME|NUMBER|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD|TIME)/
+var gform_input_width_digitconv = /^\[(DATE_TIME|PERIOD|YEAR_?PERIOD|FINANCIAL_PERIOD|YEARPERIOD|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
 var gform_input_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
 var gform_input_width_cache = {}
@@ -47,25 +46,33 @@ function form_input_is_pure_date(element) {
     return false
 }
 
-function form_input_is_mv_number(element) {
-    if (Number(element.getAttribute('exogroupno')) <= 0)
+// Number / amount as cell text host (same SPAN path as codes), not fixed INPUT box.
+// [NUMBER…] or bare align R with no conversion (journals MAIN_AMOUNT).
+function form_dictitem_is_number_text(dictitem) {
+    if (!dictitem)
         return false
-    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
     if (conv.indexOf('[NUMBER') === 0)
         return true
-    // Line amounts often set align R without conversion (journals MAIN_AMOUNT,
-    // OTHER_AMOUNT) — dict_number stamps [NUMBER]; bare di.align='R' does not.
-    if (!conv) {
-        var al = (element.getAttribute('exodusalign') || '').toUpperCase()
-        if (al.indexOf('R') === 0)
-            return true
-    }
+    var al = String(dictitem.align || '').toUpperCase()
+    if (al.indexOf('R') === 0 && !conv)
+        return true
     return false
+}
+
+// INPUT → SPAN: free-text/codes (align T) or numbers (dict_code-style content host).
+function form_dictitem_wants_text_span(dictitem) {
+    if (!dictitem)
+        return false
+    var al = String(dictitem.align || '').toUpperCase()
+    if (al.indexOf('T') === 0)
+        return true
+    return form_dictitem_is_number_text(dictitem)
 }
 
 function form_input_width_char(element) {
     var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
-    // Pure DATE / MV NUMBER handled separately in form_apply
+    // Pure DATE handled by form_apply via sample string — not length×glyph
     if (gform_input_width_digitconv.test(conv))
         return '8'
     if (gform_input_width_dateconv.test(conv))
@@ -86,28 +93,6 @@ function form_apply_input_field_width(element) {
         return
     if (element.size == 1)
         return
-    // Line-grid numbers: content-sized like codes (nowrap, expand with value), right.
-    // INPUT min-content does NOT track the typed value (unlike SPAN codes) — need
-    // field-sizing:content. width:100% only filled a fixed cell so looked unchanged.
-    // Header numbers keep fixed digit paint.
-    if (form_input_is_mv_number(element)) {
-        element.style.boxSizing = 'content-box'
-        try {
-            element.style.fieldSizing = 'content'
-        } catch (e) { }
-        element.style.width = 'auto'
-        element.style.minWidth = ''
-        element.style.maxWidth = 'none'
-        element.style.whiteSpace = 'nowrap'
-        if (!element.style.textAlign)
-            element.style.textAlign = 'right'
-        try {
-            element.removeAttribute('size')
-        } catch (e2) {
-            element.size = 1
-        }
-        return
-    }
     var pureDate = form_input_is_pure_date(element)
     var n = parseInt(element.getAttribute('exoduslength'), 10)
     if (!pureDate && !(n > 0))
@@ -724,8 +709,11 @@ async function formfunctions_onload() {
             //dictionary modifications
             //none - currently done in dictrec builder
 
-            //convert long text input to spans so that it can flow (if length not defined)
-            if (element.tagName == 'INPUT' && dictitem.align == 'T') {
+            // INPUT → SPAN for cell text hosts (not fixed control boxes):
+            //   align T — free text / codes (dict_code)
+            //   numbers — [NUMBER] or bare align R (same content sizing as codes)
+            // Dates/periods/times stay INPUT (sample/digit paint).
+            if (element.tagName == 'INPUT' && form_dictitem_wants_text_span(dictitem)) {
 
                 //replace original element
                 var newspan = document.createElement('span')
@@ -983,10 +971,11 @@ async function formfunctions_onload() {
 
             }
 
-            // Align-T SPAN white-space from source dictitem (same as align == 'T' above).
-            // lowercase false → codes, nowrap. true/missing → free text, pre-wrap fold.
+            // SPAN white-space: codes (lowercase false) and numbers → nowrap.
+            // Free text (align T, not code) → pre-wrap fold.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 var noFold = (dictitem.lowercase === false)
+                    || form_dictitem_is_number_text(dictitem)
                 try {
                     if (noFold) {
                         element.style.whiteSpace = 'nowrap'
