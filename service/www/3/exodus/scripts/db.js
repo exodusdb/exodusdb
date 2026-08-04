@@ -433,17 +433,16 @@ function exodus_dict_textarea(di, nrows, length) {
  di.exostyle = 'text'
 }
 
-// Align T uppercase codes (nowrap, no fold). Own axes — does not call dict_text.
-// length arg → preferred min host (paint min-width). Omitted → clear length.
-// Call sites that want a floor pass length explicitly.
+// Align T uppercase codes (nowrap, no fold). Own style axes only.
+// Does not touch di.length — callers set length before/after if they want a min host.
+// Optional length arg still accepted for call sites that pass it (sets length).
 function exodus_dict_code(di, length) {
 
  exodusassertobject(di, 'exodus_dict_code', 'di')
  di.align = 'T'
  if (typeof length != 'undefined')
   di.length = length
- else
-  di.length = ''
+ // else leave di.length as-is (preexisting or unset)
  di.rows = 1
  di.lowercase = false
  di.exostyle = 'code'
