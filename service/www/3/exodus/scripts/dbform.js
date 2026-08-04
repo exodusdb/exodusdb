@@ -2148,9 +2148,9 @@ async function formfunctions_onload() {
             gro.defaultrevstr = gparameters.defaultrevstr
 
         // Framework open prefill (this flight only):
-        // 1) cleardoc — empty load, then gparameters keys that match dict fields via setx
-        // 2) filldefaults — dict defaultvalue into empty required cells
-        // 3) calcfields / updatedisplay
+        // 1) cleardoc — empty load (full calcfields once), gparameters setx, form_postdisplay
+        // 2) filldefaults — cell.text only + mark exodusdependents into gdependents
+        // 3) limited calcfields(gdependents) then updatedisplay (not a second full calc)
         // That sequence is complete when the awaits below return. We do not detect
         // later custom work (e.g. leave-field validation that expands SCHEDULE_NO);
         // that is outside this open path. Same idea as settouched(false) after
@@ -2160,7 +2160,10 @@ async function formfunctions_onload() {
         await validateall('filldefaults')
 
         grecn = null
-        await calcfields()
+        // Only fields marked by setx (gparameters) or filldefaults dependents.
+        // Full calc already ran in cleardoc via gds_onreadystatechange.
+        await calcfields(gdependents)
+        gdependents = []
         await updatedisplay()
 
         // Unbound save stays enabled (settouched: savebuttonactive || !gKeyNodes).
@@ -6711,6 +6714,16 @@ async function validateall(mode) {
                     gdefault = await getdefault(element)
                     if (gdefault != null && gdefault != '') {
                         cell.text = gdefault
+                        // Mark dependents only (no setx/paint) — same list as setx2/validateupdate.
+                        // Unbound open uses calcfields(gdependents) instead of a second full calc.
+                        var deps = element.getAttribute('exodusdependents')
+                        if (deps) {
+                            deps = deps.split(';')
+                            for (var depn = 0; depn < deps.length; depn++) {
+                                if (!gdependents.exoduslocate(deps[depn]))
+                                    gdependents[gdependents.length] = deps[depn]
+                            }
+                        }
                         anydata = true
                         continue
                     }
