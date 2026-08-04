@@ -945,26 +945,38 @@ async function formfunctions_onload() {
                 }
             }
 
-            //allow for data entry in SPAN elements (unless hidden)
-            // Restored from 9fd7b4fa / 3b4f6495 (semi-working): always fill host cell —
-            // F6/F7 must not switch field to inline-block (that zeroed empty free-text).
-            // Empty free-text: exomaxwidth=30ch for wide-form crush (later addition).
-            if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
-                //buggy and not necessary on msie7
-                //if (!isMSIE) {
-                if (!isMSIE && !element.getAttribute('exodusreadonly')) {
-                    element.style.display = 'block'
-                    element.style.width = '100%'
+            // Free-text soft max — entry and display the same (stop excluding display).
+            // Free-text = align T, not code (lowercase false). Empty length → exomaxwidth 30ch.
+            // Entry F: fill cell. Display (readonly F / type S): same cap, no contenteditable.
+            if (element.tagName == 'SPAN' && element.style.display != 'none'
+                && element.getAttribute('exodusalign') == 'T'
+                && element.getAttribute('exoduslowercase') !== 'false') {
+                var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
+                if (!(freeLen > 0))
+                    freeLen = 0
+                if (!freeLen)
+                    element.setAttribute('exomaxwidth', '30ch')
+                else
+                    element.removeAttribute('exomaxwidth')
+                if (!isMSIE) {
+                    var entryF = (element.getAttribute('exodustype') == 'F'
+                        && !element.getAttribute('exodusreadonly'))
+                    if (entryF) {
+                        element.style.display = 'block'
+                        element.style.width = '100%'
+                    } else {
+                        // display free-text / names — same soft max; keep side-by-side with codes
+                        element.style.display = 'inline-block'
+                        element.style.verticalAlign = 'top'
+                    }
                     element.style.maxWidth = '100%'
                     element.style.minWidth = '0'
                     element.style.boxSizing = 'border-box'
-                    var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
-                    if (!(freeLen > 0) && element.getAttribute('exoduslowercase') !== 'false')
-                        element.setAttribute('exomaxwidth', '30ch')
-                    else
-                        element.removeAttribute('exomaxwidth')
                 }
+            }
 
+            //allow for data entry in SPAN elements (unless hidden)
+            if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
                 if (!(element.getAttribute('exodusreadonly'))) {
                     element.contentEditable = 'true'
                     //element.contentEditable = true

@@ -5992,10 +5992,11 @@ function form_table_set_wide_class(table, wide) {
 }
 
 // Wide only: style max-width from exomaxwidth (e.g. 30ch); narrow restore 100%.
+// All free-text with exomaxwidth — entry and display (not only contenteditable).
 function form_table_apply_freetext_wide_max(table, wide) {
 	if (!table || !table.querySelectorAll)
 		return
-	var spans = table.querySelectorAll('SPAN[contenteditable][exomaxwidth]')
+	var spans = table.querySelectorAll('SPAN[exomaxwidth]')
 	for (var i = 0; i < spans.length; i++) {
 		var sp = spans[i]
 		var mx = sp.getAttribute('exomaxwidth')
@@ -6163,7 +6164,7 @@ function form_table_crush_wants_wide(table, ceiling) {
 		table.style.width = ''
 		var tableW = table.getBoundingClientRect().width || table.offsetWidth || 0
 		if (tableW >= ceiling - 4) {
-			var spans = table.querySelectorAll('SPAN[contenteditable][exomaxwidth]')
+			var spans = table.querySelectorAll('SPAN[exomaxwidth]')
 			var candidates = []
 			var sn
 			for (sn = 0; sn < spans.length; sn++) {
