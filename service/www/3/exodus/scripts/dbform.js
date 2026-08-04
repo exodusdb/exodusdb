@@ -996,6 +996,13 @@ async function formfunctions_onload() {
                 }
             }
 
+            // Number SPANs (form_dictitem_is_number_text): content-sized like codes,
+            // floor so empty amount columns are not zero-width. Expand freely above.
+            if (element.tagName == 'SPAN' && form_dictitem_is_number_text(dictitem)) {
+                element.style.minWidth = '6ch'
+                element.style.maxWidth = 'none'
+            }
+
             // Free-text soft max — entry and display the same (stop excluding display).
             // Free-text = align T, not code (lowercase false). Empty length → exomaxwidth 30ch.
             // Entry F: fill cell. Display (readonly F / type S): same cap, no contenteditable.
