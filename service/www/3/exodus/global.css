@@ -673,6 +673,21 @@ BODY
     border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
     border-radius: 0.3rem;
     cursor: pointer;
+    /* th/td use label italic — buttons must not inherit prompt face */
+    font-style: normal;
+    font-size: var(--exodus-form-data-font-size, 1rem);
+}
+
+/* Keep raised face when disabled (generic input:disabled greys strip button look in DM). */
+.exodusbutton:disabled,
+.exodustab:disabled,
+.graphicbutton:disabled,
+input.exodusbutton:disabled {
+    background-color: var(--exodus-informbutton-bg);
+    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
+    color: var(--exodus-informbutton-color);
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 
 BUTTON
