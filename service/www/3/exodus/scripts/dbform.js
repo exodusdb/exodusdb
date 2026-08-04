@@ -398,6 +398,9 @@ var gformdigitaccesskeys = null
 var gformdigitaccesskey_capture_installed = false
 // Alt+arrows viewport pan — also capture/sync (Gate A modal block undoes scrollBy).
 var gform_scroll_viewport_capture_installed = false
+// Radio/checkbox: focus on mouseup only (not mousedown). Capture/sync outside Gate A.
+var gform_radio_md_target = null
+var gform_radio_mouseup_focus_installed = false
 var gtouched = false//set true in validateupdate exit and delete row (not insert row)
 var gelementthatjustcalledsettouched
 var gallowsavewithoutchanges = false//allows locked records (with keys) to be saved anyway
@@ -876,6 +879,8 @@ async function formfunctions_onload() {
                     //temp+='<span style="white-space: nowrap"><input type='+elementtype+' id='+element.name
                     //must be done to group radio boxes
                     temp += ' name=' + fieldname
+                    // mark for mouseup-focus handler (expanded radios have no other marker)
+                    temp += ' exodustype=F'
                     if (typeof (options[ii][0]) != 'undefined')
                         temp += ' value=' + options[ii][0].toString().exodusquote()
 
@@ -2183,6 +2188,8 @@ async function formfunctions_onload() {
     addeventlistener(document, 'keydown', 'document_onkeydown')
     // Alt+arrows pan: must be capture/sync outside Gate A (see form_ensure_scroll_viewport_capture).
     form_ensure_scroll_viewport_capture()
+    // Radio/checkbox: focus on mouseup only (not mousedown)
+    form_ensure_radio_mouseup_focus()
     //to prevent ctrl+N opening documents in not msie browsers but kills enter key in msie for some reason
     //if (!isMSIE)
     //    addeventlistener(document, 'keypress', 'document_onkeypress')
@@ -4603,6 +4610,53 @@ function form_focus_noscroll(el) {
     } catch (e) {
         try { el.focus() } catch (e2) { }
     }
+}
+
+// Form radio/checkbox: no focus on mousedown — only mouseup on the same control.
+// Mousedown focus runs document_onfocus before mouseup; scroll/layout then moves
+// the page so only focus changes and the click does not commit the value.
+function form_ensure_radio_mouseup_focus() {
+    if (gform_radio_mouseup_focus_installed)
+        return
+    if (typeof document == 'undefined' || !document.addEventListener)
+        return
+    gform_radio_mouseup_focus_installed = true
+    document.addEventListener('mousedown', form_radio_mousedown_nofocus, true)
+    document.addEventListener('mouseup', form_radio_mouseup_focus, true)
+}
+
+function form_radio_is_exodus_toggle(el) {
+    if (!el || (el.type != 'radio' && el.type != 'checkbox') || el.disabled)
+        return false
+    if (el.getAttribute && el.getAttribute('exodustype'))
+        return true
+    var oc = el.getAttribute && el.getAttribute('exodusonclick')
+    return !!(oc && oc.indexOf('onclickradiocheckbox') >= 0)
+}
+
+function form_radio_mousedown_nofocus(event) {
+    if (event.button != 0)
+        return
+    var t = event.target
+    if (!form_radio_is_exodus_toggle(t)) {
+        gform_radio_md_target = null
+        return
+    }
+    gform_radio_md_target = t
+    if (event.preventDefault)
+        event.preventDefault()
+}
+
+function form_radio_mouseup_focus(event) {
+    if (event.button != 0)
+        return
+    var t = event.target
+    var md = gform_radio_md_target
+    gform_radio_md_target = null
+    if (!md || t != md || !form_radio_is_exodus_toggle(t))
+        return
+    if (document.activeElement != t)
+        form_focus_noscroll(t)
 }
 
 /*
