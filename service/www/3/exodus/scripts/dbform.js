@@ -14,7 +14,7 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //   INCLUDE  INPUT type text/password (and blank type) with exoduslength, size!=1
 //            pure DATE: always (sample '11/11/1111'), length optional
 //   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA; SELECT
-//   EXCLUDE  NUMBER / bare align-R amounts — become SPAN like codes (see paint)
+//   EXCLUDE  radio/checkbox/select; [NUMBER…] fields → SPAN (see paint)
 //
 // Paint width = sample measured in the field's computed font (after class/font).
 // content-box width = minWidth = maxWidth.
@@ -22,11 +22,14 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 // as the painted width.
 //
 // Sample / glyph choice (first match wins)
-//   pure DATE — measure "11/11/1111" (not length×digit; slashes are narrower)
+//   pure DATE — measure "11/11/1111"
 //   period   — measure "11/1111" (PERIOD_OF_YEAR / YEAR_PERIOD / FINANCIAL_PERIOD)
-//   "8"  digit-ish — TIME / DATE_TIME (NUMBER is SPAN now)
+//   "8"  digit-ish — TIME / DATE_TIME
 //   "0"  average  — exoduslowercase is set and not "false"
-//   "M"  max char — codes, keys, uppercase text
+//   "M"  max char — other INPUTs
+//
+// Categories from dictitem axes only (align, lowercase, conversion, radio/checkbox).
+// App dict helpers set those axes; this file does not know app modules.
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
@@ -57,27 +60,18 @@ function form_input_is_period(element) {
     return gform_input_width_periodconv.test(conv)
 }
 
-// Number / amount as cell text host (same SPAN path as codes), not fixed INPUT box.
-// [NUMBER…] or bare align R with no conversion (journals MAIN_AMOUNT).
-// Never radio/checkbox — settings ALLORONE/CONVERT use align R + radio and must
-// stay INPUT until radio expand (bare R→SPAN destroyed them → init hang).
+// [NUMBER…] conversion (exodus_dict_number) → content SPAN host, not fixed INPUT.
+// radio/checkbox never (expanded later). Style for codes = align T (dict_code).
 function form_dictitem_is_number_text(dictitem) {
     if (!dictitem)
         return false
     if (dictitem.radio || dictitem.checkbox)
         return false
     var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
-    if (conv.indexOf('[NUMBER') === 0)
-        return true
-    var al = String(dictitem.align || '').toUpperCase()
-    if (al.indexOf('R') === 0 && !conv)
-        return true
-    return false
+    return conv.indexOf('[NUMBER') === 0
 }
 
-// INPUT → SPAN: free-text/codes (align T via dict_text/dict_code) or amounts.
-// Style for account fields = call exodus_dict_code after general_dict_acno — not
-// conversion [ACCOUNT_NO] as a paint category (acno is helper only).
+// INPUT → SPAN: align T (dict_text / dict_code) or [NUMBER…] (dict_number).
 function form_dictitem_wants_text_span(dictitem) {
     if (!dictitem)
         return false
@@ -732,11 +726,8 @@ async function formfunctions_onload() {
             //dictionary modifications
             //none - currently done in dictrec builder
 
-            // INPUT → SPAN for cell text hosts (not fixed control boxes):
-            //   align T — free text / codes (dict_code)
-            //   numbers — [NUMBER] or bare align R (same content sizing as codes)
-            // Dates/periods/times stay INPUT (sample/digit paint).
-            // Only text-like inputs — never radio/checkbox (expanded later).
+            // INPUT → SPAN when dict axes say text host: align T or [NUMBER…].
+            // Dates/periods/times stay INPUT. Never radio/checkbox (expanded later).
             if (element.tagName == 'INPUT'
                 && (!element.type || element.type == 'text' || element.type == 'password')
                 && form_dictitem_wants_text_span(dictitem)) {
@@ -997,8 +988,7 @@ async function formfunctions_onload() {
 
             }
 
-            // SPAN white-space: dict_code (lowercase false) and amount SPANs → nowrap.
-            // Free text (align T, not code) → pre-wrap fold.
+            // SPAN white-space: lowercase false or [NUMBER…] → nowrap; else free-text fold.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 var noFold = (dictitem.lowercase === false)
                     || form_dictitem_is_number_text(dictitem)
@@ -1022,8 +1012,7 @@ async function formfunctions_onload() {
                 }
             }
 
-            // Amount SPANs: content-sized; inline-block so min-width applies; floor 6ch.
-            // dict_code fields get nowrap via lowercase false (no forced 6ch floor).
+            // [NUMBER…] SPANs: inline-block (min-width applies), floor 6ch, expand freely.
             if (element.tagName == 'SPAN' && form_dictitem_is_number_text(dictitem)) {
                 element.style.display = 'inline-block'
                 element.style.minWidth = '6ch'
