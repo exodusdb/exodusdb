@@ -379,10 +379,16 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
  if (typeof maximum=='undefined') maximum=''
  params+=','+minimum+','+maximum
  dicti.conversion='[NUMBER,'+params+']'
- // Amounts right-aligned (header and line). Callers may set di.align after.
- dicti.align = 'R'
- // Style axis for dbform paint. Fields with only [NUMBER…] and no helper still
- // paint as number via form_field_exostyle fallback (conversion).
+ // Style axis for dbform paint (exostyle number). Prefer dict_number over
+ // conversion-only fields so host/width match this helper.
+ // Align: keep preset (forms often set L/R already). If unset: line-grid R,
+ // header/single L. Call after dictrec so di.groupno is set when needed.
+ if (typeof dicti.align == 'undefined' || dicti.align === '' || dicti.align == null) {
+  if (Number(dicti.groupno) > 0)
+   dicti.align = 'R'
+  else
+   dicti.align = 'L'
+ }
  dicti.exostyle = 'number'
 
 }
