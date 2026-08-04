@@ -28,12 +28,26 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //   "0"  average  — exoduslowercase is set and not "false"
 //   "M"  max char — other INPUTs
 //
-// Categories from dictitem axes only (align, lowercase, conversion, radio/checkbox).
-// App dict helpers set those axes; this file does not know app modules.
+// =============================================================================
+// Field style / host (INPUT width + INPUT→SPAN paint below)
+//
+// ONLY Exodus artifacts — never app modules (Neosys/agency/finance field names,
+// product helpers, or “this looks like a client account”).
+//
+// Allowed inputs to style logic:
+//   - dictitem axes set by Exodus helpers in db.js: align, lowercase, conversion,
+//     length, radio, checkbox, type, groupno, … (exodus_dict_text / _code /
+//     _number / _date / _period / … and raw dictrec)
+//   - DOM exodus* attributes copied from those axes (exodusalign, exodusconversion, …)
+//   - Framework tags/types (INPUT/SPAN, type text/radio, form_pop_calendar)
+//
+// App dicts call helpers to set axes. Paint reacts only to the axes. Behaviour
+// helpers (popup/val/typeahead) are not style — if style is wrong, fix the dict
+// (e.g. exodus_dict_code after a behaviour helper), not special cases here.
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
-// PERIOD_OF_YEAR, YEAR_PERIOD, FINANCIAL_PERIOD, YEARPERIOD
+// PERIOD_OF_YEAR, YEAR_PERIOD, FINANCIAL_PERIOD, YEARPERIOD (exodus_dict_period)
 var gform_input_width_periodconv = /\[(PERIOD_OF_YEAR|YEAR_?PERIOD|FINANCIAL_PERIOD)/
 var gform_input_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
 var gform_input_width_cache = {}
@@ -60,8 +74,8 @@ function form_input_is_period(element) {
     return gform_input_width_periodconv.test(conv)
 }
 
-// [NUMBER…] conversion (exodus_dict_number) → content SPAN host, not fixed INPUT.
-// radio/checkbox never (expanded later). Style for codes = align T (dict_code).
+// conversion [NUMBER…] (exodus_dict_number) → content SPAN host, not fixed INPUT.
+// radio/checkbox never (expanded later).
 function form_dictitem_is_number_text(dictitem) {
     if (!dictitem)
         return false
@@ -71,7 +85,7 @@ function form_dictitem_is_number_text(dictitem) {
     return conv.indexOf('[NUMBER') === 0
 }
 
-// INPUT → SPAN: align T (dict_text / dict_code) or [NUMBER…] (dict_number).
+// INPUT → SPAN: align T (exodus_dict_text / _code) or [NUMBER…] (exodus_dict_number).
 function form_dictitem_wants_text_span(dictitem) {
     if (!dictitem)
         return false
