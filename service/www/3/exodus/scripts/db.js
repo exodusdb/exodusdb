@@ -160,9 +160,7 @@ function exodus_dict_year(dicti,from,to,defaultyear) {
  if (!to) to=0
  exodusassertobject(dicti,'exodus_dict_year','dicti')
  dicti.conversion='[NUMBER,0]'
- //dicti.align='R'
- // see exodus_dict_date() why switch to L
- dicti.align='L'
+ dicti.align='R'
  dicti.length=4
  var curryear=exodusdate().exodusoconv('[DATE,YEAR]')
  var years=''
@@ -180,9 +178,7 @@ function exodus_dict_datetimeupdated(di) {
  exodus_dict_datetime(di)
  di.readonly=true
  di.copyable=false
- //di.align='R'
- // see exodus_dict_date() why switch to L
- di.align='L'
+ di.align='R'
  di.lowercase=true
 }
 
@@ -190,9 +186,7 @@ function exodus_dict_datetime(di,params) {
 
  if (!params) params=''
  di.conversion='[DATE_TIME,'+params+']'
- //di.align='R'
- // see exodus_dict_date() why switch to L
- di.align='L'
+ di.align='R'
  di.lowercase=true
 }
 
@@ -262,9 +256,7 @@ function exodus_dict_period(di,mode,otherperiodid,conversion) {
  if (!conversion) conversion=''
  exodusassertobject(di,'exodus_dict_period','di')
  di.conversion='[PERIOD_OF_YEAR]'
- //di.align='R'
- // see exodus_dict_date() why switch to L
- di.align='L'
+ di.align='R'
  di.length=7
  if (di.type=='F') di.validation='await exodus_val_period("'+mode+'","'+otherperiodid+'")'
 }
@@ -274,9 +266,7 @@ function exodus_dict_year_period(di,mode) {
  if (!mode) mode=''
  exodusassertobject(di,'exodus_dict_yearperiod','di')
  di.conversion='[YEAR_PERIOD,'+mode+']'
- //di.align='R'
- // see exodus_dict_date() why switch to L
- di.align='L'
+ di.align='R'
  di.length=7
 }
 
@@ -363,14 +353,8 @@ function exodus_dict_date(dicti,params) {
 
  exodusassertobject(dicti,'exodus_dict_date','dicti')
  dicti.conversion='[DATE,'+params+']'
- //dicti.align='R' causes funny columns data entry (where?)
- //dicti.align='R' //put back so reports.htm shows neatly
- // dbform.js fixed to actaully do align = 'R', previously only did left
- // decided best to preserve the current but technically wrong left alignment
- // as to not disrupt users and in case aligning to right creates some bug
- dicti.align = 'L'
-
-
+ // Right like amounts/columns of fixed date strings. Callers may set di.align after.
+ dicti.align = 'R'
  dicti.length=10
  dicti.popup='await form_pop_calendar()'
  if (!gcalendarscript) gcalendarscript=1
@@ -395,8 +379,7 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
  if (typeof maximum=='undefined') maximum=''
  params+=','+minimum+','+maximum
  dicti.conversion='[NUMBER,'+params+']'
- // Header/single fields: left (same as dates — see exodus_dict_date).
- // Multivalued (groupno > 0, line-grid / exotable): right, like classic amount columns.
+ // Header/single fields: left. Multivalued (groupno > 0, line-grid): right.
  // Call after dictrec so di.groupno is already set. Callers may still set di.align after.
  if (Number(dicti.groupno) > 0)
   dicti.align = 'R'
