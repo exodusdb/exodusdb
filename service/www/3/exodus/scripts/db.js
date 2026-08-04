@@ -391,11 +391,10 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
 }
 
 // Align T free text: contenteditable SPAN, fold at spaces (lowercase true).
-// Paint fills the cell; di.length is a hint not used for free-text paint today.
-// To store length deliberately: pass length here, or set di.length after this call.
-// length omitted → clear di.length (no inherit from dictrec). No default length.
-// Codes: exodus_dict_code. Multi-line: exodus_dict_textarea (separate; does not call this).
-// exostyle "text" — dbform free-text host/width (not code).
+// di.length: used for free-text in wide mode only (empty → soft max 30ch when
+// .exodusform-wide; length set → no soft max). Not a min-width. Omitted → clear.
+// Codes: exodus_dict_code. Multi-line: exodus_dict_textarea (separate).
+// exostyle "text".
 function exodus_dict_text(dicti, length, rows) {
 
  exodusassertobject(dicti, 'exodus_dict_text', 'dicti')

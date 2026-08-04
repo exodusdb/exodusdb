@@ -36,13 +36,16 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // Primary axis: di.exostyle → DOM attribute "exostyle" (copydictitem; not exodusexostyle).
 //   set by style helpers only:
-//     exodus_dict_code     → "code"   (uppercase SPAN; floor 6ch like number — not length)
-//     exodus_dict_text     → "text"   (free-text SPAN, soft max / fill)
+//     exodus_dict_code     → "code"   (uppercase SPAN; floor 6ch)
+//     exodus_dict_text     → "text"   (free-text SPAN; fill + wide soft max)
 //     exodus_dict_textarea → "text"
-//     exodus_dict_number   → "number" (SPAN, floor 6ch)
-// Style helpers do not own length (number and code). Callers may set di.length
-// rarely. Paint classifies once via form_field_exostyle. Fallback when exostyle
-// missing: old axes. Align L/R INPUT: form_apply_input_field_width (length / sample).
+//     exodus_dict_number   → "number" (SPAN; floor 6ch)
+//
+// di.length for SPAN paint:
+//   text   — wide mode only: empty → exomaxwidth 30ch (client applies when
+//            .exodusform-wide); length set → no soft max. Not a min-width.
+//   code / number — unused (floor 6ch either way).
+// Align L/R INPUT: form_apply_input_field_width (length / sample).
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
