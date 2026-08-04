@@ -1009,11 +1009,11 @@ async function formfunctions_onload() {
 
             }
 
-            // SPAN white-space: codes (lowercase false) and numbers → nowrap.
+            // SPAN white-space: codes (lowercase false), numbers, account codes → nowrap.
             // Free text (align T, not code) → pre-wrap fold.
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 var noFold = (dictitem.lowercase === false)
-                    || form_dictitem_is_number_text(dictitem)
+                    || form_dictitem_is_code_span(dictitem)
                 try {
                     if (noFold) {
                         element.style.whiteSpace = 'nowrap'
@@ -1034,10 +1034,9 @@ async function formfunctions_onload() {
                 }
             }
 
-            // Number SPANs (form_dictitem_is_number_text): content-sized like codes.
-            // inline-block required — min-width is ignored on display:inline SPANs.
-            // Floor 6ch so empty amount columns are not zero-width; expand freely above.
-            if (element.tagName == 'SPAN' && form_dictitem_is_number_text(dictitem)) {
+            // Code-like SPANs (amounts, ACCOUNT_NO): content-sized; inline-block so
+            // min-width applies; floor 6ch for empty cells.
+            if (element.tagName == 'SPAN' && form_dictitem_is_code_span(dictitem)) {
                 element.style.display = 'inline-block'
                 element.style.minWidth = '6ch'
                 element.style.maxWidth = 'none'
