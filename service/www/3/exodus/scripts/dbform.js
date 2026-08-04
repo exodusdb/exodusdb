@@ -1124,9 +1124,10 @@ async function formfunctions_onload() {
                     if (entryF) {
                         element.style.display = 'block'
                         element.style.width = '100%'
-                        // Floor so empty hosts in shrink-wrap cells (e.g. search TEXT_XREF)
-                        // do not collapse to zero; freeLen if set, else soft-max default 30ch.
-                        element.style.minWidth = (freeLen > 0 ? freeLen : 30) + 'ch'
+                        // Small floor only (same as code/number 6ch) so empty hosts in
+                        // shrink-wrap cells do not collapse to zero. Do NOT use freeLen
+                        // or 30ch here — length is only for wide soft max (exomaxwidth).
+                        element.style.minWidth = '6ch'
                     } else {
                         // display free-text / names — keep side-by-side with codes
                         element.style.display = 'inline-block'
