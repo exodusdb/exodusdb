@@ -2618,8 +2618,8 @@ async function element_exodussetdropdown(element, request, noautoselection) {
 
 }
 
-// Trace who advances Esc undo baseline (gpreviousvalue). Console: filter "gpreviousvalue".
-// Set false when done diagnosing premature snapshot / Esc-no-revert.
+// Trace Esc undo baseline only when validateupdate commits (not every focus move).
+// Console filter: gpreviousvalue. Off: gform_trace_gprevious = false
 var gform_trace_gprevious = true
 
 function form_trace_gprevious(why, el, oldVal, newVal) {
@@ -2648,16 +2648,12 @@ function form_trace_gprevious(why, el, oldVal, newVal) {
 //or add this function name to the list of functions that dont require yield if converting exodus2 to exodus3
 function setgpreviouselement(element, value) {
 
-    var oldVal = gpreviousvalue
-    var oldEl = gpreviouselement
-
     if (!element) {
         gpreviouselement = null
         gpreviousvalue = ''
         // Clear radio group arrival (left form / no previous field)
         g_radio_arrival_anchor = null
         g_radio_arrival_value = ''
-        form_trace_gprevious('setgpreviouselement(null)', oldEl, oldVal, '')
         return
     }
 
@@ -2676,10 +2672,6 @@ function setgpreviouselement(element, value) {
         gpreviousvalue = getvalue(gpreviouselement)
     } else
         gpreviousvalue = value
-
-    form_trace_gprevious(
-        typeof value == 'undefined' ? 'setgpreviouselement' : 'setgpreviouselement(value)',
-        gpreviouselement, oldVal, gpreviousvalue)
 }
 
 async function newrecordfocus() {
@@ -7545,9 +7537,8 @@ async function onclickradiocheckbox(event) {
         setvalue(gpreviouselement, gpreviousvalue)
         return
     }
-    var _gprev_click = gpreviousvalue
+    // gpreviousvalue already advanced inside validateupdate (traced there)
     gpreviousvalue = getvalue(gpreviouselement)
-    form_trace_gprevious('onclickradiocheckbox', gpreviouselement, _gprev_click, gpreviousvalue)
     if (clickWasUntouched
         && (event.target.type == 'radio' || event.target.type == 'checkbox'))
         gelementthatjustcalledsettouched = event.target
