@@ -2722,16 +2722,20 @@ async function newrecordfocus() {
     //fill in any defaults where possible
     //do this BEFORE setting gpreviouselement as setdefault will overwrite it
     //
-    // Pre-open multipart key (!gloaded, !glocked): parts live in the DOM for getkey().
-    // When focus starts on a later key part (form gstartelement), paint prior key
-    // defaults onto the DOM only (setdefault donotupdate) — no validateupdate/gds.setx yet.
+    // Pre-open multipart key (!gloaded, !glocked), start on a later key part
+    // (e.g. journals gstartelement=JOURNAL_NO): fill prior parts and commit into
+    // gds (setdefault with validateupdate). DOM-only donotupdate broke Open
+    // paths that gds.getx company/type while the screen already showed them.
     if (gKeyNodes && !glocked && !gloaded) {
         for (var kn = 0; kn < gKeyNodes.length; kn++) {
             var keyel = gKeyNodes[kn]
             if (keyel.id == element.id)
                 break
             if (getvalue(keyel) == '')
-                await setdefault(keyel, true)
+                await setdefault(keyel)
+            else if ((await gds.getx(keyel.id)) != getvalue(keyel))
+                // Already on screen (SELECT default etc.) but not yet in gds
+                await gds.setx(keyel, null, getvalue(keyel))
         }
     }
     if (!gKeyNodes || glocked) {
@@ -7805,6 +7809,9 @@ async function checkrequired(elements, element, groupno) {
     //check the given elements with the given group number
     //and prior to the given field for required
     //and try to set default otherwise return false
+    //
+    // Pre-open (!gloaded): only key parts (fieldno 0). Body requireds (Job etc.)
+    // after load. Stops F7/gfields pre-open nags; keeps multipart key fill-in.
 
     grecn = getrecn(element)
 
@@ -7832,6 +7839,10 @@ async function checkrequired(elements, element, groupno) {
 
         //only check input fields
         if (!element2.tagName.match(gdatatagnames))
+            continue
+
+        // Pre-open: only key parts (not JOB_NO etc.)
+        if (!gloaded && element2.getAttribute('exodusfieldno') !== '0')
             continue
 
         //don't check current but continue looking for lower tabindexed fields
