@@ -1685,6 +1685,17 @@ async function formfunctions_onload() {
                     //if (element.getAttribute('exodusnodeleterow')&& !tablex.getAttribute('nodeleterow')) {
                     await maybe_remove_rowbutton('insert')
                     await maybe_remove_rowbutton('delete')
+                    // Both buttons gone: keep lead-in td, hide it (same as build)
+                    if (tablex.getAttribute('noinsertrow') && tablex.getAttribute('nodeleterow')
+                        && !tablex.querySelector('[id^="insertrowbutton"], [id^="deleterowbutton"]')
+                        && tablex.tBodies && tablex.tBodies[0]) {
+                        var brows = tablex.tBodies[0].rows
+                        for (var bri = 0; bri < brows.length; bri++) {
+                            var btd = brows[bri].cells[0]
+                            if (btd && !btd.querySelector('[exodusname], [exodustype], input[name]'))
+                                btd.style.display = 'none'
+                        }
+                    }
 
                 }
                 else {
@@ -1757,10 +1768,12 @@ async function formfunctions_onload() {
                         t2 = '(Ctrl+I or Ctrl+Insert)'
                         t3 = '(Ctrl+D or Ctrl+Delete)'
                     }
+                    var hasIns = !(element.getAttribute('exodusnoinsertrow'))
+                    var hasDel = !(element.getAttribute('exodusnodeleterow'))
                     var t = ''
-                    t += ' <span style="white-space: nowrap">'
+                    t += '<span style="white-space: nowrap">'
                     //if (!(exodusgetattribute(element,'exodusnoinsertrow')))
-                    if (!(element.getAttribute('exodusnoinsertrow'))) {
+                    if (hasIns) {
                         t += exodus_icon_html(ginsertrowimage, null,
                             ' id="insertrowbutton' + groupno + '"'
                             + ' title="Insert a new row here ' + t2 + '"'
@@ -1768,22 +1781,28 @@ async function formfunctions_onload() {
                             + ' style="cursor:pointer;vertical-align:top"')
                     }
                     //if (!(exodusgetattribute(element,'exodusnodeleterow')))
-                    if (!(element.getAttribute('exodusnodeleterow'))) {
+                    if (hasDel) {
                         t += exodus_icon_html(gdeleterowimage, null,
                             ' id="deleterowbutton' + groupno + '"'
                             + ' title="Delete this row ' + t3 + '"'
                             + ' exodusonclick="await deleterow_onclick(event)"'
                             + ' style="cursor:pointer;vertical-align:top"')
                     }
-                    t += ' </span>'
+                    t += '</span>'
                     var insertdeletebuttons = document.createElement('td')
                     insertdeletebuttons.innerHTML = t
                     insertdeletebuttons.style.borderRightWidth = '0px'
-                    insertdeletebuttons.style.paddingRight = '3px'
                     // Same shrink as thead chrome col below. Group tables are
                     // width:100% (global.css free-text fold); without 1% this td
                     // absorbs free space → variable width vs F7/F6 in next td.
-                    insertdeletebuttons.width = '1%'
+                    // No buttons: still create the td (clones) but display:none — no residual gap.
+                    if (hasIns || hasDel) {
+                        insertdeletebuttons.style.paddingRight = '3px'
+                        insertdeletebuttons.width = '1%'
+                    }
+                    else {
+                        insertdeletebuttons.style.display = 'none'
+                    }
 
                     //locate the TR element in the parents
                     var trx = getancestor(element, 'tr')
@@ -1795,7 +1814,7 @@ async function formfunctions_onload() {
                     //add page up/down buttons at the first column in the thead and tfoot
                     var pgupdownbuttons = document.createElement('th')
                     pgupdownbuttons.width = '1%'
-                    var t = '&nbsp;'
+                    var t = ''
                     t += '<button id=exogroup' + groupno + 'showall class=exodusbutton'
                     t += ' style=display:none exodusonclick="await form_filter(\'unfilter\',' + groupno + ')"'
                     t += '>Show All</button>'
@@ -1809,6 +1828,10 @@ async function formfunctions_onload() {
                         t += ' size="3"'
                         t += ' tabIndex="-1"'
                         t += ' />'
+                    }
+                    else if (!(hasIns || hasDel)) {
+                        // no ins/del and no filter: hide residual like tbody lead-in
+                        pgupdownbuttons.style.display = 'none'
                     }
 
                     pgupdownbuttons.innerHTML = t
@@ -1844,7 +1867,9 @@ async function formfunctions_onload() {
                         if (tfxr) {
                             var footspacer = document.createElement('td')
                             footspacer.width = '1%'
-                            footspacer.innerHTML = '&nbsp;'
+                            footspacer.innerHTML = ''
+                            if (!(hasIns || hasDel))
+                                footspacer.style.display = 'none'
                             tfxr.insertBefore(footspacer, tfxr.firstChild)
                             footspacer.rowSpan = tfx.rows.length
                         }
@@ -11022,8 +11047,12 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         for (rownn = 0; rownn < hiderowns.length; ++rownn) {
             var rown = hiderowns[rownn]
             grows[rown].style.display = 'none'
-            if (tablexshowall)
+            if (tablexshowall) {
                 tablexshowall.style.display = ''
+                // lead-in th may be display:none when no ins/del — show for Show All
+                if (tablexshowall.parentNode)
+                    tablexshowall.parentNode.style.display = ''
+            }
         }
         //mark last unhidden row as expand image
         for (var rown = 0; rown < lastunhiddenrows.length; ++rown)
