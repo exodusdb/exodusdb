@@ -996,11 +996,14 @@ async function formfunctions_onload() {
                 }
             }
 
-            // Number SPANs (form_dictitem_is_number_text): content-sized like codes,
-            // floor so empty amount columns are not zero-width. Expand freely above.
+            // Number SPANs (form_dictitem_is_number_text): content-sized like codes.
+            // inline-block required — min-width is ignored on display:inline SPANs.
+            // Floor 6ch so empty amount columns are not zero-width; expand freely above.
             if (element.tagName == 'SPAN' && form_dictitem_is_number_text(dictitem)) {
+                element.style.display = 'inline-block'
                 element.style.minWidth = '6ch'
                 element.style.maxWidth = 'none'
+                element.style.boxSizing = 'border-box'
             }
 
             // Free-text soft max — entry and display the same (stop excluding display).
