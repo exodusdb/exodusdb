@@ -2618,9 +2618,38 @@ async function element_exodussetdropdown(element, request, noautoselection) {
 
 }
 
+// Trace who advances Esc undo baseline (gpreviousvalue). Console: filter "gpreviousvalue".
+// Set false when done diagnosing premature snapshot / Esc-no-revert.
+var gform_trace_gprevious = true
+
+function form_trace_gprevious(why, el, oldVal, newVal) {
+    if (!gform_trace_gprevious)
+        return
+    var ev = (typeof gevent != 'undefined' && gevent) ? gevent : null
+    var ae = (typeof document != 'undefined') ? document.activeElement : null
+    function lab(x) {
+        if (!x)
+            return ''
+        return (x.id || '') + (x.tagName ? '/' + x.tagName : '')
+            + (x.type ? '[' + x.type + ']' : '')
+    }
+    console.log('gpreviousvalue', why, {
+        el: lab(el),
+        old: oldVal,
+        'new': newVal,
+        active: lab(ae),
+        eventType: ev ? (ev.type || String(ev)) : '',
+        eventTarget: ev && ev.target ? lab(ev.target) : '',
+        stack: (new Error()).stack
+    })
+}
+
 //be careful this is a sync function without _sync in name so only convert exodus3 to exodus2
 //or add this function name to the list of functions that dont require yield if converting exodus2 to exodus3
 function setgpreviouselement(element, value) {
+
+    var oldVal = gpreviousvalue
+    var oldEl = gpreviouselement
 
     if (!element) {
         gpreviouselement = null
@@ -2628,6 +2657,7 @@ function setgpreviouselement(element, value) {
         // Clear radio group arrival (left form / no previous field)
         g_radio_arrival_anchor = null
         g_radio_arrival_value = ''
+        form_trace_gprevious('setgpreviouselement(null)', oldEl, oldVal, '')
         return
     }
 
@@ -2646,6 +2676,10 @@ function setgpreviouselement(element, value) {
         gpreviousvalue = getvalue(gpreviouselement)
     } else
         gpreviousvalue = value
+
+    form_trace_gprevious(
+        typeof value == 'undefined' ? 'setgpreviouselement' : 'setgpreviouselement(value)',
+        gpreviouselement, oldVal, gpreviousvalue)
 }
 
 async function newrecordfocus() {
@@ -7511,7 +7545,9 @@ async function onclickradiocheckbox(event) {
         setvalue(gpreviouselement, gpreviousvalue)
         return
     }
+    var _gprev_click = gpreviousvalue
     gpreviousvalue = getvalue(gpreviouselement)
+    form_trace_gprevious('onclickradiocheckbox', gpreviouselement, _gprev_click, gpreviousvalue)
     if (clickWasUntouched
         && (event.target.type == 'radio' || event.target.type == 'checkbox'))
         gelementthatjustcalledsettouched = event.target
@@ -7671,7 +7707,10 @@ async function validateupdate() {
     gdependents = []
 
     //why is this necessary?
+    // Advances Esc undo baseline to committed value (same gpreviouselement).
+    var _gprev_before = gpreviousvalue
     gpreviousvalue = getvalue(gpreviouselement)
+    form_trace_gprevious('validateupdate', gpreviouselement, _gprev_before, gpreviousvalue)
 
     //logout('validateupdate - done')
 
