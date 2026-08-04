@@ -208,39 +208,40 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
     margin: 0.125em 4px;
 }
 /*
- * Nested tables that host free-text / fieldstrips fill the form cell.
- * (costs/estimates ITEM_DESCRIPTION grids; Attention/Signatory fieldstrips.)
- * Without this, shrink-wrap + free-text min-width:0 collapses empty entry
- * hosts to ~0 (only F7 icon). Host is capped by form max-width.
- * Explicit width= on markup still wins (:not([width])).
+ * Nested host tables fill the form cell — standard styling, not width= in HTM.
+ * exotable / group lines + fieldstrips (Attention, Signatory, …).
+ * Without fill, shrink-wrap + free-text min-width:0 collapses empty entry hosts.
  */
-TABLE.exodusform > tbody > tr > td > TABLE.exotable:not([width]),
-TABLE.exodusform > tbody > tr > td > TABLE[exogroupno]:not([width]),
-TABLE.exodusform > tbody > tr > td > TABLE.exodus-fieldstrip:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE.exotable:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE.exodus-fieldstrip:not([width]) {
+TABLE.exodusform > tbody > tr > td > TABLE.exotable,
+TABLE.exodusform > tbody > tr > td > TABLE[exogroupno],
+TABLE.exodusform > tbody > tr > td > TABLE.exodus-fieldstrip,
+TABLE.exodusform > tbody > tr > th > TABLE.exotable,
+TABLE.exodusform > tbody > tr > th > TABLE[exogroupno],
+TABLE.exodusform > tbody > tr > th > TABLE.exodus-fieldstrip {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
 }
 
-/* Embedded group/detail tables — flush padding only; host cell stays on the form grid
-   (border-bottom etc.). Do not border:none here — that dropped inner grid lines.
-   max-width + min-width:0 so nested min(max-content, 100%) can resolve against the
-   pane (default min-width:auto keeps the cell at unwrapped text width). */
+/* Host cell: flush padding; min-width 0 so % width can resolve (not max-content). */
 TABLE.exodusform > tbody > tr > td:has(> TABLE[exogroupno]),
 TABLE.exodusform > tbody > tr > td:has(> TABLE.exotable),
+TABLE.exodusform > tbody > tr > td:has(> TABLE.exodus-fieldstrip),
 TABLE.exodusform > tbody > tr > th:has(> TABLE[exogroupno]),
 TABLE.exodusform > tbody > tr > th:has(> TABLE.exotable),
+TABLE.exodusform > tbody > tr > th:has(> TABLE.exodus-fieldstrip),
 TABLE.exodusform > thead > tr > td:has(> TABLE[exogroupno]),
 TABLE.exodusform > thead > tr > td:has(> TABLE.exotable),
+TABLE.exodusform > thead > tr > td:has(> TABLE.exodus-fieldstrip),
 TABLE.exodusform > thead > tr > th:has(> TABLE[exogroupno]),
 TABLE.exodusform > thead > tr > th:has(> TABLE.exotable),
+TABLE.exodusform > thead > tr > th:has(> TABLE.exodus-fieldstrip),
 TABLE.exodusform > tr > td:has(> TABLE[exogroupno]),
 TABLE.exodusform > tr > td:has(> TABLE.exotable),
+TABLE.exodusform > tr > td:has(> TABLE.exodus-fieldstrip),
 TABLE.exodusform > tr > th:has(> TABLE[exogroupno]),
-TABLE.exodusform > tr > th:has(> TABLE.exotable) {
+TABLE.exodusform > tr > th:has(> TABLE.exotable),
+TABLE.exodusform > tr > th:has(> TABLE.exodus-fieldstrip) {
     padding: 0;
     max-width: 100%;
     min-width: 0;
