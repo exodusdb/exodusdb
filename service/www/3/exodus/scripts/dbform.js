@@ -1165,16 +1165,22 @@ async function formfunctions_onload() {
             //   di.popup='' / di.link='' → pad that slot (with real other chrome, or alone)
             //   false/null → suppress (copydictitem: no attribute). Omit → nothing.
             //   never create a clickable icon for empty string.
+            //   conversion SELECT free F7 only when popup slot is not pad (empty di.popup);
+            //   otherwise pad-only would nest a second wrap and detach pads from the SELECT.
             var popupExpr = element.getAttribute('exoduspopup') || ''
             var linkExpr = element.getAttribute('exoduslink') || ''
             // pad only when dict set the property to empty (not when property omitted)
             var padPopup = element.hasAttribute('exoduspopup') && !popupExpr
             var padLink = element.hasAttribute('exoduslink') && !linkExpr
+            // free F7 on SELECT (multivalue discoverability) — not when di.popup='' pad
+            var freeSelectPopup = element.tagName == 'SELECT' && !padPopup
+            var installedRealPopup = false
+            var installedRealLink = false
 
             //add button before element with popups (and selects to make it clear to users that F7 is available - especially since useful when selecting multivalues)
             if (
                 (
-                    element.tagName == 'SELECT'
+                    freeSelectPopup
                     ||
                     popupExpr
                 )
@@ -1191,11 +1197,12 @@ async function formfunctions_onload() {
                     element.tagName == 'SELECT'
                 )
             ) {
-                if (popupExpr || element.tagName == 'SELECT') {
+                if (popupExpr || freeSelectPopup) {
                     //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
 
                     element.style.verticalAlign = 'top'
                     element = form_field_chrome_ensure_wrap(element, dictitem)
+                    installedRealPopup = true
 
                     var element2 = exodus_create_icon_element(
                         fieldname.indexOf('DATE') >= 0 ? gcalendarimage : gfindimage
@@ -1230,6 +1237,7 @@ async function formfunctions_onload() {
 
                     element.style.verticalAlign = 'top'
                     element = form_field_chrome_ensure_wrap(element, dictitem)
+                    installedRealLink = true
 
                     var element2 = exodus_create_icon_element(glinkimage)
                     element.parentNode.insertBefore(element2, element)
@@ -1253,7 +1261,8 @@ async function formfunctions_onload() {
             //   (global.css: nested fieldstrips use nested-cell-padding-x). Include
             //   that gap on the last pad slot only — same as F7+padLink above.
             //   both → F7 icon; F6 icon+gap. one slot → icon+gap.
-            if ((padPopup || padLink) && !popupExpr && !linkExpr) {
+            //   Skip if real F7/F6 already installed (e.g. free SELECT F7 + padLink).
+            if ((padPopup || padLink) && !installedRealPopup && !installedRealLink) {
                 element = form_field_chrome_ensure_wrap(element, dictitem)
                 var iconW = 'var(--exodus-ui-icon-size)'
                 // Same gap as real icon margin in nested tables (costs fieldstrips).
