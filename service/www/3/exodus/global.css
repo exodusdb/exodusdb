@@ -1370,8 +1370,9 @@ input[type=radio] {
     height: var(--exodus-check-size);
     border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
-    margin-right: 5px;
-    margin-bottom: 2px;
+    /* margin-left 0: line up with F7 popup icons in the same TD column (UA default
+       left margin sits radios to the right of chrome above/below). */
+    margin: 0 5px 2px 0;
     /*position: relative;*/
     /*top: 2px;*/
     background-color: var(--bg-color);
@@ -1410,8 +1411,8 @@ input[type=checkbox] {
     height: var(--exodus-check-size);
     border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
     /*transition: 0.1s all linear;*/
-    margin-right: 5px;
-    margin-bottom: 1px;
+    /* Same as radio: no UA left margin so control lines up with F7 chrome column. */
+    margin: 0 5px 1px 0;
     /*position: relative;*/
     /*top: 2px;*/
     background-color: var(--bg-color);
