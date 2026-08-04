@@ -1268,7 +1268,27 @@ async function formfunctions_onload() {
             //   popup only → one F7 slot (e.g. PERIOD under calendar date)
             //   both → F7+F6 slots so name lines up under code with find+link
             //     (F6 pad includes icon→field gap that CSS puts after a real F6).
+            // Wrap pads+field like real F7/F6 (inline-flex / free-text flex) so pads
+            // stay glued to the host — not loose siblings that wrap or float apart.
             if ((padPopup || padLink) && !popupExpr && !linkExpr) {
+                var wrapFillPad = (element.tagName == 'SPAN'
+                    && element.getAttribute('exodustype') == 'F'
+                    && form_field_exostyle(dictitem, element) === 'text')
+                var padWrap = document.createElement('span')
+                padWrap.style.display = wrapFillPad ? 'flex' : 'inline-flex'
+                if (wrapFillPad) {
+                    padWrap.style.width = '100%'
+                    padWrap.style.maxWidth = '100%'
+                }
+                padWrap.style.alignItems = 'flex-start'
+                // replaceChild returns the field; re-parent into padWrap
+                element = element.parentNode.replaceChild(padWrap, element)
+                padWrap.insertBefore(element, null)
+                if (wrapFillPad) {
+                    element.style.flex = '1 1 auto'
+                    element.style.width = 'auto'
+                    element.style.minWidth = '0'
+                }
                 if (padPopup) {
                     var padOnly7 = document.createElement('span')
                     padOnly7.className = 'exodus-fieldchrome-pad'
