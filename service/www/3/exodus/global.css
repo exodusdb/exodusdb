@@ -208,16 +208,16 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
     margin: 0.125em 4px;
 }
 /*
- * Nested host tables fill the form cell — standard styling, not width= in HTM.
- * exotable / group lines + fieldstrips (Attention, Signatory, …).
- * Without fill, shrink-wrap + free-text min-width:0 collapses empty entry hosts.
+ * Nested host tables fill the form cell when HTM has no width=.
+ * HTML width= must win (CSS must not set width when [width] is present).
+ * Without fill (and no width=), shrink-wrap + free-text min-width:0 collapses.
  */
-TABLE.exodusform > tbody > tr > td > TABLE.exotable,
-TABLE.exodusform > tbody > tr > td > TABLE[exogroupno],
-TABLE.exodusform > tbody > tr > td > TABLE.exodus-fieldstrip,
-TABLE.exodusform > tbody > tr > th > TABLE.exotable,
-TABLE.exodusform > tbody > tr > th > TABLE[exogroupno],
-TABLE.exodusform > tbody > tr > th > TABLE.exodus-fieldstrip {
+TABLE.exodusform > tbody > tr > td > TABLE.exotable:not([width]),
+TABLE.exodusform > tbody > tr > td > TABLE[exogroupno]:not([width]),
+TABLE.exodusform > tbody > tr > td > TABLE.exodus-fieldstrip:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE.exotable:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE.exodus-fieldstrip:not([width]) {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
