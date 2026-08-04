@@ -208,16 +208,18 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
     margin: 0.125em 4px;
 }
 /*
- * Embedded line grid (costs/estimates ITEM_DESCRIPTION, journals group lines, …).
- * Attention/header free text sits in a fieldstrip width=100% and folds under the
- * form soft ceiling. Row free text lives in this nested table: max-content alone
- * grows past the screen and never folds. Fill the host cell (host is capped by
- * form max-width calc(100vw-2rem)) so pre-wrap T spans can wrap.
+ * Nested tables that host free-text / fieldstrips fill the form cell.
+ * (costs/estimates ITEM_DESCRIPTION grids; Attention/Signatory fieldstrips.)
+ * Without this, shrink-wrap + free-text min-width:0 collapses empty entry
+ * hosts to ~0 (only F7 icon). Host is capped by form max-width.
+ * Explicit width= on markup still wins (:not([width])).
  */
 TABLE.exodusform > tbody > tr > td > TABLE.exotable:not([width]),
 TABLE.exodusform > tbody > tr > td > TABLE[exogroupno]:not([width]),
+TABLE.exodusform > tbody > tr > td > TABLE.exodus-fieldstrip:not([width]),
 TABLE.exodusform > tbody > tr > th > TABLE.exotable:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]) {
+TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]),
+TABLE.exodusform > tbody > tr > th > TABLE.exodus-fieldstrip:not([width]) {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
