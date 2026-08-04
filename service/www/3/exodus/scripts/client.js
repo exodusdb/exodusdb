@@ -6549,12 +6549,15 @@ var gblockevents
 var gblockevents_hist = []
 var gblockevents_hist_max = 48
 var gblockevents_nonzero_since = 0
+// Continuous raw flight: only (no modal_dialog / db_send / confirm / …).
+// Open→search for minutes then READU must not inherit dialog age as "long flight".
+var gblockevents_raw_flight_since = 0
 var gblockevents_skipped_n = 0
 var gblockevents_heartbeat_id = 0
 var gblockevents_stuck_reported = false
 // Orphan depth (no known holder): alert + force clear after this.
 var gblockevents_orphan_ms = 8000
-// Airborne flight this long: systemerror dump only (do not force-clear).
+// Continuous raw flight this long: systemerror dump only (do not force-clear).
 var gblockevents_flight_warn_ms = 120000
 
 // ---------------------------------------------------------------------------
@@ -6712,10 +6715,12 @@ function exodus_gblockevents_holder() {
 function exodus_gblockevents_dump() {
 	var now = Date.now()
 	var age = gblockevents_nonzero_since ? (now - gblockevents_nonzero_since) : 0
+	var rawAge = gblockevents_raw_flight_since ? (now - gblockevents_raw_flight_since) : 0
 	var lines = []
 	lines.push(
 		'gblockevents=' + (gblockevents || 0)
 		+ ' nonzero_ms=' + age
+		+ ' raw_flight_ms=' + rawAge
 		+ ' skipped_events=' + gblockevents_skipped_n
 		+ ' flow=' + (typeof g_exodus_flow != 'undefined' && g_exodus_flow
 			? ('#' + g_exodus_flow.n + ' ' + g_exodus_flow.location) : 'null')
@@ -6742,6 +6747,7 @@ function exodus_gblockevents_force0(reason) {
 	var was = gblockevents || 0
 	gblockevents = 0
 	gblockevents_nonzero_since = 0
+	gblockevents_raw_flight_since = 0
 	gblockevents_skipped_n = 0
 	gblockevents_stuck_reported = false
 	form_blockevents_hist_push('force0', 0, 'force0', reason || ('was=' + was))
@@ -6753,22 +6759,36 @@ function exodus_gblockevents_force0(reason) {
 function exodus_gblockevents_heartbeat() {
 	if (!gblockevents) {
 		gblockevents_stuck_reported = false
+		gblockevents_raw_flight_since = 0
 		return
 	}
-	var age = gblockevents_nonzero_since ? (Date.now() - gblockevents_nonzero_since) : 0
+	var now = Date.now()
+	var age = gblockevents_nonzero_since ? (now - gblockevents_nonzero_since) : 0
 	var holder = exodus_gblockevents_holder()
+	// Track continuous *raw* flight only. Long Open→search (modal_dialog) then
+	// READU must not use total nonzero_ms (~6 min) as the long-flight clock.
+	if (holder && holder.indexOf('flight:') == 0) {
+		if (!gblockevents_raw_flight_since)
+			gblockevents_raw_flight_since = now
+	} else {
+		gblockevents_raw_flight_since = 0
+		// Legitimate hold: allow a later true hang to report again
+		if (holder)
+			gblockevents_stuck_reported = false
+	}
 	if (holder) {
 		// modal_dialog / modal_child / db_send / confirm / colors / calendar:
-		// legitimate hold — no warn. flight: only when airborne with no known
-		// wait UI (true hang / never lands).
+		// legitimate hold — no warn. flight: only continuous raw flight age.
+		var rawAge = gblockevents_raw_flight_since
+			? (now - gblockevents_raw_flight_since) : 0
 		if (holder.indexOf('flight:') == 0
-			&& age >= gblockevents_flight_warn_ms
+			&& rawAge >= gblockevents_flight_warn_ms
 			&& !gblockevents_stuck_reported) {
 			gblockevents_stuck_reported = true
 			systemerror(
 				'gblockevents long flight',
-				'Gate A airborne ' + age + 'ms under ' + holder
-				+ ' (no auto-reset — dump for bug report):\n'
+				'Gate A raw flight ' + rawAge + 'ms under ' + holder
+				+ ' (nonzero_ms=' + age + '; no auto-reset — dump for bug report):\n'
 				+ exodus_gblockevents_dump()
 			)
 		}
@@ -6811,6 +6831,7 @@ function form_blockevents(truefalse, callinfo) {
 		++gblockevents
 		if (gblockevents == 1) {
 			gblockevents_nonzero_since = Date.now()
+			gblockevents_raw_flight_since = 0
 			gblockevents_skipped_n = 0
 			gblockevents_stuck_reported = false
 		}
@@ -6825,6 +6846,7 @@ function form_blockevents(truefalse, callinfo) {
 		form_blockevents_hist_push('unblock', gblockevents, callername, callinfo)
 		if (gblockevents == 0) {
 			gblockevents_nonzero_since = 0
+			gblockevents_raw_flight_since = 0
 			gblockevents_skipped_n = 0
 			gblockevents_stuck_reported = false
 		}
