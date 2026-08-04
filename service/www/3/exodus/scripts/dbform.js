@@ -75,21 +75,14 @@ function form_dictitem_is_number_text(dictitem) {
     return false
 }
 
-// Account codes (general_dict_acno): [ACCOUNT_NO…] — short keys, not free-text fold.
-function form_dictitem_is_account_code(dictitem) {
-    if (!dictitem || dictitem.radio || dictitem.checkbox)
-        return false
-    var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
-    return conv.indexOf('[ACCOUNT_NO') === 0
-}
-
-// Nowrap content SPAN: amounts, account codes (and dict_code via lowercase false).
+// Nowrap content SPAN floor: amounts only. dict_code style = align T + lowercase false
+// (exodus_dict_code) — do not treat conversion [ACCOUNT_NO] as style; that is
+// general_dict_acno (helper). Call exodus_dict_code after acno for code host.
 function form_dictitem_is_code_span(dictitem) {
     return form_dictitem_is_number_text(dictitem)
-        || form_dictitem_is_account_code(dictitem)
 }
 
-// INPUT → SPAN: free-text/codes (align T), numbers, account codes.
+// INPUT → SPAN: free-text/codes (align T via dict_text/dict_code) or amounts.
 function form_dictitem_wants_text_span(dictitem) {
     if (!dictitem)
         return false
@@ -98,7 +91,7 @@ function form_dictitem_wants_text_span(dictitem) {
     var al = String(dictitem.align || '').toUpperCase()
     if (al.indexOf('T') === 0)
         return true
-    return form_dictitem_is_code_span(dictitem)
+    return form_dictitem_is_number_text(dictitem)
 }
 
 function form_input_width_char(element) {
