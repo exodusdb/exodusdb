@@ -14,16 +14,17 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //   INCLUDE  INPUT type text/password (and blank type) with exoduslength, size!=1
 //            pure DATE: always (sample '11/11/1111'), length optional
 //   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA; SELECT
+//   EXCLUDE  MV NUMBER (groupno>0): fill cell, nowrap, free expand — no fixed lock
 //
 // Paint width = sample measured in the field's computed font (after class/font).
-// content-box width = minWidth = maxWidth.
+// content-box width = minWidth = maxWidth (except MV numbers).
 // HTML size = length only (table preferred-width hint); never size+2; never size
 // as the painted width.
 //
 // Sample / glyph choice (first match wins)
+//   MV NUMBER — fill cell + nowrap + right (like code hug/expand, not free-text fold)
 //   pure DATE — measure "11/11/1111" (not length×digit; slashes are narrower)
-//        [DATE] / [DATE,…] only — not DATE_TIME. Or calendar popup alone.
-//   "8"  digit-ish — NUMBER / PERIOD / TIME / DATE_TIME / other *DATE* convs
+//   "8"  digit-ish — header NUMBER / PERIOD / TIME / DATE_TIME / other *DATE*
 //   "0"  average  — exoduslowercase is set and not "false"
 //   "M"  max char — codes, keys, uppercase text
 // =============================================================================
@@ -46,9 +47,25 @@ function form_input_is_pure_date(element) {
     return false
 }
 
+function form_input_is_mv_number(element) {
+    if (Number(element.getAttribute('exogroupno')) <= 0)
+        return false
+    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    if (conv.indexOf('[NUMBER') === 0)
+        return true
+    // Line amounts often set align R without conversion (journals MAIN_AMOUNT,
+    // OTHER_AMOUNT) — dict_number stamps [NUMBER]; bare di.align='R' does not.
+    if (!conv) {
+        var al = (element.getAttribute('exodusalign') || '').toUpperCase()
+        if (al.indexOf('R') === 0)
+            return true
+    }
+    return false
+}
+
 function form_input_width_char(element) {
     var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
-    // Pure DATE handled by form_apply via sample string — not length×glyph
+    // Pure DATE / MV NUMBER handled separately in form_apply
     if (gform_input_width_digitconv.test(conv))
         return '8'
     if (gform_input_width_dateconv.test(conv))
@@ -69,6 +86,28 @@ function form_apply_input_field_width(element) {
         return
     if (element.size == 1)
         return
+    // Line-grid numbers: content-sized like codes (nowrap, expand with value), right.
+    // INPUT min-content does NOT track the typed value (unlike SPAN codes) — need
+    // field-sizing:content. width:100% only filled a fixed cell so looked unchanged.
+    // Header numbers keep fixed digit paint.
+    if (form_input_is_mv_number(element)) {
+        element.style.boxSizing = 'content-box'
+        try {
+            element.style.fieldSizing = 'content'
+        } catch (e) { }
+        element.style.width = 'auto'
+        element.style.minWidth = ''
+        element.style.maxWidth = 'none'
+        element.style.whiteSpace = 'nowrap'
+        if (!element.style.textAlign)
+            element.style.textAlign = 'right'
+        try {
+            element.removeAttribute('size')
+        } catch (e2) {
+            element.size = 1
+        }
+        return
+    }
     var pureDate = form_input_is_pure_date(element)
     var n = parseInt(element.getAttribute('exoduslength'), 10)
     if (!pureDate && !(n > 0))
