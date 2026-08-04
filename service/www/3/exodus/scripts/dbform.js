@@ -210,7 +210,9 @@ function form_field_chrome_ensure_wrap(element, dictitem) {
     if (wrapFill) {
         element.style.flex = '1 1 auto'
         element.style.width = 'auto'
-        element.style.minWidth = '0'
+        // Keep same small floor as free-text paint (6ch). Zero here collapses empty
+        // FTS/search hosts so typeahead has no anchor (TEXT_XREF).
+        element.style.minWidth = '6ch'
     }
     return element
 }
