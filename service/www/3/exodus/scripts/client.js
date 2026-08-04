@@ -6051,10 +6051,16 @@ function form_record_is_displayed() {
 	return false
 }
 
-// Open bound record → crush; otherwise (cleardoc, unbound, empty) → skeleton.
+// Empty / unbound → skeleton (fixed cols vs soft ceiling).
+// Record open → crush if free-text is crushed; else skeleton so multi-col forms
+// (new journal, empty narrative) do not drop to narrow when crush has no signal.
+// Do not change apply/paint here — only who may request wide.
 function form_table_wants_wide(table, ceiling) {
-	if (form_record_is_displayed())
-		return form_table_crush_wants_wide(table, ceiling)
+	if (form_record_is_displayed()) {
+		if (form_table_crush_wants_wide(table, ceiling))
+			return true
+		return form_table_skeleton_wants_wide(table, ceiling)
+	}
 	return form_table_skeleton_wants_wide(table, ceiling)
 }
 
@@ -6235,15 +6241,18 @@ function form_update_wide_layout(fromResize) {
 	// Fresh exomaxwidth→px cache for this decide
 	gform_wide_exomax_px_cache = {}
 
-	// cleardoc / empty / unbound → skeleton; open bound record → crush.
+	// cleardoc / empty → skeleton; record open → crush || skeleton.
 	for (var i = 0; i < forms.length; i++) {
 		var table = forms[i]
 		if (table.offsetParent === null && table.offsetWidth === 0 && table.offsetHeight === 0)
 			continue
 		var hadWide = form_table_is_wide(table)
 		var wantWide = form_table_wants_wide(table, ceiling)
-		if (wantWide !== hadWide)
+		if (wantWide !== hadWide) {
+			// Filter console: wide | narrow
+			console.log((hadWide ? 'wide' : 'narrow') + ' → ' + (wantWide ? 'wide' : 'narrow'))
 			form_table_set_wide(table, wantWide)
+		}
 	}
 
 	// Snapshot after decide (class may have changed widths)
