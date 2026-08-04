@@ -379,13 +379,10 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
  if (typeof maximum=='undefined') maximum=''
  params+=','+minimum+','+maximum
  dicti.conversion='[NUMBER,'+params+']'
- // Header/single fields: left. Multivalued (groupno > 0, line-grid): right.
- // Call after dictrec so di.groupno is already set. Callers may still set di.align after.
- if (Number(dicti.groupno) > 0)
-  dicti.align = 'R'
- else
-  dicti.align = 'L'
- // Style axis for dbform paint (not inferred from conversion alone once set).
+ // Amounts right-aligned (header and line). Callers may set di.align after.
+ dicti.align = 'R'
+ // Style axis for dbform paint. Fields with only [NUMBER…] and no helper still
+ // paint as number via form_field_exostyle fallback (conversion).
  dicti.exostyle = 'number'
 
 }
@@ -432,10 +429,9 @@ function exodus_dict_textarea(di, nrows, length) {
  di.exostyle = 'text'
 }
 
-// Align T uppercase codes (nowrap, no fold). Style only — same length contract as
-// exodus_dict_number: no length arg, does not set or clear di.length.
-// Callers may set di.length after if they want (rare; same as amounts).
-// Paint: floor like numbers (see dbform code/number SPAN), not length-as-min.
+// Align T uppercase codes (nowrap, no fold). Style only — like dict_number:
+// no length arg, does not set or clear di.length. length unused by paint
+// (floor 6ch same as number). Free-text wide soft-max is text-only.
 function exodus_dict_code(di) {
 
  exodusassertobject(di, 'exodus_dict_code', 'di')
