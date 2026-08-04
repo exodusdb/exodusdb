@@ -187,7 +187,7 @@ async function system_getdepartments(deptoptions) {
 
 async function system_dict_departmentcode(di, many, deptoptions) {
     // Style: uppercase code host (dept ids); preferred length 10
-    exodus_dict_code(di, 10)
+    exodus_dict_code(di)
     if (!many)
         many = false
     if (!deptoptions)

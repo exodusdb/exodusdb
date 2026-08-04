@@ -30,7 +30,7 @@ async function dict_AUTHORISATION(parameters) {
 
     di = dict[++din] = dictrec('KEYS', 'F', 2, '', usersgroupn)
     if (!(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
-    exodus_dict_code(di, 40)
+    exodus_dict_code(di)
     di.validation = 'await user_val_keys()'
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
     di.validcharacters='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ '

@@ -36,15 +36,13 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // Primary axis: di.exostyle → DOM attribute "exostyle" (copydictitem; not exodusexostyle).
 //   set by style helpers only:
-//     exodus_dict_code     → "code"   (uppercase SPAN, min-width from length)
+//     exodus_dict_code     → "code"   (uppercase SPAN; floor 6ch like number — not length)
 //     exodus_dict_text     → "text"   (free-text SPAN, soft max / fill)
 //     exodus_dict_textarea → "text"
 //     exodus_dict_number   → "number" (SPAN, floor 6ch)
-// Paint classifies once via form_field_exostyle; host/width/wrap use that — no
-// re-guess from lowercase/align/conversion on later passes.
-// Fallback when exostyle missing: old axes (align T + lowercase, [NUMBER…]) so
-// raw dicts still paint. Behaviour helpers never set exostyle.
-// Align L/R INPUT fixed width: form_apply_input_field_width (length / date sample).
+// Style helpers do not own length (number and code). Callers may set di.length
+// rarely. Paint classifies once via form_field_exostyle. Fallback when exostyle
+// missing: old axes. Align L/R INPUT: form_apply_input_field_width (length / sample).
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
@@ -1099,21 +1097,14 @@ async function formfunctions_onload() {
                 }
             }
 
-            if (element.tagName == 'SPAN' && fieldStyle === 'number') {
-                // number: floor 6ch, expand freely
+            // code and number: same host width policy (floor 6ch, expand freely).
+            // Length is not min-width here (helpers do not own length; rare callers may set it).
+            if (element.tagName == 'SPAN'
+                && (fieldStyle === 'number' || fieldStyle === 'code')) {
                 element.style.display = 'inline-block'
                 element.style.minWidth = '6ch'
                 element.style.maxWidth = 'none'
                 element.style.boxSizing = 'border-box'
-            } else if (element.tagName == 'SPAN' && fieldStyle === 'code') {
-                // code: min-width from length, expand freely (L INPUT uses form_apply_*)
-                var codeLen = parseInt(element.getAttribute('exoduslength'), 10)
-                if (codeLen > 0) {
-                    element.style.display = 'inline-block'
-                    element.style.minWidth = codeLen + 'ch'
-                    element.style.maxWidth = 'none'
-                    element.style.boxSizing = 'border-box'
-                }
             } else if (element.tagName == 'SPAN' && element.style.display != 'none'
                 && fieldStyle === 'text') {
                 // text: soft max / fill — length is not min-width. Empty length → exomaxwidth 30ch.

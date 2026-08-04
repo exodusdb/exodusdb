@@ -84,10 +84,10 @@
 	<strong>preexisting</strong> <code>di.length</code> is kept (no clear, no
 	default 80). Typical: <code>di.length = 60</code> then
 	<code>exodus_dict_textarea(di, 5)</code>, or pass length as the third arg.</P>
-<H4>exodus_dict_code(dictitem,length)</H4>
-<P>Uppercase code fields (align T, lowercase false — nowrap, no fold).
-	Passes <em>length</em> into <code>exodus_dict_text</code> (default 30) so
-	<code>di.length</code> is set.</P>
+<H4>exodus_dict_code(dictitem)</H4>
+<P>Uppercase code fields (align T, lowercase false, exostyle code). Style only —
+	same length contract as <code>exodus_dict_number</code> (no length arg; does not
+	set or clear <code>di.length</code>). Paint floor matches numbers (6ch).</P>
 
 <p>
     Copyright NEOSYS All Rights Reserved.</p>
