@@ -101,6 +101,14 @@ function form_dictitem_wants_text_span(dictitem) {
     return form_dictitem_is_number_text(dictitem)
 }
 
+// Free-text allows lowercase; codes do not.
+// copydictitem stores boolean false as "" (never the string "false") so empty/missing
+// attribute means uppercase-only (exodus_dict_code). Truthy "true" = free text.
+function form_element_allows_lowercase(element) {
+    var lc = element.getAttribute('exoduslowercase')
+    return !!(lc && lc !== 'false')
+}
+
 function form_input_width_char(element) {
     var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
     // Pure DATE handled by form_apply via sample string — not length×glyph
@@ -1038,10 +1046,10 @@ async function formfunctions_onload() {
                 element.style.boxSizing = 'border-box'
             }
 
-            // Code SPANs (exodus_dict_code → lowercase false): min-width from length, expand freely.
+            // Code SPANs (uppercase-only: empty/false lowercase attr): min-width from length.
             // Align L that stay INPUT already get length via form_apply_input_field_width.
-            // Future: if an exodusstyle "code" axis appears, treat it the same as lowercase false.
-            if (element.tagName == 'SPAN' && dictitem.lowercase === false
+            // Future: if an exodusstyle "code" axis appears, treat it the same as uppercase-only.
+            if (element.tagName == 'SPAN' && !form_element_allows_lowercase(element)
                 && !form_dictitem_is_number_text(dictitem)) {
                 var codeLen = parseInt(element.getAttribute('exoduslength'), 10)
                 if (codeLen > 0) {
@@ -1053,11 +1061,11 @@ async function formfunctions_onload() {
             }
 
             // Free-text soft max — entry and display the same (stop excluding display).
-            // Free-text = align T, not code (lowercase false). Empty length → exomaxwidth 30ch.
+            // Free-text = align T + lowercase allowed (not code). Empty length → exomaxwidth 30ch.
             // Entry F: fill cell. Display (readonly F / type S): same cap, no contenteditable.
             if (element.tagName == 'SPAN' && element.style.display != 'none'
                 && element.getAttribute('exodusalign') == 'T'
-                && element.getAttribute('exoduslowercase') !== 'false') {
+                && form_element_allows_lowercase(element)) {
                 var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
                 if (!(freeLen > 0))
                     freeLen = 0
@@ -1141,10 +1149,11 @@ async function formfunctions_onload() {
                     // F7 wrap: free-text T owns the cell → flex 100%. Codes/INPUTs hug
                     // (inline-flex) so a sibling name SPAN stays on the same line
                     // (e.g. MARKET_CODE + MARKET_NAME). Not inline-block (zeroed empty free-text).
+                    // Codes: empty lowercase attr (copydictitem false→"") — not free-text.
                     var wrapFill = (element.tagName == 'SPAN'
                         && element.getAttribute('exodustype') == 'F'
                         && element.getAttribute('exodusalign') == 'T'
-                        && element.getAttribute('exoduslowercase') !== 'false')
+                        && form_element_allows_lowercase(element))
                     var nowrapper = document.createElement('span')
                     nowrapper.style.display = wrapFill ? 'flex' : 'inline-flex'
                     if (wrapFill) {
@@ -1204,7 +1213,7 @@ async function formfunctions_onload() {
                     var wrapFill6 = (element.tagName == 'SPAN'
                         && element.getAttribute('exodustype') == 'F'
                         && element.getAttribute('exodusalign') == 'T'
-                        && element.getAttribute('exoduslowercase') !== 'false')
+                        && form_element_allows_lowercase(element))
                     var nowrapper = document.createElement('span')
                     nowrapper.style.display = wrapFill6 ? 'flex' : 'inline-flex'
                     if (wrapFill6) {
