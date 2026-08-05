@@ -273,6 +273,30 @@ TABLE.exodusform TABLE.exotable th {
      * encloses the form. Flexible columns (ITEM_DESCRIPTION) get a real width
      * budget and can fold once the form would otherwise exceed the screen.
      * (Clamping the pane itself made wide journals grids stick out of the frame.)
+     *
+     * --- width: (deliberately NOT set here) ---
+     * Non-wide forms use table auto width (UA content sizing under max-width).
+     *
+     * Competing bugs — do not flip-flop without checking BOTH:
+     *
+     *  A) Sibling stretch in a coalesced multi-form pane
+     *     Several TABLE.exodusform in one .exodusformpane: a wide sibling can
+     *     stretch narrower ones if the table stretches with the pane/budget.
+     *     Historical fix (c7f63c62): width:max-content on
+     *     .exodusformpane > TABLE.exodusform:not([width]) so each form hugs
+     *     its own content; HTML width= / style.width still opts into expand.
+     *
+     *  B) Free-text fold / soft-ceiling budget (multi-col line grids)
+     *     Forms that need a real width budget so pre-wrap T fields fold under
+     *     the soft ceiling (journals, costs DESCRIPTION, …). Blanket
+     *     width:max-content on every form fights that path and is easy to
+     *     “fix” configuration-looking wide tables for the wrong reason.
+     *
+     * Wide path (.exodusform-wide below) sets width:max-content on purpose
+     * after form_update_wide_layout() decides the form is extreme-wide.
+     * Restoring (A) for non-wide forms must reintroduce :not([width]) and
+     * prove multi-form panes still OK with free-text crush — not a one-line
+     * “hug again” from a single narrow form looking wide.
      */
     max-width: calc(100vw - 2rem);
 }
@@ -283,6 +307,7 @@ TABLE.exodusform TABLE.exotable th {
  * min-width max-content. Empty-length free-text 30ch is set in JS only when
  * the wide class is applied (form_table_set_wide) — not here, so narrow
  * never inherits a ch cap.
+ * width:max-content here is intentional (see tradeoff note on non-wide forms).
  */
 .exodusformpane > TABLE.exodusform.exodusform-wide {
     max-width: none;
