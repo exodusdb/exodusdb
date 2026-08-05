@@ -79,6 +79,21 @@ async function system_getdatasets(refresh) {
 //users and security
 ////////////////////
 
+// Session cache of USERS rows for typeahead (keyed by sortselect). Like general_typeahead_master.
+var system_typeahead_user_rows = {}
+
+// Same SELECT clauses as system_pop_users (BY RANK + optional filters).
+function system_users_sortselect(withtask, haslocks, sselect) {
+    var sortselect = ' AND WITH ID NOT STARTING "%"'
+    if (sselect)
+        sortselect += ' AND ' + sselect
+    if (withtask)
+        sortselect += ' AND WITH AUTHORISED_' + String(withtask).exodusconvert(' ', '_').toUpperCase()
+    if (typeof haslocks == 'boolean')
+        sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
+    return 'BY RANK ' + sortselect.slice(5)
+}
+
 async function system_dict_usercode(di, many, withtask, haslocks, sselect) {
     if (!many)
         many = false
@@ -97,6 +112,8 @@ async function system_dict_usercode(di, many, withtask, haslocks, sselect) {
     if ("'\"".indexOf(sselect.substr(0, 1)) == -1)
         sselect = '"' + sselect.exodusswap('"', '\\"') + '"'
     di.popup = 'await system_pop_users(' + many + ',"' + withtask + '",' + haslocks + ',' + sselect + ')'
+    // Live typeahead: same filters as F7 (sselect already quoted for the expression)
+    di.onchange = 'await system_typeahead_users("' + withtask + '",' + haslocks + ',' + sselect + ')'
     di.filename = 'USERS'
     di.validation = 'await system_val_users()'
     if (many)
@@ -104,21 +121,46 @@ async function system_dict_usercode(di, many, withtask, haslocks, sselect) {
 }
 
 async function system_pop_users(many, withtask, haslocks, sselect) {
-    var sortselect = ' AND WITH ID NOT STARTING "%"'
-    //currently available "authorisation groups" supported - easy to add any you like in DICT.USERS
-    //AUTHORISED_JOURNAL_POST
-    //AUTHORISED_TIMESHEET_ADMINISTRATION
-    if (sselect)
-        sortselect += ' AND ' + sselect
-    if (withtask)
-        sortselect += ' AND WITH AUTHORISED_' + withtask.exodusconvert(' ', '_').toUpperCase()
-    //users tend not to have locks and departments/group tend to have locks
-    if (typeof haslocks == 'boolean')
-        sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
-    sortselect = 'BY RANK ' + sortselect.slice(5)
+    var sortselect = system_users_sortselect(withtask, haslocks, sselect)
     var selcol0 = 1
 
     return await exodusfilepopup('USERS', [['USER_NAME', 'User Name'], ['USER_CODE', 'User Code'], ['DEPARTMENT_CODE2', 'Department'], ['EMAIL_ADDRESS', 'Email'], ['LAST_LOGIN_DATETIME', 'Last Login Datetime'], ['LAST_LOGIN_LOCATION', 'Last Login Location']], selcol0, sortselect, many)
+}
+
+// Find-as-you-type for USER_CODE. coln 0 = USER_CODE (pick). Session SELECT once per filter set.
+async function system_typeahead_users(withtask, haslocks, sselect) {
+    var key = String(gvalue || '').replace(/^\s+|\s+$/g, '')
+    if (!key) {
+        if (typeof form_typeahead_hide == 'function')
+            form_typeahead_hide()
+        return true
+    }
+    var sortselect = system_users_sortselect(withtask, haslocks, sselect)
+    var cols = [
+        ['USER_CODE', 'User Code'],
+        ['USER_NAME', 'User Name'],
+        ['DEPARTMENT_CODE2', 'Department'],
+        ['EMAIL_ADDRESS', 'Email']
+    ]
+    var colids = []
+    for (var i = 0; i < cols.length; i++)
+        colids[i] = cols[i][0]
+    var cachekey = sortselect + '\t' + colids.join(' ')
+    if (!system_typeahead_user_rows[cachekey]) {
+        var typeahead_limitn = 1000
+        var request = 'CACHE\rSELECT\rUSERS\r' + sortselect + '\r' + colids.join(' ') + '\rXML\r' + typeahead_limitn
+        var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
+        tdb.request = request
+        if (!(await tdb.send()) || !tdb.data)
+            return await exodus_typeahead(null, cols, 0, { rows: [] })
+        system_typeahead_user_rows[cachekey] = (typeof exodus_typeahead_parserows == 'function')
+            ? exodus_typeahead_parserows(tdb.data, colids)
+            : []
+    }
+    return await exodus_typeahead(null, cols, 0, {
+        rows: system_typeahead_user_rows[cachekey],
+        wordstart: true
+    })
 }
 
 async function system_val_users() {
@@ -194,6 +236,8 @@ async function system_dict_departmentcode(di, many, deptoptions) {
         deptoptions = ''
     di.popup = 'await system_pop_department(' + many + ',' + deptoptions.exodusquote() + ')'
     di.validation = 'await system_val_department(' + deptoptions.exodusquote() + ')'
+    // Same dept list as F7 (SECURITY*USERS via system_getdepartments)
+    di.onchange = 'await system_typeahead_department(' + deptoptions.exodusquote() + ')'
 }
 
 async function system_pop_department(many, deptoptions) {
@@ -204,6 +248,27 @@ async function system_pop_department(many, deptoptions) {
     //return await exodusdecide('', gdepartments.split(fm), '', 0, '', many)
     var cols = [[0, 'Department'], [1, 'Name'], [2, 'Users with email']]
     return await exodusdecide('', gdepts, cols, 0, gvalue, many, true)
+}
+
+// Find-as-you-type for department/group codes (emailusers TO_GROUP_CODE, etc.)
+async function system_typeahead_department(deptoptions) {
+    var key = String(gvalue || '').replace(/^\s+|\s+$/g, '')
+    if (!key) {
+        if (typeof form_typeahead_hide == 'function')
+            form_typeahead_hide()
+        return true
+    }
+    var cols = [
+        ['DEPT', 'Department'],
+        ['NAME', 'Name'],
+        ['USERS', 'Users with email']
+    ]
+    if (!(await system_getdepartments(deptoptions)))
+        return await exodus_typeahead(null, cols, 0, { rows: [] })
+    var rows = []
+    for (var i = 0; i < gdepts[0].length; i++)
+        rows.push([gdepts[0][i], gdepts[1][i] || '', gdepts[2][i] || ''])
+    return await exodus_typeahead(null, cols, 0, { rows: rows, wordstart: true })
 }
 
 async function system_val_department(deptoptions) {
