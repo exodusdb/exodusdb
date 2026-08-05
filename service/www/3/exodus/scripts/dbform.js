@@ -15,7 +15,10 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //            pure DATE: always (sample '11/11/1111'), length optional
 //   INCLUDE  SELECT — maxWidth 60ch only (trap stupid long option titles;
 //            does not paint a fixed width from length)
-//   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA
+//   INCLUDE  TEXTAREA — separate paint (not form_apply_input_field_width):
+//            length → min-width Nch (no length → 6ch floor like free-text);
+//            width/max 100% fill cell like entry free-text SPAN. Not fixed cols.
+//   EXCLUDE  radio, checkbox, button, submit, image; SPAN
 //   EXCLUDE  radio/checkbox; [NUMBER…] fields → SPAN (see paint)
 //
 // Paint width = sample measured in the field's computed font (after class/font).
@@ -47,6 +50,7 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //   text   — wide mode only: empty → exomaxwidth 30ch (client applies when
 //            .exodusform-wide); length set → no soft max. Not a min-width.
 //   code / number — unused (floor 6ch either way).
+// di.length for TEXTAREA paint: min-width floor (Nch); fill cell for max.
 // Align L/R INPUT: form_apply_input_field_width (length / sample).
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
@@ -1422,9 +1426,19 @@ async function formfunctions_onload() {
                     }
                     else {
 
-                        // Ordinary paint: length → size → cols; no length → keep HTM cols
-                        if (element.size)
-                            element.cols = element.size
+                        // Ordinary paint: fill cell like free-text entry SPAN;
+                        // length → min-width Nch floor (no length → 6ch anti-collapse).
+                        // Do not drive width with cols (that fixed preferred width and
+                        // held the form). cols=1 is a weak UA hint only.
+                        var taLen = parseInt(element.getAttribute('exoduslength'), 10)
+                        if (!(taLen > 0))
+                            taLen = 0
+                        element.cols = 1
+                        element.style.display = 'block'
+                        element.style.width = '100%'
+                        element.style.maxWidth = '100%'
+                        element.style.boxSizing = 'border-box'
+                        element.style.minWidth = taLen > 0 ? (taLen + 'ch') : '6ch'
                         var exodusrows = element.getAttribute('exodusrows')
                         if (exodusrows && exodusrows > 1)
                             element.rows = exodusrows

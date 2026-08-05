@@ -418,9 +418,10 @@ function exodus_dict_text(dicti, length, rows) {
 }
 
 // Multi-line free text (HTML TEXTAREA). Does NOT call dict_text — different length rule:
-//  - length arg provided → set di.length
+//  - length arg provided → set di.length (dbform: min-width Nch; fill cell for max)
 //  - length omitted → keep preexisting di.length (do not clear, no default 80)
 // nrows default 3. align T, lowercase true if unset. exostyle "text".
+// Unlike free-text SPAN, length is a min-width floor (not only wide soft max).
 function exodus_dict_textarea(di, nrows, length) {
 
  exodusassertobject(di, 'exodus_dict_textarea', 'di')
