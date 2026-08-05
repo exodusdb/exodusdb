@@ -343,13 +343,18 @@ function form_scroll_el_label(el) {
 var gdictfilename
 
 var gparameters
-// Parent args (windowopen / windowopenkey set opener.gwindowopenparameters).
-// Not URL query — keeps the form URL cacheable. Refresh must re-read the same
-// bag as first open; do not null the parent (new opens overwrite the bag).
+// Move input parameters from parent windows (windowopen / windowopenkey).
+// Done via opener.gwindowopenparameters — not ?param= in the URL (keeps URL cacheable).
+// Lifecycle of the bag is owned by the parent (windowopen always replaces it).
+// Child only *reads* on load/refresh — same path either way. Do not null the
+// parent here: that made F5 lose key while opener still existed.
+// (Old one-shot: window.opener.gwindowopenparameters = null after copy.)
 var gwindowopenerparameters = ''
 try {
-    if (window.opener && window.opener.gwindowopenparameters)
+    if (window.opener && window.opener.gwindowopenparameters) {
         gwindowopenerparameters = window.opener.gwindowopenparameters
+        // do not clear opener.gwindowopenparameters — refresh re-reads
+    }
 }
 catch (e) {
 }

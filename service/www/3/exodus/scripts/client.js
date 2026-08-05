@@ -1616,10 +1616,14 @@ async function windowopen(url, parameters, style) {
 	// and this may cause problems for any other relative urls in the page like images
 	url = url.replace(/\\/g, '/')
 
-	//these parameters are picked up by the opened window (from its parent) after it opens
-	//since no way to pass parameters directly to non modal windows except in the URL
-	//and even then the this causes different urls perhaps defeating http caching
-	gwindowopenparameters = parameters
+	// Parent bag for non-modal children (dbform copies into gparameters on load *and*
+	// refresh). Always *replace* the whole bag here — never leave a prior open's
+	// key if this open has none. Child must not null this (see dbform.js).
+	// URL query avoided so the form URL stays cacheable.
+	if (!parameters || typeof parameters != 'object')
+		gwindowopenparameters = {}
+	else
+		gwindowopenparameters = parameters
 	gwindowopenparameters.logincode = glogincode
 	try {
 
