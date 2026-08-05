@@ -367,6 +367,17 @@ TABLE.exodusform td:has(> span[contenteditable]) {
     border-bottom: none;
 }
 
+/*
+ * Group lead-in col 0 (ins/del icons, Show All, filter, residual spacer).
+ * Cells are tagged exogroup_col0 + exogroupN_col0 at bind time.
+ * Residual (no ins/del): table.exogroup_col0_hide hides the whole col via CSS —
+ * filter Show All removes that class so thead/tbody/tfoot stay aligned.
+ */
+TABLE.exogroup_col0_hide > :is(thead, tbody, tfoot) > tr > .exogroup_col0,
+TABLE.exogroup_col0_hide > tr > .exogroup_col0 {
+    display: none;
+}
+
 /* Multirow tables (exogroupno): sticky column headings while scrolling */
 TABLE.exodusform[exogroupno] {
     padding-top: 0;

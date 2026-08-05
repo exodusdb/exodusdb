@@ -1721,26 +1721,12 @@ async function formfunctions_onload() {
                     //if (element.getAttribute('exodusnodeleterow')&& !tablex.getAttribute('nodeleterow')) {
                     await maybe_remove_rowbutton('insert')
                     await maybe_remove_rowbutton('delete')
-                    // Both buttons gone: keep lead-in cells for clone/col align, hide them
-                    // (same as build when first field already has noinsert+nodelete).
-                    // thead + tfoot too — ed6df7e0 only hid tbody; a visible thead
-                    // lead-in th (rowspan) shifts multi-row headers one column.
+                    // Both buttons gone: residual lead-in stays for clone/col align; hide via
+                    // table.exogroup_col0_hide (CSS). Tag cells if build path missed them.
                     if (tablex.getAttribute('noinsertrow') && tablex.getAttribute('nodeleterow')
                         && !tablex.querySelector('[id^="insertrowbutton"], [id^="deleterowbutton"]')) {
-                        if (tablex.tBodies && tablex.tBodies[0]) {
-                            var brows = tablex.tBodies[0].rows
-                            for (var bri = 0; bri < brows.length; bri++) {
-                                var btd = brows[bri].cells[0]
-                                if (btd && !btd.querySelector('[exodusname], [exodustype], input[name]'))
-                                    btd.style.display = 'none'
-                            }
-                        }
-                        var thx0 = tablex.tHead && tablex.tHead.rows[0] && tablex.tHead.rows[0].cells[0]
-                        if (thx0 && !thx0.querySelector('[exodusname], [exodustype], input[name]'))
-                            thx0.style.display = 'none'
-                        var tfx0 = tablex.tFoot && tablex.tFoot.rows[0] && tablex.tFoot.rows[0].cells[0]
-                        if (tfx0 && !tfx0.querySelector('[exodusname], [exodustype], input[name]'))
-                            tfx0.style.display = 'none'
+                        form_group_tag_col0(tablex, groupno)
+                        tablex.classList.add('exogroup_col0_hide')
                     }
 
                 }
@@ -1816,6 +1802,8 @@ async function formfunctions_onload() {
                     }
                     var hasIns = !(element.getAttribute('exodusnoinsertrow'))
                     var hasDel = !(element.getAttribute('exodusnodeleterow'))
+                    // Lead-in col 0: ins/del, Show All, filter. Shared class for CSS hide.
+                    var col0class = 'exogroup_col0 exogroup' + groupno + '_col0'
                     var t = ''
                     t += '<span style="white-space: nowrap">'
                     //if (!(exodusgetattribute(element,'exodusnoinsertrow')))
@@ -1836,19 +1824,16 @@ async function formfunctions_onload() {
                     }
                     t += '</span>'
                     var insertdeletebuttons = document.createElement('td')
+                    insertdeletebuttons.className = col0class
                     insertdeletebuttons.innerHTML = t
                     insertdeletebuttons.style.borderRightWidth = '0px'
                     // Same shrink as thead chrome col below. Group tables are
                     // width:100% (global.css free-text fold); without 1% this td
                     // absorbs free space → variable width vs F7/F6 in next td.
-                    // No buttons: still create the td (clones) but display:none — no residual gap.
-                    if (hasIns || hasDel) {
+                    // No buttons: still create the td (clones); hide via table.exogroup_col0_hide.
+                    insertdeletebuttons.width = '1%'
+                    if (hasIns || hasDel)
                         insertdeletebuttons.style.paddingRight = '3px'
-                        insertdeletebuttons.width = '1%'
-                    }
-                    else {
-                        insertdeletebuttons.style.display = 'none'
-                    }
 
                     //locate the TR element in the parents
                     var trx = getancestor(element, 'tr')
@@ -1859,6 +1844,7 @@ async function formfunctions_onload() {
 
                     //add page up/down buttons at the first column in the thead and tfoot
                     var pgupdownbuttons = document.createElement('th')
+                    pgupdownbuttons.className = col0class
                     pgupdownbuttons.width = '1%'
                     var t = ''
                     t += '<button id=exogroup' + groupno + 'showall class=exodusbutton'
@@ -1874,10 +1860,6 @@ async function formfunctions_onload() {
                         t += ' size="3"'
                         t += ' tabIndex="-1"'
                         t += ' />'
-                    }
-                    else if (!(hasIns || hasDel)) {
-                        // no ins/del and no filter: hide residual like tbody lead-in
-                        pgupdownbuttons.style.display = 'none'
                     }
 
                     pgupdownbuttons.innerHTML = t
@@ -1912,14 +1894,17 @@ async function formfunctions_onload() {
                         var tfxr = tfx.getElementsByTagName('tr')[0]
                         if (tfxr) {
                             var footspacer = document.createElement('td')
+                            footspacer.className = col0class
                             footspacer.width = '1%'
                             footspacer.innerHTML = ''
-                            if (!(hasIns || hasDel))
-                                footspacer.style.display = 'none'
                             tfxr.insertBefore(footspacer, tfxr.firstChild)
                             footspacer.rowSpan = tfx.rows.length
                         }
                     }
+
+                    // Residual col0 (no ins/del): hide all col0 cells via CSS class on table
+                    if (!(hasIns || hasDel))
+                        tablex.classList.add('exogroup_col0_hide')
 
                 }
             }
@@ -11028,6 +11013,46 @@ async function form_onrightclick(event) {
     return true
 }
 
+// Lead-in col 0 cells: class "exogroup_col0 exogroupN_col0". Residual hide is
+// table.exogroup_col0_hide (CSS) — one class toggles thead+tbody+tfoot together.
+function form_group_col0_class(groupno) {
+    return 'exogroup_col0 exogroup' + groupno + '_col0'
+}
+
+function form_group_tag_col0(tablex, groupno) {
+    if (!tablex)
+        return
+    var col0class = form_group_col0_class(groupno)
+    function tag(cell) {
+        if (!cell || cell.querySelector('[exodusname], [exodustype], input[name]'))
+            return
+        if ((' ' + (cell.className || '') + ' ').indexOf(' exogroup_col0 ') >= 0)
+            return
+        cell.className = (cell.className ? cell.className + ' ' : '') + col0class
+    }
+    if (tablex.tBodies && tablex.tBodies[0]) {
+        var brows = tablex.tBodies[0].rows
+        for (var bri = 0; bri < brows.length; bri++)
+            tag(brows[bri].cells[0])
+    }
+    tag(tablex.tHead && tablex.tHead.rows[0] && tablex.tHead.rows[0].cells[0])
+    tag(tablex.tFoot && tablex.tFoot.rows[0] && tablex.tFoot.rows[0].cells[0])
+}
+
+// Residual lead-in only (no ins/del). Show All must reveal all col0 cells at once.
+function form_group_leadin_display(tablex, show) {
+    if (!tablex)
+        return
+    if (!(tablex.getAttribute('noinsertrow') && tablex.getAttribute('nodeleterow')))
+        return
+    if (tablex.querySelector('[id^="insertrowbutton"], [id^="deleterowbutton"]'))
+        return
+    if (show)
+        tablex.classList.remove('exogroup_col0_hide')
+    else
+        tablex.classList.add('exogroup_col0_hide')
+}
+
 // Raw onblur/onfocus from DOM filter input — enter Gate A (form_filter is async).
 // when_idle: these handlers bypass starteventhandler/gblockevents, so a one-shot
 // begin during an open flight would systemerror; wait for land instead.
@@ -11148,6 +11173,8 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         //hide the show all buttons (can be two - in THEAD and TFOOT)
         //tablexshowall.style.display='none'
         showhide('exogroup' + groupno + 'showall', false)
+        // residual lead-in (no ins/del): re-hide thead/tbody/tfoot together
+        form_group_leadin_display(tablex, false)
         if (typeof tablexfilter != 'undefined' && tablexfilter)
             tablexfilter.size = 3
         await calcfields()
@@ -11261,9 +11288,9 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
             grows[rown].style.display = 'none'
             if (tablexshowall) {
                 tablexshowall.style.display = ''
-                // lead-in th may be display:none when no ins/del — show for Show All
-                if (tablexshowall.parentNode)
-                    tablexshowall.parentNode.style.display = ''
+                // residual lead-in (no ins/del): thead was only shown for Show All —
+                // must open tbody/tfoot first cells too or headers shift one column
+                form_group_leadin_display(tablex, true)
             }
         }
         //mark last unhidden row as expand image
