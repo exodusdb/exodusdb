@@ -343,16 +343,13 @@ function form_scroll_el_label(el) {
 var gdictfilename
 
 var gparameters
-//move any input parameters over from parent windows
-//this is done to avoid using ?param=etc in the url which prevents caching
-//and is therefore slower
+// Parent args (windowopen / windowopenkey set opener.gwindowopenparameters).
+// Not URL query — keeps the form URL cacheable. Refresh must re-read the same
+// bag as first open; do not null the parent (new opens overwrite the bag).
 var gwindowopenerparameters = ''
 try {
-    if (window.opener && window.opener.gwindowopenparameters) {
+    if (window.opener && window.opener.gwindowopenparameters)
         gwindowopenerparameters = window.opener.gwindowopenparameters
-        //delete the parameters so that they are only used once
-        window.opener.gwindowopenparameters = null
-    }
 }
 catch (e) {
 }
