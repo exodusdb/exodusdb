@@ -6457,6 +6457,11 @@ function form_typeahead_hide() {
     gform_typeahead_rows = []
     gform_typeahead_focusn = -1
     gform_typeahead_select_all = false
+    gform_typeahead_ctx_menu = false
+    if (gform_typeahead_ctx_timer) {
+        window.clearTimeout(gform_typeahead_ctx_timer)
+        gform_typeahead_ctx_timer = null
+    }
 }
 
 // Free viewport band for typeahead (below sticky menubar).
@@ -6714,8 +6719,11 @@ function form_typeahead_selection_in_list() {
     return !!(div.contains(sel.anchorNode) || div.contains(sel.focusNode))
 }
 
-// Ctrl+A in typeahead: select whole list (incl. scrolled rows). Copy uses gform_typeahead_rows.
+// Ctrl+A / context-menu Select All: select whole list (incl. scrolled). Copy uses gform_typeahead_rows.
 var gform_typeahead_select_all = false
+// After right-click on list/field, watch selectionchange so menu "Select All" re-scopes to the list.
+var gform_typeahead_ctx_menu = false
+var gform_typeahead_ctx_timer = null
 
 function form_typeahead_select_all_list() {
     var div = gform_typeahead_div
@@ -6733,6 +6741,44 @@ function form_typeahead_select_all_list() {
     }
     gform_typeahead_select_all = true
     return true
+}
+
+// Context-menu Select All usually selects the field or the whole page (focus stays on the field).
+// After a right-click on the open list or its field, clamp any non-list selection to the full list.
+function form_typeahead_contextmenu_watch(event) {
+    if (!gform_typeahead_div || gform_typeahead_div.style.display == 'none')
+        return
+    event = getevent(event)
+    var t = event.target
+    if (!t)
+        return
+    var onList = gform_typeahead_div.contains(t)
+    var onField = gform_typeahead_element
+        && (t === gform_typeahead_element || (gform_typeahead_element.contains && gform_typeahead_element.contains(t)))
+    if (!onList && !onField)
+        return
+    gform_typeahead_ctx_menu = true
+    if (gform_typeahead_ctx_timer)
+        window.clearTimeout(gform_typeahead_ctx_timer)
+    gform_typeahead_ctx_timer = window.setTimeout(function () {
+        gform_typeahead_ctx_menu = false
+        gform_typeahead_ctx_timer = null
+    }, 5000)
+}
+
+function form_typeahead_on_selectionchange() {
+    if (!gform_typeahead_ctx_menu)
+        return
+    if (!gform_typeahead_div || gform_typeahead_div.style.display == 'none')
+        return
+    var sel = window.getSelection && window.getSelection()
+    if (!sel || !sel.rangeCount || sel.isCollapsed)
+        return
+    // Already confined to the list (drag-select) — leave alone unless select-all flag needed
+    if (form_typeahead_selection_in_list())
+        return
+    // Select All on field/page → same as Ctrl+A on the list
+    form_typeahead_select_all_list()
 }
 
 // Full list as TSV (headers + every data row in gform_typeahead_rows — not just viewport).
@@ -6933,6 +6979,7 @@ function form_typeahead_keydown(event) {
 
 // Hide when focus leaves the field (unless mousedown on list).
 // Re-focus also drops the panel so a stale list (old INC after INCO) is not shown again.
+// Context-menu Select All: watch selectionchange after right-click on list/field.
 ;(function form_typeahead_blur_install() {
     if (typeof document == 'undefined' || !document.addEventListener)
         return
@@ -6946,6 +6993,8 @@ function form_typeahead_keydown(event) {
         // leave field or return to it — drop panel; typing re-arms search
         form_typeahead_hide()
     }, true)
+    document.addEventListener('contextmenu', form_typeahead_contextmenu_watch, true)
+    document.addEventListener('selectionchange', form_typeahead_on_selectionchange)
 })()
 
 async function form_onchangeselect(event) {
