@@ -1,14 +1,17 @@
 /*
  * Form frame model (keep this simple)
  * -----------------------------------
- * 1. .exodusformpane   — sole outer frame (border, radius, padding). All forms
- *                        are wrapped by exoduswrapformpanes() in client.js.
+ * 1. .exodusformpane   — sole outer frame (border, radius, padding).
  * 2. TABLE.exodusform  — no table border (never competes with the pane).
- * 3. Direct form cells — full lightgrey borders = the internal grid.
- *    Prompt cells are th (face tint: TABLE.exodusform th); data cells stay td.
- *    Sticky group thead has its own richer rules (TABLE[exogroupno] > thead).
- * 4. Outer cell edges  — stripped so only *inner* lines remain (see below).
- * Nested tables / .exotable / [exogroupno] are not this grid.
+ * 3. STANDARD — direct form cells (any section: thead/tbody/tfoot, or bare tr):
+ *    same border + cell padding. Do not special-case a section unless product
+ *    deliberately overrides below.
+ * 4. OVERRIDES (only):
+ *    - outer cell edges stripped (pane is the frame) — first/last col, edge rows
+ *    - nested plain tables — tighter padding
+ *    - prompt th face, sticky group thead, free-text/wide rules, etc.
+ * Nested [exogroupno] / .exotable are not this top-level grid unless they are
+ * themselves TABLE.exodusform.
  *
  * Until html.exodus-panes-ready (set after wrap+coalesce): keep forms out of
  * sight so bare tables / per-form shells never flash before the final pane.
@@ -33,9 +36,9 @@ TABLE.exodusform
     font-style: var(--exodus-form-label-font-style);
 }
 
-/* Internal grid: every direct form cell — thead/tbody/tfoot same unless overridden.
- * (Omitting tfoot was a bug: totals lost padding/border and misaligned with body.) */
-.exodusform > :is(thead, tbody, tfoot) > tr > :is(td, th),
+/* STANDARD — internal grid: every direct form cell (all sections the same) */
+.exodusform > * > tr > td,
+.exodusform > * > tr > th,
 .exodusform > tr > td,
 .exodusform > tr > th {
     border: 1px solid lightgrey;
