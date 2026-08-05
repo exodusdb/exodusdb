@@ -7656,6 +7656,7 @@ function exodusconfirm_scrollpane() {
 
 // Scroll a table row into view below a sticky thead (scrollIntoView nearest
 // can leave the focused radio/row under sticky colheads on wheel/Up/Home).
+// +4px: radio/checkbox focus ring is 3px box-shadow; flush under thead clips it.
 function exodus_scroll_row_below_sticky_thead(tr, scrollpane, thead) {
 	if (!tr || !scrollpane)
 		return
@@ -7666,7 +7667,7 @@ function exodus_scroll_row_below_sticky_thead(tr, scrollpane, thead) {
 	var headH = thead ? thead.offsetHeight : 0
 	var paneRect = scrollpane.getBoundingClientRect()
 	var trRect = tr.getBoundingClientRect()
-	var topLimit = paneRect.top + headH
+	var topLimit = paneRect.top + headH + (headH ? 4 : 0)
 	if (trRect.top < topLimit)
 		scrollpane.scrollTop -= (topLimit - trRect.top)
 	else if (trRect.bottom > paneRect.bottom)

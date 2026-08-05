@@ -1580,12 +1580,18 @@ input[type=checkbox]:focus-visible {
     max-width: 100%;
     margin: 0;
 }
-/* Extra horizontal air in decide dialog columns */
+/* Extra horizontal air in decide dialog columns.
+ * tbody padding-top: radio focus ring is 3px box-shadow; without air it
+ * sits under sticky thead (scroll slack cannot help at scrollTop 0). */
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 th,
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 td {
     padding-left: 0.5em;
     padding-right: 0.5em;
     vertical-align: top;
+}
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 tbody td {
+    padding-top: 4px;
+    padding-bottom: 2px;
 }
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 input[type=radio],
 .exodusconfirmdiv.exodusconfirm_decide #decide_table1 input[type=checkbox] {
