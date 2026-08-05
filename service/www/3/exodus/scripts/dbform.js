@@ -2242,9 +2242,6 @@ async function formfunctions_onload() {
         // document_onpaste already re-invokes form_oninput after single-line paste
     }
 
-    // Wheel over a date field (or its calendar icon) opens the calendar popup
-    form_ensure_date_field_wheel_capture()
-
     //record based forms
     if (gKeyNodes) {
         if (gparameters.key) {
@@ -11069,72 +11066,6 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 }
 
 var calendar_checkInDatePicker
-var gform_date_field_wheel_capture_installed = false
-
-// Wheel over date field / calendar icon → open popup (same path as F7 / icon click).
-// Capture/sync; calendar owns wheel when already open.
-function form_ensure_date_field_wheel_capture() {
-
-    if (gform_date_field_wheel_capture_installed)
-        return
-    if (!document.addEventListener)
-        return
-    gform_date_field_wheel_capture_installed = true
-    document.addEventListener('wheel', form_date_field_wheel_capture, { capture: true, passive: false })
-}
-
-function form_date_field_wheel_capture(event) {
-
-    if (event.ctrlKey || event.metaKey || event.altKey)
-        return
-    // Open calendar handles its own wheel (day grid / month / year)
-    if (typeof calendar_checkInDatePicker != 'undefined' && calendar_checkInDatePicker
-        && calendar_checkInDatePicker._showing)
-        return
-    // Other modal UI (confirm/decide/colours)
-    if (typeof gmodalblockdepth != 'undefined' && gmodalblockdepth > 0)
-        return
-
-    var el = event.target || event.srcElement
-    if (!el)
-        return
-    // Calendar icon → bound field
-    if (el.getAttribute && el.getAttribute('isexoduspopup') == '1' && el.id
-        && el.id.length > 6 && el.id.slice(-6) == '_popup') {
-        var baseid = el.id.slice(0, -6)
-        var field = typeof $$ == 'function' ? $$(baseid) : document.getElementById(baseid)
-        if (field && field[0])
-            field = field[0]
-        if (field)
-            el = field
-    }
-    // Nearest ancestor with form_pop_calendar popup
-    while (el && el != document && el != document.body) {
-        if (el.getAttribute && el.getAttribute('exoduspopup')
-            && String(el.getAttribute('exoduspopup')).indexOf('form_pop_calendar') >= 0)
-            break
-        el = el.parentNode
-    }
-    if (!el || !el.getAttribute
-        || String(el.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') < 0)
-        return
-    if (el.getAttribute('exodusreadonly') || el.disabled)
-        return
-    if (typeof exodusfieldpopupallowed == 'function' && !exodusfieldpopupallowed(el))
-        return
-
-    if (event.preventDefault)
-        event.preventDefault()
-    if (event.stopPropagation)
-        event.stopPropagation()
-
-    // Same entry as icon click / F7 (exoduspopup → form_pop_calendar when idle)
-    if (typeof exodus_begin == 'function' && typeof exoduspopup == 'function') {
-        void exodus_begin(async function form_date_wheel_popup() {
-            await exoduspopup({ target: el }, el)
-        }, 'form_date_wheel_popup')
-    }
-}
 
 async function form_pop_calendar() {
     // Non-modal UI that must outlive this click flight. Opening inside the same
