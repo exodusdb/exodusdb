@@ -362,22 +362,33 @@ var gdictfilename
 var gparameters
 // Move input parameters from parent windows (windowopen / windowopenkey).
 // Done via opener.gwindowopenparameters — not ?param= in the URL (keeps URL cacheable).
-// Lifecycle of the bag is owned by the parent (windowopen always replaces it).
-// Child only *reads* on load/refresh — same path either way. Do not null the
-// parent here: that made F5 lose key while opener still existed.
-// (Old one-shot: window.opener.gwindowopenparameters = null after copy.)
+// Parent owns bag lifecycle (windowopen always replaces). Child does not null the
+// bag so F5 re-reads the same open (a74835d4). Stale keys across forms: only apply
+// when bag._openhtm matches this page basename (journals must not inherit a
+// vouchers key left after windowopenkey).
+// (Pre-a74835d4 one-shot: null after copy — fixed F5 same-form reopen.)
 var gwindowopenerparameters = ''
 try {
     if (window.opener && window.opener.gwindowopenparameters) {
-        gwindowopenerparameters = window.opener.gwindowopenparameters
-        // do not clear opener.gwindowopenparameters — refresh re-reads
+        var bag = window.opener.gwindowopenparameters
+        var here = ''
+        try {
+            here = String(window.location.pathname || '').replace(/\\/g, '/').split('/').pop().toLowerCase()
+        } catch (e2) { }
+        var forhtm = bag._openhtm != null ? String(bag._openhtm).toLowerCase() : ''
+        // Match: stamped bag for this form. Unstamped (legacy): accept once.
+        if (!forhtm || !here || forhtm == here)
+            gwindowopenerparameters = bag
     }
 }
 catch (e) {
 }
 if (gwindowopenerparameters) {
-    for (var paramname in gwindowopenerparameters)
+    for (var paramname in gwindowopenerparameters) {
+        if (paramname == '_openhtm')
+            continue
         gparameters[paramname] = gwindowopenerparameters[paramname]
+    }
 }
 if (gparameters.readonlymode)
     greadonlymode = true

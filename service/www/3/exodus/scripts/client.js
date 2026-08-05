@@ -1622,13 +1622,20 @@ async function windowopen(url, parameters, style) {
 
 	// Parent bag for non-modal children (dbform copies into gparameters on load *and*
 	// refresh). Always *replace* the whole bag here — never leave a prior open's
-	// key if this open has none. Child must not null this (see dbform.js).
+	// key if this open has none. Child must not null this (F5 same form re-reads).
+	// Stamp _openhtm so a bag left for vouchers is not applied to journals (etc.).
 	// URL query avoided so the form URL stays cacheable.
 	if (!parameters || typeof parameters != 'object')
 		gwindowopenparameters = {}
 	else
 		gwindowopenparameters = parameters
 	gwindowopenparameters.logincode = glogincode
+	try {
+		var openpath = String(url || '').replace(/\\/g, '/').split('?')[0]
+		gwindowopenparameters._openhtm = openpath.split('/').pop().toLowerCase()
+	} catch (e) {
+		gwindowopenparameters._openhtm = ''
+	}
 	try {
 
 		var result = window.open(url, '', style)
