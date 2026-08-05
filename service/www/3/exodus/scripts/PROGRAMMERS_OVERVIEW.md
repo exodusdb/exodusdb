@@ -230,6 +230,24 @@ Typical request shapes (same CR separators throughout):
 
 On success `db.send()` is truthy; `db.data` holds the body (often XML for SELECT), `db.response` holds the status/message. Login / logout helpers exist on the dblink object.
 
+### Every `db.send` must have a failure path
+
+**Rule:** no request is success-only. Callers handle `!(await db.send())` (or equivalent): `exodusinvalid`, typeahead miss/hide, `return false`, etc. “This is only typeahead / quiet / background — ignore fail” is a bug.
+
+**Session lost (`Please login`)** is one failure mode handled **inside** dblink for **all** sends (main `db` and typeahead private/`quiet` link) — same path:
+
+1. `send` calls `login()` still inside the send loop; on success the **same request is retried**.
+2. **Resume login as {user}?** (`exodusyesno`, default Yes):
+   - **Yes** — cookie auto-login if remembered, else **modal** `index.html`; then retry.
+   - **No** — full-page `index.html`, return false (async unwind; no `force_an_exit` throw under evaluate). Post-login start is index logic (often `users.htm`), not return-to-form.
+3. Typeahead `quiet` = no modal **shield** per keystroke only — **not** skip reauth or skip handling `!send` after fail.
+
+**Typeahead parallel dblink:** uniquely uses a **private** `exodusdblink` (`form_typeahead_dblink` / `gform_typeahead_db`) so client-side main `db`/`gds` is not blocked by keystroke I/O. It still shares the **same PHP session cookie**. PHP would serialize concurrent requests on that session unless `xhttp.php` releases the lock early (`session_write_close()` before the long `.1` poll for non-LOGIN). So typeahead and main-channel traffic are **queued/interlaced on the server** under one session identity — parallel client channels, not a separate login. Reauth and failure paths stay universal.
+
+**Hard case (one Gate A):** Resume confirm / modal login are interactive UI **nested under** `await db.send` (and often typeahead → evaluate), with automatic retry. Confirm/modal depth and orphan force-cancel looking like No are real risks. Prefer fixing call sites and failure paths over a second gate or silent swallow.
+
+Code: `client.js` — `exodusdblink_login`, both send transports’ `Please login` branches; typeahead `form_typeahead_dblink()`; `xhttp.php` session release.
+
 Cookies are used heavily for dataset, username, globals (`exodusgetcookie2`, `exodussetcookie`).
 
 ## 5. Dictionary-Driven Forms (The Main Pattern)

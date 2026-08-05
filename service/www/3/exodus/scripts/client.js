@@ -2815,6 +2815,10 @@ async function exodusdblink_login(username, password, dataset, system) {
 	var arguments = ['', '', dataset, '', '', '', system]
 	var failed = false
 
+	// Drop typeahead panel before Resume/modal login (DOMUI under onchange)
+	if (typeof form_typeahead_hide == 'function')
+		form_typeahead_hide()
+
 	//maybe relogging after request to relogin (eg expired session on server)
 	if (gusername) {
 		var question = 'Your session has timed out\nor been lost to another login or another computer or browser\nor the server has been restarted.'
@@ -2824,7 +2828,9 @@ async function exodusdblink_login(username, password, dataset, system) {
 		question += '\n\nResume login as ' + gusername + '?'
 		if (!(await exodusyesno(question, 1))) {
 
-			//switch to login window
+			// Refuse resume: leave this form, full login shell (same for all callers,
+			// including typeahead under evaluate — no force_an_exit throw).
+			// Yes path: cookie auto-login or modal index.html, then send retries.
 			exodussettimeout('window.location.assign("../index.html")', 1)
 
 			//try to avoid unlocking on exit
@@ -2835,11 +2841,9 @@ async function exodusdblink_login(username, password, dataset, system) {
 			db.requesting = false
 
 			await exodusinvalid()
-			failed = true
-			//pity there is no way to abort script without generating an error
-			//TODO avoid showing error message in catch clause if switching to index.html
-			force_an_exit___please_ignore_this_message()
-
+			// Async callers (send → typeahead → evaluate) return false cleanly;
+			// page navigation follows. Do not throw undefined force_an_exit___…
+			// (that became System Error under typeahead onchange evaluate).
 			return false
 
 		}
@@ -2999,6 +3003,8 @@ async function exodusdblink_send_byhttp_using_forms(data) {
 			//	glocked=false
 			//	gtouched=false
 			//}
+			// Universal reauth — PROGRAMMERS_OVERVIEW §4 Session lost mid-request
+			// (typeahead quiet: same login(); quiet ≠ skip reauth)
 			if (!(await this.login() )) {
 				this.data = ''
 				this.response = ('ERROR: Please login')
@@ -3392,6 +3398,8 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 				//				var tt=origrequest.slice(0,5)!='LOGIN'?gusername:''
 				//				tt=gusername
 				//alert(origrequest+' gusername='+tt)
+				// Universal reauth — PROGRAMMERS_OVERVIEW §4 Session lost mid-request
+				// (typeahead quiet: same login(); quiet ≠ skip reauth)
 				tt = ''
 				if (!(await this.login(tt) )) {
 					this.data = ''

@@ -204,6 +204,8 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 - **Same gesture:** focus runs *before* the click of that click. Cancelling that click → SELECT focus-only on first press. Allow native SELECT activation through while blocked; still do not start a new flight.
 - **Do not blur+refocus** a control that already holds `document.activeElement` (closes open listboxes). `focuson` / `focuson2` only re-assert when focus was lost.
 
+- **Every `db.send` must have a failure path** (including session/`Please login`). Universal reauth is in dblink; callers still handle `!send`. Typeahead’s private dblink shares the same PHP session cookie (server-side queue/interlace via `session_write_close`). Detail: `PROGRAMMERS_OVERVIEW.md` §4.
+
 ### DOMUI events while a popup is open (strategy)
 
 `#exodusconfirmdiv` and other exclusive UI are **product-owned** for the shell lifetime. Do not re-grow a three-path maze (startevent + document_onkeydown “belt” + div handler all half-implementing Enter).
