@@ -7156,9 +7156,11 @@ async function validateall(mode) {
 
             } //propname in row
 
-            // Trailing blank line after real rows is always ok. Sole empty row is not
-            // (allowemptyrows false / rowrequired: e.g. company table must not pass empty).
-            if (groupno > 0 && !anydata && rown == rows.length - 1 && rows.length > 1)
+            // Empty last group row is always ok (template after real rows, or sole
+            // empty optional group e.g. schedule account share). Required cols apply
+            // only when the row has other data. Sole empty *required* groups use
+            // rowrequired below ("At least one …"), not field-level required.
+            if (groupno > 0 && !anydata && rown == rows.length - 1)
                 missingelement = false
 
             //fail if any missing data
@@ -7186,7 +7188,7 @@ async function validateall(mode) {
 
         } //rows
 
-        //error if not enough rows
+        //error if not enough rows (sole empty template: field required cleared above)
         if
             (
             groupno > 0
