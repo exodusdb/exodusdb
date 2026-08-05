@@ -6456,6 +6456,7 @@ function form_typeahead_hide() {
     gform_typeahead_element = null
     gform_typeahead_rows = []
     gform_typeahead_focusn = -1
+    gform_typeahead_select_all = false
 }
 
 // Free viewport band for typeahead (below sticky menubar).
@@ -6713,6 +6714,78 @@ function form_typeahead_selection_in_list() {
     return !!(div.contains(sel.anchorNode) || div.contains(sel.focusNode))
 }
 
+// Ctrl+A in typeahead: select whole list (incl. scrolled rows). Copy uses gform_typeahead_rows.
+var gform_typeahead_select_all = false
+
+function form_typeahead_select_all_list() {
+    var div = gform_typeahead_div
+    if (!div || div.style.display == 'none')
+        return false
+    var table = div.querySelector('.exodus_typeahead_table')
+    if (!table)
+        return false
+    if (window.getSelection && document.createRange) {
+        var sel = window.getSelection()
+        var range = document.createRange()
+        range.selectNodeContents(table)
+        sel.removeAllRanges()
+        sel.addRange(range)
+    }
+    gform_typeahead_select_all = true
+    return true
+}
+
+// Full list as TSV (headers + every data row in gform_typeahead_rows — not just viewport).
+function form_typeahead_list_tsv() {
+    var lines = []
+    var div = gform_typeahead_div
+    if (div) {
+        var ths = div.querySelectorAll('thead th')
+        if (ths.length) {
+            var h = []
+            for (var i = 0; i < ths.length; i++)
+                h.push(String(ths[i].textContent || '').replace(/\t/g, ' ').replace(/\r?\n/g, ' '))
+            lines.push(h.join('\t'))
+        }
+    }
+    var rows = gform_typeahead_rows || []
+    for (var r = 0; r < rows.length; r++) {
+        var row = rows[r]
+        var cells = []
+        if (row) {
+            var n = (typeof row.length == 'number') ? row.length : 0
+            for (var c = 0; c < n; c++)
+                cells.push(String(row[c] == null ? '' : row[c]).replace(/\t/g, ' ').replace(/\r?\n/g, ' '))
+        }
+        lines.push(cells.join('\t'))
+    }
+    return lines.join('\n')
+}
+
+// Put plain text on clipboard during copy event (same constraints as form_copy_text_field_sync).
+function form_typeahead_copy_text_sync(event, text) {
+    if (text == null || text === '')
+        return false
+    var clip = event.clipboardData || window.clipboardData
+    if (!clip || !clip.setData)
+        return false
+    try {
+        if (window.clipboardData && clip === window.clipboardData)
+            clip.setData('Text', text)
+        else {
+            clip.setData('text/plain', text)
+            clip.setData('text/html', String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\n/g, '<br>\n'))
+        }
+    } catch (e) {
+        return false
+    }
+    return exoduscancelevent(event) || true
+}
+
 function form_typeahead_row_pick(event) {
 
     event = getevent(event)
@@ -6722,6 +6795,7 @@ function form_typeahead_row_pick(event) {
     // Drag-selected list text → leave selection for Ctrl+C / right-click Copy
     if (form_typeahead_selection_in_list())
         return
+    gform_typeahead_select_all = false
     var tr = event.target
     while (tr && tr.tagName != 'TR')
         tr = tr.parentNode
@@ -6799,10 +6873,16 @@ function form_typeahead_keydown(event) {
 
     if (!gform_typeahead_div || gform_typeahead_div.style.display == 'none')
         return null
-    // With modifiers, leave Home/End to form (ctrl+home first row, etc.)
+    var keycode = event.keyCode ? event.keyCode : event.which
+    // Ctrl/Cmd+A: select whole typeahead list (incl. scrolled rows), not the field
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && keycode == 65) {
+        if (form_typeahead_select_all_list())
+            return false
+        return null
+    }
+    // Other modifiers: leave to form/browser (Ctrl+C, ctrl+home, …)
     if (event.ctrlKey || event.altKey || event.metaKey)
         return null
-    var keycode = event.keyCode ? event.keyCode : event.which
     if (keycode == 27) {
         form_typeahead_hide()
         return false
@@ -11440,8 +11520,12 @@ async function document_oncopy(event) {
 
     event = getevent(event)
 
-    // Typeahead list selection → browser default (true = allow; no form intercept).
-    // form_typeahead_keydown already ignores Ctrl so Ctrl+C reaches here.
+    // Typeahead: Ctrl+A then copy → full list TSV (all rows in panel data, not viewport only).
+    // Partial drag-select in list → browser default.
+    if (gform_typeahead_select_all && gform_typeahead_div && gform_typeahead_div.style.display != 'none') {
+        if (form_typeahead_copy_text_sync(event, form_typeahead_list_tsv()))
+            return false
+    }
     if (form_typeahead_selection_in_list())
         return true
 
