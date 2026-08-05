@@ -11569,6 +11569,15 @@ async function document_oncopy(event) {
 
     event = getevent(event)
 
+    // Decide list (F7/popup): same select-all / copy contract as typeahead
+    if (typeof decide_oncopy == 'function') {
+        var decideCopy = decide_oncopy(event)
+        if (decideCopy === true)
+            return true
+        if (decideCopy === false)
+            return false
+    }
+
     // Typeahead: Ctrl+A then copy → full list TSV (all rows in panel data, not viewport only).
     // Partial drag-select in list → browser default.
     if (gform_typeahead_select_all && gform_typeahead_div && gform_typeahead_div.style.display != 'none') {

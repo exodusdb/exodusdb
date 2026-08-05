@@ -1606,6 +1606,12 @@ input[type=checkbox]:focus-visible {
     white-space: normal;
     overflow-wrap: break-word;
 }
+/* Allow drag-select + Ctrl+C / right-click Copy (same as typeahead list) */
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 th,
+.exodusconfirmdiv.exodusconfirm_decide #decide_table1 td {
+    -webkit-user-select: text;
+    user-select: text;
+}
 /* Already in promptcol — slight inset from shared left edge */
 .exodusconfirm_scrollhint_wrap {
     flex: 0 0 auto;

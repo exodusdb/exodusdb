@@ -995,6 +995,10 @@ var gmodalblock_pin = null
 var gmodalblock_capturebound
 // Set while a decide list is open; wheel over options moves selection/focus (classic list).
 var gdecide_onwheel = null
+// Ctrl+A / context-menu Select All → full list selection; copy uses decide_list_tsv().
+var gdecide_select_all = false
+var gdecide_ctx_menu = false
+var gdecide_ctx_timer = null
 
 function modalblock_scrollpane_under(event) {
 
@@ -8854,11 +8858,158 @@ function cancel_backpage_event(event) {
 // so the pale list popup does not sit behind the invalid dialog.
 async function decide_fail_no_options() {
 	gdecide_onwheel = null
+	gdecide_select_all = false
+	gdecide_ctx_menu = false
+	if (gdecide_ctx_timer) {
+		window.clearTimeout(gdecide_ctx_timer)
+		gdecide_ctx_timer = null
+	}
 	var shell = $$('exodusconfirmdiv')
 	if (shell)
 		exodusremovenode(shell)
 	return await exodusinvalid('No records found.')
 }
+
+// --- Decide list select-all / copy (same idea as form typeahead) ---
+
+function decide_is_open() {
+	return !!(document.getElementById('decide_table1'))
+}
+
+function decide_selection_in_list() {
+	var table = document.getElementById('decide_table1')
+	if (!table)
+		return false
+	var sel = window.getSelection && window.getSelection()
+	if (!sel || sel.isCollapsed || !sel.rangeCount)
+		return false
+	return !!(table.contains(sel.anchorNode) || table.contains(sel.focusNode))
+}
+
+function decide_select_all_list() {
+	var table = document.getElementById('decide_table1')
+	if (!table)
+		return false
+	if (window.getSelection && document.createRange) {
+		var sel = window.getSelection()
+		var range = document.createRange()
+		range.selectNodeContents(table)
+		sel.removeAllRanges()
+		sel.addRange(range)
+	}
+	gdecide_select_all = true
+	return true
+}
+
+// Visible option rows only (respect type-filter); all columns including scrolled-off.
+function decide_list_tsv() {
+	var table = document.getElementById('decide_table1')
+	if (!table)
+		return ''
+	var lines = []
+	var ths = table.querySelectorAll('thead th')
+	if (ths.length) {
+		var h = []
+		for (var i = 0; i < ths.length; i++)
+			h.push(String(ths[i].textContent || '').replace(/\t/g, ' ').replace(/\r?\n/g, ' '))
+		lines.push(h.join('\t'))
+	}
+	var trs = table.querySelectorAll('tbody tr[decide_row]')
+	for (var r = 0; r < trs.length; r++) {
+		var tr = trs[r]
+		// Type-filter uses display:none on non-matches
+		if (tr.style && tr.style.display == 'none')
+			continue
+		var tds = tr.cells
+		var cells = []
+		for (var c = 0; c < tds.length; c++)
+			cells.push(String(tds[c].textContent || '').replace(/\t/g, ' ').replace(/\r?\n/g, ' '))
+		lines.push(cells.join('\t'))
+	}
+	return lines.join('\n')
+}
+
+function decide_copy_text_sync(event, text) {
+	if (text == null || text === '')
+		return false
+	var clip = event.clipboardData || window.clipboardData
+	if (!clip || !clip.setData)
+		return false
+	try {
+		if (window.clipboardData && clip === window.clipboardData)
+			clip.setData('Text', text)
+		else {
+			clip.setData('text/plain', text)
+			clip.setData('text/html', String(text)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/\n/g, '<br>\n'))
+		}
+	} catch (e) {
+		return false
+	}
+	if (typeof exoduscancelevent == 'function')
+		return exoduscancelevent(event) || true
+	if (event.preventDefault)
+		event.preventDefault()
+	return true
+}
+
+// Used by dbform document_oncopy and decide capture: null = not us; true = browser; false = handled.
+function decide_oncopy(event) {
+	if (!decide_is_open())
+		return null
+	if (gdecide_select_all) {
+		if (decide_copy_text_sync(event, decide_list_tsv()))
+			return false
+	}
+	if (decide_selection_in_list())
+		return true
+	return null
+}
+
+function decide_contextmenu_watch(event) {
+	if (!decide_is_open())
+		return
+	event = getevent(event)
+	var t = event.target
+	var conf = document.getElementById('exodusconfirmdiv')
+	if (!conf || !t || !(conf.contains(t)))
+		return
+	gdecide_ctx_menu = true
+	if (gdecide_ctx_timer)
+		window.clearTimeout(gdecide_ctx_timer)
+	gdecide_ctx_timer = window.setTimeout(function () {
+		gdecide_ctx_menu = false
+		gdecide_ctx_timer = null
+	}, 5000)
+}
+
+function decide_on_selectionchange() {
+	if (!gdecide_ctx_menu || !decide_is_open())
+		return
+	var sel = window.getSelection && window.getSelection()
+	if (!sel || !sel.rangeCount || sel.isCollapsed)
+		return
+	if (decide_selection_in_list())
+		return
+	decide_select_all_list()
+}
+
+;(function decide_copy_select_install() {
+	if (typeof document == 'undefined' || !document.addEventListener)
+		return
+	document.addEventListener('contextmenu', decide_contextmenu_watch, true)
+	document.addEventListener('selectionchange', decide_on_selectionchange)
+	document.addEventListener('copy', function (event) {
+		var r = decide_oncopy(event)
+		// false = we put TSV on clipboard (preventDefault already done)
+		// true/null = leave alone (browser or other handlers)
+		if (r === false && event.stopPropagation)
+			event.stopPropagation()
+	}, true)
+})()
 
 async function decide_onload(decide_args) {
 
@@ -9489,6 +9640,9 @@ async function decide_onload(decide_args) {
 	// Option-row click only (tbody rows carry decide_row). Footer uses its own handlers.
 	function decide_document_onclick(event, forceCheck) {
 		event = getevent(event)
+		// Drag-selected list text → leave for Ctrl+C / right-click Copy
+		if (decide_selection_in_list())
+			return
 		if (event.target && event.target.type == 'checkbox' && typeof forceCheck !== 'boolean')
 			return exoduscancelevent(event)
 
@@ -9500,6 +9654,7 @@ async function decide_onload(decide_args) {
 		if (!element)
 			return
 
+		gdecide_select_all = false
 		if (decide_returnmany) {
 			if (typeof forceCheck === 'boolean')
 				decide_checkbox_select(event, element, forceCheck)
@@ -9573,6 +9728,12 @@ async function decide_onload(decide_args) {
 	// Only exit from the decide popup
 	function decide_close(value) {
 		gdecide_onwheel = null
+		gdecide_select_all = false
+		gdecide_ctx_menu = false
+		if (gdecide_ctx_timer) {
+			window.clearTimeout(gdecide_ctx_timer)
+			gdecide_ctx_timer = null
+		}
 		resolvePendingConfirm(value, 'decide_close')
 	}
 
@@ -9888,6 +10049,12 @@ async function decide_onload(decide_args) {
 		var keycode = event.keyCode
 
 		//console.log('decide_document_onkeydown ' + keycode)
+
+		// Ctrl/Cmd+A: select whole decide list (incl. scrolled), not the page
+		if ((event.ctrlKey || event.metaKey) && !event.altKey && keycode == 65) {
+			if (decide_select_all_list())
+				return exoduscancelevent(event)
+		}
 
 		// Tab: list (one stop) -> Select -> Cancel -> list (Shift reverses).
 		// Multi-select also includes the All button before the list.
