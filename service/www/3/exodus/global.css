@@ -47,14 +47,17 @@ TABLE.exodusform
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
 }
-/* tfoot: same padding as body (TOTAL_* right-align with amount columns).
- * Padding only — never grid borders on foot (body grid rule stays thead/tbody). */
+/* tfoot: same padding + border *width* as body so right-aligned TOTAL_* digits
+ * share the content edge with AMOUNT_* (dump: same td box.right; body
+ * border-right ~1px, foot was 0 → total sat ~1px further right). Transparent
+ * border: no visible foot grid (unlike painting lightgrey on every foot cell). */
 .exodusform > tfoot > tr > td,
 .exodusform > tfoot > tr > th {
     padding-left: var(--exodus-form-cell-padding-x);
     padding-right: var(--exodus-form-cell-padding-x);
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
+    border: 1px solid transparent;
 }
 
 /*
