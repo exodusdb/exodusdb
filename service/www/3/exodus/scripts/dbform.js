@@ -1718,16 +1718,26 @@ async function formfunctions_onload() {
                     //if (element.getAttribute('exodusnodeleterow')&& !tablex.getAttribute('nodeleterow')) {
                     await maybe_remove_rowbutton('insert')
                     await maybe_remove_rowbutton('delete')
-                    // Both buttons gone: keep lead-in td, hide it (same as build)
+                    // Both buttons gone: keep lead-in cells for clone/col align, hide them
+                    // (same as build when first field already has noinsert+nodelete).
+                    // thead + tfoot too — ed6df7e0 only hid tbody; a visible thead
+                    // lead-in th (rowspan) shifts multi-row headers one column.
                     if (tablex.getAttribute('noinsertrow') && tablex.getAttribute('nodeleterow')
-                        && !tablex.querySelector('[id^="insertrowbutton"], [id^="deleterowbutton"]')
-                        && tablex.tBodies && tablex.tBodies[0]) {
-                        var brows = tablex.tBodies[0].rows
-                        for (var bri = 0; bri < brows.length; bri++) {
-                            var btd = brows[bri].cells[0]
-                            if (btd && !btd.querySelector('[exodusname], [exodustype], input[name]'))
-                                btd.style.display = 'none'
+                        && !tablex.querySelector('[id^="insertrowbutton"], [id^="deleterowbutton"]')) {
+                        if (tablex.tBodies && tablex.tBodies[0]) {
+                            var brows = tablex.tBodies[0].rows
+                            for (var bri = 0; bri < brows.length; bri++) {
+                                var btd = brows[bri].cells[0]
+                                if (btd && !btd.querySelector('[exodusname], [exodustype], input[name]'))
+                                    btd.style.display = 'none'
+                            }
                         }
+                        var thx0 = tablex.tHead && tablex.tHead.rows[0] && tablex.tHead.rows[0].cells[0]
+                        if (thx0 && !thx0.querySelector('[exodusname], [exodustype], input[name]'))
+                            thx0.style.display = 'none'
+                        var tfx0 = tablex.tFoot && tablex.tFoot.rows[0] && tablex.tFoot.rows[0].cells[0]
+                        if (tfx0 && !tfx0.querySelector('[exodusname], [exodustype], input[name]'))
+                            tfx0.style.display = 'none'
                     }
 
                 }
