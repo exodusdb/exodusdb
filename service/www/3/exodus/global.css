@@ -344,17 +344,18 @@ TABLE.exodusform td:has(> span[contenteditable]) {
 }
 /*
  * No outer cell borders (pane is the frame).
- *   L/R — first/last column (structural)
- *   T/B — .exodus-form-edge-* from exodus_mark_form_edge_rows() (first/last
- *         row with display != none). Do not use :last-child for bottom: hidden
- *         trailer rows leave the last *visible* row with a false grid edge.
+ *   L/R — .exodus-form-edge-left/right from exodus_mark_form_edge_rows()
+ *         (first/last cell with display != none). Do not use :first/:last-child:
+ *         hidden trailers (e.g. schedules heading button/rating cells) leave the
+ *         last *visible* side-by-side fieldstrip with a false right grid edge.
+ *   T/B — .exodus-form-edge-top/bottom (first/last visible non-spacer row).
  */
-.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr > :first-child,
-.exodusformpane > TABLE.exodusform > tr > :first-child {
+.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr > .exodus-form-edge-left,
+.exodusformpane > TABLE.exodusform > tr > .exodus-form-edge-left {
     border-left: none;
 }
-.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr > :last-child,
-.exodusformpane > TABLE.exodusform > tr > :last-child {
+.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr > .exodus-form-edge-right,
+.exodusformpane > TABLE.exodusform > tr > .exodus-form-edge-right {
     border-right: none;
 }
 .exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr.exodus-form-edge-top > *,

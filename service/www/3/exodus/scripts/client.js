@@ -6375,10 +6375,15 @@ function exoduswrapformpanes() {
 }
 
 /*
- * Pane owns outer T/B: mark first/last *content* row (display != none, not an
- * empty spacer). Runs after formfunctions_onload (postinit showhide already
- * applied). Only direct child forms of .exodusformpane. Multi-form pane: only
- * the last form gets edge-bottom so the rule between forms stays.
+ * Pane owns outer edges: mark first/last *visible* content (display != none).
+ * Runs after formfunctions_onload (postinit showhide already applied). Only
+ * direct child forms of .exodusformpane.
+ *
+ * T/B: first/last non-spacer row. Multi-form pane: only the last form gets
+ * edge-bottom so the rule between forms stays.
+ * L/R: first/last visible cell per row (hidden trailers e.g. schedules heading
+ * button/rating cells must not leave a false right grid edge on the last
+ * visible side-by-side fieldstrip).
  *
  * Spacers: bare <tr></tr> (joblist Format) or cells with no element children
  * and no text (costestimateprint trailing <tr><td colspan="2"></td></tr>).
@@ -6404,6 +6409,13 @@ function exodus_mark_form_edge_rows() {
 				var tr = rows[rown]
 				tr.classList.remove('exodus-form-edge-top')
 				tr.classList.remove('exodus-form-edge-bottom')
+				// L/R classes on cells every pass (row may be re-shown later)
+				if (tr.cells) {
+					for (var cci = 0; cci < tr.cells.length; cci++) {
+						tr.cells[cci].classList.remove('exodus-form-edge-left')
+						tr.cells[cci].classList.remove('exodus-form-edge-right')
+					}
+				}
 				if (tr.style.display == 'none')
 					continue
 				// Empty spacer: no cells, or only empty cells (no kids, no text).
@@ -6432,6 +6444,26 @@ function exodus_mark_form_edge_rows() {
 				if (!firstRow)
 					firstRow = tr
 				lastRow = tr
+				// First/last visible cell in this row (not structural first/last)
+				var firstCell = null
+				var lastCell = null
+				for (var cjn = 0; cjn < tr.cells.length; cjn++) {
+					var c = tr.cells[cjn]
+					if (c.style.display == 'none')
+						continue
+					// computed style for id=ratingsection showhide etc.
+					try {
+						if (window.getComputedStyle && getComputedStyle(c).display == 'none')
+							continue
+					} catch (e) { }
+					if (!firstCell)
+						firstCell = c
+					lastCell = c
+				}
+				if (firstCell)
+					firstCell.classList.add('exodus-form-edge-left')
+				if (lastCell)
+					lastCell.classList.add('exodus-form-edge-right')
 			}
 			if (firstRow)
 				firstRow.classList.add('exodus-form-edge-top')
