@@ -484,6 +484,9 @@ TABLE
     white-space: normal;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    /* Allow drag-select + Ctrl+C / right-click Copy (pick is left-click only) */
+    -webkit-user-select: text;
+    user-select: text;
 }
 .exodus_typeahead_table th {
     font-weight: bold;

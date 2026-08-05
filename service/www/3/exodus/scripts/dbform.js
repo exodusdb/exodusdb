@@ -6672,11 +6672,12 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     div.scrollLeft = 0
     form_typeahead_listen_scroll(true)
 
-    // Only data rows (data-ta-row); header has no pick/hover handlers
+    // Only data rows (data-ta-row); header has no pick/hover handlers.
+    // click (not mousedown) to pick so drag-select + Ctrl+C / right-click Copy work.
     var trs = div.querySelectorAll('tr[data-ta-row]')
     for (var i = 0; i < trs.length; i++) {
         trs[i].onmouseover = form_typeahead_row_hover
-        trs[i].onmousedown = form_typeahead_row_pick
+        trs[i].onclick = form_typeahead_row_pick
     }
     // After paint: restore list scroll; re-run main into-view once layout settles
     if (typeof requestAnimationFrame == 'function') {
@@ -6701,11 +6702,26 @@ function form_typeahead_row_hover(event) {
     form_typeahead_set_focus(Number(tr.getAttribute('data-ta-row')))
 }
 
+// True if the user has a non-empty text selection inside the open typeahead list.
+function form_typeahead_selection_in_list() {
+    var div = gform_typeahead_div
+    if (!div || div.style.display == 'none')
+        return false
+    var sel = window.getSelection && window.getSelection()
+    if (!sel || sel.isCollapsed || !sel.rangeCount)
+        return false
+    return !!(div.contains(sel.anchorNode) || div.contains(sel.focusNode))
+}
+
 function form_typeahead_row_pick(event) {
 
     event = getevent(event)
-    if (event.preventDefault)
-        event.preventDefault()
+    // Right/middle button: no pick (context menu / selection). Left click only.
+    if (event.button != null && event.button !== 0)
+        return
+    // Drag-selected list text → leave selection for Ctrl+C / right-click Copy
+    if (form_typeahead_selection_in_list())
+        return
     var tr = event.target
     while (tr && tr.tagName != 'TR')
         tr = tr.parentNode
@@ -11423,6 +11439,11 @@ function form_copy_text_field_sync(event) {
 async function document_oncopy(event) {
 
     event = getevent(event)
+
+    // Typeahead list selection → browser default (true = allow; no form intercept).
+    // form_typeahead_keydown already ignores Ctrl so Ctrl+C reaches here.
+    if (form_typeahead_selection_in_list())
+        return true
 
     // Before any await: plain field selection → text only (not <input> HTML).
     if (form_copy_text_field_sync(event))
