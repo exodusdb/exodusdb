@@ -10884,8 +10884,9 @@ function logevent(msg) {
 function exodus_dump_styles(sel, props) {
 	var roots
 	if (sel == null || sel === '') {
-		var one = (typeof $0 != 'undefined' && $0) || document.activeElement
-		roots = one ? [one] : []
+		// $0 = last selected node in DevTools (when present)
+		var pick = (typeof $0 != 'undefined' && $0) || document.activeElement
+		roots = pick ? [pick] : []
 	}
 	else if (typeof sel == 'string')
 		roots = Array.prototype.slice.call(document.querySelectorAll(sel))
@@ -10953,7 +10954,7 @@ function exodus_dump_styles(sel, props) {
 		return hits
 	}
 
-	function one(el) {
+	function dump_one_node(el) {
 		var cs = window.getComputedStyle(el)
 		var styles = {}
 		for (var i = 0; i < want.length; i++) {
@@ -10984,7 +10985,7 @@ function exodus_dump_styles(sel, props) {
 	var out = {
 		url: location.href,
 		n: roots.length,
-		nodes: roots.map(one)
+		nodes: roots.map(dump_one_node)
 	}
 	var text = JSON.stringify(out, null, 2)
 	if (typeof console != 'undefined' && console.log)
