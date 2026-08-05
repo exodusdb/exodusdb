@@ -1,5 +1,14 @@
 # Exodus — notes for AI assistants
 
+## Deploy (do not reinvent)
+
+Full procedure is **below** in this file:
+
+1. **Lib/CLI:** **Build and install** — `m` / `ninja` + **test** + `ninja install` (from `~/exodus/build`). Do not skip tests before install.
+2. **Live:** **Service / neosys C++** — **`cd ~/exodus/service && ./copyall CONFIRM`**. Not hand-`cp` of `.so`. Without `CONFIRM` = dry run.
+
+Also tip in global **`~/.grok/AGENTS.md`** so agents hit it on every project under this user.
+
 ## Live remotecall (login + post)
 
 Skill **`exodus-remotecall`**: **`.grok/skills/exodus-remotecall/scripts/test.exodus.sh`** (login + post via xhttp.php). Password only via passfile; never load/log it. Global `~/.grok/AGENTS.md` has the same rule.

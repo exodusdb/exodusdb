@@ -6966,8 +6966,9 @@ async function validateall(mode) {
 
             } //propname in row
 
-            //empty last row is always ok
-            if (groupno > 0 && !anydata && rown == rows.length - 1)
+            // Trailing blank line after real rows is always ok. Sole empty row is not
+            // (allowemptyrows false / rowrequired: e.g. company table must not pass empty).
+            if (groupno > 0 && !anydata && rown == rows.length - 1 && rows.length > 1)
                 missingelement = false
 
             //fail if any missing data

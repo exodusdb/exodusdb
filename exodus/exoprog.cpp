@@ -893,20 +893,44 @@ var ExoProgram::perform(in command_line) {
 	//var savesentence = move(SENTENCE);
 	let saved_sentence = SENTENCE;
 
-	// Note that move sets the moved variable to an empty string "".
-	let saved_command = COMMAND.move();
-	let saved_options = OPTIONS.move();
+	// swap allows unassigned (move asserts assigned). Then leave callee with "".
+	var saved_command;
+	var saved_options;
+	var saved_recur0;
+	var saved_recur1;
+	var saved_recur2;
+	var saved_recur3;
+	var saved_recur4;
+	var saved_id;
+	var saved_record;
+	var saved_mv;
+	var saved_dict;
 
-	let saved_recur0 = RECUR0.move();
-	let saved_recur1 = RECUR1.move();
-	let saved_recur2 = RECUR2.move();
-	let saved_recur3 = RECUR3.move();
-	let saved_recur4 = RECUR4.move();
+	COMMAND.swap(saved_command);
+	OPTIONS.swap(saved_options);
 
-	let saved_id     = ID.move();
-	let saved_record = RECORD.move();
-	let saved_mv     = MV.move();
-	let saved_dict   = DICT.move();
+	RECUR0.swap(saved_recur0);
+	RECUR1.swap(saved_recur1);
+	RECUR2.swap(saved_recur2);
+	RECUR3.swap(saved_recur3);
+	RECUR4.swap(saved_recur4);
+
+	ID.swap(saved_id);
+	RECORD.swap(saved_record);
+	MV.swap(saved_mv);
+	DICT.swap(saved_dict);
+
+	COMMAND = "";
+	OPTIONS = "";
+	RECUR0 = "";
+	RECUR1 = "";
+	RECUR2 = "";
+	RECUR3 = "";
+	RECUR4 = "";
+	ID = "";
+	RECORD = "";
+	MV = "";
+	DICT = "";
 
 	const int saved_precision = var::getprecision();
 
