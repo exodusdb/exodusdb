@@ -3867,13 +3867,12 @@ async function exodus_typeahead(request, cols, coln, options) {
 		return typeof gform_onchange_seq == 'undefined' || seqAtStart == gform_onchange_seq
 	}
 
-	// Quiet empty/fail: hide list. Miss-tint unless form_field_is_allownew
-	// (single-part key fieldno 0, or EXECUTIVE_CODE).
+	// Quiet empty/fail: hide list. Red miss, or green allownew (new key/record).
 	function missOut() {
 		if (!stillActive())
 			return true
 		var allowNew = (typeof form_field_is_allownew == 'function' && form_field_is_allownew(el))
-		setMiss(el, !allowNew)
+		setMiss(el, allowNew ? 'new' : true)
 		form_typeahead_hide()
 		return true
 	}
@@ -3890,8 +3889,15 @@ async function exodus_typeahead(request, cols, coln, options) {
 		if (req.slice(0, 6) != 'CACHE\r')
 			req = 'CACHE\r' + req
 		tdb.request = req
-		if (!(await tdb.send()) || !tdb.data)
+		var sent = await tdb.send()
+		// Abort from form_typeahead_dblink_reset (newer keystroke): not a miss.
+		if (!sent || !tdb.data) {
+			var resp = String(tdb.response || '')
+			if (resp == 'Cancelled' || resp.indexOf('ABORT') >= 0
+				|| resp.indexOf('Client cancelled') >= 0)
+				return true
 			return missOut()
+		}
 		rows = exodus_typeahead_parserows(tdb.data, colids)
 	}
 

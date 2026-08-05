@@ -493,9 +493,14 @@ TABLE
     cursor: pointer;
 }
 /* Row highlight: match decide_row_hover */
-/* Miss tint: quiet no-match (no-grow while class on). Bold + system Highlight. */
+/* Miss tint: quiet no-match. Bold + system Highlight (red-ish). */
 :is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_miss {
     color: Highlight;
+    font-weight: bold;
+}
+/* Allownew no-match: green — typed value is a candidate new key/record. */
+:is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_new {
+    color: var(--exodus-icon-green, #22b014);
     font-weight: bold;
 }
 

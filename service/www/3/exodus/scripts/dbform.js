@@ -6215,7 +6215,7 @@ async function form_oninput(event) {
         settouched(true)
     }
 
-    // optional live onchange (e.g. brand_code_onchange) — debounced
+    // optional live onchange (e.g. brand_code_onchange) — debounced typeahead
     var onchangexpr = element.getAttribute('exodusonchange')
     if (onchangexpr) {
         gform_onchange_element = element
@@ -6257,7 +6257,15 @@ async function form_run_onchange(element, onchangexpr) {
         return
     }
 
+    // green allownew: stay tinted, no re-search (red uses form_is_miss_tinted to block keys)
+    if (element.classList && element.classList.contains('exotypeahead_new'))
+        return
+
     gvalue = text
+
+    // Clear prior tint before I/O
+    form_typeahead_set_miss(element, false)
+
     // do not set gpreviouselement here — leave-field validate owns that
     // one quiet request at a time on the private link
     form_typeahead_dblink_reset()
@@ -6355,34 +6363,39 @@ function form_field_is_allownew(el) {
     return true
 }
 
-// Miss tint (.exotypeahead_miss): bold + Highlight colour; no grow while class is on.
-// Class is the only marker (no parallel global). Typeahead is one producer;
-// clear via class scan. Leave-field validation unchanged.
+// Typeahead no-hit tints (class only; typeahead is the producer):
+//   .exotypeahead_miss — red/Highlight: not found, not allownew (form_is_miss_tinted blocks keys)
+//   .exotypeahead_new  — green allownew (form_run_onchange skips re-search)
 function form_is_miss_tinted(el) {
     return !!(el && el.classList && el.classList.contains('exotypeahead_miss'))
 }
 
 function form_typeahead_clear_miss() {
-    var list = document.getElementsByClassName('exotypeahead_miss')
-    // live HTMLCollection — remove from the end
-    for (var i = list.length - 1; i >= 0; i--)
-        list[i].classList.remove('exotypeahead_miss')
+    var lists = ['exotypeahead_miss', 'exotypeahead_new']
+    for (var c = 0; c < lists.length; c++) {
+        var list = document.getElementsByClassName(lists[c])
+        for (var i = list.length - 1; i >= 0; i--)
+            list[i].classList.remove(lists[c])
+    }
 }
 
+// miss true → red; miss 'new' → green allownew; miss false → clear
 function form_typeahead_set_miss(el, miss) {
-    if (miss) {
+    if (miss === 'new' || miss === true) {
         if (!el || !el.classList)
             return
         form_typeahead_clear_miss()
-        el.classList.add('exotypeahead_miss')
+        el.classList.add(miss === 'new' ? 'exotypeahead_new' : 'exotypeahead_miss')
         return
     }
     if (!el) {
         form_typeahead_clear_miss()
         return
     }
-    if (el.classList)
+    if (el.classList) {
         el.classList.remove('exotypeahead_miss')
+        el.classList.remove('exotypeahead_new')
+    }
 }
 
 // While miss-tinted: block insert keys; BS/Delete/nav free.
