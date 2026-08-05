@@ -10874,4 +10874,129 @@ function logevent(msg) {
 		console.log(msg)
 }
 
+// Dev dump: more than outerHTML — box + key computed styles + matched rules.
+// Usage (console):
+//   exodus_dump_styles()                    // $0 if set, else document.activeElement
+//   exodus_dump_styles('#INVOICE_TO')
+//   exodus_dump_styles(el, ['display','width','padding'])
+//   exodus_dump_styles('table[exogroupno="4"] tbody tr:first-child > *')
+// Returns the object; console.logs JSON; copy() when available.
+function exodus_dump_styles(sel, props) {
+	var roots
+	if (sel == null || sel === '') {
+		var one = (typeof $0 != 'undefined' && $0) || document.activeElement
+		roots = one ? [one] : []
+	}
+	else if (typeof sel == 'string')
+		roots = Array.prototype.slice.call(document.querySelectorAll(sel))
+	else if (sel && sel.nodeType == 1)
+		roots = [sel]
+	else if (sel && sel.length != null)
+		roots = Array.prototype.slice.call(sel)
+	else
+		roots = []
+
+	// Default props: enough for layout/chrome bugs without dumping every longhand
+	var want = props
+	if (!want || !want.length) {
+		want = [
+			'display', 'visibility', 'position', 'box-sizing',
+			'width', 'min-width', 'max-width', 'height', 'min-height', 'max-height',
+			'padding', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom',
+			'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom',
+			'border', 'border-width', 'border-left-width', 'border-right-width',
+			'overflow', 'overflow-x', 'overflow-y',
+			'flex', 'flex-shrink', 'flex-grow', 'align-items', 'vertical-align',
+			'font', 'font-size', 'line-height', 'white-space', 'color', 'background-color'
+		]
+	}
+
+	function sheet_label(ss, i) {
+		if (ss.href)
+			return ss.href
+		if (ss.ownerNode && ss.ownerNode.id)
+			return '#' + ss.ownerNode.id
+		return 'inline#' + i
+	}
+
+	function matched_rules(el) {
+		var hits = []
+		for (var si = 0; si < document.styleSheets.length; si++) {
+			var ss = document.styleSheets[si]
+			var rules
+			try {
+				rules = ss.cssRules
+			}
+			catch (e) {
+				hits.push({ sheet: sheet_label(ss, si), error: String(e) })
+				continue
+			}
+			if (!rules)
+				continue
+			for (var ri = 0; ri < rules.length; ri++) {
+				var r = rules[ri]
+				if (!r.selectorText)
+					continue
+				try {
+					if (el.matches(r.selectorText))
+						hits.push({
+							sheet: sheet_label(ss, si),
+							sel: r.selectorText,
+							css: r.style ? r.style.cssText : r.cssText
+						})
+				}
+				catch (e2) {
+					// :has() / complex selectors that matches() rejects — skip
+				}
+			}
+		}
+		return hits
+	}
+
+	function one(el) {
+		var cs = window.getComputedStyle(el)
+		var styles = {}
+		for (var i = 0; i < want.length; i++) {
+			var p = want[i]
+			styles[p] = cs.getPropertyValue(p) || cs[p]
+		}
+		var r = el.getBoundingClientRect()
+		return {
+			tag: el.tagName,
+			id: el.id || '',
+			name: el.getAttribute('name') || el.getAttribute('exodusname') || '',
+			className: el.className || '',
+			html: (el.outerHTML || '').slice(0, 500),
+			box: {
+				x: r.x, y: r.y, w: r.width, h: r.height,
+				top: r.top, left: r.left, bottom: r.bottom, right: r.right
+			},
+			offset: {
+				w: el.offsetWidth, h: el.offsetHeight,
+				offsetParent: el.offsetParent && (el.offsetParent.id || el.offsetParent.tagName)
+			},
+			inline: el.getAttribute('style') || '',
+			computed: styles,
+			matched: matched_rules(el)
+		}
+	}
+
+	var out = {
+		url: location.href,
+		n: roots.length,
+		nodes: roots.map(one)
+	}
+	var text = JSON.stringify(out, null, 2)
+	if (typeof console != 'undefined' && console.log)
+		console.log(out)
+	if (typeof copy == 'function') {
+		try {
+			copy(text)
+		}
+		catch (e) {
+		}
+	}
+	return out
+}
+
 //end of client.js
