@@ -6248,6 +6248,14 @@ async function form_oninput(event) {
     var onchangexpr = element.getAttribute('exodusonchange')
     if (onchangexpr) {
         gform_onchange_element = element
+        // Supersede in-flight typeahead for older text. Without this, a late
+        // empty response for "A" can paint red miss after the user has already
+        // typed "AB" and before the new search opens the list.
+        gform_onchange_seq++
+        form_typeahead_set_miss(element, false)
+        if (typeof form_typeahead_hide == 'function')
+            form_typeahead_hide()
+        form_typeahead_dblink_reset()
         if (gform_onchange_timer)
             window.clearTimeout(gform_onchange_timer)
         gform_onchange_timer = window.setTimeout(function () {
