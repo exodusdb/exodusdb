@@ -871,12 +871,15 @@ async function formfunctions_onload() {
                 var elementtype = element.getAttribute('exodusradio') ? 'radio' : 'checkbox'
                 for (var ii = 0; ii < options.length; ii++) {
 
+                    // One nowrap unit: radio/checkbox + label (no break between control and title
+                    // in narrow cells — e.g. scheduleprint Invoice Type). Label-only nowrap
+                    // left the input as a separate wrap opportunity.
+                    temp += '<span style="white-space:nowrap;vertical-align:middle">'
                     //build an input item
                     temp += '<input type=' + elementtype + ' id=' + fieldname
                     temp += ' style="vertical-align:middle"'
                     if (element.getAttribute('exodusreadonly'))
                         temp += ' disabled=true'
-                    //temp+='<span style="white-space: nowrap"><input type='+elementtype+' id='+element.name
                     //must be done to group radio boxes
                     temp += ' name=' + fieldname
                     // mark for mouseup-focus handler (expanded radios have no other marker)
@@ -892,7 +895,8 @@ async function formfunctions_onload() {
 
                     //postfix the option title
                     if (typeof (options[ii][1]) != 'undefined')
-                        temp += '<span style="vertical-align:middle; white-space: nowrap">' + options[ii][1] + '</span>'
+                        temp += '<span style="vertical-align:middle">' + options[ii][1] + '</span>'
+                    temp += '</span>'
 
                     //horizontal or vertical
                     //if vertical then add <br /> between options
@@ -901,7 +905,6 @@ async function formfunctions_onload() {
                         temp += '&nbsp;&nbsp;'
                     else if (ii < options.length - 1)
                         temp += '<br />'
-                    //temp+='</span>'+(element.getAttribute('exodushorizontal')?'&nbsp;':'<br />')
 
                 }
 
@@ -911,9 +914,10 @@ async function formfunctions_onload() {
                 //element.swapNode(temp)
                 element.parentNode.replaceChild(newspan, element)
 
-                //setup onfocus and onclick for all boxes
-                for (var ii = 0; ii < newspan.childNodes.length; ii++) {
-                    element = newspan.childNodes[ii]
+                //setup onfocus and onclick for all boxes (inputs nested in option wraps)
+                var boxes = newspan.getElementsByTagName('input')
+                for (var ii = 0; ii < boxes.length; ii++) {
+                    element = boxes[ii]
                     if (element.type == elementtype) {
                         element.tabIndex = elementtabindex
 
