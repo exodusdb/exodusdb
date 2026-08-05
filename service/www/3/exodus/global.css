@@ -33,11 +33,9 @@ TABLE.exodusform
     font-style: var(--exodus-form-label-font-style);
 }
 
-/* Internal grid: every direct form cell (prompt th or td | value td) */
-.exodusform > tbody > tr > td,
-.exodusform > tbody > tr > th,
-.exodusform > thead > tr > th,
-.exodusform > thead > tr > td,
+/* Internal grid: every direct form cell — thead/tbody/tfoot same unless overridden.
+ * (Omitting tfoot was a bug: totals lost padding/border and misaligned with body.) */
+.exodusform > :is(thead, tbody, tfoot) > tr > :is(td, th),
 .exodusform > tr > td,
 .exodusform > tr > th {
     border: 1px solid lightgrey;
@@ -46,18 +44,6 @@ TABLE.exodusform
     padding-right: var(--exodus-form-cell-padding-x);
     padding-top: var(--exodus-form-cell-padding-y);
     padding-bottom: var(--exodus-form-cell-padding-y);
-}
-/* tfoot: same padding + border *width* as body so right-aligned TOTAL_* digits
- * share the content edge with AMOUNT_* (dump: same td box.right; body
- * border-right ~1px, foot was 0 → total sat ~1px further right). Transparent
- * border: no visible foot grid (unlike painting lightgrey on every foot cell). */
-.exodusform > tfoot > tr > td,
-.exodusform > tfoot > tr > th {
-    padding-left: var(--exodus-form-cell-padding-x);
-    padding-right: var(--exodus-form-cell-padding-x);
-    padding-top: var(--exodus-form-cell-padding-y);
-    padding-bottom: var(--exodus-form-cell-padding-y);
-    border: 1px solid transparent;
 }
 
 /*
@@ -328,19 +314,19 @@ TABLE.exodusform td:has(> span[contenteditable]) {
  *         row with display != none). Do not use :last-child for bottom: hidden
  *         trailer rows leave the last *visible* row with a false grid edge.
  */
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr > :first-child,
+.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr > :first-child,
 .exodusformpane > TABLE.exodusform > tr > :first-child {
     border-left: none;
 }
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr > :last-child,
+.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr > :last-child,
 .exodusformpane > TABLE.exodusform > tr > :last-child {
     border-right: none;
 }
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr.exodus-form-edge-top > *,
+.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr.exodus-form-edge-top > *,
 .exodusformpane > TABLE.exodusform > tr.exodus-form-edge-top > * {
     border-top: none;
 }
-.exodusformpane > TABLE.exodusform > :is(thead, tbody) > tr.exodus-form-edge-bottom > *,
+.exodusformpane > TABLE.exodusform > :is(thead, tbody, tfoot) > tr.exodus-form-edge-bottom > *,
 .exodusformpane > TABLE.exodusform > tr.exodus-form-edge-bottom > * {
     border-bottom: none;
 }
@@ -1844,10 +1830,7 @@ SPAN.calendar-date-committed[contenteditable] {
     background-color: #303a5a;
 }
 
-:root[data-theme="dark_mode"] .exodusform > tbody > tr > td,
-:root[data-theme="dark_mode"] .exodusform > tbody > tr > th,
-:root[data-theme="dark_mode"] .exodusform > thead > tr > th,
-:root[data-theme="dark_mode"] .exodusform > thead > tr > td,
+:root[data-theme="dark_mode"] .exodusform > :is(thead, tbody, tfoot) > tr > :is(td, th),
 :root[data-theme="dark_mode"] .exodusform > tr > td,
 :root[data-theme="dark_mode"] .exodusform > tr > th {
     border-color: #5a6090 !important;
