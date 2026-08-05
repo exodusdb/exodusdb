@@ -1329,15 +1329,18 @@ async function formfunctions_onload() {
             var groupno = Number(element.getAttribute('exogroupno'))
 
             //align
-            //right align parent TD/TH if in columns (groupn>0)
+            // right-align when dict left align empty and conversion is fixed-width numeric/date-ish
+            // ([NUMBER…], [DATE…], [DATE_TIME…]). Not [TIME…] — helper keeps L for short times.
             if (
                 !element.getAttribute('exodusalign')
                 &&
                 typeof (element.getAttribute('exodusconversion')) == 'string'
-                &&
-                element.getAttribute('exodusconversion').indexOf('[NUMBER') >= 0
             ) {
-                element.setAttribute('exodusalign', 'R')
+                var convU = element.getAttribute('exodusconversion').toUpperCase()
+                if (convU.indexOf('[NUMBER') >= 0
+                    || convU.indexOf('[DATE_TIME') >= 0
+                    || /^\[DATE([,\]]|$)/.test(convU))
+                    element.setAttribute('exodusalign', 'R')
             }
             //if (groupno>0&&element.getAttribute('exodusalign')=='R'&&'THTD'.indexOf(element.parentNode.tagName)>=0)
             //if (element.getAttribute('exodusalign')=='R'&&'THTD'.indexOf(element.parentNode.tagName)>=0)
