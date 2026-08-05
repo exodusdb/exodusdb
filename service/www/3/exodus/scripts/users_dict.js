@@ -69,11 +69,15 @@ async function dict_USERS() {
  
  di=dict[++din]=dictrec('LOGIN_DATETIME','F',15,'',1)
  exodus_dict_datetime(di)
+ // Display-only: code SPAN hugs content (INPUT default size wasted fixed space)
+ exodus_dict_code(di)
+ di.align='R'
  di.readonly=true
  di.noinsertrow=true
  di.nodeleterow=true
    
  di=dict[++din]=dictrec('LOGIN_LOCATION','F',16,'',groupn)
+ exodus_dict_code(di)
  di.readonly=true
 
  di=dict[++din]=dictrec('LOGIN_RESULT','F',18,'',groupn)
