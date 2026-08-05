@@ -13,8 +13,10 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 // Scope
 //   INCLUDE  INPUT type text/password (and blank type) with exoduslength, size!=1
 //            pure DATE: always (sample '11/11/1111'), length optional
-//   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA; SELECT
-//   EXCLUDE  radio/checkbox/select; [NUMBER…] fields → SPAN (see paint)
+//   INCLUDE  SELECT — maxWidth 60ch only (trap stupid long option titles;
+//            does not paint a fixed width from length)
+//   EXCLUDE  radio, checkbox, button, submit, image; SPAN; TEXTAREA
+//   EXCLUDE  radio/checkbox; [NUMBER…] fields → SPAN (see paint)
 //
 // Paint width = sample measured in the field's computed font (after class/font).
 // content-box width = minWidth = maxWidth.
@@ -53,6 +55,9 @@ var gform_input_width_puredate = /^\[DATE([,\]]|$)/
 var gform_input_width_periodconv = /\[(PERIOD_OF_YEAR|YEAR_?PERIOD|FINANCIAL_PERIOD)/
 var gform_input_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
 var gform_input_width_cache = {}
+// SELECT: cap used/preferred width so conversion/dropdown option titles
+// cannot force the form wider than a normal 60-col field.
+var gform_select_max_width = '60ch'
 // Sample display date for pure DATE INPUT paint (dd/mm/yyyy style width)
 var gform_input_width_date_sample = '11/11/1111'
 // Sample period display (mm/yyyy or similar)
@@ -147,7 +152,15 @@ function form_input_width_char(element) {
 }
 
 function form_apply_input_field_width(element) {
-    if (!element || element.tagName != 'INPUT')
+    if (!element)
+        return
+    // Conversion/dropdown SELECT: longest option title can hold the form wide.
+    // Cap only — do not invent a fixed width; open list still shows full labels.
+    if (element.tagName == 'SELECT') {
+        element.style.maxWidth = gform_select_max_width
+        return
+    }
+    if (element.tagName != 'INPUT')
         return
     if (element.type == 'radio' || element.type == 'checkbox'
         || element.type == 'button' || element.type == 'submit' || element.type == 'image')
