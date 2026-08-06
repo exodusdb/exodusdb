@@ -152,9 +152,10 @@ div[align="center"] > .exodusformpane {
     width: max-content;
     margin: var(--exodus-form-pane-margin) auto;
 }
-/* Unbound form OK/List + Close bar (dbform.js #formbuttonsdiv) and inline action rows */
+/* Unbound form OK/List + Close bar — face is visible; source is .exodus_formbuttons_source */
 .exodusformactions,
-body > #formbuttonsdiv.exodusformactions {
+body > #formbuttonsdiv.exodusformactions,
+body > #formbuttonsdiv_face.exodusformactions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -168,13 +169,15 @@ body > #formbuttonsdiv.exodusformactions {
 }
 
 .exodusformactions > span,
-body > #formbuttonsdiv.exodusformactions > span {
+body > #formbuttonsdiv.exodusformactions > span,
+body > #formbuttonsdiv_face.exodusformactions > span {
     display: inline-flex;
     align-items: center;
 }
 
 .exodusformactions .graphicbutton,
-body > #formbuttonsdiv .graphicbutton {
+body > #formbuttonsdiv .graphicbutton,
+body > #formbuttonsdiv_face .graphicbutton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -189,7 +192,8 @@ body > #formbuttonsdiv .graphicbutton {
 }
 
 .exodusformactions .graphicbutton img,
-body > #formbuttonsdiv .graphicbutton img {
+body > #formbuttonsdiv .graphicbutton img,
+body > #formbuttonsdiv_face .graphicbutton img {
     height: var(--exodus-ui-icon-size);
     width: var(--exodus-ui-icon-size);
     box-sizing: border-box;
@@ -200,9 +204,27 @@ body > #formbuttonsdiv .graphicbutton img {
 }
 
 .exodusformactions .graphicbutton [id$="_label"],
-body > #formbuttonsdiv .graphicbutton [id$="_label"] {
+body > #formbuttonsdiv .graphicbutton [id$="_label"],
+body > #formbuttonsdiv_face .graphicbutton [data-source-id$="_label"] {
     display: inline-block;
     line-height: 1.2;
+}
+
+/* Real form-action strip: mutated by existing code; out of layout (face is shown). */
+#formbuttonsdiv.exodus_formbuttons_source {
+    position: fixed !important;
+    left: -10000px !important;
+    top: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    float: none !important;
+    display: block !important;
+    pointer-events: none;
 }
 
 .exodusformactions .exodusbutton {
@@ -1206,8 +1228,8 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     display: block;
 }
 
-/* Form actions in menubar: flex so button gaps are real (not float-collapsed). */
-#exodus_menu #formbuttonsdiv {
+/* Form actions in menubar: face is the visible strip. */
+#exodus_menu #formbuttonsdiv_face {
     float: left;
     display: inline-flex;
     align-items: center;
@@ -1216,21 +1238,21 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
 
 /* Extra air when actions were moved up from under the form (unbound).
    No vertical rule — reads as an unwanted separator after Menu. */
-#exodus_menu #formbuttonsdiv.exodus_formbuttons_relocated {
+#exodus_menu #formbuttonsdiv_face.exodus_formbuttons_relocated {
     margin-left: 8px;
     padding-left: 8px;
 }
 
 /* Form chrome in menubar: bound tools (menubutton) + unbound actions (graphicbutton) */
-#exodus_menu #formbuttonsdiv .menubutton,
-#exodus_menu #formbuttonsdiv .graphicbutton {
+#exodus_menu #formbuttonsdiv_face .menubutton,
+#exodus_menu #formbuttonsdiv_face .graphicbutton {
     float: none;
     margin-left: 4px;
     margin-right: 4px;
 }
 
 /* Record nav: more air on the left so the group reads separate from New/Open… */
-#exodus_menu #formbuttonsdiv .exodus_recordnav_group {
+#exodus_menu #formbuttonsdiv_face .exodus_recordnav_group {
     margin-left: 12px;
     margin-right: 4px;
 }
@@ -1276,13 +1298,16 @@ TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SEL
     margin-inline-end: 0 !important;
 }
 
-/* "n of m" — equal text pad; outer spacing still from group gap */
-.exodus_recordnav_group #selectrecordbutton {
+/* "n of m" — equal text pad; outer spacing still from group gap.
+ * Face clone uses data-source-id (ids stay on hidden source). */
+.exodus_recordnav_group #selectrecordbutton,
+.exodus_recordnav_group [data-source-id="selectrecordbutton"] {
     padding-left: 0.3em !important;
     padding-right: 0.3em !important;
 }
 
-.exodus_recordnav_group #selectrecordbutton_label {
+.exodus_recordnav_group #selectrecordbutton_label,
+.exodus_recordnav_group [data-source-id="selectrecordbutton_label"] {
     display: flex;
     align-items: center;
     justify-content: center;

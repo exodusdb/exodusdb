@@ -549,13 +549,107 @@ function form_place_menubar_session() {
         adjust_bodymargin()
 }
 
+// Form action strip: real #formbuttonsdiv = source (existing code mutates it; hidden).
+// #formbuttonsdiv_face = visible deep clone (ids + accesskeys stripped). Menu not copied.
+// Initiation: formbutton_op(handler) → op → render_formbuttons. Also paint after bind (opendoc2/cleardoc).
+
+function formbuttons_place_face(source) {
+    if (!source)
+        return null
+    var face = $$('formbuttonsdiv_face')
+    if (!face || face.tagName !== source.tagName) {
+        var next = document.createElement(source.tagName === 'DIV' ? 'DIV' : 'SPAN')
+        next.id = 'formbuttonsdiv_face'
+        if (face && face.parentNode)
+            face.parentNode.replaceChild(next, face)
+        face = next
+    }
+    if (source.parentNode && (face.parentNode !== source.parentNode || face.previousSibling !== source))
+        source.parentNode.insertBefore(face, source.nextSibling)
+    return face
+}
+
+function formbuttons_install() {
+    var source = $$('formbuttonsdiv')
+    if (!source)
+        return
+    source.classList.add('exodus_formbuttons_source')
+    source.inert = true
+    formbuttons_place_face(source)
+    render_formbuttons()
+}
+
+// True while inside formbutton_op (nested settouched etc. must not re-enter formbutton_op).
+var gin_form_op
+
+// Run a form-action handler, then always refresh the visible face from source.
+async function formbutton_op(op, event) {
+    gin_form_op = true
+    try {
+        if (typeof op == 'function') {
+            if (arguments.length > 1)
+                return await op(event)
+            return await op()
+        }
+    } finally {
+        gin_form_op = false
+        render_formbuttons()
+    }
+}
+
+// Deep-clone source → face; strip id and accesskey; wrap exodusonclick via formbutton_op.
+function render_formbuttons() {
+    var source = $$('formbuttonsdiv')
+    var face = $$('formbuttonsdiv_face')
+    if (!source || !face)
+        return
+
+    var clone = source.cloneNode(true)
+    clone.classList.remove('exodus_formbuttons_source')
+
+    function scrub(node) {
+        if (!node || node.nodeType !== 1)
+            return
+        if (node.id) {
+            node.setAttribute('data-source-id', node.id)
+            node.removeAttribute('id')
+        }
+        if (node.getAttribute('accesskey'))
+            node.removeAttribute('accesskey')
+        // await openrecord_onclick(event) → await formbutton_op(openrecord_onclick, event)
+        var oc = node.getAttribute('exodusonclick')
+        if (oc) {
+            var m = oc.match(/^\s*await\s+([A-Za-z_$][\w$]*)\s*\((.*)\)\s*$/)
+            if (m) {
+                var args = m[2].replace(/^\s+|\s+$/g, '')
+                if (args)
+                    node.setAttribute('exodusonclick', 'await formbutton_op(' + m[1] + ', ' + args + ')')
+                else
+                    node.setAttribute('exodusonclick', 'await formbutton_op(' + m[1] + ')')
+            }
+        }
+    }
+    scrub(clone)
+    var nodes = clone.querySelectorAll('*')
+    for (var i = 0; i < nodes.length; ++i)
+        scrub(nodes[i])
+
+    face.innerHTML = ''
+    while (clone.firstChild)
+        face.appendChild(clone.firstChild)
+
+    face.classList.toggle('exodusformactions', source.classList.contains('exodusformactions'))
+    face.classList.toggle('exodus_formbuttons_relocated', source.classList.contains('exodus_formbuttons_relocated'))
+}
+
 // Call after form_postdisplay / custom buttons / pane wrap: if the action bar is
 // under the form but not fully on-screen, put it in the top menubar.
 // Idempotent when already top. client.js re-runs this after exoduswrapformpanes.
+// Geometry from the *face* (source is off-screen).
 function form_keep_action_buttons_on_screen() {
     if (gformbuttonsplace !== 'bottom')
         return
-    var bar = $$('formbuttonsdiv')
+    var bar = $$('formbuttonsdiv_face') || $$('formbuttonsdiv')
     if (!bar)
         return
     var vh = window.innerHeight || document.documentElement.clientHeight || 0
@@ -581,6 +675,10 @@ function form_move_action_buttons_to_top() {
 
     add_exodus_menubar()
 
+    var oldface = $$('formbuttonsdiv_face')
+    if (oldface && oldface.parentNode)
+        oldface.parentNode.removeChild(oldface)
+
     // #exodus_menu is a SPAN — keep formbuttonsdiv a SPAN for valid nesting
     var topbar = bar
     if (bar.tagName !== 'SPAN') {
@@ -599,6 +697,7 @@ function form_move_action_buttons_to_top() {
 
     // Mark relocated so CSS can add spacing after Menu (not for native top bars)
     topbar.classList.add('exodus_formbuttons_relocated')
+    topbar.classList.add('exodus_formbuttons_source')
 
     // Order: Menu | form actions (List/…) | trailing. Never left of Menu.
     // Race: form_keep / rAF often runs *after* client.js inserts .hamburger_menu;
@@ -610,6 +709,8 @@ function form_move_action_buttons_to_top() {
     else
         gexodus_menubar.insertBefore(topbar, gexodus_menubar.firstChild)
     form_place_menubar_session()
+
+    formbuttons_install()
 
     if (typeof adjust_bodymargin == 'function')
         adjust_bodymargin()
@@ -2090,6 +2191,9 @@ async function formfunctions_onload() {
         window[buttonname] = buttonelement
     }
 
+    // Visible face = clone of source; source stays mutation target (1s timer re-clones)
+    formbuttons_install()
+
     //program the various buttons to be visible when enabled
     exodussetexpression(saverecord, 'style:display', 'saverecord.getAttribute("disabled")?"none":""')
     exodussetexpression(closerecord, 'style:display', 'closerecord.getAttribute("disabled")?"none":""')
@@ -3454,14 +3558,15 @@ async function document_onkeydown2(event) {
         //else if (gkeycode==76) exodussettimeout('await exoduslogout_onclick()',1)
         //Logout and List swapped to be G and L respectively
         else if (gkeycode == 71) await exoduslogout_onclick()//g
-        else if (gkeycode == 78) await newrecord_onclick()//n
-        else if (gkeycode == 79) await openrecord_onclick()//o
-        else if (gkeycode == 83) await saverecord_onclick()//s
-        else if (gkeycode == 67) await closerecord_onclick()//c
-        else if (gkeycode == 69) await editreleaserecord_onclick()//e
-        //else if (gkeycode == 68) await deleterecord_onclick()//d reserved
-        else if (gkeycode == 76) await listrecord_onclick()//l
-        else if (gkeycode == 80) await printsendrecord_onclick()//p
+        // Form-action bar: same path as face clicks (formbutton_op → render)
+        else if (gkeycode == 78) await formbutton_op(newrecord_onclick)//n
+        else if (gkeycode == 79) await formbutton_op(openrecord_onclick)//o
+        else if (gkeycode == 83) await formbutton_op(saverecord_onclick)//s
+        else if (gkeycode == 67) await formbutton_op(closerecord_onclick)//c
+        else if (gkeycode == 69) await formbutton_op(editreleaserecord_onclick)//e
+        //else if (gkeycode == 68) await formbutton_op(deleterecord_onclick)//d reserved
+        else if (gkeycode == 76) await formbutton_op(listrecord_onclick)//l
+        else if (gkeycode == 80) await formbutton_op(printsendrecord_onclick)//p
         else if (gkeycode == 82) await refreshcache_onclick()//r
         else
             found = false
@@ -3470,31 +3575,31 @@ async function document_onkeydown2(event) {
 
     //alt+{ is first record
     if (keycode == 219 && event.altKey && event.shiftKey) {
-        await firstrecord_onclick(event)
+        await formbutton_op(firstrecord_onclick, event)
         return exoduscancelevent(event)
     }
 
     //alt+} is last record
     if (keycode == 221 && event.altKey && event.shiftKey) {
-        await lastrecord_onclick(event)
+        await formbutton_op(lastrecord_onclick, event)
         return exoduscancelevent(event)
     }
 
     //alt+[ is previous record
     if (keycode == 219 && event.altKey) {
-        await previousrecord_onclick(event)
+        await formbutton_op(previousrecord_onclick, event)
         return exoduscancelevent(event)
     }
 
     //alt+] is next record
     if (keycode == 221 && event.altKey) {
-        await nextrecord_onclick(event)
+        await formbutton_op(nextrecord_onclick, event)
         return exoduscancelevent(event)
     }
 
     //alt+^ is select record
     if (keycode == 54 && event.altKey && event.shiftKey) {
-        await selectrecord_onclick(event)
+        await formbutton_op(selectrecord_onclick, event)
         return exoduscancelevent(event)
     }
 
@@ -3631,7 +3736,7 @@ async function document_onkeydown2(event) {
         //prevent document save unless the save button is enabled
         if (!(saverecord.getAttribute('disabled'))) {
             //await savedoc()
-            await saverecord_onclick()
+            await formbutton_op(saverecord_onclick)
         }
 
         return exoduscancelevent(event)
@@ -3741,7 +3846,7 @@ async function document_onkeydown2(event) {
             }
         }
 
-        await closerecord_onclick()
+        await formbutton_op(closerecord_onclick)
 
         return exoduscancelevent(event)
 
@@ -3756,7 +3861,7 @@ async function document_onkeydown2(event) {
         // Reconcile, form Cancel, …). Same shortcut as Enter on a data field with Ctrl.
         if (keycode == 13 && (event.ctrlKey || event.metaKey) && !event.altKey) {
             if (saverecord && !saverecord.getAttribute('disabled'))
-                await saverecord_onclick()
+                await formbutton_op(saverecord_onclick)
             return exoduscancelevent(event)
         }
         // Focused form action button (e.g. unbound OK/Cancel at bottom): bare Enter/Space
@@ -3961,7 +4066,7 @@ async function document_onkeydown2(event) {
         ) {
             if (!(saverecord.getAttribute('disabled'))) {
                 //await savedoc()
-                await saverecord_onclick()
+                await formbutton_op(saverecord_onclick)
             }
             return exoduscancelevent(event)
         }
@@ -5668,6 +5773,9 @@ async function opendoc2(newkey0) {
     if (typeof form_update_wide_layout == 'function')
         form_update_wide_layout()
 
+    // Record bound to form (buttons already updated on source) — refresh face
+    render_formbuttons()
+
     //logout('opendoc2')
 
     return true
@@ -6089,6 +6197,9 @@ async function cleardoc() {
     // .exodusform-wide before first record paints — avoids crushed→wide flash.
     if (typeof form_update_wide_layout == 'function')
         form_update_wide_layout()
+
+    // Empty/default record bound (bound clear + unbound open both use cleardoc)
+    render_formbuttons()
 
     //logout('cleardoc')
 
@@ -9097,7 +9208,19 @@ function form_try_insert_tab_char(element) {
 }
 
 //var gautofitwindowpending
+// Touch / clear-touch: if not already in formbutton_op, run via formbutton_op so face re-renders.
 function settouched(value, savebuttonactive) {
+    if (!gin_form_op) {
+        // Fire formbutton_op (async); callers historically ignore settouched return
+        formbutton_op(function () {
+            settouched_core(value, savebuttonactive)
+        })
+        return
+    }
+    settouched_core(value, savebuttonactive)
+}
+
+function settouched_core(value, savebuttonactive) {
     gtouched = value
     if (!gtouched)
         gelementthatjustcalledsettouched = null
