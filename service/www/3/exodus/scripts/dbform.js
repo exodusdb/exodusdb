@@ -2289,8 +2289,9 @@ async function formfunctions_onload() {
         if (gparameters.key) {
 
             //allow multiple keys to be loaded
+            // keyn 0: gkey still empty here so setgkeys cannot locate — same as F7 setgkeys(reply, 0)
             if (typeof gparameters.key == 'object') {
-                await setgkeys(gparameters.key)
+                await setgkeys(gparameters.key, 0)
                 gparameters.key = gparameters.key[0]
             }
 
