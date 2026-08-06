@@ -6774,6 +6774,40 @@ function form_typeahead_scroll_main_into_view(element, div) {
     form_typeahead_place(element, div)
 }
 
+// Default highlight for open list: exact match on returnable col → that row;
+// else first row when not allownew. allownew + no match → -1 (Enter leaves typed as new).
+// Multi-code fields: match last segment only (gform_typeahead_prefix restored on pick).
+function form_typeahead_auto_focusn(element, rows, returncoln) {
+    if (!rows || !rows.length)
+        return -1
+    var typed = ''
+    if (element) {
+        typed = (typeof getvalue == 'function') ? getvalue(element) : (element.value || '')
+        typed = String(typed == null ? '' : typed)
+        if (typeof gform_typeahead_prefix == 'string' && gform_typeahead_prefix
+            && typed.indexOf(gform_typeahead_prefix) === 0)
+            typed = typed.slice(gform_typeahead_prefix.length)
+        typed = typed.replace(/^\s+|\s+$/g, '')
+        if (!(element.getAttribute && element.getAttribute('exoduslowercase')))
+            typed = typed.toUpperCase()
+    }
+    if (typed) {
+        for (var r = 0; r < rows.length; r++) {
+            var cell = rows[r] ? rows[r][returncoln] : ''
+            if (cell == null)
+                cell = ''
+            cell = String(cell).replace(/^\s+|\s+$/g, '')
+            if (!(element && element.getAttribute && element.getAttribute('exoduslowercase')))
+                cell = cell.toUpperCase()
+            if (cell === typed)
+                return r
+        }
+    }
+    if (typeof form_field_is_allownew == 'function' && form_field_is_allownew(element))
+        return -1
+    return 0
+}
+
 // cols: [[id,title],…] or [id,…]; rows: [[cell,…],…]; returncoln: 0-based col to write on pick
 function form_typeahead_show(element, cols, rows, returncoln) {
 
@@ -6782,6 +6816,9 @@ function form_typeahead_show(element, cols, rows, returncoln) {
         return
     }
     if (typeof returncoln == 'undefined' || returncoln == null || returncoln === '')
+        returncoln = 0
+    returncoln = Number(returncoln)
+    if (isNaN(returncoln))
         returncoln = 0
 
     // Cap display only — do not change backend tools (FINDACCOUNT/VAL/GETACC).
@@ -6794,10 +6831,10 @@ function form_typeahead_show(element, cols, rows, returncoln) {
 
     var div = form_typeahead_ensure()
     gform_typeahead_element = element
-    gform_typeahead_returncoln = Number(returncoln)
+    gform_typeahead_returncoln = returncoln
     gform_typeahead_rows = rows
-    // No row selected until user arrows or clicks (plain Enter = normal field leave)
     gform_typeahead_focusn = -1
+    var autoFocus = form_typeahead_auto_focusn(element, rows, returncoln)
 
     // col[0] may be a numeric field index into the row (same as exodusdecide / ACCOUNTLIST).
     // col[1] is the title when col is [id, title, …].
@@ -6863,14 +6900,21 @@ function form_typeahead_show(element, cols, rows, returncoln) {
         trs[i].onmouseover = form_typeahead_row_hover
         trs[i].onclick = form_typeahead_row_pick
     }
-    // After paint: restore list scroll; re-run main into-view once layout settles
+    // Highlight now so Enter before rAF still applies the match / first row.
+    if (autoFocus >= 0)
+        form_typeahead_set_focus(autoFocus)
+    // After paint: main into-view; re-apply focus scroll for mid-list exact match.
     if (typeof requestAnimationFrame == 'function') {
         requestAnimationFrame(function () {
             if (gform_typeahead_div !== div || div.style.display == 'none')
                 return
             form_typeahead_scroll_main_into_view(element, div)
-            div.scrollTop = 0
-            div.scrollLeft = 0
+            if (autoFocus >= 0)
+                form_typeahead_set_focus(autoFocus)
+            else {
+                div.scrollTop = 0
+                div.scrollLeft = 0
+            }
         })
     }
 }
@@ -7093,8 +7137,8 @@ function form_typeahead_apply(n) {
 }
 
 // Esc dismiss; arrows / PgUp/PgDn / Home / End move highlight;
-// Enter only applies if user has moved highlight.
-// Plain Enter (no arrow selection): hide list and let normal Enter / focusnext run.
+// Enter applies current highlight (auto: exact returnable match, or first if not allownew).
+// No highlight (allownew + no match): hide list and let normal Enter / focusnext run.
 // Up/Down wrap (top↔bottom), same as decide list arrows. PgUp/PgDn clamp.
 // PgUp/PgDn step by a fixed page of rows (viewport auto-count is unreliable with wrapping cells).
 var gform_typeahead_pagesize = 10
