@@ -6502,6 +6502,7 @@ function form_typeahead_hide() {
     gform_typeahead_focusn = -1
     gform_typeahead_select_all = false
     gform_typeahead_ctx_menu = false
+    gform_typeahead_prefix = ''
     if (gform_typeahead_ctx_timer) {
         window.clearTimeout(gform_typeahead_ctx_timer)
         gform_typeahead_ctx_timer = null
@@ -6931,6 +6932,9 @@ function form_typeahead_set_focus(n) {
 
 // Mouse/keyboard pick: set value and focusnext only.
 // Validation is normal leave-field via gpreviouselement (same as Tab/Enter).
+// gform_typeahead_prefix: optional multi-value prefix (e.g. "AAA,") restored on pick.
+var gform_typeahead_prefix = ''
+
 function form_typeahead_apply(n) {
 
     var element = gform_typeahead_element
@@ -6941,6 +6945,9 @@ function form_typeahead_apply(n) {
     var val = rows[n][coln]
     if (val == null)
         val = ''
+    if (typeof gform_typeahead_prefix == 'string' && gform_typeahead_prefix)
+        val = gform_typeahead_prefix + val
+    gform_typeahead_prefix = ''
     if (gform_onchange_timer) {
         window.clearTimeout(gform_onchange_timer)
         gform_onchange_timer = null
@@ -10208,8 +10215,9 @@ async function form_insertrow(event, append) {
         }
     }
 
-    // Following row hidden: expand indented peers (not filter-hidden rows).
-    // Filter uses display:none too but Show All / dblclick-clear owns that.
+    // Following row hidden: expand indented peers only (not form_filter hide).
+    // Filter sets Show All display='' and/or table.exodus_filter_*; expand path
+    // would return without inserting and leave the wrong UI (user: focus key, no row).
     if (grecn < (nrows - 1) && grows[grecn + 1].style.display == 'none'
         && !form_group_is_filtered(tablex, groupno)) {
 
