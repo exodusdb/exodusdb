@@ -10235,6 +10235,8 @@ async function decide_onload(decide_args) {
 
 		// Type-to-filter: letters always; digits/space/- etc only once filter is active.
 		// First character cannot be 1-9 (those select option 1-9 when filter empty).
+		// Once no matches (red filter title), block further insert keys —
+		// Backspace/Esc above still shorten or clear.
 		if (!event.ctrlKey && !event.altKey && !event.metaKey) {
 			var ch = ''
 			if (event.key && event.key.length == 1)
@@ -10244,6 +10246,10 @@ async function decide_onload(decide_args) {
 				var isLetter = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
 				var isExtra = ch == ' ' || ch == '-' || ch == '.' || ch == '/' || ch == '_' || ch == '*' || ch == '#'
 				if (isLetter || (decide_filter_text && (isDigit || isExtra))) {
+					var stEmpty = $$('decide_filter_status')
+					if (stEmpty && stEmpty.classList
+						&& stEmpty.classList.contains('decide_filter_empty'))
+						return exoduscancelevent(event)
 					decide_filter_text += ch
 					decide_apply_filter()
 					return exoduscancelevent(event)
