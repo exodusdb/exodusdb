@@ -5975,23 +5975,14 @@ function exodus_reveal_form_panes() {
 /*
  * Extreme-wide form auto-class (temp/wide-form-crush).
  *
- * When (bound and unbound share the same hooks):
- *   cleardoc — skeleton decide so multi-col forms (journals) can be wide
- *     before the first record paints (no crushed→wide flash).
- *   opendoc — crush decide with content; resize re-runs (skip if geometry unchanged).
- * What: pane-direct tables after wrap; bare TABLE.exodusform pre-wrap
- *   (init cleardoc runs before wrap).
- *
- * Skeleton: free-text zeroed; fixed-col width vs soft ceiling.
- * Crush under NARROW: form at ceiling + free-text folding while below its
- *   exomaxwidth (empty-length free-text gets exomaxwidth=30ch at paint).
- * Empty-length free-text style max 30ch only when wide (form_table_set_wide).
+ * wantWide = (skeleton > soft_ceiling) OR (record && free-text crushed).
+ * Skeleton: free-text at empty floor 6ch, table unlimited max-content width.
+ * Soft ceiling = current zoom (100vw − 2rem). Remeasure each decide (KISS).
+ * Free-text soft max 30ch only when wide (form_table_set_wide).
  */
 var gform_wide_layout_resize_wired = false
 var gform_wide_crush_slack_px = 32
-// Per decide: raw exomaxwidth string → px (usually one "30ch" value)
 var gform_wide_exomax_px_cache = null
-// Resize skip: last ceiling + form widths + record flag
 var gform_wide_last_geom_snap = ''
 
 function form_table_is_wide(table) {
@@ -6002,7 +5993,6 @@ function form_table_is_wide(table) {
 	return (' ' + (table.className || '') + ' ').indexOf(' exodusform-wide ') >= 0
 }
 
-// Class only — no free-text max churn (use during measure).
 function form_table_set_wide_class(table, wide) {
 	if (!table)
 		return
@@ -6020,8 +6010,6 @@ function form_table_set_wide_class(table, wide) {
 		table.className = (' ' + table.className + ' ').replace(/ exodusform-wide /g, ' ').replace(/^\s+|\s+$/g, '')
 }
 
-// Wide only: style max-width from exomaxwidth (e.g. 30ch); narrow restore 100%.
-// All free-text with exomaxwidth — entry and display (not only contenteditable).
 function form_table_apply_freetext_wide_max(table, wide) {
 	if (!table || !table.querySelectorAll)
 		return
@@ -6042,7 +6030,6 @@ function form_table_set_wide(table, wide) {
 	form_table_apply_freetext_wide_max(table, wide)
 }
 
-// Resolve exomaxwidth (e.g. 30ch) to px once per distinct value per decide.
 function form_freetext_exomaxwidth_px(span) {
 	if (!span || !span.getAttribute)
 		return 0
@@ -6080,20 +6067,15 @@ function form_record_is_displayed() {
 	return false
 }
 
-// Empty / unbound → skeleton (fixed cols vs soft ceiling).
-// Record open → crush if free-text is crushed; else skeleton so multi-col forms
-// (new journal, empty narrative) do not drop to narrow when crush has no signal.
-// Do not change apply/paint here — only who may request wide.
+// Skeleton first (floor); crush only adds wide when skeleton fits.
 function form_table_wants_wide(table, ceiling) {
-	if (form_record_is_displayed()) {
-		if (form_table_crush_wants_wide(table, ceiling))
-			return true
-		return form_table_skeleton_wants_wide(table, ceiling)
-	}
-	return form_table_skeleton_wants_wide(table, ceiling)
+	if (form_table_skeleton_wants_wide(table, ceiling))
+		return true
+	if (form_record_is_displayed() && form_table_crush_wants_wide(table, ceiling))
+		return true
+	return false
 }
 
-// Pane-direct after wrap; bare form tables during init cleardoc (pre-wrap).
 function form_wide_layout_tables() {
 	var forms = document.querySelectorAll('.exodusformpane > TABLE.exodusform')
 	if (forms.length)
@@ -6101,7 +6083,6 @@ function form_wide_layout_tables() {
 	return document.querySelectorAll('TABLE.exodusform')
 }
 
-// Geometry snapshot for resize skip (ceiling + record flag + form widths).
 function form_wide_layout_geom_snap(forms, ceiling) {
 	var parts = [String(Math.round(ceiling)), form_record_is_displayed() ? '1' : '0']
 	for (var i = 0; i < forms.length; i++) {
@@ -6138,7 +6119,7 @@ function form_restore_span_boxes(saved) {
 	}
 }
 
-// Empty form: fixed-column skeleton width (free-text zeroed) vs soft ceiling
+// Unlimited preferred width: free-text @ 6ch (empty paint floor), no wide-class toggle.
 function form_table_skeleton_wants_wide(table, ceiling) {
 	if (!table || !(ceiling > 0))
 		return false
@@ -6152,20 +6133,19 @@ function form_table_skeleton_wants_wide(table, ceiling) {
 			maxWidth: sp.style.maxWidth,
 			minWidth: sp.style.minWidth,
 			width: sp.style.width,
-			overflow: sp.style.overflow
+			overflow: sp.style.overflow,
+			whiteSpace: sp.style.whiteSpace
 		})
-		sp.style.maxWidth = '0'
-		sp.style.minWidth = '0'
-		sp.style.width = '0'
+		sp.style.maxWidth = '6ch'
+		sp.style.minWidth = '6ch'
+		sp.style.width = '6ch'
 		sp.style.overflow = 'hidden'
+		sp.style.whiteSpace = 'nowrap'
 	}
-	var hadWide = form_table_is_wide(table)
 	var prevMax = table.style.maxWidth
 	var prevWidth = table.style.width
 	var skeleton = 0
 	try {
-		// Class only during measure — no free-text 30ch thrash
-		form_table_set_wide_class(table, false)
 		table.style.maxWidth = 'none'
 		table.style.width = 'max-content'
 		skeleton = table.scrollWidth || table.offsetWidth || 0
@@ -6178,13 +6158,13 @@ function form_table_skeleton_wants_wide(table, ceiling) {
 			sv.el.style.minWidth = sv.minWidth
 			sv.el.style.width = sv.width
 			sv.el.style.overflow = sv.overflow
+			sv.el.style.whiteSpace = sv.whiteSpace
 		}
-		form_table_set_wide_class(table, hadWide)
 	}
-	return skeleton > ceiling
+	return skeleton > ceiling - 4
 }
 
-// With record: crush under NARROW. Prefer one layout pass for preferred widths.
+// Free-text crushed under soft ceiling while narrow?
 function form_table_crush_wants_wide(table, ceiling) {
 	if (!table || !(ceiling > 0))
 		return false
@@ -6213,13 +6193,11 @@ function form_table_crush_wants_wide(table, ceiling) {
 				var maxPx = form_freetext_exomaxwidth_px(span)
 				if (!(maxPx > 0))
 					continue
-				// Already at content max → normal wrap, not crush
 				if (actual >= maxPx - gform_wide_crush_slack_px)
 					continue
 				candidates.push({ el: span, actual: actual })
 			}
 			if (candidates.length) {
-				// Batch preferred one-line width (one style pass + one layout)
 				prefSaved = []
 				for (sn = 0; sn < candidates.length; sn++) {
 					var sp = candidates[sn].el
@@ -6251,7 +6229,6 @@ function form_table_crush_wants_wide(table, ceiling) {
 	return wantWide
 }
 
-// fromResize: skip full decide when ceiling + form widths unchanged
 function form_update_wide_layout(fromResize) {
 
 	var ceiling = form_soft_ceiling_px()
@@ -6267,10 +6244,8 @@ function form_update_wide_layout(fromResize) {
 		return
 	}
 
-	// Fresh exomaxwidth→px cache for this decide
 	gform_wide_exomax_px_cache = {}
 
-	// cleardoc / empty → skeleton; record open → crush || skeleton.
 	for (var i = 0; i < forms.length; i++) {
 		var table = forms[i]
 		if (table.offsetParent === null && table.offsetWidth === 0 && table.offsetHeight === 0)
@@ -6278,13 +6253,13 @@ function form_update_wide_layout(fromResize) {
 		var hadWide = form_table_is_wide(table)
 		var wantWide = form_table_wants_wide(table, ceiling)
 		if (wantWide !== hadWide) {
-			// Filter console: wide | narrow
 			console.log((hadWide ? 'wide' : 'narrow') + ' → ' + (wantWide ? 'wide' : 'narrow'))
 			form_table_set_wide(table, wantWide)
+		} else if (wantWide) {
+			form_table_apply_freetext_wide_max(table, true)
 		}
 	}
 
-	// Snapshot after decide (class may have changed widths)
 	gform_wide_last_geom_snap = form_wide_layout_geom_snap(forms, ceiling)
 	form_wide_layout_wire_resize()
 }
