@@ -4076,6 +4076,12 @@ async function document_onkeydown2(event) {
             return exoduscancelevent(event)
         }
 
+        // Enter on last field wraps to first (not form OK/Cancel — those are Tab/arrows only)
+        if (!event.shiftKey && element == gfinalinputelement && (ggroupno == 0 || (ggroupno > 0 && grecn == gnrecs))) {
+            focuson(gstartelement)
+            return exoduscancelevent(event)
+        }
+
         //shift+enter on 1st field → end (or OK via focusdirection wrap / DOM order)
         if (event.shiftKey && element == gstartelement) {
             focusdirection(-1, element)
@@ -4650,11 +4656,13 @@ function focusdirection(direction, element, notgroupno, scopex) {
             continue
 
         // Form action face SPANs (no id). tabIndex 0 = stop (unbound OK/Cancel); -1 = skip (bound tools).
-        // Bypass field id/tag/tabIndex-999 rules so DOM order works for Tab/Enter/arrows.
+        // Tab/arrows land on them. Enter never — gfinalinputelement is highest tabIndex, often a later
+        // *hidden* field, so "last" visible (e.g. STATIONERY) uses focusdirection and would hit OK.
         var formActionTabStop = nextelement.classList
             && (nextelement.classList.contains('graphicbutton') || nextelement.classList.contains('menubutton'))
             && nextelement.getAttribute('exodusonclick')
             && nextelement.tabIndex >= 0
+            && gkeycode != 13
 
         //skip uninteresting tags with no id or non-data entry tag
         if (!formActionTabStop) {
