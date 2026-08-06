@@ -10208,8 +10208,10 @@ async function form_insertrow(event, append) {
         }
     }
 
-    //if following row is hidden then expand following hidden rows INSTEAD of inserting
-    if (grecn < (nrows - 1) && grows[grecn + 1].style.display == 'none') {
+    // Following row hidden: expand indented peers (not filter-hidden rows).
+    // Filter uses display:none too but Show All / dblclick-clear owns that.
+    if (grecn < (nrows - 1) && grows[grecn + 1].style.display == 'none'
+        && !form_group_is_filtered(tablex, groupno)) {
 
         //return to insertrow image
         setinsertimage('insert', grows[grecn], groupno)
@@ -10323,6 +10325,23 @@ function setinsertimage(mode, row, groupno) {
         insertimage.title = 'Insert a new row here (Ctrl+I or Ctrl+Insert)'
     }
     return
+}
+
+// True while row filter is active (dblclick state and/or Show All visible).
+function form_group_is_filtered(tablex, groupno) {
+    if (tablex && tablex.exodus_filter_colid)
+        return true
+    // Prefer the bound multivalue table (exogroupN), not a nested TABLE ancestor.
+    var gtable = (typeof groupno != 'undefined' && groupno !== '' && groupno != null)
+        ? document.getElementById('exogroup' + groupno)
+        : null
+    if (gtable && gtable.exodus_filter_colid)
+        return true
+    var showall = document.getElementById('exogroup' + groupno + 'showall')
+    if (!showall)
+        return false
+    // style.display '' means shown (default); only 'none' is hidden.
+    return showall.style.display != 'none'
 }
 
 async function openrecord_onclick() {
@@ -11188,6 +11207,9 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         form_group_leadin_display(tablex, false)
         if (typeof tablexfilter != 'undefined' && tablexfilter)
             tablexfilter.size = 3
+        // clear dblclick filter snapshot on the ruling table
+        tablex.exodus_filter_colid = ''
+        tablex.exodus_filter_value = ''
         await calcfields()
         return true
     }
@@ -11217,6 +11239,17 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
             grecn = getrecn()
             var value = values[grecn]
         }
+    }
+
+    // Dblclick same col + same value again → Show All (unfilter).
+    // State lives on the multivalue TABLE (exogroupN).
+    if (mode == 'filter' && !regexp && !maxrecn && !filterall) {
+        var prevCol = tablex.exodus_filter_colid
+        var prevVal = tablex.exodus_filter_value
+        if (prevCol === colid && String(prevVal) === String(value))
+            return await form_filter('unfilter', groupno)
+        tablex.exodus_filter_colid = colid
+        tablex.exodus_filter_value = value
     }
 
     //hide unmatched rows
@@ -11304,10 +11337,8 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
                 form_group_leadin_display(tablex, true)
             }
         }
-        //mark last unhidden row as expand image
-        for (var rown = 0; rown < lastunhiddenrows.length; ++rown)
-            //change to expandrow image
-            setinsertimage('expand', lastunhiddenrows[rown], groupno)
+        // Filter hide is not indent-collapse: leave insert icons as insert.
+        // (Expand [+] is only for hierarchical peer rows, not form_filter.)
         await calcfields()
     }
 
