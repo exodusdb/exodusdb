@@ -765,7 +765,7 @@ function form_add_action_button(spec) {
     }
 
     if (!gKeyNodes)
-        button.tabIndex = 9998
+        button.tabIndex = 0
     if (spec.disabled)
         setdisabledandhidden(button, true)
     window[id + 'button'] = button
@@ -2102,7 +2102,6 @@ async function formfunctions_onload() {
     //button shortcut keys are ctrl+ on mac and alt+ on pc
     var AltorCtrl = isMac ? 'Ctrl' : 'Alt'
 
-    //tabindex buttons at 9999 to come after other fields at 999
     var buttonhtml = ''
 
     gformbuttonsplace = form_formbuttons_place()
@@ -2261,8 +2260,9 @@ async function formfunctions_onload() {
     //remove record orientated buttons if no key fields
     if (!gKeyNodes) {
 
-        saverecord.tabIndex = 9999 - 1//before menu and logout
-        closerecord.tabIndex = 9999 - 1
+        // Unbound OK/Cancel: field-nav stop (DOM order; not historical 9998)
+        saverecord.tabIndex = 0
+        closerecord.tabIndex = 0
 
         /*
         newrecord.style.display='none'
@@ -2308,6 +2308,8 @@ async function formfunctions_onload() {
             setdisabledandhidden(closerecord, false)
         }
 
+        // Face needs tabIndex from source (install ran before unbound tabIndex set)
+        render_formbuttons()
     }
 
     var temp = document.createElement('div')
@@ -3864,9 +3866,12 @@ async function document_onkeydown2(event) {
                 await formbutton_op(saverecord_onclick)
             return exoduscancelevent(event)
         }
-        // Focused form action button (e.g. unbound OK/Cancel at bottom): bare Enter/Space
-        // activate it like a native button. Not when Ctrl/Alt (see above for Ctrl+Enter).
-        if ((keycode == 13 || keycode == 32) && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        // Form action focused: Shift+Enter = previous (like Up); bare Enter/Space activate.
+        if (keycode == 13 && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            focusprevious(element)
+            return exoduscancelevent(event)
+        }
+        if ((keycode == 13 || keycode == 32) && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {
             if (await form_activate_focused_action_button(event, element))
                 return exoduscancelevent(event)
         }
@@ -4071,13 +4076,7 @@ async function document_onkeydown2(event) {
             return exoduscancelevent(event)
         }
 
-        //enter on last field goes to start of doc
-        if (!event.shiftKey && element == gfinalinputelement && (ggroupno == 0 || (ggroupno > 0 && grecn == gnrecs))) {
-            focuson(gstartelement)
-            return exoduscancelevent(event)
-        }
-
-        //shift+enter on 1st key field goes to end of doc
+        //shift+enter on 1st field → end (or OK via focusdirection wrap / DOM order)
         if (event.shiftKey && element == gstartelement) {
             focusdirection(-1, element)
             return exoduscancelevent(event)
@@ -4137,16 +4136,13 @@ async function document_onkeydown2(event) {
 
     }
 
-    // Tab: same path as Enter-as-tab so focusdirection can land on form actions
-    // (see form-action exception there). Enter/down keep gkeycode 13/40 and skip them.
+    // Tab: same focusdirection path as Enter-as-tab (form actions are stops when tabIndex >= 0).
     if (keycode == 9 && !event.ctrlKey && !event.altKey) {
         focusdirection(event.shiftKey ? -1 : 1, element)
         return exoduscancelevent(event)
     }
 
-    // Horizontal radio: Up/Down = Shift+Enter / Enter (dbform field leave).
-    // Prefer Enter over Tab: Enter is fully defined here (focusdirection +
-    // gkeycode 13 skips form-action buttons); Tab is browser-adjacent.
+    // Horizontal radio: Up/Down = field leave (same focusdirection as Enter/Tab).
     // Same-group skip still applies so any option leaves the group as one stop.
     // Left/Right stay browser option change.
     if (element.type == 'radio' && element.getAttribute('exodushorizontal')
@@ -4641,22 +4637,36 @@ function focusdirection(direction, element, notgroupno, scopex) {
         nextelement = scope[scopeindex]
         var nextid = nextelement.id
 
-        //skip uninteresting tags with no id or non-data entry tag
-        if (!nextelement.id || !nextelement.tagName.match(gdatatagnames)) {
-            //console.log('SKIP '+nextid+' '+nextelement.tagName+' skipped')
-            continue
+        // Hidden source bar (face is the tab stop). Source is 1×1 off-screen so
+        // offsetWidth checks do not skip it — must skip by class or focus sticks.
+        var inFormbuttonsSource = false
+        for (var p = nextelement; p; p = p.parentNode) {
+            if (p.classList && p.classList.contains('exodus_formbuttons_source')) {
+                inFormbuttonsSource = true
+                break
+            }
         }
+        if (inFormbuttonsSource)
+            continue
 
-        // Form action controls are SPANs (menubutton/graphicbutton), not inputs.
-        // Accept them on Tab only (gkeycode 9) so OK/Search is next after the last
-        // field; Enter/arrows still skip them and wrap to the first field.
-        var isformaction = nextelement.classList
+        // Form action face SPANs (no id). tabIndex 0 = stop (unbound OK/Cancel); -1 = skip (bound tools).
+        // Bypass field id/tag/tabIndex-999 rules so DOM order works for Tab/Enter/arrows.
+        var formActionTabStop = nextelement.classList
             && (nextelement.classList.contains('graphicbutton') || nextelement.classList.contains('menubutton'))
             && nextelement.getAttribute('exodusonclick')
+            && nextelement.tabIndex >= 0
 
-        //skip uneditable elements (except form actions when Tabbing)
+        //skip uninteresting tags with no id or non-data entry tag
+        if (!formActionTabStop) {
+            if (!nextelement.id || !nextelement.tagName.match(gdatatagnames)) {
+                //console.log('SKIP '+nextid+' '+nextelement.tagName+' skipped')
+                continue
+            }
+        }
+
+        //skip uneditable elements (except tabbable form actions on nav keys)
         if (nextelement.tagName != 'INPUT' && !nextelement.isContentEditable && nextelement.tagName != 'SELECT' && nextelement.tagName != 'TEXTAREA') {
-            if (!(gkeycode == 9 && isformaction)) {
+            if (!formActionTabStop) {
                 //console.log('SKIP '+nextid+' is not contentEditable')
                 continue
             }
@@ -4686,22 +4696,25 @@ function focusdirection(direction, element, notgroupno, scopex) {
             continue
         }
 
-        //skip tabindex -1
-        if (nextelement.tabIndex == -1) {
+        //skip tabindex -1 (form actions use 0+; bound menubar tools stay -1)
+        if (!formActionTabStop && nextelement.tabIndex == -1) {
             //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex)
             continue
         }
 
-        //skip lower tabindex if forward direction
-        if (direction > 0 && elementtabindex && nextelement.tabIndex < elementtabindex) {
-            //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' < '+elementtabindex)
-            continue
-        }
+        // Field tabIndex ladder (999 etc.) — not for form-action stops (0 after last field)
+        if (!formActionTabStop) {
+            //skip lower tabindex if forward direction
+            if (direction > 0 && elementtabindex && nextelement.tabIndex < elementtabindex) {
+                //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' < '+elementtabindex)
+                continue
+            }
 
-        //skip higher tabindex if backward direction
-        if (direction < 0 && elementtabindex && nextelement.tabIndex > elementtabindex) {
-            //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' > '+elementtabindex)
-            continue
+            //skip higher tabindex if backward direction
+            if (direction < 0 && elementtabindex && nextelement.tabIndex > elementtabindex) {
+                //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' > '+elementtabindex)
+                continue
+            }
         }
 
         //(isMSIE && nextelement.currentStyle && nextelement.currentStyle.display == 'none' && nextelement.parentNode.currentStyle.display == 'none')
