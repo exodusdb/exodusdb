@@ -6603,6 +6603,8 @@ var gblockevents_flight_warn_ms = 120000
 //   • Ctrl/Cmd + / - / 0          zoom in/out/reset (keydown capture below)
 //   • Ctrl/Cmd + wheel            zoom (modalblock_onwheel returns early)
 //   • Ctrl/Cmd + C when allowed   copy (confirm/colour startevent true)
+//   • Alt+Left / Alt+Right        history back/forward when form is not wide
+//                                 (wide forms: horizontal viewport pan like Alt+Up/Down)
 //
 // TAKEN BY APP while modal (gmodalblockdepth / gblockevents):
 //   • plain wheel                 page scroll blocked; confirm body may scroll

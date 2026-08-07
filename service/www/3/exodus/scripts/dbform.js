@@ -426,7 +426,8 @@ var gfinalinputelement
 var gformdigitaccesskeys = null
 // Capture-phase sync keydown installed once (not via Gate A addeventlistener).
 var gformdigitaccesskey_capture_installed = false
-// Alt+arrows viewport pan — also capture/sync (Gate A modal block undoes scrollBy).
+// Alt+Up/Down viewport pan always; Alt+Left/Right pan only when form is wide
+// (else browser history back/forward). Capture/sync (Gate A undoes scrollBy).
 var gform_scroll_viewport_capture_installed = false
 // Radio/checkbox: focus on mouseup only (not mousedown). Capture/sync outside Gate A.
 var gform_radio_md_target = null
@@ -2368,7 +2369,7 @@ async function formfunctions_onload() {
     window.onunload = window_onunload_sync
 
     addeventlistener(document, 'keydown', 'document_onkeydown')
-    // Alt+arrows pan: must be capture/sync outside Gate A (see form_ensure_scroll_viewport_capture).
+    // Alt+Up/Down pan; Alt+Left/Right pan only if wide (else browser history).
     form_ensure_scroll_viewport_capture()
     // Radio/checkbox: focus on mouseup only (not mousedown)
     form_ensure_radio_mouseup_focus()
@@ -3503,8 +3504,7 @@ async function document_onkeydown2(event) {
         return exoduscancelevent(event)
     }
 
-    // Alt+arrows (viewport pan): form_scroll_viewport_capture_keydown (capture/sync).
-    // Not handled here — Gate A blockmodalui restores scroll and undoes scrollBy.
+    // Alt+Up/Down pan always; Alt+Left/Right only when .exodusform-wide (else history).
 
     //close (F8)
     if (keycode == 119) {
@@ -4859,9 +4859,25 @@ function form_radio_mouseup_focus(event) {
         form_focus_noscroll(t)
 }
 
+// True if any main form is extreme-wide (.exodusform-wide) — horizontal pan useful.
+function form_any_wide_layout() {
+    var tables = document.querySelectorAll
+        ? document.querySelectorAll('TABLE.exodusform')
+        : []
+    for (var i = 0; i < tables.length; i++) {
+        if (typeof form_table_is_wide == 'function') {
+            if (form_table_is_wide(tables[i]))
+                return true
+        } else if (tables[i].classList && tables[i].classList.contains('exodusform-wide'))
+            return true
+    }
+    return false
+}
+
 /*
- * Alt+arrows: pan the window by almost one viewport (overlap retained for context).
- * keycode 37← 38↑ 39→ 40↓. Focus stays put; does not move fields.
+ * Alt+arrows: pan the window by almost one viewport (overlap for context).
+ * Alt+Up/Down always; Alt+Left/Right only when form_any_wide_layout() (else browser history).
+ * Focus stays put; does not move fields.
  * Called only from form_scroll_viewport_capture_keydown (sync, outside Gate A).
  */
 function form_scroll_viewport(keycode) {
@@ -4919,6 +4935,9 @@ function form_scroll_viewport_capture_keydown(event) {
 
     var keycode = event.keyCode ? event.keyCode : event.which
     if (keycode != 37 && keycode != 38 && keycode != 39 && keycode != 40)
+        return
+    // Horizontal pan only when form is wide; otherwise Alt+Left/Right → browser history
+    if ((keycode == 37 || keycode == 39) && !form_any_wide_layout())
         return
 
     // Alt+Down on SELECT opens popup (F7 path in async keydown) — do not pan
