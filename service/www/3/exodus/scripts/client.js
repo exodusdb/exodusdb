@@ -9639,6 +9639,18 @@ async function decide_onload(decide_args) {
 		return decide_document_onmouse(event, 'out')
 	}
 
+	// One row highlight: mouseover steals; arrows/Home/End steal via decide_set_row_hover.
+	function decide_set_row_hover(tr) {
+		var tbody = $$('decide_table1body1')
+		if (tbody) {
+			var hovered = tbody.querySelectorAll('tr.decide_row_hover')
+			for (var hi = 0; hi < hovered.length; hi++)
+				hovered[hi].classList.remove('decide_row_hover')
+		}
+		if (tr)
+			tr.classList.add('decide_row_hover')
+	}
+
 	function decide_document_onmouse(event, mode) {
 
 		event = getevent(event)
@@ -9654,9 +9666,9 @@ async function decide_onload(decide_args) {
 		if (!element)
 			return
 
-		// Highlight row in popup when hovering over it
+		// Highlight row in popup when hovering over it (steals keyboard highlight)
 		if (mode == 'over')
-			trtag.classList.add('decide_row_hover')
+			decide_set_row_hover(trtag)
 		else
 			trtag.classList.remove('decide_row_hover')
 
@@ -9874,6 +9886,11 @@ async function decide_onload(decide_args) {
 			client_focuson(newelement)
 		}
 
+		// Arrows/wheel steal row highlight from mouse; mouseover steals back
+		var hovertr = getancestor(newelement, 'tr')
+		if (hovertr)
+			decide_set_row_hover(hovertr)
+
 		// Single-select: move the radio with focus (arrow/wheel). Multi: focus only.
 		if (selectRadio && !decide_returnmany)
 			newelement.checked = true
@@ -9939,6 +9956,10 @@ async function decide_onload(decide_args) {
 		decide_last_option_element = newelement
 		newelement.focus()
 		newelement.select()
+		// Home/End: same highlight steal as arrows
+		var hovertr = getancestor(newelement, 'tr')
+		if (hovertr)
+			decide_set_row_hover(hovertr)
 		return true
 	}
 
