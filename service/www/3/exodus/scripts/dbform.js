@@ -3963,24 +3963,22 @@ async function document_onkeydown2(event) {
         }
     }
 
-    //in tables goto first/last data entry column of first/last visible row
-    //ctrl+home 36 = first col, first row (top left)
-    //ctrl+end  35 = last col, last row (bottom right)
+    //in tables: same column, first/last visible row (not first/last col of that row)
+    //ctrl+home 36 = current col, first row; ctrl+end 35 = current col, last row
     if (tablex && (keycode == 36 || keycode == 35) && event.ctrlKey && !event.shiftKey && !event.altKey) {
+        var id = element.id
         if (keycode == 36) {
-            var id = gfields[tablex_firstinputcolscreenfn].id
             var startrown = 0
             var increment = 1
         } else {
-            var id = gfields[tablex_lastinputcolscreenfn].id
             var startrown = grows.length - 1
             var increment = -1
         }
-        //work forwards from first to last row, or backwards from last to first row, looking for a visible row to focus on
+        // forwards from first / backwards from last — same col if enabled+visible
         for (var ii = startrown; ii >= 0 && ii < grows.length; ii += increment) {
-            var element = grows[ii].exodusfields[id]
-            if (exodusenabledandvisible(element)) {
-                focuson(element)
+            var cellelement = grows[ii].exodusfields && grows[ii].exodusfields[id]
+            if (cellelement && exodusenabledandvisible(cellelement)) {
+                focuson(cellelement)
                 break
             }
         }
