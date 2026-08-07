@@ -59,28 +59,31 @@ TABLE.exodusform TABLE.exodusform > tr > th {
 }
 
 /*
- * Prompt th — every th under TABLE.exodusform (nested strips included).
- * Same richer face as sticky group thead (OKLCH; data-form-head; DM).
- * Data cells must stay plain td. Group sticky thead has its own rules.
- * TABLE.exodus-fieldstrip is optional markup for side-by-side strips; face is
- * the same (kept so strips outside a form table still tint).
+ * Prompt face — form th, fieldstrip th, and .exodusformpane shell (same bg).
+ * Data cells stay plain td (table body face). Group sticky thead has its own rules.
  */
 TABLE.exodusform th,
-TABLE.exodus-fieldstrip th {
+TABLE.exodus-fieldstrip th,
+.exodusformpane {
     background-color: var(--exodus-form-face);
     /* Pale faces: mild L drop + small chroma floor (half the prior delta from face). */
     background-color: oklch(from var(--exodus-form-face)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
+}
+TABLE.exodusform th,
+TABLE.exodus-fieldstrip th {
     white-space: nowrap;
 }
 :root[data-form-head="lighter"] TABLE.exodusform th,
-:root[data-form-head="lighter"] TABLE.exodus-fieldstrip th {
+:root[data-form-head="lighter"] TABLE.exodus-fieldstrip th,
+:root[data-form-head="lighter"] .exodusformpane {
     background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform th,
-:root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th {
+:root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th,
+:root[data-theme="dark_mode"] .exodusformpane {
     background-color: #303a5a;
 }
 
@@ -262,25 +265,32 @@ TABLE.exodusform > tbody > tr > th > TABLE.exodus-fieldstrip:not([width]) {
     box-sizing: border-box;
 }
 
-/* Host cell: flush padding; min-width 0 so % width can resolve when width=100%. */
+/* Host cell: flush padding; min-width 0 so % width can resolve when width=100%.
+ * Includes nested TABLE.exodusform (charts/companies form-in-form). */
 TABLE.exodusform > tbody > tr > td:has(> TABLE[exogroupno]),
 TABLE.exodusform > tbody > tr > td:has(> TABLE.exotable),
 TABLE.exodusform > tbody > tr > td:has(> TABLE.exodus-fieldstrip),
+TABLE.exodusform > tbody > tr > td:has(> TABLE.exodusform),
 TABLE.exodusform > tbody > tr > th:has(> TABLE[exogroupno]),
 TABLE.exodusform > tbody > tr > th:has(> TABLE.exotable),
 TABLE.exodusform > tbody > tr > th:has(> TABLE.exodus-fieldstrip),
+TABLE.exodusform > tbody > tr > th:has(> TABLE.exodusform),
 TABLE.exodusform > thead > tr > td:has(> TABLE[exogroupno]),
 TABLE.exodusform > thead > tr > td:has(> TABLE.exotable),
 TABLE.exodusform > thead > tr > td:has(> TABLE.exodus-fieldstrip),
+TABLE.exodusform > thead > tr > td:has(> TABLE.exodusform),
 TABLE.exodusform > thead > tr > th:has(> TABLE[exogroupno]),
 TABLE.exodusform > thead > tr > th:has(> TABLE.exotable),
 TABLE.exodusform > thead > tr > th:has(> TABLE.exodus-fieldstrip),
+TABLE.exodusform > thead > tr > th:has(> TABLE.exodusform),
 TABLE.exodusform > tr > td:has(> TABLE[exogroupno]),
 TABLE.exodusform > tr > td:has(> TABLE.exotable),
 TABLE.exodusform > tr > td:has(> TABLE.exodus-fieldstrip),
+TABLE.exodusform > tr > td:has(> TABLE.exodusform),
 TABLE.exodusform > tr > th:has(> TABLE[exogroupno]),
 TABLE.exodusform > tr > th:has(> TABLE.exotable),
-TABLE.exodusform > tr > th:has(> TABLE.exodus-fieldstrip) {
+TABLE.exodusform > tr > th:has(> TABLE.exodus-fieldstrip),
+TABLE.exodusform > tr > th:has(> TABLE.exodusform) {
     padding: 0;
     max-width: 100%;
     min-width: 0;
