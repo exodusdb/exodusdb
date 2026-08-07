@@ -10291,6 +10291,15 @@ async function decide_onload(decide_args) {
 			return exoduscancelevent(event)
 		}
 
+		// multi Backspace: reverse Enter — up one (wrap) then toggle. Not clear-all (Del/F8).
+		if (decide_returnmany && keycode == 8) {
+			if (!decide_move_option(-1, 1, false, true))
+				return exoduscancelevent(event)
+			if (decide_last_option_element)
+				decide_checkbox_select(event, decide_last_option_element)
+			return exoduscancelevent(event)
+		}
+
 		// Type-to-filter: letters always; digits/space/- etc only once filter is active.
 		// First character cannot be 1-9 (those select option 1-9 when filter empty).
 		// Once no matches (red filter title), block further insert keys —
@@ -10386,14 +10395,14 @@ async function decide_onload(decide_args) {
 		if (n < 0)
 			return
 
-		//pgup 33/pgdn 34/down 40/up 38/backspace 8 keys (Tab is handled above)
+		//pgup 33/pgdn 34/down 40/up 38 keys (Tab handled above; multi Backspace above)
 		// Step by *visible* rows only (display:none filter skips); PgUp/PgDn = 10 visible.
 		// Wheel uses the same decide_move_option path (radio check; multi focus only).
-		if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 8) {
+		if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38) {
 
 			var direction
 			if (keycode == 34 || keycode == 40) direction = 1
-			if (keycode == 33 || keycode == 38 || keycode == 8) direction = -1
+			if (keycode == 33 || keycode == 38) direction = -1
 
 			var steps = 1
 			var toEnd = false
@@ -10434,18 +10443,12 @@ async function decide_onload(decide_args) {
 				return exoduscancelevent(event)
 			}
 
-			// Up/Down (and faked from Space): radio checks; multi focus only; wrap ends.
-			// PgUp/PgDn: no wrap (wheel same). Backspace: move up then uncheck if multi.
-			var selectRadio = !decide_returnmany && keycode != 8
+			// Up/Down (and faked from Enter multi): radio checks; multi focus only; wrap ends.
+			// PgUp/PgDn: no wrap (wheel same).
+			var selectRadio = !decide_returnmany
 			var wrap = !(keycode == 33 || keycode == 34)
 			if (!decide_move_option(direction, steps, selectRadio, wrap))
 				return exoduscancelevent(event)
-
-			if (keycode == 8 && decide_returnmany) {
-				var cur = decide_last_option_element
-				if (cur && cur.checked)
-					decide_checkbox_select(event, cur, false)
-			}
 
 			return exoduscancelevent(event)
 
