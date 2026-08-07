@@ -9163,6 +9163,18 @@ async function decide_onload(decide_args) {
 		}
 		oCell.innerHTML = title
 		oCell.className = 'decide_datacol'
+		// Sort only when the column has a visible title (untitled data cols: no icon, no sort)
+		if (String(title || '').replace(/^\s+|\s+$/g, '')
+			&& typeof exodus_create_icon_element == 'function'
+			&& typeof exodus_sortimage == 'function') {
+			var sorticon = exodus_create_icon_element(
+				(typeof gsortimage != 'undefined' && gsortimage) ? gsortimage : exodus_sortimage())
+			if (typeof exodus_apply_sort_icon == 'function')
+				sorticon = exodus_apply_sort_icon(sorticon, '') || sorticon
+			sorticon.id = 'sortbutton_decide_' + ii
+			sorticon.title = 'Sort by ' + String(title)
+			oCell.appendChild(sorticon)
+		}
 		oRow.appendChild(oCell)
 
 		if (!cols[ii][3] && cols[ii][2] && (cols[ii][2] == 'DATE' || cols[ii][2] == 'TIME'))
@@ -10417,18 +10429,44 @@ function decide_sorttable2_sync(event) {
 	//locate the current element
 	event = getevent(event)
 
+	// Click may be on the sort icon (or its mask child) — resolve to TH
 	var th = event.target
-	if (th.tagName != "TH")
+	while (th && th.tagName != 'TH' && th != document.body)
+		th = th.parentNode
+	if (!th || th.tagName != 'TH')
+		return (0)
+	// Only titled data columns (untitled: no sortbutton_ — skip All / rank / blank heads)
+	if (!th.classList || !th.classList.contains('decide_datacol'))
+		return (0)
+	if (!th.querySelector('[id^="sortbutton_"]'))
 		return (0)
 
 	var tableelement = th.parentElement.parentElement.parentElement
 	var tablerows = tableelement.tBodies[0].getElementsByTagName('tr')
 	var coln = th.cellIndex + gsorttable2offset
 
-	var reverse = event.target.getAttribute('sorttable2_issorted')
-	event.target.setAttribute('sorttable2_issorted', reverse ? '' : 1)
+	// Toggle: first click ascending, second reverse (same as before)
+	var reverse = th.getAttribute('sorttable2_issorted')
+	th.setAttribute('sorttable2_issorted', reverse ? '' : 1)
 
-	var rown = th.parentElement.rowIndex
+	// Chevrons: active col down→up cycle; others unsorted (exotable sortbutton_*)
+	var headrow = th.parentElement
+	if (headrow && typeof exodus_apply_sort_icon == 'function') {
+		var dths = headrow.querySelectorAll('th.decide_datacol')
+		for (var hi = 0; hi < dths.length; hi++) {
+			var icon = dths[hi].querySelector('[id^="sortbutton_"]')
+			if (!icon)
+				continue
+			if (dths[hi] === th) {
+				// reverse was previous state: was sorted → now up; was unset → down
+				exodus_apply_sort_icon(icon, reverse ? 'up' : 'down')
+			} else {
+				dths[hi].removeAttribute('sorttable2_issorted')
+				exodus_apply_sort_icon(icon, '')
+			}
+		}
+	}
+
 	var nrows = tablerows.length
 	fromrown = 0
 	uptorown = nrows - 1
@@ -10448,6 +10486,8 @@ function decide_sorttable2_sync(event) {
 	var periodregex = / ?(\d{1,2})\/(\d{4})/g
 	for (var ii = fromrown; ii <= uptorown; ++ii) {
 		var cell = tablerows[ii].cells[coln]
+		if (!cell)
+			continue
 		var value = (cell.textContent || cell.innerText || "").toUpperCase()
 		var match
 		while (match = value.match(dateregex)) {
@@ -10475,7 +10515,6 @@ function decide_sorttable2_sync(event) {
 		oldrows[oldrown] = tablerows[oldrown]
 
 	//reorder table rows
-	var newdatarows = []
 	for (var newrown = 0; newrown < sortdata.length; ++newrown) {
 		var oldrown = sortdata[newrown][1]
 		if (newrown != oldrown)
