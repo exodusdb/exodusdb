@@ -9406,6 +9406,17 @@ async function decide_onload(decide_args) {
 
 	var selections = document.getElementsByName('decide_selection')
 
+	// Entry check/rank snapshot — F8/Del restore (not pure clear-all)
+	var decide_entry_checked = []
+	var decide_entry_ranks = []
+	if (decide_returnmany) {
+		var ranks0 = document.getElementsByName('decide_rank')
+		for (var si0 = 0; si0 < selections.length; si0++) {
+			decide_entry_checked[si0] = !!selections[si0].checked
+			decide_entry_ranks[si0] = ranks0[si0] ? String(ranks0[si0].innerText || '') : ''
+		}
+	}
+
 	//focus on the first checked item or the first rown
 	// Tab cycles options (as one stop) -> Select -> Cancel -> same option (see decide_document_onkeydown)
 	var decide_last_option_element = null
@@ -9511,15 +9522,18 @@ async function decide_onload(decide_args) {
 		}
 	}
 
-	function decide_all_clear() {
-		selections = document.getElementsByName('decide_selection')
-		ranks = document.getElementsByName('decide_rank')
-		for (var ii = 0; ii < selections.length; ii++) {
-			var element = selections[ii]
-			element.checked = false
-			var rowtag = getancestor(element, 'tr')
-			rowtag.style.fontWeight = 'normal'
-			ranks[ii].innerText = ''
+	// F8/Del: restore checked+rank as when the popup opened (not wipe to empty).
+	function decide_restore_entry_state() {
+		var sels = document.getElementsByName('decide_selection')
+		var ranks = document.getElementsByName('decide_rank')
+		for (var ii = 0; ii < sels.length; ii++) {
+			var want = !!decide_entry_checked[ii]
+			sels[ii].checked = want
+			var rowtag = getancestor(sels[ii], 'tr')
+			if (rowtag)
+				rowtag.style.fontWeight = want ? 'bold' : 'normal'
+			if (ranks[ii])
+				ranks[ii].innerText = decide_entry_ranks[ii] || ''
 		}
 	}
 
@@ -10463,9 +10477,9 @@ async function decide_onload(decide_args) {
 			return
 		}
 
-		//del or F8 none/delete
+		// Del or F8: restore entry checks (not clear-all)
 		if (keycode == 46 || keycode == 119) {
-			decide_all_clear()
+			decide_restore_entry_state()
 			return exoduscancelevent(event)
 		}
 
