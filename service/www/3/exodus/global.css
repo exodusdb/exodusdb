@@ -49,6 +49,15 @@ TABLE.exodusform
     padding-bottom: var(--exodus-form-cell-padding-y);
 }
 
+/* Form-in-form (charts header, companies sections, …): no cell grid — outer pane is the frame.
+ * Nested form still gets STANDARD pad; only border suppressed. */
+TABLE.exodusform TABLE.exodusform > * > tr > td,
+TABLE.exodusform TABLE.exodusform > * > tr > th,
+TABLE.exodusform TABLE.exodusform > tr > td,
+TABLE.exodusform TABLE.exodusform > tr > th {
+    border: none;
+}
+
 /*
  * Prompt th — every th under TABLE.exodusform (nested strips included).
  * Same richer face as sticky group thead (OKLCH; data-form-head; DM).
