@@ -6489,6 +6489,8 @@ var gform_typeahead_rows = []
 var gform_typeahead_focusn = -1
 var gform_typeahead_mousedown = false
 var gform_typeahead_scroll_listening = false
+// After open (auto-highlight ready for Enter): ignore mouseover until real mousemove
+var gform_typeahead_hover_locked = false
 
 function form_typeahead_ensure() {
 
@@ -6503,6 +6505,10 @@ function form_typeahead_ensure() {
     }
     div.onmouseup = function () {
         gform_typeahead_mousedown = false
+    }
+    // Real pointer move only — not scroll-under-cursor / arrival under stationary mouse
+    div.onmousemove = function () {
+        gform_typeahead_hover_locked = false
     }
     // Wheel = normal overflow scroll only (CSS overscroll-behavior: contain).
     // No JS option-stepping (decide does that). No custom scrollTop.
@@ -6650,6 +6656,7 @@ function form_typeahead_hide() {
     gform_typeahead_element = null
     gform_typeahead_rows = []
     gform_typeahead_focusn = -1
+    gform_typeahead_hover_locked = false
     gform_typeahead_select_all = false
     gform_typeahead_ctx_menu = false
     gform_typeahead_prefix = ''
@@ -6917,6 +6924,8 @@ function form_typeahead_show(element, cols, rows, returncoln) {
         trs[i].onmouseover = form_typeahead_row_hover
         trs[i].onclick = form_typeahead_row_pick
     }
+    // Arrival: keep auto-highlight for Enter; ignore mouse until real mousemove
+    gform_typeahead_hover_locked = true
     // Highlight now so Enter before rAF still applies the match / first row.
     if (autoFocus >= 0)
         form_typeahead_set_focus(autoFocus)
@@ -6938,6 +6947,8 @@ function form_typeahead_show(element, cols, rows, returncoln) {
 
 function form_typeahead_row_hover(event) {
 
+    if (gform_typeahead_hover_locked)
+        return
     event = getevent(event)
     var tr = event.target
     while (tr && tr.tagName != 'TR')
