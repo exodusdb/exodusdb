@@ -3815,7 +3815,10 @@ async function document_onkeydown2(event) {
                     gpreviousvalue = gdefaultvalue
             }
 
-            if (value != gpreviousvalue) {
+            // Revert field edit when value differs OR this field was the touch source
+            // (e.g. spaces-only: getvalue trims so value==gpreviousvalue, but form_oninput
+            // already settouched — still restore display and clear gtouched).
+            if (value != gpreviousvalue || element == gelementthatjustcalledsettouched) {
 
                 //restore the original value
                 //get from datasource
