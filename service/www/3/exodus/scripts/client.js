@@ -9433,6 +9433,8 @@ async function decide_onload(decide_args) {
 	addeventlistener(exodusconfirmdiv, 'dblclick', decide_document_ondblclick)
 	addeventlistener(exodusconfirmdiv, 'mouseover', decide_document_onmouseover)
 	addeventlistener(exodusconfirmdiv, 'mouseout', decide_document_onmouseout)
+	// Real pointer move only — not scroll-under-cursor (see decide_hover_locked)
+	addeventlistener(exodusconfirmdiv, 'mousemove', decide_document_onmousemove)
 
 	// Wheel over the option table: step like Up/Down (modalblock_onwheel calls this).
 	gdecide_onwheel = function decide_onwheel(event) {
@@ -9639,8 +9641,16 @@ async function decide_onload(decide_args) {
 		return decide_document_onmouse(event, 'out')
 	}
 
-	// One row highlight: mouseover steals; arrows/Home/End steal via decide_set_row_hover.
-	function decide_set_row_hover(tr) {
+	// After keyboard/wheel row move, ignore mouseover/out until a real mousemove
+	// (scroll-under-cursor would otherwise steal or strip the highlight).
+	var decide_hover_locked = false
+
+	function decide_document_onmousemove() {
+		decide_hover_locked = false
+	}
+
+	// One row highlight: mouseover steals after unlock; arrows/wheel set + lock.
+	function decide_set_row_hover(tr, fromkeys) {
 		var tbody = $$('decide_table1body1')
 		if (tbody) {
 			var hovered = tbody.querySelectorAll('tr.decide_row_hover')
@@ -9649,12 +9659,17 @@ async function decide_onload(decide_args) {
 		}
 		if (tr)
 			tr.classList.add('decide_row_hover')
+		if (fromkeys)
+			decide_hover_locked = true
 	}
 
 	function decide_document_onmouse(event, mode) {
 
 		event = getevent(event)
 		exoduscancelevent(event)
+
+		if (decide_hover_locked)
+			return
 
 		var trtag = getancestor(event.target, 'tr')
 		if (!trtag)
@@ -9886,10 +9901,10 @@ async function decide_onload(decide_args) {
 			client_focuson(newelement)
 		}
 
-		// Arrows/wheel steal row highlight from mouse; mouseover steals back
+		// Arrows/wheel steal highlight + lock until real mousemove
 		var hovertr = getancestor(newelement, 'tr')
 		if (hovertr)
-			decide_set_row_hover(hovertr)
+			decide_set_row_hover(hovertr, true)
 
 		// Single-select: move the radio with focus (arrow/wheel). Multi: focus only.
 		if (selectRadio && !decide_returnmany)
@@ -9956,10 +9971,10 @@ async function decide_onload(decide_args) {
 		decide_last_option_element = newelement
 		newelement.focus()
 		newelement.select()
-		// Home/End: same highlight steal as arrows
+		// Home/End: same highlight steal + lock as arrows
 		var hovertr = getancestor(newelement, 'tr')
 		if (hovertr)
-			decide_set_row_hover(hovertr)
+			decide_set_row_hover(hovertr, true)
 		return true
 	}
 
