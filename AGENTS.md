@@ -73,10 +73,21 @@ Plain **`review`** / **squash** must not wait for the user to also say “KISS�
 
 Set **`gparameters.key`** before dbform’s post-init open (dict build or `form_postinit`). dbform then `opendoc`s it. Do **not** use `setTimeout`/`focuson` hacks. Examples: `users_dict.js` (`gparameters.key = gusername`), `systemconfiguration_dict.js` / `form_postinit` (`'SYSTEM.CFG'`). Optional: `di.defaultvalue` on the key field for New/clear defaults only.
 
+## Exodus is a framework
+
+**Generic fact, always on:** Exodus is an application-agnostic **framework**. It knows nothing about any particular product built on it — including **Neosys**. Product domain, screens, and policy live in the application (for this site: `~/neosys`). Framework code must stay generic and **callable** by applications; it must not **import**, name, or special-case them.
+
+| | Role |
+|--|------|
+| **Exodus** (`~/exodus`) | Framework: forms, dblink, decide/filepopup, keys/gates, service/lib |
+| **Application** (here: `~/neosys`) | Product: modules, dicts, domain popups/validation, business rules |
+
+Applies to **every** framework change — not a list of special cases.
+
 ## Framework stay-out (default)
 
 - **Do not edit framework code** (`dbform.js`, `client.js`, core form/event/gate machinery) unless the user has **explicitly instructed that in the last few turns** of this conversation.
-- Prefer fixing product code (`colors.js`, page dicts/HTM, `users.js`, etc.). If a bug looks framework-wide, **say so and wait** — do not “fix” it by changing F7, `gpreviousvalue`, `validateupdate`, or popup contracts.
+- Prefer fixing **application** code. If a bug looks framework-wide, **say so and wait** — do not “fix” it by changing F7, `gpreviousvalue`, `validateupdate`, or popup contracts — and do not push product policy into the framework.
 - Popup cancel without `validateupdate` is **standard Exodus practice**; product popups must not break that (e.g. do not wipe mid-edit field text to paper over face-preview bugs).
 
 ## Build and install (basic exodus lib / CLI)
@@ -275,4 +286,4 @@ Address detail PNGs, logos (`exoduslogo.webp`, `login.webp`, …). Toolbar/actio
 
 ## Neosys modules
 
-Agency/finance/jobs/media HTM under `~/neosys/web/3/` is symlinked into `service/www/3/` via `~/neosys/merge_web_modules`. Module pages use the same Exodus framework paths (`../exodus/scripts/client.js`, etc.).
+Neosys is **one application** on the Exodus framework (not part of the framework). Agency/finance/jobs/media HTM under `~/neosys/web/3/` is symlinked into `service/www/3/` via `~/neosys/merge_web_modules`. Module pages use the same framework paths (`../exodus/scripts/client.js`, etc.). Application behaviour stays in neosys — see **Exodus is a framework** above.
