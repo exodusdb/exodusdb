@@ -100,6 +100,20 @@ Applies to **every** framework change — not a list of special cases.
 - Prefer fixing **application** code. If a bug looks framework-wide, **say so and wait** — do not “fix” it by changing F7, `gpreviousvalue`, `validateupdate`, or popup contracts — and do not push product policy into the framework.
 - Popup cancel without `validateupdate` is **standard Exodus practice**; product popups must not break that (e.g. do not wipe mid-edit field text to paper over face-preview bugs).
 
+### When the user *has* asked for a framework change (`dbform.js` / `client.js`)
+
+Amend with **fear and trepidation** — but **do not refuse every risk**. Wrong focus/key/gate edits cost ~10× later; missing a real shared seam also costs (parallel product hacks, “works only on one form”).
+
+| Do | Do not |
+|----|--------|
+| Name **blast radius** (what else Tab/arrows/focus/validate will hit) | Silent drive-by refactors of half of dbform |
+| Prefer **one more case on the real machine** (walker skip list, `gkeycode`, shared helper like `form_field_all_selected`) | A second key router “for this conversion only” |
+| Take a **measured risk** when the reward is one shared contract (all forms, MV + SPAN) | Ship thrash as the answer; leave duplicate specials |
+| Small commits; easy bisect | Mega-commit “while we’re here” |
+
+**Fear:** smallest change that still hits the true seam; prove with the known special case (e.g. charts `[INDENTED]` + MV left/right).  
+**Reward:** extract/reuse existing specialisation rather than a one-off; delete a path when two do the same job.
+
 ## Build and install (basic exodus lib / CLI)
 
 Core library, CLI tools, and tests live under `~/exodus` (this tree). They are **not** the service/neosys `.so` plugins.
@@ -214,13 +228,14 @@ Editing `.cpp` under `service/src/` or `~/neosys/src/` (or their `.dat` sources)
 
 ## Light framework changes (dbform / client)
 
-Only when the user has **just** asked for a light framework adaptation of keyboard, focus, tab order, or form actions:
+Only when the user has **just** asked for a light framework adaptation of keyboard, focus, tab order, or form actions. Stance: **fear and trepidation, still take risks for shared rewards** (see **When the user has asked for a framework change** above).
 
 - **`focusdirection` is a dumb DOM walker**, not a form model. Policy is the skip/accept list. Prefer **one more accepted target** (e.g. form-action SPANs on Tab only via `gkeycode`) over wrap helpers, last-field oracles, or parallel routers.
 - Do **not** trust `gfinalinputelement` / `gstartelement` identity alone after `form_postinit` (pages like search reorder rows; “last field” is “walker finds nothing else before wrap”).
 - Key-specific behaviour already uses **`gkeycode`** (e.g. Enter skips buttons). Extend that pattern: Tab-only vs Enter/arrows, not a new code path.
+- **Reuse field-level selection state** (`form_field_all_selected` / whole-field vs editing) for left/right, multiline up/down, and Tab-as-data — do not invent a second “is editing?” per key.
 - Form actions are **SPANs** (`.menubutton` / `.graphicbutton` + `exodusonclick`), not native `<button>`s — the walker already visits them if the skip list allows.
-- If the first idea needs a new named helper + special-case call site, **pause** and re-read the existing walker/filter first.
+- If the first idea needs a new named helper + special-case call site, **pause** and re-read the existing walker/filter first — then take the shared helper if the contract is truly identical.
 
 ### Gate A / DOM events (do not layer hacks)
 
