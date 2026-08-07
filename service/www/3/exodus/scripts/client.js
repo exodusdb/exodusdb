@@ -10342,9 +10342,11 @@ async function decide_onload(decide_args) {
 			return exoduscancelevent(event)
 		}
 
-		//enter or space - check or clear a checkbox and move down (or up if shift)
+		// multi: Space toggles checkbox only (stay on row). Enter toggles + move down (Shift+Enter up).
 		if (decide_returnmany && (keycode == 32 || keycode == 13)) {
 			decide_checkbox_select(event)
+			if (keycode == 32)
+				return exoduscancelevent(event)
 			if (event.shiftKey)
 				keycode = 38//fake up
 			else
