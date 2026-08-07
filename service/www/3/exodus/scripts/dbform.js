@@ -1346,11 +1346,9 @@ async function formfunctions_onload() {
                     element2.id = element.id + '_popup'
                     element.parentNode.insertBefore(element2, element)
                     element2.style.flexShrink = '0'
-                    // di.link='' → pad F6 slot + icon→field gap (between F7 and field)
+                    // di.link='' → pad F6 slot (icon width only; no fake cell-pad gap)
                     if (padLink)
-                        form_field_chrome_pad(element,
-                            'calc(var(--exodus-ui-icon-size) + var(--exodus-form-nested-cell-padding-x))',
-                            'top')
+                        form_field_chrome_pad(element, 'var(--exodus-ui-icon-size)', 'top')
 
                     element2.style.verticalAlign = 'top'
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
@@ -1393,20 +1391,15 @@ async function formfunctions_onload() {
             }
 
             // Pad-only (di.popup='' and/or di.link='' with no real F7/F6):
-            //   Real icons get margin-left after the *last* chrome icon → field
-            //   (global.css: nested fieldstrips use nested-cell-padding-x). Include
-            //   that gap on the last pad slot only — same as F7+padLink above.
-            //   both → F7 icon; F6 icon+gap. one slot → icon+gap.
+            //   Empty slots = icon width only (no cell-pad gap; icons look after themselves).
             //   Skip if real F7/F6 already installed (e.g. free SELECT F7 + padLink).
             if ((padPopup || padLink) && !installedRealPopup && !installedRealLink) {
                 element = form_field_chrome_ensure_wrap(element, dictitem)
                 var iconW = 'var(--exodus-ui-icon-size)'
-                // Same gap as real icon margin in nested tables (costs fieldstrips).
-                var iconAndGap = 'calc(var(--exodus-ui-icon-size) + var(--exodus-form-nested-cell-padding-x))'
                 if (padPopup)
-                    form_field_chrome_pad(element, padLink ? iconW : iconAndGap, 'middle')
+                    form_field_chrome_pad(element, iconW, 'middle')
                 if (padLink)
-                    form_field_chrome_pad(element, iconAndGap, 'middle')
+                    form_field_chrome_pad(element, iconW, 'middle')
             }
 
             //add image element and hide element
@@ -4173,53 +4166,8 @@ async function document_onkeydown2(event) {
     if ((keycode == 38 || keycode == 40) && !event.ctrlKey && !event.shiftKey && !event.altKey) {
 
         //up/down on select and textarea leave system to process it normally
-        if (element.tagName == 'TEXTAREA' && getvalue(element) && !onkeydown_allisselected(element))
+        if (element.tagName == 'TEXTAREA' && getvalue(element) && !form_field_all_selected(element))
             return true
-    }
-
-    function onkeydown_allisselected(element) {
-
-        var text = getvalue(element)
-
-        //empty field is considered as all selected
-        if (!text)
-            return true
-
-        //standard and ie9+ (not spans)
-        //.selectionStart throws and error on ff/chrome/standard on radio/checkbox etc
-        //try {var selectionStart=element.selectionStart} catch (e) {var selectionStart=false}
-        //if (selectionStart) {
-        if (typeof element.selectionStart == 'number') {
-            if (element.selectionStart != 0 || element.selectionEnd != text.length)
-                return false
-
-            //msie (doesnt work on spans?)
-        } else if (document.selection) {
-            //var textrange = document.selection.createRange()
-            //var textrange=document.forms[0].selection.createRange()
-            //            alert(document.selection.createRange().text+' ... '+text)
-            if (document.selection.createRange().text.replace(/[\r\n]/g, '') != text.replace(/[\r\n]/g, ''))
-                return false
-
-            //standard spans firefox/chrome
-        } else if (window.getSelection) {
-            //        alert('z')
-            //anchorOffset: 3, focusNode: #text "sdvsdvsdv ", focusOffset: 7, isCollapsed: false
-            var selection = window.getSelection()
-
-            //            if (selection.toString && selection.text.replace(/[\r\n]/g,'') == text.replace(/[\r\n]/g,'')) {
-            if (selection.toString && selection.toString().replace(/[\r\n]/g, '') == text.replace(/[\r\n]/g, '')) {
-                return true
-            }
-
-            //this doesnt seem to work
-            //            alert(selection.isCollapsed + ' : ' + selection.getRangeAt(0).startOffset  + ' : ' +  selection.getRangeAt(0).endOffset + ' : ' + selection.rangeCount + ' : ' + text.length)
-            if (selection.isCollapsed || selection.getRangeAt(0).startOffset != 0 || selection.getRangeAt(0).endOffset != text.length)
-                return false
-
-        }
-
-        return true
     }
 
     //left arrow or right arrow and whole field is selected else return
@@ -4227,7 +4175,7 @@ async function document_onkeydown2(event) {
 
         //handle left/right normally if not all text selected
         if (element.maxLength != 1 && element.tagName.match(gtexttagnames) && element.type != 'button' && element.type != 'checkbox') {
-            if (!onkeydown_allisselected(element))
+            if (!form_field_all_selected(element))
                 return
 
         }
@@ -4245,7 +4193,7 @@ async function document_onkeydown2(event) {
 
     //up down in multiline text treated normally - up and down in the text
     if ((keycode == 38 || keycode == 40) && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-        if (!onkeydown_allisselected(element) && getvalue(element).indexOf('\n') >= 0)
+        if (!form_field_all_selected(element) && getvalue(element).indexOf('\n') >= 0)
             return
     }
 
@@ -9264,8 +9212,53 @@ async function getdefault(element) {
 
 }
 
-// Tab-as-data for fields with exodusconversion [INDENTED] (leading-indent display).
-// Returns true if Tab was consumed as a character insert.
+// Whole-field selection (arrival / select-all). Shared by arrow nav and Tab-as-data.
+// Empty field counts as all-selected (same as classic left/right in MV).
+// INPUT: selectionStart/End. Contenteditable SPAN: window Selection.
+function form_field_all_selected(element) {
+    if (!element)
+        return true
+    var text = getvalue(element)
+    if (!text)
+        return true
+
+    if (typeof element.selectionStart == 'number') {
+        if (element.selectionStart != 0 || element.selectionEnd != text.length)
+            return false
+        return true
+    }
+    if (document.selection) {
+        if (document.selection.createRange().text.replace(/[\r\n]/g, '') != text.replace(/[\r\n]/g, ''))
+            return false
+        return true
+    }
+    if (window.getSelection) {
+        var selection = window.getSelection()
+        if (!selection || selection.rangeCount < 1)
+            return true
+        // Caret or partial → not all selected (editing)
+        if (selection.isCollapsed)
+            return false
+        if (selection.toString
+            && selection.toString().replace(/[\r\n]/g, '') == text.replace(/[\r\n]/g, ''))
+            return true
+        // SPAN multi-node: range covers full contents?
+        try {
+            var range = selection.getRangeAt(0)
+            var full = document.createRange()
+            full.selectNodeContents(element)
+            if (range.compareBoundaryPoints(Range.START_TO_START, full) <= 0
+                && range.compareBoundaryPoints(Range.END_TO_END, full) >= 0)
+                return true
+        } catch (e) { }
+        return false
+    }
+    return true
+}
+
+// Tab-as-data for [INDENTED] (e.g. charts ACCOUNT_NAME). Consumes Tab only while
+// editing — same whole-field test as left/right (form_field_all_selected).
+// Empty field: all-selected for arrows, but still allow indent (blank-row indent).
 function form_try_insert_tab_char(element) {
     if (!element)
         return false
@@ -9278,24 +9271,58 @@ function form_try_insert_tab_char(element) {
     if (element.getAttribute('exodusreadonly') || element.disabled
         || element.getAttribute('disabled') != null)
         return false
-    if (element.tagName != 'INPUT' && element.tagName != 'TEXTAREA')
+    // Non-empty whole-field select → navigate (Tab); caret/partial → insert
+    var text = getvalue(element)
+    if (text && form_field_all_selected(element))
         return false
-    var start
-    var end
+
+    if (element.tagName == 'INPUT' || element.tagName == 'TEXTAREA') {
+        var start
+        var end
+        try {
+            start = element.selectionStart
+            end = element.selectionEnd
+        } catch (e) {
+            return false
+        }
+        if (typeof start != 'number' || typeof end != 'number')
+            return false
+        var v = element.value || ''
+        element.value = v.slice(0, start) + '\t' + v.slice(end)
+        var pos = start + 1
+        try {
+            element.setSelectionRange(pos, pos)
+        } catch (e) { }
+        settouched(true)
+        return true
+    }
+
+    // contenteditable SPAN (dict_text host)
+    if (!element.isContentEditable)
+        return false
+    var sel = window.getSelection && window.getSelection()
+    if (!sel || sel.rangeCount < 1)
+        return false
+    var anchor = sel.anchorNode
+    if (anchor && anchor !== element && !element.contains(anchor))
+        return false
     try {
-        start = element.selectionStart
-        end = element.selectionEnd
+        if (document.execCommand && document.queryCommandSupported
+            && document.queryCommandSupported('insertText')) {
+            document.execCommand('insertText', false, '\t')
+        } else {
+            var range = sel.getRangeAt(0)
+            range.deleteContents()
+            var tn = document.createTextNode('\t')
+            range.insertNode(tn)
+            range.setStartAfter(tn)
+            range.collapse(true)
+            sel.removeAllRanges()
+            sel.addRange(range)
+        }
     } catch (e) {
         return false
     }
-    if (typeof start != 'number' || typeof end != 'number')
-        return false
-    var v = element.value || ''
-    element.value = v.slice(0, start) + '\t' + v.slice(end)
-    var pos = start + 1
-    try {
-        element.setSelectionRange(pos, pos)
-    } catch (e) { }
     settouched(true)
     return true
 }
