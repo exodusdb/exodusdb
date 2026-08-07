@@ -1,6 +1,14 @@
-# Documentation Generation for Exodus
+# Documentation Generation for Exodus (C++ / var / exoprog)
 
-This subdirectory owns the generation of the project's documentation
+This subdirectory owns **core Exodus** documentation generation (var API, man page, header-derived tests) — not the web UI framework.
+
+**Web programming docs** (forms, client.js, browser keys) live under:
+
+`service/www/exodus/doc/`
+
+---
+
+This directory produces the project's C++ documentation
 and the derived comprehensive test file.
 
 ## What it produces

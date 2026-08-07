@@ -1,6 +1,9 @@
 # Exodus Web Framework Programmer's Manual
 
-**Location:** `exodus/service/www/3/exodus/scripts/`
+**Location:** `service/www/exodus/doc/` (web programming docs)  
+**Runtime code:** `service/www/3/exodus/scripts/` (`client.js`, `dbform.js`, …)  
+**See also:** [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md), [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [FORM-UI-KEYBOARD-BROWSER.md](./FORM-UI-KEYBOARD-BROWSER.md)  
+**Not here:** C++/var/exoprog — repo-root `doc/`
 
 This document describes how to use the client-side JavaScript web framework in the Exodus system (version 3 UI). The framework provides modal dialogs, an `async`/`await` cooperative event model, database access, dictionary-driven forms, security, uploads, and more. It is designed to work with the Exodus backend via the `xhttp.php` bridge (or file mode for local testing).
 
@@ -402,7 +405,7 @@ Helpers:
 - Match input `id`s exactly to dictionary codes.
 - Field 0 is special (key).
 - Use groups in the dictionary for multivalue sets.
-- **MV row clone:** `cloneNode` keeps attributes, not `addEventListener` handlers. Prefer document/table **delegation** (or attributes) over per-element listeners on group fields — see FORM-UI-PHILOSOPHY § Multivalue rows.
+- **MV row clone:** `cloneNode` keeps attributes, not `addEventListener` handlers. Prefer document/table **delegation** (or attributes) over per-element listeners on group fields — see [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md) § Multivalue rows.
 - The framework does a lot of auto-wiring — follow the template patterns.
 - 128 character combined path+filename limit (enforced in upload handling).
 - Internal paths/filenames passed around are generally not considered confidential.

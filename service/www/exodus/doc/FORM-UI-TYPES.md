@@ -1,8 +1,10 @@
 # FORM-UI-TYPES
 
+**Location:** `service/www/exodus/doc/` (web programming docs)
+
 Exodus bound form fields: **theory** (clean categories) and **practice** (dictitem × paint × DOM as implemented).
 
-Primary code: `scripts/db.js` (`dictrec`, `exodus_dict_*`), `scripts/dbform.js` (paint, `copydictitem`), wide soft max in `scripts/client.js` + `global.css`.
+Primary code: `../3/exodus/scripts/db.js` (`dictrec`, `exodus_dict_*`), `dbform.js` (paint, `copydictitem`), wide soft max in `client.js` + `global.css`.
 
 Related: [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md).
 

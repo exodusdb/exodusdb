@@ -1,9 +1,10 @@
 # Exodus form UI — layout philosophy
 
-**Location:** `exodus/service/www/3/exodus/`  
+**Location:** `service/www/exodus/doc/` (web programming docs)  
 **Audience:** maintainers and AI assistants working on Exodus web forms  
-**Discovery:** pointed to from `~/exodus/AGENTS.md`, `~/neosys/AGENTS.md`, and `.grok/rules/exodus-form-ui.md` in those repos  
-**See also:** `scripts/PROGRAMMERS_OVERVIEW.md`, `exodus/doc/forms.htm`, `global.css`
+**Discovery:** pointed to from `~/exodus/AGENTS.md`, `~/neosys/AGENTS.md`, and `.grok/rules/exodus-form-ui.md`  
+**See also:** [PROGRAMMERS_OVERVIEW.md](./PROGRAMMERS_OVERVIEW.md), [forms.htm](./forms.htm), `../3/exodus/global.css`, [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [FORM-UI-KEYBOARD-BROWSER.md](./FORM-UI-KEYBOARD-BROWSER.md)  
+**Not here:** C++/var/exoprog docs live under repo-root `doc/`
 
 This note captures *strategic* UI conventions — how forms are built at runtime, how borders and width behave, and what to avoid. It is not a duplicate of the programmer's manual.
 

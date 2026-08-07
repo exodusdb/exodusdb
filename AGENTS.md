@@ -17,20 +17,30 @@ Skill **`exodus-remotecall`**: **`.grok/skills/exodus-remotecall/scripts/test.ex
 
 Before changing **form layout**, **CSS**, **borders**, **width**, **tabs**, **repeating groups**, or **embedded tables**, read:
 
-**`service/www/3/exodus/FORM-UI-PHILOSOPHY.md`**
+**`service/www/exodus/doc/FORM-UI-PHILOSOPHY.md`**
 
 That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spans, embedded `exogroupno` tables) and lists anti-patterns to avoid.
+
+## Doc layout
+
+| Kind | Directory |
+|------|-----------|
+| **Web** (forms, client.js, dicts, browser keys) | `service/www/exodus/doc/` |
+| **Core Exodus** (var, exoprog, gendoc, man/HTML for C++) | repo-root `doc/` |
 
 ## Framework reference
 
 | Topic | Location |
 |-------|----------|
-| Form UI philosophy | `service/www/3/exodus/FORM-UI-PHILOSOPHY.md` |
-| JS API / architecture | `service/www/3/exodus/scripts/PROGRAMMERS_OVERVIEW.md` |
+| Form UI philosophy | `service/www/exodus/doc/FORM-UI-PHILOSOPHY.md` |
+| Form field kinds | `service/www/exodus/doc/FORM-UI-TYPES.md` |
+| Browser vs form keys | `service/www/exodus/doc/FORM-UI-KEYBOARD-BROWSER.md` |
+| JS API / architecture | `service/www/exodus/doc/PROGRAMMERS_OVERVIEW.md` |
 | Form CSS | `service/www/3/exodus/global.css` |
 | Form automation | `service/www/3/exodus/scripts/dbform.js` |
 | Pane wrap | `service/www/3/exodus/scripts/client.js` (`exoduswrapformpanes`) |
-| Dev docs (HTML) | `service/www/exodus/doc/forms.htm` |
+| Web HTML notes | `service/www/exodus/doc/forms.htm` (and peers) |
+| C++/var docs | `doc/` (see `doc/README.md`) |
 
 ## Quality model (debt allowed → clean on **review** / **squash**)
 
