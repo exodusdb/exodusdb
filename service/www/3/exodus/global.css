@@ -651,10 +651,12 @@ BODY
     --exodus-form-border: #d0d0d0;
     --exodus-form-pane-padding: 0.375em;
     --exodus-form-pane-margin: 0.125em;
-    /* Horizontal: equal L/R (was all in left — 0.5em / nested 0.3em) */
-    --exodus-form-cell-padding-x: 0.25em;
+    /* Horizontal: equal L/R (was all in left — 0.5em / nested 0.3em).
+     * +0.125em L/R: old .clsReadOnly host pad moved onto the cell so th and td
+     * share the same air (host pad is 0; do not put it only on display spans). */
+    --exodus-form-cell-padding-x: 0.375em; /* was 0.25em + 0.125em host */
     --exodus-form-cell-padding-y: 0.35em;
-    --exodus-form-nested-cell-padding-x: 0.15em;
+    --exodus-form-nested-cell-padding-x: 0.275em; /* was 0.15em + 0.125em host */
     --exodus-form-nested-cell-padding-y: 0.2em;
     /* Aliases: older rules / popup icon gap after find/link */
     --exodus-form-cell-padding-left: var(--exodus-form-cell-padding-x);
@@ -748,8 +750,8 @@ BODY
     border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
     border-radius: 0.3rem;
     cursor: pointer;
-    /* th/td use label italic — buttons must not inherit prompt face */
-    font-style: normal;
+    /* In-form: inherit TABLE.exodusform / cell label italic; outside form body is normal */
+    font-style: inherit;
     font-size: var(--exodus-form-data-font-size, 1rem);
 }
 
@@ -897,12 +899,10 @@ SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
     background: transparent !important;
     border: none;
     border-radius: 0;
-    margin: 0px;
-    /*padding: 0px;*/
-    padding: 0 0.125em;
+    margin: 0;
+    /* No host L/R pad — cell pad owns inset; th has no host so this was fake "td air". */
+    padding: 0;
     font-size: var(--exodus-form-data-font-size);
-    /*filter: alpha(opacity=80);
-    opacity: 0.80;*/
 }
 
 /* bound data — shared size/style for entry + display fields */
@@ -1155,20 +1155,7 @@ img[id^="deleterowbutton"] {
     width: var(--exodus-ui-icon-size);
     cursor: pointer;
 }
-/*
- * Find/link icons sit left of the data field inside the cell. Cell padding-x
- * already applies before the first icon; replicate that pad after the last chrome
- * icon so the field keeps the same left inset (icons must not consume it).
- * Only adjacent data controls — not intermediate wrapper spans when both icons exist.
- */
-TABLE.exodusform :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly),
-TABLE.exodusform :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
-    margin-left: var(--exodus-form-cell-padding-x);
-}
-TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduspopup="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly),
-TABLE.exodusform TABLE :is(.exodus-icon, img)[isexoduslink="1"] + :is(INPUT, SELECT, TEXTAREA, SPAN.clsRequired, SPAN.clsNotRequired, .clsReadOnly) {
-    margin-left: var(--exodus-form-nested-cell-padding-x);
-}
+/* F7/F6 icons: no extra margin on the field — cell pad is enough; icons sit flush. */
 /* Column sort chevrons after title text — tight to label (margin, not glyph pad). */
 :is(.exodus-icon, img)[id^="sortbutton_"] {
     margin-left: 0.15em;
