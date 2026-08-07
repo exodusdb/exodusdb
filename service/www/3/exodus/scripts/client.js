@@ -9799,26 +9799,36 @@ async function decide_onload(decide_args) {
 		if (typeof wrap == 'undefined' || wrap == null)
 			wrap = true
 
+		// Origin: highlighted row first (mouse hover or prior key steal), else focus/check.
+		// So Up/Down from a hover on row 5 moves from 5, not from the checked radio on row 1.
 		var element = null
-		var active = document.activeElement
-		if (active && active.name == 'decide_selection' && !decide_selection_row_hidden(active))
-			element = active
-		else if (decide_last_option_element
-			&& decide_last_option_element.name == 'decide_selection'
-			&& !decide_selection_row_hidden(decide_last_option_element))
-			element = decide_last_option_element
-		else {
-			for (var ci = 0; ci < selections.length; ci++) {
-				if (selections[ci].checked && !decide_selection_row_hidden(selections[ci])) {
-					element = selections[ci]
-					break
-				}
-			}
-			if (!element) {
-				for (var vi = 0; vi < selections.length; vi++) {
-					if (!decide_selection_row_hidden(selections[vi])) {
-						element = selections[vi]
+		var hovertr0 = document.querySelector('#decide_table1body1 tr.decide_row_hover')
+		if (hovertr0) {
+			var hoverinp = hovertr0.getElementsByTagName('input')[0]
+			if (hoverinp && hoverinp.name == 'decide_selection' && !decide_selection_row_hidden(hoverinp))
+				element = hoverinp
+		}
+		if (!element) {
+			var active = document.activeElement
+			if (active && active.name == 'decide_selection' && !decide_selection_row_hidden(active))
+				element = active
+			else if (decide_last_option_element
+				&& decide_last_option_element.name == 'decide_selection'
+				&& !decide_selection_row_hidden(decide_last_option_element))
+				element = decide_last_option_element
+			else {
+				for (var ci = 0; ci < selections.length; ci++) {
+					if (selections[ci].checked && !decide_selection_row_hidden(selections[ci])) {
+						element = selections[ci]
 						break
+					}
+				}
+				if (!element) {
+					for (var vi = 0; vi < selections.length; vi++) {
+						if (!decide_selection_row_hidden(selections[vi])) {
+							element = selections[vi]
+							break
+						}
 					}
 				}
 			}
