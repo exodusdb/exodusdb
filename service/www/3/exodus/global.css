@@ -442,23 +442,14 @@ body > #formbuttonsdiv_face .graphicbutton [data-source-id$="_label"] {
 }
 /*
  * Nested host tables (exotable / exogroup / fieldstrip) when HTM has no width=:
- * no forced width (do not fill the host cell). max-width 100% of host only.
- * HTML width= wins (:not([width])); line grids that need full data column use
- * width="100%".
- *
- * Layout policy (with form soft ceiling + free-text paint):
- * Exodus form tables / fieldstrips are left-oriented. They size to content and
- * as far as possible minimise and fold text to stay within the screen (form
- * max-width calc(100vw-2rem); free-text max-width 100% of cell). If a form
- * cannot fit ( .exodusform-wide ), default free-text (empty di.length) folds
- * within 30ch (exomaxwidth; form_table_apply_freetext_wide_max).
+ * hug content (max-content); max-width 100% of host. HTML width= wins
+ * (:not([width])); line grids that need full data column use width="100%".
+ * Any depth under form (not only direct form-td children).
  */
-TABLE.exodusform > tbody > tr > td > TABLE.exotable:not([width]),
-TABLE.exodusform > tbody > tr > td > TABLE[exogroupno]:not([width]),
-TABLE.exodusform > tbody > tr > td > TABLE.exodus-fieldstrip:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE.exotable:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE[exogroupno]:not([width]),
-TABLE.exodusform > tbody > tr > th > TABLE.exodus-fieldstrip:not([width]) {
+TABLE.exodusform TABLE.exotable:not([width]),
+TABLE.exodusform TABLE[exogroupno]:not([width]),
+TABLE.exodusform TABLE.exodus-fieldstrip:not([width]) {
+    width: max-content;
     max-width: 100%;
     box-sizing: border-box;
 }
