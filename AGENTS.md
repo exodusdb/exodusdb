@@ -193,6 +193,20 @@ Changing `src/dat/dict.*` is **not** live until:
 
 Do **not** invent app-level “force reindex stamps” for formula changes — that is **syncdat/dict2sql/createindex** on startup after dat is live.
 
+### Dict type **S** with C++ / formula code (must rebuild libdict)
+
+**F**-type items are field maps only — dat file + syncdat is enough.
+
+**S**-type items that run code (symbolic formulas / `dictinit(…)` in `libdict_*.so`) are **not** live from dat alone. Listen resolves them by loading a **function of that name** from **`libdict_<file>.so`** (e.g. `LIVE_USER` → `live_user` in `libdict_users.so`). Missing symbol → runtime: *function cannot be found in lib …*.
+
+| Step | What |
+|------|------|
+| **1. Dat source** | Add/change the item under **`src/dat/dict.<file>/ITEM_NAME`** (exodus service and/or neosys product tree). |
+| **2. Generate + compile** | **`cd ~/exodus/service/src && ./compall`** (or **`~/neosys/src/compall`** / full **`~/neosys/compall`** when the dict is product-side). That **regenerates `dic/dict_<file>.cpp`** from changed dat (`syncdat dat {IG…}`) **and compiles** into **`$EXO_HOME/lib/libdict_<file>.so`**. **`compall dat` alone** only rsyncs dat — **does not** rebuild the `.so`. |
+| **3. Deploy live** | **`cd ~/exodus/service && ./copyall CONFIRM`** so live gets **dat + libdict_*.so** and services restart. |
+
+**Do not** hand-edit `dict_*.cpp` as the only source of truth for formula bodies that exist in dat — regenerate from dat via **compall**. **Do not** expect `WITH SOME_S_FIELD` / SELECT to work after only dropping a new S item into dat.
+
 ## C++ style: prefer `var` member functions (FYI)
 
 Free functions in `exofuncs.h` (`quote`, `squote`, `oconv`, `osshell`, …) mostly **forward to members**. The library and apps are written in a **member-first** style because `var` is used heavily in chains and the same names exist on both sides.
