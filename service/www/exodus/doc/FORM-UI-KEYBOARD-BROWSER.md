@@ -58,7 +58,7 @@ After material key-policy changes, re-run the inventory (or the agent prompt) an
 
 | Keys | Browser (typical) | Exodus |
 |------|-------------------|--------|
-| **Alt+←** | History **back** | **Not wide:** history back. **Wide form** (`.exodusform-wide`): pan left ~1 screen |
+| **Alt+←** | History **back** | **Not wide:** history back. **Wide form** (`.exodusform-wide`): pan left ~1 screen — see [FORM-UI-WIDE-NARROW.md](./FORM-UI-WIDE-NARROW.md) |
 | **Alt+→** | History **forward** | **Not wide:** history forward. **Wide:** pan right |
 | **Alt+↑ / Alt+↓** | (varies; rarely page nav) | **Pan** up/down ~1 screen (Alt+↓ on a drop-down still opens options) |
 | **Backspace** (not in text) | Old IE: back; modern: usually nothing | **Owned:** field leave / typeahead / decide, etc. — not browser back |

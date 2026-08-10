@@ -6,7 +6,10 @@ Exodus bound form fields: **theory** (clean categories) and **practice** (dictit
 
 Primary code: `../3/exodus/scripts/db.js` (`dictrec`, `exodus_dict_*`), `dbform.js` (paint, `copydictitem`), wide soft max in `client.js` + `global.css`.
 
-Related: [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md).
+Related:
+
+- [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md)
+- **[FORM-UI-WIDE-NARROW.md](./FORM-UI-WIDE-NARROW.md)** — AIM + method of narrow free-text fold vs extreme-wide (`.exodusform-wide`, 30ch soft max, nest width rules)
 
 ---
 
@@ -99,10 +102,11 @@ Rough order in `formfunctions_onload`:
 11. **class**: editable F → `clsNotRequired` / `clsRequired`; else → **`clsReadOnly`**
 12. **`form_apply_input_field_width`** — **INPUT only** (not SPAN)
 
-Then wide layout (separate):
+Then wide layout (separate) — full AIM/method: **[FORM-UI-WIDE-NARROW.md](./FORM-UI-WIDE-NARROW.md)**:
 
 - `exomaxwidth` → max 30ch when wide (`form_table_apply_freetext_wide_max`)
 - CSS: wide `td:has(> contenteditable | clsReadOnly | align=T)` → `min-width: max-content`
+- Narrow: free-text folds under form soft ceiling (`max-width: 100%` on span; **not** 30ch)
 
 ## 3. DOM result axes (what you can observe)
 
@@ -254,14 +258,16 @@ Display free-text is **three** mechanisms (readonly, type S, clsReadOnly) that m
 
 ### Free-text soft max (current rule of thumb)
 
+Full story: **[FORM-UI-WIDE-NARROW.md](./FORM-UI-WIDE-NARROW.md)**.
+
 | | Rule |
 |---|------|
-| Who | free-text = align T and not code (`lowercase !== false`) |
-| Empty length | `exomaxwidth=30ch` (entry **and** display SPANs) |
-| Narrow | max-width 100% |
+| Who | free-text = exostyle text / align T and not code |
+| Empty length | attribute `exomaxwidth=30ch` (candidate only) |
+| Narrow | **style** max-width **100%** — fold under soft ceiling; **never** lock to 30ch |
 | Wide | style max-width from `exomaxwidth` on all `SPAN[exomaxwidth]` |
 | Entry | type F + !readonly → contenteditable, fill cell |
 | Display | readonly F or type S → no contenteditable, inline-block + same soft max |
-| Codes | lowercase false → nowrap, out of soft max |
+| Codes | nowrap, out of soft max |
 
 Wide host `min-width: max-content` on contenteditable / clsReadOnly / align T cells is a **separate** axis from soft max on the span; do not conflate the two without an explicit decision.

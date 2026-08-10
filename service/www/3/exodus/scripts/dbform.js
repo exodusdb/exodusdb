@@ -47,11 +47,18 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //     exodus_dict_number   → "number" (SPAN; floor 6ch)
 //
 // di.length for SPAN paint:
-//   text   — wide mode only: empty → exomaxwidth 30ch (client applies when
-//            .exodusform-wide); length set → no soft max. Not a min-width.
+//   text   — wide mode ONLY: empty → attribute exomaxwidth="30ch" (client applies
+//            style.maxWidth when .exodusform-wide). length set → no soft max.
+//            NOT a min-width. Narrow forms: style.maxWidth must stay 100% so
+//            free-text folds under form soft ceiling — NEVER lock to 30ch.
 //   code / number — unused (floor 6ch either way).
 // di.length for TEXTAREA paint: min-width floor (Nch); fill cell for max.
 // Align L/R INPUT: form_apply_input_field_width (length / sample).
+//
+// Free-text fold / wide vs narrow (AIM + method):
+//   service/www/exodus/doc/FORM-UI-WIDE-NARROW.md
+// Nested TABLE.exotable|exogroup|fieldstrip without [width] must NOT use
+// width:max-content in global.css — strips fold budget (HARD RULE there).
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
@@ -1259,8 +1266,10 @@ async function formfunctions_onload() {
                 element.style.boxSizing = 'border-box'
             } else if (element.tagName == 'SPAN' && element.style.display != 'none'
                 && fieldStyle === 'text') {
-                // text: fill cell. length gates wide soft max only (form_table_set_wide):
-                // empty length → exomaxwidth 30ch; length set → no soft max.
+                // Free-text fold (narrow default): fill cell, pre-wrap, maxWidth 100%.
+                // Attribute exomaxwidth="30ch" is a WIDE-MODE soft max only — applied by
+                // form_table_apply_freetext_wide_max when .exodusform-wide. Do NOT set
+                // style.maxWidth to 30ch here (would lock typing to ~30 chars always).
                 var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
                 if (!(freeLen > 0))
                     freeLen = 0
@@ -1274,16 +1283,14 @@ async function formfunctions_onload() {
                     if (entryF) {
                         element.style.display = 'block'
                         element.style.width = '100%'
-                        // Small floor only (same as code/number 6ch) so empty hosts in
-                        // shrink-wrap cells do not collapse to zero. Do NOT use freeLen
-                        // or 30ch here — length is only for wide soft max (exomaxwidth).
+                        // Empty-host floor only. Not freeLen / not 30ch.
                         element.style.minWidth = '6ch'
                     } else {
                         // display free-text / names — keep side-by-side with codes
-                        // valign: .exodata > * (leaf data cell)
                         element.style.display = 'inline-block'
                         element.style.minWidth = '0'
                     }
+                    // Always 100% at paint; wide layout may raise soft max later
                     element.style.maxWidth = '100%'
                     element.style.boxSizing = 'border-box'
                 }

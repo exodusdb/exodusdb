@@ -387,15 +387,33 @@ body > #formbuttonsdiv_face .graphicbutton [data-source-id$="_label"] {
 }
 /*
  * Nested host tables (exotable / exogroup / fieldstrip) when HTM has no width=:
- * hug content (max-content); max-width 100% of host. HTML width= wins
- * (:not([width])); line grids that need full data column use width="100%".
- * Any depth under form (not only direct form-td children) — 2a0af295 policy.
- * Free-text stays width/max 100% fill cell (ec72667c fold); hug is the table.
+ * ---------------------------------------------------------------------------
+ * Doc (AIM + method): service/www/exodus/doc/FORM-UI-WIDE-NARROW.md
+ *
+ * HARD RULE — free-text fold (do not “fix” hug by violating this):
+ *
+ *   FORBIDDEN: width: max-content  (or min-width: max-content) on these nests.
+ *   That is a REPEATED BAD REGRESSION for users: long free-text (exostyle text /
+ *   align=T pre-wrap) must fold under the form soft ceiling
+ *   (.exodusformpane > TABLE.exodusform { max-width: calc(100vw - 2rem) }).
+ *   max-content on the nest removes the width budget; text never wraps; users
+ *   get horizontal sprawl or false .exodusform-wide → 30ch soft-max lock.
+ *
+ *   REQUIRED: max-width: 100% only (no forced width). Table sizes under the
+ *   parent budget; free-text cells (min-width: 0 below) shrink; spans fold.
+ *
+ *   OPT-IN full width: HTML width="100%" on the nest (line grids).
+ *   Any depth under form (not only direct form-td children).
+ *
+ * Free-text host paint (dbform): width/max 100%, pre-wrap — not a ch min here.
+ * Extreme-wide 30ch soft max is ONLY when JS sets .exodusform-wide (client.js
+ * form_table_set_wide) — never from this rule.
+ * See soft-ceiling tradeoff note on .exodusformpane > TABLE.exodusform (B).
  */
 TABLE.exodusform TABLE.exotable:not([width]),
 TABLE.exodusform TABLE[exogroupno]:not([width]),
 TABLE.exodusform TABLE.exodus-fieldstrip:not([width]) {
-    width: max-content;
+    /* Do NOT add width:max-content — free-text fold regression (see comment). */
     max-width: 100%;
     box-sizing: border-box;
 }
@@ -449,48 +467,42 @@ TABLE.exodusform TABLE.exotable th {
     box-sizing: border-box;
     /*
      * Soft ceiling at the viewport — not on the pane.
-     * THIS is the “if form would exceed screen, force a width budget” rule:
-     * under that budget, free-text hosts with min-width:0 shrink first
-     * (can look “crushed” on extreme-wide multi-col forms).
-     * Pane stays width:max-content and still follows this table, so the border
-     * encloses the form. Flexible columns (ITEM_DESCRIPTION) get a real width
-     * budget and can fold once the form would otherwise exceed the screen.
-     * (Clamping the pane itself made wide journals grids stick out of the frame.)
+     * Doc (AIM + method): service/www/exodus/doc/FORM-UI-WIDE-NARROW.md
      *
-     * --- width: (deliberately NOT set here) ---
-     * Non-wide forms use table auto width (UA content sizing under max-width).
+     * THIS is the free-text fold budget: under max-width, free-text hosts with
+     * min-width:0 shrink first and pre-wrap folds. Pane stays width:max-content
+     * and still follows this table so the border encloses the form.
      *
-     * Competing bugs — do not flip-flop without checking BOTH:
+     * --- width: (deliberately NOT set here on non-wide forms) ---
+     * Non-wide: table auto width under this max-width (UA content sizing).
+     *
+     * REGRESSION GUARD — competing bugs (check BOTH before any width: change):
      *
      *  A) Sibling stretch in a coalesced multi-form pane
-     *     Several TABLE.exodusform in one .exodusformpane: a wide sibling can
-     *     stretch narrower ones if the table stretches with the pane/budget.
+     *     Wide sibling can stretch narrower forms if tables fill the pane.
      *     Historical fix (c7f63c62): width:max-content on
-     *     .exodusformpane > TABLE.exodusform:not([width]) so each form hugs
-     *     its own content; HTML width= / style.width still opts into expand.
+     *     .exodusformpane > TABLE.exodusform:not([width]) — NOT on nested hosts.
      *
-     *  B) Free-text fold / soft-ceiling budget (multi-col line grids)
-     *     Forms that need a real width budget so pre-wrap T fields fold under
-     *     the soft ceiling (journals, costs DESCRIPTION, …). Blanket
-     *     width:max-content on every form fights that path and is easy to
-     *     “fix” configuration-looking wide tables for the wrong reason.
+     *  B) Free-text fold under soft ceiling (journals, costs DESCRIPTION, …)
+     *     FORBIDDEN: width:max-content / min-width:max-content on
+     *     nested TABLE.exotable|exogroup|fieldstrip without [width], or on
+     *     non-wide form tables here. That is a REPEATED BAD REGRESSION:
+     *     long text no longer folds with screen width; or form flips to
+     *     .exodusform-wide and free-text gets the 30ch soft max (looks like
+     *     “all text locked to 30 characters”).
      *
-     * Wide path (.exodusform-wide below) sets width:max-content on purpose
-     * after form_update_wide_layout() decides the form is extreme-wide.
-     * Restoring (A) for non-wide forms must reintroduce :not([width]) and
-     * prove multi-form panes still OK with free-text crush — not a one-line
-     * “hug again” from a single narrow form looking wide.
+     * Wide path (.exodusform-wide) sets width:max-content only after
+     * form_update_wide_layout() decides extreme-wide — not a default.
      */
     max-width: calc(100vw - 2rem);
 }
 
 /*
- * Extreme-wide forms (.exodusform-wide) — set by form_update_wide_layout()
- * (temp/wide-form-crush). When wide: no soft ceiling; free-text hosts
- * min-width max-content. Empty-length free-text 30ch is set in JS only when
- * the wide class is applied (form_table_set_wide) — not here, so narrow
- * never inherits a ch cap.
- * width:max-content here is intentional (see tradeoff note on non-wide forms).
+ * Extreme-wide forms (.exodusform-wide) — form_update_wide_layout() only.
+ * Doc: service/www/exodus/doc/FORM-UI-WIDE-NARROW.md
+ * Empty-length free-text 30ch soft max: JS form_table_set_wide / apply_freetext_wide_max
+ * ONLY when this class is on. Narrow forms must keep style.maxWidth 100% (never 30ch).
+ * Do not put 30ch or max-content free-text rules here for non-wide forms.
  */
 .exodusformpane > TABLE.exodusform.exodusform-wide {
     max-width: none;
@@ -503,8 +515,9 @@ TABLE.exodusform.exodusform-wide td:has(> span[exodusalign="T"]) {
 }
 
 /*
- * Flowing text (align=T → contenteditable span).
- * Fill cell (width 100% from dbform). No forced ch here.
+ * Flowing free-text (exostyle text / align=T → contenteditable span).
+ * Fill cell (width 100% from dbform). NO ch cap here — fold under cell budget.
+ * 30ch is wide-mode only (attribute exomaxwidth + form_table_apply_freetext_wide_max).
  */
 SPAN.clsRequired[contenteditable],
 SPAN.clsNotRequired[contenteditable] {
@@ -512,7 +525,7 @@ SPAN.clsNotRequired[contenteditable] {
     max-width: 100%;
     overflow-wrap: break-word;
 }
-/* Allows free-text columns to shrink under the form soft ceiling (with max-width above). */
+/* Free-text columns shrink under form soft ceiling (pair with span max-width 100%). */
 TABLE.exotable td:has(> span[contenteditable]),
 TABLE[exogroupno] td:has(> span[contenteditable]),
 TABLE.exodusform td:has(> span[contenteditable]) {

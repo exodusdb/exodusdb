@@ -5993,10 +5993,19 @@ function exodus_reveal_form_panes() {
 /*
  * Extreme-wide form auto-class (temp/wide-form-crush).
  *
+ * Doc (AIM + method of narrow vs wide):
+ *   service/www/exodus/doc/FORM-UI-WIDE-NARROW.md
+ * Also: FORM-UI-TYPES.md (field categories), FORM-UI-PHILOSOPHY.md (pane model).
+ *
  * wantWide = (skeleton > soft_ceiling) OR (record && free-text crushed).
  * Skeleton: free-text at empty floor 6ch, table unlimited max-content width.
  * Soft ceiling = current zoom (100vw − 2rem). Remeasure each decide (KISS).
- * Free-text soft max 30ch only when wide (form_table_set_wide).
+ *
+ * Free-text soft max 30ch ONLY when .exodusform-wide (form_table_set_wide).
+ * REGRESSION GUARD: never leave style.maxWidth=30ch on narrow forms — that
+ * looks like “all text locked to 30 characters”. Always apply 100% when !wide.
+ * Nested host tables must NOT use width:max-content (global.css) or free-text
+ * cannot fold under the soft ceiling (repeated user-facing regression).
  */
 var gform_wide_layout_resize_wired = false
 var gform_wide_crush_slack_px = 32
@@ -6031,12 +6040,16 @@ function form_table_set_wide_class(table, wide) {
 function form_table_apply_freetext_wide_max(table, wide) {
 	if (!table || !table.querySelectorAll)
 		return
+	// Never paint 30ch unless the table is actually wide (stale flag / call order)
+	if (wide && !form_table_is_wide(table))
+		wide = false
 	var spans = table.querySelectorAll('SPAN[exomaxwidth]')
 	for (var i = 0; i < spans.length; i++) {
 		var sp = spans[i]
 		var mx = sp.getAttribute('exomaxwidth')
 		if (!mx)
 			continue
+		// narrow: 100% of cell (fold under soft ceiling). wide: soft max e.g. 30ch
 		sp.style.maxWidth = wide ? mx : '100%'
 	}
 }
@@ -6045,7 +6058,8 @@ function form_table_set_wide(table, wide) {
 	if (!table)
 		return
 	form_table_set_wide_class(table, wide)
-	form_table_apply_freetext_wide_max(table, wide)
+	// Always sync free-text maxWidth to class (clears stale 30ch when leaving wide)
+	form_table_apply_freetext_wide_max(table, !!wide)
 }
 
 function form_freetext_exomaxwidth_px(span) {
@@ -6275,6 +6289,9 @@ function form_update_wide_layout(fromResize) {
 			form_table_set_wide(table, wantWide)
 		} else if (wantWide) {
 			form_table_apply_freetext_wide_max(table, true)
+		} else {
+			// Stay narrow: clear any leftover 30ch soft max (fold under cell 100%)
+			form_table_apply_freetext_wide_max(table, false)
 		}
 	}
 

@@ -34,6 +34,7 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 |-------|----------|
 | Form UI philosophy | `service/www/exodus/doc/FORM-UI-PHILOSOPHY.md` |
 | Form field kinds | `service/www/exodus/doc/FORM-UI-TYPES.md` |
+| Form wide vs narrow (fold / 30ch) | `service/www/exodus/doc/FORM-UI-WIDE-NARROW.md` |
 | Browser vs form keys | `service/www/exodus/doc/FORM-UI-KEYBOARD-BROWSER.md` |
 | JS API / architecture | `service/www/exodus/doc/PROGRAMMERS_OVERVIEW.md` |
 | Form CSS | `service/www/3/exodus/global.css` |
