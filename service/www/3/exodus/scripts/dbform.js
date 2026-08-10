@@ -1993,13 +1993,13 @@ async function formfunctions_onload() {
                     }
 
                     //locate the TFOOT element in the parents
-                    // Spacer only (column align with thead Show All cell) — must be td,
-                    // not th, or TABLE.exodusform th prompt face tints the footing lead-in.
+                    // Spacer only (column align with thead Show All cell) — th like thead
+                    // lead-in (base bgcolor); was td to avoid th tint (obsolete with inversion).
                     var tfx = tablex.getElementsByTagName('tfoot')[0]
                     if (tfx) {
                         var tfxr = tfx.getElementsByTagName('tr')[0]
                         if (tfxr) {
-                            var footspacer = document.createElement('td')
+                            var footspacer = document.createElement('th')
                             footspacer.className = col0class
                             footspacer.width = '1%'
                             footspacer.innerHTML = ''
