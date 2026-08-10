@@ -6458,26 +6458,19 @@ function exodus_mark_form_edge_rows() {
 
 function exodusclear_embeddedtable_hostborders() {
 
-	// Host td/th wrapping any nested table inside TABLE.exodusform:
-	// tag .exodusembeddedtable (CSS: same bgcolor as th/pane — empty colspan area
-	// to the right of max-content nested tables). Strip leftover inline borders.
+	// Static exotable / embedded group tables: strip inline borders on the host row/cell
 	var tables = document.getElementsByTagName('TABLE')
 	for (var tablen = 0; tablen < tables.length; tablen++) {
 		var tablex = tables[tablen]
+		var isgroup = Number(tablex.getAttribute('exogroupno'))
+		var isexotable = tablex.className && (' ' + tablex.className + ' ').indexOf(' exotable ') >= 0
+		if (!isgroup && !isexotable)
+			continue
 		var hostcell = tablex.parentNode
+		// Outer grid prompt cells may be th; data cells are td
 		if (!hostcell || (hostcell.tagName != 'TD' && hostcell.tagName != 'TH'))
 			continue
-		// Must sit inside an outer form (not the top-level form's own parent)
-		var outerForm = null
-		for (var p = hostcell.parentNode; p; p = p.parentNode) {
-			if (p.tagName == 'TABLE' && (' ' + (p.className || '') + ' ').indexOf(' exodusform ') >= 0) {
-				outerForm = p
-				break
-			}
-		}
-		if (!outerForm || tablex === outerForm)
-			continue
-		if ((' ' + (hostcell.className || '') + ' ').indexOf(' exodusembeddedtable ') < 0)
+		if ((' ' + hostcell.className + ' ').indexOf(' exodusembeddedtable ') < 0)
 			hostcell.className += (hostcell.className ? ' ' : '') + 'exodusembeddedtable'
 		hostcell.style.removeProperty('border')
 		var hostrow = hostcell.parentNode
