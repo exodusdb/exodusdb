@@ -1697,6 +1697,15 @@ async function formfunctions_onload() {
             var rowx = getancestor(element, 'TR')
             var tablex = getancestor(rowx, 'TABLE')
 
+            // Leaf data cell: nearest td/th of a bound field (CSS .exodata = form body).
+            // Skip structure hosts (exotable/group wrappers) — those stay base-tinted.
+            var datacell = getancestor(element, ' TD TH ')
+            if (datacell) {
+                var dcn = ' ' + (datacell.className || '') + ' '
+                if (dcn.indexOf(' exodusembeddedtable ') < 0 && dcn.indexOf(' exodata ') < 0)
+                    datacell.className += (datacell.className ? ' ' : '') + 'exodata'
+            }
+
             //set the datasrc of single valued elements
             if (groupno == 0) {
 

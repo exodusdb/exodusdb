@@ -81,8 +81,13 @@ TABLE.exodusform th.exodusembeddedtable {
         calc(c * 1.175 + 0.0075)
         h);
 }
-/* Nested tables: form body under transparent td (host base only outside the table) */
+/* Nested tables: form body under transparent unmarked td (host base only outside) */
 TABLE.exodusform TABLE {
+    background-color: var(--exodus-form-face, #fdf5e6);
+}
+/* Leaf data cells — marked on bind (dbform: nearest td/th of gfields control) */
+TABLE.exodusform td.exodata,
+TABLE.exodusform th.exodata {
     background-color: var(--exodus-form-face, #fdf5e6);
 }
 TABLE.exodusform th,
@@ -109,7 +114,9 @@ TABLE[exogroupno] th {
 :root[data-theme="dark_mode"] TABLE.exodusform th.exodusembeddedtable {
     background-color: #303a5a;
 }
-:root[data-theme="dark_mode"] TABLE.exodusform TABLE {
+:root[data-theme="dark_mode"] TABLE.exodusform TABLE,
+:root[data-theme="dark_mode"] TABLE.exodusform td.exodata,
+:root[data-theme="dark_mode"] TABLE.exodusform th.exodata {
     background-color: #28304a;
 }
 
