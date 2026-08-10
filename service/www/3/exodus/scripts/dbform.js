@@ -6508,11 +6508,17 @@ function form_typeahead_listen_scroll(on) {
 }
 
 // Detect create-style allownew for a bound field (for typeahead etc.).
+//  - Form forbids new records: gupdateonlymode / gpreventcreation / greadonlymode
+//    (same as New button hide — e.g. users.htm gupdateonlymode=true)
 //  - EXECUTIVE_CODE / BRAND_EXECUTIVE_CODE: always true (for now)
 //  - else true only if fieldno 0 and single-part key (gKeyNodes length 1)
-// Not wired to miss-tint; callers opt in.
 function form_field_is_allownew(el) {
     if (!el || !el.getAttribute)
+        return false
+    // No new records on this form → typeahead miss is red, not green allownew
+    if ((typeof gupdateonlymode != 'undefined' && gupdateonlymode)
+        || (typeof gpreventcreation != 'undefined' && gpreventcreation)
+        || (typeof greadonlymode != 'undefined' && greadonlymode))
         return false
     var id = el.id || el.getAttribute('exodusname') || ''
     if (id == 'EXECUTIVE_CODE' || id == 'BRAND_EXECUTIVE_CODE')
