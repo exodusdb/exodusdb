@@ -10489,11 +10489,18 @@ async function form_insertrow(event, append) {
         }
     }
 
-    // Following row hidden: expand indented peers only (not form_filter hide).
-    // Filter sets Show All display='' and/or table.exodus_filter_*; expand path
-    // would return without inserting and leave the wrong UI (user: focus key, no row).
+    // Following row(s) hidden → expand instead of insert, except:
+    //   • dblclick value filter (table.exodus_filter_colid): always insert
+    //     (c137c49b — filter hide is not fold; insert after filter)
+    //   • fold-on-open [+] (exodusexpand) while Show All up: expand those
+    //   • not filtered: expand (indent/legacy hide)
+    var valueFilter = !!(tablex && tablex.exodus_filter_colid)
+    var insertbtn = grows[grecn] && grows[grecn].exodusfields
+        && grows[grecn].exodusfields['insertrowbutton' + groupno]
+    var expandAffordance = insertbtn && insertbtn.getAttribute('exodusexpand')
     if (grecn < (nrows - 1) && grows[grecn + 1].style.display == 'none'
-        && !form_group_is_filtered(tablex, groupno)) {
+        && !valueFilter
+        && (expandAffordance || !form_group_is_filtered(tablex, groupno))) {
 
         //return to insertrow image
         setinsertimage('insert', grows[grecn], groupno)
@@ -10598,11 +10605,13 @@ function setinsertimage(mode, row, groupno) {
 
     if (mode == 'expand') {
         insertimage = exodus_set_icon_element(insertimage, gexpandrowimage)
+        insertimage.setAttribute('exodusexpand', '1')
         //duplicate keycodes in 3 places
         insertimage.title = 'Expand hidden rows here (Ctrl+I or Ctrl+Insert)'
     }
     else {
         insertimage = exodus_set_icon_element(insertimage, ginsertrowimage)
+        insertimage.removeAttribute('exodusexpand')
         //duplicate keycodes in 3 places
         insertimage.title = 'Insert a new row here (Ctrl+I or Ctrl+Insert)'
     }
@@ -11619,8 +11628,17 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
                 form_group_leadin_display(tablex, true)
             }
         }
-        // Filter hide is not indent-collapse: leave insert icons as insert.
-        // (Expand [+] is only for hierarchical peer rows, not form_filter.)
+        // Fold-on-open (regexp / maxrecn): expand [+] on last visible before a
+        // hidden run. Dblclick value filter / filterall: green insert only —
+        // clear any leftover fold expand marks so insert after filter works.
+        if (regexp || maxrecn) {
+            for (var ern = 0; ern < lastunhiddenrows.length; ++ern)
+                setinsertimage('expand', lastunhiddenrows[ern], groupno)
+        }
+        else {
+            for (var irn = 0; irn < grows.length; ++irn)
+                setinsertimage('insert', grows[irn], groupno)
+        }
         await calcfields()
     }
 
