@@ -172,17 +172,14 @@ html:not(.exodus-panes-ready) TABLE.exodusform,
 html:not(.exodus-panes-ready) .exodusformpane {
 	visibility: hidden;
 }
-/*must be first in order to customise screen form color (screencolor may set rule bg) */
+/* No table fill — pane + .exodata; screencolor is --exodus-form-bg-color only. */
 TABLE.exodusform
 {
-    /*display: none; this used to be cleared by something on successful loading */
-    margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
+    margin: 1px;
     border-collapse: collapse;
-    /* No fill — pane is the chrome; only .exodata paints body. */
     border: none; /* outer frame is .exodusformpane only */
     padding: 0.125em;
     text-align: left;
-    /* prompts/labels — tune via --exodus-form-label-font-style */
     font-style: var(--exodus-form-label-font-style);
 }
 
@@ -705,15 +702,15 @@ TABLE
     }
 }
 
-/* Browser default (toolbar/system size); user SCREEN_FONT_SIZE is % on <html> via exodus_set_style */
+/* Size: cookie fs → html font-size % (exodus_chrome_apply_font). Empty = 100%. */
 HTML {
     font-size: 100%;
 }
 
 BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
 {
-    /*all rules with font-family will have their font-size controlled*/
-    font-family: verdana,sans-serif,arial,helvetica;
+    /* Face: cookie ff → --exodus-screen-font-family. Empty = fallback stack. */
+    font-family: var(--exodus-screen-font-family, verdana, sans-serif, arial, helvetica);
     font-size: 1rem;
 }
 

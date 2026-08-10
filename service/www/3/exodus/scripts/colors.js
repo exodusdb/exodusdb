@@ -1,42 +1,46 @@
 
-// Apply LM form body for the current session (stylesheet + --exodus-form-bg-color).
-// Cookie "fc" is NOT written here — only users form_postwrite after a real save.
-// Never touches day/night: only form load and the theme button may theme_toggle.
-// In DM, exodus_set_style('screencolor') already no-ops form-body paint — do not force LM.
+// Preview / apply LM form body (session only). Cookies written only on users Save.
+// Empty / Default → CSS :root default (exodus_chrome_apply_color removes override).
 function colors_apply_screencolor(value) {
-	if (typeof exodus_set_style != 'function')
-		return
-	exodus_set_style('screencolor', value == null ? '' : String(value))
+	if (typeof exodus_chrome_apply_color == 'function')
+		exodus_chrome_apply_color(value)
+	else if (typeof exodus_set_style == 'function')
+		exodus_set_style('screencolor', value)
 }
 
-// Restore form body from last-saved cookie (discard / clear / postdisplay).
-// Call when the bound user record is not the source of truth for chrome.
+// Discard / clear / postdisplay: full chrome from cookies (fc + ff + fs).
+function colors_restore_saved_chrome() {
+	if (typeof exodus_chrome_from_cookies == 'function')
+		exodus_chrome_from_cookies()
+}
+// Old name — colour-only callers
 function colors_restore_saved_screencolor() {
-	if (typeof gisdarktheme != 'undefined' && gisdarktheme)
-		return
-	if (typeof exodusgetcookie2 != 'function')
-		return
-	colors_apply_screencolor(exodusgetcookie2('fc'))
+	colors_restore_saved_chrome()
 }
 
-// Custom colour validators: always call exodus_val_color() first (base is not
-// chained when di.validation is replaced after exodus_dict_color).
+// Custom validators: always call base val first (di.validation replaces base).
 async function colors_val_screencolor() {
 	if (!(await exodus_val_color())) return await exodusinvalid()
-	// Edit-time form-body preview only. Durable cookie is users form_postwrite on save.
+	// Preview only. Empty after Default → system body via CSS fallback.
 	colors_apply_screencolor(gvalue)
 	return true
 }
 
 async function colors_val_screenfont() {
 	if (!(await exodus_val_font())) return await exodusinvalid()
-	exodus_set_style('screenfont', gvalue, await gds.getx('SCREEN_FONT_SIZE'))
+	if (typeof exodus_chrome_apply_font == 'function')
+		exodus_chrome_apply_font(gvalue, await gds.getx('SCREEN_FONT_SIZE'))
+	else if (typeof exodus_set_style == 'function')
+		exodus_set_style('screenfont', gvalue, await gds.getx('SCREEN_FONT_SIZE'))
 	return true
 }
 
 async function colors_val_screenfontsize() {
-    exodus_set_style('screenfont', await gds.getx('SCREEN_FONT'), gvalue)
-    return true
+	if (typeof exodus_chrome_apply_font == 'function')
+		exodus_chrome_apply_font(await gds.getx('SCREEN_FONT'), gvalue)
+	else if (typeof exodus_set_style == 'function')
+		exodus_set_style('screenfont', await gds.getx('SCREEN_FONT'), gvalue)
+	return true
 }
 
 async function exodus_val_font() {
@@ -1659,13 +1663,19 @@ async function colors_popup_clear() {
 			colors_popup_hide()
 			return
 		}
-		// Empty bound field (touched until Save). Always reset form body colour to system
-		// default — even if the field was already "" (store early-return would
-		// skip apply and leave the last hover/click continuum colour on the form).
+		// Return "Default"; field validation turns it into "" and applies system
+		// form-body (colors_val_screencolor / exodus_val_color).
+		var prev = colors_field_text(field)
 		colors_popup_hide()
-		await colors_field_store(field, '')
-		if (field.id == 'SCREEN_BODY_COLOR')
-			colors_apply_screencolor('')
+		await colors_field_store(field, 'Default')
+		if (typeof validateupdate == 'function') {
+			// Force leave-field validate: previous ≠ Default so the change is seen
+			if (typeof gpreviouselement != 'undefined')
+				gpreviouselement = field
+			if (typeof gpreviousvalue != 'undefined')
+				gpreviousvalue = prev
+			await validateupdate()
+		}
 	} finally {
 		colors_popup._closing = false
 	}
@@ -1989,14 +1999,12 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.nwords = 1
     exodus_dict_color(di)
 
-    // SCREEN_BODY_COLOR — live LM form body: cookie fc, colors_val_screencolor,
-    // exodus_set_style('screencolor') → --exodus-form-bg-color only (.exodata + pane step).
+    // SCREEN_BODY_COLOR — users preview → --exodus-form-bg-color; cookie fc on Save.
     di = dict[++din] = dictrec('SCREEN_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 5
     di.nwords = 1
     exodus_dict_color(di)
-    // Replaces base exodus_val_color; custom calls it first.
     di.validation = 'await colors_val_screencolor()'
 
     di = dict[++din] = dictrec('SCREEN_FONT', 'F', fn)
@@ -2004,9 +2012,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.wordno = 6
     di.nwords = 1
     exodus_dict_font(di)
-    // Replaces base exodus_val_font; custom calls it first.
     di.validation = 'await colors_val_screenfont()'
-    //di.required=true
 
     di = dict[++din] = dictrec('SCREEN_FONT_SIZE', 'F', fn)
     di.wordsep = vm
@@ -2063,16 +2069,8 @@ function colors_css_to_hex6(v) {
 	return ('#' + hx(m[1]) + hx(m[2]) + hx(m[3])).toLowerCase()
 }
 
-// Fixed system form body (stylesheet original / hard default). Not the live form body.
-// Used when committing a continuum pick that equals "use Default" (empty store).
+// System form body — global.css :root LM default. Not live preview / cookie.
 function colors_system_default_body_hex() {
-	try {
-		if (typeof goriginalstyles != 'undefined' && goriginalstyles.screencolor) {
-			var oh = colors_css_to_hex6(goriginalstyles.screencolor)
-			if (oh)
-				return oh.toLowerCase()
-		}
-	} catch (e) { }
 	return '#fdf5e6'
 }
 
@@ -2136,7 +2134,8 @@ function colors_sync_swatch(field) {
 	}
 }
 
-// Write store into bound colour text + gds (+ live body style). store is "" or #rrggbb.
+// Write store into bound colour text + gds (+ live body style).
+// store is "" | "Default" | #rrggbb. "Default" is for field validate → "" + body apply.
 async function colors_field_store(field, store) {
 	if (!field)
 		return
@@ -2169,11 +2168,9 @@ async function colors_field_store(field, store) {
 			settouched(true)
 	}
 
-	// Dirty-edit form-body preview only. Cookie "fc" is written on users form_postwrite
-	// after Save; discard/clear restores via colors_restore_saved_screencolor.
-	// Always re-apply for body colour so Default (store "") still clears a
-	// continuum hover form-body when the field was already empty.
-	if (field.id == 'SCREEN_BODY_COLOR')
+	// Preview only. Cookie written on users Save; discard → colors_restore_saved_chrome.
+	// "Default" skipped here — validation → "" → apply (CSS system body).
+	if (field.id == 'SCREEN_BODY_COLOR' && store.toUpperCase() != 'DEFAULT')
 		colors_apply_screencolor(store)
 
 	colors_sync_swatch(field)

@@ -44,10 +44,12 @@ async function form_postdisplay() {
         //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
     }
 
-    // Form chrome follows last-saved cookie, not unsaved field edits / popup Default.
-    // Discard and cleardoc both re-enter postdisplay — restores face without save.
-    if (typeof colors_restore_saved_screencolor == 'function')
-        colors_restore_saved_screencolor()
+    // Chrome = last-saved cookies (not unsaved field / popup play).
+    // Discard and cleardoc re-enter postdisplay.
+    if (typeof colors_restore_saved_chrome == 'function')
+        colors_restore_saved_chrome()
+    else if (typeof exodus_chrome_from_cookies == 'function')
+        exodus_chrome_from_cookies()
 
     // After gds.load (not form_postread): form_filter and signature img need bound rows.
     await users_postdisplay()
@@ -70,20 +72,19 @@ async function form_postwrite() {
         db.login(gusername, gtasks_newpassword)
     gtasks_newpassword = false
 
-    // Durable chrome prefs only after a real Save (not popup Default / touched preview).
-    var bodyColor = await gds.getx('SCREEN_BODY_COLOR')
-    var screenFont = await gds.getx('SCREEN_FONT')
-    var screenFontSize = await gds.getx('SCREEN_FONT_SIZE')
+    // Only cookie write site for screen chrome. Sanitize empty/Default/keywords → "".
+    var store = typeof exodus_chrome_cookie_store == 'function'
+        ? exodus_chrome_cookie_store
+        : function (v) { return v == null ? '' : String(v) }
+    var bodyColor = store(await gds.getx('SCREEN_BODY_COLOR'))
+    var screenFont = store(await gds.getx('SCREEN_FONT'))
+    var screenFontSize = store(await gds.getx('SCREEN_FONT_SIZE'))
     exodussetcookie(glogincode, 'EXODUS2', bodyColor, 'fc')
     exodussetcookie(glogincode, 'EXODUS2', screenFont, 'ff')
     exodussetcookie(glogincode, 'EXODUS2', screenFontSize, 'fs')
-    // Commit face for this session (cookie alone would wait for next page load)
-    if (typeof colors_apply_screencolor == 'function')
-        colors_apply_screencolor(bodyColor)
-    else if (typeof exodus_set_style == 'function')
-        exodus_set_style('screencolor', bodyColor)
-    if (typeof exodus_set_style == 'function')
-        exodus_set_style('screenfont', screenFont, screenFontSize)
+    // Same path as every other screen entry
+    if (typeof exodus_chrome_from_cookies == 'function')
+        exodus_chrome_from_cookies()
 
     return true
 

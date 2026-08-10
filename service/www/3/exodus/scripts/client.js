@@ -196,8 +196,6 @@ isMac = navigator.appVersion.indexOf('Macintosh') >= 0
 
 var e//mac safari 3.1.2 cannot tolerate "catch(e)" without this
 
-var goriginalstyles = {}
-
 //prevent framing?
 //if (window != top)
 //	top.location.href = location.href
@@ -1930,27 +1928,6 @@ function exodus_global_css_link() {
 
 }
 
-function exodus_exodusform_rule_style() {
-
-	var link = exodus_global_css_link()
-	if (!link || !link.sheet)
-		return null
-
-	var rules = link.sheet.cssRules || link.sheet.rules
-	if (!rules)
-		return null
-
-	for (var rulen = 0; rulen < rules.length; rulen++) {
-		var rule = rules[rulen]
-		if (rule.selectorText && rule.selectorText.toUpperCase() == 'TABLE.EXODUSFORM')
-			return rule.style
-	}
-
-	// fallback: first rule is still TABLE.exodusform in global.css
-	return rules[0] && rules[0].style
-
-}
-
 function exodus_clear_form_inline_theme() {
 
 	var tables = document.getElementsByTagName('TABLE')
@@ -1981,15 +1958,14 @@ function theme_toggle(theme = 'default') {
 		var fg = document.getElementById('exodus_dm_flashguard')
 		if (fg && fg.parentNode)
 			fg.parentNode.removeChild(fg)
-		// Restore LM screencolor on stylesheet rule + --exodus-form-bg-color for .exodusformpane
-		if (exodus_global_css_link())
-			exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
+		// Full LM chrome from cookies (colour + font + size)
+		exodus_chrome_from_cookies()
 		exodus_clear_form_inline_theme()
 	} else {
 		gisdarktheme = true
 		html.setAttribute('data-theme', theme)
 		html.style.removeProperty('--exodus-cardcolor')
-		// Inline LM screencolor on <html> overrides :root[data-theme] custom properties
+		// Inline LM colour on <html> would override DM :root tokens
 		html.style.removeProperty('--exodus-form-bg-color')
 		html.style.removeProperty('--exodus-form-border-color')
 		html.removeAttribute('data-form-head')
@@ -2010,12 +1986,8 @@ function theme_toggle(theme = 'default') {
 }
 
 // Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
-//
-// Only decides deeper vs lighter from body luma; CSS owns the two formulas:
-//   deeper  → oklch L−   (light form bodies)
-//   lighter → mix white  (dark form bodies; L+ clips on hot sRGB colours)
-//
-// Call whenever --exodus-form-bg-color is set (screencolor / cookie fc).
+// Deeper vs lighter from body luma; CSS owns the two formulas.
+// Call when setting a non-empty --exodus-form-bg-color.
 function exodus_set_form_head_direction(cssColor) {
 	var s = String(cssColor == null ? '' : cssColor).replace(/\s+/g, '')
 	if (/^[0-9a-fA-F]{3}$/.test(s) || /^[0-9a-fA-F]{6}$/.test(s))
@@ -2032,100 +2004,102 @@ function exodus_set_form_head_direction(cssColor) {
 	document.documentElement.setAttribute('data-form-head', light ? 'deeper' : 'lighter')
 }
 
-function exodus_set_style(mode, value, value2) {
+// ---------------------------------------------------------------------------
+// Screen chrome (cookies fc / ff / fs → CSS vars only)
+//
+// Source of truth after login: cookies. Empty cookie/field = no inline override
+// (global.css :root / BODY fallbacks win). users.htm may preview via apply_*;
+// only users form_postwrite writes cookies.
+// ---------------------------------------------------------------------------
 
-	if (value.toUpperCase() == 'DEFAULT') value = ''
-
-	//restore original value
-	if (!value && goriginalstyles[mode]) value = goriginalstyles[mode]
-
-	var link = exodus_global_css_link()
-	if (!link || !link.sheet) return
-	var rules = link.sheet.cssRules || link.sheet.rules
-	var oldvalue = ''
-
-	// LM form body colour (SCREEN_BODY_COLOR / cookie fc) → CSS var only.
-	// Do NOT paint TABLE.exodusform background — pane is chrome base; only
-	// .exodata cells consume --exodus-form-bg-color (data tint).
-	// SCREEN_HEAD_COLOR (SYSTEM 46,4) is unused — no cookie/UI apply path.
-	if (mode == 'screencolor' && rules && !gisdarktheme) {
-
-		if (!value) value = '#fdf5e6'
-
-		oldvalue = document.documentElement.style.getPropertyValue('--exodus-form-bg-color')
-			|| (goriginalstyles[mode] || '')
-		try {
-			// Clear any historical fill on the TABLE.exodusform rule
-			var style = exodus_exodusform_rule_style()
-			if (style) {
-				style.display = ''
-				style.removeProperty('background-color')
-			}
-			document.documentElement.style.setProperty('--exodus-form-bg-color', value)
-			document.documentElement.style.setProperty('--exodus-form-border-color', '#d0d0d0')
-			exodus_set_form_head_direction(value)
-		}
-		catch (e) {
-			if (e.number == -2146827908) {
-				void exodus_begin(function () {
-					return exodusinvalid(value + ' is not a recognised color')
-				}, 'exodus_set_style color')
-				return
-			}
-			return systemerror('exodus_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
-		}
-		document.documentElement.style.removeProperty('--exodus-cardcolor')
-	}
-
-	//screenfont — family on body rule; size as % of browser default on <html>
-	else if (mode == 'screenfont' && rules) {
-		if (!value) value = 'verdana,sans-serif,arial,helvetica'
-		if (!value2) value2 = 100
-		if (!(Number(value2))) {
-			alert(value2 + ' is not a recognised font size, using 100%')
-			value2 = 100
-		}
-		if (typeof gformfontscale != 'undefined' && gformfontscale)
-			value2 *= gformfontscale
-		value2 = Number(value2)
-		if (value2 == 100)
-			document.documentElement.style.removeProperty('font-size')
-		else
-			document.documentElement.style.fontSize = value2 + '%'
-
-		for (var rulen = 0; rulen < rules.length; rulen++) {
-			var style = rules[rulen].style
-			if (!style || !style.fontFamily) continue
-
-			oldvalue = style.fontFamily
-			try {
-				style.fontFamily = value
-				// rem/em/% hierarchy — scale via <html> font-size only
-				style.removeProperty('font-size')
-			}
-			catch (e) {
-				if (e.number == -2146827908) {
-					void exodus_begin(function () {
-						return exodusinvalid(value + ' is not a recognised font')
-					}, 'exodus_set_style font')
-					return
-				}
-				return systemerror('exodus_set_style("' + mode + '","' + value + '","' + value2 + '")', e.number + ' ' + e.description)
-			}
-		}
-	}
-
-	if (!goriginalstyles[mode] && oldvalue)
-		goriginalstyles[mode] = oldvalue
-
+// Empty / Default / CSS keywords → treat as "not available"
+function exodus_chrome_is_empty(v) {
+	if (v == null)
+		return true
+	v = String(v).trim()
+	if (!v)
+		return true
+	if (v.toUpperCase() == 'DEFAULT')
+		return true
+	if (/^(inherit|initial|unset|revert)$/i.test(v))
+		return true
+	return false
 }
 
-//called early in decide and decide2
+// Value stored in cookie: empty string when not available
+function exodus_chrome_cookie_store(v) {
+	return exodus_chrome_is_empty(v) ? '' : String(v).trim()
+}
+
+// LM form body only. Empty → removeProperty so CSS default #fdf5e6 applies.
+function exodus_chrome_apply_color(value) {
+	if (typeof gisdarktheme != 'undefined' && gisdarktheme)
+		return
+	var html = document.documentElement
+	if (exodus_chrome_is_empty(value)) {
+		html.style.removeProperty('--exodus-form-bg-color')
+		html.style.removeProperty('--exodus-form-border-color')
+		html.removeAttribute('data-form-head')
+		html.style.removeProperty('--exodus-cardcolor')
+		return
+	}
+	value = String(value).trim()
+	html.style.setProperty('--exodus-form-bg-color', value)
+	html.style.setProperty('--exodus-form-border-color', '#d0d0d0')
+	exodus_set_form_head_direction(value)
+	html.style.removeProperty('--exodus-cardcolor')
+}
+
+// Font family + size %. Empty family/size → CSS / browser default (remove override).
+function exodus_chrome_apply_font(family, size) {
+	var html = document.documentElement
+	if (exodus_chrome_is_empty(family))
+		html.style.removeProperty('--exodus-screen-font-family')
+	else
+		html.style.setProperty('--exodus-screen-font-family', String(family).trim())
+
+	if (exodus_chrome_is_empty(size)) {
+		html.style.removeProperty('font-size')
+		return
+	}
+	var n = Number(size)
+	if (!n) {
+		html.style.removeProperty('font-size')
+		return
+	}
+	if (typeof gformfontscale != 'undefined' && gformfontscale)
+		n *= gformfontscale
+	if (n == 100)
+		html.style.removeProperty('font-size')
+	else
+		html.style.fontSize = n + '%'
+}
+
+// Entry / theme→day / discard / post-save: cookies only.
+function exodus_chrome_from_cookies() {
+	var ff = ''
+	var fs = ''
+	var fc = ''
+	if (typeof exodusgetcookie2 == 'function') {
+		ff = exodusgetcookie2('ff')
+		fs = exodusgetcookie2('fs')
+		fc = exodusgetcookie2('fc')
+	}
+	exodus_chrome_apply_font(ff, fs)
+	exodus_chrome_apply_color(fc)
+}
+
+// Thin aliases — prefer exodus_chrome_* at new call sites.
+function exodus_set_style(mode, value, value2) {
+	if (mode == 'screencolor')
+		exodus_chrome_apply_color(value)
+	else if (mode == 'screenfont')
+		exodus_chrome_apply_font(value, value2)
+}
+
+// Early in decide / decide2 / print
 async function clientfunctions_setstyle() {
-	//set font first since setting color changes style display from none to inline
-	exodus_set_style('screenfont', exodusgetcookie2('ff'), exodusgetcookie2('fs'))
-	if (!gisdarktheme)
-		exodus_set_style('screencolor', exodusgetcookie2('fc'))
+	exodus_chrome_from_cookies()
 }
 
 async function clientfunctions_getglobals() {
