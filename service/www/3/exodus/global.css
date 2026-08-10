@@ -59,31 +59,47 @@ TABLE.exodusform TABLE.exodusform > tr > th {
 }
 
 /*
- * Prompt face — form th, fieldstrip th, and .exodusformpane shell (same bg).
- * Data cells stay plain td (table body face). Group sticky thead has its own rules.
+ * Base bgcolor: pane, form th, fieldstrip th, and hosts of nested tables
+ * (.exodusembeddedtable — set in client.js on td/th that wrap exotable/group/strip/form).
+ * Host cells are often colspan wider than max-content nested tables; paint base so
+ * empty space to the right matches th/pane (not table body fill showing through).
  */
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
-.exodusformpane {
+TABLE.exotable th,
+TABLE[exogroupno] th,
+.exodusformpane,
+TABLE.exodusform td.exodusembeddedtable,
+TABLE.exodusform th.exodusembeddedtable {
     background-color: var(--exodus-form-face);
-    /* Pale faces: mild L drop + small chroma floor (half the prior delta from face). */
+    /* Mild L drop + chroma floor */
     background-color: oklch(from var(--exodus-form-face)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
 }
 TABLE.exodusform th,
-TABLE.exodus-fieldstrip th {
+TABLE.exodus-fieldstrip th,
+TABLE.exotable th,
+TABLE[exogroupno] th {
     white-space: nowrap;
 }
 :root[data-form-head="lighter"] TABLE.exodusform th,
 :root[data-form-head="lighter"] TABLE.exodus-fieldstrip th,
-:root[data-form-head="lighter"] .exodusformpane {
+:root[data-form-head="lighter"] TABLE.exotable th,
+:root[data-form-head="lighter"] TABLE[exogroupno] th,
+:root[data-form-head="lighter"] .exodusformpane,
+:root[data-form-head="lighter"] TABLE.exodusform td.exodusembeddedtable,
+:root[data-form-head="lighter"] TABLE.exodusform th.exodusembeddedtable {
     background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform th,
 :root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th,
-:root[data-theme="dark_mode"] .exodusformpane {
+:root[data-theme="dark_mode"] TABLE.exotable th,
+:root[data-theme="dark_mode"] TABLE[exogroupno] th,
+:root[data-theme="dark_mode"] .exodusformpane,
+:root[data-theme="dark_mode"] TABLE.exodusform td.exodusembeddedtable,
+:root[data-theme="dark_mode"] TABLE.exodusform th.exodusembeddedtable {
     background-color: #303a5a;
 }
 
