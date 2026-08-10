@@ -63,6 +63,9 @@ TABLE.exodusform TABLE.exodusform > tr > th {
  * (.exodusembeddedtable — set in client.js on td/th that wrap exotable/group/strip/form).
  * Host cells are often colspan wider than max-content nested tables; paint base so
  * empty space to the right matches th/pane (not table body fill showing through).
+ *
+ * Nested TABLE must be opaque form body — otherwise transparent nested td show the
+ * host th base through them (th paint must not "override" lower data cells).
  */
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
@@ -77,6 +80,10 @@ TABLE.exodusform th.exodusembeddedtable {
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
+}
+/* Nested tables: form body under transparent td (host base only outside the table) */
+TABLE.exodusform TABLE {
+    background-color: var(--exodus-form-face, #fdf5e6);
 }
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
@@ -101,6 +108,9 @@ TABLE[exogroupno] th {
 :root[data-theme="dark_mode"] TABLE.exodusform td.exodusembeddedtable,
 :root[data-theme="dark_mode"] TABLE.exodusform th.exodusembeddedtable {
     background-color: #303a5a;
+}
+:root[data-theme="dark_mode"] TABLE.exodusform TABLE {
+    background-color: #28304a;
 }
 
 /*
