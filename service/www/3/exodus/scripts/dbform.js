@@ -406,6 +406,10 @@ var gnextelement = null
 var g_radio_arrival_anchor = null
 var g_radio_arrival_value = ''
 var gdependents = []
+// insertallrows multi-entry: suspend calcfields so S-field xlate runs once mass
+// (grecn null + array.exodusxlate) at end or after mid-loop validation fail.
+var gcalcfields_suspend = 0
+var gcalcfields_pending = null // null | true (all) | [fieldn,…]
 var gKeyNodes = false//init will get an array of key nodes if any
 // Form OK/Cancel/Save/custom actions: 'top' menubar or 'bottom' under the form.
 // Default 'auto': bound → top; unbound → bottom *preferred*.
@@ -9877,6 +9881,55 @@ async function validateoconv(element, ivalue) {
 
 }
 
+// Suspend calcfields (depth). Callers flush with calcfields_resume().
+function calcfields_suspend() {
+    gcalcfields_suspend++
+}
+
+// Queue fieldns while suspended (null/undefined = full calc).
+function calcfields_queue(fieldns) {
+    if (fieldns == null || typeof fieldns == 'undefined') {
+        gcalcfields_pending = true
+        return
+    }
+    if (gcalcfields_pending === true)
+        return
+    if (!gcalcfields_pending)
+        gcalcfields_pending = []
+    if (typeof fieldns != 'object')
+        fieldns = [fieldns]
+    for (var i = 0; i < fieldns.length; i++) {
+        var fn = fieldns[i]
+        if (fn === '' && typeof fn != 'number')
+            continue
+        if (gcalcfields_pending.indexOf(fn) < 0)
+            gcalcfields_pending.push(fn)
+    }
+}
+
+// End suspend; run queued calcfields once with grecn null (mass xlate).
+async function calcfields_resume() {
+    if (gcalcfields_suspend > 0)
+        gcalcfields_suspend--
+    if (gcalcfields_suspend > 0)
+        return true
+    var pending = gcalcfields_pending
+    gcalcfields_pending = null
+    if (pending === null || pending === undefined)
+        return true
+    var savegrecn = grecn
+    grecn = null
+    try {
+        if (pending === true)
+            await calcfields(null)
+        else if (pending.length)
+            await calcfields(pending)
+    } finally {
+        grecn = savegrecn
+    }
+    return true
+}
+
 //given an array of field numbers calculate and set their contents
 async function calcfields(fieldns) {
 
@@ -9884,6 +9937,12 @@ async function calcfields(fieldns) {
 
     if (gKeyNodes && !gloaded)
         return false //logout('calcfields no record')
+
+    // Multi-entry insertallrows: queue only (flush in calcfields_resume)
+    if (gcalcfields_suspend > 0) {
+        calcfields_queue(fieldns)
+        return true
+    }
 
     //if list is empty then do all calculated fields
     //exclude real fields (type=F) that have functioncode specified
@@ -10280,7 +10339,14 @@ async function insertallrows(elements, values, fromrecn) {
 	var save_gpreviousvalue = gpreviousvalue
 	var save_grecn = grecn
 
-	var result = await insertallrows2(elements, values, fromrecn)
+	// Defer calcfields until all rows validated (or mid-fail): one mass regetx/xlate
+	calcfields_suspend()
+	var result
+	try {
+		result = await insertallrows2(elements, values, fromrecn)
+	} finally {
+		await calcfields_resume()
+	}
 
 	//if (gdataset.split('_')[0] == 'gravity' || gdataset.split('_')[1] == 'test') {
 		gpreviouselement = save_gpreviouselement
