@@ -1064,6 +1064,16 @@ TABLE.exodusform .clsReadOnly {
     font-style: var(--exodus-form-data-font-style);
     font-size: var(--exodus-form-data-font-size);
 }
+/*
+ * Leaf data cell (.exodata — same mark as body bg): all element children share top.
+ * td/th vertical-align only places the cell in the row, not siblings inside it.
+ * Text nodes are not elements; .exodus-fieldchrome uses flex-start for icons+hosts.
+ * Nested tables count as one child unit. Radio option labels keep inline middle.
+ */
+TABLE.exodusform td.exodata > *,
+TABLE.exodusform th.exodata > * {
+    vertical-align: top;
+}
 
 /* UA forms.css shrinks controls after screenfont strips font-size from font-family rules */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton),

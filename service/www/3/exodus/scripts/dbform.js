@@ -215,12 +215,14 @@ function form_field_chrome_ensure_wrap(element, dictitem) {
         && element.getAttribute('exodustype') == 'F'
         && form_field_exostyle(dictitem, element) === 'text'
     var wrap = document.createElement('span')
+    wrap.className = 'exodus-fieldchrome'
     wrap.style.display = wrapFill ? 'flex' : 'inline-flex'
     if (wrapFill) {
         wrap.style.width = '100%'
         wrap.style.maxWidth = '100%'
     }
     wrap.style.alignItems = 'flex-start'
+    // valign: CSS .exodata > * (wrap is direct child of leaf data cell)
     // replaceChild returns the field; re-parent into wrap
     element = element.parentNode.replaceChild(wrap, element)
     wrap.insertBefore(element, null)
@@ -235,7 +237,8 @@ function form_field_chrome_ensure_wrap(element, dictitem) {
 }
 
 // Empty F7/F6 slot. Inserted immediately before insertBeforeEl (icon or field).
-function form_field_chrome_pad(insertBeforeEl, widthCss, valign) {
+// Vertical align: chrome is flex (align-items: flex-start); no per-pad valign.
+function form_field_chrome_pad(insertBeforeEl, widthCss) {
     var pad = document.createElement('span')
     pad.className = 'exodus-fieldchrome-pad'
     pad.setAttribute('aria-hidden', 'true')
@@ -243,7 +246,6 @@ function form_field_chrome_pad(insertBeforeEl, widthCss, valign) {
     pad.style.flexShrink = '0'
     pad.style.width = widthCss
     pad.style.height = 'var(--exodus-ui-icon-size)'
-    pad.style.verticalAlign = valign || 'top'
     insertBeforeEl.parentNode.insertBefore(pad, insertBeforeEl)
     return pad
 }
@@ -1244,6 +1246,7 @@ async function formfunctions_onload() {
             }
 
             // code and number: same host width (floor 6ch, expand). length unused.
+            // valign: leaf cell children use CSS top (.exodata > *).
             if (element.tagName == 'SPAN'
                 && (fieldStyle === 'number' || fieldStyle === 'code')) {
                 element.style.display = 'inline-block'
@@ -1273,8 +1276,8 @@ async function formfunctions_onload() {
                         element.style.minWidth = '6ch'
                     } else {
                         // display free-text / names — keep side-by-side with codes
+                        // valign: .exodata > * (leaf data cell)
                         element.style.display = 'inline-block'
-                        element.style.verticalAlign = 'top'
                         element.style.minWidth = '0'
                     }
                     element.style.maxWidth = '100%'
@@ -1335,8 +1338,7 @@ async function formfunctions_onload() {
             ) {
                 if (popupExpr || freeSelectPopup) {
                     //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
-
-                    element.style.verticalAlign = 'top'
+                    // valign: wrap under .exodata → CSS .exodata > *; chrome flex-start for icon+host.
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealPopup = true
 
@@ -1348,9 +1350,8 @@ async function formfunctions_onload() {
                     element2.style.flexShrink = '0'
                     // di.link='' → pad F6 slot (icon width only; no fake cell-pad gap)
                     if (padLink)
-                        form_field_chrome_pad(element, 'var(--exodus-ui-icon-size)', 'top')
+                        form_field_chrome_pad(element, 'var(--exodus-ui-icon-size)')
 
-                    element2.style.verticalAlign = 'top'
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
                     element2.title += ' (F7)'
                     element2.style.cursor = 'pointer'
@@ -1368,8 +1369,7 @@ async function formfunctions_onload() {
                 }
                 else {
                     //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
-
-                    element.style.verticalAlign = 'top'
+                    // valign: .exodata > * + chrome flex-start (same as F7 block above).
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealLink = true
 
@@ -1378,9 +1378,8 @@ async function formfunctions_onload() {
                     element2.style.flexShrink = '0'
                     // di.popup='' → pad F7 slot before link (e.g. DATELIST)
                     if (padPopup)
-                        form_field_chrome_pad(element2, 'var(--exodus-ui-icon-size)', 'top')
+                        form_field_chrome_pad(element2, 'var(--exodus-ui-icon-size)')
 
-                    element2.style.verticalAlign = 'top'
                     element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
                     element2.style.cursor = 'pointer'
 
@@ -1397,9 +1396,9 @@ async function formfunctions_onload() {
                 element = form_field_chrome_ensure_wrap(element, dictitem)
                 var iconW = 'var(--exodus-ui-icon-size)'
                 if (padPopup)
-                    form_field_chrome_pad(element, iconW, 'middle')
+                    form_field_chrome_pad(element, iconW)
                 if (padLink)
-                    form_field_chrome_pad(element, iconW, 'middle')
+                    form_field_chrome_pad(element, iconW)
             }
 
             //add image element and hide element
