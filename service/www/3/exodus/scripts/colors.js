@@ -1990,7 +1990,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     exodus_dict_color(di)
 
     // SCREEN_BODY_COLOR — live LM form body: cookie fc, colors_val_screencolor,
-    // exodus_set_style('screencolor') → TABLE.exodusform + --exodus-form-bg-color.
+    // exodus_set_style('screencolor') → --exodus-form-bg-color only (.exodata + pane step).
     di = dict[++din] = dictrec('SCREEN_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 5

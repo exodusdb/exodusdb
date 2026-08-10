@@ -1,13 +1,9 @@
 /*
  * Form frame model (keep this simple)
  * -----------------------------------
- * 1. .exodusformpane   — sole outer frame (border, radius, padding) and
- *    origin of the form bgcolor hierarchy:
- *      --exodus-form-bg-color  = data / table fill (screencolor / cookie fc)
- *      --exodus-form-th-bg-color  = chrome step (th, hosts, pane shell)
- *    Descendants consume those vars; do not invent a parallel fill on the table.
- * 2. TABLE.exodusform  — no table border (never competes with the pane);
- *    body fill from --exodus-form-bg-color (set on :root / pane / screencolor).
+ * 1. .exodusformpane   — sole outer frame + chrome fill.
+ * 2. TABLE.exodusform  — no table border; no fill.
+ * Form bgcolor: only two paints — pane (chrome) and .exodata (data).
  * 3. STANDARD — direct form cells (any section: thead/tbody/tfoot, or bare tr):
  *    same border + cell padding. Do not special-case a section unless product
  *    deliberately overrides below.
@@ -174,8 +170,7 @@ TABLE.exodusform
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
     border-collapse: collapse;
-    /* body from pane hierarchy; #fdf5e6 before tokens load */
-    background-color: var(--exodus-form-bg-color, #fdf5e6);
+    /* No fill — pane is the chrome; only .exodata paints body. */
     border: none; /* outer frame is .exodusformpane only */
     padding: 0.125em;
     text-align: left;
@@ -205,77 +200,11 @@ TABLE.exodusform TABLE.exodusform > tr > th {
     border: none;
 }
 
-/*
- * Form bgcolor hierarchy (origin: .exodusformpane — see that rule for tokens).
- *
- *   body  — table fill, nested TABLE, .exodata (leaf field cells)
- *   base  — th, fieldstrip th, .exodusembeddedtable hosts, pane shell
- *
- * Hosts are often colspan wider than max-content nested tables; base on the
- * host paints the empty strip. Leaf .exodata uses body so th/host base does
- * not show through data cells. Nested TABLE body is fallback for unmarked td.
- *
- * Consumers use --exodus-form-th-bg-color / --exodus-form-bg-color when the pane set them;
- * outside a pane, fall back to body (+ same OKLCH step for base).
- */
-TABLE.exodusform th,
-TABLE.exodus-fieldstrip th,
-TABLE.exotable th,
-TABLE[exogroupno] th,
-TABLE.exodusform td.exodusembeddedtable,
-TABLE.exodusform th.exodusembeddedtable {
-    background-color: var(--exodus-form-bg-color);
-    background-color: oklch(from var(--exodus-form-bg-color)
-        calc(l * 0.985)
-        calc(c * 1.175 + 0.0075)
-        h);
-    /* pane-originated base wins when set */
-    background-color: var(--exodus-form-th-bg-color, oklch(from var(--exodus-form-bg-color)
-        calc(l * 0.985)
-        calc(c * 1.175 + 0.0075)
-        h));
-}
-/* Nested tables + leaf data cells: body */
-TABLE.exodusform TABLE,
-TABLE.exodusform td.exodata,
-TABLE.exodusform th.exodata {
-    background-color: var(--exodus-form-bg-color, #fdf5e6);
-}
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
 TABLE.exotable th,
 TABLE[exogroupno] th {
     white-space: nowrap;
-}
-/* lighter: retarget base on the pane only — th/hosts consume --exodus-form-th-bg-color */
-:root[data-form-head="lighter"] .exodusformpane {
-    --exodus-form-th-bg-color: color-mix(in oklch, var(--exodus-form-bg-color) 90%, white);
-    background-color: var(--exodus-form-th-bg-color);
-}
-/* outside pane (rare): same lighter step from body */
-:root[data-form-head="lighter"] TABLE.exodusform th,
-:root[data-form-head="lighter"] TABLE.exodus-fieldstrip th,
-:root[data-form-head="lighter"] TABLE.exotable th,
-:root[data-form-head="lighter"] TABLE[exogroupno] th,
-:root[data-form-head="lighter"] TABLE.exodusform td.exodusembeddedtable,
-:root[data-form-head="lighter"] TABLE.exodusform th.exodusembeddedtable {
-    background-color: color-mix(in oklch, var(--exodus-form-bg-color) 90%, white);
-    background-color: var(--exodus-form-th-bg-color, color-mix(in oklch, var(--exodus-form-bg-color) 90%, white));
-}
-:root[data-theme="dark_mode"] TABLE.exodusform th,
-:root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th,
-:root[data-theme="dark_mode"] TABLE.exotable th,
-:root[data-theme="dark_mode"] TABLE[exogroupno] th,
-:root[data-theme="dark_mode"] TABLE.exodusform td.exodusembeddedtable,
-:root[data-theme="dark_mode"] TABLE.exodusform th.exodusembeddedtable {
-    background-color: #303a5a;
-    background-color: var(--exodus-form-th-bg-color, #303a5a);
-}
-:root[data-theme="dark_mode"] TABLE.exodusform TABLE,
-:root[data-theme="dark_mode"] TABLE.exodusform td.exodata,
-:root[data-theme="dark_mode"] TABLE.exodusform th.exodata {
-    background-color: #28304a;
-    background-color: var(--exodus-form-bg-color, #28304a);
 }
 
 /*
@@ -332,8 +261,12 @@ TABLE.exodus-help-table th {
     vertical-align: top;
 }
 
-/* Rounded form shell — div wrapper inserted by exoduswrapformpanes() in client.js.
- * Origin of form bgcolor hierarchy: body (data) + base (th / hosts / this shell). */
+/*
+ * Form bgcolor — two paints only:
+ *   1. .exodusformpane — chrome base (step from --exodus-form-bg-color)
+ *   2. .exodata        — data tint (--exodus-form-bg-color / screencolor)
+ * Screencolor sets the CSS var; it must not paint TABLE.exodusform (client.js).
+ */
 .exodusformpane {
     display: inline-block;
     vertical-align: top;
@@ -343,7 +276,6 @@ TABLE.exodus-help-table th {
      * (journals multi-col line grid, etc.). Do not max-width/overflow the pane;
      * the page scrolls if the shell is wider than the window. */
     width: max-content;
-    /* body inherits from :root / screencolor; base = mild step for chrome (th/hosts) */
     --exodus-form-th-bg-color: var(--exodus-form-bg-color, #fdf5e6);
     --exodus-form-th-bg-color: oklch(from var(--exodus-form-bg-color, #fdf5e6)
         calc(l * 0.985)
@@ -355,6 +287,14 @@ TABLE.exodus-help-table th {
     padding: var(--exodus-form-pane-padding);
     margin: var(--exodus-form-pane-margin);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+:root[data-form-head="lighter"] .exodusformpane {
+    --exodus-form-th-bg-color: color-mix(in oklch, var(--exodus-form-bg-color) 90%, white);
+    background-color: var(--exodus-form-th-bg-color);
+}
+TABLE.exodusform td.exodata,
+TABLE.exodusform th.exodata {
+    background-color: var(--exodus-form-bg-color, #fdf5e6);
 }
 /* Centered popup/dialog: form pane stacks above sibling buttons (e.g. schedules_calendar) */
 div[align="center"] > .exodusformpane {
@@ -444,7 +384,8 @@ body > #formbuttonsdiv_face .graphicbutton [data-source-id$="_label"] {
  * Nested host tables (exotable / exogroup / fieldstrip) when HTM has no width=:
  * hug content (max-content); max-width 100% of host. HTML width= wins
  * (:not([width])); line grids that need full data column use width="100%".
- * Any depth under form (not only direct form-td children).
+ * Any depth under form (not only direct form-td children) — 2a0af295 policy.
+ * Free-text stays width/max 100% fill cell (ec72667c fold); hug is the table.
  */
 TABLE.exodusform TABLE.exotable:not([width]),
 TABLE.exodusform TABLE[exogroupno]:not([width]),
@@ -573,7 +514,7 @@ TABLE.exodusform td:has(> span[contenteditable]) {
     min-width: 0;
 }
 /*
- * No outer cell borders (pane is the frame).
+ * No outer cell borders (pane is the frame). Border only — never background.
  *   L/R — .exodus-form-edge-left/right from exodus_mark_form_edge_rows()
  *         (first/last cell with display != none). Do not use :first/:last-child:
  *         hidden trailers (e.g. schedules heading button/rating cells) leave the
@@ -639,33 +580,15 @@ TABLE[exogroupno] > thead {
     box-shadow: 0 1px 0 #5a6090;
 }
 /*
- * LM sticky thead tint (from form body / --exodus-form-bg-color)
- * ----------------------------------------------------------
- * Common UI pattern: same hue, slightly stronger (richer + a touch deeper).
- * Not SCREEN_HEAD_COLOR (unused — see colors.js).
- *
- * Switch: <html data-form-head="deeper"|"lighter"> set by
- * exodus_set_form_head_direction() from Rec.601 body luma (threshold 128).
- *
- *   deeper (light bodies, default) — OKLCH relative color (CSS Color 5):
- *     l' = l × 0.985
- *     c' = c × 1.175 + 0.0075  (half prior delta from body)
- *     h' = h
- *     Fallback = plain form body if oklch(from) unsupported.
- *
- *   lighter (dark bodies) — color-mix body 90% / white (half prior mix).
- *
- * exotable heads a step stronger. DM: fixed greys (ignore data-form-head).
+ * Sticky group thead: same chrome as pane (not data body). Opaque so rows do
+ * not bleed under sticky heads while scrolling. data-form-head only retargets
+ * the pane token; heads consume --exodus-form-th-bg-color.
  */
 TABLE[exogroupno] > thead th,
 TABLE[exogroupno] > thead td {
-    background-color: var(--exodus-form-bg-color);
-    background-color: oklch(from var(--exodus-form-bg-color)
-        calc(l * 0.985)
-        calc(c * 1.175 + 0.0075)
-        h);
+    background-color: var(--exodus-form-th-bg-color, var(--exodus-form-bg-color, #fdf5e6));
 }
-/* Decide + typeahead heads: same OKLCH step from popup shell (not form body) */
+/* Decide + typeahead heads: step from popup shell (not form) */
 .exodusconfirmdiv #decide_table1 > thead th,
 .exodusconfirmdiv #decide_table1 > thead td,
 .exodus_typeahead_table > thead th {
@@ -675,26 +598,10 @@ TABLE[exogroupno] > thead td {
         calc(c * 1.175 + 0.0075)
         h);
 }
-TABLE.exotable[exogroupno] > thead th,
-TABLE.exotable[exogroupno] > thead td {
-    background-color: var(--exodus-form-bg-color);
-    background-color: oklch(from var(--exodus-form-bg-color)
-        calc(l * 0.98)
-        calc(c * 1.2 + 0.009)
-        h);
-}
-:root[data-form-head="lighter"] TABLE[exogroupno] > thead th,
-:root[data-form-head="lighter"] TABLE[exogroupno] > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-bg-color) 90%, white);
-}
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td,
 :root[data-form-head="lighter"] .exodus_typeahead_table > thead th {
     background-color: color-mix(in oklch, var(--exodus-popup-bg-color) 90%, white);
-}
-:root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead th,
-:root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-bg-color) 87.5%, white);
 }
 
 TABLE
@@ -1919,9 +1826,7 @@ input[type=checkbox]:focus-visible {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform {
-    /* Pane body when wrapped; hard fallback if LM body still on <html> outside pane */
-    background-color: #28304a !important;
-    background-color: var(--exodus-form-bg-color, #28304a) !important;
+    /* No fill (pane base); body only .exodata */
     border-color: #7070e0 !important;
 }
 
@@ -1933,12 +1838,11 @@ SPAN.calendar-date-committed[contenteditable] {
     color: var(--exodus-calendar-today-color);
 }
 
-/* DM sticky head: lift off form body (#28304a). Same step for all group tables —
- * was only on .exotable, so reports/journals (exodusform+groupno) looked flat. */
+/* DM sticky group head: pane chrome token (same as LM sticky) */
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead th,
-:root[data-theme="dark_mode"] TABLE[exogroupno] > thead td,
-:root[data-theme="dark_mode"] TABLE.exotable[exogroupno] > thead th,
-:root[data-theme="dark_mode"] TABLE.exotable[exogroupno] > thead td,
+:root[data-theme="dark_mode"] TABLE[exogroupno] > thead td {
+    background-color: var(--exodus-form-th-bg-color, #303a5a);
+}
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead td,
 :root[data-theme="dark_mode"] .exodus_typeahead_table > thead th {

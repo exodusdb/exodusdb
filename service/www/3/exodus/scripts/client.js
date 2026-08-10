@@ -420,7 +420,7 @@ function exodus_client_init() {
 		document.writeln('<style id="exodus_dm_flashguard">'
 			+ '@media screen{'
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
-			+ ':root[data-theme=dark_mode] TABLE.exodusform{background-color:#28304a!important}'
+			// No TABLE.exodusform body fill — pane chrome + .exodata only (global.css)
 			+ '}'
 			+ '</style>')
 	}
@@ -2044,23 +2044,26 @@ function exodus_set_style(mode, value, value2) {
 	var rules = link.sheet.cssRules || link.sheet.rules
 	var oldvalue = ''
 
-	// LM form body colour (SCREEN_BODY_COLOR / cookie fc) → body + thead direction.
+	// LM form body colour (SCREEN_BODY_COLOR / cookie fc) → CSS var only.
+	// Do NOT paint TABLE.exodusform background — pane is chrome base; only
+	// .exodata cells consume --exodus-form-bg-color (data tint).
 	// SCREEN_HEAD_COLOR (SYSTEM 46,4) is unused — no cookie/UI apply path.
 	if (mode == 'screencolor' && rules && !gisdarktheme) {
 
-		var style = exodus_exodusform_rule_style()
-		if (!style) return
-
-		style.display = ''
-
 		if (!value) value = '#fdf5e6'
 
-		oldvalue = style.backgroundColor
+		oldvalue = document.documentElement.style.getPropertyValue('--exodus-form-bg-color')
+			|| (goriginalstyles[mode] || '')
 		try {
-			style.backgroundColor = value
+			// Clear any historical fill on the TABLE.exodusform rule
+			var style = exodus_exodusform_rule_style()
+			if (style) {
+				style.display = ''
+				style.removeProperty('background-color')
+			}
 			document.documentElement.style.setProperty('--exodus-form-bg-color', value)
 			document.documentElement.style.setProperty('--exodus-form-border-color', '#d0d0d0')
-			exodus_set_form_head_direction(style.backgroundColor || value)
+			exodus_set_form_head_direction(value)
 		}
 		catch (e) {
 			if (e.number == -2146827908) {
