@@ -160,6 +160,37 @@ function exodus_refresh_sortimages() {
 
 var gcache
 
+// Client READ cache (gcache.values — one reader/writer around db.send):
+//   undefined  → not in cache → network
+//   null       → known NO RECORD → fail without network
+//   string     → body ('' = empty existing record, not a miss)
+// null is only stored on .values (object store). Attribute store is legacy/string-only.
+
+// Apply a cache hit for db.send. Returns undefined if not in cache;
+// true = data hit; false = known NO RECORD (sets response).
+function dblink_cache_apply(self, request2) {
+	var temp = readcache(request2)
+	if (typeof temp == 'undefined')
+		return undefined
+	if (temp === null) {
+		self.data = ''
+		self.response = 'Error: NO RECORD'
+		return false
+	}
+	self.data = temp
+	self.response = 'OK'
+	return true
+}
+
+// Store NO RECORD only for READ-like keys (and CACHE\r callers).
+function dblink_cache_store_norecord(request2, trycache) {
+	if (!(trycache || (request2 && request2.slice(0, 4) == 'READ')))
+		return
+	if (!request2 || request2.indexOf('READ\r') != 0)
+		return
+	writecache(request2, null)
+}
+
 var glogincode
 var gDialogArguments//similar to window.dialogArguments
 
@@ -2509,13 +2540,15 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 
 		//get a record from the cache
 		var cachekey = 'READ\r' + filename + '\r' + key
-		var rec
-		if (rec = readcache(cachekey)) {
-			//and do xlate logic on cached record
+		var rec = readcache(cachekey)
+		if (typeof rec != 'undefined') {
+			// Known miss (null) → leave results[keyn] '' (same as NO RECORD)
+			if (rec === null)
+				continue
+			// Hit with body — xlate logic on cached record
 			results[keyn] = await exodusxlatelogic(filename, (key + fm + rec).split(fm), fieldno, mode, key)
 		}
-
-		//or build a unique list of keys of records to be selected
+		// Not in cache — batch SELECT later
 		else {
 			if (!uncachedkeys.exoduslocate(key)) uncachedkeys[uncachedkeys.length] = key
 		}
@@ -2546,16 +2579,22 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 			return []
 		}
 
-		//if no data returned then thats it!
-		if (!db.data) return results
+		//if no data returned then all uncached keys are misses
+		if (!db.data) {
+			for (var uk = 0; uk < uncachedkeys.length; uk++)
+				writecache('READ\r' + filename + '\r' + uncachedkeys[uk], null)
+			return results
+		}
 
 		//process the multiple records separated by rm char characters
+		var foundkeys = {}
 		var recset = db.data.split(rm)
 		for (ii = 0; ii < recset.length; ii++) {
 
 			//do xlate logic on the record
 			var keyrec = recset[ii].split(fm)
 			var key = keyrec[0]
+			foundkeys[key] = true
 			var result = await exodusxlatelogic(filename, keyrec, fieldno, mode, key)
 
 			//store the results whereever they are needed
@@ -2568,6 +2607,12 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 			var cachekey = 'READ\r' + filename + '\r' + key
 			writecache(cachekey, keyrec.slice(1).join(fm))
 
+		}
+
+		// SELECT only returns existing keys — mark the rest as known misses (null)
+		for (var uk = 0; uk < uncachedkeys.length; uk++) {
+			if (!foundkeys[uncachedkeys[uk]])
+				writecache('READ\r' + filename + '\r' + uncachedkeys[uk], null)
 		}
 
 	} //any uncachedkeys
@@ -2964,11 +3009,9 @@ async function exodusdblink_send_byhttp_using_forms(data) {
 	var trycache = (request2.slice(0, 6) == 'CACHE\r')
 	if (trycache) {
 		request2 = request2.slice(6)
-		var temp
-		if (temp = readcache(request2)) {
-			this.data = temp
-			return true
-		}
+		var cached = dblink_cache_apply(this, request2)
+		if (typeof cached != 'undefined')
+			return cached
 	}
 
 	var gotresponse = false
@@ -3023,6 +3066,8 @@ async function exodusdblink_send_byhttp_using_forms(data) {
 		return true
 	}
 	else {
+		if (this.response && this.response.indexOf('NO RECORD') >= 0)
+			dblink_cache_store_norecord(request2, trycache)
 		return false
 	}
 
@@ -3067,12 +3112,10 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 	var trycache = (request2.slice(0, 6) == 'CACHE\r')
 	if (trycache) {
 		request2 = request2.slice(6)
-		var temp = readcache(request2)
-		//returns undefined or null if not in cache
-		if (temp || temp == '') {
-			this.data = temp
+		var cached = dblink_cache_apply(this, request2)
+		if (typeof cached != 'undefined') {
 			this.requesting = false
-			return true
+			return cached
 		}
 	}
 
@@ -3475,6 +3518,8 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 		return true
 	}
 	else {
+		if (this.response && this.response.indexOf('NO RECORD') >= 0)
+			dblink_cache_store_norecord(request2, trycache)
 		this.requesting = false
 		return false
 	}
@@ -4767,33 +4812,25 @@ function prunecache(request) {
 function readcache(request) {
 
 	//login('readcache')
+	// Returns: undefined = not in cache; null = known NO RECORD; string = body.
 
 	if (!(loadcache())) {
 		//logout('readcache - loadcache failed')
-		return null
+		return undefined
 	}
 
 	var key = cachekey(request)
-	var result
+	// Prefer object store (can hold null for misses). Attribute store is string-only.
 	if (gcache.values) {
-		result = gcache.values[key]
-
-		//delete and restore to implement simple LRU cache
-		//delete gcache.values[key]
-		//gcache.values[key]=result
-
-	}
-	else {
-		result = gcache.getAttribute(key)
-
-		//delete and restore to implement simple LRU cache
-		//gcache.removeAttribute(key)
-		//gcache.addAttribute(key,result)
-
+		if (!Object.prototype.hasOwnProperty.call(gcache.values, key))
+			return undefined
+		return gcache.values[key]
 	}
 
-	//logout('readcache ok')
-
+	var result = gcache.getAttribute(key)
+	// DOM: null = attribute absent → not in cache (cannot store null miss here)
+	if (result === null)
+		return undefined
 	return result
 
 }
@@ -4830,6 +4867,7 @@ function deletecacherecord(filename, key) {
 
 function writecache(request, data) {
 	//login('writecache')
+	// data: string body, or null = known NO RECORD (object store only)
 
 	if (!(loadcache())) {
 		//logout('writecache loadcache failed')
@@ -4838,6 +4876,9 @@ function writecache(request, data) {
 
 	if (gcache.values)
 		gcache.values[cachekey(request)] = data
+	else if (data === null)
+		// cannot represent miss in string attributes — leave uncached
+		return false
 	else
 		gcache.setAttribute(cachekey(request), data)
 

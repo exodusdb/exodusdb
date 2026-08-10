@@ -83,16 +83,14 @@ function exodusdblink_send_byfile(data) {
 
     xlog(this.request)
 
-    //try to use cache
+    //try to use cache (null entry = known NO RECORD → same as network miss)
     var request2 = this.request
     var trycache = (this.documentprotocolcode == 'file' && request2.slice(0, 6) == 'CACHE\r')
     if (trycache) {
         request2 = request2.slice(6)
-        var temp
-        if (temp = readcache(request2)) {
-            this.data = temp
-            return true
-        }
+        var cached = dblink_cache_apply(this, request2)
+        if (typeof cached != 'undefined')
+            return cached
     }
 
     var linkfile3exists = false
@@ -565,6 +563,9 @@ function exodusdblink_send_byfile(data) {
                     }
                     else {
                         result = 0
+                        if (this.response && this.response.indexOf('NO RECORD') >= 0
+                            && typeof dblink_cache_store_norecord == 'function')
+                            dblink_cache_store_norecord(request2, trycache)
                     }
 
                     break
