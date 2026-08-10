@@ -202,8 +202,8 @@ Do **not** invent app-level “force reindex stamps” for formula changes — t
 | Step | What |
 |------|------|
 | **1. Dat source** | Add/change the item under **`src/dat/dict.<file>/ITEM_NAME`** (exodus service and/or neosys product tree). |
-| **2. Generate + compile** | **`cd ~/exodus/service/src && ./compall`** (or **`~/neosys/src/compall`** / full **`~/neosys/compall`** when the dict is product-side). That **regenerates `dic/dict_<file>.cpp`** from changed dat (`syncdat dat {IG…}`) **and compiles** into **`$EXO_HOME/lib/libdict_<file>.so`**. **`compall dat` alone** only rsyncs dat — **does not** rebuild the `.so`. |
-| **3. Deploy live** | **`cd ~/exodus/service && ./copyall CONFIRM`** so live gets **dat + libdict_*.so** and services restart. |
+| **2. Generate + compile (before the usual copyall CONFIRM)** | **`cd ~/exodus/service/src && ./compall`** (or **`~/neosys/src/compall`** / full **`~/neosys/compall`** when the dict is product-side). That **regenerates `dic/dict_<file>.cpp`** from changed dat (`syncdat dat {IG…}`) **and compiles** into **`$EXO_HOME/lib/libdict_<file>.so`**. **`compall dat` alone** only rsyncs dat — **does not** rebuild the `.so`. |
+| **3. Deploy live** | Then the usual **`cd ~/exodus/service && ./copyall CONFIRM`** so live gets **dat + libdict_*.so** and services restart. |
 
 **Do not** hand-edit `dict_*.cpp` as the only source of truth for formula bodies that exist in dat — regenerate from dat via **compall**. **Do not** expect `WITH SOME_S_FIELD` / SELECT to work after only dropping a new S item into dat.
 
