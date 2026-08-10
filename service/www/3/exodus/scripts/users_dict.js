@@ -25,7 +25,8 @@ async function dict_USERS() {
  di.invalidcharacters='*'
  if (await exodussecurity('AUTHORISATION ACCESS')) {
   updateallowed=gusers_authorisation_update
-  di.popup='await system_pop_users()'
+  // F7 popup + typeahead (same as emailusers); expired skipped via LIVE_USER
+  await system_dict_usercode(di)
  }
  else {
   di.readonly=true

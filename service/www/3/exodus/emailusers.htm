@@ -49,6 +49,7 @@
 
             ++groupn
             di = dict[++din] = dictrec('CC_USER_CODE', 'F', 3, '', groupn)
+            // Expired skipped via system_users_sortselect LIVE_USER (same as TO / users.htm)
             await system_dict_usercode(di, many = true)
             di.unique = true
 

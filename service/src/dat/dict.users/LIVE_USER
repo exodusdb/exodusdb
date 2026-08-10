@@ -1,0 +1,34 @@
+S
+
+LIVE USER
+S
+
+
+
+	let expired = RECORD.f(35);\
+	if (expired and expired <= date()) {\
+		ANS = 0;\
+	} else {\
+		ANS = 1;\
+	}\
+	return ANS;
+L
+10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0

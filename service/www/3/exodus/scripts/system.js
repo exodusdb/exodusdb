@@ -79,9 +79,11 @@ async function system_getdatasets(refresh) {
 //users and security
 ////////////////////
 
-// Same SELECT clauses as system_pop_users (BY RANK + optional filters).
+// Same SELECT clauses as system_pop_users / system_typeahead_users (BY RANK + filters).
+// Always skip expired users (dict.users LIVE_USER: EXPIRY_DATE empty or > today).
 function system_users_sortselect(withtask, haslocks, sselect) {
     var sortselect = ' AND WITH ID NOT STARTING "%"'
+    sortselect += ' AND WITH LIVE_USER'
     if (sselect)
         sortselect += ' AND ' + sselect
     if (withtask)
