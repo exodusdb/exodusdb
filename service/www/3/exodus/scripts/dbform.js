@@ -3823,7 +3823,8 @@ async function document_onkeydown2(event) {
                 return exoduscancelevent(event)
             }
             // at arrival — fall through to closerecord
-        } else if (escSameField) {
+        // TEXTAREA: no field-level Esc undo (multi-line; do not wipe whole edit).
+        } else if (escSameField && element.tagName != 'TEXTAREA') {
 
             value = getvalue(element)
 
@@ -3852,10 +3853,22 @@ async function document_onkeydown2(event) {
                 //prevent normal esc handling
                 exoduscancelevent(event)
 
-                //select it
+                // Full-select restored value (dates already did via INPUT.select;
+                // free-text SPAN needs selectNodeContents). Similar: document_onfocus.
                 try {
                     if (element.select)
                         element.select()
+                    else if (window.getSelection && document.createRange) {
+                        var escSel = window.getSelection()
+                        escSel.removeAllRanges()
+                        var escRange = document.createRange()
+                        escRange.selectNodeContents(element)
+                        escSel.addRange(escRange)
+                    } else if (document.selection && document.body.createTextRange) {
+                        var escTr = document.body.createTextRange()
+                        escTr.moveToElementText(element)
+                        escTr.select()
+                    }
                 }
                 catch (e) { }
 
