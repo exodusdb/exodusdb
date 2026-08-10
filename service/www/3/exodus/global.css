@@ -135,7 +135,15 @@
     --exodus-field-focus-width: 3px;
     --exodus-field-focus-border-bottom: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
     --exodus-field-focus-border: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
-    --exodus-form-bg-color: #28304a;
+    /*
+     * DM form pair (same sense as LM: data well lighter than pane chrome).
+     * Old: data #28304a, base #303a5a. New base = old data; new data = old data
+     * + (old base − old data) so the chrome step is inverted onto the wells:
+     *   Δ = #303a5a − #28304a = (0x08,0x0a,0x10)
+     *   base  = #28304a
+     *   data  = #28304a + Δ = #303a5a
+     */
+    --exodus-form-bg-color: #303a5a;
     --exodus-form-border-color: #7070e0;
     --exodus-form-label-font-style: italic;
     --exodus-form-data-font-style: normal;
@@ -1818,9 +1826,11 @@ input[type=checkbox]:focus-visible {
 }
 
 :root[data-theme="dark_mode"] .exodusformpane {
-    /* Scoped vars override inline LM screencolor on <html>; re-root body/base here */
-    --exodus-form-bg-color: #28304a;
-    --exodus-form-th-bg-color: #303a5a;
+    /* Scoped vars override inline LM screencolor on <html>.
+     * base (pane) = old data #28304a; data (exodata) = #28304a + Δ → #303a5a
+     * (Δ = old base − old data). Pane darker, wells lighter — same sense as LM. */
+    --exodus-form-bg-color: #303a5a;
+    --exodus-form-th-bg-color: #28304a;
     --exodus-form-border-color: #7070e0;
     background-color: var(--exodus-form-th-bg-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
