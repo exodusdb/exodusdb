@@ -122,13 +122,13 @@ async function users_postdisplay() {
 
     var userexpirydate=await gds.getx('EXPIRY_DATE')
     if (userexpirydate && userexpirydate <= exodusdate()) {
-        $expiryelement.innerHTML = '<font color=red><strong>EXPIRED ' + userexpirydate.exodusoconv('[DATE]') + '</strong></font>'
+        $expiryelement.innerHTML = '<strong style="color:Highlight">EXPIRED ' + userexpirydate.exodusoconv('[DATE]') + '</strong>'
     } else {
         var reminderdays = 6
         var passwordexpires = await gds.getx('PASSWORD_EXPIRY_DATE')
         //if (passwordexpires) {
         if (!passwordexpires) {
-            $expiryelement.innerHTML = '<font color=green><strong>ACTIVE</strong></font>'
+            $expiryelement.innerHTML = '<strong style="color:var(--exodus-icon-green,#22b014)">ACTIVE</strong>'
         } else {
             var text=''
             var expirydays = (exodusint(passwordexpires) - exodusdate())
@@ -139,7 +139,7 @@ async function users_postdisplay() {
             else if (expirydays <= reminderdays)
              text='Password expires in ' + expirydays + ' days.'
             if (text)
-                $expiryelement.innerHTML = '<font color=red>&nbsp;&nbsp;&nbsp;'+text+'</font>'
+                $expiryelement.innerHTML = '<span style="color:Highlight">&nbsp;&nbsp;&nbsp;'+text+'</span>'
         }
     }
     return true
