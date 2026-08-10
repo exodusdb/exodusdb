@@ -1,15 +1,20 @@
 /*
  * Form frame model (keep this simple)
  * -----------------------------------
- * 1. .exodusformpane   — sole outer frame (border, radius, padding).
- * 2. TABLE.exodusform  — no table border (never competes with the pane).
+ * 1. .exodusformpane   — sole outer frame (border, radius, padding) and
+ *    origin of the form bgcolor hierarchy:
+ *      --exodus-form-body  = data / table fill (from --exodus-form-face)
+ *      --exodus-form-base  = chrome step (th, hosts, pane shell)
+ *    Descendants consume those vars; do not invent a parallel face on the table.
+ * 2. TABLE.exodusform  — no table border (never competes with the pane);
+ *    body fill from --exodus-form-body (pane) / face fallback.
  * 3. STANDARD — direct form cells (any section: thead/tbody/tfoot, or bare tr):
  *    same border + cell padding. Do not special-case a section unless product
  *    deliberately overrides below.
  * 4. OVERRIDES (only):
  *    - outer cell edges stripped (pane is the frame) — first/last col, edge rows
  *    - nested plain tables — tighter padding
- *    - prompt th face, sticky group thead, free-text/wide rules, etc.
+ *    - prompt th / sticky group thead, free-text/wide rules, etc.
  * Nested [exogroupno] / .exotable are not this top-level grid unless they are
  * themselves TABLE.exodusform.
  *
@@ -21,14 +26,14 @@ html:not(.exodus-panes-ready) TABLE.exodusform,
 html:not(.exodus-panes-ready) .exodusformpane {
 	visibility: hidden;
 }
-/*must be first in order to customise screen form color*/
+/*must be first in order to customise screen form color (screencolor may set rule bg) */
 TABLE.exodusform
 {
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
     border-collapse: collapse;
-    /* background-color: #ffffc0; cellpadding: 1; */
-    background-color: #fdf5e6;
+    /* body from pane hierarchy; face fallback before wrap / outside pane */
+    background-color: var(--exodus-form-body, var(--exodus-form-face, #fdf5e6));
     border: none; /* outer frame is .exodusformpane only */
     padding: 0.125em;
     text-align: left;
@@ -59,36 +64,40 @@ TABLE.exodusform TABLE.exodusform > tr > th {
 }
 
 /*
- * Base bgcolor: pane, form th, fieldstrip th, and hosts of nested tables
- * (.exodusembeddedtable — set in client.js on td/th that wrap exotable/group/strip/form).
- * Host cells are often colspan wider than max-content nested tables; paint base so
- * empty space to the right matches th/pane (not table body fill showing through).
+ * Form bgcolor hierarchy (origin: .exodusformpane — see that rule for tokens).
  *
- * Nested TABLE must be opaque form body — otherwise transparent nested td show the
- * host th base through them (th paint must not "override" lower data cells).
+ *   body  — table fill, nested TABLE, .exodata (leaf field cells)
+ *   base  — th, fieldstrip th, .exodusembeddedtable hosts, pane shell
+ *
+ * Hosts are often colspan wider than max-content nested tables; base on the
+ * host paints the empty strip. Leaf .exodata uses body so th/host base does
+ * not show through data cells. Nested TABLE body is fallback for unmarked td.
+ *
+ * Consumers use --exodus-form-base / --exodus-form-body when the pane set them;
+ * outside a pane, fall back to face (+ same OKLCH step for base).
  */
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
 TABLE.exotable th,
 TABLE[exogroupno] th,
-.exodusformpane,
 TABLE.exodusform td.exodusembeddedtable,
 TABLE.exodusform th.exodusembeddedtable {
     background-color: var(--exodus-form-face);
-    /* Mild L drop + chroma floor */
     background-color: oklch(from var(--exodus-form-face)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
+    /* pane-originated base wins when set */
+    background-color: var(--exodus-form-base, oklch(from var(--exodus-form-face)
+        calc(l * 0.985)
+        calc(c * 1.175 + 0.0075)
+        h));
 }
-/* Nested tables: form body under transparent unmarked td (host base only outside) */
-TABLE.exodusform TABLE {
-    background-color: var(--exodus-form-face, #fdf5e6);
-}
-/* Leaf data cells — marked on bind (dbform: nearest td/th of gfields control) */
+/* Nested tables + leaf data cells: body (pane token / face) */
+TABLE.exodusform TABLE,
 TABLE.exodusform td.exodata,
 TABLE.exodusform th.exodata {
-    background-color: var(--exodus-form-face, #fdf5e6);
+    background-color: var(--exodus-form-body, var(--exodus-form-face, #fdf5e6));
 }
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
@@ -96,28 +105,35 @@ TABLE.exotable th,
 TABLE[exogroupno] th {
     white-space: nowrap;
 }
+/* lighter: retarget base on the pane only — th/hosts consume --exodus-form-base */
+:root[data-form-head="lighter"] .exodusformpane {
+    --exodus-form-base: color-mix(in oklch, var(--exodus-form-body, var(--exodus-form-face)) 90%, white);
+    background-color: var(--exodus-form-base);
+}
+/* outside pane (rare): same lighter step from face */
 :root[data-form-head="lighter"] TABLE.exodusform th,
 :root[data-form-head="lighter"] TABLE.exodus-fieldstrip th,
 :root[data-form-head="lighter"] TABLE.exotable th,
 :root[data-form-head="lighter"] TABLE[exogroupno] th,
-:root[data-form-head="lighter"] .exodusformpane,
 :root[data-form-head="lighter"] TABLE.exodusform td.exodusembeddedtable,
 :root[data-form-head="lighter"] TABLE.exodusform th.exodusembeddedtable {
     background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
+    background-color: var(--exodus-form-base, color-mix(in oklch, var(--exodus-form-face) 90%, white));
 }
 :root[data-theme="dark_mode"] TABLE.exodusform th,
 :root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th,
 :root[data-theme="dark_mode"] TABLE.exotable th,
 :root[data-theme="dark_mode"] TABLE[exogroupno] th,
-:root[data-theme="dark_mode"] .exodusformpane,
 :root[data-theme="dark_mode"] TABLE.exodusform td.exodusembeddedtable,
 :root[data-theme="dark_mode"] TABLE.exodusform th.exodusembeddedtable {
     background-color: #303a5a;
+    background-color: var(--exodus-form-base, #303a5a);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform TABLE,
 :root[data-theme="dark_mode"] TABLE.exodusform td.exodata,
 :root[data-theme="dark_mode"] TABLE.exodusform th.exodata {
     background-color: #28304a;
+    background-color: var(--exodus-form-body, #28304a);
 }
 
 /*
@@ -174,7 +190,8 @@ TABLE.exodus-help-table th {
     vertical-align: top;
 }
 
-/* Rounded form shell — div wrapper inserted by exoduswrapformpanes() in client.js */
+/* Rounded form shell — div wrapper inserted by exoduswrapformpanes() in client.js.
+ * Origin of form bgcolor hierarchy: body (data) + base (th / hosts / this shell). */
 .exodusformpane {
     display: inline-block;
     vertical-align: top;
@@ -184,7 +201,14 @@ TABLE.exodus-help-table th {
      * (journals multi-col line grid, etc.). Do not max-width/overflow the pane;
      * the page scrolls if the shell is wider than the window. */
     width: max-content;
-    background-color: var(--exodus-form-face);
+    /* body = screencolor / face; base = mild step for chrome (same formula as th) */
+    --exodus-form-body: var(--exodus-form-face, #fdf5e6);
+    --exodus-form-base: var(--exodus-form-body);
+    --exodus-form-base: oklch(from var(--exodus-form-body)
+        calc(l * 0.985)
+        calc(c * 1.175 + 0.0075)
+        h);
+    background-color: var(--exodus-form-base);
     border: 1px solid var(--exodus-form-border);
     border-radius: var(--exodus-form-radius);
     padding: var(--exodus-form-pane-padding);
@@ -699,6 +723,8 @@ BODY
 /* In-form buttons (exodusbutton etc.): one rule for LM/DM; themes override colours only */
 :root {
     --exodus-form-face: #fdf5e6;
+    /* body default = face; pane redefines body/base for the form hierarchy */
+    --exodus-form-body: var(--exodus-form-face);
     --exodus-form-radius: 10px;
     --exodus-form-border: #d0d0d0;
     --exodus-form-pane-padding: 0.375em;
@@ -1919,14 +1945,18 @@ input[type=checkbox]:focus-visible {
 }
 
 :root[data-theme="dark_mode"] .exodusformpane {
-    /* Scoped vars override inline --exodus-form-face from LM screencolor on <html> */
+    /* Scoped vars override inline LM screencolor on <html>; re-root body/base here */
     --exodus-form-face: #28304a;
+    --exodus-form-body: #28304a;
+    --exodus-form-base: #303a5a;
     --exodus-form-border: #7070e0;
+    background-color: var(--exodus-form-base);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform {
-    /* Hardcoded — must not use var(); inline LM screencolor on <html> would win */
+    /* Pane body when wrapped; hard fallback if LM face still on <html> outside pane */
     background-color: #28304a !important;
+    background-color: var(--exodus-form-body, #28304a) !important;
     border-color: #7070e0 !important;
 }
 
