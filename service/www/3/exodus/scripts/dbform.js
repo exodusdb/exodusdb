@@ -8859,7 +8859,7 @@ function exodussetreadonly(elements, msg, options, recn) {
                 try {
                     if (typeof getComputedStyle != 'undefined')
                         bcol = getComputedStyle(document.documentElement)
-                            .getPropertyValue('--exodus-form-border').trim()
+                            .getPropertyValue('--exodus-form-border-color').trim()
                 } catch (e2) { }
                 elementx.style.borderColor = bcol || 'currentColor'
             }

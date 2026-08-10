@@ -3,11 +3,11 @@
  * -----------------------------------
  * 1. .exodusformpane   — sole outer frame (border, radius, padding) and
  *    origin of the form bgcolor hierarchy:
- *      --exodus-form-body  = data / table fill (from --exodus-form-face)
- *      --exodus-form-base  = chrome step (th, hosts, pane shell)
- *    Descendants consume those vars; do not invent a parallel face on the table.
+ *      --exodus-form-bg-color  = data / table fill (screencolor / cookie fc)
+ *      --exodus-form-th-bg-color  = chrome step (th, hosts, pane shell)
+ *    Descendants consume those vars; do not invent a parallel fill on the table.
  * 2. TABLE.exodusform  — no table border (never competes with the pane);
- *    body fill from --exodus-form-body (pane) / face fallback.
+ *    body fill from --exodus-form-bg-color (set on :root / pane / screencolor).
  * 3. STANDARD — direct form cells (any section: thead/tbody/tfoot, or bare tr):
  *    same border + cell padding. Do not special-case a section unless product
  *    deliberately overrides below.
@@ -22,6 +22,148 @@
  * sight so bare tables / per-form shells never flash before the final pane.
  * visibility (not display:none) so onload can still measure layout.
  */
+/*
+ * Theme constants (LM defaults + DM overrides).
+ * Component rules below only consume var(...); do not re-declare these here
+ * except element-scoped derivations (pane th-bg, icon roles, print).
+ */
+:root {
+
+    /* form body fill (screencolor / cookie fc); pane derives --exodus-form-th-bg-color */
+    --exodus-form-bg-color: #fdf5e6;
+    --exodus-form-border-radius: 10px;
+    --exodus-form-border-color: #d0d0d0;
+    --exodus-form-pane-padding: 0.375em;
+    --exodus-form-pane-margin: 0.125em;
+    /* Horizontal: equal L/R (was all in left — 0.5em / nested 0.3em).
+     * +0.125em L/R: old .clsReadOnly host pad moved onto the cell so th and td
+     * share the same air (host pad is 0; do not put it only on display spans). */
+    --exodus-form-cell-padding-x: 0.375em; /* was 0.25em + 0.125em host */
+    --exodus-form-cell-padding-y: 0.35em;
+    --exodus-form-nested-cell-padding-x: 0.275em; /* was 0.15em + 0.125em host */
+    --exodus-form-nested-cell-padding-y: 0.2em;
+    /* Aliases: older rules / popup icon gap after find/link */
+    --exodus-form-cell-padding-left: var(--exodus-form-cell-padding-x);
+    --exodus-form-nested-cell-padding-left: var(--exodus-form-nested-cell-padding-x);
+    --exodus-form-label-font-style: italic;
+    --exodus-form-data-font-style: normal;
+    --exodus-form-data-font-size: 1rem; /* INPUT and display SPANs share this */
+    /*
+     * LM buttons: form body with a light neutral lift so hue shows through
+     * on form body, th, and page-bg (not a pure grey slab).
+     * First line = fallback if color-mix/oklch unsupported.
+     */
+    --exodus-informbutton-bg-color: #f0f0f0;
+    --exodus-informbutton-bg-color: color-mix(in oklch, var(--exodus-form-bg-color) 72%, white);
+    --exodus-informbutton-hover-bg-color: #f5f5f5;
+    --exodus-informbutton-hover-bg-color: color-mix(in oklch, var(--exodus-form-bg-color) 58%, white);
+    --exodus-informbutton-border-color: #cccccc;
+    --exodus-informbutton-border-color: color-mix(in oklch, var(--exodus-form-bg-color) 55%, #888888);
+    --exodus-informbutton-hover-border-color: #bbbbbb;
+    --exodus-informbutton-hover-border-color: color-mix(in oklch, var(--exodus-form-bg-color) 45%, #666666);
+    --exodus-informbutton-border-style: solid;
+    --exodus-informbutton-color: inherit;
+    /* Toolbar/field icons (see AGENTS.md § Menubar / form icons):
+       --exodus-ui-icon-size  = ONE scale for all (outer box, with text).
+       --exodus-ui-icon-glyph = 1 always (fill box). SVGs full-bleed 16×16;
+       perceptually large glyphs pad inside the SVG file, not here. */
+    --exodus-ui-icon-size: 1.325em;
+    --exodus-ui-icon-glyph: 1;
+    /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
+    --exodus-check-size: 1.3125em;
+    /*
+     * Role tints only (mono masks). Greys live next to --exodus-text-color below
+     * so neutral/darkgrey are visibly the same token as body text.
+     */
+    --exodus-icon-green: #22b014;
+    --exodus-icon-red: #ad1a1b; /* sole 16×16 red — LM */
+    --exodus-icon-orange: #e04510; /* also confirm No when Cancel is shown */
+    --exodus-icon-blue: #1e97cc;
+
+    --exodus-bg-color: #fff;
+    --exodus-h-color: #000;
+    --exodus-text-color: #000000;
+    /* Mono chrome icons = body text (one source; DM only reassigns --exodus-text-color) */
+    --exodus-icon-neutral: var(--exodus-text-color);
+    --exodus-icon-darkgrey: var(--exodus-icon-neutral);
+    --exodus-icon-lightgrey: color-mix(in srgb, var(--exodus-icon-neutral) 32%, transparent);
+    --exodus-menu-bg: linear-gradient(to bottom, #f0f0f0, #ffffff);
+    --exodus-outline-color: #d8d8d8;
+    --exodus-menu-box-shadow: #d8d8d8 0px 1px 3px;
+    --exodus-menu-hover-bg-color: #d3d3d3;
+    /* Field underlines: resting dotted + focus solid (empty fields rely on focus line) */
+    --exodus-dot-border-color: #5a4a3a;
+    --exodus-field-border-bottom: 2.5px dotted var(--exodus-dot-border-color);
+    --exodus-field-focus-color: #e04510;
+    /* One stroke weight for field underlines and chrome-button focus marks */
+    --exodus-field-focus-width: 3px;
+    --exodus-field-focus-border-bottom: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
+    --exodus-field-focus-border: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
+    --exodus-textarea-border-color: #8f8378;
+    --exodus-radio-color: rgba(0, 84, 187, 0.596);
+    --exodus-radio-ring-border-color: #999999;
+    --exodus-page-bg-color: #f9f9f9;
+    /* DOMUI popup shells (confirm/decide, calendar, colour continuum) — define once here */
+    --exodus-popup-bg-color: var(--exodus-form-bg-color);
+    --exodus-popup-border-color: color-mix(in srgb, var(--exodus-text-color) 40%, transparent);
+    --exodus-popup-box-shadow: 0 4px 24px color-mix(in srgb, black 35%, transparent);
+    --exodus-popup-divider-border-color: color-mix(in srgb, var(--exodus-text-color) 12%, transparent);
+    --exodus-popup-hover-bg-color: color-mix(in srgb, var(--exodus-text-color) 12%, transparent);
+    /* Calendar-only accent (today / committed dates) */
+    --exodus-calendar-today-color: #c03030;
+}
+
+:root[data-theme="dark_mode"] {
+
+    color-scheme: dark;
+    --exodus-page-bg-color: #000000;
+    --exodus-text-color: #ffffff; /* greys: --exodus-icon-neutral → this (see LM :root) */
+    /* popup border/hover/divider recompute from textcolor; shadow stronger in DM */
+    --exodus-popup-border-color: color-mix(in srgb, var(--exodus-text-color) 55%, transparent);
+    --exodus-popup-box-shadow: 0 8px 40px color-mix(in srgb, black 90%, transparent),
+        0 0 0 1px color-mix(in srgb, white 12%, transparent);
+    --exodus-popup-divider-border-color: color-mix(in srgb, var(--exodus-text-color) 18%, transparent);
+    --exodus-popup-hover-bg-color: color-mix(in srgb, var(--exodus-text-color) 18%, transparent);
+    --exodus-calendar-today-color: #ff8a80;
+    --exodus-menu-bg: linear-gradient(to top, #303a5a, #1a2035);
+    --exodus-outline-color: #5058a0;
+    --exodus-menu-box-shadow: #000 0px 1px 10px;
+    --exodus-menu-hover-bg-color: #354060;
+    /* Burger dropdown / flyouts — slightly above form chrome */
+    --exodus-flyout-bg-color: #303c5c;
+    --exodus-flyout-border-color: #8888f0;
+    --exodus-flyout-hover-bg-color: #4a5880;
+    --exodus-dot-border-color: #c8c0b0;
+    --exodus-field-border-bottom: 2.5px dotted var(--exodus-dot-border-color);
+    --exodus-field-focus-color: #ff7a40;
+    --exodus-field-focus-width: 3px;
+    --exodus-field-focus-border-bottom: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
+    --exodus-field-focus-border: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
+    --exodus-form-bg-color: #28304a;
+    --exodus-form-border-color: #7070e0;
+    --exodus-form-label-font-style: italic;
+    --exodus-form-data-font-style: normal;
+    --exodus-form-data-font-size: 1rem;
+    --exodus-textarea-border-color: #6070b8;
+    /* Normal buttons (exodusbutton + graphicbutton): fixed DM fill (not form-mix) */
+    --exodus-informbutton-bg-color: #354060;
+    --exodus-informbutton-hover-bg-color: #455880;
+    --exodus-informbutton-hover-border-color: #9898f8;
+    --exodus-informbutton-border-color: #7070e0;
+    --exodus-informbutton-border-style: solid;
+    --exodus-informbutton-color: #ffffff;
+    /* Role tints only (DM). Greys stay var(--exodus-text-color) from LM :root. */
+    --exodus-icon-green: #3ec848;
+    --exodus-icon-red: #ff442a; /* sole 16×16 red — DM (matches painted Delete minus) */
+    --exodus-icon-orange: #ff7a40;
+    --exodus-icon-blue: #6aa3e8;
+    --exodus-bg-color: #1e1e1e;
+    --exodus-h-color: #ffffff;
+    --exodus-radio-color: rgba(36, 100, 173, 1);
+    --exodus-radio-checked-bg-color: #f0f0f0;
+    --exodus-radio-ring-border-color: #d4ccc0;
+}
+
 html:not(.exodus-panes-ready) TABLE.exodusform,
 html:not(.exodus-panes-ready) .exodusformpane {
 	visibility: hidden;
@@ -32,8 +174,8 @@ TABLE.exodusform
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
     border-collapse: collapse;
-    /* body from pane hierarchy; face fallback before wrap / outside pane */
-    background-color: var(--exodus-form-body, var(--exodus-form-face, #fdf5e6));
+    /* body from pane hierarchy; #fdf5e6 before tokens load */
+    background-color: var(--exodus-form-bg-color, #fdf5e6);
     border: none; /* outer frame is .exodusformpane only */
     padding: 0.125em;
     text-align: left;
@@ -73,8 +215,8 @@ TABLE.exodusform TABLE.exodusform > tr > th {
  * host paints the empty strip. Leaf .exodata uses body so th/host base does
  * not show through data cells. Nested TABLE body is fallback for unmarked td.
  *
- * Consumers use --exodus-form-base / --exodus-form-body when the pane set them;
- * outside a pane, fall back to face (+ same OKLCH step for base).
+ * Consumers use --exodus-form-th-bg-color / --exodus-form-bg-color when the pane set them;
+ * outside a pane, fall back to body (+ same OKLCH step for base).
  */
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
@@ -82,22 +224,22 @@ TABLE.exotable th,
 TABLE[exogroupno] th,
 TABLE.exodusform td.exodusembeddedtable,
 TABLE.exodusform th.exodusembeddedtable {
-    background-color: var(--exodus-form-face);
-    background-color: oklch(from var(--exodus-form-face)
+    background-color: var(--exodus-form-bg-color);
+    background-color: oklch(from var(--exodus-form-bg-color)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
     /* pane-originated base wins when set */
-    background-color: var(--exodus-form-base, oklch(from var(--exodus-form-face)
+    background-color: var(--exodus-form-th-bg-color, oklch(from var(--exodus-form-bg-color)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h));
 }
-/* Nested tables + leaf data cells: body (pane token / face) */
+/* Nested tables + leaf data cells: body */
 TABLE.exodusform TABLE,
 TABLE.exodusform td.exodata,
 TABLE.exodusform th.exodata {
-    background-color: var(--exodus-form-body, var(--exodus-form-face, #fdf5e6));
+    background-color: var(--exodus-form-bg-color, #fdf5e6);
 }
 TABLE.exodusform th,
 TABLE.exodus-fieldstrip th,
@@ -105,20 +247,20 @@ TABLE.exotable th,
 TABLE[exogroupno] th {
     white-space: nowrap;
 }
-/* lighter: retarget base on the pane only — th/hosts consume --exodus-form-base */
+/* lighter: retarget base on the pane only — th/hosts consume --exodus-form-th-bg-color */
 :root[data-form-head="lighter"] .exodusformpane {
-    --exodus-form-base: color-mix(in oklch, var(--exodus-form-body, var(--exodus-form-face)) 90%, white);
-    background-color: var(--exodus-form-base);
+    --exodus-form-th-bg-color: color-mix(in oklch, var(--exodus-form-bg-color) 90%, white);
+    background-color: var(--exodus-form-th-bg-color);
 }
-/* outside pane (rare): same lighter step from face */
+/* outside pane (rare): same lighter step from body */
 :root[data-form-head="lighter"] TABLE.exodusform th,
 :root[data-form-head="lighter"] TABLE.exodus-fieldstrip th,
 :root[data-form-head="lighter"] TABLE.exotable th,
 :root[data-form-head="lighter"] TABLE[exogroupno] th,
 :root[data-form-head="lighter"] TABLE.exodusform td.exodusembeddedtable,
 :root[data-form-head="lighter"] TABLE.exodusform th.exodusembeddedtable {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
-    background-color: var(--exodus-form-base, color-mix(in oklch, var(--exodus-form-face) 90%, white));
+    background-color: color-mix(in oklch, var(--exodus-form-bg-color) 90%, white);
+    background-color: var(--exodus-form-th-bg-color, color-mix(in oklch, var(--exodus-form-bg-color) 90%, white));
 }
 :root[data-theme="dark_mode"] TABLE.exodusform th,
 :root[data-theme="dark_mode"] TABLE.exodus-fieldstrip th,
@@ -127,13 +269,13 @@ TABLE[exogroupno] th {
 :root[data-theme="dark_mode"] TABLE.exodusform td.exodusembeddedtable,
 :root[data-theme="dark_mode"] TABLE.exodusform th.exodusembeddedtable {
     background-color: #303a5a;
-    background-color: var(--exodus-form-base, #303a5a);
+    background-color: var(--exodus-form-th-bg-color, #303a5a);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform TABLE,
 :root[data-theme="dark_mode"] TABLE.exodusform td.exodata,
 :root[data-theme="dark_mode"] TABLE.exodusform th.exodata {
     background-color: #28304a;
-    background-color: var(--exodus-form-body, #28304a);
+    background-color: var(--exodus-form-bg-color, #28304a);
 }
 
 /*
@@ -141,7 +283,7 @@ TABLE[exogroupno] th {
  * There is no project h2 rule (never was): size/weight/margin are browser UA.
  *   Chromium/Firefox html.css: h2 { font-size: 1.5em; font-weight: bold;
  *     margin-block: 0.83em; }  (em relative to parent; parent th is 1rem here)
- * Cell face = prompt th tint; italic = TABLE.exodusform inheritance.
+ * Cell bg = prompt th tint; italic = TABLE.exodusform inheritance.
  * Do not re-specify size/margin here unless deliberately diverging from UA.
  */
 
@@ -174,18 +316,18 @@ TABLE[exogroupno] tr {
 
 /*
  * Help / reference tables (e.g. helpkeyboard crosstab).
- * Face and border follow form theme tokens so day/night stays readable.
+ * Fill and border follow form theme tokens so day/night stays readable.
  * Do not use fixed pastel backgrounds (#ffffcc etc.).
  */
 TABLE.exodus-help-table {
     border-collapse: collapse;
-    background-color: var(--exodus-form-face, #fdf5e6);
-    border: 1px solid var(--exodus-form-border, #d0d0d0);
+    background-color: var(--exodus-form-bg-color, #fdf5e6);
+    border: 1px solid var(--exodus-form-border-color, #d0d0d0);
     text-align: left;
 }
 TABLE.exodus-help-table td,
 TABLE.exodus-help-table th {
-    border: 1px solid var(--exodus-form-border, #d0d0d0);
+    border: 1px solid var(--exodus-form-border-color, #d0d0d0);
     padding: 0.25em 0.5em;
     vertical-align: top;
 }
@@ -201,16 +343,15 @@ TABLE.exodus-help-table th {
      * (journals multi-col line grid, etc.). Do not max-width/overflow the pane;
      * the page scrolls if the shell is wider than the window. */
     width: max-content;
-    /* body = screencolor / face; base = mild step for chrome (same formula as th) */
-    --exodus-form-body: var(--exodus-form-face, #fdf5e6);
-    --exodus-form-base: var(--exodus-form-body);
-    --exodus-form-base: oklch(from var(--exodus-form-body)
+    /* body inherits from :root / screencolor; base = mild step for chrome (th/hosts) */
+    --exodus-form-th-bg-color: var(--exodus-form-bg-color, #fdf5e6);
+    --exodus-form-th-bg-color: oklch(from var(--exodus-form-bg-color, #fdf5e6)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
-    background-color: var(--exodus-form-base);
-    border: 1px solid var(--exodus-form-border);
-    border-radius: var(--exodus-form-radius);
+    background-color: var(--exodus-form-th-bg-color);
+    border: 1px solid var(--exodus-form-border-color);
+    border-radius: var(--exodus-form-border-radius);
     padding: var(--exodus-form-pane-padding);
     margin: var(--exodus-form-pane-margin);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -507,7 +648,7 @@ TABLE[exogroupno] > thead {
     box-shadow: 0 1px 0 #5a6090;
 }
 /*
- * LM sticky thead tint (from form body / --exodus-form-face)
+ * LM sticky thead tint (from form body / --exodus-form-bg-color)
  * ----------------------------------------------------------
  * Common UI pattern: same hue, slightly stronger (richer + a touch deeper).
  * Not SCREEN_HEAD_COLOR (unused — see colors.js).
@@ -517,52 +658,52 @@ TABLE[exogroupno] > thead {
  *
  *   deeper (light bodies, default) — OKLCH relative color (CSS Color 5):
  *     l' = l × 0.985
- *     c' = c × 1.175 + 0.0075  (half prior delta from face)
+ *     c' = c × 1.175 + 0.0075  (half prior delta from body)
  *     h' = h
- *     Fallback = plain form face if oklch(from) unsupported.
+ *     Fallback = plain form body if oklch(from) unsupported.
  *
- *   lighter (dark bodies) — color-mix face 90% / white (half prior mix).
+ *   lighter (dark bodies) — color-mix body 90% / white (half prior mix).
  *
  * exotable heads a step stronger. DM: fixed greys (ignore data-form-head).
  */
 TABLE[exogroupno] > thead th,
 TABLE[exogroupno] > thead td {
-    background-color: var(--exodus-form-face);
-    background-color: oklch(from var(--exodus-form-face)
+    background-color: var(--exodus-form-bg-color);
+    background-color: oklch(from var(--exodus-form-bg-color)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
 }
-/* Decide + typeahead heads: same OKLCH step from popup shell (not form-face) */
+/* Decide + typeahead heads: same OKLCH step from popup shell (not form body) */
 .exodusconfirmdiv #decide_table1 > thead th,
 .exodusconfirmdiv #decide_table1 > thead td,
 .exodus_typeahead_table > thead th {
-    background-color: var(--exodus-popup-face);
-    background-color: oklch(from var(--exodus-popup-face)
+    background-color: var(--exodus-popup-bg-color);
+    background-color: oklch(from var(--exodus-popup-bg-color)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
 }
 TABLE.exotable[exogroupno] > thead th,
 TABLE.exotable[exogroupno] > thead td {
-    background-color: var(--exodus-form-face);
-    background-color: oklch(from var(--exodus-form-face)
+    background-color: var(--exodus-form-bg-color);
+    background-color: oklch(from var(--exodus-form-bg-color)
         calc(l * 0.98)
         calc(c * 1.2 + 0.009)
         h);
 }
 :root[data-form-head="lighter"] TABLE[exogroupno] > thead th,
 :root[data-form-head="lighter"] TABLE[exogroupno] > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 90%, white);
+    background-color: color-mix(in oklch, var(--exodus-form-bg-color) 90%, white);
 }
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td,
 :root[data-form-head="lighter"] .exodus_typeahead_table > thead th {
-    background-color: color-mix(in oklch, var(--exodus-popup-face) 90%, white);
+    background-color: color-mix(in oklch, var(--exodus-popup-bg-color) 90%, white);
 }
 :root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead th,
 :root[data-form-head="lighter"] TABLE.exotable[exogroupno] > thead td {
-    background-color: color-mix(in oklch, var(--exodus-form-face) 87.5%, white);
+    background-color: color-mix(in oklch, var(--exodus-form-bg-color) 87.5%, white);
 }
 
 TABLE
@@ -571,15 +712,13 @@ TABLE
     border-width: 0px;
 }
 
-/* Find-as-you-type: same shell face/border/shadow language as .exodusconfirmdiv
-   (popup UI), not a separate white card. max-height/max-width also set in
-   form_typeahead_place from available viewport. */
+/* Find-as-you-type: same popup shell tokens as confirm/decide/calendar */
 .exodus_typeahead {
-    background: var(--exodus-popup-face);
+    background: var(--exodus-popup-bg-color);
     color: inherit;
-    border: 2px solid #666666;
-    border-radius: 10px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    border: 2px solid var(--exodus-popup-border-color);
+    border-radius: var(--exodus-form-border-radius);
+    box-shadow: var(--exodus-popup-box-shadow);
     max-height: 28em;
     overflow: auto;
     /* Normal wheel scrolls the list only; do not chain to page (decide steps options instead) */
@@ -588,27 +727,13 @@ TABLE
     /* No top padding: scrolled rows paint in that gap above sticky heads (flicker) */
     padding: 0 4px 4px 4px;
 }
-:root[data-theme="dark_mode"] .exodus_typeahead {
-    border-color: #7a88b0;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
-}
-/* Hit typeahead_limitn — emphasize bottom edge + footer (form_typeahead_show) */
-.exodus_typeahead.exodus_typeahead_is_truncated {
-    border-bottom-width: 4px;
-    border-bottom-color: #c60;
-}
-:root[data-theme="dark_mode"] .exodus_typeahead.exodus_typeahead_is_truncated {
-    border-bottom-color: #e8a040;
-}
+/* Hit typeahead_limitn — footer copy only (no thick accent bar; was focus-orange) */
 .exodus_typeahead_truncated {
     padding: 0.35em 0.5em 0.15em;
     font-size: 0.9em;
     opacity: 0.9;
-    border-top: 1px solid #999;
+    border-top: 1px solid var(--exodus-popup-divider-border-color);
     text-align: center;
-}
-:root[data-theme="dark_mode"] .exodus_typeahead_truncated {
-    border-top-color: #7a88b0;
 }
 .exodus_typeahead_table {
     /* separate: sticky heads paint a solid layer (collapse lets row text bleed) */
@@ -652,11 +777,7 @@ TABLE
 
 .exodus_typeahead_table tr.exodus_typeahead_focus td,
 .exodus_typeahead_table tr[data-ta-row]:hover td {
-    background-color: lightgrey;
-}
-:root[data-theme="dark_mode"] .exodus_typeahead_table tr.exodus_typeahead_focus td,
-:root[data-theme="dark_mode"] .exodus_typeahead_table tr[data-ta-row]:hover td {
-    background-color: rgba(255, 255, 255, 0.18);
+    background-color: var(--exodus-popup-hover-bg-color);
 }
 
 /* Print: keep form tables printable; hide fixed menubar; paper is white (DM screen CSS is @media screen only). */
@@ -712,71 +833,16 @@ BUTTON:focus, SPAN:focus
    (that painted black/white text for DM OS + Exodus day). DM flash: firstpaint
    sets data-theme=dark_mode + flashguard; full rules under :root[data-theme=dark_mode]. */
 html {
-    background: var(--exodus-page-bg, #f9f9f9);
+    background-color: var(--exodus-page-bg-color, #f9f9f9);
 }
 BODY
 {
-    background: var(--exodus-page-bg, #f9f9f9);
+    background-color: var(--exodus-page-bg-color, #f9f9f9);
     color: #000000;
 }
 
-/* In-form buttons (exodusbutton etc.): one rule for LM/DM; themes override colours only */
-:root {
-    --exodus-form-face: #fdf5e6;
-    /* body default = face; pane redefines body/base for the form hierarchy */
-    --exodus-form-body: var(--exodus-form-face);
-    --exodus-form-radius: 10px;
-    --exodus-form-border: #d0d0d0;
-    --exodus-form-pane-padding: 0.375em;
-    --exodus-form-pane-margin: 0.125em;
-    /* Horizontal: equal L/R (was all in left — 0.5em / nested 0.3em).
-     * +0.125em L/R: old .clsReadOnly host pad moved onto the cell so th and td
-     * share the same air (host pad is 0; do not put it only on display spans). */
-    --exodus-form-cell-padding-x: 0.375em; /* was 0.25em + 0.125em host */
-    --exodus-form-cell-padding-y: 0.35em;
-    --exodus-form-nested-cell-padding-x: 0.275em; /* was 0.15em + 0.125em host */
-    --exodus-form-nested-cell-padding-y: 0.2em;
-    /* Aliases: older rules / popup icon gap after find/link */
-    --exodus-form-cell-padding-left: var(--exodus-form-cell-padding-x);
-    --exodus-form-nested-cell-padding-left: var(--exodus-form-nested-cell-padding-x);
-    --exodus-form-label-font-style: italic;
-    --exodus-form-data-font-style: normal;
-    --exodus-form-data-font-size: 1rem; /* INPUT and display SPANs share this */
-    /*
-     * LM buttons: form-face with a light neutral lift so hue shows through
-     * on form body, th, and page-bg (not a pure grey slab).
-     * First line = fallback if color-mix/oklch unsupported.
-     */
-    --exodus-informbutton-bg: #f0f0f0;
-    --exodus-informbutton-bg: color-mix(in oklch, var(--exodus-form-face) 72%, white);
-    --exodus-informbutton-hover-bg: #f5f5f5;
-    --exodus-informbutton-hover-bg: color-mix(in oklch, var(--exodus-form-face) 58%, white);
-    --exodus-informbutton-border: #cccccc;
-    --exodus-informbutton-border: color-mix(in oklch, var(--exodus-form-face) 55%, #888888);
-    --exodus-informbutton-hover-border: #bbbbbb;
-    --exodus-informbutton-hover-border: color-mix(in oklch, var(--exodus-form-face) 45%, #666666);
-    --exodus-informbutton-border-style: solid;
-    --exodus-informbutton-color: inherit;
-    /* Toolbar/field icons (see AGENTS.md § Menubar / form icons):
-       --exodus-ui-icon-size  = ONE scale for all (outer box, with text).
-       --exodus-ui-icon-glyph = 1 always (fill box). SVGs full-bleed 16×16;
-       perceptually large glyphs pad inside the SVG file, not here. */
-    --exodus-ui-icon-size: 1.325em;
-    --exodus-ui-icon-glyph: 1;
-    /* Radio/checkbox: independent of icon size (14px beside former 8pt body text) */
-    --exodus-check-size: 1.3125em;
-    /*
-     * Role tints only (mono masks). Greys live next to --exodus-textcolor below
-     * so neutral/darkgrey are visibly the same token as body text.
-     */
-    --exodus-icon-green: #22b014;
-    --exodus-icon-red: #ad1a1b; /* sole 16×16 red — LM */
-    --exodus-icon-orange: #e04510; /* also confirm No when Cancel is shown */
-    --exodus-icon-blue: #1e97cc;
-}
-
 /*
- * Tinted monochrome icon: black SVG used as mask; fill from --exodus-icon-color.
+ * Tinted monochrome icon: black SVG used as mask; fill from --exodus-icon-bg-color.
  * mask-image is set inline on the element (absolute URL) — do not put relative
  * url() only in a custom property used from this file (resolves against CSS path → 404).
  */
@@ -788,7 +854,7 @@ BODY
     flex-shrink: 0;
     vertical-align: middle;
     /* Colour the glyph; never inherit button/menubar background as the fill */
-    background-color: var(--exodus-icon-color, currentColor) !important;
+    background-color: var(--exodus-icon-bg-color, currentColor) !important;
     background-image: none !important;
     /* Same mass as painted img icons (those use padding + object-fit) */
     -webkit-mask-size: calc(100% * var(--exodus-ui-icon-glyph));
@@ -805,13 +871,13 @@ BODY
     box-shadow: none !important;
     overflow: visible;
 }
-.exodus-icon-green { --exodus-icon-color: var(--exodus-icon-green); }
-.exodus-icon-red { --exodus-icon-color: var(--exodus-icon-red); }
-.exodus-icon-orange { --exodus-icon-color: var(--exodus-icon-orange); }
-.exodus-icon-blue { --exodus-icon-color: var(--exodus-icon-blue); }
-.exodus-icon-darkgrey { --exodus-icon-color: var(--exodus-icon-darkgrey); }
-.exodus-icon-lightgrey { --exodus-icon-color: var(--exodus-icon-lightgrey); }
-.exodus-icon-neutral { --exodus-icon-color: var(--exodus-icon-neutral); }
+.exodus-icon-green { --exodus-icon-bg-color: var(--exodus-icon-green); }
+.exodus-icon-red { --exodus-icon-bg-color: var(--exodus-icon-red); }
+.exodus-icon-orange { --exodus-icon-bg-color: var(--exodus-icon-orange); }
+.exodus-icon-blue { --exodus-icon-bg-color: var(--exodus-icon-blue); }
+.exodus-icon-darkgrey { --exodus-icon-bg-color: var(--exodus-icon-darkgrey); }
+.exodus-icon-lightgrey { --exodus-icon-bg-color: var(--exodus-icon-lightgrey); }
+.exodus-icon-neutral { --exodus-icon-bg-color: var(--exodus-icon-neutral); }
 
 /*
  * Normal button face — one set of tokens for all raised actions:
@@ -822,10 +888,10 @@ BODY
 .exodusbutton,
 .exodustab,
 .graphicbutton {
-    background-color: var(--exodus-informbutton-bg);
+    background-color: var(--exodus-informbutton-bg-color);
     color: var(--exodus-informbutton-color);
     padding: 0.2em 0.45em;
-    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
+    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border-color);
     border-radius: 0.3rem;
     cursor: pointer;
     /* In-form: inherit TABLE.exodusform / cell label italic; outside form body is normal */
@@ -838,8 +904,8 @@ BODY
 .exodustab:disabled,
 .graphicbutton:disabled,
 input.exodusbutton:disabled {
-    background-color: var(--exodus-informbutton-bg);
-    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
+    background-color: var(--exodus-informbutton-bg-color);
+    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border-color);
     color: var(--exodus-informbutton-color);
     opacity: 0.55;
     cursor: not-allowed;
@@ -848,7 +914,7 @@ input.exodusbutton:disabled {
 BUTTON
 {
     cursor: pointer;
-    background-color: var(--exodus-informbutton-bg);
+    background-color: var(--exodus-informbutton-bg-color);
     border-radius:0.3rem;
 }
 
@@ -1007,7 +1073,7 @@ TEXTAREA {
 }
 
 /*
- * Single resting style: dotted underline (async-ui). Theme via --exodus-field-underline.
+ * Single resting style: dotted underline (async-ui). Theme via --exodus-field-border-bottom.
  * :not(:focus) so resting never competes with the solid focus underline.
  */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield):not(:focus),
@@ -1017,7 +1083,7 @@ SPAN.clsNotRequired[contenteditable]:not(:focus),
 .exodusid_textinput:not(:focus) {
     background-color: transparent;
     border: none;
-    border-bottom: var(--exodus-field-underline);
+    border-bottom: var(--exodus-field-border-bottom);
     border-radius: 0;
 }
 
@@ -1038,7 +1104,7 @@ TEXTAREA:not(:focus),
 TEXTAREA.clsRequired:not(:focus),
 TEXTAREA.clsNotRequired:not(:focus) {
     background-color: transparent;
-    border: 1.7px dotted var(--exodus-textarea-border);
+    border: 1.7px dotted var(--exodus-textarea-border-color);
     border-radius: 0.3rem;
     margin: 0;
     padding: 0.15em 0.3em;
@@ -1054,7 +1120,7 @@ SPAN.clsNotRequired[contenteditable]:focus,
     outline: none;
     background-color: transparent;
     border: none;
-    border-bottom: var(--exodus-field-focus-underline);
+    border-bottom: var(--exodus-field-focus-border-bottom);
     border-radius: 0;
 }
 
@@ -1072,7 +1138,7 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
     content: "\00a0";
     display: inline-block;
     width: 1ch;
-    border-bottom: 2.5px solid color-mix(in srgb, var(--exodus-dotcolor) 33%, transparent);
+    border-bottom: 2.5px solid color-mix(in srgb, var(--exodus-dot-border-color) 33%, transparent);
 }
 
 #menudiv > button[accesskey="M"] {
@@ -1178,25 +1244,25 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
 }
 
 .menubutton:hover {
-    background-color: var(--exodus-menuhighlight);
+    background-color: var(--exodus-menu-hover-bg-color);
 }
 
 /* Normal button hover/focus (exodusbutton + graphicbutton share informbutton tokens) */
 .exodusbutton:hover:enabled,
 .graphicbutton:hover {
-    background-color: var(--exodus-informbutton-hover-bg);
-    border-color: var(--exodus-informbutton-hover-border);
+    background-color: var(--exodus-informbutton-hover-bg-color);
+    border-color: var(--exodus-informbutton-hover-border-color);
 }
 .exodusbutton:focus:enabled,
 .graphicbutton:focus {
     outline: none;
-    background-color: var(--exodus-informbutton-hover-bg);
+    background-color: var(--exodus-informbutton-hover-bg-color);
     box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
 }
 /* Flat menubar tools: highlight fill + same focus ring */
 .menubutton:focus {
     outline: none;
-    background-color: var(--exodus-menuhighlight);
+    background-color: var(--exodus-menu-hover-bg-color);
     box-shadow: 0 0 0 2px var(--exodus-field-focus-color);
 }
 
@@ -1250,7 +1316,7 @@ img[id^="deleterowbutton"] {
 .menubutton:focus .exodus-icon,
 .graphicbutton:hover .exodus-icon,
 .graphicbutton:focus .exodus-icon {
-    background-color: var(--exodus-icon-color, currentColor) !important;
+    background-color: var(--exodus-icon-bg-color, currentColor) !important;
 }
 
 #menubutton_label {
@@ -1258,10 +1324,10 @@ img[id^="deleterowbutton"] {
 }
 
 #exodus_menu {
-    outline: var(--exodus-smallerbordercolor) solid 1px !important;
-    background: var(--exodus-menubkgcolor) !important;
-    box-shadow: var(--exodus-menuboxshadow);
-    color: var(--exodus-textcolor) !important;
+    outline: var(--exodus-outline-color) solid 1px !important;
+    background: var(--exodus-menu-bg) !important;
+    box-shadow: var(--exodus-menu-box-shadow);
+    color: var(--exodus-text-color) !important;
     z-index: 999;
 }
 
@@ -1452,54 +1518,6 @@ img[id^="deleterowbutton"] {
 }
 
 
-:root {
-    --bg-color: #fff;
-    --h-color: #000;
-    /*--text-color: black;*/
-    --text-color: #D4D4D4;
-    --link-color: #006;
-    --exodus-textcolor: #000000;
-    /* Mono chrome icons = body text (one source; DM only reassigns --exodus-textcolor) */
-    --exodus-icon-neutral: var(--exodus-textcolor);
-    --exodus-icon-darkgrey: var(--exodus-icon-neutral);
-    --exodus-icon-lightgrey: color-mix(in srgb, var(--exodus-icon-neutral) 32%, transparent);
-    --exodus-menubkgcolor: linear-gradient(to bottom, #f0f0f0, #ffffff);
-    --exodus-smallerbordercolor: #d8d8d8;
-    --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
-    --exodus-menuhighlight: #d3d3d3;
-    /* Field underlines: resting dotted + focus solid (empty fields rely on focus line) */
-    --exodus-dotcolor: #5a4a3a;
-    --exodus-field-underline: 2.5px dotted var(--exodus-dotcolor);
-    --exodus-field-focus-color: #e04510;
-    /* One stroke weight for field underlines and chrome-button focus marks */
-    --exodus-field-focus-width: 3px;
-    --exodus-field-focus-underline: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
-    --exodus-field-focus-border: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
-    --exodus-textarea-border: #8f8378;
-    --radio-color: rgba(0, 84, 187, 0.596);
-    --radio-ring-color: #999999;
-    --border-color: #bbb;
-    --thead-color: #ccc;
-    --tbody-color-odd: #ddd;
-    --tbody-color-even: #eee;
-    --ok-color: #a0ffa0;
-    --fail-color: #ffa0a0;
-    --warning-color: #FF3403;
-    --exodus-page-bg: #f9f9f9;
-    /* All DOMUI popup shells (confirm/decide, calendar, colour continuum) */
-    --exodus-popup-face: var(--exodus-form-face);
-    --exodus-calendar-border: #4444cc;
-    --exodus-calendar-color: #000000;
-    --exodus-calendar-header-color: #000000;
-    --exodus-calendar-today-color: #c03030;
-    --exodus-calendar-select-bg: #ffffff;
-    --exodus-calendar-select-color: #000000;
-    --exodus-calendar-select-border: #4444cc;
-    --exodus-calendar-button-bg: #f0f0f0;
-    --exodus-calendar-button-color: #000000;
-    --exodus-calendar-button-border: #cccccc;
-}
-
 input[type=radio] {
     /*how to override radio/checkbox style*/
     /*https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio*/
@@ -1511,14 +1529,14 @@ input[type=radio] {
     min-height: 0;
     width: var(--exodus-check-size);
     height: var(--exodus-check-size);
-    border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
+    border: calc(var(--exodus-check-size) * 1 / 14) solid var(--exodus-radio-ring-border-color);
     /*transition: 0.1s all linear;*/
     /* margin-left 0: line up with F7 popup icons in the same TD column (UA default
        left margin sits radios to the right of chrome above/below). */
     margin: 0 5px 2px 0;
     /*position: relative;*/
     /*top: 2px;*/
-    background-color: var(--bg-color);
+    background-color: var(--exodus-bg-color);
     /*transition: 0.1s all linear;*/
     vertical-align: middle;
 
@@ -1528,17 +1546,17 @@ input[type=radio] {
 }
 
 input[type=radio]:checked {
-    border: calc(var(--exodus-check-size) * 4 / 14) solid var(--radio-color);
+    border: calc(var(--exodus-check-size) * 4 / 14) solid var(--exodus-radio-color);
     /*transition: 0.1s all linear;*/
 }
 
 :checked+label {
     font-weight: bold;
-    color: var(--h-color);
+    color: var(--exodus-h-color);
 }
 
 select {
-    color: var(--h-color);
+    color: var(--exodus-h-color);
 }
 
 input[type=checkbox] {
@@ -1552,20 +1570,20 @@ input[type=checkbox] {
     min-height: 0;
     width: var(--exodus-check-size);
     height: var(--exodus-check-size);
-    border: calc(var(--exodus-check-size) * 1 / 14) solid var(--radio-ring-color);
+    border: calc(var(--exodus-check-size) * 1 / 14) solid var(--exodus-radio-ring-border-color);
     /*transition: 0.1s all linear;*/
     /* Same as radio: no UA left margin so control lines up with F7 chrome column. */
     margin: 0 5px 1px 0;
     /*position: relative;*/
     /*top: 2px;*/
-    background-color: var(--bg-color);
+    background-color: var(--exodus-bg-color);
     vertical-align: middle;
     /*border-radius: 20%;*/
     border-radius: calc(var(--exodus-check-size) * 2 / 14);
 }
 
 input[type=checkbox]:checked {
-    background-color:var(--radio-color);
+    background-color:var(--exodus-radio-color);
     border: 0px;
     /* U+2714 heavy check mark glyph */
     background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
@@ -1597,7 +1615,7 @@ input[type=checkbox]:focus-visible {
 /* Shell: one-row two-col table — icon | (title + options + ▼ + buttons).
    Everything in col2 shares one left edge; no spacer/padding alignment hacks. */
 .exodusconfirmdiv {
-    --exodusconfirm-iconcol-width: 4.3em;
+    --exodus-confirm-iconcol-width: 4.3em;
     z-index: 1001;
     position: fixed;
     width: fit-content;
@@ -1607,11 +1625,11 @@ input[type=checkbox]:focus-visible {
     margin: auto;
     inset: 0;
     text-align: left;
-    background: var(--exodus-popup-face);
-    border: 2px solid #666666;
-    border-radius: 10px;
+    background: var(--exodus-popup-bg-color);
+    border: 2px solid var(--exodus-popup-border-color);
+    border-radius: var(--exodus-form-border-radius);
     padding: 10px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--exodus-popup-box-shadow);
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -1628,7 +1646,7 @@ input[type=checkbox]:focus-visible {
     align-items: stretch;
 }
 .exodusconfirm_iconcol {
-    width: var(--exodusconfirm-iconcol-width);
+    width: var(--exodus-confirm-iconcol-width);
     flex: 0 0 auto;
     padding: 0.35em 12px 0 2px; /* match question top air */
     white-space: nowrap;
@@ -1839,7 +1857,7 @@ input[type=checkbox]:focus-visible {
 /* decide thead sticky + tint: shared with TABLE[exogroupno] > thead above */
 
 .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
-    background-color: lightgrey;
+    background-color: var(--exodus-popup-hover-bg-color);
 }
 
 /* ========== Theme toggle (top-right menubar): sun/moon icon only, no slider ========== */
@@ -1880,83 +1898,28 @@ input[type=checkbox]:focus-visible {
     object-fit: contain;
 }
 
-/* ========== Dark mode (light mode rules above stay unchanged) ========== */
-:root[data-theme="dark_mode"] {
-    color-scheme: dark;
-    --exodus-page-bg: #000000;
-    --exodus-calendar-border: #7070e0;
-    --exodus-calendar-color: #ffffff;
-    --exodus-calendar-header-color: #ffffff;
-    --exodus-calendar-today-color: #ff8a80;
-    --exodus-calendar-select-bg: #28304a;
-    --exodus-calendar-select-color: #ffffff;
-    --exodus-calendar-select-border: #7070e0;
-    --exodus-calendar-button-bg: #6a5e50;
-    --exodus-calendar-button-color: #ffffff;
-    --exodus-calendar-button-border: #a8957c;
-    --exodus-textcolor: #ffffff; /* greys: --exodus-icon-neutral → this (see LM :root) */
-    --exodus-menubkgcolor: linear-gradient(to top, #303a5a, #1a2035);
-    --exodus-smallerbordercolor: #5058a0;
-    --exodus-menuboxshadow: #000 0px 1px 10px;
-    --exodus-menuhighlight: #354060;
-    /* Burger dropdown / flyouts — slightly above form chrome */
-    --exodus-flyout-face: #303c5c;
-    --exodus-flyout-border: #8888f0;
-    --exodus-flyout-highlight: #4a5880;
-    --exodus-dotcolor: #c8c0b0;
-    --exodus-field-underline: 2.5px dotted var(--exodus-dotcolor);
-    --exodus-field-focus-color: #ff7a40;
-    --exodus-field-focus-width: 3px;
-    --exodus-field-focus-underline: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
-    --exodus-field-focus-border: var(--exodus-field-focus-width) solid var(--exodus-field-focus-color);
-    --exodus-form-face: #28304a;
-    --exodus-form-border: #7070e0;
-    --exodus-form-label-font-style: italic;
-    --exodus-form-data-font-style: normal;
-    --exodus-form-data-font-size: 1rem;
-    --exodus-textarea-border: #6070b8;
-    /* Normal buttons (exodusbutton + graphicbutton): fixed DM face (not form-mix) */
-    --exodus-informbutton-bg: #354060;
-    --exodus-informbutton-hover-bg: #455880;
-    --exodus-informbutton-hover-border: #9898f8;
-    --exodus-informbutton-border: #7070e0;
-    --exodus-informbutton-border-style: solid;
-    --exodus-informbutton-color: #ffffff;
-    /* Role tints only (DM). Greys stay var(--exodus-textcolor) from LM :root. */
-    --exodus-icon-green: #3ec848;
-    --exodus-icon-red: #ff442a; /* sole 16×16 red — DM (matches painted Delete minus) */
-    --exodus-icon-orange: #ff7a40;
-    --exodus-icon-blue: #6aa3e8;
-    --bg-color: #1e1e1e;
-    --h-color: #ffffff;
-    --text-color: #fdfdfd;
-    --radio-color: rgba(36, 100, 173, 1);
-    --radio-checked-bg: #f0f0f0;
-    --radio-ring-color: #d4ccc0;
-}
-
+/* ========== Dark mode (component rules; tokens are at top of file) ========== */
 /* Screen only — print block at EOF forces black-on-white for paper */
 @media screen {
 :root[data-theme="dark_mode"],
 :root[data-theme="dark_mode"] BODY {
-    background: var(--exodus-page-bg) !important;
+    background-color: var(--exodus-page-bg-color) !important;
     color: #ffffff;
 }
 }
 
 :root[data-theme="dark_mode"] .exodusformpane {
     /* Scoped vars override inline LM screencolor on <html>; re-root body/base here */
-    --exodus-form-face: #28304a;
-    --exodus-form-body: #28304a;
-    --exodus-form-base: #303a5a;
-    --exodus-form-border: #7070e0;
-    background-color: var(--exodus-form-base);
+    --exodus-form-bg-color: #28304a;
+    --exodus-form-th-bg-color: #303a5a;
+    --exodus-form-border-color: #7070e0;
+    background-color: var(--exodus-form-th-bg-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exodusform {
-    /* Pane body when wrapped; hard fallback if LM face still on <html> outside pane */
+    /* Pane body when wrapped; hard fallback if LM body still on <html> outside pane */
     background-color: #28304a !important;
-    background-color: var(--exodus-form-body, #28304a) !important;
+    background-color: var(--exodus-form-bg-color, #28304a) !important;
     border-color: #7070e0 !important;
 }
 
@@ -1968,7 +1931,7 @@ SPAN.calendar-date-committed[contenteditable] {
     color: var(--exodus-calendar-today-color);
 }
 
-/* DM sticky head: lift off form face (#28304a). Same step for all group tables —
+/* DM sticky head: lift off form body (#28304a). Same step for all group tables —
  * was only on .exotable, so reports/journals (exodusform+groupno) looked flat. */
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead th,
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead td,
@@ -1986,7 +1949,7 @@ SPAN.calendar-date-committed[contenteditable] {
     border-color: #5a6090 !important;
 }
 
-/* Dark mode: transparent field face; text inherits BODY white. */
+/* Dark mode: transparent field fill; text inherits BODY white. */
 :root[data-theme="dark_mode"] INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exodusbutton):not(.graphicbutton):not(.loginfield),
 :root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect),
 :root[data-theme="dark_mode"] SPAN.clsRequired[contenteditable],
@@ -2011,12 +1974,12 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 
 :root[data-theme="dark_mode"] .menu {
-    /* menuchangeoption() uses var(--exodus-menuhighlight) — override per flyout */
-    --exodus-menuhighlight: var(--exodus-flyout-highlight);
-    background-color: var(--exodus-flyout-face) !important;
+    /* menuchangeoption() uses var(--exodus-menu-hover-bg-color) — override per flyout */
+    --exodus-menu-hover-bg-color: var(--exodus-flyout-hover-bg-color);
+    background-color: var(--exodus-flyout-bg-color) !important;
     color: #ffffff;
     opacity: 1 !important;
-    border: 1px solid var(--exodus-flyout-border) !important;
+    border: 1px solid var(--exodus-flyout-border-color) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
@@ -2034,25 +1997,24 @@ SPAN.calendar-date-committed[contenteditable] {
 /* Bare BUTTON only — .graphicbutton uses --exodus-informbutton-* like .exodusbutton.
  * Continuum swatches are <button class="exodus-color-cell"> for a11y, not chrome. */
 :root[data-theme="dark_mode"] BUTTON:not(.exodusbutton):not(.exodustab):not(.exodus-color-cell) {
-    background-color: var(--exodus-informbutton-bg);
-    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border);
+    background-color: var(--exodus-informbutton-bg-color);
+    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border-color);
     color: var(--exodus-informbutton-color);
 }
 
 :root[data-theme="dark_mode"] #exodus_menu .menubutton:hover,
 :root[data-theme="dark_mode"] #exodus_menu .menubutton:focus {
-    background-color: var(--exodus-menuhighlight);
+    background-color: var(--exodus-menu-hover-bg-color);
 }
 
 :root[data-theme="dark_mode"] A:link { color: #8ab4f8; }
 :root[data-theme="dark_mode"] A:visited { color: #9db4cc; }
 
 :root[data-theme="dark_mode"] .exodusconfirmdiv {
-    --exodusconfirm-border: #b8a99a;
-    /* face: --exodus-popup-face → form-face */
-    border: 2px solid var(--exodusconfirm-border);
-    color: #ffffff;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
+    /* shell tokens from :root[data-theme=dark_mode]; no local colour sprinkles */
+    border: 2px solid var(--exodus-popup-border-color);
+    color: var(--exodus-text-color);
+    box-shadow: var(--exodus-popup-box-shadow);
 }
 
 :root[data-theme="dark_mode"] .exodusconfirm_scrollhint {
@@ -2065,15 +2027,15 @@ SPAN.calendar-date-committed[contenteditable] {
     color: #ffffff;
     background: transparent;
     border: none;
-    border-bottom: var(--exodus-field-underline);
+    border-bottom: var(--exodus-field-border-bottom);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 {
-    border-color: var(--exodusconfirm-border);
+    border-color: var(--exodus-popup-border-color);
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 tbody tr.decide_row_hover {
-    background-color: rgba(255, 255, 255, 0.18);
+    background-color: var(--exodus-popup-hover-bg-color);
 }
-/* DM: type classes no longer recolour the shell (same neutral face as base) */
+/* DM: type classes no longer recolour the shell (same neutral fill as base) */
 
 :root[data-theme="dark_mode"] input[type=radio]:not(:checked),
 :root[data-theme="dark_mode"] input[type=checkbox]:not(:checked) {
@@ -2082,25 +2044,25 @@ SPAN.calendar-date-committed[contenteditable] {
 
 :root[data-theme="dark_mode"] input[type=radio]:checked,
 :root[data-theme="dark_mode"] input[type=checkbox]:checked {
-    border: calc(var(--exodus-check-size) * 1.5 / 14) solid var(--radio-ring-color);
+    border: calc(var(--exodus-check-size) * 1.5 / 14) solid var(--exodus-radio-ring-border-color);
 }
 
 :root[data-theme="dark_mode"] input[type=checkbox]:checked {
-    background-color: var(--radio-color);
+    background-color: var(--exodus-radio-color);
     background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
     background-size: 90%;
 }
 
 :root[data-theme="dark_mode"] input[type=radio]:checked {
-    background-color: var(--radio-checked-bg);
-    box-shadow: inset 0 0 0 calc(var(--exodus-check-size) * 2 / 14) var(--radio-color);
+    background-color: var(--exodus-radio-checked-bg-color);
+    box-shadow: inset 0 0 0 calc(var(--exodus-check-size) * 2 / 14) var(--exodus-radio-color);
 }
 
 /* Keep DM checked-radio inset when focused; orange focus ring only outside */
 :root[data-theme="dark_mode"] input[type=radio]:checked:focus,
 :root[data-theme="dark_mode"] input[type=radio]:checked:focus-visible {
     box-shadow:
-        inset 0 0 0 calc(var(--exodus-check-size) * 2 / 14) var(--radio-color),
+        inset 0 0 0 calc(var(--exodus-check-size) * 2 / 14) var(--exodus-radio-color),
         0 0 0 3px var(--exodus-field-focus-color);
 }
 
@@ -2113,35 +2075,38 @@ SPAN.calendar-date-committed[contenteditable] {
     background: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* ========== Date picker popup (calendar.js); colour continuum reuses .calendar ========== */
+/* ========== Date picker popup (calendar.js); colour continuum reuses .calendar ==========
+ * Shell/hover/divider = --exodus-popup-*; buttons = --exodus-informbutton-*.
+ * Only calendar-specific colour token: --exodus-calendar-today-color (defined on :root).
+ */
 .calendar {
     text-align: center;
-    background: var(--exodus-popup-face);
-    color: var(--exodus-calendar-color);
-    border: 2px solid var(--exodus-calendar-border);
-    border-radius: 10px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    background: var(--exodus-popup-bg-color);
+    color: var(--exodus-text-color);
+    border: 2px solid var(--exodus-popup-border-color);
+    border-radius: var(--exodus-form-border-radius);
+    box-shadow: var(--exodus-popup-box-shadow);
     padding: 8px 10px 10px;
     max-height: min(90vh, 420px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
-/* tabindex=1 + .focus() for keyboard nav — hide browser focus ring (was tan/red, not our border) */
+/* tabindex=1 + .focus() for keyboard nav — hide browser focus ring */
 .calendar:focus,
 .calendar:focus-visible {
     outline: none;
-    border-color: var(--exodus-calendar-border);
+    border-color: var(--exodus-popup-border-color);
 }
 .calendarHeader {
     position: sticky;
     top: 0;
     z-index: 12;
     flex: 0 0 auto;
-    background: var(--exodus-popup-face);
-    color: var(--exodus-calendar-header-color);
+    background: var(--exodus-popup-bg-color);
+    color: var(--exodus-text-color);
     padding: 2px 0 6px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid var(--exodus-popup-divider-border-color);
 }
 .calendarBody {
     flex: 1 1 auto;
@@ -2149,27 +2114,29 @@ SPAN.calendar-date-committed[contenteditable] {
     overflow: auto;
 }
 .calendarHeader select.calendarSelect {
-    background-color: var(--exodus-calendar-select-bg);
-    color: var(--exodus-calendar-select-color);
-    border: 1px solid var(--exodus-calendar-select-border);
-    border-radius: 4px;
+    background-color: var(--exodus-popup-bg-color);
+    color: var(--exodus-text-color);
+    border: 1px solid var(--exodus-form-border-color);
+    border-radius: 0.25rem;
     font: inherit;
     max-width: 9em;
 }
+/* Same raised chrome as confirm/decide / form actions (DOMUI informbutton) */
 .calendarHeader button,
 .calendarFooter button {
-    background: var(--exodus-calendar-button-bg);
-    color: var(--exodus-calendar-button-color);
-    border: 2px solid var(--exodus-calendar-button-border);
-    border-radius: 4px;
+    background-color: var(--exodus-informbutton-bg-color);
+    color: var(--exodus-informbutton-color);
+    border: 2px var(--exodus-informbutton-border-style) var(--exodus-informbutton-border-color);
+    border-radius: 0.3rem;
     cursor: pointer;
     font: inherit;
+    font-size: var(--exodus-form-data-font-size, 1rem);
 }
 .calendarHeader button {
     padding: 2px 8px;
 }
 .calendarBody table.grid {
-    color: var(--exodus-calendar-color);
+    color: inherit;
     cursor: default;
     text-align: center;
     border-collapse: collapse;
@@ -2181,17 +2148,17 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 .calendarBody th.weekDayHead {
     font-weight: bold;
-    border-bottom: 1px solid var(--exodus-calendar-border);
-    background: var(--exodus-form-face);
+    border-bottom: 1px solid var(--exodus-form-border-color);
+    background: var(--exodus-form-bg-color);
     padding: 4px 6px;
 }
 .calendarBody td.weekNumber {
-    border-right: 1px solid var(--exodus-calendar-border);
+    border-right: 1px solid var(--exodus-form-border-color);
     padding: 2px 6px;
 }
 .calendarBody td.calendarDay {
     cursor: pointer;
-    color: var(--exodus-calendar-color);
+    color: inherit;
     font-weight: normal;
     border: none;
     padding: 3px 6px;
@@ -2200,13 +2167,13 @@ SPAN.calendar-date-committed[contenteditable] {
     cursor: default;
 }
 .calendarBody td.calendarDay:not(.empty):hover {
-    background-color: lightgrey;
+    background-color: var(--exodus-popup-hover-bg-color);
 }
 .calendarBody td.calendarDay.today {
     color: var(--exodus-calendar-today-color);
     font-weight: bold;
 }
-/* Cursor (.current): keyboard / wheel / hover — outline uses system selection colour */
+/* Cursor (.current): keyboard / wheel / hover — system selection colour (UA) */
 .calendarBody td.calendarDay.current {
     font-weight: bold;
     box-shadow: inset 0 0 0 3px Highlight;
@@ -2214,7 +2181,7 @@ SPAN.calendar-date-committed[contenteditable] {
 .calendarFooter {
     flex: 0 0 auto;
     padding-top: 8px;
-    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    border-top: 1px solid var(--exodus-popup-divider-border-color);
 }
 .calendarFooter .footerTable {
     width: auto;
@@ -2234,21 +2201,9 @@ SPAN.calendar-date-committed[contenteditable] {
     padding: 4px 10px;
     white-space: nowrap;
 }
-:root[data-theme="dark_mode"] .calendar {
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
-}
-:root[data-theme="dark_mode"] .calendarHeader {
-    border-bottom-color: var(--exodus-calendar-border);
-}
-:root[data-theme="dark_mode"] .calendarFooter {
-    border-top-color: var(--exodus-calendar-border);
-}
-:root[data-theme="dark_mode"] .calendarBody td.calendarDay:not(.empty):hover {
-    background-color: rgba(255, 255, 255, 0.18);
-}
 :root[data-theme="dark_mode"] .calendarHeader select.calendarSelect option {
-    background-color: var(--exodus-calendar-select-bg);
-    color: var(--exodus-calendar-select-color);
+    background-color: var(--exodus-popup-bg-color);
+    color: var(--exodus-text-color);
 }
 
 /*must be last (except print — print must beat DM !important screen rules)*/
@@ -2279,10 +2234,10 @@ SPAN.calendar-date-committed[contenteditable] {
 
     :root,
     :root[data-theme="dark_mode"] {
-        --exodus-page-bg: #ffffff;
-        --exodus-form-face: #ffffff;
-        --exodus-form-border: #333333;
-        --exodus-textcolor: #000000;
+        --exodus-page-bg-color: #ffffff;
+        --exodus-form-bg-color: #ffffff;
+        --exodus-form-border-color: #333333;
+        --exodus-text-color: #000000;
         color-scheme: only light;
     }
 

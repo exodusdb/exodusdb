@@ -413,7 +413,7 @@ function exodus_client_init() {
 		theme_toggle(exodusgetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
 	}
 
-	// Before global.css: page/form face only. No field color/border !important —
+	// Before global.css: page/form body only. No field color/border !important —
 	// that stays after load and blocks focus underline and miss Highlight.
 	if (gisdarktheme) {
 		// @media screen only — must not win over @media print (white paper + light text = blank)
@@ -1093,7 +1093,7 @@ function modalblock_create() {
 	blocker.style.width = '100vw'
 	blocker.style.height = '100vh'
 	blocker.style.background = gisdarktheme
-		? 'rgba(0, 0, 0, 0.08)'//near-transparent tint, matches --exodus-page-bg
+		? 'rgba(0, 0, 0, 0.08)'//near-transparent tint, matches --exodus-page-bg-color
 		: 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
 	blocker.style.position = 'fixed'
 	blocker.style.top = '0'
@@ -1981,7 +1981,7 @@ function theme_toggle(theme = 'default') {
 		var fg = document.getElementById('exodus_dm_flashguard')
 		if (fg && fg.parentNode)
 			fg.parentNode.removeChild(fg)
-		// Restore LM screencolor on stylesheet rule + --exodus-form-face for .exodusformpane
+		// Restore LM screencolor on stylesheet rule + --exodus-form-bg-color for .exodusformpane
 		if (exodus_global_css_link())
 			exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
 		exodus_clear_form_inline_theme()
@@ -1990,8 +1990,8 @@ function theme_toggle(theme = 'default') {
 		html.setAttribute('data-theme', theme)
 		html.style.removeProperty('--exodus-cardcolor')
 		// Inline LM screencolor on <html> overrides :root[data-theme] custom properties
-		html.style.removeProperty('--exodus-form-face')
-		html.style.removeProperty('--exodus-form-border')
+		html.style.removeProperty('--exodus-form-bg-color')
+		html.style.removeProperty('--exodus-form-border-color')
 		html.removeAttribute('data-form-head')
 	}
 
@@ -2012,10 +2012,10 @@ function theme_toggle(theme = 'default') {
 // Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
 //
 // Only decides deeper vs lighter from body luma; CSS owns the two formulas:
-//   deeper  → oklch L−   (light form faces)
-//   lighter → mix white  (dark form faces; L+ clips on hot sRGB colours)
+//   deeper  → oklch L−   (light form bodies)
+//   lighter → mix white  (dark form bodies; L+ clips on hot sRGB colours)
 //
-// Call whenever --exodus-form-face is set (screencolor / cookie fc).
+// Call whenever --exodus-form-bg-color is set (screencolor / cookie fc).
 function exodus_set_form_head_direction(cssColor) {
 	var s = String(cssColor == null ? '' : cssColor).replace(/\s+/g, '')
 	if (/^[0-9a-fA-F]{3}$/.test(s) || /^[0-9a-fA-F]{6}$/.test(s))
@@ -2044,7 +2044,7 @@ function exodus_set_style(mode, value, value2) {
 	var rules = link.sheet.cssRules || link.sheet.rules
 	var oldvalue = ''
 
-	// LM form body colour (SCREEN_BODY_COLOR / cookie fc) → face + thead direction.
+	// LM form body colour (SCREEN_BODY_COLOR / cookie fc) → body + thead direction.
 	// SCREEN_HEAD_COLOR (SYSTEM 46,4) is unused — no cookie/UI apply path.
 	if (mode == 'screencolor' && rules && !gisdarktheme) {
 
@@ -2058,8 +2058,8 @@ function exodus_set_style(mode, value, value2) {
 		oldvalue = style.backgroundColor
 		try {
 			style.backgroundColor = value
-			document.documentElement.style.setProperty('--exodus-form-face', value)
-			document.documentElement.style.setProperty('--exodus-form-border', '#d0d0d0')
+			document.documentElement.style.setProperty('--exodus-form-bg-color', value)
+			document.documentElement.style.setProperty('--exodus-form-border-color', '#d0d0d0')
 			exodus_set_form_head_direction(style.backgroundColor || value)
 		}
 		catch (e) {
@@ -5550,7 +5550,7 @@ function menuchangeoption(menu, newmenuoption) {
 
 	//highlight new menu item
 	//newmenuoption.style.backgroundColor='#d0d0d0'
-	newmenuoption.style.background = 'var(--exodus-menuhighlight)'
+	newmenuoption.style.background = 'var(--exodus-menu-hover-bg-color)'
 	newmenuoption.style.borderRadius = '8px'
 	//newmenuoption.style.backgroundColor = 'highlight'
 	//newmenuoption.style.color = 'highlighttext'

@@ -29,7 +29,7 @@ button.exodus-native-color,
     min-height: 1.35rem;
     padding: 0;
     margin: 0;
-    border: 2px solid var(--exodus-form-border, #888);
+    border: 2px solid var(--exodus-form-border-color, #888);
     border-radius: 0.3rem;
     vertical-align: middle;
     cursor: pointer;
@@ -84,7 +84,7 @@ button.exodus-native-color:focus {
     grid-template-columns: repeat(var(--exodus-color-n), var(--exodus-color-cell));
     grid-template-rows: repeat(var(--exodus-color-n), var(--exodus-color-cell));
     gap: 0;
-    border: 1px solid var(--exodus-calendar-border, #888);
+    border: 1px solid var(--exodus-popup-border-color, #666);
     flex: 0 0 auto;
 }
 /* N brightness steps for current hue/sat (light at top), flush */
@@ -93,13 +93,13 @@ button.exodus-native-color:focus {
     grid-template-columns: calc(var(--exodus-color-cell) * 1.3);
     grid-template-rows: repeat(var(--exodus-color-n), var(--exodus-color-cell));
     gap: 0;
-    border: 1px solid var(--exodus-calendar-border, #888);
+    border: 1px solid var(--exodus-popup-border-color, #666);
     flex: 0 0 auto;
 }
 /* Tab focus on the N / N×N panes (cells stay tabIndex -1) */
 .exodus-color-popup-grid:focus,
 .exodus-color-popup-bright:focus {
-    outline: 2px solid var(--exodus-calendar-accent, #06c);
+    outline: 2px solid var(--exodus-field-focus-color, #e04510);
     outline-offset: 1px;
 }
 .exodus-color-popup-nlabel {
@@ -129,9 +129,9 @@ button.exodus-native-color:focus {
     position: relative;
 }
 /*
- * Colour monitor stack (face + sticky-thead tint).
- * --exodus-color-monitor-face is set by colors_popup_sync_chrome.
- * Must not depend on form-face / DM field chrome for the sample fill.
+ * Colour monitor stack (sample + sticky-thead tint).
+ * --exodus-color-monitor-bg-color is set by colors_popup_sync_chrome.
+ * Must not depend on form body / DM field chrome for the sample fill.
  */
 .exodus-color-popup-monitor {
     display: flex;
@@ -141,7 +141,7 @@ button.exodus-native-color:focus {
     gap: 0;
     box-sizing: border-box;
 }
-/* Face sample — double previous height (was 1.75em) */
+/* Sample block — double previous height (was 1.75em) */
 .exodus-color-popup-hex,
 :root[data-theme="dark_mode"] .exodus-color-popup INPUT.exodus-color-popup-hex,
 :root[data-theme="dark_mode"] INPUT.exodus-color-popup-hex {
@@ -158,14 +158,14 @@ button.exodus-native-color:focus {
     font-size: 0.9em;
     text-align: center;
     letter-spacing: 0.02em;
-    background-color: var(--exodus-color-monitor-face, #808080);
+    background-color: var(--exodus-color-monitor-bg-color, #808080);
     background-image: none;
     color: #fff;
     -webkit-text-fill-color: currentColor;
     box-shadow: none;
     outline: none;
 }
-/* Same-size block under face: sticky thead (keep in sync with global.css) */
+/* Same-size block under sample: sticky thead (keep in sync with global.css) */
 .exodus-color-popup-hex-thead {
     box-sizing: border-box;
     width: 100%;
@@ -173,7 +173,7 @@ button.exodus-native-color:focus {
     margin: 0;
     padding: 0.35em 0.4em;
     border: 1px solid #888;
-    border-top: 1px solid #000; /* thin split under face sample */
+    border-top: 1px solid #000; /* thin split under sample */
     border-radius: 0 0 0.25rem 0.25rem;
     font: inherit;
     font-family: ui-monospace, monospace;
@@ -184,9 +184,9 @@ button.exodus-native-color:focus {
     align-items: center;
     justify-content: center;
     user-select: none;
-    /* OKLCH relative: same as form th / sticky thead (chroma floor for pale faces) */
-    background-color: var(--exodus-color-monitor-face, #808080);
-    background-color: oklch(from var(--exodus-color-monitor-face, #808080)
+    /* OKLCH relative: same as form th / sticky thead (chroma floor for pale body colours) */
+    background-color: var(--exodus-color-monitor-bg-color, #808080);
+    background-color: oklch(from var(--exodus-color-monitor-bg-color, #808080)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
@@ -195,7 +195,7 @@ button.exodus-native-color:focus {
 }
 /* Standard tint — match :root[data-form-head=lighter] group thead */
 .exodus-color-popup-hex-thead[data-monitor-head="lighter"] {
-    background-color: color-mix(in oklch, var(--exodus-color-monitor-face, #808080) 90%, white);
+    background-color: color-mix(in oklch, var(--exodus-color-monitor-bg-color, #808080) 90%, white);
 }
 .exodus-color-popup-actions {
     display: flex;
@@ -209,11 +209,11 @@ button.exodus-native-color:focus {
     padding: 0.2em 0.55em;
     cursor: pointer;
     border-radius: 0.25rem;
-    border: 1px solid var(--exodus-calendar-border, #888);
-    background: var(--exodus-form-face, #fdf5e6);
+    border: 1px solid var(--exodus-popup-border-color, #666);
+    background: var(--exodus-form-bg-color, #fdf5e6);
     color: inherit;
 }
 .exodus-color-popup-actions button:focus {
     outline: none;
-    border-bottom: var(--exodus-field-focus-underline);
+    border-bottom: var(--exodus-field-focus-border-bottom);
 }

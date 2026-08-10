@@ -1,15 +1,15 @@
 
-// Apply LM form face for the current session (stylesheet + --exodus-form-face).
+// Apply LM form body for the current session (stylesheet + --exodus-form-bg-color).
 // Cookie "fc" is NOT written here — only users form_postwrite after a real save.
 // Never touches day/night: only form load and the theme button may theme_toggle.
-// In DM, exodus_set_style('screencolor') already no-ops face paint — do not force LM.
+// In DM, exodus_set_style('screencolor') already no-ops form-body paint — do not force LM.
 function colors_apply_screencolor(value) {
 	if (typeof exodus_set_style != 'function')
 		return
 	exodus_set_style('screencolor', value == null ? '' : String(value))
 }
 
-// Restore form face from last-saved cookie (discard / clear / postdisplay).
+// Restore form body from last-saved cookie (discard / clear / postdisplay).
 // Call when the bound user record is not the source of truth for chrome.
 function colors_restore_saved_screencolor() {
 	if (typeof gisdarktheme != 'undefined' && gisdarktheme)
@@ -23,7 +23,7 @@ function colors_restore_saved_screencolor() {
 // chained when di.validation is replaced after exodus_dict_color).
 async function colors_val_screencolor() {
 	if (!(await exodus_val_color())) return await exodusinvalid()
-	// Edit-time face preview only. Durable cookie is users form_postwrite on save.
+	// Edit-time form-body preview only. Durable cookie is users form_postwrite on save.
 	colors_apply_screencolor(gvalue)
 	return true
 }
@@ -161,7 +161,7 @@ function exodus_dict_color(di) {
 	di.align = 'T'
 
 	// Magic conversion: bound text + swatch sibling (colors_install_swatch).
-	// Empty paints current form face — not di.defaultvalue.
+	// Empty paints current form body — not di.defaultvalue.
 	di.conversion = 'color'
 
 	di.popup = 'await exodus_pop_color('
@@ -208,7 +208,7 @@ async function colors_pop_color_decide(required, many) {
 //
 // Continuum: N×N hue×sat grid + N brightness samples (N = 1..32, default 16).
 // Ctrl+wheel over continuum changes N. Event delegation (not 1k listeners).
-// Lightness mapped 75%–100% (form faces stay pale).
+// Lightness mapped 75%–100% (form body colours stay pale).
 //
 // F7 returns null (calendar contract) + opens when idle; Esc / form_closepopups /
 // F7 toggle dismisses. Bound text tabbable; swatch click = F7.
@@ -275,7 +275,7 @@ var colors_popup = {
 	_modalOn: false
 }
 
-// Lightness floor for continuum (form faces stay pale)
+// Lightness floor for continuum (form body colours stay pale)
 var COLORS_POPUP_LIGHT_MIN = 75
 // Continuum resolution steps only (Ctrl+wheel jumps among these)
 var COLORS_POPUP_N_STEPS = [8, 16, 24, 32]
@@ -458,7 +458,7 @@ function colors_popup_monitor_text_color(hex) {
 	}
 }
 
-// Sticky-thead head direction for this face (same threshold as exodus_set_form_head_direction).
+// Sticky-thead head direction for this form-body sample (same threshold as exodus_set_form_head_direction).
 function colors_popup_monitor_head_direction(hex) {
 	try {
 		var r = parseInt(hex.slice(1, 3), 16)
@@ -484,20 +484,20 @@ function colors_popup_sync_chrome(hexOverride) {
 	inp.value = hex
 	var textCol = colors_popup_monitor_text_color(hex)
 	var headDir = colors_popup_monitor_head_direction(hex)
-	// Face sample — own fill; beat theme INPUT rules
+	// Sample block — own fill; beat theme INPUT rules
 	if (mon)
-		mon.style.setProperty('--exodus-color-monitor-face', hex)
+		mon.style.setProperty('--exodus-color-monitor-bg-color', hex)
 	inp.style.setProperty('background-color', hex, 'important')
 	inp.style.setProperty('background-image', 'none', 'important')
 	inp.style.setProperty('color', textCol, 'important')
 	inp.style.setProperty('-webkit-text-fill-color', textCol, 'important')
-	// Thead-tint sample under face (CSS oklch / color-mix matches global sticky thead)
+	// Thead-tint sample under form-body sample (CSS oklch / color-mix matches global sticky thead)
 	if (thead) {
 		thead.setAttribute('data-monitor-head', headDir)
 		thead.style.setProperty('color', textCol, 'important')
 		thead.style.setProperty('-webkit-text-fill-color', textCol, 'important')
 		thead.textContent = 'thead'
-		thead.title = 'Sticky column-head tint of this face (' + headDir + ')'
+		thead.title = 'Sticky column-head tint of this form body colour (' + headDir + ')'
 	}
 }
 
@@ -508,8 +508,8 @@ function colors_popup_live_body() {
 	if (!field || field.id != 'SCREEN_BODY_COLOR')
 		return
 	// Sync apply — must not queue via exodus_begin or a late hover flight
-	// re-applies after Default/OK and leaves the form face on a continuum colour.
-	// Session face only; cookie still waits for users form_postwrite on save.
+	// re-applies after Default/OK and leaves the form body on a continuum colour.
+	// Session form body only; cookie still waits for users form_postwrite on save.
 	colors_apply_screencolor(hex)
 }
 
@@ -1125,12 +1125,12 @@ function colors_popup_create() {
 	hexInput.readOnly = true
 	hexInput.tabIndex = -1
 	hexInput.spellcheck = false
-	hexInput.title = 'Form face colour (hex)'
-	hexInput.setAttribute('aria-label', 'Form face colour')
+	hexInput.title = 'Form body colour (hex)'
+	hexInput.setAttribute('aria-label', 'Form body colour')
 	hexInput.setAttribute('aria-readonly', 'true')
 	var hexThead = document.createElement('div')
 	hexThead.className = 'exodus-color-popup-hex-thead'
-	hexThead.setAttribute('aria-label', 'Sticky thead tint of this face')
+	hexThead.setAttribute('aria-label', 'Sticky thead tint of this form body colour')
 	hexThead.textContent = 'thead'
 	monitor.appendChild(hexInput)
 	monitor.appendChild(hexThead)
@@ -1542,14 +1542,14 @@ function colors_popup_place(field) {
 	div.style.top = Math.round(topPos) + 'px'
 }
 
-// Snapshot live form face (--exodus-form-face / cookie) for cancel restore.
-// The popup must not leave the form face changed unless the user OK/Defaults.
-function colors_popup_capture_form_face() {
+// Snapshot live form body (--exodus-form-bg-color / cookie) for cancel restore.
+// The popup must not leave the form body changed unless the user OK/Defaults.
+function colors_popup_capture_form_body() {
 	try {
-		var face = getComputedStyle(document.documentElement)
-			.getPropertyValue('--exodus-form-face').trim()
-		if (face)
-			return face
+		var formBody = getComputedStyle(document.documentElement)
+			.getPropertyValue('--exodus-form-bg-color').trim()
+		if (formBody)
+			return formBody
 	} catch (e) { }
 	if (typeof exodusgetcookie2 == 'function') {
 		try {
@@ -1558,7 +1558,7 @@ function colors_popup_capture_form_face() {
 				return String(fc)
 		} catch (e2) { }
 	}
-	return colors_system_default_face_hex()
+	return colors_system_default_body_hex()
 }
 
 function colors_popup_show(field) {
@@ -1574,9 +1574,9 @@ function colors_popup_show(field) {
 
 	// Do not touch field.value / gpreviousvalue — form popups must not wipe typing.
 	// Seed UI from current field text (may be mid-edit); only continuum hover/OK
-	// changes the form face, and cancel restores the face captured here.
+	// changes the form body, and cancel restores the form body captured here.
 	if (!reopening)
-		colors_popup._openedFace = colors_popup_capture_form_face()
+		colors_popup._openedFormBody = colors_popup_capture_form_body()
 
 	var raw = field.value
 	if (typeof getvalue == 'function') {
@@ -1597,7 +1597,7 @@ function colors_popup_show(field) {
 	colors_popup._hsLocked = fromField
 	colors_popup._vLocked = fromField
 	colors_popup_modal_on()
-	// exact seed in chrome; do NOT live-preview form face until continuum pick
+	// exact seed in chrome; do NOT live-preview form body until continuum pick
 	colors_popup_set_from_hex(seed, fromField)
 	colors_popup_place(field)
 	colors_popup_focus_stop(colors_popup._bright)
@@ -1638,9 +1638,9 @@ async function colors_popup_ok() {
 		}
 		// Prefer chrome hex (exact field seed until user picks a continuum cell)
 		var hex = colors_popup._hex || colors_popup_current_hex()
-		// Empty store only for the fixed system face — not live --exodus-form-face
-		// (live face follows preview, so hex===face would always store "").
-		var sys = colors_system_default_face_hex()
+		// Empty store only for the fixed system form body — not live --exodus-form-bg-color
+		// (live form body follows preview, so hex===formBody would always store "").
+		var sys = colors_system_default_body_hex()
 		var store = (hex && hex === sys) ? '' : hex
 		colors_popup_hide()
 		await colors_field_store(field, store)
@@ -1659,7 +1659,7 @@ async function colors_popup_clear() {
 			colors_popup_hide()
 			return
 		}
-		// Empty bound field (touched until Save). Always reset face to system
+		// Empty bound field (touched until Save). Always reset form body colour to system
 		// default — even if the field was already "" (store early-return would
 		// skip apply and leave the last hover/click continuum colour on the form).
 		colors_popup_hide()
@@ -1677,12 +1677,12 @@ async function colors_popup_cancel() {
 	colors_popup._closing = true
 	try {
 		var field = colors_popup._field
-		// Undo any live form-face preview only — leave field text alone
+		// Undo any live form-body preview only — leave field text alone
 		// (including mid-edit typing; standard popup cancel does not validate).
-		var face = colors_popup._openedFace
+		var formBody = colors_popup._openedFormBody
 		colors_popup_hide()
 		if (field && field.id == 'SCREEN_BODY_COLOR')
-			colors_apply_screencolor(face == null ? '' : face)
+			colors_apply_screencolor(formBody == null ? '' : formBody)
 	} finally {
 		colors_popup._closing = false
 	}
@@ -1982,15 +1982,15 @@ function exodus_dict_colorfontsize(dict, fn) {
     // SCREEN_HEAD_COLOR — UNUSED in the live UI (no cookie, no set_style, no HTM
     // input on Screens row). Kept as word 4 so SYSTEM 46,* field layout stays stable
     // (see initgeneral formheadcolor). Sticky thead tint is CSS: slightly darker
-    // mix of --exodus-form-face (body colour), not this field.
+    // mix of --exodus-form-bg-color (body colour), not this field.
     di = dict[++din] = dictrec('SCREEN_HEAD_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 4
     di.nwords = 1
     exodus_dict_color(di)
 
-    // SCREEN_BODY_COLOR — live LM form face: cookie fc, colors_val_screencolor,
-    // exodus_set_style('screencolor') → TABLE.exodusform + --exodus-form-face.
+    // SCREEN_BODY_COLOR — live LM form body: cookie fc, colors_val_screencolor,
+    // exodus_set_style('screencolor') → TABLE.exodusform + --exodus-form-bg-color.
     di = dict[++din] = dictrec('SCREEN_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 5
@@ -2063,9 +2063,9 @@ function colors_css_to_hex6(v) {
 	return ('#' + hx(m[1]) + hx(m[2]) + hx(m[3])).toLowerCase()
 }
 
-// Fixed system form face (stylesheet original / hard default). Not the live face.
+// Fixed system form body (stylesheet original / hard default). Not the live form body.
 // Used when committing a continuum pick that equals "use Default" (empty store).
-function colors_system_default_face_hex() {
+function colors_system_default_body_hex() {
 	try {
 		if (typeof goriginalstyles != 'undefined' && goriginalstyles.screencolor) {
 			var oh = colors_css_to_hex6(goriginalstyles.screencolor)
@@ -2076,17 +2076,17 @@ function colors_system_default_face_hex() {
 	return '#fdf5e6'
 }
 
-// Empty field swatch paint = live form body colour (cookie fc / --exodus-form-face).
+// Empty field swatch paint = live form body colour (cookie fc / --exodus-form-bg-color).
 // After live preview this follows the popup selection — do not use for "is default?".
 function colors_default_swatch_hex() {
 	try {
-		var face = getComputedStyle(document.documentElement)
-			.getPropertyValue('--exodus-form-face').trim()
-		var hex = colors_css_to_hex6(face)
+		var formBody = getComputedStyle(document.documentElement)
+			.getPropertyValue('--exodus-form-bg-color').trim()
+		var hex = colors_css_to_hex6(formBody)
 		if (hex)
 			return hex
 	} catch (e) { }
-	return colors_system_default_face_hex()
+	return colors_system_default_body_hex()
 }
 
 function colors_field_swatch(field) {
@@ -2110,7 +2110,7 @@ function colors_field_text(field) {
 	return field.value == null ? '' : String(field.value)
 }
 
-// Bound text → swatch paint. Empty text paints form face (not written back to text).
+// Bound text → swatch paint. Empty text paints form body (not written back to text).
 function colors_sync_swatch(field) {
 	var swatch = colors_field_swatch(field)
 	if (!swatch)
@@ -2123,7 +2123,7 @@ function colors_sync_swatch(field) {
 		if (swatch.value !== hex)
 			swatch.value = hex
 	} else {
-		// Solid fill + checkerboard underlay (face-matching colours still visible)
+		// Solid fill + checkerboard underlay (form-body-matching colours still visible)
 		swatch.style.backgroundColor = hex
 		swatch.style.backgroundImage =
 			'linear-gradient(' + hex + ',' + hex + '),'
@@ -2169,10 +2169,10 @@ async function colors_field_store(field, store) {
 			settouched(true)
 	}
 
-	// Dirty-edit face preview only. Cookie "fc" is written on users form_postwrite
+	// Dirty-edit form-body preview only. Cookie "fc" is written on users form_postwrite
 	// after Save; discard/clear restores via colors_restore_saved_screencolor.
 	// Always re-apply for body colour so Default (store "") still clears a
-	// continuum hover face when the field was already empty.
+	// continuum hover form-body when the field was already empty.
 	if (field.id == 'SCREEN_BODY_COLOR')
 		colors_apply_screencolor(store)
 
