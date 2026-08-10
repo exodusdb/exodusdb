@@ -3767,15 +3767,15 @@ async function document_onkeydown2(event) {
             return exoduscancelevent(event)
         }
 
-        //if changing current field then let system use it to 'undo' changes
-        // Radio: same group as gpreviouselement counts even if focus is another member
-        var escSameField = element.name && (
-            element == gpreviouselement
+        // Text Esc undo (old): same field as gpreviouselement → restore gpreviousvalue.
+        // Do not require element.name — free-text SPANs use id/exodusname; .name is not
+        // reliable field identity (INPUT-era gate; broke journals OTHER_DETAILS etc.).
+        // Radio/checkbox: same group/id still counts as same field.
+        var escSameField = (element == gpreviouselement)
             || (element.type == 'radio' && gpreviouselement
                 && form_radio_same_group(element, gpreviouselement))
             || (element.type == 'checkbox' && gpreviouselement
                 && gpreviouselement.type == 'checkbox' && element.id == gpreviouselement.id)
-        )
         // Esc: restore radio/checkbox to arrival value (not last click). Live click-validate unchanged.
         // (Same idea as text Esc + gpreviousvalue, but live validate advances gpreviousvalue.)
         var escArrival = g_radio_arrival_anchor && (
