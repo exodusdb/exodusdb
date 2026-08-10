@@ -6650,8 +6650,9 @@ function form_typeahead_free_band() {
 }
 
 /*
- * Always under the field (never flip above / shift off the field).
- * fixed + live scroll sync keeps the panel under the field as the page moves.
+ * Always under the field (never flip above). fixed + live scroll sync.
+ * Horizontal: align under field left; if past free-band right, shift left by
+ * the overflow (not past free-band left).
  */
 function form_typeahead_place(element, div) {
 
@@ -6660,15 +6661,29 @@ function form_typeahead_place(element, div) {
     var r = element.getBoundingClientRect()
     var margin = 8
     var band = form_typeahead_free_band()
+    var left0 = Math.max(band.left, r.left)
     div.style.position = 'fixed'
-    div.style.left = Math.max(4, r.left) + 'px'
+    div.style.left = left0 + 'px'
     div.style.top = (r.bottom + 2) + 'px'
-    div.style.minWidth = Math.max(r.width, 280) + 'px'
-    var maxW = Math.max(280, (band.right || window.innerWidth) - Math.max(4, r.left) - margin)
+    // Full free-band width available after a left shift (not only space right of field)
+    var maxW = Math.max(120, band.right - band.left)
+    var minW = Math.max(r.width, 280)
+    if (minW > maxW)
+        minW = maxW
+    div.style.minWidth = minW + 'px'
     div.style.maxWidth = maxW + 'px'
     var maxH = Math.max(120, (band.bottom || window.innerHeight) - (r.bottom + 2) - margin)
     div.style.maxHeight = maxH + 'px'
     div.style.zIndex = 10050
+    // Layout then clamp: move left by overflow right, not past band.left
+    void div.offsetWidth
+    var pr = div.getBoundingClientRect()
+    if (pr.right > band.right) {
+        var left = pr.left - (pr.right - band.right)
+        if (left < band.left)
+            left = band.left
+        div.style.left = left + 'px'
+    }
 }
 
 /*
