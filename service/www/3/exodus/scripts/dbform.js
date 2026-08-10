@@ -6448,7 +6448,8 @@ var gform_typeahead_rows = []
 var gform_typeahead_focusn = -1
 var gform_typeahead_mousedown = false
 var gform_typeahead_scroll_listening = false
-// After open (auto-highlight ready for Enter): ignore mouseover until real mousemove
+// Ignore mouseover until real mousemove: on open, and after keyboard row move
+// (scroll-under-cursor would otherwise steal the key highlight — same as decide).
 var gform_typeahead_hover_locked = false
 
 function form_typeahead_ensure() {
@@ -7060,7 +7061,8 @@ function form_typeahead_row_pick(event) {
     return false
 }
 
-function form_typeahead_set_focus(n) {
+// fromkeys: arrows/Pg/Home/End steal highlight and lock until real mousemove (decide).
+function form_typeahead_set_focus(n, fromkeys) {
 
     var div = gform_typeahead_div
     if (!div)
@@ -7077,6 +7079,8 @@ function form_typeahead_set_focus(n) {
         else
             trs[i].classList.remove('exodus_typeahead_focus')
     }
+    if (fromkeys)
+        gform_typeahead_hover_locked = true
     // Keep highlight below sticky thead (same helper as decide)
     if (trs[n]) {
         if (typeof exodus_scroll_row_below_sticky_thead == 'function')
@@ -7160,25 +7164,25 @@ function form_typeahead_keydown(event) {
             n = (n + 1) % nrows
         else
             n = (n - 1 + nrows) % nrows
-        form_typeahead_set_focus(n)
+        form_typeahead_set_focus(n, true)
         return false
     }
     // Page Down / Page Up — fixed step (gform_typeahead_pagesize); clamp at ends
     if (keycode == 34) {
-        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn + gform_typeahead_pagesize)
+        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn + gform_typeahead_pagesize, true)
         return false
     }
     if (keycode == 33) {
-        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn - gform_typeahead_pagesize)
+        form_typeahead_set_focus(gform_typeahead_focusn < 0 ? 0 : gform_typeahead_focusn - gform_typeahead_pagesize, true)
         return false
     }
     // Home → first row; End → last (form_typeahead_set_focus clamps)
     if (keycode == 36) {
-        form_typeahead_set_focus(0)
+        form_typeahead_set_focus(0, true)
         return false
     }
     if (keycode == 35) {
-        form_typeahead_set_focus(999999)
+        form_typeahead_set_focus(999999, true)
         return false
     }
     if (keycode == 13) {

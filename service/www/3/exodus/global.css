@@ -775,8 +775,9 @@ TABLE
     font-weight: bold;
 }
 
-.exodus_typeahead_table tr.exodus_typeahead_focus td,
-.exodus_typeahead_table tr[data-ta-row]:hover td {
+/* JS class only (decide_row_hover pattern). No :hover — stationary mouse +
+ * PgUp/Dn scroll would paint under-cursor rows and dual-highlight with keys. */
+.exodus_typeahead_table tr.exodus_typeahead_focus td {
     background-color: var(--exodus-popup-hover-bg-color);
 }
 
