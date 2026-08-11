@@ -1230,29 +1230,6 @@ function weekOfPeriod(cal, dayOfPeriod, dayOfWeek) {
 
 
 
-function Point(iX, iY) {
-
-   this.x = iX;
-   this.y = iY;
-}
-
-
-function getPoint(aTag) {
-
-   var oTmp = aTag;  
-   var point = new Point(0,0);
-  
-   do  {
-
-      point.x += oTmp.offsetLeft;
-      point.y += oTmp.offsetTop;
-      oTmp = oTmp.offsetParent;
-   } 
-   while (oTmp.tagName != "BODY");
-
-   return point;
-}
-
 function toISODate(date) {
 	var s = date.getFullYear();
 	var m = date.getMonth() + 1;

@@ -1297,20 +1297,6 @@ function colors_popup_create() {
 	})
 }
 
-function colors_popup_anchor_point(element) {
-	var el = element
-	if (el && el.id && document.getElementById(el.id + '_swatch'))
-		el = document.getElementById(el.id + '_swatch')
-	if (!el && typeof gpreviouselement != 'undefined')
-		el = gpreviouselement
-	if (!el)
-		return { x: 40, y: 40 }
-	if (typeof getPoint == 'function')
-		return getPoint(el)
-	var r = el.getBoundingClientRect()
-	return { x: r.left + (window.scrollX || 0), y: r.top + (window.scrollY || 0) }
-}
-
 // Bounds of the colour control for placement: wrap (text+swatch) plus any
 // F7 find icon (id + '_popup') to the left — so we never cover that icon.
 function colors_popup_base_rect(field) {
