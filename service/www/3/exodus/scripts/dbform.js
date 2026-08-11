@@ -109,14 +109,15 @@ function form_field_exostyle(dictitem, element) {
         if (dictitem.radio || dictitem.checkbox)
             return ''
         var conv = String(dictitem.conversion != null ? dictitem.conversion : '').toUpperCase()
-        if (conv.indexOf('[NUMBER') === 0)
+        // ROUND = non-amount number (same SPAN host as NUMBER; grouping differs in oconv)
+        if (conv.indexOf('[NUMBER') === 0 || conv.indexOf('[ROUND') === 0)
             return 'number'
         var al = String(dictitem.align || '').toUpperCase()
         if (al.indexOf('T') === 0)
             return (dictitem.lowercase === false) ? 'code' : 'text'
     } else if (element && element.getAttribute) {
         var conv2 = String(element.getAttribute('exodusconversion') || '').toUpperCase()
-        if (conv2.indexOf('[NUMBER') === 0)
+        if (conv2.indexOf('[NUMBER') === 0 || conv2.indexOf('[ROUND') === 0)
             return 'number'
         if (String(element.getAttribute('exodusalign') || '').toUpperCase().indexOf('T') === 0) {
             var lc = element.getAttribute('exoduslowercase')
@@ -1457,6 +1458,7 @@ async function formfunctions_onload() {
             ) {
                 var convU = element.getAttribute('exodusconversion').toUpperCase()
                 if (convU.indexOf('[NUMBER') >= 0
+                    || convU.indexOf('[ROUND') >= 0
                     || convU.indexOf('[DATE_TIME') >= 0
                     || /^\[DATE([,\]]|$)/.test(convU))
                     element.setAttribute('exodusalign', 'R')
