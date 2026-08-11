@@ -10,8 +10,10 @@
 
 | Conversion | Role |
 |------------|------|
-| **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form |
-| **`[ROUND,…]`** | Same numeric work as NUMBER OCONV but **plain** (no thousands / no MD-MC chrome) — for intermediate math |
+| **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form (amounts: thousands when BASEFMT groups) |
+| **`[ROUND,…]`** | Same numeric work as NUMBER OCONV but **plain** (no thousands) — intermediate math **and** non-amount integers (journal no, counts, sequences) |
+
+**Dict helpers:** `exodus_dict_number` → `[NUMBER,…]`. **`exodus_dict_number_plain`** → same ICONV/min/max/`exostyle` but `[ROUND,…]` so paint has **no commas** (JOURNAL_NO, NUMBER_ADS, SEQUENCE, …).
 
 | Direction | Meaning |
 |-----------|---------|

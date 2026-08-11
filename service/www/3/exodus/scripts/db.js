@@ -395,6 +395,14 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
 
 }
 
+// Same as exodus_dict_number but OCONV without thousands (ids, counts, days, sequences).
+// Use for JOURNAL_NO, NUMBER_ADS, SEQUENCE, etc. Money stays on dict_number / [NUMBER].
+function exodus_dict_number_plain(dicti, params, minimum, maximum) {
+ exodus_dict_number(dicti, params, minimum, maximum)
+ if (dicti.conversion && dicti.conversion.slice(0, 7) == '[NUMBER')
+  dicti.conversion = '[ROUND' + dicti.conversion.slice(7)
+}
+
 // Align T free text: contenteditable SPAN, fold at spaces (lowercase true).
 // di.length: used for free-text in wide mode only (empty → soft max 30ch when
 // .exodusform-wide; length set → no soft max). Not a min-width. Omitted → clear.
