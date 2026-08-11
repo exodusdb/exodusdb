@@ -1085,7 +1085,7 @@ function addfield(rec,fieldname,fieldtext) {
           
          //convert any crlf to tms
          //temp=temp.replace(/\r/gi,String.fromCharCode(251)).replace(/\n/gi,'')
-         //internet explorer lines seem to be separated by crlf \r\n whereas firefox/chrome are separated by lf (\n) only
+         // line endings may be \r\n or \n depending on the engine
          temp=temp.replace(/\n/g,tm).replace(/\r/g,'')
 
          //check dates and numbers are numeric
@@ -1169,7 +1169,6 @@ function exodusrecord_dictitem(dictitemname)
 {
  //if present as number then return it
  var temp=this.dict.fieldnos[dictitemname]
- //doesnt work on Mac IE5.23
  //if (temp!=undefined) return temp
  if (temp) return temp
 

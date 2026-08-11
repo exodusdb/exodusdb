@@ -45,8 +45,9 @@ async function formfunctions_onload() {
     glogin_button = $$('loginbutton')
     gwaitdiv = $$('waitdivelement')
 
-    $$('wrongconfiguration').style.display = 'none'
-    $$('logindiv').style.display = ''
+    var logindiv = $$('logindiv')
+    if (logindiv)
+        logindiv.style.display = ''
 
     // Warm both eye assets (open + slash) so first click is not blocked on fetch
     ;['login-eye.svg', 'login-eye-slash.svg'].forEach(function (name) {
@@ -60,7 +61,7 @@ async function formfunctions_onload() {
     addeventlistener(gpasswordreset_link,'click','passwordreset_onclick')
     var datasetx
 
-    //fix a bug in mac ie5 where input fields are not selectable in modaldialogs
+    // ensure inputs are selectable in modal dialogs
     //by doing all popups in calling window
     if (gisdialog) {
         //gusername_element.value=gDialogArguments[0]
@@ -131,7 +132,7 @@ async function formfunctions_onload() {
     // manager autofill, or Remember-me cookie path that prefilled u/p.
     // (Old test was checkbox .value == 'on', which is always true for a checkbox
     // and was never a real "Remember me checked" check.) Skip if no password yet;
-    // dblogin would no-op anyway. Hold Shift to skip (legacy MSIE window.event).
+    // dblogin would no-op anyway. Hold Shift to skip (window.event.shiftKey if present).
     if ((!window.event || !window.event.shiftKey)
         && gusername_element.value
         && gpassword_element.value)
@@ -336,7 +337,7 @@ async function login_onclick() {
             else if (!startinglocation)
                 startinglocation = unescape(exodusgetcookie2('ll', 'EXODUS', ''))
             //if (!startinglocation||(window.event&&window.event.shiftKey)) startinglocation=EXODUSlocation+'users.htm'
-            //TODO MSIE only window.event
+            // Shift+skip uses window.event when present
             if (!startinglocation || (window.event && window.event.shiftKey)) {
                 startinglocation = EXODUSlocation
                 if (exodusgetcookie2('m').split(',')[0] == 'TIMESHEETS')

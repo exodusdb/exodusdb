@@ -90,28 +90,11 @@ async function form_postwrite() {
 
 }
 
-//fix for older MSIE browsers
-function user_signature_onload_sync(event) {
-    if (isMSIE) {
-        event=getevent(event)
-        event.target.removeAttribute("width")
-        event.target.removeAttribute("height")
-    }
-}
-
 async function users_postdisplay() {
 
     var signatureimageelement = document.getElementById('signature_image')
     if (signatureimageelement) {
         signatureimageelement.src = ''
-
-        //older msie browsers IE6-8? show a red cross/missing file icon for users with no uploaded signature file
-        //instead of the alt ("") which more recent browsers do
-        //removed in image onload event - see user_signature_onload_sync
-        if (isMSIE) {
-            signatureimageelement.height = 0
-            signatureimageelement.width = 0
-        }
         signatureimageelement.src = '../../images/'+gdataset+'/upload/users/' + gkey.exodusconvert(' ', '').toLowerCase() + '_signature.jpg'
     }
 

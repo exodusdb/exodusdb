@@ -103,10 +103,8 @@
                 else if (param[0] == 'filename') {
                     $filename.innerText = param[1]
 
-                    //this is used in internet explorer
+                    // opener.returnValue (legacy dialogs) and window returnValue
                     window.opener.returnValue = param[1]
-
-                    //this becomes the return value of the window at least for non-internet explorer browsers
                     returnValue = param[1]
 
                     //close immediately if successful

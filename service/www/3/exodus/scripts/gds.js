@@ -226,7 +226,6 @@ function gds_getcells(dbelementordbelementid, recn) {
 
         //gets all elements if multivalued
         //gets first element only (on PC (mac?) dbelement2[0]==dbelement is true)
-        //dbelement2=document.all(dbelementordbelementid)
 
         //find dbelement in dom
         //dbelement=document.getElementsByName(dbelementordbelementid)[0]
@@ -1015,7 +1014,7 @@ async function gds_bind(datasource, elements, rownx) {
             //gtimers.stop(1)
 
             //gtimers.start(2)
-            //setup even the first row to avoid a bug in mac ie5 where column widths are excessive
+            // setup even the first row so column widths are not excessive
             setupnewrow(rowx)
             //alert('rows:'+rows)
             //alert('rown:'+rown)

@@ -769,7 +769,7 @@
 
                 while (1) {
 
-                    //exit if client disconnected (not MSIE /2/ which hasnt yield and uses synchronous XMLHTTP in the client)
+                    // exit if client disconnected (skip legacy User-Agent MSIE — sync XMLHTTP / no yield)
                     //if (!Response.IsClientConnected) {
                     //debug(this.agent)
                     if (this.agent.indexOf('MSIE')<0 && !Response.IsClientConnected) {

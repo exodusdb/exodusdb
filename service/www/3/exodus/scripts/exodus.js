@@ -1079,7 +1079,7 @@ function exodusamount(string) {
     //var result = string.match(gleadingnumberregex)
     //this.amount = string.slice(0, result.lastIndex)
     //this.unit = string.slice(result.lastIndex)
-    //lastIndex not working in standard browsers like MSIE so use a more reliable method
+    // lastIndex unreliable here — use a more portable method
     this.unit = string.replace(gleadingnumberregex,'')
     if (this.unit.length)
         this.amount = string.slice(0,-this.unit.length)

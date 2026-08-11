@@ -3,7 +3,6 @@
 //CollectGarbage() in all versions
 //"finally" block in v5.0
 
-//mozilla differences from IE (out of date?)
 // HTML element has a parentNode which is not usual element so be careful in "ancestor finder" routines
 // elements cannot be referred to simply as variables like idx
 // (must use getElementById or set an equivalent global variable)
@@ -222,9 +221,6 @@ var STMre, TMre, SMre, VMre, FMre, RMre, ALLFMre
 var XMLXXre
 var FMs
 
-isMSIE = typeof ActiveXObject != 'undefined' || ('ActiveXObject' in window)//|| is for MSIE11
-isMac = navigator.appVersion.indexOf('Macintosh') >= 0
-
 var e//mac safari 3.1.2 cannot tolerate "catch(e)" without this
 
 //prevent framing?
@@ -235,35 +231,6 @@ var gkeepalivemins = 10
 //gkeepalivemins=1
 var gkeepalive_timer = null
 
-//check browser capabilities
-
-var gunsupported = ''
-
-//support "innerText" or fail
-if (typeof document.createElement('div').innerText == 'undefined') {
-	if (typeof HTMLElement == 'undefined' || !HTMLElement.prototype || !HTMLElement.prototype.__defineGetter__)
-		gunsupported += ' innerText()'
-	else {
-		//for more see http://dean.edwards.name/moz-behaviors/src/
-		//for moz/safari
-		HTMLElement.prototype.__defineGetter__("innerText", function () { return this.textContent; });
-		HTMLElement.prototype.__defineSetter__("innerText", function ($value) { this.textContent = $value; });
-		/*
-		if(typeof HTMLElement!="undefined"){
-		HTMLElement.prototype.innerText getter = function(){
-		var tmp = this.innerHTML.replace(/<br />/gi,"\n");
-		return tmp.replace(/<[^>]+>/g,"");
-		}
-
-		HTMLElement.prototype.innerText setter = function(txtStr){
-		var parsedText = document.createTextNode(txtStr);
-		this.innerHTML = "";
-		this.appendChild( parsedText );
-		}
-		}
-		*/
-	}
-}
 // Stage 6: no live function*/yield* in app code — only async/await + Gate A/B.
 // A repo-wide yield* count is almost all *commented* legacy (and docs/error strings).
 // Do not re-audit those as active generators. This regex is only for stripping old
@@ -272,28 +239,13 @@ var gyieldregex = /yield ?\*/g
 
 exodus_client_init()
 
-//this is only called if not switching browser
 //any global variable defined in this function must not of course be declare var here otherwise would be local function variables
 function exodus_client_init() {
 
 	// Browser zoom keys: sync capture, out of form/Gate A key path (see client.js)
 	exodus_ensure_browser_chrome_keydown()
 
-	//actually this is only needed if exodusforms are used
-	if (!document.getElementsByClassName && !document.all)
-		gunsupported += ' getElementsByClassName or .all'
-
-	//check right browser and cookies allowed else switch to login which handled this error
-	if (gunsupported) {
-		alert('Sorry, your web browser does not support EXODUS.\nUse Internet Explorer 6+, Safari 3+, Firefox 3+ or Chrome 8.0+\n\nIt doesnt support' + gunsupported)
-		//window.location.assign(EXODUSlocation+'wrongbrowser.htm')
-		if (typeof glogin == 'undefined') {
-			window.location.assign(EXODUSlocation + '../index.html')
-			return
-		}
-	}
-
-	//implement swapNode if not native
+	// swapNode polyfill — still used by sort + ledgerprint
 	if (!document.swapNode) {
 		Node.prototype.swapNode = function (node) {
 			var p = node.parentNode;
@@ -304,17 +256,12 @@ function exodus_client_init() {
 		}
 	}
 
-	//polyfill
-	if (typeof console == 'undefined')
-		window.console = {}
-	if (typeof console.log == 'undefined')
-		window.console.log = log
-
-	//setup function $$() NOT $() since that is used by JQuery
-	if (document.getElementsByClassName)
-		$$ = $class
-	else
-		$$ = $all
+	// $$ is an Exodus DOM helper (not a browser polyfill; not jQuery $).
+	// Primary lookup: class exodusid_<id> (so multi-row/multi-instance fields share one logical id).
+	// Return shape (legacy document.all-like): one match → element; many → collection; none → getElementById then undefined.
+	// getElementById alone does not match this: it always returns at most one node even when duplicate ids exist.
+	// Required by login/dbform/etc. — do not drop or replace with plain getElementById.
+	$$ = $class
 
 	document.protocolcode = document.location.toString().slice(0, 4)
 
@@ -662,7 +609,7 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 				catch (e) { }
 			if (!elements)
 				return
-			//TODO cater for msie returning an array of many
+			// TODO: multi-element $$ result (collection) if many matches
 			elements = [elements]
 		}
 	}
@@ -680,9 +627,9 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 			exodussetexpression(elements[ii], attributename, expression)
 		else {
 
-			//ie8 leaves the function in but throws an error when used?!
+			// some engines leave a stub that throws when used
 			try {
-				//force error if doesnt exist or is ie8 (exists and doesnt work?!)
+				// force error if missing or unusable stub
 				if (elements[ii].setExpression) {
 					var element = elements[ii]
 					if (style)
@@ -723,11 +670,11 @@ function exodussetexpression2(elementids, attributename, expression) {
 				catch (e) { }
 			if (!elements)
 				continue
-			//$$() like "MSIE global id variables" returns array only if more than one
+			// $$() returns a collection only when more than one match
 			if (!elements.length)
 				elements = [elements]
 		}
-		//rearray to make sure is an array otherwise ie6 $$() seems to return a collection and concat appends all as one element on the end
+		// rearray so $$ multi-match collection is a real array (concat-safe)
 		allelements = allelements.concat(rearray(elements))
 	}
 
@@ -789,13 +736,14 @@ function exodusenabledandvisible(element0, allowreadonly) {
 	if (!element.offsetWidth || element.style.display == 'none')
 		return false
 
-	//have to check parents in msie TODO only required for older MSIE?)
-	while (isMSIE && element.parentNode && element.parentNode.tagName != 'BODY') {
-		element = element.parentNode
-		if (element.style.display == 'none')
+	// Hidden ancestor (display:none) — not focusable
+	var p = element.parentNode
+	while (p && p.tagName != 'BODY') {
+		if (p.style && p.style.display == 'none')
 			return false
-		if (element.getAttribute('disabled'))
+		if (p.getAttribute && p.getAttribute('disabled'))
 			return false
+		p = p.parentNode
 	}
 
 	return true
@@ -828,7 +776,7 @@ function showhide(element, show) {
 		if (!show)
 			element.style.display = 'none'
 		else {
-			//use '' because 'inline' doesnt line up columns in mozilla and table-row etc is only accepted by msie8+
+			// use '' — 'inline' misaligns columns; display:table-row is widely supported now
 			element.style.display = ''
 		}
 	}
@@ -1303,7 +1251,7 @@ function getdialogstyle_sync(dialogstyle) {
 	//var maxwidth = max.width
 	//var maxheight = max.height
 
-	//on ie6 seems to minimise
+	// some engines minimise instead of open features as expected
 	//maxwidth=0
 	//maxheight=0
 	if (!dialogstyle) {
@@ -1341,7 +1289,7 @@ function getdialogstyle_sync(dialogstyle) {
 		dialogstyle = standardstyle + ',height:' + max.height + 'px,width:' + max.width + 'px;'
 	}
 
-	//return with comma AND semicolon separators (MSIE requires semicolon and Firefox/Webkit require commas)
+	// return with comma AND semicolon separators (browsers differ on which they accept)
 	//dialogstyle = dialogstyle + ';' + dialogstyle.replace(/,/g, ';')
 
 	return dialogstyle
@@ -1445,8 +1393,8 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 		gpendingDialogOwner = null
 		console.log('exodusshowmodaldialog result is ' + result)
 
-		//Safari doesnt return an error and looks like a Window [x] close unfortunately
-		if (typeof result == 'undefined' && window.navigator.appVersion.indexOf('Safari') >= 0)
+		// Closed / blocked popup — no return value (was Safari-only UA sniff)
+		if (typeof result == 'undefined')
 			throw (url)
 
 		return result
@@ -1669,8 +1617,8 @@ async function windowopen(url, parameters, style) {
 
 		var result = window.open(url, '', style)
 
-		//Safari doesnt return an error and looks like a Window [x] close unfortunately
-		if (typeof result == 'undefined' && window.navigator.appVersion.indexOf('Safari') >= 0)
+		// Closed / blocked popup — no window handle (null or undefined)
+		if (result == null)
 			throw (url)
 
 		// Empty url → about:blank. Some browsers pair dark canvas with black text
@@ -1841,16 +1789,15 @@ function exodus_update_auth_button() {
 	if (!btn)
 		return
 	var label = $$('exoduslogoutbutton_label')
-	var ctrlalt = isMac ? 'Ctrl' : 'Alt'
 	if (!gusername) {
 		if (label)
 			label.innerHTML = 'Login'
-		btn.title = 'Login. ' + ctrlalt + '+L'
+		btn.title = 'Login. Alt+L'
 		setgraphicbutton(btn, null, gloginimage)
 	} else {
 		if (label)
 			label.innerHTML = 'Lo<u>g</u>out'
-		btn.title = 'Logout. ' + ctrlalt + '+G'
+		btn.title = 'Logout. Alt+G'
 		setgraphicbutton(btn, null, glogoutimage)
 	}
 }
@@ -2329,8 +2276,6 @@ async function clientfunctions_windowonload() {
 	//if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
 	if (!window.dialogArguments && (typeof gshowmenu == 'undefined' || gshowmenu) && EXODUSlocation != './exodus/' && document.getElementsByClassName('navbar').length == 0) {
 
-		var ctrlalt = isMac ? 'Ctrl' : 'Alt'
-
 		// Trailing cluster: theme | refresh | logout (equal gap)
 		var trailing = exodus_menubar_trailing_cluster()
 
@@ -2341,7 +2286,7 @@ async function clientfunctions_windowonload() {
 		if (typeof gshowrefreshcachebutton == 'undefined' || gshowrefreshcachebutton) {
 			var refresh_span = document.createElement('span')
 			refresh_span.classList.add('refresh_wrapper')
-			refresh_span.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '', 'Refresh the Database Cache. ' + ctrlalt + '+R', 'X')
+			refresh_span.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '', 'Refresh the Database Cache. Alt+R', 'X')
 			trailing.appendChild(refresh_span)
 			//if no dbform
 			if (typeof gdictfilename == 'undefined')
@@ -2351,7 +2296,7 @@ async function clientfunctions_windowonload() {
 		//button to logout
 		var temp2 = document.createElement('span')
 		temp2.classList.add('logout_wrapper')
-		temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
+		temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. Alt+G', 'G')
 		trailing.appendChild(temp2)
 
 		exodus_update_auth_button()
@@ -2363,7 +2308,7 @@ async function clientfunctions_windowonload() {
 		if (gmenucodes && gmenucodes != 'EXIT2') {
 			var menu_span = document.createElement('span')
 			menu_span.classList.add('hamburger_menu')
-			menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. ' + ctrlalt + '+M', 'M')
+			menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. Alt+M', 'M')
 			//document.body.insertBefore(menu_span, document.body.firstChild)
 			gexodus_menubar.insertBefore(menu_span, gexodus_menubar.firstChild)
 
@@ -2427,7 +2372,7 @@ function menuonload() {
 	}
 	else {
 		//menuframe=$$('menuframe')
-		//iframe.onload supported in ie55
+		// iframe.onload
 		//if (typeof menuframe.menudiv=='undefined'||menuframe.menucompleted.readyState!='complete') return
 		if (!menuframe.menucompleted)
 			return
@@ -2468,7 +2413,7 @@ function menuonload() {
 	//enable the menu button events
 	var menubuttonx = $$('menubutton')
 	menubuttonx.onmouseover = menuonmouseover
-	menubuttonx.onmouseoutmenuonmouseout
+	menubuttonx.onmouseout = menuonmouseout
 
 	//do both?!
 	//addeventlistener(menubuttonx, 'onclick', 'menuonclick')
@@ -2754,7 +2699,7 @@ function exodusdblink() {
 	//setup environment for http messaging
 	if (this.documentprotocolcode != 'file') {
 
-		//netscape or IE7 xmlhttp
+		// native XMLHttpRequest
 		try {
 			this.XMLHTTP = new XMLHttpRequest()
 			this.send = exodusdblink_send_byhttp_using_xmlhttp
@@ -2762,7 +2707,7 @@ function exodusdblink() {
 		}
 		catch (e) { }
 
-		//IE6 xmlhttp
+		// ActiveX XMLHTTP fallback
 		try {
 			this.XMLHTTP = new ActiveXObject('Microsoft.XMLHTTP')
 			this.send = exodusdblink_send_byhttp_using_xmlhttp
@@ -3317,14 +3262,6 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 			return 0
 		}
 
-		//prevent error "object does not support property or method '.loadXML'" in MSIE 10 plus and warnings in other browsers
-		//https://blogs.msdn.microsoft.com/ie/2012/07/19/xmlhttprequest-responsexml-in-ie10-release-preview/
-		//fails in IE6?
-		if (isMSIE)
-			try {
-				xhttp.responseType = 'msxml-document'
-			} catch (e) { }
-
 		//send
 
 		try {
@@ -3550,7 +3487,7 @@ function dbready(windowx) {
 	if (windowx) try { windowx.close() } catch (e) { }
 }
 
-//fix a bug/feature in internet explorer where closing a window opened with window.open causes loss of all non permanent cookies
+// some browsers clear non-permanent cookies when a window.open child is closed
 function exodusfixcookie() {
 	var cookies = document.cookie.split('; ')
 	var npreservedcookies = 0
@@ -3636,29 +3573,9 @@ function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
 		cookie += '; expires=Fri, 31 Dec 2000 23:59:59 GMT; SameSite=Strict'
 	//else if (permanent) cookie+=permanent
 
-	//problem on safari5 on mac - seems to cause multiple paths if path=/ without domain name (only if ipno?)
-	//and isnt necessary since without path then cookie is available to all pages
-	//but IS necessary because the default path on login page and other pages is DIFFERENT!
-	//summary of issues
-	//1. PC and Mac (all browsers) can login but NOT logout with no path=/ or no domain
-	//2. PC and Mac (all browsers) can login and out with path=/ and no domain - EXCEPT safari cannot login
-	//3. Mac (all browsers) can login and out with path=/ and domain
-	//doesnt seem to make any difference if domain or ip number
-	//cookie=cookie.replace(/&/g,'#')
-	//if (cookie.indexOf(';')>=0)
-	// alert(cookie)
-	//cookie=cookie.replace(/;/g,'?')
-	if (isMac) {
-		//cookie+='; path=/'
-		//var urlbit=document.location.href.toString().split('/')
-		//urlbit=urlbit[0]+'//'+urlbit[2]+'/'
-		cookie += '; path=/'
-		//cookie='xyz=steve&abc=123; path=/'
-		//alert(cookie)
-	}
-	else
-		cookie += '; path=/'
-	//cookie+='; domain='+gdomainname
+	// path=/ so login page and app pages share the same cookie
+	cookie += '; path=/'
+
 
 	//cookie=cookie.replace(/=/,'!')
 	document.cookie = cookie
@@ -3692,7 +3609,7 @@ function exodusgetcookie(loginsessionid, key, subkey) {
 	//alert(cookie0)
 	//cookies are separated by semicolons
 	//accessing cookies in modaldialog windows when there is port number in the URL
-	//cause unspecified security error in IE6 not prior versions
+	// can throw unspecified security error in some engines
 	var cookies = (window.dialogArguments && window.dialogArguments.cookie) ? window.dialogArguments.cookie : document.cookie
 	//if (window.dialogArguments&&window.dialogArguments.cookie)
 	//alert('W='+window.dialogArguments&&window.dialogArguments.cookie)
@@ -4265,7 +4182,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
 			var description = decodehtmlcodes(cell.text)
 
 			//add the option description
-			//must be done before insertion otherwise width on mac ie5 is v small
+			// must be done before insertion so width is computed correctly
 			option1.innerHTML = description
 			//option+=cell.text
 
@@ -4288,7 +4205,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
 	//select first option if none selected
 	// if (element.selectedIndex==-1) element.selectedIndex=0
 
-	//force element to recalculate width (needed on msie55 but not mac ie5)
+	// force element to recalculate width after style change
 	//this work around probably no longer needed
 	//element.parentNode.replaceChild(element,element)
 
@@ -4447,7 +4364,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 				if (option.value == selectedvalue || option.text == selectedvalue) {
 					try {
 						option.selected = true
-					} catch (e) { }//error in ie6 sometimes
+					} catch (e) { } // some engines throw here
 					break
 				}
 			}
@@ -4558,10 +4475,10 @@ function getdropdown0(element) {
 
 	var index = element.selectedIndex
 
-	//ie5 on mac appears to use index=length sometimes (when only one option?)
+	// some engines use index=length when only one option
 	if (index >= element.length) index = 0
 
-	//ie5 on pc uses -1 to indicate not selected
+	// -1 means not selected
 	if (index < 0) return ''
 
 	return element[index].value
@@ -4661,7 +4578,7 @@ function loadcache() {
 
 	//if gcache available already
 	try {
-		//ensure we can still access gcache.values since permission can be denied in MSIE if parent window has been closed
+		// parent may be closed — gcache.values access can throw permission denied
 		if (typeof gcache == 'object' && gcache != null && gcache.values)
 			return true
 	} catch (e) {
@@ -4675,7 +4592,7 @@ function loadcache() {
 		//if (window.opener && window.opener.gcache) {
 		if (window.opener && window.opener.gcache && gdataset && window.opener.gdataset == gdataset) {
 			gcache = window.opener.gcache
-			//ensure we can access gcache.values since permission can be denied in MSIE if parent window has been closed
+			// parent may be closed — gcache.values access can throw permission denied
 			if (gcache.values)
 				temp = true
 		}
@@ -5839,7 +5756,7 @@ var gevent
 
 function getevent(event) {
 
-	//if not passed event then try MSIE's window.event
+	// if not passed event then try window.event (legacy)
 	if (!event) {
 		if (window.event)
 			event = window.event
@@ -5852,7 +5769,7 @@ function getevent(event) {
 	if (!event)
 		return {}
 
-	//if no target then try MSIE's window.srcElement
+	// if no target then try srcElement (legacy)
 	if (!event.target && event.srcElement)
 		event.target = event.srcElement
 
@@ -6517,7 +6434,7 @@ function exodusclear_embeddedtable_hostborders() {
 	}
 }
 
-//allows dom scan without using IE document.all(ii)
+// sequential DOM scan by sourceIndex / walk (not document.all index)
 function nextelement(element) {
 
 	//return first child
@@ -6576,7 +6493,7 @@ function getmaxwindow_sync() {
 
 	var max = {}
 	try {
-		//internet explorer gives permission denied when uploading files
+		// some environments throw permission denied when uploading files
 		max.width = parentwindow.outerWidth
 		max.height = parentwindow.outerHeight
 		//max.height=parentwindow.innerHeight
@@ -7386,8 +7303,8 @@ function addeventlistener(element, eventname, functionx) {
 	var capture = eventname == 'focus'
 
 	if (element.addEventListener)
-		element.addEventListener(eventname, functionx, capture)//FF/Safari/IE9+
-	else if (element.attachEvent)//pre IE9
+		element.addEventListener(eventname, functionx, capture)
+	else if (element.attachEvent) // legacy
 		//if cant attachEvent then possibly it isnt a DOM element
 		element.attachEvent('on' + eventname, functionx)
 	//else
@@ -7608,58 +7525,26 @@ function systemerror(functionname, e) {
 		debugger
 }
 
-//works like msie
-function $all(elementid, element) {
-	if (!element) {
-		var id = elementid.id ? elementid.id : elementid
-		/*
-		var result
-		if (document.querySelectorAll) {
-		var result = document.querySelectorAll('.exodusid_' + id)
-		if (!result.length)
-		result = false
-		}
-		if (!result)
-		*/
-		//return document.all(id) //this returns only one element in ie8 unless in compatibility mode
-		return document.all[id]
-
-		/* doesnt solve difference in document.all in ie8 between normal and compatibility mode
-		var id = elementid.id ? elementid.id : elementid
-		var temp = window[id]
-		if (temp)
-		return temp
-		else
-		return document.all(elementid)
-
-		*/
-	}
-	else
-		//should this be changed to [elementid] similar to above
-		// or is it supposed to return element it only 1 and array if more than one
-		return element.all(elementid)
-}
-
+// Implementation of $$. Class-based (exodusid_*) so one logical name can have many nodes
+// (rows/repeats). single → element, multi → HTMLCollection, miss → getElementById (one only).
 function $class(elementid, element) {
 	var temp
 	if (element)
 		temp = element.getElementsByClassName('exodusid_' + elementid)
 	else
 		temp = document.getElementsByClassName('exodusid_' + elementid)
-	//return the element if one(
+	// one → bare element (callers use .value / .focus etc. without [0])
 	if (temp.length == 1)
 		return temp[0]
-	//return an array if many
+	// many → collection (callers index or iterate)
 	else if (temp.length > 1)
 		return temp
 
-	//last ditch attempt to find by id
-	//NB but this doesnt respect the element argument
+	// fallback: real id attribute (always at most one; ignores element scope)
 	temp = document.getElementById(elementid)
 	if (temp)
 		return temp
 
-	//return undefined if not found
 	return
 }
 
@@ -7688,7 +7573,7 @@ async function getcurrentstyle(element) {
 		return element.currentStyle
 }
 
-//firefox innertext doesnt work like internet explorer and webkit (chrome/safari)
+// Firefox innerText historically differed from WebKit (BR → newline); use walk when needed
 //need BR to show as \n
 function exodus_getinnertext(element) {
 	if (element.tagName == 'BR')
@@ -8696,7 +8581,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	//YIELD RIGHT HERE!
 	//1. hang here until something like a button click function calls geventhandler .next(response)
-	//2. keyword "yield" causes crash in internet explorer so it will be commented out in /2/ version
+	//2. keyword "yield" must stay out of /2/ build strings (legacy)
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Phase 1.2: convert the confirm/decide UI leaf to Promise-driven.

@@ -1282,23 +1282,21 @@ async function formfunctions_onload() {
                     element.setAttribute('exomaxwidth', '30ch')
                 else
                     element.removeAttribute('exomaxwidth')
-                if (!isMSIE) {
-                    var entryF = (element.getAttribute('exodustype') == 'F'
-                        && !element.getAttribute('exodusreadonly'))
-                    if (entryF) {
-                        element.style.display = 'block'
-                        element.style.width = '100%'
-                        // Empty-host floor only. Not freeLen / not 30ch.
-                        element.style.minWidth = '6ch'
-                    } else {
-                        // display free-text / names — keep side-by-side with codes
-                        element.style.display = 'inline-block'
-                        element.style.minWidth = '0'
-                    }
-                    // Always 100% at paint; wide layout may raise soft max later
-                    element.style.maxWidth = '100%'
-                    element.style.boxSizing = 'border-box'
+                var entryF = (element.getAttribute('exodustype') == 'F'
+                    && !element.getAttribute('exodusreadonly'))
+                if (entryF) {
+                    element.style.display = 'block'
+                    element.style.width = '100%'
+                    // Empty-host floor only. Not freeLen / not 30ch.
+                    element.style.minWidth = '6ch'
+                } else {
+                    // display free-text / names — keep side-by-side with codes
+                    element.style.display = 'inline-block'
+                    element.style.minWidth = '0'
                 }
+                // Always 100% at paint; wide layout may raise soft max later
+                element.style.maxWidth = '100%'
+                element.style.boxSizing = 'border-box'
             }
 
             //allow for data entry in SPAN elements (unless hidden)
@@ -1512,8 +1510,7 @@ async function formfunctions_onload() {
                 }
                 if (element.tagName == 'TEXTAREA') {
 
-                    //doesnt work in ie6 works in ie10 and 11, unknown if works in ie7,8,9
-                    if (typeof CKEDITOR != 'undefined'/*&&!isMSIE*/) {
+                    if (typeof CKEDITOR != 'undefined') {
 
                         CKEDITOR.config.toolbarCanCollapse = true;
                         CKEDITOR.config.toolbarStartupExpanded = false;
@@ -1599,7 +1596,7 @@ async function formfunctions_onload() {
             //if (element.getAttribute('exodustype')=='F'&&element.tagName!='SPAN')
             if (element.getAttribute('exodustype') == 'F') {
 
-                //as of ie5 we can only focus on elements which have tabindex
+                // only focus elements that have tabindex
                 //make them all the same and tab will work nicely
                 //tabindex can also be hard coded in the form design
                 //use <999 to come before defaults and >999 to come after
@@ -1919,17 +1916,9 @@ async function formfunctions_onload() {
 
                     //add insert and delete row buttons at the first column in the tbody
 
-                    //button shortcut keys are ctrl+ on mac and alt+ on pc
-                    var t2
-                    if (isMac) {
-                        t2 = 'x'
-                        t3 = 'x'
-                    }
-                    else {
-                        //duplicate keycodes in 3 places
-                        t2 = '(Ctrl+I or Ctrl+Insert)'
-                        t3 = '(Ctrl+D or Ctrl+Delete)'
-                    }
+                    // duplicate keycodes in 3 places
+                    var t2 = '(Ctrl+I or Ctrl+Insert)'
+                    var t3 = '(Ctrl+D or Ctrl+Delete)'
                     var hasIns = !(element.getAttribute('exodusnoinsertrow'))
                     var hasDel = !(element.getAttribute('exodusnodeleterow'))
                     // Lead-in col 0: ins/del, Show All, filter. Shared class for CSS hide.
@@ -2117,8 +2106,8 @@ async function formfunctions_onload() {
 
     //add the open, save, close and delete buttons
 
-    //button shortcut keys are ctrl+ on mac and alt+ on pc
-    var AltorCtrl = isMac ? 'Ctrl' : 'Alt'
+    // Form chrome shortcuts use event.altKey (tooltip: Alt+…)
+    var AltorCtrl = 'Alt'
 
     var buttonhtml = ''
 
@@ -2320,7 +2309,7 @@ async function formfunctions_onload() {
         }
         else {
             // Same accesskey C as bound Close (menubuttonhtml2 … 'C'); show it on the face + tip.
-            var AltorCtrl = (typeof isMac != 'undefined' && isMac) ? 'Ctrl' : 'Alt'
+            var AltorCtrl = 'Alt'
             setgraphicbutton(closerecord, '<u>C</u>ancel')
             closerecord.title = 'Cancel and exit. ' + AltorCtrl + '+C or Esc'
             setdisabledandhidden(closerecord, false)
@@ -2390,10 +2379,6 @@ async function formfunctions_onload() {
     form_ensure_scroll_viewport_capture()
     // Radio/checkbox: focus on mouseup only (not mousedown)
     form_ensure_radio_mouseup_focus()
-    //to prevent ctrl+N opening documents in not msie browsers but kills enter key in msie for some reason
-    //if (!isMSIE)
-    //    addeventlistener(document, 'keypress', 'document_onkeypress')
-
     addeventlistener(document, 'click', 'document_onclick')
 
     addeventlistener(document, 'paste', 'document_onpaste')
@@ -2869,7 +2854,7 @@ async function updatedisplay(elements) {
         // alone is the flex wrap SPAN for popup/link fields).
         var parent = getancestor(subelement, ' TD TH ')
         if (parent) {
-            //IE5.5 why does a TD enclosing a DIV have two childnodes the second being blank???
+            // TD enclosing a DIV can have a blank second child node
             var nchildnodes = 0
             for (var ii = 0; ii < parent.childNodes.length; ii++) if (parent.childNodes[ii].tagName) nchildnodes++
             if (nchildnodes == 1) subelement = parent
@@ -3395,7 +3380,7 @@ async function document_onclick(event) {
 
 async function tabit2() {
     var element = gpreviouselement
-    //older defacto ff/chrome/ie9+ (createEvent/initMousEvent+dispatchEvent)
+    // createEvent/initMouseEvent+dispatchEvent path
     if (document.createEventxxx) {
         //mozilla http://developer.mozilla.org/en/docs/DOM:event.initMouseEvent
         var eventx = document.createEvent("KeyboardEvent");
@@ -3418,7 +3403,6 @@ async function tabit2() {
         form_blockevents(false, 'tabit2')
         var cancelled = !element.dispatchEvent(eventx);
         form_blockevents(true, 'tabit2')
-        //older msie pre 9?
     } else
         focusdirection(direction, element, notgroupno)
 }
@@ -3628,13 +3612,10 @@ async function document_onkeydown2(event) {
 
     //alert(gkeycode)
 
-    //F5
-    //refresh (F5) system key refresh (do manually because mac does not seem to bubble key events)
-    if (keycode == 116) {
-        if (isMac)
-            document.location.reload(true)//true means from server, not cache
+    // F5 — leave to browser (all platforms)
+    if (keycode == 116)
         return true
-    }
+
 
     //F6 is now link
     if (keycode == 117) {
@@ -3662,8 +3643,7 @@ async function document_onkeydown2(event) {
         return exoduscancelevent(event)
     }
 
-    //menu bar hot keys for non-msie (including msie now) alt keys
-    //if (event.altKey && !document.all && [77, 78, 76, 79, 83, 67, 82, 69, 73, 80, 88].exoduslocate(gkeycode)) {
+    // menu bar Alt hot keys
     if (event.altKey && ! event.shiftKey && [71, 78, 76, 79, 83, 67, 82, 69, 77, 80, 88].exoduslocate(gkeycode)) {
         exoduscancelevent(event)
         var found = true
@@ -3673,9 +3653,9 @@ async function document_onkeydown2(event) {
             var menubutton = $$("menubutton");
 
             /* do it by directly calling menuonmouseover since clicking suffers conflict with onmouseover on mobile
-            //older defacto ff/chrome/ie9+ (createEvent/initMousEvent+dispatchEvent)
+            // createEvent/initMouseEvent+dispatchEvent path
             if (document.createEvent) {
-                //mozilla http://developer.mozilla.org/en/docs/DOM:event.initMouseEvent
+                // initMouseEvent (legacy createEvent path)
                 var mouseevent = document.createEvent("MouseEvents");
                 form_blockevents(false,'onkeydown2 alt')
                 mouseevent.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -3692,7 +3672,6 @@ async function document_onkeydown2(event) {
                 form_blockevents(false,'onkeydown2 not mouse')
                 var cancelled = !menubutton.dispatchEvent(mouseevent);
                 form_blockevents(true,'onkeydown2 not mouse')
-            //older msie pre 9?
             } else
             */
             exodussettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
@@ -3816,7 +3795,7 @@ async function document_onkeydown2(event) {
     var textrange
     if (keycode == 113) {
 
-        //internet explorer
+        // legacy TextRange selection
         if (document.selection
             && document.selection.createRange
             && (textrange = document.selection.createRange()).text != '') {
@@ -4145,8 +4124,8 @@ async function document_onkeydown2(event) {
         return exoduscancelevent(event)
     }
 
-    //Enter on textarea
-    if (!isMac && keycode == 13 && (element.tagName == 'TEXTAREA' && !event.ctrlKey && !event.shiftKey)) {
+    // Enter on TEXTAREA
+    if (keycode == 13 && (element.tagName == 'TEXTAREA' && !event.ctrlKey && !event.shiftKey)) {
         if (gKeyNodes && !glocked) {
             keycode = 9
             event.keyCode = keycode
@@ -4271,8 +4250,7 @@ async function document_onkeydown2(event) {
         keycode = 9
         event.keyCode = keycode
 
-        //setting keyCode is only allowed on msie
-        //if (!document.all && !event.ctrlKey) {
+        // if assigning keyCode was ignored, synthesise tab navigation
         if (event.keyCode != keycode) {
             var notgroupno
             if (event.shiftKey)
@@ -4667,10 +4645,6 @@ function form_radio_tab_target(radio) {
 }
 
 function focusdirection(direction, element, notgroupno, scopex) {
-    //currently required sourceIndex which is msie only
-    //if (!document.body.sourceIndex)
-    //    return
-
     if (typeof notgroupno == 'undefined')
         notgroupno = ''
 
@@ -4694,8 +4668,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
     if (!scope)
         scope = document.getElementsByTagName('*')
 
-    //work out index into scope of elements (all or one row usually)
-    //sourceIndex of document.all[0].sourceIndex is 0 in MSIE6 and 1 in later versions
+    // work out index into scope of elements (all or one row usually)
     var scopeindex
     //if (typeof nextelement.sourceIndex != 'undefined') {
     //    var sourceindex = nextelement.sourceIndex
@@ -4838,13 +4811,9 @@ function focusdirection(direction, element, notgroupno, scopex) {
             }
         }
 
-        //(isMSIE && nextelement.currentStyle && nextelement.currentStyle.display == 'none' && nextelement.parentNode.currentStyle.display == 'none')
-        //should also text mozilla currentstyle
-        //(await getcurrentstyle(nextelement) && await getcurrentstyle(nextelement).display == 'none' && await getcurrentstyle(nextelement.parentNode).display == 'none')
-        if (isMSIE && !exodusenabledandvisible(nextelement)) {
-            //console.log('SKIP '+nextid+' isMSIE and not enabledandvisible')
+        if (!exodusenabledandvisible(nextelement))
             continue
-        }
+
 
         // Cursor keys skip SELECT / radio — browser would change value if pressed again.
         // Exception: Up/Down may land on horizontal radios (options are Left/Right only;
@@ -5896,7 +5865,7 @@ async function opendoc2(newkey0) {
     //set editor textarea readonly or not
     //gCKEDITOR_EDITOR may not be ready yet when first opening the page
     //so we also do the same in its instanceReady event.
-    //MSIE has a problem with this, "permission denied" - so skip on error
+    // setReadOnly can throw "permission denied" if editor not ready — skip on error
     try {
         if (typeof gCKEDITOR_EDITOR != 'undefined')
             gCKEDITOR_EDITOR.setReadOnly(!glocked)
@@ -5965,15 +5934,6 @@ async function closedoc(mode) {
     //return await saveandorcleardoc(mode,save,clear=mode!='OPEN')
     //return await saveandorcleardoc(mode,save=mode!='CLEAR',clear=mode!='OPEN')
     var result = await saveandorcleardoc(mode)
-
-    /*/msie needs to result null otherwise prompts to leave or stay in window
-    //this is how we tell that we are in msie and onbeforeunload event
-    if (isMSIE&&window.event&&window.event.type=='beforeunload') {
-        if (result)
-           return
-        else
-            return 'Warning: You will lose any unsaved data'
-    }*/
 
     return result
 }
@@ -8489,9 +8449,7 @@ function focusongpreviouselement2() {
         }
     }
 
-    // Restore caret after focus settles. focusout of the temporary next field
-    // used to overwrite gprevious_sel; even with that fixed, browser/onfocus
-    // may full-select if we restore too early — defer one tick.
+    // Restore caret after focus settles.
     var bounceEl = gpreviouselement
     var snap = (gprevious_sel && gprevious_sel.el == bounceEl) ? gprevious_sel : null
     window.setTimeout(function () {
@@ -8500,40 +8458,27 @@ function focusongpreviouselement2() {
         if (snap && form_restore_field_caret(bounceEl, snap))
             return
 
-        if (isMac && bounceEl.tagName != 'SELECT' && bounceEl.tagName != 'TEXTAREA') {
-            try {
-                if (bounceEl.select)
-                    bounceEl.select()
-            } catch (e) { }
-        }
-
-        // No snap: full-select / end so L/R navigate fields again
-        if (!isMac && bounceEl.tagName != 'SELECT' && document.selection
-            && document.selection.createRange) {
-            try {
+        // No snap: full-select so L/R navigate fields again
+        if (bounceEl.tagName == 'SELECT' || bounceEl.tagName == 'OPTION')
+            return
+        try {
+            if (bounceEl.select && !bounceEl.isContentEditable
+                && bounceEl.type != 'checkbox' && bounceEl.type != 'radio'
+                && bounceEl.type != 'button' && bounceEl.type != 'submit') {
                 bounceEl.select()
-                var textrange = document.selection.createRange()
-                textrange.collapse(false)
-                textrange.select()
-            } catch (e) { }
-        } else if (!isMac && bounceEl.tagName != 'SELECT'
-            && window.getSelection && document.createRange
-            && (bounceEl.isContentEditable
-                || (bounceEl.tagName == 'SPAN'
-                    && bounceEl.getAttribute('contenteditable')))) {
-            try {
+                return
+            }
+            if (window.getSelection && document.createRange
+                && (bounceEl.isContentEditable
+                    || (bounceEl.tagName == 'SPAN'
+                        && bounceEl.getAttribute('contenteditable')))) {
                 var sel = window.getSelection()
                 sel.removeAllRanges()
                 var range = document.createRange()
                 range.selectNodeContents(bounceEl)
                 sel.addRange(range)
-            } catch (e) { }
-        } else if (!isMac && bounceEl.select
-            && bounceEl.tagName != 'SELECT' && bounceEl.tagName != 'TEXTAREA') {
-            try {
-                bounceEl.select()
-            } catch (e) { }
-        }
+            }
+        } catch (e) { }
     }, 0)
 
 }
@@ -8865,8 +8810,8 @@ function getvalue(element, recn) {
             //allow /r by itself but replace \\r\n combinations (to allow spans to have multiple lines)
             //var value = element.innerText.replace(/\r\n/g, ' ').exodustrimr()
 
-            //var value = element.innerText //returns with random missing spaces in IE11
-            //works on IE11 as well only from IE9
+            //var value = element.innerText // can drop spaces in some engines
+            // modern browsers (selectionStart etc.)
             //alternatives are .data and .wholeText
             if (typeof element.textContent != 'undefined')
                 var value = element.textContent
@@ -8875,7 +8820,7 @@ function getvalue(element, recn) {
                 //Note: .innerText property shim to textContent is added to HTMLElement.prototype in client.js
                 var value = element.innerText
 
-            //MSIE (IE7) has \r\n for line marks whereas FIREFOX et al have \n
+            // some engines use \r\n line marks; others \n
             //value = value.replace(/\r\n/g, ' ').exodustrimr()
             //else
             //    var value = element.innerHTML.replace(/([\r\n]+)/g, ' ').exodustrimr()
@@ -9000,7 +8945,7 @@ function exodussetreadonly(elements, msg, options, recn) {
             return true
     }
 
-    //provide hasAttribute method for ie6 etc
+    // hasAttribute polyfill if missing
     if (!elementx.hasAttribute) {
         elementx.hasAttribute =
             function hasAttribute(attrName) {
@@ -9253,8 +9198,7 @@ function setvalue2(element, value) {
                 if (oEditor) {
                     //oEditor.SetHTML(value)
                     //oEditor.setData(value)
-                    //using .setTimeout() because Internet Explorer 10/11 at least give error "permission denied"
-                    //if you call setData before previous setData has completed (asynchronously)
+                    // defer setData — overlapping async setData can throw "permission denied"
                     window.setTimeout(function () {
                         try {
                             oEditor.setData(value)
@@ -10346,7 +10290,7 @@ async function form_deleterow(event, element) {
     if (groupno == 0)
         return false //logout('deleterow group 0')
 
-    //does not work on mac ie5 ... var rown=row.sectionRowIndex
+    // prefer rowIndex over sectionRowIndex (more portable)
     var rown = row.rowIndex
     if (tablex.tHead)
         rown -= tablex.tHead.rows.length
@@ -12153,7 +12097,7 @@ function copydictitem(dictitem, element) {
             : (propertyname == 'exostyle' ? 'exostyle' : ('exodus' + propertyname))
         if (typeof element[attr] == 'undefined' && typeof dictitem[propertyname] != 'undefined') {
             //element[attr]=dictitem[propertyname]
-            //use setAttribute because only msie will clone expando properties and needed for row cloning
+            // setAttribute so row cloneNode keeps dict attrs (expandos are not cloned)
             //store false as "" otherwise since attributes are stored as strings it becomes "false"
             //which does not evaluate to false — still must setAttribute (was only in else).
             var value = dictitem[propertyname]
@@ -12327,7 +12271,7 @@ async function form_oncopy_generic(event) {
     var elements = document.getElementsByClassName('exodusid_' + elementid)
     var lns = []
     if (!selection.containsNode)
-        return false//not supported in MSIE so trigger normal copy?
+        return false // no containsNode — fall through to normal copy
     for (var ln = 0; ln < elements.length; ++ln) {
         if (selection.containsNode(elements[ln], true))
             lns.push(ln)
@@ -12472,11 +12416,9 @@ async function document_onpaste(event) {
     //standardise on \n
     text = text.replace(/\r\n/g, '\n')
 
-    //these dont work on INPUT or TEXTAREA
+    // these dont work on INPUT or TEXTAREA
     //document.execCommand("insertText", false, text);
-    //non-MSIE
     document.execCommand("insertHTML", false, text);
-    //MSIE
     document.execCommand('paste', false, text)
 
     //dont continue to normal paste
