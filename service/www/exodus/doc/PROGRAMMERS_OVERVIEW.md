@@ -2,7 +2,7 @@
 
 **Location:** `service/www/exodus/doc/` (web programming docs)  
 **Runtime code:** `service/www/3/exodus/scripts/` (`client.js`, `dbform.js`, …)  
-**See also:** [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md), [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [FORM-UI-KEYBOARD-BROWSER.md](./FORM-UI-KEYBOARD-BROWSER.md)  
+**See also:** [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md), [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [FORM-UI-NUMBER.md](./FORM-UI-NUMBER.md), [FORM-UI-KEYBOARD-BROWSER.md](./FORM-UI-KEYBOARD-BROWSER.md)  
 **Not here:** C++/var/exoprog — repo-root `doc/`
 
 This document describes how to use the client-side JavaScript web framework in the Exodus system (version 3 UI). The framework provides modal dialogs, an `async`/`await` cooperative event model, database access, dictionary-driven forms, security, uploads, and more. It is designed to work with the Exodus backend via the `xhttp.php` bridge (or file mode for local testing).

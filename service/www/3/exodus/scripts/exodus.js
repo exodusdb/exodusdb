@@ -786,41 +786,15 @@ function exodusmod(num, div) {
 //TIME AND DATE FUNCTIONS
 /////////////////////////
 
-function exodusconvarray(functionx, mode, value, params) {
+function exodusconvarray(functionx, mode, value, params, display) {
     var result = []
     for (var ii = 0; ii < value.length; ii++) {
-        result[i] = functionx(mode, value[ii], params)
+        result[ii] = functionx(mode, value[ii], params, display)
         //if any conversion fails return complete failure
-        if (result[i] == null)
+        if (result[ii] == null)
             return null
     }
     return result
-}
-
-// NUMBER OCONV display extras (set by number_oconv_begin around bind/setx).
-//   • Display (SPAN, SELECT, …) → MD/MC + thousands when BASEFMT ends with ,
-//   • Editable INPUT/TEXTAREA/contenteditable + bare .exodusoconv → no thousands
-// CURRENCY in params: peel/reattach trailing unit (e.g. 1042.00USD) on ICONV and OCONV
-// so internal amount+unit and external 1,042.00USD round-trip via bind/validate.
-var gnumber_oconv_display = false
-
-function number_oconv_wants_display_format(el) {
-    if (!el || !el.tagName)
-        return false
-    var tag = el.tagName
-    if (tag == 'INPUT' || tag == 'TEXTAREA')
-        return false
-    if (el.isContentEditable)
-        return false
-    return true
-}
-
-function number_oconv_begin(el) {
-    gnumber_oconv_display = number_oconv_wants_display_format(el)
-}
-
-function number_oconv_end() {
-    gnumber_oconv_display = false
 }
 
 // Leading indent: storage uses spaces; display/edit uses tabs (visible width).
@@ -853,44 +827,51 @@ function INDENTED(mode, value, params) {
     return value.replace(/^ +/, function (m) { return '\t'.repeat(m.length) })
 }
 
-function NUMBER(mode, value, params) {
+// NUMBER: ICONV/OCONV for numeric fields.
+// 4th arg `display` (default true): OCONV applies gbasefmt grouping/MD-MC when true.
+// ROUND(...) / [ROUND,…] calls NUMBER with display false — plain after decimals
+// (intermediate math / re-entrable). Prefer ROUND over bare NUMBER oconv for rounding.
+// No global paint flag.
+
+function ROUND(mode, value, params) {
+    return NUMBER(mode, value, params, false)
+}
+
+function NUMBER(mode, value, params, display) {
 
     /*
-     * params (comma-separated; CURRENCY flag may appear in any slot):
-     *   decimals | NDECS | BASE | nZ — decimal places (params[0] after flag strip)
+     * params (comma-separated; CURRENCY/UNIT may appear in any slot):
+     *   decimals | NDECS | BASE | nZ — decimal places
      *   POSITIVE | min — params[1]
      *   max — params[2]
-     *   CURRENCY (or UNIT) — amount+unit internal (1042.00USD); external may group
+     *   CURRENCY | UNIT — amount+unit (1042.00USD)
      *
-     * Display OCONV (gnumber_oconv_display): thousands when BASEFMT ends with ,
-     *   and peels unit even without CURRENCY (legacy display of amount+unit F fields).
-     * ICONV peels unit only when CURRENCY is set (plain NUMBER still rejects "100USD").
+     * display (default true): OCONV adds thousands when BASEFMT ends with ,
+     *   and MD/MC decimal character. false = plain (re-entrable) after ndecs.
+     * ICONV always strips grouping; peels unit only when CURRENCY set.
      */
 
-    gmsg=''
-    
-    //can handle an array of values
+    if (typeof display == 'undefined')
+        display = true
+
+    gmsg = ''
+
     if (typeof value == 'object')
-        return exodusconvarray(NUMBER, mode, value, params)
+        return exodusconvarray(NUMBER, mode, value, params, display)
 
     if (typeof value == 'string') {
-
-        //can handle records, multivalues and subvalues
         if (value.indexOf(fm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(fm), params).join(fm)
+            return exodusconvarray(NUMBER, mode, value.split(fm), params, display).join(fm)
         else if (value.indexOf(vm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(vm), params).join(vm)
-        else if (value.indexOf(sm) +1)
-            return exodusconvarray(NUMBER, mode, value.split(sm), params).join(sm)
-
+            return exodusconvarray(NUMBER, mode, value.split(vm), params, display).join(vm)
+        else if (value.indexOf(sm) + 1)
+            return exodusconvarray(NUMBER, mode, value.split(sm), params, display).join(sm)
     }
 
-    //empty in, empty out
     if (value == '')
         return value
 
     var paramsStr = String(params == null ? '' : params)
-    // Detect flag on raw string too (avoids missing CURRENCY if param slots shift)
     var allowCurrency = /(?:^|,)\s*(CURRENCY|UNIT)\s*(?:,|$)/i.test(paramsStr)
     params = paramsStr.split(',')
     var paramsFiltered = []
@@ -904,13 +885,10 @@ function NUMBER(mode, value, params) {
     }
     params = paramsFiltered
 
-    // Peel trailing unit before numeric work. Display OCONV: always (legacy).
-    // ICONV: only with CURRENCY so plain NUMBER inputs stay strict.
     var unitSuffix = ''
-    var peelUnit = allowCurrency || (mode != 'ICONV' && gnumber_oconv_display)
+    var peelUnit = allowCurrency || (mode != 'ICONV' && display)
     if (peelUnit) {
         try {
-            // Internal 1042.00USD or external 1,042.00USD / 1.042,00EUR
             var um = String(value).match(/^([-+]?[0-9.,]+)([A-Za-z]+)$/)
             if (um) {
                 value = um[1]
@@ -919,45 +897,34 @@ function NUMBER(mode, value, params) {
         } catch (e) { }
     }
 
-    //accept comma as decimal point - use exceptions for speed since usually string but might not be
-    // historical ICONV (validate / editable NUMBER fields) — leave as-is
-    if (mode == 'ICONV') {
-        try {
-            if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC') {
-                // European: . thousands, , decimal
-                value = String(value).replace(/\./g, '').replace(/,/g, '.')
-            }
-            else {
-                // MD / default: , thousands (and/or gthousands_regex), . decimal
-                if (typeof gthousands_regex != 'undefined' && gthousands_regex)
-                    value = String(value).replace(gthousands_regex, '')
-                else
-                    value = String(value).replace(/,/g, '')
-            }
+    // Normalize grouping for both ICONV and OCONV (accept plain or already-external).
+    // OCONV used to skip this → "23,504.00" failed exodusnum (setx double-format / ROUND).
+    try {
+        if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC') {
+            value = String(value).replace(/\./g, '').replace(/,/g, '.')
         }
-        catch (e) { }
+        else {
+            if (typeof gthousands_regex != 'undefined' && gthousands_regex)
+                value = String(value).replace(gthousands_regex, '')
+            else
+                value = String(value).replace(/,/g, '')
+        }
     }
+    catch (e) { }
 
-    //prevent reformatting
     if (params[0] == '' || typeof params[0] == 'undefined')
         params[0] = value.toString().replace(/[^0-9.]/gi, '').exodusfield('.', 2, 1).length.toString()
 
-    //if cannot parseFloat then is deemed not a number
-    //value = parseFloat(value)
-    //if (isNaN(value)) return null
     if (!(exodusnum(value))) {
-        // Last chance peel: value still has unit (peel missed) but CURRENCY requested
         if (allowCurrency && !unitSuffix) {
             try {
                 var um2 = String(value).match(/^([-+]?[0-9.,]+)([A-Za-z]+)$/)
                 if (um2) {
                     var tryv = um2[1]
-                    if (mode == 'ICONV') {
-                        if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC')
-                            tryv = tryv.replace(/\./g, '').replace(/,/g, '.')
-                        else
-                            tryv = tryv.replace(/,/g, '')
-                    }
+                    if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC')
+                        tryv = tryv.replace(/\./g, '').replace(/,/g, '.')
+                    else
+                        tryv = tryv.replace(/,/g, '')
                     if (exodusnum(tryv)) {
                         value = tryv
                         unitSuffix = um2[2]
@@ -967,15 +934,13 @@ function NUMBER(mode, value, params) {
         }
     }
     if (!(exodusnum(value))) {
-        gmsg=value+' cannot be understood as a number'
+        gmsg = value + ' cannot be understood as a number'
         return null
     }
     value = exodusnumber(value)
 
-    //format to N decimal places
     if (value !== '') {
 
-        //check to remove trailing zeros
         var nozero = params[0].slice(-1) == 'Z'
         if (nozero) params[0] = params[0].slice(0, -1)
 
@@ -983,21 +948,14 @@ function NUMBER(mode, value, params) {
             params[0] = gbasefmt.substr(2, 1)
         }
         if (params[0] == 'BASE') params = ['4']
-        //if (params=='NDECS') params=['2']
         if (params[0] == 'NDECS') {
-            //params[0]=(typeof gndecs=='undefined')?getrecord('NDECS'):gndecs.toString()
-            //params[0] = (typeof gndecs == 'undefined') ? await gds.getx('NDECS') : gndecs.toString()
-            //params[0] = (typeof gndecs == 'undefined') ? getvalue('NDECS') : gndecs.toString()
-            if (typeof gndecs=='undefined')
-                params[0]=gds.data['NDECS'].text
+            if (typeof gndecs == 'undefined')
+                params[0] = gds.data['NDECS'].text
             else
-                params[0]=gndecs.toString()
-
+                params[0] = gndecs.toString()
         }
 
-        //do formatting
         if (params[0].match(/^\d+$/)) {
-            //value=exodusformatnumber(value,params[0])
             var ndecimals = exodusnumber(params[0])
             value = exodusround(value, ndecimals)
             if (ndecimals > 0) {
@@ -1006,57 +964,43 @@ function NUMBER(mode, value, params) {
                     temp[1] = ''
                 value = temp.join('.') + '00000000000000000000'.substr(0, ndecimals - temp[1].length)
             }
-
         }
 
-        //remove training zeros
         if (nozero && value == 0)
             value = ''
-        // value=(parseFloat(value)+0).toString()
-
     }
 
-    //input conversion
     var result
     if (mode == 'ICONV') {
 
-        //prevent negative
         if (value < 0 && params[1] == 'POSITIVE') {
             gmsg = value + ' is negative but must be positive'
             return null
         }
 
-        //minimum
         if (params[1] != '' && exodusnum(params[1]) && value < +params[1]) {
-            gmsg = value+' must not be less than ' + params[1]
+            gmsg = value + ' must not be less than ' + params[1]
             return null
         }
 
-        //maximum
-        //if (params[2]!=''&&exodusnum(params[2])&&gvalue>+params[2])
         if (params[2] && exodusnum(params[2]) && value > +params[2]) {
-            gmsg = value+' must not be more than ' + params[2]
+            gmsg = value + ' must not be more than ' + params[2]
             return null
         }
 
-        //   var result=parseFloat(value)
         result = value.toString()
         if (!(exodusnum(result))) {
-            gmsg = value+' number is too large'
+            gmsg = value + ' number is too large'
             return null
         }
-        // internal form keeps unit: 1042.00USD
         if (unitSuffix)
             result += unitSuffix
 
     }
 
-    //output conversion
     else {
-        //zzz should format it with params? — plain for INPUT / scripts
         result = value.toString()
-        // Display hosts only: locale decimal + optional thousands + unit
-        if (gnumber_oconv_display && result !== '' && typeof gbasefmt == 'string' && gbasefmt) {
+        if (display && result !== '' && typeof gbasefmt == 'string' && gbasefmt) {
             var isMC = gbasefmt.substr(0, 2) == 'MC'
             var useThousands = gbasefmt.slice(-1) == ','
             var thousep = isMC ? '.' : ','
@@ -1075,7 +1019,6 @@ function NUMBER(mode, value, params) {
                 result += unitSuffix
         }
         else if (unitSuffix) {
-            // CURRENCY OCONV without display chrome: keep unit on plain number
             result += unitSuffix
         }
     }
@@ -1083,6 +1026,7 @@ function NUMBER(mode, value, params) {
     return result
 
 }
+
 
 var gdatedaypos
 var gdatemonthpos
@@ -1175,7 +1119,7 @@ function exodusaddunits(a, b) {
                     ndecs = ax.amount.exodusfield('.', 2).length
                     bndecs = bx.amount.exodusfield('.', 2).length
                     if (bndecs > ndecs) ndecs = bndecs
-                    if (exodusnum(ax.amount) && exodusnum(bx.amount)) b[bn] = (Number(bx.amount) + Number(ax.amount)).exodusoconv('[NUMBER,' + ndecs + ']') + ax.unit
+                    if (exodusnum(ax.amount) && exodusnum(bx.amount)) b[bn] = (Number(bx.amount) + Number(ax.amount)).exodusoconv('[ROUND,' + ndecs + ']') + ax.unit
                 }
                 else {
                     b[bn] = ax.unit

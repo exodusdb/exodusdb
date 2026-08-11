@@ -935,15 +935,10 @@ async function gds_bind(datasource, elements, rownx) {
                 //put the value into the screen
                 //log('value=')
 
-                //conversions (NUMBER thousands only on non-editable display hosts)
+                //conversions (NUMBER OCONV defaults display=true — grouping on paint)
                 var conversion = element.getAttribute('exodusconversion')
                 if (value != '' && typeof (conversion) == 'string' && conversion.substr(0, 1) == '[') {
-                    number_oconv_begin(element)
-                    try {
-                        value2 = value.exodusoconv(conversion)
-                    } finally {
-                        number_oconv_end()
-                    }
+                    value2 = value.exodusoconv(conversion)
                     if (value2 == null) {
                         return systemerror('bind()', 'bind("' + element.id + '") ' + exodusquote(value) + ' is not a valid internal ' + conversion.slice(1, -1) + ' value')
                     }
