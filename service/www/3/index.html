@@ -257,35 +257,9 @@
 		var EXODUSlocation = 'exodus/'
 		var glogin = true
 		var gshowmenu = false
-		var gswitchingbrowser = false
 
-		//1. following code will, in exodus/3, switch to exodus (exodus/2 in future) if the browser doesnt support yield - eg MSIE
-		//2. note that client.js in exodus2 will switch to exodus/3 if showmodaldialog is not supported (and yield is supported)
-		// yield //var guseyield=false //activated in exodus/2 - code doesnt use yield
-		/* yield */var guseyield = true  //activated in exodus/3 - code has yield
-		if (guseyield) {
-
-			//determine if yield * supported by browser
-			var gcan_yield
-			try { eval('function * f(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
-
-			//cannot continue in non-yielding code if browser does not support showmodaldialog
-			//if (!window.showModalDialog && !guseyield) {
-			if (!gcan_yield) {
-				gswitchingbrowser = true
-				if (window.showModalDialog) {
-					var oldurl = window.location.toString()
-					window.location = oldurl.replace(/\/3\//, '/2/')
-				}
-			}
-		}
-
-		//dont include exodus/3 yielding code with function * or yield * until we know the browser can handler them
-		//because the browser will fail and anyway, we are switching to a different url that doesnt require yielding browser
-		if (!gswitchingbrowser) {
-			document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/client.js"></scr' + 'ipt>')
-			document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/login.js"></scr' + 'ipt>')
-		}
+		document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/client.js"></scr' + 'ipt>')
+		document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/login.js"></scr' + 'ipt>')
 
 		// Login Tab order: native DOM order only (no tabindex, no Tab keydown trap).
 
@@ -345,68 +319,11 @@
 		</div>
 	</div>
 
-	<!-- copy this to wrongbrowser.htm and top level redirecing default.htm as well -->
-	<div style="text-align: center" id="wrongconfiguration">
-		<div align="center">
-			<table cellpadding="5" cellspacing="0" style="background-color: #f5fffa">
-				<tr style="vertical-align: top; background-color: #b0e0e6">
-					<th>
-						EXODUS requires
-					</th>
-					<th>
-					You have
-					</th>
-				</tr>
-				<tr style="vertical-align: top">
-					<td>
-						1. MS Edge<br />
-						&nbsp;or Safari<br />
-						&nbsp;or Firefox<br />
-						&nbsp;or Chrome<br />
-					</td>
-					<td>
-						<script	type="text/javascript">
-							document.writeln(navigator.appName)
-						</script>
-						<br />
-						<script	type="text/javascript">
-							document.writeln(navigator.userAgent)
-						</script>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						2. Scripting enabled
-					</td>
-					<td>
-						<noscript>
-							<span style="color: Red">
-								<b>Scripting disabled</b>
-							</span>
-						</noscript>
-						<script type="text/javascript">
-							document.write('Scripting enabled')
-						</script>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						3. Cookies enabled
-					</td>
-					<td>
-						<noscript>
-							<span style="color: Red">
-								<b>Unknown</b>
-							</span>
-						</noscript>
-						<script type="text/javascript">
-							document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')
-						</script>
-					</td>
-				</tr>
-			</table>
-		</div>
-	</div>
+	<noscript>
+		<p style="text-align:center;margin:2em;font-family:sans-serif">
+			EXODUS needs JavaScript enabled.
+		</p>
+	</noscript>
 	<div style="display: none; text-align: center" id="waitdivelement" class="waiting">
 		Please wait ...</div>
 	</div>
