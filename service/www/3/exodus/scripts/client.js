@@ -256,7 +256,7 @@ function exodus_client_init() {
 		}
 	}
 
-	// $$ is an Exodus DOM helper (not a browser polyfill; not jQuery $).
+	// $$ is an Exodus DOM helper (not a browser polyfill).
 	// Primary lookup: class exodusid_<id> (so multi-row/multi-instance fields share one logical id).
 	// Return shape (legacy document.all-like): one match → element; many → collection; none → getElementById then undefined.
 	// getElementById alone does not match this: it always returns at most one node even when duplicate ids exist.
@@ -403,9 +403,6 @@ function exodus_client_init() {
 
 	//style sheet
 	document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
-
-	//jquery (not used)
-	//document.writeln('<scr' + 'ipt type="text/javascript" id=jquery src="' + EXODUSlocation + 'scripts/jquery-1.4.4-min.js"></scr' + 'ipt>')
 
 	//general functions
 	if (!($$('generalfunctions'))) {
