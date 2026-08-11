@@ -45,9 +45,13 @@ async function formfunctions_onload() {
     glogin_button = $$('loginbutton')
     gwaitdiv = $$('waitdivelement')
 
-    var logindiv = $$('logindiv')
-    if (logindiv)
-        logindiv.style.display = ''
+    // needjs display:inline / login-ui display:none in HTML; swap when script runs
+    var needjs = document.getElementById('exodus-needjs')
+    if (needjs)
+        needjs.style.display = 'none'
+    var loginui = document.getElementById('exodus-login-ui')
+    if (loginui)
+        loginui.style.display = ''
 
     // Warm both eye assets (open + slash) so first click is not blocked on fetch
     ;['login-eye.svg', 'login-eye-slash.svg'].forEach(function (name) {

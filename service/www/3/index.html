@@ -268,8 +268,10 @@
 </head>
 
 
-<body class="login-page">
+<body class="login-page" style="text-align:center">
 
+	<p id="exodus-needjs" style="display:inline;margin:2em;padding:0.5em 1em;font-family:sans-serif;font-size:1rem;line-height:1.4;color:#222;background:#fff">EXODUS needs JavaScript enabled.</p>
+	<div id="exodus-login-ui" style="display:none">
 	<div class="login-shell">
 		<div id="logindiv" class="loginform login-shell-form">
 
@@ -319,20 +321,14 @@
 		</div>
 	</div>
 
-	<noscript>
-		<p style="text-align:center;margin:2em;font-family:sans-serif">
-			EXODUS needs JavaScript enabled.
-		</p>
-	</noscript>
 	<div style="display: none; text-align: center" id="waitdivelement" class="waiting">
 		Please wait ...</div>
+
+	<footer class="login-footer">
+		<span>Version 2022-06-15 Copyright © NEOSYS All rights reserved.</span>
+	</footer>
 	</div>
 
 </body>
-
-<footer class="login-footer">
-	<span>Version 2022-06-15 Copyright © NEOSYS All rights reserved.</span>
-</footer>
-
 
 </html>
