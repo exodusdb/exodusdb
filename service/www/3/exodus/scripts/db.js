@@ -1008,7 +1008,8 @@ function addfield(rec,fieldname,fieldtext) {
    }
   }
   
-  var numberdateconvs=/(^\[DATE)|(^\[NUMBER).*/
+  // ROUND is non-amount number paint (same numeric store check as NUMBER)
+  var numberdateconvs=/(^\[DATE)|(^\[NUMBER)|(^\[ROUND).*/
   
   //split all old fields into arrays of multivalues (will be re-joined later)
   for (var fieldno=0;fieldno<nfields;fieldno++) rev[fieldno]=rev[fieldno].split()
