@@ -21,11 +21,14 @@ exodus_dict_number(di, { decimals: 0, plain: true })       // [ROUND,…] ids/co
 exodus_dict_number(di)                                     // same as {}
 ```
 
-| `opts` key | Role |
-|------------|------|
-| `decimals` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `''` / `nZ` |
-| `min` / `max` | ICONV limits; `min: 'POSITIVE'` |
-| `plain` | `true` → `[ROUND,…]` (no thousands); omit/false → `[NUMBER,…]` |
+| `opts` key | Default if omitted | Role |
+|------------|--------------------|------|
+| `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` |
+| `min` / `max` | `''` | ICONV limits; `min: 'POSITIVE'` |
+| `plain` | `false` | `true` → `[ROUND,…]` (no thousands); omit → `[NUMBER,…]` |
+
+**Omit defaults** — do not write `decimals: ''`, `min: ''`, or `plain: false`.  
+`exodus_dict_number(di, { min: 0, max: 100 })` not `{ decimals: '', min: 0, max: 100 }`.
 
 Use `plain: true` for non-amounts (JOURNAL_NO, NUMBER_ADS, SEQUENCE, port numbers, day counts, …).
 

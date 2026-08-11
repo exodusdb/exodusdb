@@ -363,17 +363,18 @@ function exodus_dict_date(dicti,params) {
  if (params) dicti.lowercase=true
 }
 
-// Numeric dict field. opts bag only:
-//   decimals — digit | BASE | NDECS | '' | CURRENCY | UNIT | combos (e.g. 'NDECS,CURRENCY')
-//              trailing Z suppresses zero (e.g. '2Z')
-//   min      — number | 'POSITIVE' | ''
-//   max      — number | ''
-//   plain    — true → [ROUND,…] (no thousands; ids/counts/sequences)
-//              false/omit → [NUMBER,…] (amounts; grouping when BASEFMT groups)
+// Numeric dict field. opts bag only.
+// Defaults (omit the key — do not pass '' / null / false):
+//   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
+//   min      → ''   number | 'POSITIVE'
+//   max      → ''   number
+//   plain    → false  true → [ROUND,…] (no thousands; ids/counts/sequences)
+//                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
 //   exodus_dict_number(di, { decimals: 0, plain: true })
-//   exodus_dict_number(di)  // same as {}
+//   exodus_dict_number(di, { min: 0, max: 100 })   // not decimals:''
+//   exodus_dict_number(di)  // all defaults
 //
 function exodus_dict_number(dicti, opts) {
 
@@ -381,6 +382,8 @@ function exodus_dict_number(dicti, opts) {
   opts = {}
  exodusassertobject(dicti, 'exodus_dict_number', 'dicti')
 
+ // Same defaults as former positional (undefined → ''). Callers should omit keys,
+ // not pass empty placeholders.
  var decimals = opts.decimals
  var minimum = opts.min
  var maximum = opts.max

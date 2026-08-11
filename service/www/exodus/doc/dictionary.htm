@@ -43,17 +43,22 @@
 	"hradio"=horizontal aligned</P>
 <H4>exodus_dict_number(dictitem, opts)</H4>
 <P>Sets up a dictionary to handle numbers. <EM>opts</EM> is an object bag
-	(optional; omit or <code>{}</code> for defaults).</P>
+	(optional; omit or <code>{}</code> for defaults). <strong>Omit keys that are
+	at default</strong> — do not pass empty placeholders.</P>
 <UL>
-	<LI><EM>decimals</EM> — a digit for the number of decimals; "BASE" (base format);
-	"NDECS" (gndecs / getrecord NDECS); "CURRENCY" / "UNIT"; append Z to suppress zeroes
-	<LI><EM>min</EM> — number or "POSITIVE"
-	<LI><EM>max</EM> — number
-	<LI><EM>plain</EM> — true → conversion <code>[ROUND,…]</code> (no thousands; ids/counts);
-	omit/false → <code>[NUMBER,…]</code> (amounts, grouping when BASEFMT groups)
+	<LI><EM>decimals</EM> (default empty) — a digit for the number of decimals;
+	"BASE" (base format); "NDECS" (gndecs / getrecord NDECS); "CURRENCY" / "UNIT";
+	append Z to suppress zeroes
+	<LI><EM>min</EM> (default empty) — number or "POSITIVE"
+	<LI><EM>max</EM> (default empty) — number
+	<LI><EM>plain</EM> (default false) — true → conversion <code>[ROUND,…]</code>
+	(no thousands; ids/counts); omit → <code>[NUMBER,…]</code>
+	(amounts, grouping when BASEFMT groups)
 </UL>
 <P>Examples: <code>exodus_dict_number(di, { decimals: 'CURRENCY' })</code>;
-	<code>exodus_dict_number(di, { decimals: 0, plain: true })</code>.</P>
+	<code>exodus_dict_number(di, { decimals: 0, plain: true })</code>;
+	<code>exodus_dict_number(di, { min: 0, max: 100 })</code>
+	(not <code>decimals: ''</code>).</P>
 <H4>exodus_dict_text(dictitem,length,rows)</H4>
 <P>Free text field (align T, lowercase true). The field expands to the available
 	cell width; that is the normal layout.</P>
