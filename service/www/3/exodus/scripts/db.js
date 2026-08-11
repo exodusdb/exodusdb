@@ -363,24 +363,38 @@ function exodus_dict_date(dicti,params) {
  if (params) dicti.lowercase=true
 }
 
-function exodus_dict_number(dicti,params,minimum,maximum) {
+// Numeric dict field. opts bag only:
+//   decimals — digit | BASE | NDECS | '' | CURRENCY | UNIT | combos (e.g. 'NDECS,CURRENCY')
+//              trailing Z suppresses zero (e.g. '2Z')
+//   min      — number | 'POSITIVE' | ''
+//   max      — number | ''
+//   plain    — true → [ROUND,…] (no thousands; ids/counts/sequences)
+//              false/omit → [NUMBER,…] (amounts; grouping when BASEFMT groups)
+//
+//   exodus_dict_number(di, { decimals: 'CURRENCY' })
+//   exodus_dict_number(di, { decimals: 0, plain: true })
+//   exodus_dict_number(di)  // same as {}
+//
+function exodus_dict_number(dicti, opts) {
 
- if (typeof params=='undefined') params=''
- exodusassertobject(dicti,'exodus_dict_number','dicti')
- 
- //params can be
- //a digit for the number of decimals
- //BASE which indicated base format
- //NDECS in which case gndecs or getrecord('NDECS') used
- //append a Z for suppression of zeroes
- //CURRENCY (or UNIT) — amount+unit internal values e.g. 1042.00USD
- //  (may combine: 'NDECS,CURRENCY' or 'CURRENCY')
+ if (!opts)
+  opts = {}
+ exodusassertobject(dicti, 'exodus_dict_number', 'dicti')
 
- //minimum can be "POSITIVE" or a number
- if (typeof minimum=='undefined') minimum=''
- if (typeof maximum=='undefined') maximum=''
- params+=','+minimum+','+maximum
- dicti.conversion='[NUMBER,'+params+']'
+ var decimals = opts.decimals
+ var minimum = opts.min
+ var maximum = opts.max
+ if (typeof decimals == 'undefined' || decimals == null)
+  decimals = ''
+ if (typeof minimum == 'undefined' || minimum == null)
+  minimum = ''
+ if (typeof maximum == 'undefined' || maximum == null)
+  maximum = ''
+
+ var params = String(decimals) + ',' + minimum + ',' + maximum
+ var kind = opts.plain ? 'ROUND' : 'NUMBER'
+ dicti.conversion = '[' + kind + ',' + params + ']'
+
  // Style axis for dbform paint (exostyle number). Prefer dict_number over
  // conversion-only fields so host/width match this helper.
  // Align: keep preset (forms often set L/R already). If unset: line-grid R,
@@ -393,14 +407,6 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
  }
  dicti.exostyle = 'number'
 
-}
-
-// Same as exodus_dict_number but OCONV without thousands (ids, counts, days, sequences).
-// Use for JOURNAL_NO, NUMBER_ADS, SEQUENCE, etc. Money stays on dict_number / [NUMBER].
-function exodus_dict_number_plain(dicti, params, minimum, maximum) {
- exodus_dict_number(dicti, params, minimum, maximum)
- if (dicti.conversion && dicti.conversion.slice(0, 7) == '[NUMBER')
-  dicti.conversion = '[ROUND' + dicti.conversion.slice(7)
 }
 
 // Align T free text: contenteditable SPAN, fold at spaces (lowercase true).

@@ -106,7 +106,7 @@ async function dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('TEMP_OTHER_KEYS', 'F', 24)
 
     di = dict[++din] = dictrec('PASSWORD_AUTOEXPIRY_DAYS', 'F', 25)
-    exodus_dict_number(di, 0, 0)
+    exodus_dict_number(di, { decimals: 0, min: 0 })
     di.length = 3
     if (!(await exodussecurity('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
 

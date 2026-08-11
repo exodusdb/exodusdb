@@ -23,7 +23,7 @@ async function dict_PARTS() {
  di.functioncode='return await this.xlate("SUB_PART_CODE", "PARTS",1,"X")'
  
  di=dict[++din]=dictrec('QUANTITY','F',3,'',1)
- exodus_dict_number(di,0,0)//no decimals, minimum 0
+ exodus_dict_number(di, { decimals: 0, min: 0 })//no decimals, minimum 0
  di.required=true
  
  return dict

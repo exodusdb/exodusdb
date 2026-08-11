@@ -2020,7 +2020,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.nwords = 1
     di.validation = 'await colors_val_screenfontsize()'
     //di.defaultvalue='100'
-    exodus_dict_number(di, 0, 50, 200)
+    exodus_dict_number(di, { decimals: 0, min: 50, max: 200 })
     di.length = 3
     di.allowcursor = true
 
@@ -2029,7 +2029,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.wordno = 8
     di.nwords = 1
     //di.defaultvalue='100'
-    exodus_dict_number(di, 0, 50, 200)
+    exodus_dict_number(di, { decimals: 0, min: 50, max: 200 })
     di.length = 3
     di.allowcursor = true
 

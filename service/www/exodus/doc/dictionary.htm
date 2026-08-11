@@ -41,19 +41,19 @@
 <P><EM>defaultvalue </EM>"Y" or "N" or defaults to "Y"</P>
 <P><EM>type</EM> "dropdown"=a drop down box, "radio"=vertical aligned, 
 	"hradio"=horizontal aligned</P>
-<H4>exodus_dict_number(dictitem,params,params2)</H4>
-<P>Sets up a dictionary to handle numbers</P>
-<P><EM>params</EM> can be:</P>
+<H4>exodus_dict_number(dictitem, opts)</H4>
+<P>Sets up a dictionary to handle numbers. <EM>opts</EM> is an object bag
+	(optional; omit or <code>{}</code> for defaults).</P>
 <UL>
-	<LI>
-	a digit for the number of decimals
-	<LI>
-	"BASE"&nbsp;which indicates base format
-	<LI>
-	"NDECS"&nbsp;in which case gndecs or getrecord('NDECS') used
-	<LI>
-		append a Z for suppression of zeroes</LI></UL>
-<P>params2 can be "POSITIVE" to restrict the entry to positive numbers</P>
+	<LI><EM>decimals</EM> — a digit for the number of decimals; "BASE" (base format);
+	"NDECS" (gndecs / getrecord NDECS); "CURRENCY" / "UNIT"; append Z to suppress zeroes
+	<LI><EM>min</EM> — number or "POSITIVE"
+	<LI><EM>max</EM> — number
+	<LI><EM>plain</EM> — true → conversion <code>[ROUND,…]</code> (no thousands; ids/counts);
+	omit/false → <code>[NUMBER,…]</code> (amounts, grouping when BASEFMT groups)
+</UL>
+<P>Examples: <code>exodus_dict_number(di, { decimals: 'CURRENCY' })</code>;
+	<code>exodus_dict_number(di, { decimals: 0, plain: true })</code>.</P>
 <H4>exodus_dict_text(dictitem,length,rows)</H4>
 <P>Free text field (align T, lowercase true). The field expands to the available
 	cell width; that is the normal layout.</P>

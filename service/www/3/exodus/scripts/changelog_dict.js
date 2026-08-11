@@ -24,7 +24,7 @@ async function dict_CHANGELOG() {
  
  di=dict[++din]=dictrec('CHANGELOG_NUMBER','F',0)
  //di.required=true
- exodus_dict_number(di,2)
+ exodus_dict_number(di, { decimals: 2 })
  di.validcharacters='1234567890.'
  di.defaultvalue=exodusdate().exodusquote()
  di.popup='await changelog_pop_number(true)'

@@ -13,7 +13,21 @@
 | **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form (amounts: thousands when BASEFMT groups) |
 | **`[ROUND,…]`** | Same numeric work as NUMBER OCONV but **plain** (no thousands) — intermediate math **and** non-amount integers (journal no, counts, sequences) |
 
-**Dict helpers:** `exodus_dict_number` → `[NUMBER,…]`. **`exodus_dict_number_plain`** → same ICONV/min/max/`exostyle` but `[ROUND,…]` so paint has **no commas** (JOURNAL_NO, NUMBER_ADS, SEQUENCE, …).
+**Dict helper** (`db.js`): bag only — `exodus_dict_number(di, opts)`.
+
+```js
+exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts
+exodus_dict_number(di, { decimals: 0, plain: true })       // [ROUND,…] ids/counts/sequences
+exodus_dict_number(di)                                     // same as {}
+```
+
+| `opts` key | Role |
+|------------|------|
+| `decimals` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `''` / `nZ` |
+| `min` / `max` | ICONV limits; `min: 'POSITIVE'` |
+| `plain` | `true` → `[ROUND,…]` (no thousands); omit/false → `[NUMBER,…]` |
+
+Use `plain: true` for non-amounts (JOURNAL_NO, NUMBER_ADS, SEQUENCE, port numbers, day counts, …).
 
 | Direction | Meaning |
 |-----------|---------|
@@ -77,7 +91,7 @@ These do **not** select thousands by name. Grouping is:
 **Bad:** `(a + b).exodusoconv('[NUMBER,2]')` then more math.  
 **Good:** `.exodusoconv('[ROUND,2]')` or pure `exodusround(n, 2)` then continue; use **NUMBER** only for real external / field conversion.
 
-Field `di.conversion = '[NUMBER,…]'` (via `exodus_dict_number`) stays **NUMBER** so paint gets grouping.
+Amount fields: omit `plain` (or `plain: false`) so conversion is `[NUMBER,…]` and paint gets grouping. Non-amount integers: `plain: true` → `[ROUND,…]`.
 
 ---
 
@@ -94,7 +108,7 @@ For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when 
 | Concern | Where |
 |---------|--------|
 | `NUMBER` / `ROUND` | `exodus.js` |
-| Dict helper | `db.js` → `exodus_dict_number` → always `[NUMBER,…]` |
+| Dict helper | `db.js` → `exodus_dict_number(di, opts)` → `[NUMBER,…]` or `[ROUND,…]` if `plain` |
 | Pure numeric round | `exodus.js` → `exodusround` |
 | BASEFMT | `client.js` → `gbasefmt`, `gthousands_regex` |
 | DOM read | `dbform.js` → `getvalue` (external), `getvalue_internal` (ICONV) |
