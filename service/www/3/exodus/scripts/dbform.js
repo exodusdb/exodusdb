@@ -3019,11 +3019,16 @@ async function newrecordfocus() {
             var keyel = gKeyNodes[kn]
             if (keyel.id == element.id)
                 break
+            // Empty = DOM empty. Sync uses getvalue_internal (ICONV for any [ conversion:
+            // NUMBER grouping, ACNO, DATE, …) so gds gets storage form not paint form.
             if (getvalue(keyel) == '')
                 await setdefault(keyel)
-            else if ((await gds.getx(keyel.id)) != getvalue(keyel))
-                // Already on screen (SELECT default etc.) but not yet in gds
-                await gds.setx(keyel, null, getvalue(keyel))
+            else {
+                var keyival = getvalue_internal(keyel)
+                if ((await gds.getx(keyel.id)) != keyival)
+                    // Already on screen (SELECT default etc.) but not yet in gds
+                    await gds.setx(keyel, null, keyival)
+            }
         }
     }
     if (!gKeyNodes || glocked) {
@@ -3985,7 +3990,7 @@ async function document_onkeydown2(event) {
     //alt+Y is copy previous record/column
     if (keycode == 89 && event.altKey && element.type != 'button') {
         if (grecn > 0) {
-            setvalue(element, await getpreviousrow(element.id, true))
+            setvalue(element, await getpreviousrow(element.id, { skipblanks: true }))
             try { element.select() } catch (e) { }
             return exoduscancelevent(event)
         }
@@ -8171,6 +8176,8 @@ async function validateupdate() {
     //    newvalue = newvalue.toUpperCase()
     if (newvalue == gpreviousvalue) {
         //logout('validateupdate - gpreviousvalue:' + gpreviousvalue + ' same as newvalue:' + newvalue)
+        // Same DOM external — still paint if conversion can canonicalise (rare drift).
+        await form_paint_oconv_if_needed(gpreviouselement, getvalue_internal(gpreviouselement))
         // Value is the committed original — end quiet typeahead including miss tint.
         form_typeahead_reset()
         return true
@@ -8542,26 +8549,19 @@ function getvalues(elementx, sepchar) {
 
 }
 
-// Display SPANs may show external NUMBER (thousands / unit). Callers using
-// Number(getvalue(...)) need internal form. Does not change validate ICONV.
-function getvalue_number_internal(element, value) {
+// getvalue is always DOM external (incl. NUMBER grouping). For storage/math:
+// getvalue_internal = getvalue + ICONV when conversion is […]. Do not hide ICONV inside getvalue.
+function getvalue_internal(element, recn) {
+    var value = getvalue(element, recn)
     if (value === '' || value == null || !element || !element.getAttribute)
         return value
     var conversion = element.getAttribute('exodusconversion')
-    if (typeof conversion != 'string' || conversion.toUpperCase().indexOf('[NUMBER') != 0)
+    if (typeof conversion != 'string' || conversion.slice(0, 1) != '[')
         return value
     try {
-        var unit = ''
-        var raw = String(value)
-        // reverse display amount+unit if present (display-only OCONV may have added grouping)
-        var um = raw.match(/^([-+]?[0-9.,]+)([A-Za-z]+)$/)
-        if (um) {
-            raw = um[1]
-            unit = um[2]
-        }
-        var iv = raw.exodusiconv(conversion)
+        var iv = String(value).exodusiconv(conversion)
         if (iv != null)
-            return unit ? iv + unit : iv
+            return iv
     } catch (e) { }
     return value
 }
@@ -8656,7 +8656,7 @@ function getvalue(element, recn) {
 						//trim leading white space if lower case not allowed
 						tx = tx.replace(/^\s+/, '')
 					}
-                    return getvalue_number_internal(element, tx)
+                    return tx
 
                 case 'radio': {
 
@@ -8742,7 +8742,7 @@ function getvalue(element, recn) {
                 //trim leading white space if lower case not allowed
                 value = value.replace(/^\s+/, '')
             }
-            return getvalue_number_internal(element, value)
+            return value
 
         case 'TEXTAREA': {
 
@@ -9745,8 +9745,9 @@ async function validate(element) {
 
         gmsg = ''
         ivalue = await exodusevaluate(expression, 'await validate(' + element.id + ') iconv');
-        if (typeof ivalue == 'undefined')
+        if (typeof ivalue == 'undefined') {
             return false //logout('validate - system error in input conversion')
+        }
 
         //null means failed to convert to internal value therefore invalid
         if (gvalue == null || ivalue == null) {
@@ -9777,8 +9778,8 @@ async function validate(element) {
         if (!ok || gvalue == null) {
             grecn = storegrecn
             await exodusinvalid()
-            console.log('validate - VALIDATION FUNCTION CODE RETURNED FALSE OR GVALUE AS NULL')
-            return false //logout('validate - validation function code returned false or gvalue as null')
+            //logout('validate - validation function code returned false or gvalue as null')
+            return false
         }
 
     }
@@ -9818,14 +9819,14 @@ async function validate(element) {
         var title = element.getAttribute('exodustitle')
         if (elementsequence == 'A') {
             var temp
-            if ((temp = await getpreviousrow('', true, true))
+            if ((temp = await getpreviousrow('', { skipblanks: true, internal: true }))
                 && gvalue < temp) {
                 //    alert(typeof gvalue+' '+gvalue+' < '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
                 return await exodusinvalid(title + ' cannot be less than ' + title + ' in the previous row above')
             }
             var temp
-            if ((temp = await getnextrow('', true, true))
+            if ((temp = await getnextrow('', { skipblanks: true, internal: true }))
                 && gvalue > temp) {
                 //    alert(typeof gvalue+' '+gvalue+' > '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
@@ -9838,11 +9839,15 @@ async function validate(element) {
     //log('before output conversion')
 
     ovalue = await validateoconv(element, gvalue)
-    if (ovalue == 'undefined' || ovalue == null)
+    // validateoconv returns false after invalid, or null/undefined on hard fail —
+    // must not fall through to return true (looked like silent Esc).
+    if (ovalue === false || ovalue == null || ovalue === 'undefined')
         return false //logout('validate - oconv failed')
 
-    //not needed because setx will update the screen with oconverted data
-    //gvalue=ovalue
+    // Canonical external into the DOM for all [ conversions (e.g. 1,11,1.00AED → 1,111.00AED).
+    // Keep gvalue internal for setx. getvalue is DOM external so grouping edits reach validate.
+    if (conversion && String(ovalue) !== String(getvalue(element)))
+        setvalue(element, ovalue)
 
     //logout('validate ' + element.id + ' ' + gvalue)
 
@@ -9850,9 +9855,23 @@ async function validate(element) {
 
 }
 
+// OCONV ivalue (internal) onto the element if DOM still shows pre-canonical external.
+async function form_paint_oconv_if_needed(element, ivalue) {
+    var conversion = element && element.getAttribute && element.getAttribute('exodusconversion')
+    if (typeof conversion != 'string' || conversion.slice(0, 1) != '[')
+        return true
+    var ovalue = await validateoconv(element, ivalue == null ? '' : ivalue)
+    if (ovalue === false || ovalue == null || typeof ovalue == 'undefined')
+        return false
+    if (String(ovalue) !== String(getvalue(element)))
+        setvalue(element, ovalue)
+    return true
+}
+
 async function validateoconv(element, ivalue) {
 
-    //returns ovalue or null if oconv fails
+    // returns ovalue string (or '') on success; false on fail.
+    // Callers must treat false (and null/undefined) as failure — not only null.
 
     //skip if nothing to convert
     ivalue = ivalue.toString()
@@ -9887,9 +9906,11 @@ async function validateoconv(element, ivalue) {
     var expression = convarray[0] + '(' + '"OCONV","' + ivalue + '","' + convopts + '")'
 
     gmsg = ''
-    var ovalue = await exodusevaluate(expression);
-    if (typeof ovalue == 'undefined')
+    var ovalue = await exodusevaluate(expression, 'validateoconv ' + (element && element.id))
+    if (typeof ovalue == 'undefined') {
+        await exodusinvalid(exodusquote(ivalue) + ' output conversion failed (undefined)\n' + gmsg)
         return false
+    }
 
     //null means failed to convert to external value therefore invalid
     if (ovalue == null) {
@@ -10138,13 +10159,8 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
 async function oconvertvalue(ivalue, conversion, element) {
     if (!conversion) return ivalue
     if (typeof (conversion) != 'string' || conversion.slice(0, 1) != '[') return ivalue
-    // element: thousands grouping only for non-editable display hosts (see NUMBER)
-    number_oconv_begin(element)
-    try {
-        return ivalue.exodusoconv(conversion)
-    } finally {
-        number_oconv_end()
-    }
+    // NUMBER OCONV defaults display=true (grouping). Use [ROUND,…] for plain.
+    return ivalue.exodusoconv(conversion)
 }
 
 async function deleterow_onclick(event) {
@@ -10443,9 +10459,9 @@ async function insertallrows2(elements, values, fromrecn) {
                 } 
                 //await gds.setx(element, grecn, newvalue)
                 var ovalue = await validateoconv(gpreviouselement, newvalue)
-                if (typeof ovalue == 'undefined' || ovalue == null) {
-                    return false                                       
-                }
+                // validateoconv returns false on fail (not only null/undefined)
+                if (ovalue === false || ovalue == null || typeof ovalue == 'undefined')
+                    return false
                 //const conversion = gpreviouselement.getAttribute('exodusconversion')
                 //if (conversion && conversion.substr(0,1) == '[')
                 //    newvalue = newvalue.exodusoconv(conversion)
@@ -11039,10 +11055,10 @@ async function exoduspopup(event, element) {
 
     //output convert it
     if (element.getAttribute('exodusconversion')) {
-        reply = await validateoconv(element, reply, reply)
-        if (typeof reply == 'undefined' || reply == null) {
+        reply = await validateoconv(element, reply)
+        // validateoconv returns false on fail (not only null/undefined)
+        if (reply === false || reply == null || typeof reply == 'undefined')
             return false //logout('exoduspopup - oconv failed')
-        }
     }
 
     //setup next onfocus to validateupdate
@@ -11353,19 +11369,37 @@ function getrecn(element) {
 
 }
 
-async function getnextrow(dictid, skipblanks, iconv) {
-    return await getrowx(dictid, skipblanks, true, iconv)
+// getpreviousrow / getnextrow / getrowx
+// ------------------------------------
+// Return value from another multivalue row (dictid, or gpreviouselement.id if '').
+//
+//   opts.skipblanks — if true, walk past empty cells
+//   opts.internal   — false/omitted → getvalue / getvalues (DOM, external / paint)
+//                     true          → gds.get1 / gds.getall (getx — storage form)
+//                     NOT getvalue+ICONV. Two layers: DOM vs gds.
+//
+// Default is DOM external. Use { internal: true } for defaultvalue/setdefault
+// (storage then OCONV for paint), gds compares, file keys, full ACCOUNT_NO, etc.
+// Alt+Y / screen copy: omit internal (DOM form).
+//
+//   getpreviousrow(id, { skipblanks: true, internal: true })
+
+async function getnextrow(dictid, opts) {
+    return await getrowx(dictid, true, opts)
 }
 
-async function getpreviousrow(dictid, skipblanks, iconv) {
-    return await getrowx(dictid, skipblanks, false, iconv)
+async function getpreviousrow(dictid, opts) {
+    return await getrowx(dictid, false, opts)
 }
 
-async function getrowx(dictid, skipblanks, forward, iconv) {
+async function getrowx(dictid, forward, opts) {
 
-    //given a dictionary id (or use gpreviouselement) and an option to skip over blanks,
-    //return the contents of the previous row to the current row determined by grecn
-    //forward true means search forwards not backwards
+    // See API note above getnextrow/getpreviousrow.
+    // forward true = next row, false = previous. grecn is current row.
+    if (!opts)
+        opts = {}
+    var skipblanks = opts.skipblanks
+    var internal = opts.internal
 
     if (!dictid)
         dictid = gpreviouselement.id
@@ -11375,7 +11409,8 @@ async function getrowx(dictid, skipblanks, forward, iconv) {
     if (!forward) {
         if (grecn == 0)
             return ''
-        if (iconv)
+        if (internal)
+            // gds storage (get1 → getx)
             value = await gds.get1(dictid, grecn - 1)
         else
             value = getvalue(dictid, grecn - 1)
@@ -11389,7 +11424,8 @@ async function getrowx(dictid, skipblanks, forward, iconv) {
     // var values=getvalue(dictid, null)
     //var values=getvalues(dictid)
     var values
-    if (iconv)
+    if (internal)
+        // gds storage (getall → getx)
         values = await gds.getall(dictid)
     else
         //values = getvalues(document.getElementsByName(dictid))
