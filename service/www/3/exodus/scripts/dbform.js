@@ -406,6 +406,9 @@ if (gparameters.readonlymode)
 var gonfocuselement
 var gpreviouselement = null
 var gnextelement = null
+// Caret snapshot for invalid leave → focus return (capture on focusout, before
+// the next field steals selection). { el, kind: 'input'|'span', start, end }
+var gprevious_sel = null
 // Radio/checkbox Esc: value when focus first entered the field (survives live click-validate).
 // Not a twin of gpreviousvalue — only Esc while still on that field/group.
 // Touched clear on Esc: same as text — gelementthatjustcalledsettouched
@@ -803,6 +806,8 @@ async function formfunctions_onload() {
     //document.body.onfocus=document_onfocus
     var activateorfocus = typeof document.body.onactivate == 'undefined' ? 'focus' : 'activate'
     addeventlistener(document.body, activateorfocus, 'document_onfocus')
+    // Caret while still on field (validate runs after focus already moved)
+    addeventlistener(document.body, 'focusout', 'form_onfocusout_capture')
 
     gds = new exodusdatasource
     gds.onreadystatechange = gds_onreadystatechange
@@ -2939,6 +2944,7 @@ function setgpreviouselement(element, value) {
     if (!element) {
         gpreviouselement = null
         gpreviousvalue = ''
+        gprevious_sel = null
         // Clear radio group arrival (left form / no previous field)
         g_radio_arrival_anchor = null
         g_radio_arrival_value = ''
@@ -2954,12 +2960,133 @@ function setgpreviouselement(element, value) {
     if (gpreviouselement.tagName == 'OPTION')
         gpreviouselement = gpreviouselement.parentNode
 
+    // Drop caret snap when baseline moves to a different field (successful leave)
+    if (gprevious_sel && gprevious_sel.el != gpreviouselement)
+        gprevious_sel = null
+
     //set gpreviousvalue as well
     if (typeof value == 'undefined') {
         //assumes grecn set if mv element
         gpreviousvalue = getvalue(gpreviouselement)
     } else
         gpreviousvalue = value
+}
+
+// Snapshot caret/selection before leave (focusout). Used when validate fails and
+// focus returns — by then the browser has already dropped the old selection.
+function form_capture_field_caret(el) {
+    if (!el || !el.tagName)
+        return null
+    if (el.tagName == 'INPUT' || el.tagName == 'TEXTAREA') {
+        if (el.type == 'checkbox' || el.type == 'radio' || el.type == 'button'
+            || el.type == 'submit' || el.type == 'image')
+            return null
+        try {
+            if (typeof el.selectionStart != 'number')
+                return null
+            return {
+                el: el,
+                kind: 'input',
+                start: el.selectionStart,
+                end: el.selectionEnd
+            }
+        } catch (e) {
+            return null
+        }
+    }
+    // contenteditable SPAN (code/text/number hosts)
+    if (!(el.isContentEditable || (el.tagName == 'SPAN' && el.getAttribute('contenteditable'))))
+        return null
+    if (!window.getSelection)
+        return null
+    try {
+        var sel = window.getSelection()
+        if (!sel || sel.rangeCount < 1)
+            return null
+        var range = sel.getRangeAt(0)
+        var anc = range.commonAncestorContainer
+        if (anc != el && !el.contains(anc))
+            return null
+        var pre = document.createRange()
+        pre.selectNodeContents(el)
+        pre.setEnd(range.startContainer, range.startOffset)
+        var start = pre.toString().length
+        pre.setEnd(range.endContainer, range.endOffset)
+        var end = pre.toString().length
+        return { el: el, kind: 'span', start: start, end: end }
+    } catch (e) {
+        return null
+    }
+}
+
+function form_restore_field_caret(el, snap) {
+    if (!el || !snap || snap.el != el)
+        return false
+    if (snap.kind == 'input' && (el.tagName == 'INPUT' || el.tagName == 'TEXTAREA')) {
+        try {
+            var len = (el.value || '').length
+            var s = Math.max(0, Math.min(snap.start, len))
+            var e = Math.max(0, Math.min(snap.end, len))
+            el.setSelectionRange(s, e)
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+    if (snap.kind == 'span' && window.getSelection && document.createRange) {
+        try {
+            function form_caret_point(root, offset) {
+                var walked = 0
+                var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null)
+                var node
+                while ((node = walker.nextNode())) {
+                    var nlen = node.nodeValue.length
+                    if (walked + nlen >= offset)
+                        return { node: node, off: offset - walked }
+                    walked += nlen
+                }
+                // past end — place at end of last text node or root
+                if (root.lastChild && root.lastChild.nodeType == 3)
+                    return { node: root.lastChild, off: root.lastChild.nodeValue.length }
+                return { node: root, off: root.childNodes.length }
+            }
+            var sp = form_caret_point(el, snap.start)
+            var ep = form_caret_point(el, snap.end)
+            var range = document.createRange()
+            if (sp.node.nodeType == 3)
+                range.setStart(sp.node, sp.off)
+            else
+                range.setStart(el, Math.min(sp.off, el.childNodes.length))
+            if (ep.node.nodeType == 3)
+                range.setEnd(ep.node, ep.off)
+            else
+                range.setEnd(el, Math.min(ep.off, el.childNodes.length))
+            var sel = window.getSelection()
+            sel.removeAllRanges()
+            sel.addRange(range)
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+    return false
+}
+
+// focusout bubbles — last chance to record caret before next field steals it.
+// Only snapshot the field we may bounce back to (gpreviouselement). When
+// invalid leave focuses the next field then returns, focusout of that temporary
+// target must not overwrite the real caret snap.
+function form_onfocusout_capture(event) {
+    var el = event && event.target
+    if (!el || !el.getAttribute || !el.getAttribute('exodustype'))
+        return
+    if (!el.tagName || !el.tagName.match(gtexttagnames))
+        return
+    if (el.type == 'checkbox' || el.type == 'radio' || el.type == 'button')
+        return
+    if (gpreviouselement && el != gpreviouselement)
+        return
+    gprevious_sel = form_capture_field_caret(el)
 }
 
 async function newrecordfocus() {
@@ -8362,21 +8489,52 @@ function focusongpreviouselement2() {
         }
     }
 
-    if (isMac && gpreviouselement.tagName != 'SELECT' && gpreviouselement.tagName != 'TEXTAREA')
-        gpreviouselement.select()
+    // Restore caret after focus settles. focusout of the temporary next field
+    // used to overwrite gprevious_sel; even with that fixed, browser/onfocus
+    // may full-select if we restore too early — defer one tick.
+    var bounceEl = gpreviouselement
+    var snap = (gprevious_sel && gprevious_sel.el == bounceEl) ? gprevious_sel : null
+    window.setTimeout(function () {
+        if (gpreviouselement != bounceEl)
+            return
+        if (snap && form_restore_field_caret(bounceEl, snap))
+            return
 
-    //exoduscancelevent(event)
-
-    //try and put cursor at end of gprevious text
-    if (!isMac && gpreviouselement.tagName != 'SELECT' && document.selection && document.selection.createRange) {
-        try {
-            gpreviouselement.select()
-            var textrange = document.selection.createRange()
-            textrange.collapse(false)
-            textrange.select()
+        if (isMac && bounceEl.tagName != 'SELECT' && bounceEl.tagName != 'TEXTAREA') {
+            try {
+                if (bounceEl.select)
+                    bounceEl.select()
+            } catch (e) { }
         }
-        catch (e) { }
-    }
+
+        // No snap: full-select / end so L/R navigate fields again
+        if (!isMac && bounceEl.tagName != 'SELECT' && document.selection
+            && document.selection.createRange) {
+            try {
+                bounceEl.select()
+                var textrange = document.selection.createRange()
+                textrange.collapse(false)
+                textrange.select()
+            } catch (e) { }
+        } else if (!isMac && bounceEl.tagName != 'SELECT'
+            && window.getSelection && document.createRange
+            && (bounceEl.isContentEditable
+                || (bounceEl.tagName == 'SPAN'
+                    && bounceEl.getAttribute('contenteditable')))) {
+            try {
+                var sel = window.getSelection()
+                sel.removeAllRanges()
+                var range = document.createRange()
+                range.selectNodeContents(bounceEl)
+                sel.addRange(range)
+            } catch (e) { }
+        } else if (!isMac && bounceEl.select
+            && bounceEl.tagName != 'SELECT' && bounceEl.tagName != 'TEXTAREA') {
+            try {
+                bounceEl.select()
+            } catch (e) { }
+        }
+    }, 0)
 
 }
 
