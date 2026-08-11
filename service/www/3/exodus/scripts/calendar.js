@@ -8,9 +8,6 @@
 // 
 // Based on Tapestry 2.3-beta1 Datepicker by Paul Geerts
 // 
-// Thanks to:
-//     Vladimir [vyc@quorus-ms.ru] for fixing the IE6 zIndex problem.
-//
 // The normal setup would be to have one text field for displaying the 
 // selected date, and one button to show/hide the date picker control.
 // This is  the recommended javascript code:
@@ -57,7 +54,6 @@ function Calendar(date) {
     Calendar.LEAP_NUM_DAYS = [0,31,60,91,121,152,182,213,244,274,305,335];
     
 
-	this._bw = new bw_check();
 	this._showing = false;	
 	this._includeWeek = false;
 	this._hideOnSelect = true;
@@ -273,7 +269,6 @@ Calendar.prototype.create = function() {
 			td.style.textAlign = "left";
 			text = document.createTextNode(String.fromCharCode(160));
 			td.appendChild(text);
-            //setCursor(td);
             td.align="center";
 			tr.appendChild(td);
 			var tmp = new Object();
@@ -288,7 +283,7 @@ Calendar.prototype.create = function() {
 			td.className = "calendarDay";
 			text = document.createTextNode(String.fromCharCode(160));
 			td.appendChild(text);
-            setCursor(td);
+			td.style.cursor = "pointer";
             td.align="center";
 			tr.appendChild(td);
 			var tmp = new Object();
@@ -345,12 +340,6 @@ Calendar.prototype.create = function() {
 	
 
 
-	// IE55+ extension		
-	this._previousMonth.hideFocus = true;
-	this._nextMonth.hideFocus = true;
-	this._todayButton.hideFocus = true;
-	// end IE55+ extension
-	
 	// hook up events
 	// buttons
 	this._previousMonth.onclick = function () {
@@ -372,17 +361,13 @@ Calendar.prototype.create = function() {
 	};
 	
 
-	this._calDiv.onselectstart = function () {
-		return false;
-	};
-
 	// Cursor box (.current) = keyboard / wheel / hover.
 	// Commit (setSelectedDate → field) = click / Enter / Today only.
 
 	// Date for the day cell under the mouse, or null
 	function dayUnderPointer(e) {
-		if (e == null) e = document.parentWindow.event;
-		var el = e.target != null ? e.target : e.srcElement;
+		if (!e) return null;
+		var el = e.target;
 		while (el && el.nodeType != 1)
 			el = el.parentNode;
 		while (el && el.tagName && el.tagName.toLowerCase() != 'td')
@@ -413,7 +398,7 @@ Calendar.prototype.create = function() {
 	};
 
 	this._calDiv.onkeydown = function (e) {
-		if (e == null) e = document.parentWindow.event;
+		if (!e) return true;
 		var kc = e.keyCode != null ? e.keyCode : e.charCode;
 
 		if (kc == 13) {
@@ -454,8 +439,8 @@ Calendar.prototype.create = function() {
 	// Wheel: over month/year SELECT → step that control; else ↑↓ one week per notch.
 	// Skip double-fired events; batch fast day-grid scroll in rAF.
 	function onWheel(e) {
-		if (e == null) e = document.parentWindow.event;
-		var t = e.target || e.srcElement;
+		if (!e) return;
+		var t = e.target;
 		var overSelect = null;
 		while (t && t != dp._calDiv) {
 			if (t.tagName == 'SELECT') {
@@ -521,33 +506,22 @@ Calendar.prototype.create = function() {
 		});
 		return false;
 	}
-	if (this._calDiv.addEventListener)
-		this._calDiv.addEventListener('wheel', onWheel, { passive: false, capture: true });
-	else
-		this._calDiv.onmousewheel = onWheel;
+	this._calDiv.addEventListener('wheel', onWheel, { passive: false, capture: true });
 
-	this._monthSelect.onchange = function(e) {
-		if (e == null) e = document.parentWindow.event;
-		e = getEventObject(e);
-		dp.setMonth(e.value);
+	this._monthSelect.onchange = function () {
+		dp.setMonth(this.value);
 	}
 
-	this._monthSelect.onclick = function(e) {
-		if (e == null) e = document.parentWindow.event;
-		e = getEventObject(e);
-		e.cancelBubble = true;
-	}
-	
-	this._yearSelect.onchange = function(e) {
-		if (e == null) e = document.parentWindow.event;
-		e = getEventObject(e);
-		dp.setYear(e.value);
+	this._monthSelect.onclick = function (e) {
+		if (e && e.stopPropagation) e.stopPropagation();
 	}
 
-	this._yearSelect.onclick = function(e) {
-		if (e == null) e = document.parentWindow.event;
-		e = getEventObject(e);
-		e.cancelBubble = true;
+	this._yearSelect.onchange = function () {
+		dp.setYear(this.value);
+	}
+
+	this._yearSelect.onclick = function (e) {
+		if (e && e.stopPropagation) e.stopPropagation();
 	}
 
 
@@ -647,7 +621,7 @@ Calendar.prototype._update = function() {
 			} else {
 				week = weekNumber(this, d1);
 				this._weekSlot[i].data.data = week;
-				this._weekSlot[i].data.parentNode.style.borderRight = "1px solid WindowText";
+				this._weekSlot[i].data.parentNode.style.borderRight = "1px solid currentColor";
 			}
 			d1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate()+7);
 		}
@@ -932,14 +906,6 @@ Calendar.prototype._place = function(element) {
 	// position:fixed → viewport coords (no scroll offset)
 	div.style.left = Math.round(leftPos) + 'px';
 	div.style.top = Math.round(topPos) + 'px';
-
-	if (this._underDiv) {
-		this._underDiv.style.position = 'fixed';
-		this._underDiv.style.left = div.style.left;
-		this._underDiv.style.top = div.style.top;
-		this._underDiv.style.width = w + 'px';
-		this._underDiv.style.height = h + 'px';
-	}
 };
 
 Calendar.prototype.show = function(element) {
@@ -953,30 +919,6 @@ Calendar.prototype.show = function(element) {
 		this._calDiv.style.display = "block";
 		this._showing = true;
 		this._modal_on();
-		
-		/* -------- */
-		if ( this._bw.ie6 ) {
-
-	     	dw = this._calDiv.offsetWidth;
-	     	dh = this._calDiv.offsetHeight;
-	     	var els = document.getElementsByTagName("body");
-	     	var body = els[0];
-	     	if( !body ) return;
-	 
-	    	//paste iframe under the modal
-		     var underDiv = this._calDiv.cloneNode(false); 
-		     underDiv.style.zIndex="1001";
-		     underDiv.style.margin = "0px";
-		     underDiv.style.padding = "0px";
-		     underDiv.style.display = "block";
-		     underDiv.style.width = dw;
-		     underDiv.style.height = dh;
-		     underDiv.style.border = "1px solid WindowText";
-		     underDiv.innerHTML = "<iframe width=\"100%\" height=\"100%\" frameborder=\"0\"></iframe>";
-		     body.appendChild(underDiv);
-		     this._underDiv = underDiv;
-	   }
-		/* -------- */
 	}
 
 	//exodus — quadrant place; never cover field + calendar icon
@@ -995,11 +937,6 @@ Calendar.prototype.hide = function() {
 		
 		this._showing = false;
 		this._modal_off();
-		if( this._bw.ie6 ) {
-		    if( this._underDiv )
-		    // this._underDiv.removeNode(true);
-             exodusremovenode(this._underDiv)
-		}
 	}
 }
 
@@ -1293,47 +1230,6 @@ function weekOfPeriod(cal, dayOfPeriod, dayOfWeek) {
 
 
 
-function getEventObject(e) {  // utility function to retrieve object from event
-    if (navigator.appName == "Microsoft Internet Explorer") {
-        return e.srcElement;
-    } else {  // is mozilla/netscape
-        // need to crawl up the tree to get the first "real" element
-        // i.e. a tag, not raw text
-        var o = e.target;
-        while (!o.tagName) {
-            o = o.parentNode;
-        }
-        return o;
-    }
-}
-
-function addEvent(name, obj, funct) { // utility function to add event handlers
-
-    if (navigator.appName == "Microsoft Internet Explorer") {
-        obj.attachEvent("on"+name, funct);
-    } else {  // is mozilla/netscape
-        obj.addEventListener(name, funct, false);
-    }
-}
-
-
-function deleteEvent(name, obj, funct) { // utility function to delete event handlers
-
-    if (navigator.appName == "Microsoft Internet Explorer") {
-        obj.detachEvent("on"+name, funct);
-    } else {  // is mozilla/netscape
-        obj.removeEventListener(name, funct, false);
-    }
-}
-
-function setCursor(obj) {
-   if (navigator.appName == "Microsoft Internet Explorer") {
-        obj.style.cursor = "hand";
-    } else {  // is mozilla/netscape
-        obj.style.cursor = "pointer";
-    }
-}
-
 function Point(iX, iY) {
 
    this.x = iX;
@@ -1379,29 +1275,5 @@ function pad(number,X) {   // utility function to pad a number to a given width
 	}
 	return number;
 }
-
-function bw_check() {
-
-    var is_major = parseInt( navigator.appVersion );
-    this.nver = is_major;
-    this.ver = navigator.appVersion;
-    this.agent = navigator.userAgent;
-    this.dom = document.getElementById ? 1 : 0;
-    this.opera = window.opera ? 1 : 0;
-    this.ie5 = ( this.ver.indexOf( "MSIE 5" ) > -1 && this.dom && !this.opera ) ? 1 : 0;
-    this.ie6 = ( this.ver.indexOf( "MSIE 6" ) > -1 && this.dom && !this.opera ) ? 1 : 0;
-    this.ie4 = ( document.all && !this.dom && !this.opera ) ? 1 : 0;
-    this.ie = this.ie4 || this.ie5 || this.ie6;
-    this.mac = this.agent.indexOf( "Mac" ) > -1;
-    this.ns6 = ( this.dom && parseInt( this.ver ) >= 5 ) ? 1 : 0;
-    this.ie3 = ( this.ver.indexOf( "MSIE" ) && ( is_major < 4 ) );
-    this.hotjava = ( this.agent.toLowerCase().indexOf( 'hotjava' ) != -1 ) ? 1 : 0;
-    this.ns4 = ( document.layers && !this.dom && !this.hotjava ) ? 1 : 0;
-    this.bw = ( this.ie6 || this.ie5 || this.ie4 || this.ns4 || this.ns6 || this.opera );
-    this.ver3 = ( this.hotjava || this.ie3 );
-    this.opera7 = ( ( this.agent.toLowerCase().indexOf( 'opera 7' ) > -1 ) || ( this.agent.toLowerCase().indexOf( 'opera/7' ) > -1 ) );
-    this.operaOld = this.opera && !this.opera7;
-    return this;
-};
 
 
