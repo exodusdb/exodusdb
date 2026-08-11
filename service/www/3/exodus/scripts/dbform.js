@@ -8010,40 +8010,33 @@ async function document_onfocus(event) {
     //    //  textrange.select()
     //}
 
-    //log('select the whole text')
+    // Full-select on field arrival (INPUT.select / SPAN selectNodeContents).
+    // Checkbox/radio/button: clear document selection — leaving a contenteditable
+    // SPAN can leave its range selected while focus is already on the control;
+    // coming back then saw non-collapsed selection and collapseToEnd, so L/R
+    // became local text moves instead of field navigation.
     if (element.tagName != 'TEXTAREA' && element.tagName != 'OPTION' && element.tagName != 'SELECT')
         try {
-
-            //select works on INPUT elements
-            if (element.select)
+            var isRadioCheckBtn = element.type == 'checkbox' || element.type == 'radio'
+                || element.type == 'button' || element.type == 'submit'
+            if (isRadioCheckBtn) {
+                if (window.getSelection)
+                    window.getSelection().removeAllRanges()
+            } else if (element.select && !element.isContentEditable) {
                 element.select()
-            else {
-
-                //TODO remove code duplication
-
-                //seems to be the most standards based way and works on spans too
-                //http://stackoverflow.com/questions/11451353/how-to-select-the-text-of-a-span-on-click
-                if (window.getSelection && document.createRange) {
-                    selection = window.getSelection();
-                    if (selection.isCollapsed) {
-                        //following selects all of text
-                        selection.removeAllRanges();
-                        range = document.createRange();
-                        range.selectNodeContents(element);
-                        selection.addRange(range);
-                    } else {
-                        //following removes any selection
-                        selection.collapseToEnd();
-                    }
-                    //            return exoduscancelevent(event)
-                } else if (document.selection && document.body.createTextRange) {
-                    range = document.body.createTextRange();
-                    range.moveToElementText(element);
-                    range.select();
-                    //            return exoduscancelevent(event)
-                }
+            } else if (window.getSelection && document.createRange) {
+                // Always full-select this element (do not key off isCollapsed:
+                // selection may still cover the *previous* SPAN after leave).
+                selection = window.getSelection()
+                selection.removeAllRanges()
+                range = document.createRange()
+                range.selectNodeContents(element)
+                selection.addRange(range)
+            } else if (document.selection && document.body.createTextRange) {
+                range = document.body.createTextRange()
+                range.moveToElementText(element)
+                range.select()
             }
-
         } catch (e) { }
 
     // Re-assert focus only if the browser is no longer on this control (e.g.
