@@ -964,7 +964,7 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
 
     if (value !== '') {
 
-        var nozero = params[0] && String(params[0]).slice(-1) == 'Z'
+        var nozero = params[0].slice(-1) == 'Z'
         if (nozero) params[0] = params[0].slice(0, -1)
 
         if (params[0] == 'BASE' && gbasefmt) {
@@ -978,12 +978,13 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
                 params[0] = gndecs.toString()
         }
 
-        // After normal comma analysis: INTEGER etc. force ndecs (still allow Z via nozero above)
+        var ndecimals
+        if (params[0].match(/^\d+$/))
+            ndecimals = exodusnumber(params[0])
+        // Final stage only: force ndecs without rewriting params (INTEGER passes 0)
         if (typeof forced_ndecs != 'undefined' && forced_ndecs !== null && forced_ndecs !== '')
-            params[0] = String(forced_ndecs)
-
-        if (params[0].match(/^\d+$/)) {
-            var ndecimals = exodusnumber(params[0])
+            ndecimals = exodusnumber(forced_ndecs)
+        if (typeof ndecimals != 'undefined') {
             value = exodusround(value, ndecimals)
             if (ndecimals > 0) {
                 var temp = value.toString().split(".")
