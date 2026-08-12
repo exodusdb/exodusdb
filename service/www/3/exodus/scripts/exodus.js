@@ -843,7 +843,10 @@ function INDENTED(mode, value, params) {
 //   before Z/BASE/NDECS analysis (Z kept from original params[0] if present).
 // DECIMAL / INTEGER — pass all params through; display false (no thousands).
 // ROUND is a legacy alias for DECIMAL.
-// No global paint flag.
+//
+// Returns: null + gmsg on validation fail; "" only for blank input or Z zero-suppress.
+// App note: production uses OCONV for paint/display; ICONV mainly for debugging /
+//   explicit validate. Do not "clean" load-bearing quirks without dict audit.
 
 function DECIMAL(mode, value, params) {
     return NUMBER(mode, value, params, false)
@@ -861,6 +864,9 @@ function ROUND(mode, value, params) {
 
 function NUMBER(mode, value, params, display, forced_ndecs) {
 
+    // OCONV usually converts (pad/round/group); hard fail → null (not the input unchanged).
+    // Multivalue is per-mv (fm/vm/sm); any cell null → whole result null (not leave bad mvs as-is).
+
     /*
      * params (comma-separated; CURRENCY/UNIT may appear in any slot):
      *   decimals | NDECS | BASE | nZ — decimal places
@@ -871,7 +877,18 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
      * display (default true): OCONV adds thousands when BASEFMT ends with ,
      *   and MD/MC decimal character. false = plain (re-entrable) after ndecs.
      * forced_ndecs: optional; becomes params[0] (ndecs) before analysis; Z preserved from old params[0].
-     * ICONV always strips grouping; peels unit only when CURRENCY set.
+     *
+     * Unit peel (deliberate — not a bug):
+     *   ICONV peels letter suffix only when CURRENCY|UNIT in params (strict store shape).
+     *   OCONV peels when CURRENCY|UNIT OR display — so SPAN paint can reformat
+     *   amount+unit (e.g. 1042.5USD → 1,042.50USD) without the CURRENCY token.
+     *   App relies on OCONV path; ICONV is mainly for debugging.
+     *
+     * Other load-bearing quirks (label, don't "fix" casually):
+     *   JS number 0 hits value=='' early (forms usually pass strings).
+     *   Z + unit zero → unit-only string (e.g. "USD") after blanking the amount.
+     *   CURRENCY token filtered out of params → later slots become min/max (shift).
+     *   MC OCONV of internal values with '.' decimal can mangle (MC treats '.' as thousands).
      */
 
     if (typeof display == 'undefined')
@@ -883,12 +900,19 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
         return exodusconvarray(NUMBER, mode, value, params, display, forced_ndecs)
 
     if (typeof value == 'string') {
-        if (value.indexOf(fm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(fm), params, display, forced_ndecs).join(fm)
-        else if (value.indexOf(vm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(vm), params, display, forced_ndecs).join(vm)
-        else if (value.indexOf(sm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(sm), params, display, forced_ndecs).join(sm)
+        // exodusconvarray returns null if any cell fails — do not .join null
+        if (value.indexOf(fm) + 1) {
+            var rfm = exodusconvarray(NUMBER, mode, value.split(fm), params, display, forced_ndecs)
+            return rfm == null ? null : rfm.join(fm)
+        }
+        else if (value.indexOf(vm) + 1) {
+            var rvm = exodusconvarray(NUMBER, mode, value.split(vm), params, display, forced_ndecs)
+            return rvm == null ? null : rvm.join(vm)
+        }
+        else if (value.indexOf(sm) + 1) {
+            var rsm = exodusconvarray(NUMBER, mode, value.split(sm), params, display, forced_ndecs)
+            return rsm == null ? null : rsm.join(sm)
+        }
     }
 
     if (value == '')
@@ -909,6 +933,8 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
     params = paramsFiltered
 
     var unitSuffix = ''
+    // Deliberate: OCONV+display peels unit even without CURRENCY (SPAN paint).
+    // ICONV peels only when allowCurrency (CURRENCY|UNIT param).
     var peelUnit = allowCurrency || (mode != 'ICONV' && display)
     if (peelUnit) {
         try {
