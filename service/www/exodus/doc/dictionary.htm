@@ -58,10 +58,15 @@
 	(amounts, grouping when BASEFMT groups)
 </UL>
 <P>Examples: <code>exodus_dict_number(di, { decimals: 'CURRENCY' })</code>;
-	<code>exodus_dict_number(di, { decimals: 0, plain: true })</code>
-	(→ <code>[INTEGER]</code>);
+	<code>exodus_dict_integer(di, { min: 0 })</code>
+	(→ <code>[INTEGER,0,0,]</code> / counts; forces decimals 0 + plain);
 	<code>exodus_dict_number(di, { min: 0, max: 100 })</code>
 	(not <code>decimals: ''</code>).</P>
+<H4>exodus_dict_integer(dictitem, opts)</H4>
+<P>Counts, days, sequences — bag-only shim to <code>exodus_dict_number</code>.
+	Copies <EM>opts</EM>; sets <EM>decimals</EM> 0 and <EM>plain</EM> true only if
+	not already set. Typical: <code>exodus_dict_integer(di, { min: 0 })</code>.
+	Do not pass string/positional args (e.g. <code>"0Z"</code>).</P>
 <H4>exodus_dict_text(dictitem,length,rows)</H4>
 <P>Free text field (align T, lowercase true). The field expands to the available
 	cell width; that is the normal layout.</P>

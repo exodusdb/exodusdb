@@ -18,7 +18,8 @@
 
 ```js
 exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts
-exodus_dict_number(di, { decimals: 0, plain: true })       // [INTEGER] counts/days/sequences
+exodus_dict_integer(di, { min: 0, max: 100 })              // = number({ decimals:0, plain:true, min, max })
+exodus_dict_integer(di)                                    // [INTEGER]
 exodus_dict_number(di)                                     // same as {}
 ```
 

@@ -375,9 +375,30 @@ function exodus_dict_date(dicti,params) {
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
 //   exodus_dict_number(di, { decimals: 0, plain: true })  // → [INTEGER] or [INTEGER,0,min,max]
+//   exodus_dict_integer(di, { min: 0, max: 100 })         // preferred for counts (forces decimals 0 + plain)
 //   exodus_dict_number(di, { min: 0, max: 100 })   // not decimals:''
 //   exodus_dict_number(di)  // all defaults
 //
+// Counts / days / sequences. Bag only (not string "0Z" etc.).
+// Copies opts; sets decimals:0 and plain:true only when not already set.
+// Typical: exodus_dict_integer(di, { min: 0 }) → same as
+//   exodus_dict_number(di, { decimals: 0, plain: true, min: 0 })
+function exodus_dict_integer(dicti, opts) {
+ if (!opts)
+  opts = {}
+ exodusassertobject(dicti, 'exodus_dict_integer', 'dicti')
+ var bag = {}
+ for (var k in opts) {
+  if (Object.prototype.hasOwnProperty.call(opts, k))
+   bag[k] = opts[k]
+ }
+ if (typeof bag.decimals == 'undefined' || bag.decimals == null)
+  bag.decimals = 0
+ if (typeof bag.plain == 'undefined')
+  bag.plain = true
+ return exodus_dict_number(dicti, bag)
+}
+
 function exodus_dict_number(dicti, opts) {
 
  if (!opts)
