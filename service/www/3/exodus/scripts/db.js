@@ -366,7 +366,7 @@ function exodus_dict_date(dicti,params) {
 // Numeric dict field. opts bag only.
 // Defaults (omit the key — do not pass '' / null / false):
 //   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
-//   min      → ''   number | 'POSITIVE'
+//   min      → ''   number (use 0 for non-negative)
 //   max      → ''   number
 //   plain    → false  true → [DECIMAL,…] or, when decimals is 0:
 //                       [INTEGER] / [INTEGER,0,min,max] (keep ,0 so min/max slots stay put)

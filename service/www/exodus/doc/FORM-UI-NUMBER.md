@@ -26,7 +26,7 @@ exodus_dict_number(di)                                     // same as {}
 | `opts` key | Default if omitted | Role |
 |------------|--------------------|------|
 | `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` |
-| `min` / `max` | `''` | ICONV limits; `min: 'POSITIVE'` |
+| `min` / `max` | `''` | ICONV limits (numeric; use `min: 0` for non-negative) |
 | `plain` | `false` | `true` → `[DECIMAL,…]`, or **`[INTEGER]`** / **`[INTEGER,0,min,max]`** when `decimals` is 0; omit → `[NUMBER,…]` |
 
 **Omit defaults** — do not write `decimals: ''`, `min: ''`, or `plain: false`.  
@@ -66,7 +66,7 @@ How DECIMAL/INTEGER ask NUMBER for plain / 0 dp is an **implementation detail** 
 ## 3. Parameters (same slots for NUMBER, DECIMAL, INTEGER)
 
 ```text
-[NUMBER|DECIMAL|INTEGER, <decimals>, <min|POSITIVE>, <max>]
+[NUMBER|DECIMAL|INTEGER, <decimals>, <min>, <max>]
 ```
 
 Examples: `[NUMBER,2]`, `[DECIMAL,2,0,100]`, `[INTEGER]`, `[INTEGER,Z]`, `[INTEGER,0,0,999999]`.
@@ -76,7 +76,7 @@ Examples: `[NUMBER,2]`, `[DECIMAL,2,0,100]`, `[INTEGER]`, `[INTEGER,Z]`, `[INTEG
 | Param | Effect |
 |-------|--------|
 | digit / empty / `NDECS` / `BASE` / `nZ` | **Decimal places** (and zero-suppress). INTEGER forces 0 at runtime; with min/max keep a `0` in this slot so min/max stay in the right positions. |
-| min / max / `POSITIVE` | ICONV limits |
+| min / max | ICONV numeric limits |
 | `CURRENCY` / `UNIT` | amount+unit |
 
 These do **not** select thousands by name. Grouping is:

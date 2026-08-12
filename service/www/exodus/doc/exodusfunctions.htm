@@ -253,8 +253,8 @@
 <P>NDECS in which case the number of decimal places will be taken from the global 
 	variable gndecs if defined or getrecord('NDECS') if not</P>
 <P>ICONV</P>
-<P>mode2 can be "POSITIVE" in which case the conversion will fail if the input is 
-	negative</P>
+<P>mode2 can be a numeric minimum (e.g. 0 for non-negative); conversion fails if
+	the input is less than that value</P>
 <H3>PERIOD_OF_YEAR(type,input,mode)</H3>
 <P>type=ICONV/OCONV<br />
 	input internal format is 1/99<br />

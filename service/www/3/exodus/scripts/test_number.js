@@ -200,13 +200,14 @@ check('NDECS from gds', NUMBER('OCONV', '1234567.85', 'NDECS'), '1234567.9')
 gndecs = 2
 globalThis.gds = undefined
 
-// --- POSITIVE / min / max ---
-console.log('\n--- POSITIVE / min / max ---')
+// --- min / max (min: 0 = non-negative; former POSITIVE keyword) ---
+console.log('\n--- min / max ---')
 gbasefmt = 'MD2,'
 gmsg = ''
-check('POSITIVE reject', NUMBER('ICONV', '-1234567.5', '2,POSITIVE'), null)
-check('POSITIVE gmsg', gmsg.indexOf('negative') >= 0, true)
-check('POSITIVE accept', NUMBER('ICONV', '1234567.5', '2,POSITIVE'), '1234567.50')
+check('min0 reject neg', NUMBER('ICONV', '-1234567.5', '2,0'), null)
+check('min0 gmsg', gmsg.indexOf('less than') >= 0, true)
+check('min0 accept 0', NUMBER('ICONV', '0', '2,0'), '0.00')
+check('min0 accept pos', NUMBER('ICONV', '1234567.5', '2,0'), '1234567.50')
 check('min reject', NUMBER('ICONV', '1000', '2,5000'), null)
 check('min gmsg', gmsg.indexOf('less than') >= 0, true)
 check('min accept', NUMBER('ICONV', '5000', '2,5000'), '5000.00')
@@ -216,7 +217,7 @@ check('max accept', NUMBER('ICONV', '1000000', '2,,1000000'), '1000000.00')
 check('min+max range', NUMBER('ICONV', '1234567', '0,1000,9999999'), '1234567')
 check('min reject is not ""', NUMBER('ICONV', '1', '2,5') === '', false)
 check('max reject is not ""', NUMBER('ICONV', '9999999', '2,,1000') === '', false)
-check('POSITIVE reject is not ""', NUMBER('ICONV', '-1', '2,POSITIVE') === '', false)
+check('min0 reject is not ""', NUMBER('ICONV', '-1', '2,0') === '', false)
 check('min equal boundary', NUMBER('ICONV', '1000', '0,1000,9999999'), '1000')
 check('max equal boundary', NUMBER('ICONV', '9999999', '0,1000,9999999'), '9999999')
 
@@ -360,8 +361,8 @@ if (!hasCurrency) {
     check('CURRENCY mid shifts min → null', NUMBER('ICONV', '1234567USD', '2,CURRENCY,9999999'), null)
     check('CURRENCY mid min gmsg', gmsg.indexOf('less than') >= 0, true)
     check('CURRENCY + min/max ok', NUMBER('ICONV', '1234567USD', '0,1000,9999999,CURRENCY'), '1234567USD')
-    check('CURRENCY + POSITIVE reject', NUMBER('ICONV', '-1234567USD', '2,POSITIVE,CURRENCY'), null)
-    check('CURRENCY + POSITIVE accept', NUMBER('ICONV', '1234567USD', '2,POSITIVE,CURRENCY'), '1234567.00USD')
+    check('CURRENCY + min0 reject', NUMBER('ICONV', '-1234567USD', '2,0,CURRENCY'), null)
+    check('CURRENCY + min0 accept', NUMBER('ICONV', '1234567USD', '2,0,CURRENCY'), '1234567.00USD')
     check('CURRENCY 0Z → unit only', NUMBER('ICONV', '0USD', '0Z,CURRENCY'), 'USD')
     check('CURRENCY 0Z 0.4→0 → unit only', NUMBER('ICONV', '0.4USD', '0Z,CURRENCY'), 'USD')
     check('CURRENCY 2Z keeps 0.01', NUMBER('ICONV', '0.01USD', '2Z,CURRENCY'), '0.01USD')
@@ -450,7 +451,8 @@ if (!hasInteger) {
     check('INTEGER max reject → null', INTEGER('ICONV', '99999999', '0,0,9999999'), null)
     check('INTEGER max reject gmsg', gmsg.indexOf('more than') >= 0, true)
     check('INTEGER,Z keeps non-zero', INTEGER('OCONV', '1234567.4', 'Z'), '1234567')
-    check('INTEGER POSITIVE reject', INTEGER('ICONV', '-1', '0,POSITIVE'), null)
+    check('INTEGER min0 reject', INTEGER('ICONV', '-1', '0,0'), null)
+    check('INTEGER min0 accept 0', INTEGER('ICONV', '0', '0,0'), '0')
     check('INTEGER empty → ""', INTEGER('OCONV', '', ''), '')
 }
 

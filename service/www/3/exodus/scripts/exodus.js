@@ -870,7 +870,7 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
     /*
      * params (comma-separated; CURRENCY/UNIT may appear in any slot):
      *   decimals | NDECS | BASE | nZ — decimal places
-     *   POSITIVE | min — params[1]
+     *   min — params[1] (numeric floor; use 0 for non-negative)
      *   max — params[2]
      *   CURRENCY | UNIT — amount+unit (1042.00USD)
      *
@@ -1028,11 +1028,6 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
 
     var result
     if (mode == 'ICONV') {
-
-        if (value < 0 && params[1] == 'POSITIVE') {
-            gmsg = value + ' is negative but must be positive'
-            return null
-        }
 
         if (params[1] != '' && exodusnum(params[1]) && value < +params[1]) {
             gmsg = value + ' must not be less than ' + params[1]
