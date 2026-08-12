@@ -689,7 +689,7 @@ function exodusround(number, ndecimals) {
     return number2
 }
 
-// Member form — mid-calc integer/dp round (prefer over .exodusoconv('[DECIMAL,0]'))
+// Member form — mid-calc integer/dp round (prefer over .exodusoconv('[INTEGER]'))
 Number.prototype.exodusround = function (ndecimals) {
     return exodusround(+this, ndecimals)
 }
@@ -796,10 +796,10 @@ function exodusmod(num, div) {
 //TIME AND DATE FUNCTIONS
 /////////////////////////
 
-function exodusconvarray(functionx, mode, value, params, display) {
+function exodusconvarray(functionx, mode, value, params, display, forced_ndecs) {
     var result = []
     for (var ii = 0; ii < value.length; ii++) {
-        result[ii] = functionx(mode, value[ii], params, display)
+        result[ii] = functionx(mode, value[ii], params, display, forced_ndecs)
         //if any conversion fails return complete failure
         if (result[ii] == null)
             return null
@@ -839,7 +839,9 @@ function INDENTED(mode, value, params) {
 
 // NUMBER: ICONV/OCONV for numeric fields.
 // 4th arg `display` (default true): OCONV applies gbasefmt grouping/MD-MC when true.
-// DECIMAL / INTEGER — shims: same params as NUMBER, display false (no thousands).
+// 5th arg `forced_ndecs`: if set (e.g. INTEGER passes 0), overrides decimals from params
+//   but zero-suppress still honours Z in the first comma-arg (e.g. 0Z, Z).
+// DECIMAL / INTEGER — pass all params through; display false (no thousands).
 // ROUND is a legacy alias for DECIMAL.
 // No global paint flag.
 
@@ -848,7 +850,8 @@ function DECIMAL(mode, value, params) {
 }
 
 function INTEGER(mode, value, params) {
-    return NUMBER(mode, value, params, false)
+    // Same params as NUMBER/DECIMAL; force 0 decimal places (Z still from first arg)
+    return NUMBER(mode, value, params, false, 0)
 }
 
 // Legacy alias — prefer DECIMAL / [DECIMAL,…]
@@ -856,7 +859,7 @@ function ROUND(mode, value, params) {
     return DECIMAL(mode, value, params)
 }
 
-function NUMBER(mode, value, params, display) {
+function NUMBER(mode, value, params, display, forced_ndecs) {
 
     /*
      * params (comma-separated; CURRENCY/UNIT may appear in any slot):
@@ -867,6 +870,7 @@ function NUMBER(mode, value, params, display) {
      *
      * display (default true): OCONV adds thousands when BASEFMT ends with ,
      *   and MD/MC decimal character. false = plain (re-entrable) after ndecs.
+     * forced_ndecs: optional override for decimal places (INTEGER passes 0).
      * ICONV always strips grouping; peels unit only when CURRENCY set.
      */
 
@@ -876,15 +880,15 @@ function NUMBER(mode, value, params, display) {
     gmsg = ''
 
     if (typeof value == 'object')
-        return exodusconvarray(NUMBER, mode, value, params, display)
+        return exodusconvarray(NUMBER, mode, value, params, display, forced_ndecs)
 
     if (typeof value == 'string') {
         if (value.indexOf(fm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(fm), params, display).join(fm)
+            return exodusconvarray(NUMBER, mode, value.split(fm), params, display, forced_ndecs).join(fm)
         else if (value.indexOf(vm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(vm), params, display).join(vm)
+            return exodusconvarray(NUMBER, mode, value.split(vm), params, display, forced_ndecs).join(vm)
         else if (value.indexOf(sm) + 1)
-            return exodusconvarray(NUMBER, mode, value.split(sm), params, display).join(sm)
+            return exodusconvarray(NUMBER, mode, value.split(sm), params, display, forced_ndecs).join(sm)
     }
 
     if (value == '')
@@ -960,28 +964,43 @@ function NUMBER(mode, value, params, display) {
 
     if (value !== '') {
 
-        var nozero = params[0].slice(-1) == 'Z'
-        if (nozero) params[0] = params[0].slice(0, -1)
+        // Zero-suppress if first comma-arg contains Z (e.g. 0Z, Z) — even when forced_ndecs set
+        var p0 = params[0] != null ? String(params[0]) : ''
+        var nozero = p0.toUpperCase().indexOf('Z') >= 0
+        if (nozero && p0)
+            params[0] = p0.replace(/Z/gi, '')
 
-        if (params[0] == 'BASE' && gbasefmt) {
-            params[0] = gbasefmt.substr(2, 1)
-        }
-        if (params[0] == 'BASE') params = ['4']
-        if (params[0] == 'NDECS') {
-            if (typeof gndecs == 'undefined')
-                params[0] = gds.data['NDECS'].text
-            else
-                params[0] = gndecs.toString()
-        }
-
-        if (params[0].match(/^\d+$/)) {
-            var ndecimals = exodusnumber(params[0])
+        if (typeof forced_ndecs != 'undefined' && forced_ndecs !== null && forced_ndecs !== '') {
+            // INTEGER etc.: ndecs from 5th arg; ignore decimals token in params (min/max still used)
+            var ndecimals = exodusnumber(forced_ndecs)
             value = exodusround(value, ndecimals)
             if (ndecimals > 0) {
                 var temp = value.toString().split(".")
                 if (temp.length == 1)
                     temp[1] = ''
                 value = temp.join('.') + '00000000000000000000'.substr(0, ndecimals - temp[1].length)
+            }
+        } else {
+            if (params[0] == 'BASE' && gbasefmt) {
+                params[0] = gbasefmt.substr(2, 1)
+            }
+            if (params[0] == 'BASE') params = ['4']
+            if (params[0] == 'NDECS') {
+                if (typeof gndecs == 'undefined')
+                    params[0] = gds.data['NDECS'].text
+                else
+                    params[0] = gndecs.toString()
+            }
+
+            if (params[0].match(/^\d+$/)) {
+                var ndecimals = exodusnumber(params[0])
+                value = exodusround(value, ndecimals)
+                if (ndecimals > 0) {
+                    var temp = value.toString().split(".")
+                    if (temp.length == 1)
+                        temp[1] = ''
+                    value = temp.join('.') + '00000000000000000000'.substr(0, ndecimals - temp[1].length)
+                }
             }
         }
 

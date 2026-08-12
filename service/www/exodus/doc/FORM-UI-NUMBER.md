@@ -12,13 +12,13 @@
 |------------|------|
 | **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form (amounts: thousands when BASEFMT groups) |
 | **`[DECIMAL,…]`** | Same as NUMBER OCONV but **plain** (no thousands); may have fractional places |
-| **`[INTEGER,0,…]`** | Same shim as DECIMAL (plain NUMBER); by convention decimals param is `0` / `0Z` |
+| **`[INTEGER]` / `[INTEGER,min,max]`** | Shim like DECIMAL + **forced 0 dp** in NUMBER; optional first arg may carry `Z` for zero-suppress (`[INTEGER,Z]`) |
 
 **Dict helper** (`db.js`): bag only — `exodus_dict_number(di, opts)`.
 
 ```js
 exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts
-exodus_dict_number(di, { decimals: 0, plain: true })       // [INTEGER,0,…] counts/days/sequences
+exodus_dict_number(di, { decimals: 0, plain: true })       // [INTEGER] counts/days/sequences
 exodus_dict_number(di)                                     // same as {}
 ```
 
@@ -26,7 +26,7 @@ exodus_dict_number(di)                                     // same as {}
 |------------|--------------------|------|
 | `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` |
 | `min` / `max` | `''` | ICONV limits; `min: 'POSITIVE'` |
-| `plain` | `false` | `true` → `[DECIMAL,…]` or `[INTEGER,0,…]` if decimals is 0; omit → `[NUMBER,…]` |
+| `plain` | `false` | `true` → `[DECIMAL,…]` or `[INTEGER]` if decimals is 0; omit → `[NUMBER,…]` |
 
 **Omit defaults** — do not write `decimals: ''`, `min: ''`, or `plain: false`.  
 `exodus_dict_number(di, { min: 0, max: 100 })` not `{ decimals: '', min: 0, max: 100 }`.
@@ -55,7 +55,7 @@ function DECIMAL(mode, value, params) {
     return NUMBER(mode, value, params, false)
 }
 function INTEGER(mode, value, params) {
-    return NUMBER(mode, value, params, false)
+    return NUMBER(mode, value, params, false, 0)  // force 0 dp; Z still from first arg
 }
 // ROUND(...) is a legacy alias for DECIMAL
 ```
@@ -99,7 +99,7 @@ These do **not** select thousands by name. Grouping is:
 **Bad:** `(a + b).exodusoconv('[NUMBER,2]')` then more math.  
 **Good:** `.exodusoconv('[DECIMAL,2]')` or pure `exodusround(n, 2)` then continue; use **NUMBER** only for real external / field conversion.
 
-Amount fields: omit `plain` (or `plain: false`) so conversion is `[NUMBER,…]` and paint gets grouping. Non-amount integers: `plain: true` + `decimals: 0` → `[INTEGER,0,…]`.
+Amount fields: omit `plain` (or `plain: false`) so conversion is `[NUMBER,…]` and paint gets grouping. Non-amount integers: `plain: true` + `decimals: 0` → `[INTEGER]` (ndecs forced in shim).
 
 ---
 
