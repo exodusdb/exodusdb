@@ -9,7 +9,7 @@ Primary code: `../3/exodus/scripts/db.js` (`dictrec`, `exodus_dict_*`), `dbform.
 Related:
 
 - [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md)
-- **[FORM-UI-NUMBER.md](./FORM-UI-NUMBER.md)** — `[NUMBER…]` / `[ROUND…]`
+- **[FORM-UI-NUMBER.md](./FORM-UI-NUMBER.md)** — `[NUMBER…]` / `[DECIMAL…]`
 - **[FORM-UI-WIDE-NARROW.md](./FORM-UI-WIDE-NARROW.md)** — AIM + method of narrow free-text fold vs extreme-wide (`.exodusform-wide`, 30ch soft max, nest width rules)
 
 ---

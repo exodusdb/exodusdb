@@ -829,12 +829,18 @@ function INDENTED(mode, value, params) {
 
 // NUMBER: ICONV/OCONV for numeric fields.
 // 4th arg `display` (default true): OCONV applies gbasefmt grouping/MD-MC when true.
-// ROUND(...) / [ROUND,…] calls NUMBER with display false — plain after decimals
-// (intermediate math / re-entrable). Prefer ROUND over bare NUMBER oconv for rounding.
+// DECIMAL(...) / [DECIMAL,…] calls NUMBER with display false — plain after decimals
+// (intermediate math / re-entrable; no thousands grouping). Prefer DECIMAL over bare
+// NUMBER oconv for intermediate math. ROUND is a legacy alias for DECIMAL.
 // No global paint flag.
 
-function ROUND(mode, value, params) {
+function DECIMAL(mode, value, params) {
     return NUMBER(mode, value, params, false)
+}
+
+// Legacy alias — prefer DECIMAL / [DECIMAL,…]
+function ROUND(mode, value, params) {
+    return DECIMAL(mode, value, params)
 }
 
 function NUMBER(mode, value, params, display) {
@@ -898,7 +904,7 @@ function NUMBER(mode, value, params, display) {
     }
 
     // Normalize grouping for both ICONV and OCONV (accept plain or already-external).
-    // OCONV used to skip this → "23,504.00" failed exodusnum (setx double-format / ROUND).
+    // OCONV used to skip this → "23,504.00" failed exodusnum (setx double-format / DECIMAL).
     try {
         if (typeof gbasefmt == 'string' && gbasefmt.substr(0, 2) == 'MC') {
             value = String(value).replace(/\./g, '').replace(/,/g, '.')
@@ -1119,7 +1125,7 @@ function exodusaddunits(a, b) {
                     ndecs = ax.amount.exodusfield('.', 2).length
                     bndecs = bx.amount.exodusfield('.', 2).length
                     if (bndecs > ndecs) ndecs = bndecs
-                    if (exodusnum(ax.amount) && exodusnum(bx.amount)) b[bn] = (Number(bx.amount) + Number(ax.amount)).exodusoconv('[ROUND,' + ndecs + ']') + ax.unit
+                    if (exodusnum(ax.amount) && exodusnum(bx.amount)) b[bn] = (Number(bx.amount) + Number(ax.amount)).exodusoconv('[DECIMAL,' + ndecs + ']') + ax.unit
                 }
                 else {
                     b[bn] = ax.unit

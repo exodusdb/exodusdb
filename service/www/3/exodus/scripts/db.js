@@ -368,7 +368,7 @@ function exodus_dict_date(dicti,params) {
 //   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
 //   min      → ''   number | 'POSITIVE'
 //   max      → ''   number
-//   plain    → false  true → [ROUND,…] (no thousands; ids/counts/sequences)
+//   plain    → false  true → [DECIMAL,…] (no thousands; ids/counts/sequences)
 //                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
@@ -395,7 +395,7 @@ function exodus_dict_number(dicti, opts) {
   maximum = ''
 
  var params = String(decimals) + ',' + minimum + ',' + maximum
- var kind = opts.plain ? 'ROUND' : 'NUMBER'
+ var kind = opts.plain ? 'DECIMAL' : 'NUMBER'
  dicti.conversion = '[' + kind + ',' + params + ']'
 
  // Style axis for dbform paint (exostyle number). Prefer dict_number over
@@ -1008,8 +1008,8 @@ function addfield(rec,fieldname,fieldtext) {
    }
   }
   
-  // ROUND is non-amount number paint (same numeric store check as NUMBER)
-  var numberdateconvs=/(^\[DATE)|(^\[NUMBER)|(^\[ROUND).*/
+  // DECIMAL (legacy ROUND) = plain number; same numeric store check as NUMBER
+  var numberdateconvs=/(^\[DATE)|(^\[NUMBER)|(^\[DECIMAL)|(^\[ROUND).*/
   
   //split all old fields into arrays of multivalues (will be re-joined later)
   for (var fieldno=0;fieldno<nfields;fieldno++) rev[fieldno]=rev[fieldno].split()
