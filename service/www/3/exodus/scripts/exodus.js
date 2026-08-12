@@ -839,8 +839,8 @@ function INDENTED(mode, value, params) {
 
 // NUMBER: ICONV/OCONV for numeric fields.
 // 4th arg `display` (default true): OCONV applies gbasefmt grouping/MD-MC when true.
-// 5th arg `forced_ndecs`: if set (e.g. INTEGER passes 0), overrides decimals from params
-//   but zero-suppress still honours Z in the first comma-arg (e.g. 0Z, Z).
+// 5th arg `forced_ndecs`: if set (e.g. INTEGER passes 0), written into params[0]
+//   before Z/BASE/NDECS analysis (Z kept from original params[0] if present).
 // DECIMAL / INTEGER — pass all params through; display false (no thousands).
 // ROUND is a legacy alias for DECIMAL.
 // No global paint flag.
@@ -870,7 +870,7 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
      *
      * display (default true): OCONV adds thousands when BASEFMT ends with ,
      *   and MD/MC decimal character. false = plain (re-entrable) after ndecs.
-     * forced_ndecs: optional override for decimal places (INTEGER passes 0).
+     * forced_ndecs: optional; becomes params[0] (ndecs) before analysis; Z preserved from old params[0].
      * ICONV always strips grouping; peels unit only when CURRENCY set.
      */
 
@@ -964,6 +964,13 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
 
     if (value !== '') {
 
+        // INTEGER etc.: force ndecs via params[0] before the usual analysis fork.
+        // Capture Z first so zero-suppress still comes from params[0] below.
+        if (typeof forced_ndecs != 'undefined' && forced_ndecs !== null && forced_ndecs !== '') {
+            var keepZ = params[0].slice(-1) == 'Z'
+            params[0] = String(forced_ndecs) + (keepZ ? 'Z' : '')
+        }
+
         var nozero = params[0].slice(-1) == 'Z'
         if (nozero) params[0] = params[0].slice(0, -1)
 
@@ -978,13 +985,8 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
                 params[0] = gndecs.toString()
         }
 
-        var ndecimals
-        if (params[0].match(/^\d+$/))
-            ndecimals = exodusnumber(params[0])
-        // Final stage only: force ndecs without rewriting params (INTEGER passes 0)
-        if (typeof forced_ndecs != 'undefined' && forced_ndecs !== null && forced_ndecs !== '')
-            ndecimals = exodusnumber(forced_ndecs)
-        if (typeof ndecimals != 'undefined') {
+        if (params[0].match(/^\d+$/)) {
+            var ndecimals = exodusnumber(params[0])
             value = exodusround(value, ndecimals)
             if (ndecimals > 0) {
                 var temp = value.toString().split(".")
