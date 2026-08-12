@@ -368,12 +368,13 @@ function exodus_dict_date(dicti,params) {
 //   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
 //   min      → ''   number | 'POSITIVE'
 //   max      → ''   number
-//   plain    → false  true → [DECIMAL,…] or [INTEGER] / [INTEGER,min,max] when decimals is 0
+//   plain    → false  true → [DECIMAL,…] or, when decimals is 0:
+//                       [INTEGER] / [INTEGER,0,min,max] (keep ,0 so min/max slots stay put)
 //                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
-//   INTEGER forces ndecs 0 in NUMBER (5th arg); conversion string omits redundant ,0
+//   INTEGER forces ndecs 0 at runtime; conversion string omits lone ,0 when no min/max
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
-//   exodus_dict_number(di, { decimals: 0, plain: true })  // → [INTEGER] or [INTEGER,min,max]
+//   exodus_dict_number(di, { decimals: 0, plain: true })  // → [INTEGER] or [INTEGER,0,min,max]
 //   exodus_dict_number(di, { min: 0, max: 100 })   // not decimals:''
 //   exodus_dict_number(di)  // all defaults
 //

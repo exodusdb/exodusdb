@@ -12,7 +12,7 @@
 |------------|------|
 | **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form (amounts: thousands when BASEFMT groups) |
 | **`[DECIMAL,…]`** | Same as NUMBER OCONV but **plain** (no thousands); may have fractional places |
-| **`[INTEGER]` / `[INTEGER,min,max]`** | Shim like DECIMAL + **forced 0 dp** in NUMBER; optional first arg may carry `Z` for zero-suppress (`[INTEGER,Z]`) |
+| **`[INTEGER]`** | Plain, **0 decimal places** (counts/days/sequences). Optional zero-suppress: **`[INTEGER,Z]`** / **`[INTEGER,0Z]`**. With min/max keep the decimals slot: **`[INTEGER,0,min,max]`** (not `[INTEGER,min,max]` — that would mis-bind min into the max slot) |
 
 **Dict helper** (`db.js`): bag only — `exodus_dict_number(di, opts)`.
 
@@ -26,7 +26,7 @@ exodus_dict_number(di)                                     // same as {}
 |------------|--------------------|------|
 | `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` |
 | `min` / `max` | `''` | ICONV limits; `min: 'POSITIVE'` |
-| `plain` | `false` | `true` → `[DECIMAL,…]` or `[INTEGER]` if decimals is 0; omit → `[NUMBER,…]` |
+| `plain` | `false` | `true` → `[DECIMAL,…]`, or **`[INTEGER]`** / **`[INTEGER,0,min,max]`** when `decimals` is 0; omit → `[NUMBER,…]` |
 
 **Omit defaults** — do not write `decimals: ''`, `min: ''`, or `plain: false`.  
 `exodus_dict_number(di, { min: 0, max: 100 })` not `{ decimals: '', min: 0, max: 100 }`.
@@ -45,49 +45,42 @@ There is **no** conversion name `AMOUNT`. Amount fields use NUMBER (often `CURRE
 
 ---
 
-## 2. `display` argument (no global flag)
+## 2. Grouping vs plain (conversion name)
 
-```js
-function NUMBER(mode, value, params, display)
-// display default **true**
+Call via conversion strings / shims — not by hand-passing extra args into `NUMBER`:
 
-function DECIMAL(mode, value, params) {
-    return NUMBER(mode, value, params, false)
-}
-function INTEGER(mode, value, params) {
-    return NUMBER(mode, value, params, false, 0)  // force 0 dp; Z still from first arg
-}
-// ROUND(...) is a legacy alias for DECIMAL
-```
-
-| Call | `display` | OCONV result |
-|------|-----------|--------------|
-| `.exodusoconv('[NUMBER,2]')` / bind / setx | **true** (default) | decimals + **grouping** when BASEFMT ends with `,` |
-| `.exodusoconv('[DECIMAL,2]')` / `DECIMAL(...)` | **false** | decimals only, plain `1000.00` |
+| Call | OCONV |
+|------|--------|
+| `.exodusoconv('[NUMBER,2]')` / bind / setx | decimals + **grouping** when BASEFMT ends with `,` |
+| `.exodusoconv('[DECIMAL,2]')` / `DECIMAL(...)` | decimals only, plain `1000.00` |
+| `.exodusoconv('[INTEGER]')` / `INTEGER(...)` | **0 dp**, plain (no thousands) |
+| `ROUND(...)` | legacy alias for `DECIMAL` |
 
 Both ICONV and OCONV **normalize** grouping before parse (accept plain or already-external).  
-`display` only controls whether OCONV **re-applies** thousands after decimals.  
+How DECIMAL/INTEGER ask NUMBER for plain / 0 dp is an **implementation detail** (not a public conversion parameter).  
 **No** `gnumber_oconv_display` / begin/end.
 
 ---
 
-## 3. Parameters (same for NUMBER and DECIMAL)
+## 3. Parameters (same slots for NUMBER, DECIMAL, INTEGER)
 
 ```text
 [NUMBER|DECIMAL|INTEGER, <decimals>, <min|POSITIVE>, <max>]
 ```
 
+Examples: `[NUMBER,2]`, `[DECIMAL,2,0,100]`, `[INTEGER]`, `[INTEGER,Z]`, `[INTEGER,0,0,999999]`.
+
 `CURRENCY` / `UNIT` may appear in any slot.
 
 | Param | Effect |
 |-------|--------|
-| digit / empty / `NDECS` / `BASE` / `nZ` | **Decimal places** (and zero-suppress) |
+| digit / empty / `NDECS` / `BASE` / `nZ` | **Decimal places** (and zero-suppress). INTEGER forces 0 at runtime; with min/max keep a `0` in this slot so min/max stay in the right positions. |
 | min / max / `POSITIVE` | ICONV limits |
 | `CURRENCY` / `UNIT` | amount+unit |
 
 These do **not** select thousands by name. Grouping is:
 
-- **OCONV + display true** + **`gbasefmt` ends with `,`**, and  
+- **NUMBER OCONV** + **`gbasefmt` ends with `,`**, and  
 - MD vs MC for **which** character is decimal vs thousands.
 
 `gbasefmt` (cookie `bf`) is fixed for the session (company format).
@@ -116,7 +109,7 @@ For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when 
 | Concern | Where |
 |---------|--------|
 | `NUMBER` / `DECIMAL` / `INTEGER` | `exodus.js` |
-| Dict helper | `db.js` → `exodus_dict_number(di, opts)` → `[NUMBER,…]` or `[DECIMAL,…]` if `plain` |
+| Dict helper | `db.js` → `exodus_dict_number(di, opts)` → `[NUMBER,…]`, or `[DECIMAL,…]` / `[INTEGER]` / `[INTEGER,0,min,max]` when `plain` |
 | Pure numeric round | `exodus.js` → `exodusround` |
 | BASEFMT | `client.js` → `gbasefmt`, `gthousands_regex` |
 | DOM read | `dbform.js` → `getvalue` (external), `getvalue_internal` (ICONV) |

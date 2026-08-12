@@ -51,12 +51,15 @@
 	append Z to suppress zeroes
 	<LI><EM>min</EM> (default empty) — number or "POSITIVE"
 	<LI><EM>max</EM> (default empty) — number
-	<LI><EM>plain</EM> (default false) — true → conversion <code>[DECIMAL,…]</code>
-	(no thousands; ids/counts); omit → <code>[NUMBER,…]</code>
+	<LI><EM>plain</EM> (default false) — true → <code>[DECIMAL,…]</code>
+	(no thousands), or when <EM>decimals</EM> is 0 → <code>[INTEGER]</code>
+	/ <code>[INTEGER,0,min,max]</code> (forced 0 dp; keep the <code>0</code> slot
+	so min/max stay in the right places); omit → <code>[NUMBER,…]</code>
 	(amounts, grouping when BASEFMT groups)
 </UL>
 <P>Examples: <code>exodus_dict_number(di, { decimals: 'CURRENCY' })</code>;
-	<code>exodus_dict_number(di, { decimals: 0, plain: true })</code>;
+	<code>exodus_dict_number(di, { decimals: 0, plain: true })</code>
+	(→ <code>[INTEGER]</code>);
 	<code>exodus_dict_number(di, { min: 0, max: 100 })</code>
 	(not <code>decimals: ''</code>).</P>
 <H4>exodus_dict_text(dictitem,length,rows)</H4>

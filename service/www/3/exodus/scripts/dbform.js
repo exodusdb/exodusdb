@@ -1459,10 +1459,11 @@ async function formfunctions_onload() {
                 typeof (element.getAttribute('exodusconversion')) == 'string'
             ) {
                 var convU = element.getAttribute('exodusconversion').toUpperCase()
-                if (convU.indexOf('[NUMBER') >= 0
-                    || convU.indexOf('[DECIMAL') >= 0
-                    || convU.indexOf('[INTEGER') >= 0
-                    || convU.indexOf('[ROUND') >= 0
+                // Prefix match (same as form_field_exostyle) — not substring anywhere
+                if (convU.indexOf('[NUMBER') === 0
+                    || convU.indexOf('[DECIMAL') === 0
+                    || convU.indexOf('[INTEGER') === 0
+                    || convU.indexOf('[ROUND') === 0
                     || convU.indexOf('[DATE_TIME') >= 0
                     || /^\[DATE([,\]]|$)/.test(convU))
                     element.setAttribute('exodusalign', 'R')
