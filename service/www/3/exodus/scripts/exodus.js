@@ -964,43 +964,32 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
 
     if (value !== '') {
 
-        // Zero-suppress if first comma-arg contains Z (e.g. 0Z, Z) — even when forced_ndecs set
-        var p0 = params[0] != null ? String(params[0]) : ''
-        var nozero = p0.toUpperCase().indexOf('Z') >= 0
-        if (nozero && p0)
-            params[0] = p0.replace(/Z/gi, '')
+        var nozero = params[0] && String(params[0]).slice(-1) == 'Z'
+        if (nozero) params[0] = params[0].slice(0, -1)
 
-        if (typeof forced_ndecs != 'undefined' && forced_ndecs !== null && forced_ndecs !== '') {
-            // INTEGER etc.: ndecs from 5th arg; ignore decimals token in params (min/max still used)
-            var ndecimals = exodusnumber(forced_ndecs)
+        if (params[0] == 'BASE' && gbasefmt) {
+            params[0] = gbasefmt.substr(2, 1)
+        }
+        if (params[0] == 'BASE') params = ['4']
+        if (params[0] == 'NDECS') {
+            if (typeof gndecs == 'undefined')
+                params[0] = gds.data['NDECS'].text
+            else
+                params[0] = gndecs.toString()
+        }
+
+        // After normal comma analysis: INTEGER etc. force ndecs (still allow Z via nozero above)
+        if (typeof forced_ndecs != 'undefined' && forced_ndecs !== null && forced_ndecs !== '')
+            params[0] = String(forced_ndecs)
+
+        if (params[0].match(/^\d+$/)) {
+            var ndecimals = exodusnumber(params[0])
             value = exodusround(value, ndecimals)
             if (ndecimals > 0) {
                 var temp = value.toString().split(".")
                 if (temp.length == 1)
                     temp[1] = ''
                 value = temp.join('.') + '00000000000000000000'.substr(0, ndecimals - temp[1].length)
-            }
-        } else {
-            if (params[0] == 'BASE' && gbasefmt) {
-                params[0] = gbasefmt.substr(2, 1)
-            }
-            if (params[0] == 'BASE') params = ['4']
-            if (params[0] == 'NDECS') {
-                if (typeof gndecs == 'undefined')
-                    params[0] = gds.data['NDECS'].text
-                else
-                    params[0] = gndecs.toString()
-            }
-
-            if (params[0].match(/^\d+$/)) {
-                var ndecimals = exodusnumber(params[0])
-                value = exodusround(value, ndecimals)
-                if (ndecimals > 0) {
-                    var temp = value.toString().split(".")
-                    if (temp.length == 1)
-                        temp[1] = ''
-                    value = temp.join('.') + '00000000000000000000'.substr(0, ndecimals - temp[1].length)
-                }
             }
         }
 
