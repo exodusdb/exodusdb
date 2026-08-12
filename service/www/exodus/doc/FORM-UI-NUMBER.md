@@ -1,7 +1,7 @@
 # FORM-UI-NUMBER — `[NUMBER…]` / `[DECIMAL…]`
 
 **Location:** `service/www/exodus/doc/`  
-**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `exodusround`), `db.js` (`exodus_dict_number`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
+**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `INTEGER`, `exodusround`), `db.js` (`exodus_dict_number`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
 **See also:** [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [PROGRAMMERS_OVERVIEW.md](./PROGRAMMERS_OVERVIEW.md)
 
 ---
@@ -11,13 +11,14 @@
 | Conversion | Role |
 |------------|------|
 | **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form (amounts: thousands when BASEFMT groups) |
-| **`[DECIMAL,…]`** | Same numeric work as NUMBER OCONV but **plain** (no thousands) — intermediate math **and** non-amount integers (journal no, counts, sequences) |
+| **`[DECIMAL,…]`** | Same as NUMBER OCONV but **plain** (no thousands); may have fractional places |
+| **`[INTEGER,0,…]`** | Same shim as DECIMAL (plain NUMBER); by convention decimals param is `0` / `0Z` |
 
 **Dict helper** (`db.js`): bag only — `exodus_dict_number(di, opts)`.
 
 ```js
 exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts
-exodus_dict_number(di, { decimals: 0, plain: true })       // [DECIMAL,…] ids/counts/sequences
+exodus_dict_number(di, { decimals: 0, plain: true })       // [INTEGER,0,…] counts/days/sequences
 exodus_dict_number(di)                                     // same as {}
 ```
 
@@ -25,7 +26,7 @@ exodus_dict_number(di)                                     // same as {}
 |------------|--------------------|------|
 | `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` |
 | `min` / `max` | `''` | ICONV limits; `min: 'POSITIVE'` |
-| `plain` | `false` | `true` → `[DECIMAL,…]` (no thousands); omit → `[NUMBER,…]` |
+| `plain` | `false` | `true` → `[DECIMAL,…]` or `[INTEGER,0,…]` if decimals is 0; omit → `[NUMBER,…]` |
 
 **Omit defaults** — do not write `decimals: ''`, `min: ''`, or `plain: false`.  
 `exodus_dict_number(di, { min: 0, max: 100 })` not `{ decimals: '', min: 0, max: 100 }`.
@@ -53,6 +54,9 @@ function NUMBER(mode, value, params, display)
 function DECIMAL(mode, value, params) {
     return NUMBER(mode, value, params, false)
 }
+function INTEGER(mode, value, params) {
+    return NUMBER(mode, value, params, false)
+}
 // ROUND(...) is a legacy alias for DECIMAL
 ```
 
@@ -70,7 +74,7 @@ Both ICONV and OCONV **normalize** grouping before parse (accept plain or alread
 ## 3. Parameters (same for NUMBER and DECIMAL)
 
 ```text
-[NUMBER|DECIMAL, <decimals>, <min|POSITIVE>, <max>]
+[NUMBER|DECIMAL|INTEGER, <decimals>, <min|POSITIVE>, <max>]
 ```
 
 `CURRENCY` / `UNIT` may appear in any slot.
@@ -95,7 +99,7 @@ These do **not** select thousands by name. Grouping is:
 **Bad:** `(a + b).exodusoconv('[NUMBER,2]')` then more math.  
 **Good:** `.exodusoconv('[DECIMAL,2]')` or pure `exodusround(n, 2)` then continue; use **NUMBER** only for real external / field conversion.
 
-Amount fields: omit `plain` (or `plain: false`) so conversion is `[NUMBER,…]` and paint gets grouping. Non-amount integers: `plain: true` → `[DECIMAL,…]`.
+Amount fields: omit `plain` (or `plain: false`) so conversion is `[NUMBER,…]` and paint gets grouping. Non-amount integers: `plain: true` + `decimals: 0` → `[INTEGER,0,…]`.
 
 ---
 
@@ -111,7 +115,7 @@ For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when 
 
 | Concern | Where |
 |---------|--------|
-| `NUMBER` / `DECIMAL` | `exodus.js` |
+| `NUMBER` / `DECIMAL` / `INTEGER` | `exodus.js` |
 | Dict helper | `db.js` → `exodus_dict_number(di, opts)` → `[NUMBER,…]` or `[DECIMAL,…]` if `plain` |
 | Pure numeric round | `exodus.js` → `exodusround` |
 | BASEFMT | `client.js` → `gbasefmt`, `gthousands_regex` |

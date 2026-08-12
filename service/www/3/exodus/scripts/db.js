@@ -368,11 +368,12 @@ function exodus_dict_date(dicti,params) {
 //   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
 //   min      → ''   number | 'POSITIVE'
 //   max      → ''   number
-//   plain    → false  true → [DECIMAL,…] (no thousands; ids/counts/sequences)
+//   plain    → false  true → [DECIMAL,…] or [INTEGER,0,…] when decimals is 0
 //                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
+//   Same param layout always: decimals, min, max
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
-//   exodus_dict_number(di, { decimals: 0, plain: true })
+//   exodus_dict_number(di, { decimals: 0, plain: true })  // → [INTEGER,0,…]
 //   exodus_dict_number(di, { min: 0, max: 100 })   // not decimals:''
 //   exodus_dict_number(di)  // all defaults
 //
@@ -395,7 +396,9 @@ function exodus_dict_number(dicti, opts) {
   maximum = ''
 
  var params = String(decimals) + ',' + minimum + ',' + maximum
- var kind = opts.plain ? 'DECIMAL' : 'NUMBER'
+ var plain = !!opts.plain
+ var zeroDp = (decimals === 0 || decimals === '0')
+ var kind = plain ? (zeroDp ? 'INTEGER' : 'DECIMAL') : 'NUMBER'
  dicti.conversion = '[' + kind + ',' + params + ']'
 
  // Style axis for dbform paint (exostyle number). Prefer dict_number over
@@ -1008,9 +1011,9 @@ function addfield(rec,fieldname,fieldtext) {
    }
   }
   
-  // DECIMAL (legacy ROUND) = plain number; same numeric store check as NUMBER
-  var numberdateconvs=/(^\[DATE)|(^\[NUMBER)|(^\[DECIMAL)|(^\[ROUND).*/
-  
+  // NUMBER / DECIMAL / INTEGER (legacy ROUND) — numeric store check
+  var numberdateconvs=/(^\[DATE)|(^\[NUMBER)|(^\[DECIMAL)|(^\[INTEGER)|(^\[ROUND).*/
+
   //split all old fields into arrays of multivalues (will be re-joined later)
   for (var fieldno=0;fieldno<nfields;fieldno++) rev[fieldno]=rev[fieldno].split()
   

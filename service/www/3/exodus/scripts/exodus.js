@@ -839,12 +839,15 @@ function INDENTED(mode, value, params) {
 
 // NUMBER: ICONV/OCONV for numeric fields.
 // 4th arg `display` (default true): OCONV applies gbasefmt grouping/MD-MC when true.
-// DECIMAL(...) / [DECIMAL,…] calls NUMBER with display false — plain after decimals
-// (intermediate math / re-entrable; no thousands grouping). Prefer DECIMAL over bare
-// NUMBER oconv for intermediate math. ROUND is a legacy alias for DECIMAL.
+// DECIMAL / INTEGER — shims: same params as NUMBER, display false (no thousands).
+// ROUND is a legacy alias for DECIMAL.
 // No global paint flag.
 
 function DECIMAL(mode, value, params) {
+    return NUMBER(mode, value, params, false)
+}
+
+function INTEGER(mode, value, params) {
     return NUMBER(mode, value, params, false)
 }
 
