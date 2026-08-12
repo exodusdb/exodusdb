@@ -682,9 +682,19 @@ function exodusquote(arg1, arg2) {
 //round a number to n decimal places
 function exodusround(number, ndecimals) {
     //return Math.round(number*Math.pow(10,ndecimals))/Math.pow(10,ndecimals)
+    if (typeof ndecimals == 'undefined')
+        ndecimals = 0
     var number2 = Math.round(Math.abs(number) * Math.pow(10, ndecimals)) / Math.pow(10, ndecimals)
     if (number < 0) return -number2
     return number2
+}
+
+// Member form — mid-calc integer/dp round (prefer over .exodusoconv('[DECIMAL,0]'))
+Number.prototype.exodusround = function (ndecimals) {
+    return exodusround(+this, ndecimals)
+}
+String.prototype.exodusround = function (ndecimals) {
+    return exodusround(+this, ndecimals)
 }
 
 //convert to number
