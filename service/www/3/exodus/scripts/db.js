@@ -366,14 +366,16 @@ function exodus_dict_date(dicti,params) {
 // Numeric dict field. opts bag only.
 // Defaults (omit the key — do not pass '' / null / false):
 //   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
-//   min      → ''   number (use 0 for non-negative)
+//   min      → ''   number | SIGNED (use 0 for non-negative)
 //   max      → ''   number
+//   signed   → omit  true → min slot SIGNED when min omitted (allow neg). Ignored if min set.
 //   plain    → false  true → [DECIMAL,…] or, when decimals is 0:
 //                       [INTEGER] / [INTEGER,0,min,max] (keep ,0 so min/max slots stay put)
 //                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
 //   INTEGER forces ndecs 0 at runtime; conversion string omits lone ,0 when no min/max
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
+//   exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED
 //   exodus_dict_number(di, { decimals: 0, plain: true })  // → [INTEGER] or [INTEGER,0,min,max]
 //   exodus_dict_integer(di, { min: 0, max: 100 })         // preferred for counts (forces decimals 0 + plain)
 //   exodus_dict_number(di, { min: 0, max: 100 })   // not decimals:''
@@ -416,6 +418,10 @@ function exodus_dict_number(dicti, opts) {
   minimum = ''
  if (typeof maximum == 'undefined' || maximum == null)
   maximum = ''
+
+ // signed: true → min SIGNED when min omitted (NUMBER allows negatives)
+ if (minimum === '' && opts.signed === true)
+  minimum = 'SIGNED'
 
  var plain = !!opts.plain
  var zeroDp = (decimals === 0 || decimals === '0')
