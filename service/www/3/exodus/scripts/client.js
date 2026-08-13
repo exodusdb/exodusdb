@@ -1699,6 +1699,56 @@ function assertelement(element, funcname, varname) {
 	return true
 }
 
+// User-facing text when backend (or rare client) surface is a system/backtrace error.
+// Refine wording later; special exodusconfirm icon/mode may follow.
+var gexodus_system_error_user_msg =
+	'A system error has occurred. Technical support has been informed.\r\n\r\n' +
+	'You may try to ignore the message or contact technical support for more info.'
+
+// Crude detection of backend VarError/stack dumps in WUI messages (db.response etc.).
+// Prefer future explicit marker (e.g. EXODUS_SYSTEM_ERROR) when backend can send one.
+// Later: systemerror() may use the same user message path.
+function exodus_looks_like_system_error(msg) {
+	if (msg == null || msg === '')
+		return false
+	var s = String(msg)
+	// Explicit backend/client marker (optional for now)
+	if (s.indexOf('EXODUS_SYSTEM_ERROR') >= 0)
+		return true
+	// listen.cpp VarError: message + FM + e.stack() (frameno: file.cpp:line: source)
+	// Also raw backtrace / gdb / address lines that sometimes appear
+	if (/Backtrace\s+\d/i.test(s))
+		return true
+	if (/\bVar(Unassigned|Unconstructed|DivideByZero|NonNumeric|NonPositive|NumOverflow|NumUnderflow|OutOfMemory|InvalidPointer|DBException|NotImplemented|Debug)\b/.test(s))
+		return true
+	if (/\bDim(Undimensioned|IndexOutOfBounds)\b/.test(s))
+		return true
+	// "12: /path/file.cpp:45:" or "12: file.cpp:45:\tcode" (FM often already \r\n)
+	if (/(^|[\r\n])\d+:\s+\S+\.(cpp|h|hpp|cc|cxx):\d+/m.test(s))
+		return true
+	// Several stack-ish lines
+	if ((s.match(/(^|[\r\n])\d+:\s+/g) || []).length >= 2 && /\.(cpp|h)\b/.test(s))
+		return true
+	// Hex address + .so / objdump style
+	if (/0x[0-9a-fA-F]{6,}/.test(s) && (/\.so[\.\d]*/.test(s) || /objdump|gdb --batch/.test(s)))
+		return true
+	return false
+}
+
+function exodus_user_facing_msg(msg) {
+	if (!exodus_looks_like_system_error(msg))
+		return msg
+	// Full technical text for EXODUS (support on the desk); others get the friendly line
+	try {
+		if (typeof gusername != 'undefined' && gusername == 'EXODUS')
+			return msg
+	} catch (e) { }
+	try {
+		console.log('EXODUS system error (hidden from user):\n' + String(msg))
+	} catch (e2) { }
+	return gexodus_system_error_user_msg
+}
+
 async function exodusnote(msg, mode) {
 
 	//if (!msg) return false
@@ -1716,6 +1766,8 @@ async function exodusnote(msg, mode) {
 	//msg=msg.replace(/\n/,'\n')
 	msg = msg.toString().replace(FMre, '\r\n').replace(VMre, '\r\n')
 	msg = msg.replace(/\|/g, '\r\n')
+
+	msg = exodus_user_facing_msg(msg)
 
 	await exodusconfirm(msg, 1, 'OK', '', '', null, false, mode)
 
