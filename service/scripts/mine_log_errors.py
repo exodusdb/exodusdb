@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
-"""Mine Exodus request XML logs for *unexpected technical* Response failures.
+"""Mine Exodus request XML logs for unusual <Response> bodies.
 
-Walks a parent directory for *.xml and *.xml.gz, extracts <Response> text,
-keeps only responses that look like framework/engine failures (Var*, stacks,
-System Error, missing lib, …) — not everyday business non-OK messages
-("brand cannot be found", validation, etc.).
+Walks a parent directory for *.xml and *.xml.gz, extracts Response text,
+drops *normal* responses, prints the rest sorted and deduplicated.
 
-Prints sorted unique messages (whitespace collapsed). Optional --count.
+Normal (dropped):
+  - OK / OK …
+  - NOT OK / NOT OK …
+  - everyday not-found / does-not-exist style messages
+
+Everything else is kept (System Error, Var*, stacks, odd Error:, …).
 
 Usage:
   mine_log_errors.py /root/hosts/c2comms/logs
   mine_log_errors.py /root/hosts --count
-  mine_log_errors.py /root/hosts --all          # every non-OK (noisy)
 """
 
 from __future__ import annotations
@@ -26,29 +28,28 @@ from pathlib import Path
 RESPONSE_OPEN = re.compile(r"<Response\b[^>]*>", re.IGNORECASE)
 RESPONSE_CLOSE = re.compile(r"</Response>", re.IGNORECASE)
 
-# Framework / engine signals — not product validation prose.
-TECHNICAL = re.compile(
-	r"""(?ix)
-	\bVar[A-Z][A-Za-z]+\b          # VarUnassigned, VarDBException, …
-	| \bSystem\s+Error\b
-	| \bINTERNAL\s+ERROR\b
-	| \bERROR\s+NO:
-	| function\s+cannot\s+be\s+found\s+in\s+lib
-	| \bsegfault\b
-	| \bAborted\b
-	| \bassert(ion)?\b
-	# stack frame: "5: foo.cpp:315:" or "foo.cpp:315:"
-	| (?:^|\s)\d+:\s+\S+\.(?:cpp|h|hpp|cc):\d+
-	| \b\w+\.(?:cpp|h|hpp|cc):\d+:
-	"""
+# Everyday validation phrases (case-insensitive substring on short prose).
+NORMAL_PHRASES = (
+	"cannot be found",
+	"could not be found",
+	"does not exist",
+	"do not exist",
+	"is missing",
+	"not found",
+	"already exists",
+	"is required",
+	"not authorised",
+	"not authorized",
+	"access refused",
+	"no record",
+	"lock not authorised",
+	"lock not authorized",
+	"your lock expired",
 )
 
-# Volatile noise inside otherwise identical technical dumps
 VOLATILE = [
 	(re.compile(r"\bcursor\d+(?:_\d+)+\b"), "cursor*"),
 	(re.compile(r"\bDECLARE\s+\w+\b"), "DECLARE cursor*"),
-	(re.compile(r"\bTHREADNO\s+\d+\b", re.I), "THREADNO *"),
-	(re.compile(r"\bpid\s*=\s*\d+\b", re.I), "pid=*"),
 ]
 
 
@@ -58,24 +59,47 @@ def open_text(path: Path):
 	return path.open("rt", encoding="utf-8", errors="replace")
 
 
-def is_success(body: str) -> bool:
+def looks_like_stack_or_engine(s: str) -> bool:
+	if re.search(r"\.(?:cpp|h|hpp|cc):\d+", s):
+		return True
+	if re.search(r"\bVar[A-Z][A-Za-z]+\b", s):
+		return True
+	if re.search(r"\bSystem\s+Error\b", s, re.I):
+		return True
+	return False
+
+
+def is_normal(body: str) -> bool:
+	"""True if routine success / soft fail / not-found prose — drop it."""
 	s = body.strip()
-	return s == "OK" or s.startswith("OK ")
+	if not s:
+		return True
 
+	if s == "OK" or s.startswith("OK "):
+		return True
+	if s == "NOT OK" or s.startswith("NOT OK "):
+		return True
 
-def is_technical(body: str) -> bool:
-	"""True if body smells like engine/framework failure, not business msg_."""
-	if is_success(body) or not body.strip():
+	# Engine failures always keep, even if text also says "not found"
+	if looks_like_stack_or_engine(s):
 		return False
-	return TECHNICAL.search(body) is not None
 
+	# Strip optional "Error:" wrapper for phrase checks
+	msg = s
+	if msg.startswith("Error:"):
+		msg = msg[6:].strip()
+		if not msg:
+			return True
 
-def is_any_non_ok(body: str) -> bool:
-	return not is_success(body) and bool(body.strip())
+	# Short prose validation only (long / multi-paragraph → keep)
+	if len(msg) > 300:
+		return False
+
+	low = msg.lower()
+	return any(p in low for p in NORMAL_PHRASES)
 
 
 def normalize(body: str) -> str:
-	"""Collapse whitespace + strip volatile ids so the same bug dedupes."""
 	s = re.sub(r"\s+", " ", body.strip())
 	for rx, repl in VOLATILE:
 		s = rx.sub(repl, s)
@@ -123,19 +147,14 @@ def iter_response_bodies(path: Path):
 def main(argv: list[str] | None = None) -> int:
 	ap = argparse.ArgumentParser(
 		description=(
-			"Unique technical failures from Exodus XML request logs "
-			"(Var*/System Error/stacks — not business non-OK)."
+			"Unique non-normal Response texts from Exodus XML request logs "
+			"(drops OK / NOT OK / not-found style)."
 		)
 	)
 	ap.add_argument(
 		"parent",
 		type=Path,
 		help="Parent directory to walk for *.xml / *.xml.gz",
-	)
-	ap.add_argument(
-		"--all",
-		action="store_true",
-		help="Include every non-OK response (business noise too)",
 	)
 	ap.add_argument(
 		"--count",
@@ -160,7 +179,6 @@ def main(argv: list[str] | None = None) -> int:
 		print(f"not a directory: {parent}", file=sys.stderr)
 		return 2
 
-	keep = is_any_non_ok if args.all else is_technical
 	counts: Counter[str] = Counter()
 	nfiles = 0
 	nresp = 0
@@ -173,7 +191,7 @@ def main(argv: list[str] | None = None) -> int:
 		try:
 			for body in iter_response_bodies(path):
 				nresp += 1
-				if not keep(body):
+				if is_normal(body):
 					continue
 				nkept += 1
 				key = body.strip() if args.raw else normalize(body)
@@ -189,10 +207,8 @@ def main(argv: list[str] | None = None) -> int:
 			print(text)
 
 	if not args.quiet:
-		mode = "all-non-OK" if args.all else "technical"
 		print(
-			f"# files={nfiles} responses={nresp} kept={nkept} "
-			f"unique={len(counts)} mode={mode}",
+			f"# files={nfiles} responses={nresp} kept={nkept} unique={len(counts)}",
 			file=sys.stderr,
 		)
 	return 0
