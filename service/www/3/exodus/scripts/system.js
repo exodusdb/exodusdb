@@ -9,10 +9,11 @@ async function system_dict_datasetcode(di, many, orcurrent, test) {
     //"" means no restriction, true=only TEST databases, false=not TEST databases
     if (typeof test == 'undefined')
         test = '""'
+    exodus_dict_code(di)
+    // dataset codes keep natural case (not forced uppercase like most codes)
+    di.lowercase = true
     di.popup = 'await system_pop_datasetcode(' + many + ',' + orcurrent + ')'
-	di.lowercase = true;
     di.validation = 'await system_val_datasetcode(' + many + ',' + orcurrent + ',' + test + ')'
-    di.length = 8;
 }
 
 async function system_pop_datasetcode(many, orcurrent) {
