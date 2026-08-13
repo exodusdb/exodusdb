@@ -8104,25 +8104,28 @@ async function document_onfocus(event) {
     //    //  textrange.select()
     //}
 
-    // Full-select on field arrival (INPUT.select / SPAN selectNodeContents).
-    // Checkbox/radio/button: clear document selection — leaving a contenteditable
-    // SPAN can leave its range selected while focus is already on the control;
-    // coming back then saw non-collapsed selection and collapseToEnd, so L/R
-    // became local text moves instead of field navigation.
+    // Field arrival selection.
+    // Always clear document selection first — leaving a contenteditable SPAN
+    // (code/text/number) keeps a Range selected even after focus moved (Enter/
+    // Tab to INPUT, SELECT, radio, button, etc.). Only radio/button used to
+    // clear; INPUT.select() does not drop a prior SPAN range → old field stays
+    // highlighted while the next control shows focus chrome.
+    try {
+        if (window.getSelection)
+            window.getSelection().removeAllRanges()
+    } catch (e) { }
+    // Full-select this field when appropriate (not TEXTAREA/SELECT/OPTION;
+    // not radio/checkbox/button — clear alone is enough).
     if (element.tagName != 'TEXTAREA' && element.tagName != 'OPTION' && element.tagName != 'SELECT')
         try {
             var isRadioCheckBtn = element.type == 'checkbox' || element.type == 'radio'
                 || element.type == 'button' || element.type == 'submit'
             if (isRadioCheckBtn) {
-                if (window.getSelection)
-                    window.getSelection().removeAllRanges()
+                // selection already cleared
             } else if (element.select && !element.isContentEditable) {
                 element.select()
             } else if (window.getSelection && document.createRange) {
-                // Always full-select this element (do not key off isCollapsed:
-                // selection may still cover the *previous* SPAN after leave).
                 selection = window.getSelection()
-                selection.removeAllRanges()
                 range = document.createRange()
                 range.selectNodeContents(element)
                 selection.addRange(range)
