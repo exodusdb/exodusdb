@@ -52,7 +52,8 @@
 	<LI><EM>min</EM> (default empty) — number or <code>SIGNED</code>; empty →
 	ICONV default &gt;= 0 unless SIGNED
 	<LI><EM>max</EM> (default empty) — number
-	<LI><EM>signed</EM> (omit) — true → min <code>SIGNED</code> when min omitted
+	<LI><EM>signed</EM> (omit) — true when min omitted: numeric max → min = −max
+	(symmetric; normal min/max); else min <code>SIGNED</code>. Ignored if min set.
 	<LI><EM>plain</EM> (default false) — true → <code>[DECIMAL,…]</code>
 	(no thousands), or when <EM>decimals</EM> is 0 → <code>[INTEGER]</code>
 	/ <code>[INTEGER,0,min,max]</code> (forced 0 dp; keep the <code>0</code> slot
@@ -61,6 +62,8 @@
 </UL>
 <P>Examples: <code>exodus_dict_number(di, { decimals: 'CURRENCY' })</code>;
 	<code>exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })</code>;
+	<code>exodus_dict_number(di, { signed: true, max: 100 })</code>
+	(→ min −100, max 100);
 	<code>exodus_dict_integer(di, { max: 100 })</code>;
 	<code>exodus_dict_decimal(di, { decimals: 2 })</code>;
 	<code>exodus_dict_number(di, { max: 100 })</code>

@@ -35,7 +35,9 @@ All via `exodus_dict_number` in `db.js`. Prefer helpers over raw `dictrec(…, '
 
 ```js
 exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts (grouping)
-exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // allow negatives (min SIGNED)
+exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED (any neg)
+exodus_dict_number(di, { signed: true, max: 100 })         // → min -100, max 100 (no SIGNED token)
+exodus_dict_number(di, { signed: true })                   // → min SIGNED
 exodus_dict_integer(di, { max: 100 })                      // plain 0-dp counts
 exodus_dict_integer(di)                                    // [INTEGER]
 exodus_dict_decimal(di, { decimals: 2 })                   // plain fractional [DECIMAL,…]
@@ -46,7 +48,7 @@ exodus_dict_number(di)                                     // same as {}
 |------------|--------------------|------|
 | `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` / combos (`'NDECS,CURRENCY'`) |
 | `min` / `max` | `''` | ICONV limits; empty min → default **≥ 0** unless `SIGNED` / `signed: true` |
-| `signed` | omit | `true` → min slot `SIGNED` (allow negatives) when min omitted. **Ignored if `min` is set.** |
+| `signed` | omit | `true` when **min omitted**: numeric **max** → min = **−max** (symmetric; normal min/max rules); else min slot **SIGNED**. **Ignored if `min` is set.** |
 | `plain` | `false` | `true` → `[DECIMAL,…]`, or **`[INTEGER]`** / **`[INTEGER,0,min,max]`** when `decimals` is 0; omit → `[NUMBER,…]` |
 
 **Shims**
@@ -90,10 +92,15 @@ Implemented in `NUMBER` (`exodus.js`). DECIMAL/INTEGER call into the same path.
 | **Numeric max** | Value must be ≤ max (same empty+numeric gate as min — so **`max: 0` works**) |
 | **`POSITIVE` keyword** | **Retired** — use numeric `min: 0` or rely on default ≥ 0 |
 
-Bag → conversion string:
+Bag → conversion string (`exodus_dict_number`):
 
-- `signed: true` and min omitted → min slot written as `SIGNED` (e.g. `[NUMBER,CURRENCY,SIGNED]`).
-- Prefer **`signed: true`** at the bag over raw `min: 'SIGNED'`.
+| Bag | Conversion min/max slots |
+|-----|--------------------------|
+| `signed: true`, no min, **no** max | min = `SIGNED` (e.g. `[NUMBER,CURRENCY,SIGNED]`) |
+| `signed: true`, no min, **numeric max** | min = **−max**, max unchanged (e.g. `{ signed: true, max: 100 }` → `…,-100,100`) — **no** `SIGNED` token; standard min/max ICONV |
+| `min` set | `signed` ignored |
+
+Prefer **`signed: true`** at the bag over raw `min: 'SIGNED'` or hand-written floors.
 
 ---
 
@@ -242,7 +249,7 @@ For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when 
 | Topic | Rule |
 |--------|------|
 | Default non-negative | Empty min → **≥ 0** |
-| Allow negatives | Bag **`signed: true`** → min slot `SIGNED` (not magic floors like `-999999999`) |
+| Allow negatives | Bag **`signed: true`** → min `SIGNED`, or min = **−max** when max set (not magic floors) |
 | Counts vs amounts | **integer** (plain 0 dp) vs **number** (full external format) vs **decimal** (plain frac) |
 | NUMBER OCONV | Always **fully formatted** external (`,.` / `.,` per BASEFMT) — including `.exodusoconv('[NUMBER…]')` in messages |
 | Bags | Omit defaults; no noisy `min: 0` |

@@ -368,7 +368,9 @@ function exodus_dict_date(dicti,params) {
 //   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
 //   min      → ''   number | SIGNED (empty min → NUMBER ICONV default >= 0 unless SIGNED)
 //   max      → ''   number
-//   signed   → omit  true → min slot SIGNED when min omitted (allow neg). Ignored if min set.
+//   signed   → omit  true when min omitted:
+//                       numeric max → min = -max (symmetric; no SIGNED token — normal min/max)
+//                       else → min slot SIGNED (any neg). Ignored if min set.
 //   plain    → false  true → [DECIMAL,…] or, when decimals is 0:
 //                       [INTEGER] / [INTEGER,0,min,max] (keep ,0 so min/max slots stay put)
 //                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
@@ -376,6 +378,7 @@ function exodus_dict_date(dicti,params) {
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
 //   exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED
+//   exodus_dict_number(di, { signed: true, max: 100 })             // → min -100, max 100
 //   exodus_dict_integer(di, { max: 100 })         // counts: decimals 0 + plain
 //   exodus_dict_decimal(di, { decimals: 2 })      // plain fractional (via dict_number)
 //   exodus_dict_number(di, { max: 100 })
@@ -431,9 +434,15 @@ function exodus_dict_number(dicti, opts) {
  if (typeof maximum == 'undefined' || maximum == null)
   maximum = ''
 
- // signed: true → min SIGNED when min omitted (NUMBER allows negatives)
- if (minimum === '' && opts.signed === true)
-  minimum = 'SIGNED'
+ // signed: true, min omitted → allow negatives via normal slots (no invent).
+ //  - numeric max → min = -max (symmetric range; SIGNED not used)
+ //  - else → min SIGNED (unbounded below)
+ if (minimum === '' && opts.signed === true) {
+  if (maximum !== '' && maximum !== null && isFinite(+maximum) && String(maximum).replace(/\s/g, '') !== '')
+   minimum = -maximum
+  else
+   minimum = 'SIGNED'
+ }
 
  var plain = !!opts.plain
  var zeroDp = (decimals === 0 || decimals === '0')
