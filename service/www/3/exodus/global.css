@@ -405,6 +405,10 @@ body > #formbuttonsdiv_face .graphicbutton [data-source-id$="_label"] {
  *   OPT-IN full width: HTML width="100%" on the nest (line grids).
  *   Any depth under form (not only direct form-td children).
  *
+ * Multivalue col0 HTML width="1%" (dbform) is a separate nest-fill side effect
+ * for free-text expand/fold — see FORM-UI-WIDE-NARROW.md § Multivalue col0.
+ * Do not remove without a replacement plan in that doc.
+ *
  * Free-text host paint (dbform): width/max 100%, pre-wrap — not a ch min here.
  * Extreme-wide 30ch soft max is ONLY when JS sets .exodusform-wide (client.js
  * form_table_set_wide) — never from this rule.

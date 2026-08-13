@@ -1955,10 +1955,12 @@ async function formfunctions_onload() {
                     insertdeletebuttons.className = col0class
                     insertdeletebuttons.innerHTML = t
                     insertdeletebuttons.style.borderRightWidth = '0px'
-                    // Same shrink as thead chrome col below. Group tables are
-                    // width:100% (global.css free-text fold); without 1% this td
-                    // absorbs free space → variable width vs F7/F6 in next td.
-                    // No buttons: still create the td (clones); hide via table.exogroup_col0_hide.
+                    // HTML width=1% on col0: NOT “column looks 1% wide” only.
+                    // Column % forces nest used width ≈ host TD (free-text expand/fold budget
+                    // under soft ceiling; wide/narrow can stay narrow so 30ch stays off until
+                    // truly wide). Also keeps col0 from absorbing free space. Full theory:
+                    // service/www/exodus/doc/FORM-UI-WIDE-NARROW.md § Multivalue col0 width=1%.
+                    // Same on thead/tfoot col0 below. Residual hide: table.exogroup_col0_hide.
                     insertdeletebuttons.width = '1%'
                     if (hasIns || hasDel)
                         insertdeletebuttons.style.paddingRight = '3px'
