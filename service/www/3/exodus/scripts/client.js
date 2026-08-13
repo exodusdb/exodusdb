@@ -1707,11 +1707,11 @@ var gexodus_system_error_user_msg =
 	'You may try to ignore the message or contact technical support for more info.'
 
 // System errors lead with "System Error" (server GENERALPROXY / client systemerror).
-// Only inspect the first 20 chars. Later backend markers optional.
+// Inspect the first 50 chars (client may prefix more before "System Error").
 function exodus_looks_like_system_error(msg) {
 	if (msg == null || msg === '')
 		return false
-	return String(msg).slice(0, 20).indexOf('System Error') >= 0
+	return String(msg).slice(0, 50).indexOf('System Error') >= 0
 }
 
 function exodus_user_facing_msg(msg) {
