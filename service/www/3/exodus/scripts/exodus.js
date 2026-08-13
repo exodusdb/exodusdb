@@ -1029,10 +1029,24 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
     var result
     if (mode == 'ICONV') {
 
-        // min/max: non-empty + numeric (same gate so max may be 0)
-        if (params[1] != '' && exodusnum(params[1]) && value < +params[1]) {
-            gmsg = value + ' must not be less than ' + params[1]
-            return null
+        // min "SIGNED" → allow negatives. Else if min → test min; else require >= 0.
+        var signed = false
+        if (String(params[1] == null ? '' : params[1]).toUpperCase().replace(/\s/g, '') == 'SIGNED') {
+            params[1] = ''
+            signed = true
+        }
+
+        if (params[1] != '' && exodusnum(params[1])) {
+            if (value < +params[1]) {
+                gmsg = value + ' must not be less than ' + params[1]
+                return null
+            }
+        }
+        else if (!signed) {
+            if (value < 0) {
+                gmsg = value + ' must not be less than 0'
+                return null
+            }
         }
 
         if (params[2] != '' && exodusnum(params[2]) && value > +params[2]) {
