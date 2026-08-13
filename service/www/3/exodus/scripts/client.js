@@ -8455,7 +8455,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		bodyinner += '\
 			<div class="exodusconfirm_decideblock">\
 			<div id="decide_filter_status" class="decide_filter_status" style="display:none"></div>\
-			<table id="decide_table1" xwidth=100% xclass="exodusform" cellspacing="0" xcellpadding="0">\
+			<table id="decide_table1" xwidth=100% xclass="exodusform">\
 				<thead onclick="decide_sorttable2_sync(event)" style="cursor: pointer">\
 					<tr id="decide_table1head1row1">\
 					</tr>\
