@@ -1713,8 +1713,8 @@ function exodus_looks_like_system_error(msg) {
 	if (msg == null || msg === '')
 		return false
 	var s = String(msg)
-	// GENERALPROXY / listen style: "System Error: …"
-	if (/System Error:/i.test(s))
+	// GENERALPROXY / listen: "System Error: …" — client systemerror: "System Error: …"
+	if (/System Error\s*:/i.test(s) || /System Error in /i.test(s))
 		return true
 	// Explicit backend/client marker (optional for now)
 	if (s.indexOf('EXODUS_SYSTEM_ERROR') >= 0)
@@ -7562,8 +7562,18 @@ function systemerror(functionname, e) {
 			}
 		}
 	}
-	if (!gonunload)
-		alert('System Error in ' + functionname + '\n' + msg)
+	// Same user path as server System Error: friendly UI; technical detail in console
+	var technical = 'System Error: ' + functionname + '\n' + msg
+	try {
+		console.log(technical)
+	} catch (e2) { }
+	if (!gonunload) {
+		var usermsg = gexodus_system_error_user_msg
+		try {
+			usermsg = String(usermsg).replace(/\r\n/g, '\n')
+		} catch (e3) { }
+		alert(usermsg)
+	}
 	//if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
 	//if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
 	if (gstepping || (gusername == 'EXODUS'))
