@@ -1702,7 +1702,8 @@ function assertelement(element, funcname, varname) {
 // User-facing text when backend (or rare client) surface is a system/backtrace error.
 // Refine wording later; special exodusconfirm icon/mode may follow.
 var gexodus_system_error_user_msg =
-	'A system error has occurred. Technical support has been informed.\r\n\r\n' +
+	'A system error has occurred.\r\n' +
+	'Technical support has been informed.\r\n\r\n' +
 	'You may try to ignore the message or contact technical support for more info.'
 
 // Crude detection of backend system/backtrace dumps in WUI messages (db.response etc.).
