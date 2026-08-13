@@ -2006,8 +2006,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.nwords = 1
     di.validation = 'await colors_val_screenfontsize()'
     //di.defaultvalue='100'
-    exodus_dict_number(di, { decimals: 0, min: 50, max: 200 })
-    di.length = 3
+    exodus_dict_integer(di, { min: 50, max: 200 })
     di.allowcursor = true
 
     di = dict[++din] = dictrec('REPORT_FONT_SIZE', 'F', fn)
@@ -2015,8 +2014,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.wordno = 8
     di.nwords = 1
     //di.defaultvalue='100'
-    exodus_dict_number(di, { decimals: 0, min: 50, max: 200 })
-    di.length = 3
+    exodus_dict_integer(di, { min: 50, max: 200 })
     di.allowcursor = true
 
     //report styles need to be ignored in LISTEN2 see task USER UPDATE "REPORT"

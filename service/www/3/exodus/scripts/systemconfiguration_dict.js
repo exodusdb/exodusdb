@@ -80,8 +80,7 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.unique = true
 
     di = dict[++din] = dictrec('NUMBER_OF_PROCESSES', 'F', 59, '', groupn)
-    exodus_dict_number(di, { decimals: 0, min: 1, max: 9 })
-    di.length = 3;
+    exodus_dict_integer(di, { min: 1, max: 9 })
     di.align = 'left'
     //di.required=true;
     if (gusername != 'EXODUS') di.readonly = true
@@ -135,13 +134,11 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.validcharacters += '0123456789-_.'
 
     di = dict[++din] = dictrec('SMTP_PORT', 'F', 103)
-    exodus_dict_number(di, { decimals: 0, min: 1, max: 65535 })
-    di.length = 5
+    exodus_dict_integer(di, { min: 1, max: 65535 })
     //di.defaultvalue='"25"'
 
     di = dict[++din] = dictrec('SMTP_TIMEOUT_SECONDS', 'F', 104)
-    exodus_dict_number(di, { decimals: 0, min: 0 })
-    di.length = 3
+    exodus_dict_integer(di)
     //di.defaultvalue='"60"'
 
     di = dict[++din] = dictrec('SMTP_USE_SSL', 'F', 105)
@@ -219,14 +216,12 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.horizontal=true
 
     di = dict[++din] = dictrec('MAX_NOLOGIN_DAYS', 'F', 128)
-    exodus_dict_number(di, { decimals: 0, min: 0, max: 9999 })
-    di.length = 3
+    exodus_dict_integer(di, { max: 9999 })
 
     //defaults to 4428 in GBP, CONTROL
     //could be set to 443 to pass outgoing fw
     di = dict[++din] = dictrec('MONITOR_PORT_NO', 'F', 131)
-    exodus_dict_number(di, { decimals: 0, min: 0, max: 65535 })
-    di.length = 3
+    exodus_dict_integer(di, { max: 65535 })
 
     //see also INIT.GENERAL for system<*>
     
