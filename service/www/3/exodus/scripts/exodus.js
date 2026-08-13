@@ -1029,12 +1029,13 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
     var result
     if (mode == 'ICONV') {
 
+        // min/max: non-empty + numeric (same gate so max may be 0)
         if (params[1] != '' && exodusnum(params[1]) && value < +params[1]) {
             gmsg = value + ' must not be less than ' + params[1]
             return null
         }
 
-        if (params[2] && exodusnum(params[2]) && value > +params[2]) {
+        if (params[2] != '' && exodusnum(params[2]) && value > +params[2]) {
             gmsg = value + ' must not be more than ' + params[2]
             return null
         }
