@@ -48,9 +48,9 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // di.length for SPAN paint:
 //   text   — wide mode ONLY: empty → attribute exomaxwidth="30ch" (client applies
-//            style.maxWidth when .exodusform-wide). length set → no soft max.
-//            NOT a min-width. Narrow forms: style.maxWidth must stay 100% so
-//            free-text folds under form soft ceiling — NEVER lock to 30ch.
+//            style.maxWidth when .exodusform-wide) unless HTM already set exomaxwidth.
+//            length set → no soft max. NOT a min-width. Narrow forms: style.maxWidth
+//            must stay 100% so free-text folds under form soft ceiling — NEVER lock to 30ch.
 //   code / number — unused (floor 6ch either way).
 // di.length for TEXTAREA paint: min-width floor (Nch); fill cell for max.
 // Align L/R INPUT: form_apply_input_field_width (length / sample).
@@ -1281,9 +1281,11 @@ async function formfunctions_onload() {
                 var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
                 if (!(freeLen > 0))
                     freeLen = 0
-                if (!freeLen)
-                    element.setAttribute('exomaxwidth', '30ch')
-                else
+                if (!freeLen) {
+                    // HTM may preset exomaxwidth (e.g. schedules VEHICLE_NAME 20ch)
+                    if (!element.getAttribute('exomaxwidth'))
+                        element.setAttribute('exomaxwidth', '30ch')
+                } else
                     element.removeAttribute('exomaxwidth')
                 var entryF = (element.getAttribute('exodustype') == 'F'
                     && !element.getAttribute('exodusreadonly'))
