@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Mine Exodus request XML logs for non-OK <Response> bodies.
+"""Mine Exodus request XML logs for *unexpected technical* Response failures.
 
-Walks a parent directory for *.xml and *.xml.gz, extracts Response text,
-keeps those that look like errors (not starting with OK), then prints
-sorted unique messages (one per line after whitespace collapse).
+Walks a parent directory for *.xml and *.xml.gz, extracts <Response> text,
+keeps only responses that look like framework/engine failures (Var*, stacks,
+System Error, missing lib, …) — not everyday business non-OK messages
+("brand cannot be found", validation, etc.).
+
+Prints sorted unique messages (whitespace collapsed). Optional --count.
 
 Usage:
   mine_log_errors.py /root/hosts/c2comms/logs
   mine_log_errors.py /root/hosts --count
+  mine_log_errors.py /root/hosts --all          # every non-OK (noisy)
 """
 
 from __future__ import annotations
@@ -19,9 +23,33 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-# Multi-line stacks live inside a single <Response>...</Response>
 RESPONSE_OPEN = re.compile(r"<Response\b[^>]*>", re.IGNORECASE)
 RESPONSE_CLOSE = re.compile(r"</Response>", re.IGNORECASE)
+
+# Framework / engine signals — not product validation prose.
+TECHNICAL = re.compile(
+	r"""(?ix)
+	\bVar[A-Z][A-Za-z]+\b          # VarUnassigned, VarDBException, …
+	| \bSystem\s+Error\b
+	| \bINTERNAL\s+ERROR\b
+	| \bERROR\s+NO:
+	| function\s+cannot\s+be\s+found\s+in\s+lib
+	| \bsegfault\b
+	| \bAborted\b
+	| \bassert(ion)?\b
+	# stack frame: "5: foo.cpp:315:" or "foo.cpp:315:"
+	| (?:^|\s)\d+:\s+\S+\.(?:cpp|h|hpp|cc):\d+
+	| \b\w+\.(?:cpp|h|hpp|cc):\d+:
+	"""
+)
+
+# Volatile noise inside otherwise identical technical dumps
+VOLATILE = [
+	(re.compile(r"\bcursor\d+(?:_\d+)+\b"), "cursor*"),
+	(re.compile(r"\bDECLARE\s+\w+\b"), "DECLARE cursor*"),
+	(re.compile(r"\bTHREADNO\s+\d+\b", re.I), "THREADNO *"),
+	(re.compile(r"\bpid\s*=\s*\d+\b", re.I), "pid=*"),
+]
 
 
 def open_text(path: Path):
@@ -30,20 +58,28 @@ def open_text(path: Path):
 	return path.open("rt", encoding="utf-8", errors="replace")
 
 
-def is_error_response(body: str) -> bool:
-	"""Listen success responses start with OK (alone or 'OK …')."""
+def is_success(body: str) -> bool:
 	s = body.strip()
-	if not s:
+	return s == "OK" or s.startswith("OK ")
+
+
+def is_technical(body: str) -> bool:
+	"""True if body smells like engine/framework failure, not business msg_."""
+	if is_success(body) or not body.strip():
 		return False
-	if s == "OK" or s.startswith("OK "):
-		return False
-	# e.g. "OK\n…" unlikely; also "OKSESSIONID" not used
-	return True
+	return TECHNICAL.search(body) is not None
+
+
+def is_any_non_ok(body: str) -> bool:
+	return not is_success(body) and bool(body.strip())
 
 
 def normalize(body: str) -> str:
-	"""Collapse whitespace so multi-line stacks dedupe cleanly."""
-	return re.sub(r"\s+", " ", body.strip())
+	"""Collapse whitespace + strip volatile ids so the same bug dedupes."""
+	s = re.sub(r"\s+", " ", body.strip())
+	for rx, repl in VOLATILE:
+		s = rx.sub(repl, s)
+	return s
 
 
 def iter_log_files(parent: Path):
@@ -56,8 +92,6 @@ def iter_log_files(parent: Path):
 
 
 def iter_response_bodies(path: Path):
-	"""Stream Response bodies from one file (handles multi-line content)."""
-	buf = ""
 	inside = False
 	parts: list[str] = []
 	with open_text(path) as f:
@@ -70,7 +104,6 @@ def iter_response_bodies(path: Path):
 				cm = RESPONSE_CLOSE.search(rest)
 				if cm:
 					yield rest[: cm.start()]
-					# rare: another open on same line — ignore for simplicity
 					continue
 				inside = True
 				parts = [rest]
@@ -84,18 +117,25 @@ def iter_response_bodies(path: Path):
 				else:
 					parts.append(line)
 	if inside and parts:
-		# truncated file; still emit what we have
 		yield "".join(parts)
 
 
 def main(argv: list[str] | None = None) -> int:
 	ap = argparse.ArgumentParser(
-		description="Extract unique error-like Response texts from Exodus XML request logs."
+		description=(
+			"Unique technical failures from Exodus XML request logs "
+			"(Var*/System Error/stacks — not business non-OK)."
+		)
 	)
 	ap.add_argument(
 		"parent",
 		type=Path,
 		help="Parent directory to walk for *.xml / *.xml.gz",
+	)
+	ap.add_argument(
+		"--all",
+		action="store_true",
+		help="Include every non-OK response (business noise too)",
 	)
 	ap.add_argument(
 		"--count",
@@ -105,7 +145,7 @@ def main(argv: list[str] | None = None) -> int:
 	ap.add_argument(
 		"--raw",
 		action="store_true",
-		help="Do not collapse whitespace (dedupe on exact text)",
+		help="Do not collapse whitespace / volatile ids for dedupe",
 	)
 	ap.add_argument(
 		"-q",
@@ -120,9 +160,11 @@ def main(argv: list[str] | None = None) -> int:
 		print(f"not a directory: {parent}", file=sys.stderr)
 		return 2
 
+	keep = is_any_non_ok if args.all else is_technical
 	counts: Counter[str] = Counter()
 	nfiles = 0
 	nresp = 0
+	nkept = 0
 
 	for path in iter_log_files(parent):
 		nfiles += 1
@@ -131,15 +173,15 @@ def main(argv: list[str] | None = None) -> int:
 		try:
 			for body in iter_response_bodies(path):
 				nresp += 1
-				if not is_error_response(body):
+				if not keep(body):
 					continue
+				nkept += 1
 				key = body.strip() if args.raw else normalize(body)
 				if key:
 					counts[key] += 1
 		except OSError as e:
 			print(f"# skip {path}: {e}", file=sys.stderr)
 
-	# Stream sorted unique (by text); optional count
 	for text in sorted(counts):
 		if args.count:
 			print(f"{counts[text]}\t{text}")
@@ -147,8 +189,10 @@ def main(argv: list[str] | None = None) -> int:
 			print(text)
 
 	if not args.quiet:
+		mode = "all-non-OK" if args.all else "technical"
 		print(
-			f"# files={nfiles} responses={nresp} unique_errors={len(counts)}",
+			f"# files={nfiles} responses={nresp} kept={nkept} "
+			f"unique={len(counts)} mode={mode}",
 			file=sys.stderr,
 		)
 	return 0
