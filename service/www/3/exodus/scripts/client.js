@@ -1706,8 +1706,9 @@ var gexodus_system_error_user_msg =
 	'Technical support has been informed.\r\n\r\n' +
 	'You may try to ignore the message or contact technical support for more info.'
 
-// System errors lead with "System Error" (server GENERALPROXY / client systemerror).
-// Inspect the first 50 chars (client may prefix more before "System Error").
+// System errors contain "System Error" near the start.
+// Server (listen) often wraps as "Error: System Error: …"; client systemerror uses
+// "System Error: …". Inspect first 50 chars so a short server prefix still matches.
 function exodus_looks_like_system_error(msg) {
 	if (msg == null || msg === '')
 		return false
