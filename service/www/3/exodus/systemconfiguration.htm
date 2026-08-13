@@ -22,6 +22,9 @@
     <div align="center">
         <h1>
             System Configuration File</h1>
+        <!-- Sibling top-level forms: exoduswrapformpanes joins them into one pane
+             (only br/ws/comment between). Same pattern as vouchers History/Supporting. -->
+
         <table class="exodusform" bordercolor="#d0d0d0">
             <tr>
                 <td>
@@ -36,6 +39,9 @@
                         configured at a higher scope.</b>
                 </td>
             </tr>
+        </table>
+
+        <table class="exodusform" bordercolor="#d0d0d0">
             <tr>
                 <th>
                     <h2>
@@ -73,6 +79,9 @@
                     </table>
                 </td>
             </tr>
+        </table>
+
+        <table class="exodusform" bordercolor="#d0d0d0">
             <tr>
                 <th>
                     <h2>
@@ -101,6 +110,9 @@
                     </table>
                 </td>
             </tr>
+        </table>
+
+        <table class="exodusform" bordercolor="#d0d0d0">
             <tr>
                 <th>
                     <h2>
@@ -203,6 +215,9 @@
                     </table>
                 </td>
             </tr>
+        </table>
+
+        <table class="exodusform" bordercolor="#d0d0d0">
             <tr>
                 <th>
                     <h2>
@@ -229,6 +244,9 @@
                     </table>
                 </td>
             </tr>
+        </table>
+
+        <table class="exodusform" bordercolor="#d0d0d0">
             <tr>
                 <th>
                     <h2>
@@ -302,20 +320,23 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2">
+                <td>
                     Add signature image
                     <input id="ADD_SIGNATURE" />
                     any "%USERNAME%" or "%USER" code configured in<br />
                     document footings unless %SIGNATURE%, %NOSIGNATURE% or another image is configured.
                 </td>
             </tr>
-            <tr id="backupsection">
+        </table>
+
+        <table class="exodusform" bordercolor="#d0d0d0" id="backupsection">
+            <tr>
                 <th>
                     <h2>
                         Automated Backup</h2>
                 </th>
             </tr>
-            <tr id="backupsection">
+            <tr>
                 <td>
                     <table>
                         <tr>
@@ -349,95 +370,102 @@
                                 Close After Backup</th>
                             <td>
                                 <input id="CLOSE_AFTER_BACKUP" /></td>
+                        </tr>
+                    </table>
+                </td>
             </tr>
         </table>
-        </td> </tr>
-        <tr id="databasesection">
-            <th>
-                <h2>
+
+        <table class="exodusform" bordercolor="#d0d0d0" id="databasesection">
+            <tr>
+                <th>
+                    <h2>
                     Databases <small>- Scope: Current Installation Only</small></h2>
-            </th>
-        </tr>
-        <tr id="databasesection">
-            <td>
-                <table>
-                    <tr>
-                        <td>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Database Code
-                                        </th>
-                                        <th>
-                                            Number of<br />
-                                            Processes<br />
-                                            Required
-                                        </th>
-                                        <th>
-                                            Automatic<br />
-                                            Backup
-                                        </th>
-                                        <th>
-                                            +Automatic<br />
-                                            Copy to<br />
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <input id="DATABASE_CODE" />
-                                        </td>
-                                        <td>
-                                            <input id="NUMBER_OF_PROCESSES" />
-                                        </td>
-                                        <td>
-                                            <input id="BACKUP_REQUIRED" />
-                                        </td>
-                                        <td>
-                                            <input id="COPY_REQUIRED" />
-                                            <input id="TEST_DATABASE_CODE" />
-                                        </td>
-                                        <td>
-                                            <button id="button_copynow" exogroupno="1" exodustype='B' exodusonclick='await sysconfig_copynow()'
-                                                class="exodusbutton" type="button">
-                                                Copy now</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <th>
-                <h2>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Database Code
+                                            </th>
+                                            <th>
+                                                Number of<br />
+                                                Processes<br />
+                                                Required
+                                            </th>
+                                            <th>
+                                                Automatic<br />
+                                                Backup
+                                            </th>
+                                            <th>
+                                                +Automatic<br />
+                                                Copy to<br />
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input id="DATABASE_CODE" />
+                                            </td>
+                                            <td>
+                                                <input id="NUMBER_OF_PROCESSES" />
+                                            </td>
+                                            <td>
+                                                <input id="BACKUP_REQUIRED" />
+                                            </td>
+                                            <td>
+                                                <input id="COPY_REQUIRED" />
+                                                <input id="TEST_DATABASE_CODE" />
+                                            </td>
+                                            <td>
+                                                <button id="button_copynow" exogroupno="1" exodustype='B' exodusonclick='await sysconfig_copynow()'
+                                                    class="exodusbutton" type="button">
+                                                    Copy now</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <table class="exodusform" bordercolor="#d0d0d0">
+            <tr>
+                <th>
+                    <h2>
                     Other</h2>
-            </th>
-        </tr>
-        <tr id="old_server">
-            <td>
-                Automatic Upgrade
-                <input id="AUTOMATIC_UPGRADE" /></td>
-        </tr>
-        <tr id="old_server">
-            <td>
-                TEST databases can start required processes
-                <input id="TESTDB_CAN_START_PROCESSES" /></td>
-        </tr>
-        <tr>
-            <td>
-                Maximum days without login
-                <input id="MAX_NOLOGIN_DAYS" /> Forces password reset. Default is 31 days, 0=No limit</td>
-        </tr>
-        <tr>
-            <td>
-                Monitor Port No.
-                <input id="MONITOR_PORT_NO" /> Default is 4428</td>
-        </tr>
+                </th>
+            </tr>
+            <tr id="old_server">
+                <td>
+                    Automatic Upgrade
+                    <input id="AUTOMATIC_UPGRADE" /></td>
+            </tr>
+            <tr id="old_server">
+                <td>
+                    TEST databases can start required processes
+                    <input id="TESTDB_CAN_START_PROCESSES" /></td>
+            </tr>
+            <tr>
+                <td>
+                    Maximum days without login
+                    <input id="MAX_NOLOGIN_DAYS" /> Forces password reset. Default is 31 days, 0=No limit</td>
+            </tr>
+            <tr>
+                <td>
+                    Monitor Port No.
+                    <input id="MONITOR_PORT_NO" /> Default is 4428</td>
+            </tr>
         </table>
     </div>
 </body>
