@@ -73,6 +73,11 @@ func main() {
 
 	if (mode == "TEST") {
 
+	} else if (mode == "ERROR_TEST") {
+
+		// Deliberate VarError for WUI system-error path (systemconfiguration Server error Test)
+		throw VarUnassigned("ERROR_TEST");
+
 	} else if (mode == "TRANTEST") {
 
 		/* TRANTEST - check speed and accuracy of "concurrent" updates by mass updating a single record.
