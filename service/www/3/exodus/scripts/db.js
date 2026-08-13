@@ -366,7 +366,7 @@ function exodus_dict_date(dicti,params) {
 // Numeric dict field. opts bag only.
 // Defaults (omit the key — do not pass '' / null / false):
 //   decimals → ''   digit | BASE | NDECS | CURRENCY | UNIT | combos ('NDECS,CURRENCY'); trailing Z zero-suppress
-//   min      → ''   number | SIGNED (use 0 for non-negative)
+//   min      → ''   number | SIGNED (empty min → NUMBER ICONV default >= 0 unless SIGNED)
 //   max      → ''   number
 //   signed   → omit  true → min slot SIGNED when min omitted (allow neg). Ignored if min set.
 //   plain    → false  true → [DECIMAL,…] or, when decimals is 0:
@@ -376,15 +376,12 @@ function exodus_dict_date(dicti,params) {
 //
 //   exodus_dict_number(di, { decimals: 'CURRENCY' })
 //   exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED
-//   exodus_dict_number(di, { decimals: 0, plain: true })  // → [INTEGER] or [INTEGER,0,min,max]
-//   exodus_dict_integer(di, { min: 0, max: 100 })         // preferred for counts (forces decimals 0 + plain)
-//   exodus_dict_number(di, { min: 0, max: 100 })   // not decimals:''
+//   exodus_dict_integer(di, { max: 100 })         // counts: decimals 0 + plain
+//   exodus_dict_decimal(di, { decimals: 2 })      // plain fractional (via dict_number)
+//   exodus_dict_number(di, { max: 100 })
 //   exodus_dict_number(di)  // all defaults
 //
-// Counts / days / sequences. Bag only (not string "0Z" etc.).
-// Copies opts; sets decimals:0 and plain:true only when not already set.
-// Typical: exodus_dict_integer(di, { min: 0 }) → same as
-//   exodus_dict_number(di, { decimals: 0, plain: true, min: 0 })
+// Counts / days / sequences. Bag only. Via dict_number (decimals 0 + plain if unset).
 function exodus_dict_integer(dicti, opts) {
  if (!opts)
   opts = {}
@@ -396,6 +393,21 @@ function exodus_dict_integer(dicti, opts) {
  }
  if (typeof bag.decimals == 'undefined' || bag.decimals == null)
   bag.decimals = 0
+ if (typeof bag.plain == 'undefined')
+  bag.plain = true
+ return exodus_dict_number(dicti, bag)
+}
+
+// Plain fractional (no thousands). Via dict_number (plain true if unset).
+function exodus_dict_decimal(dicti, opts) {
+ if (!opts)
+  opts = {}
+ exodusassertobject(dicti, 'exodus_dict_decimal', 'dicti')
+ var bag = {}
+ for (var k in opts) {
+  if (Object.prototype.hasOwnProperty.call(opts, k))
+   bag[k] = opts[k]
+ }
  if (typeof bag.plain == 'undefined')
   bag.plain = true
  return exodus_dict_number(dicti, bag)

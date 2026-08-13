@@ -49,8 +49,10 @@
 	<LI><EM>decimals</EM> (default empty) — a digit for the number of decimals;
 	"BASE" (base format); "NDECS" (gndecs / getrecord NDECS); "CURRENCY" / "UNIT";
 	append Z to suppress zeroes
-	<LI><EM>min</EM> (default empty) — number (use 0 for non-negative)
+	<LI><EM>min</EM> (default empty) — number or <code>SIGNED</code>; empty →
+	ICONV default &gt;= 0 unless SIGNED
 	<LI><EM>max</EM> (default empty) — number
+	<LI><EM>signed</EM> (omit) — true → min <code>SIGNED</code> when min omitted
 	<LI><EM>plain</EM> (default false) — true → <code>[DECIMAL,…]</code>
 	(no thousands), or when <EM>decimals</EM> is 0 → <code>[INTEGER]</code>
 	/ <code>[INTEGER,0,min,max]</code> (forced 0 dp; keep the <code>0</code> slot
@@ -58,15 +60,20 @@
 	(amounts, grouping when BASEFMT groups)
 </UL>
 <P>Examples: <code>exodus_dict_number(di, { decimals: 'CURRENCY' })</code>;
-	<code>exodus_dict_integer(di, { min: 0 })</code>
-	(→ <code>[INTEGER,0,0,]</code> / counts; forces decimals 0 + plain);
-	<code>exodus_dict_number(di, { min: 0, max: 100 })</code>
+	<code>exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })</code>;
+	<code>exodus_dict_integer(di, { max: 100 })</code>;
+	<code>exodus_dict_decimal(di, { decimals: 2 })</code>;
+	<code>exodus_dict_number(di, { max: 100 })</code>
 	(not <code>decimals: ''</code>).</P>
 <H4>exodus_dict_integer(dictitem, opts)</H4>
 <P>Counts, days, sequences — bag-only shim to <code>exodus_dict_number</code>.
 	Copies <EM>opts</EM>; sets <EM>decimals</EM> 0 and <EM>plain</EM> true only if
-	not already set. Typical: <code>exodus_dict_integer(di, { min: 0 })</code>.
-	Do not pass string/positional args (e.g. <code>"0Z"</code>).</P>
+	not already set. Typical: <code>exodus_dict_integer(di)</code> or
+	<code>{ max: 100 }</code>. Do not pass string/positional args (e.g. <code>"0Z"</code>).</P>
+<H4>exodus_dict_decimal(dictitem, opts)</H4>
+<P>Plain fractional (no thousands) — bag-only shim to <code>exodus_dict_number</code>.
+	Copies <EM>opts</EM>; sets <EM>plain</EM> true only if not already set.
+	Typical: <code>exodus_dict_decimal(di, { decimals: 2 })</code>.</P>
 <H4>exodus_dict_text(dictitem,length,rows)</H4>
 <P>Free text field (align T, lowercase true). The field expands to the available
 	cell width; that is the normal layout.</P>

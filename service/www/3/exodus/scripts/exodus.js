@@ -870,7 +870,7 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
     /*
      * params (comma-separated; CURRENCY/UNIT may appear in any slot):
      *   decimals | NDECS | BASE | nZ — decimal places
-     *   min — params[1] (numeric floor; use 0 for non-negative)
+     *   min — params[1] (number | SIGNED). Empty min → default >= 0 unless SIGNED
      *   max — params[2]
      *   CURRENCY | UNIT — amount+unit (1042.00USD)
      *

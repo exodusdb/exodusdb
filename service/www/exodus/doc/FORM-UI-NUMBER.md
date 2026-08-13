@@ -14,25 +14,28 @@
 | **`[DECIMAL,…]`** | Same as NUMBER OCONV but **plain** (no thousands); may have fractional places |
 | **`[INTEGER]`** | Plain, **0 decimal places** (counts/days/sequences). Optional zero-suppress: **`[INTEGER,Z]`** / **`[INTEGER,0Z]`**. With min/max keep the decimals slot: **`[INTEGER,0,min,max]`** (not `[INTEGER,min,max]` — that would mis-bind min into the max slot) |
 
-**Dict helper** (`db.js`): bag only — `exodus_dict_number(di, opts)`.
+**Dict helpers** (`db.js`): bag only — all via `exodus_dict_number`.
 
 ```js
-exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts
-exodus_dict_integer(di, { min: 0, max: 100 })              // = number({ decimals:0, plain:true, min, max })
+exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts (grouping)
+exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // allow negatives (min SIGNED)
+exodus_dict_integer(di, { max: 100 })                      // plain 0-dp counts
 exodus_dict_integer(di)                                    // [INTEGER]
+exodus_dict_decimal(di, { decimals: 2 })                   // plain fractional [DECIMAL,…]
 exodus_dict_number(di)                                     // same as {}
 ```
 
 | `opts` key | Default if omitted | Role |
 |------------|--------------------|------|
 | `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` |
-| `min` / `max` | `''` | ICONV limits (numeric; use `min: 0` for non-negative) |
+| `min` / `max` | `''` | ICONV limits; empty min → default **≥ 0** unless `SIGNED` / `signed: true` |
+| `signed` | omit | `true` → min slot `SIGNED` (allow negatives) when min omitted |
 | `plain` | `false` | `true` → `[DECIMAL,…]`, or **`[INTEGER]`** / **`[INTEGER,0,min,max]`** when `decimals` is 0; omit → `[NUMBER,…]` |
 
 **Omit defaults** — do not write `decimals: ''`, `min: ''`, or `plain: false`.  
-`exodus_dict_number(di, { min: 0, max: 100 })` not `{ decimals: '', min: 0, max: 100 }`.
+Prefer `exodus_dict_number(di, { max: 100 })` over `{ min: 0, max: 100 }` (default ≥ 0).
 
-Use `plain: true` for non-amounts (JOURNAL_NO, NUMBER_ADS, SEQUENCE, port numbers, day counts, …).
+Use **integer** for counts/days/sequences; **decimal** for plain fractional; **number** for amounts (grouping when BASEFMT groups).
 
 | Direction | Meaning |
 |-----------|---------|
