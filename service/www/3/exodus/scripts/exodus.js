@@ -1036,7 +1036,9 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
             signed = true
         }
 
-        if (params[1] != '' && exodusnum(params[1])) {
+        // min/max: treat null/undefined as absent (not only != '').
+        // max:0 must still gate (empty string only means “no max”).
+        if (params[1] != null && params[1] !== '' && exodusnum(params[1])) {
             if (value < +params[1]) {
                 gmsg = value + ' must not be less than ' + params[1]
                 return null
@@ -1049,7 +1051,7 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
             }
         }
 
-        if (params[2] != '' && exodusnum(params[2]) && value > +params[2]) {
+        if (params[2] != null && params[2] !== '' && exodusnum(params[2]) && value > +params[2]) {
             gmsg = value + ' must not be more than ' + params[2]
             return null
         }
