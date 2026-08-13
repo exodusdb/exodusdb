@@ -159,6 +159,10 @@ function exodus_dict_year(dicti,from,to,defaultyear) {
  if (!from) from=0
  if (!to) to=0
  exodusassertobject(dicti,'exodus_dict_year','dicti')
+ // Year dropdown: install value;title list as conversion (not a live [NUMBER…] field).
+ // Brief [NUMBER,0] seed then replace — same “numeric then select” pattern as other
+ // code that wants number-ish align/width defaults before the option list owns conversion.
+ // Final conversion is the select list; option labels are plain years (grouping N/A).
  dicti.conversion='[NUMBER,0]'
  dicti.align='R'
  dicti.length=4
