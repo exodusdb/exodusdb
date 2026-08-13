@@ -1,7 +1,8 @@
-# FORM-UI-NUMBER — `[NUMBER…]` / `[DECIMAL…]`
+# FORM-UI-NUMBER — `[NUMBER…]` / `[DECIMAL…]` / `[INTEGER]`
 
 **Location:** `service/www/exodus/doc/`  
-**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `INTEGER`, `exodusround`), `db.js` (`exodus_dict_number`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
+**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `INTEGER`, `exodusround`), `db.js` (`exodus_dict_number` / `_integer` / `_decimal`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
+**Tests:** `service/www/3/exodus/scripts/test_number.js`  
 **See also:** [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [PROGRAMMERS_OVERVIEW.md](./PROGRAMMERS_OVERVIEW.md)
 
 ---
@@ -10,11 +11,27 @@
 
 | Conversion | Role |
 |------------|------|
-| **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form (amounts: thousands when BASEFMT groups) |
-| **`[DECIMAL,…]`** | Same as NUMBER OCONV but **plain** (no thousands); may have fractional places |
+| **`[NUMBER,…]`** | Full numeric **ICONV/OCONV** for bound fields and true **external** form — **fully formatted** amounts (see §5) |
+| **`[DECIMAL,…]`** | Same ndecs path as NUMBER OCONV but **plain** (no thousands; `.` decimal only) |
 | **`[INTEGER]`** | Plain, **0 decimal places** (counts/days/sequences). Optional zero-suppress: **`[INTEGER,Z]`** / **`[INTEGER,0Z]`**. With min/max keep the decimals slot: **`[INTEGER,0,min,max]`** (not `[INTEGER,min,max]` — that would mis-bind min into the max slot) |
 
-**Dict helpers** (`db.js`): bag only — all via `exodus_dict_number`.
+There is **no** conversion name `AMOUNT`. Amount fields use NUMBER (often `CURRENCY` / `BASE` / `NDECS`).
+
+`ROUND` is a **legacy alias** for `DECIMAL` — prefer `DECIMAL` / `[DECIMAL,…]`.
+
+| Direction | Meaning |
+|-----------|---------|
+| **ICONV** | external → internal (always strips grouping; validates min/max) |
+| **OCONV** | internal → external |
+
+**Internal (gds):** plain ASCII e.g. `1000.00` or `1000.00USD` (`.` decimal, **no** thousands).  
+**External (NUMBER OCONV / screen):** fully formatted per company BASEFMT — e.g. `1,000.00` or `1.000,00` (and unit suffix when `CURRENCY`/`UNIT`).
+
+---
+
+## 2. Dict helpers (bag only)
+
+All via `exodus_dict_number` in `db.js`. Prefer helpers over raw `dictrec(…, '[NUMBER…]')` or `di.conversion = '[NUMBER…]'`.
 
 ```js
 exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts (grouping)
@@ -27,80 +44,192 @@ exodus_dict_number(di)                                     // same as {}
 
 | `opts` key | Default if omitted | Role |
 |------------|--------------------|------|
-| `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` |
+| `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` / combos (`'NDECS,CURRENCY'`) |
 | `min` / `max` | `''` | ICONV limits; empty min → default **≥ 0** unless `SIGNED` / `signed: true` |
-| `signed` | omit | `true` → min slot `SIGNED` (allow negatives) when min omitted |
+| `signed` | omit | `true` → min slot `SIGNED` (allow negatives) when min omitted. **Ignored if `min` is set.** |
 | `plain` | `false` | `true` → `[DECIMAL,…]`, or **`[INTEGER]`** / **`[INTEGER,0,min,max]`** when `decimals` is 0; omit → `[NUMBER,…]` |
 
-**Omit defaults** — do not write `decimals: ''`, `min: ''`, or `plain: false`.  
-Prefer `exodus_dict_number(di, { max: 100 })` over `{ min: 0, max: 100 }` (default ≥ 0).
+**Shims**
 
-Use **integer** for counts/days/sequences; **decimal** for plain fractional; **number** for amounts (grouping when BASEFMT groups).
+| Helper | Defaults if unset | Result kind |
+|--------|-------------------|-------------|
+| `exodus_dict_integer` | `decimals: 0`, `plain: true` | counts / days / sequences |
+| `exodus_dict_decimal` | `plain: true` | plain fractional (no thousands) |
+| `exodus_dict_number` | (none) | amounts unless `plain` |
 
-| Direction | Meaning |
-|-----------|---------|
-| **ICONV** | external → internal (always strips grouping; validates min/max) |
-| **OCONV** | internal → external |
+**Omit defaults** — do not write `decimals: ''`, `min: ''`, `plain: false`, or redundant `min: 0` (empty min already means ≥ 0).
 
-**Internal (gds):** plain e.g. `1000.00` or `1000.00USD`.  
-**External (screen):** often `1,000.00` or `1.000,00` when company BASEFMT groups.
+```js
+// Prefer
+exodus_dict_number(di, { max: 100 })
+// Not
+exodus_dict_number(di, { min: 0, max: 100 })
+```
 
-There is **no** conversion name `AMOUNT`. Amount fields use NUMBER (often `CURRENCY` / `BASE` / `NDECS`).
+**Choose the helper by meaning**
 
----
-
-## 2. Grouping vs plain (conversion name)
-
-Call via conversion strings / shims — not by hand-passing extra args into `NUMBER`:
-
-| Call | OCONV |
-|------|--------|
-| `.exodusoconv('[NUMBER,2]')` / bind / setx | decimals + **grouping** when BASEFMT ends with `,` |
-| `.exodusoconv('[DECIMAL,2]')` / `DECIMAL(...)` | decimals only, plain `1000.00` |
-| `.exodusoconv('[INTEGER]')` / `INTEGER(...)` | **0 dp**, plain (no thousands) |
-| `ROUND(...)` | legacy alias for `DECIMAL` |
-
-Both ICONV and OCONV **normalize** grouping before parse (accept plain or already-external).  
-How DECIMAL/INTEGER ask NUMBER for plain / 0 dp is an **implementation detail** (not a public conversion parameter).  
-**No** `gnumber_oconv_display` / begin/end.
+| Kind | Helper | Typical bag |
+|------|--------|-------------|
+| Counts, days, sequences, line nos | `exodus_dict_integer` | `{ max: n }` if needed |
+| Amounts (grouping when BASEFMT groups) | `exodus_dict_number` | `{ decimals: 'CURRENCY' }` / `'BASE'` / `'NDECS'` |
+| Allow negatives (credits, journals, some estimates) | same + | `signed: true` |
+| Plain fractional (no thousands) | `exodus_dict_decimal` | `{ decimals: 2 }` or `NDECS` |
 
 ---
 
-## 3. Parameters (same slots for NUMBER, DECIMAL, INTEGER)
+## 3. ICONV min / max / SIGNED (load-bearing)
+
+Implemented in `NUMBER` (`exodus.js`). DECIMAL/INTEGER call into the same path.
+
+| Rule | Behaviour |
+|------|-----------|
+| **Empty min** | Value must be **≥ 0** |
+| **min `SIGNED`** | Clears the min numeric test; **negatives allowed** |
+| **Numeric min** | Value must be ≥ min |
+| **Empty max** | No upper bound |
+| **Numeric max** | Value must be ≤ max (same empty+numeric gate as min — so **`max: 0` works**) |
+| **`POSITIVE` keyword** | **Retired** — use numeric `min: 0` or rely on default ≥ 0 |
+
+Bag → conversion string:
+
+- `signed: true` and min omitted → min slot written as `SIGNED` (e.g. `[NUMBER,CURRENCY,SIGNED]`).
+- Prefer **`signed: true`** at the bag over raw `min: 'SIGNED'`.
+
+---
+
+## 4. Parameters (same slots for NUMBER, DECIMAL, INTEGER)
 
 ```text
 [NUMBER|DECIMAL|INTEGER, <decimals>, <min>, <max>]
 ```
 
-Examples: `[NUMBER,2]`, `[DECIMAL,2,0,100]`, `[INTEGER]`, `[INTEGER,Z]`, `[INTEGER,0,0,999999]`.
+Examples: `[NUMBER,2]`, `[DECIMAL,2,0,100]`, `[INTEGER]`, `[INTEGER,Z]`, `[INTEGER,0,0,999999]`, `[NUMBER,CURRENCY,SIGNED]`.
 
-`CURRENCY` / `UNIT` may appear in any slot.
+`CURRENCY` / `UNIT` may appear in any slot (they are filtered out of the numeric slots; mid-list tokens can shift min/max — see tests).
 
 | Param | Effect |
 |-------|--------|
 | digit / empty / `NDECS` / `BASE` / `nZ` | **Decimal places** (and zero-suppress). INTEGER forces 0 at runtime; with min/max keep a `0` in this slot so min/max stay in the right positions. |
-| min / max | ICONV numeric limits |
+| min / max | ICONV numeric limits (`SIGNED` in min = allow neg) |
 | `CURRENCY` / `UNIT` | amount+unit |
 
-These do **not** select thousands by name. Grouping is:
-
-- **NUMBER OCONV** + **`gbasefmt` ends with `,`**, and  
-- MD vs MC for **which** character is decimal vs thousands.
-
-`gbasefmt` (cookie `bf`) is fixed for the session (company format).
+Parameter tokens (`CURRENCY`, decimals, min, max) do **not** choose thousands by name. Grouping and `,.` / `.,` separators are **only** a NUMBER OCONV + BASEFMT concern (§5).
 
 ---
 
-## 4. Policy: do not OCONV to round mid-calc
+## 5. NUMBER OCONV = fully formatted external (`,.` / `.,`)
 
-**Bad:** `(a + b).exodusoconv('[NUMBER,2]')` then more math.  
-**Good:** `.exodusoconv('[DECIMAL,2]')` or pure `exodusround(n, 2)` then continue; use **NUMBER** only for real external / field conversion.
+**Any** use of NUMBER for **output** is full external form — not a light pad/round.
 
-Amount fields: omit `plain` (or `plain: false`) so conversion is `[NUMBER,…]` and paint gets grouping. Non-amount integers: `plain: true` + `decimals: 0` → `[INTEGER]` (ndecs forced in shim).
+That includes:
+
+| Call site | Same rule |
+|-----------|-----------|
+| `.exodusoconv('[NUMBER]')` / `.exodusoconv('[NUMBER,…]')` | Fully formatted OCONV |
+| Bound field paint / `setx` with conversion `[NUMBER,…]` | Same |
+| `NUMBER('OCONV', value, params)` with default `display` | Same |
+| User messages, notes, invalid text built with `.exodusoconv('[NUMBER,…]')` | Same — intentional screen text |
+
+**Not** “almost plain with optional commas.” Assume the result may contain **thousands separators and a locale decimal** and must not be fed back into arithmetic without ICONV (or avoid NUMBER mid-calc entirely — §6).
+
+### BASEFMT rules (`gbasefmt`, cookie `bf`)
+
+Session company format. OCONV (when grouping is on) uses:
+
+| `gbasefmt` | Thousands | Decimal | Example OCONV of `1000.5` at 2 dp |
+|------------|-----------|---------|-------------------------------------|
+| **MD…,** (common “Anglo”) | `,` | `.` | `1,000.50` |
+| **MC…,** (common “Euro”) | `.` | `,` | `1.000,50` |
+| BASEFMT **does not** end with `,` | *(none)* | `.` | `1000.50` (ndecs only; still NUMBER path) |
+
+Implementation sketch (`exodus.js` NUMBER OCONV):
+
+- `useThousands` ⇔ last character of `gbasefmt` is `,`
+- `isMC` ⇔ `gbasefmt` starts with `MC` → thousands `.` and decimal `,`; else thousands `,` and decimal `.`
+- Integer part gets `\B(?=(\d{3})+(?!\d))` grouping when `useThousands`
+- Unit suffix (`CURRENCY` / `UNIT`) is reattached after separators
+
+ICONV **strips** either grouping style before parse (accept plain or already-external).
+
+### Grouping vs plain (conversion name)
+
+| Call | OCONV result shape |
+|------|--------------------|
+| `.exodusoconv('[NUMBER,…]')` / bind / setx / messages | **External:** ndecs + **full** `,.` or `.,` formatting when BASEFMT groups |
+| `.exodusoconv('[DECIMAL,…]')` / `DECIMAL(...)` | **Plain:** ndecs only, `.` decimal, **no** thousands — re-entrable for math |
+| `.exodusoconv('[INTEGER]')` / `INTEGER(...)` | **Plain:** 0 dp, no thousands |
+| `ROUND(...)` | legacy alias for `DECIMAL` |
+
+How DECIMAL/INTEGER ask NUMBER for plain / 0 dp is an **implementation detail** (`display` / `forced_ndecs` — not a public conversion parameter).  
+**No** `gnumber_oconv_display` / begin/end.
+
+**Document every `[NUMBER…]` OCONV as user-facing formatted output.** If you need plain digits for further calc or storage shape, use **`[DECIMAL…]`**, **`[INTEGER]`**, or **`exodusround`** — not NUMBER.
 
 ---
 
-## 5. getvalue
+## 6. Policy: do not OCONV to round mid-calc
+
+**Bad:** `(a + b).exodusoconv('[NUMBER,2]')` then more math — result may be `1,234.56` / `1.234,56`, not a plain number.  
+**Good:** `.exodusoconv('[DECIMAL,2]')` or pure `exodusround(n, 2)` then continue.
+
+Use **NUMBER** only for:
+
+- Bound field conversion (helper → `[NUMBER,…]`)
+- True **external** display / print
+- **User-facing** strings (warnings, notes, invalid messages) where full formatting is wanted
+
+Amount fields: omit `plain` so conversion is `[NUMBER,…]` and paint gets full external formatting.  
+Non-amount integers: `exodus_dict_integer` (or `plain: true` + `decimals: 0`) → `[INTEGER]`.
+
+---
+
+## 7. Paint and host (dbform)
+
+Primary axis: **`di.exostyle`** (set by helpers only).
+
+| Helper | `exostyle` | Host |
+|--------|------------|------|
+| `exodus_dict_number` / `_integer` / `_decimal` | `"number"` | content **SPAN** (not fixed INPUT) |
+
+| Axis | Number SPAN behaviour |
+|------|------------------------|
+| **`di.length`** | **Unused** for code/number SPANs (floor **6ch**, expand). Do not set length to “size” a number field. |
+| **`di.align`** | Helper: if unset → **R** when `groupno > 0`, else **L**. Preset (e.g. footer totals) is **kept**. |
+| **INPUT width** | NUMBER fields become SPAN; length-based INPUT width rules do not apply. |
+
+### Align / length after the helper
+
+**After** `exodus_dict_integer` / `_number` / `_decimal`:
+
+- Do **not** set `di.align` or `di.exostyle` (helper owns them).
+- Do **not** set `di.length` for paint (ignored for number SPAN).
+
+**Exception — align R on non-group / header / tfoot fields:** set **`di.align = 'R'` before** the helper so the helper preserves it (default for `groupno` 0 is L).
+
+```js
+// Footer total (group blank) — want R like table money cells
+di = dict[++din] = dictrec('TOTAL_AMOUNT', 'S')
+di.align = 'R'
+exodus_dict_number(di, { decimals: 'NDECS' })
+```
+
+### dictrec constructor args
+
+Once a field uses a number helper, drop trailing conversion / align / length from `dictrec`:
+
+```js
+// Bad (legacy)
+di = dict[++din] = dictrec('SEQUENCE', 'F', 3, '', '', '', '', '[INTEGER]', '', 'R', 5)
+// Good
+di = dict[++din] = dictrec('SEQUENCE', 'F', 3)
+exodus_dict_integer(di)
+```
+
+Indent helper calls at the **same** level as the matching `di = dict[++din] = …` line.
+
+---
+
+## 8. getvalue
 
 `getvalue` is always **external** from the DOM (including NUMBER with thousands/unit).
 
@@ -108,12 +237,108 @@ For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when 
 
 ---
 
-## 6. Source map
+## 9. Settled contract (do not re-open casually)
+
+| Topic | Rule |
+|--------|------|
+| Default non-negative | Empty min → **≥ 0** |
+| Allow negatives | Bag **`signed: true`** → min slot `SIGNED` (not magic floors like `-999999999`) |
+| Counts vs amounts | **integer** (plain 0 dp) vs **number** (full external format) vs **decimal** (plain frac) |
+| NUMBER OCONV | Always **fully formatted** external (`,.` / `.,` per BASEFMT) — including `.exodusoconv('[NUMBER…]')` in messages |
+| Bags | Omit defaults; no noisy `min: 0` |
+| Paint | Helper sets `exostyle` + default align; no post-helper align/length/exostyle |
+| Prefer helpers | Do not put `[NUMBER…]` / `[INTEGER…]` in `dictrec` conversion7 for live numeric fields |
+| No `POSITIVE` | Use default ≥ 0 or numeric `min: 0` only when you need an explicit floor equal to zero **and** something else is going on (prefer omit) |
+| No `UNSIGNED` | Not part of the public API unless explicitly reintroduced |
+
+**Load-bearing NUMBER quirks** (documented in `exodus.js`; do not “fix” without tests): unit peel differs ICONV vs OCONV; `CURRENCY` mid-list shifts min/max; Z + unit zero; JS `0` vs `''` early exit. See comments on `function NUMBER` and `test_number.js`.
+
+---
+
+## 10. Rationalisation status
+
+### Framework (exodus) — strong
+
+| Area | Status |
+|------|--------|
+| ICONV default ≥ 0 / SIGNED / max gate | Done |
+| INTEGER / DECIMAL shims + ROUND alias | Done |
+| `exodus_dict_number` bag + integer/decimal helpers | Done |
+| `signed: true` → min SIGNED | Done |
+| Paint: `exostyle number`, length unused, align by groupno | Done |
+| Docs + `test_number.js` | Done |
+
+**Framework leftovers (small)**
+
+- Some **exodus product dicts** still call `exodus_dict_number({ decimals: 0, min: 0 })` instead of `exodus_dict_integer` and omitting `min: 0` (`systemconfiguration`, `parts`, `authorisation`, `colors`, …).
+- Helpers under-used **inside** exodus’s own form scripts (API exists; call sites lag).
+- Patterns that seed a numeric conversion then **overwrite** with a select list (e.g. year dropdown) are not “number fields” — do not treat as NUMBER migration targets.
+
+### App call sites (neosys and peers) — strong on bound conversions
+
+Typical mature state after the bag migration wave:
+
+| Pattern | Target state |
+|---------|----------------|
+| `dictrec(…, '[NUMBER…]')` / `[INTEGER…]` / `[DECIMAL…]` | **None** for live numeric fields — use helpers |
+| `di.conversion = '[NUMBER…]'` | Prefer helper; rare specials only |
+| Allow-neg amounts | `signed: true` on the bag |
+| Redundant `min: 0` | Dropped (default ≥ 0) |
+| Post-helper `align` / `exostyle` | Dropped |
+| Post-helper `length` | Drop (paint-dead for number SPAN); residual sites OK to clear when touched |
+
+**Not the same as** “every right-aligned cell is a NUMBER field.” Many `dictrec(…, 'R', n)` columns are codes, ids, or display chrome **without** a numeric conversion — migrate only when ICONV/OCONV or amount semantics are real.
+
+### Partial / open
+
+| Topic | Notes |
+|--------|------|
+| Select list + leftover `[INTEGER]` / helper | If `di.conversion = cols` (or `'0:1:2:…'`) **overwrites** a prior numeric conversion, the field is a **select**, not a number. Do **not** add `dict_integer` (it would wipe the list). Drop dead `[INTEGER]` from dictrec; drop stray `exostyle = 'number'` unless paint truly needs it. |
+| Helper **after** select assign | `di.conversion = cols` then `exodus_dict_integer(di)` makes the helper win — confirm product intent; often a smell. |
+| Special raw forms (e.g. `[NUMBER,*]`) | Decide per field: helper bag, keep raw with a comment, or replace. |
+| `dict_number({ decimals: 0 })` without plain | May be intentional 0-dp **amount** (grouping). Pure counts → `dict_integer`. Signed 0-dp amounts → often still **number** + `signed: true`, not integer. |
+| Legacy `dictrec(…, 'R', length)` next to a helper | Redundant; length unused for number SPAN; align usually already set by helper when `groupno > 0`. Strip when touching the line. |
+| Mid-calc | Prefer DECIMAL / `exodusround`; NUMBER only for external / messages. |
+| Server C++ amount formatting | **Out of scope** of this JS conversion/helper rationalisation. |
+| Broad `dict_decimal` adoption | API ready; few call sites until plain fractional fields are walked deliberately. |
+
+### Scorecard (intent)
+
+| Layer | Maturity | Meaning |
+|--------|----------|---------|
+| Exodus ICONV/OCONV semantics | High | Contract stable; tested |
+| Exodus dict helper API | High | One bag path; shims thin |
+| Exodus own product dicts | Medium | Still some `decimals:0` + `min:0` style |
+| App bound fields on helpers | High | Raw dictrec numeric conversions largely gone |
+| App bag style (signed / omit min:0) | High | Matches framework |
+| App post-helper paint cleanup | High | align/exostyle; length residual |
+| “Every R-aligned value is rationalised” | Low | Not a goal without per-field “is this NUMBER?” |
+| Mid-calc / C++ | Partial / separate | Do not claim finished |
+
+---
+
+## 11. Source map
 
 | Concern | Where |
 |---------|--------|
-| `NUMBER` / `DECIMAL` / `INTEGER` | `exodus.js` |
-| Dict helper | `db.js` → `exodus_dict_number(di, opts)` → `[NUMBER,…]`, or `[DECIMAL,…]` / `[INTEGER]` / `[INTEGER,0,min,max]` when `plain` |
+| `NUMBER` / `DECIMAL` / `INTEGER` / `ROUND` | `exodus.js` |
+| Dict helpers | `db.js` → `exodus_dict_number` / `_integer` / `_decimal` |
 | Pure numeric round | `exodus.js` → `exodusround` |
 | BASEFMT | `client.js` → `gbasefmt`, `gthousands_regex` |
 | DOM read | `dbform.js` → `getvalue` (external), `getvalue_internal` (ICONV) |
+| Number SPAN paint | `dbform.js` — `exostyle` number/code: floor 6ch, length unused |
+| Self-check suite | `test_number.js` |
+
+---
+
+## 12. Migration checklist (when touching a field)
+
+1. Is the **live** conversion numeric (`[NUMBER…]` / `[INTEGER…]` / `[DECIMAL…]`), or a select / other overwrite?
+2. If numeric: pick **integer** / **number** / **decimal**; add helper **after** `dictrec` (so `groupno` is set).
+3. Allow negatives? → `signed: true` (do not invent floors).
+4. Drop dictrec conversion7 / align9 / length10 for that field; drop post-helper align / length / exostyle.
+5. Footer / header want R with blank group? → `di.align = 'R'` **before** helper.
+6. Mid-calc nearby? → DECIMAL or `exodusround`, not NUMBER (NUMBER OCONV is fully formatted `,.` / `.,`).
+7. User message amounts? → `[NUMBER…]` is correct (full format); do not treat the string as internal.
+8. Match indent of the `di =` line.
+
