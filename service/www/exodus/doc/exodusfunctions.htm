@@ -245,16 +245,34 @@
 <P>type must be ICONV or defaults to OCONV</P>
 <P>input must be something that can be parsed as a number or an array of the same 
 	or will return null indicating that the conversion has failed</P>
-<P>mode can be a comma separated list of parameters</P>
-<P>mode1 can be:</P>
-<P>a number of decimals eg. 2</P>
-<P>BASE in which case the number of decimal places&nbsp;will be taken from the 
-	third character of the base currency format in gbasefmt&nbsp;(eg MD20P)&nbsp;</P>
-<P>NDECS in which case the number of decimal places will be taken from the global 
-	variable gndecs if defined or getrecord('NDECS') if not</P>
-<P>ICONV</P>
-<P>mode2 can be a numeric minimum (e.g. 0 for non-negative); conversion fails if
-	the input is less than that value</P>
+<P>mode is a comma-separated list of parameters (same slots for DECIMAL / INTEGER):</P>
+<P><code>[NUMBER|DECIMAL|INTEGER, &lt;decimals&gt;, &lt;min&gt;, &lt;max&gt;]</code>
+	— also <code>CURRENCY</code> / <code>UNIT</code> may appear in any slot</P>
+<P><B>mode1 — decimals</B></P>
+<UL>
+	<LI>a number of decimals e.g. 2 (append Z to zero-suppress)</LI>
+	<LI>empty — ndecs from the value’s fractional length (keep entered places; rare for bound amounts)</LI>
+	<LI>BASE — decimal places from the third character of gbasefmt (e.g. MD20P)</LI>
+	<LI>NDECS — from gndecs if defined, else getrecord('NDECS')</LI>
+	<LI>CURRENCY / UNIT — amount+unit (e.g. 1042.00USD); filtered out of numeric slots</LI>
+</UL>
+<P><B>mode2 — min (ICONV only)</B></P>
+<UL>
+	<LI><B>empty</B> — default <B>≥ 0</B> (non-negative)</LI>
+	<LI><B>SIGNED</B> — allow negatives (no lower bound from this slot)</LI>
+	<LI><B>numeric</B> — value must be ≥ min (e.g. 0 same as default ≥0; or 1000 for a floor)</LI>
+	<LI>POSITIVE keyword is <B>retired</B> — use empty min or numeric 0</LI>
+</UL>
+<P><B>mode3 — max (ICONV only)</B></P>
+<UL>
+	<LI>empty — no upper bound</LI>
+	<LI>numeric — value must be ≤ max (same empty+numeric gate as min, so max 0 works)</LI>
+</UL>
+<P><B>OCONV</B> — external form; when gbasefmt ends with “,”, NUMBER applies thousands
+	grouping and MD/MC decimal vs thousands characters (e.g. 1,000.50 or 1.000,50).
+	DECIMAL / INTEGER are plain (no thousands). See FORM-UI-NUMBER.md for dict helpers
+	(<code>exodus_dict_number</code> / <code>_integer</code> / <code>_decimal</code>,
+	bag <code>signed: true</code> → min SIGNED, or min = −max when max is set).</P>
 <H3>PERIOD_OF_YEAR(type,input,mode)</H3>
 <P>type=ICONV/OCONV<br />
 	input internal format is 1/99<br />
