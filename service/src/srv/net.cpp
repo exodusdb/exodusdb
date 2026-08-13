@@ -55,7 +55,6 @@ listen:
 
 		} catch (VarError& varerror) {
 			// Similar code in net.cpp and listen.cpp
-			// Prefix matches listen request-level catch; sysmsg() below emails support.
 			//msg_ = varerror.description.default_from("No error message") ^ FM ^ backtrace();
 			msg_ = "System Error: " ^ var(varerror.message) ^ FM ^ varerror.stack();
 			//msg_ = varerror.description.default_from("No error message");

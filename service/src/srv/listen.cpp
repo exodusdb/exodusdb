@@ -1536,9 +1536,7 @@ subr process() {
 			if (not rollbacktrans())
 				loglasterror();
 			// Similar code in net.cpp and listen.cpp
-			// Prefix for WUI system-error path; sysmsg emails support (log/sendmail).
 			response_ = "System Error: " ^ var(e.message) ^ FM ^ e.stack();
-			call sysmsg(response_, response_.f(1).first(256));
 		}
 
 	return;
