@@ -1706,33 +1706,12 @@ var gexodus_system_error_user_msg =
 	'Technical support has been informed.\r\n\r\n' +
 	'You may try to ignore the message or contact technical support for more info.'
 
-// Crude detection of backend system/backtrace dumps in WUI messages (db.response etc.).
-// "System Error: …" is the main live path (e.g. GENERALPROXY invalid request / ERROR_TEST).
-// Also VarError stacks / EXODUS_SYSTEM_ERROR marker. Later: systemerror() same user msg.
+// System errors lead with "System Error" (server GENERALPROXY / client systemerror).
+// Only inspect the first 20 chars. Later backend markers optional.
 function exodus_looks_like_system_error(msg) {
 	if (msg == null || msg === '')
 		return false
-	var s = String(msg)
-	// GENERALPROXY / listen: "System Error: …" — client systemerror: "System Error: …"
-	if (/System Error\s*:/i.test(s) || /System Error in /i.test(s))
-		return true
-	// Explicit backend/client marker (optional for now)
-	if (s.indexOf('EXODUS_SYSTEM_ERROR') >= 0)
-		return true
-	// listen.cpp VarError: message + FM + e.stack() (frameno: file.cpp:line: source)
-	if (/Backtrace\s+\d/i.test(s))
-		return true
-	if (/\bVar(Unassigned|Unconstructed|DivideByZero|NonNumeric|NonPositive|NumOverflow|NumUnderflow|OutOfMemory|InvalidPointer|DBException|NotImplemented|Debug)\b/.test(s))
-		return true
-	if (/\bDim(Undimensioned|IndexOutOfBounds)\b/.test(s))
-		return true
-	if (/(^|[\r\n])\d+:\s+\S+\.(cpp|h|hpp|cc|cxx):\d+/m.test(s))
-		return true
-	if ((s.match(/(^|[\r\n])\d+:\s+/g) || []).length >= 2 && /\.(cpp|h)\b/.test(s))
-		return true
-	if (/0x[0-9a-fA-F]{6,}/.test(s) && (/\.so[\.\d]*/.test(s) || /objdump|gdb --batch/.test(s)))
-		return true
-	return false
+	return String(msg).slice(0, 20).indexOf('System Error') >= 0
 }
 
 function exodus_user_facing_msg(msg) {
