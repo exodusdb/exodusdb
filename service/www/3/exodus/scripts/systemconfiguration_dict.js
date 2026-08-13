@@ -80,8 +80,6 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.unique = true
 
     di = dict[++din] = dictrec('NUMBER_OF_PROCESSES', 'F', 59, '', groupn)
-    // L (not group-default R): admin header field, not a money column
-    di.align = 'L'
     exodus_dict_integer(di, { min: 1, max: 9 })
     //di.required=true;
     if (gusername != 'EXODUS') di.readonly = true
