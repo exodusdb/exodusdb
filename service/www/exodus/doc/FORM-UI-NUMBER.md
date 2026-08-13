@@ -46,7 +46,7 @@ exodus_dict_number(di)                                     // same as {}
 
 | `opts` key | Default if omitted | Role |
 |------------|--------------------|------|
-| `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` / combos (`'NDECS,CURRENCY'`) |
+| `decimals` | `''` | digit / `BASE` / `NDECS` / `CURRENCY` / `UNIT` / `nZ` / combos (`'NDECS,CURRENCY'`). **Empty is special** — see below |
 | `min` / `max` | `''` | ICONV limits; empty min → default **≥ 0** unless `SIGNED` / `signed: true` |
 | `signed` | omit | `true` when **min omitted**: numeric **max** → min = **−max** (symmetric; normal min/max rules); else min slot **SIGNED**. **Ignored if `min` is set.** |
 | `plain` | `false` | `true` → `[DECIMAL,…]`, or **`[INTEGER]`** / **`[INTEGER,0,min,max]`** when `decimals` is 0; omit → `[NUMBER,…]` |
@@ -67,6 +67,14 @@ exodus_dict_number(di, { max: 100 })
 // Not
 exodus_dict_number(di, { min: 0, max: 100 })
 ```
+
+**Empty / omitted `decimals` (rare — intentional only)**  
+
+When the decimals slot is empty, NUMBER ICONV/OCONV sets ndecs from the **current value’s** fractional digit count (keep entered places / “dynamic” width), not from company NDECS/BASE.  
+
+- **Omit `decimals` only when that dynamic / keep-entered behaviour is intentional** (unusual for bound amounts).  
+- Prefer an explicit choice: `0`, `2`, `'NDECS'`, `'BASE'`, `'CURRENCY'`, etc.  
+- Do **not** omit just to “use the default” for normal money fields — default empty ≠ NDECS.
 
 **Choose the helper by meaning**
 
