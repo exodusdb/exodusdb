@@ -1572,6 +1572,9 @@ adddatasetcodename:
 	// Testing that requires service environment
 	gosub dosystests();
 
+	// Project sysmsg support addresses for PHP (see writesupportcfg comments).
+	gosub writesupportcfg();
+
 	call log2("*emailing any notifications, warnings or errors", logtime);
 	if (msg_) {
 		call sysmsg(msg_, "Messages from INIT.GENERAL");
@@ -1711,6 +1714,101 @@ subr dosystests() {
 			//Update on successful testing
 			exobuilddate.write(DEFINITIONS, lasttestkey);
 		}
+	}
+
+	return;
+}
+
+// writesupportcfg — publish support email list for PHP WUI system-error reporting
+// ////////////////////////////////////////////////////////////////////////////////
+//
+// Why
+// ---
+// Client systemerror() posts EXECUTE GENERAL SYSTEM_ERROR via a side dblink so support
+// can be told even when the main db request is stuck. Prefer handling that in xhttp.php
+// when possible so a dead listen process still reports.
+//
+// Backend sysmsg() has a full multilevel config stack (getbackpars: DEFINITIONS BACKUP,
+// work backup.cfg, ../../backup.cfg, SYSTEM fields, testdata rules, default
+// sysmsg@neosys.com). PHP must not reimplement that, and must not rely on open_basedir
+// (or similar) to walk outside the host tree Apache already uses.
+//
+// So at service startup, after all those levels are loaded, we *project* the address
+// list sysmsg would use for a normal system message into a tiny file PHP can read on
+// the same paths it already uses (exodusrootpath/work — same as .run files; service
+// WorkingDirectory is ~/hosts/<host>/work).
+//
+// Where / one file per install
+// ---------------------------
+// Path: support.cfg in service cwd = ~/hosts/<host>/work/support.cfg
+// One file per host install, not per database: support team may vary by installation
+// (~/hosts dir) but not per dataset under that host.
+//
+// When (call site)
+// ----------------
+// Late initgeneral, after dosystests / full SYSTEM and after getbackpars has been used
+// for SYSTEM<61> etc., so a sysmsg() call at this point would already pick the right
+// addresses. Re-call getbackpars here so we are not stale.
+//
+// disabled.cfg (same as sysmsg, not sendmail)
+// -------------------------------------------
+// sysmsg checks osfile("~/hosts/disabled.cfg") *directly* on every call — after log/
+// journalctl -t sysmsg, before getbackpars/sendmail. sendmail.cpp does not know about
+// it. If the file exists (even empty), we write an *empty* support.cfg so PHP suppresses
+// email but can still treat "report" as OK (logged-only). getbackpars also uses
+// disabled.cfg as one signal for "testdata" bakpars(11); that is separate from this
+// email kill-switch.
+//
+// Address recipe (mirror sysmsg generic path; not login-failure specials)
+// -----------------------------------------------------------------------
+// bakpars.f(6) tech emails; bakpars.f(10) may append after "/"; take field("/",1);
+// replace backups@neosys.com → sysmsg@neosys.com; if still empty → sysmsg@neosys.com.
+// We do not apply per-user EXODUS-session restrictions here — this is install-level.
+//
+// File format (read by xhttp SYSTEM_ERROR path — same conventions as sendmail.cpp)
+// -----------------------------------------------------------------------------
+// First non-# line written as sysmsg would pass to sendmail as toaddress:
+//   ;   separates addresses in the same role (To, or Cc)
+//   ;;  optional: To list ;; Cc list  (sendmail splits on ";;" into to + cc)
+// Empty line/file = suppress mail. Missing file = PHP fails so WUI shows technical.
+//
+// Consumer
+// --------
+// xhttp.php intercepts EXECUTE GENERAL SYSTEM_ERROR, syslog/error_log always, then
+// mail() / sendmail -t to support.cfg addresses (or suppress if empty).
+//
+subr writesupportcfg() {
+
+	call log2("*write support.cfg for PHP WUI system errors", logtime);
+
+	var emailaddrs = "";
+
+	// Same early exit as sysmsg: global suppress (direct file probe, every sysmsg call)
+	if (not osfile("~/hosts/disabled.cfg")) {
+
+		// Re-resolve after full init (SYSTEM, DEFINITIONS, backup.cfg levels)
+		call getbackpars(bakpars);
+
+		// Mirror sysmsg address selection (generic system message, not login-failure specials)
+		emailaddrs = bakpars.f(6);
+		if (bakpars.f(10)) {
+			if (emailaddrs) {
+				emailaddrs ^= "/";
+			}
+			emailaddrs ^= bakpars.f(10);
+		}
+		emailaddrs = emailaddrs.field("/", 1);
+		emailaddrs.replacer("backups@neosys.com", "sysmsg@neosys.com");
+
+		// sysmsg defaults empty to sysmsg@neosys.com (when not disabled)
+		if (emailaddrs == "") {
+			emailaddrs = "sysmsg@neosys.com";
+		}
+	}
+
+	// work/support.cfg only (cwd = ~/hosts/<host>/work)
+	if (not oswrite(emailaddrs, "support.cfg")) {
+		loglasterror();
 	}
 
 	return;

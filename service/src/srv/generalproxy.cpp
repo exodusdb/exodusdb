@@ -80,8 +80,9 @@ func main() {
 
 	} else if (mode == "SYSTEM_ERROR") {
 
-		// Client systemerror() posts full technical text in data_ for support email.
-		// (Later xhttp.php may handle SYSTEM_ERROR without a live db process.)
+		// Web client path is HIJACKED in xhttp.php (never reaches here) so WUI can
+		// report when listen is down. This mode remains for non-xhttp callers or if
+		// the hijack is removed: data_ = full technical text → sysmsg.
 		if (data_)
 			call sysmsg(data_, "WUI System Error");
 		else

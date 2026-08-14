@@ -355,6 +355,22 @@ while (1) {
 		break;
 	}
 
+	// HIJACK: after session auth, before any listen/file poll — so WUI systemerror()
+	// can still email/syslog when the db process is down. Never reaches generalproxy.
+	if ($requests[0] == 'EXECUTE'
+		&& strtoupper(isset($requests[1]) ? $requests[1] : '') == 'GENERAL'
+		&& strtoupper(isset($requests[2]) ? $requests[2] : '') == 'SYSTEM_ERROR') {
+		$ip = isset($remoteaddr) ? $remoteaddr : '';
+		if (xhttp_report_wui_system_error($username, $database, $ip, $data_in)) {
+			$response = 'OK';
+			$result = 1;
+		} else {
+			$response = 'Error: Failed to report WUI system error (PHP)';
+			$result = 0;
+		}
+		break;
+	}
+
 	//explicit cancel for PHP-FPM (browser XHR abort is not reliably seen by connection_aborted)
 	if ($requests[0] == 'CANCEL') {
 
@@ -727,6 +743,127 @@ function xhttp_write_cancel_marker($linkfilename)
 	$response = 'Error: Client cancelled request in EXODUS xhttp.php ' . $linkfilename;
 	error_log($response);
 	WriteAll($linkfilename . '.5', $response);
+}
+
+// Report client systemerror() payload without the database.
+// Returns true if email was accepted (or deliberately suppressed with empty support.cfg).
+// Addresses from initgeneral writesupportcfg → work/support.cfg (one per host install).
+// (mirrors enough of sysmsg getbackpars for PHP without open_basedir escapes).
+function xhttp_report_wui_system_error($username, $database, $remoteaddr, $data_in)
+{
+	global $exodusrootpath;
+	global $gslash;
+
+	// Subject/To: single line only (strip controls — header injection)
+	$subject = 'EXODUS WUI System Error' . ($database !== '' ? ': ' . $database : '');
+	$subject = trim(preg_replace('/[\x00-\x1F\x7F]+/', ' ', $subject));
+
+	$body = '';
+	$body .= "User: " . ($username !== '' ? $username : '(unknown)') . "\n";
+	$body .= "Database: " . ($database !== '' ? $database : '(unknown)') . "\n";
+	$body .= "IP: " . ($remoteaddr !== '' ? $remoteaddr : '(unknown)') . "\n";
+	if (isset($_SERVER['HTTP_USER_AGENT']))
+		$body .= "Agent: " . $_SERVER['HTTP_USER_AGENT'] . "\n";
+	if (isset($_SERVER['SERVER_NAME']))
+		$body .= "Server: " . $_SERVER['SERVER_NAME'] . "\n";
+	$body .= "\n";
+	$body .= ($data_in !== '' && $data_in !== null) ? $data_in : '(empty system error data)';
+
+	// Always log — journalctl / apache error log even if mail is broken
+	$oneline = str_replace(array("\r\n", "\n", "\r"), ' | ', $body);
+	if (strlen($oneline) > 8000)
+		$oneline = substr($oneline, 0, 8000) . '…';
+	error_log('exodus-wui SYSTEM_ERROR: ' . $oneline);
+
+	if (function_exists('openlog') && function_exists('syslog')) {
+		@openlog('exodus-wui', LOG_ODELAY | LOG_PID, LOG_USER);
+		$n = 0;
+		foreach (preg_split("/\r\n|\n|\r/", $body) as $line) {
+			if ($line === '')
+				continue;
+			@syslog(LOG_ERR, $line);
+			if (++$n >= 80)
+				break;
+		}
+		@closelog();
+	}
+
+	// work/support.cfg (initgeneral); first non-# line = addrs; empty = suppress; missing = fail
+	$to = null;
+	$path = ($exodusrootpath ? $exodusrootpath . 'work' . $gslash . 'support.cfg' : '');
+	if ($path && is_readable($path) && ($raw = @file_get_contents($path)) !== false) {
+		$to = '';
+		foreach (preg_split("/\r\n|\n|\r/", $raw) as $line) {
+			$line = trim($line);
+			if ($line === '' || $line[0] === '#')
+				continue;
+			if (stripos($line, 'email=') === 0)
+				$line = trim(substr($line, 6));
+			$to = $line;
+			break;
+		}
+	}
+	if ($to === null) {
+		error_log('exodus-wui SYSTEM_ERROR: no work/support.cfg');
+		return false;
+	}
+	if ($to === '') {
+		error_log('exodus-wui SYSTEM_ERROR: support.cfg empty — email suppressed');
+		return true;
+	}
+	// Emulate sendmail.cpp: optional Cc after ";;"; within To/Cc, ";" separates addrs
+	// (bakpars/sysmsg storage). For headers, ";" → "," (same idea as sendmail convert).
+	$to = trim(preg_replace('/[\x00-\x1F\x7F]+/', ' ', $to));
+	$cc = '';
+	$p = strpos($to, ';;');
+	if ($p !== false) {
+		$cc = trim(substr($to, $p + 2));
+		$to = trim(substr($to, 0, $p));
+	}
+	$to = trim(preg_replace('/,+/', ',', str_replace(';', ',', $to)), " \t,");
+	$cc = trim(preg_replace('/,+/', ',', str_replace(';', ',', $cc)), " \t,");
+	if ($to === '') {
+		error_log('exodus-wui SYSTEM_ERROR: no To addresses after parse');
+		return false;
+	}
+
+	$host = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
+	$from = 'exodus-wui@' . preg_replace('/[^a-zA-Z0-9.-]/', '', $host);
+	$headers = "From: $from\r\n"
+		. "Content-Type: text/plain; charset=UTF-8\r\n"
+		. "X-Exodus-Source: xhttp.php SYSTEM_ERROR\r\n";
+	if ($cc !== '')
+		$headers .= "Cc: $cc\r\n";
+
+	$mail_ok = false;
+
+	// Prefer sendmail -t (same family as backend sendmail.cpp)
+	$sendmail = '/usr/sbin/sendmail';
+	if (is_executable($sendmail)) {
+		$fd = @popen($sendmail . ' -t -i', 'w');
+		if (is_resource($fd)) {
+			$msg = "To: $to\n"
+				. "Subject: $subject\n"
+				. $headers
+				. "\n"
+				. $body
+				. "\n";
+			$wrote = @fwrite($fd, $msg);
+			$code = @pclose($fd);
+			$mail_ok = ($wrote !== false && $code === 0);
+			if (!$mail_ok)
+				error_log("exodus-wui SYSTEM_ERROR: sendmail failed wrote=$wrote code=$code");
+		}
+	}
+
+	if (!$mail_ok && function_exists('mail')) {
+		// Cc already in $headers; mail() To is first arg only
+		$mail_ok = @mail($to, $subject, $body, $headers);
+		if (!$mail_ok)
+			error_log('exodus-wui SYSTEM_ERROR: mail() returned false');
+	}
+
+	return $mail_ok;
 }
 
 function exodusrnd($max, $min)

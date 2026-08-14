@@ -108,6 +108,7 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.horizontal = true
     //di.defaultvalue='"1:2:3:4:5:6:7"'
 
+    // Tech/alert emails (sysmsg To). ; separates addresses; after ;; is Cc (sendmail.cpp).
     di = dict[++din] = dictrec('BACKUP_EMAIL_ADDRESSES', 'F', 76)
     exodus_dict_emailaddress(di, ';')
 

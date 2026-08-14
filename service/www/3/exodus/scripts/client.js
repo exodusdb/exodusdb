@@ -1702,7 +1702,7 @@ function assertelement(element, funcname, varname) {
 // User-facing text when backend (or rare client) surface is a system/backtrace error.
 // Refine wording later; special exodusconfirm icon/mode may follow.
 var gexodus_system_error_user_msg =
-	'A system error has occurred.\r\n' +
+	'A system error has occurred.\r\n\r\n' +
 	'Technical support has been informed.\r\n\r\n' +
 	'You may try to ignore the message or contact technical support for more info.'
 
@@ -7545,15 +7545,23 @@ function systemerror(functionname, e) {
 			}
 		}
 	}
-	// Full technical + stack for support report / DevTools. Always console.log —
-	// not only when the WUI alert is the friendly (hidden) message.
+	// Full technical + stack (+ page URL). Always console.log — whether or not the
+	// WUI alert hides it. Side-request data for xhttp SYSTEM_ERROR (hijacked in PHP;
+	// never depends on listen being up).
 	var technical = 'System Error: ' + functionname + '\n' + msg
 	try {
-		console.log('EXODUS systemerror (always):\n' + technical)
+		var pageurl = ''
+		if (typeof location != 'undefined')
+			pageurl = location.href || ((location.pathname || '') + (location.search || ''))
+		if (pageurl)
+			technical += '\n\nPage: ' + pageurl
+	} catch (eurl) { }
+	try {
+		console.log('EXODUS systemerror:\n' + technical)
 	} catch (e2) { }
 
-	// Return a promise so await systemerror() waits for report + alert when desired.
-	// Sync call sites still fire the report; alert runs when the side request finishes.
+	// Report on a side dblink (not main db). Awaitable if callers use await systemerror().
+	// Send OK → friendly "support informed"; fail → alert full technical text.
 	return (async function systemerror_report_and_alert() {
 		var reported = false
 		if (!gexodus_reporting_system_error && !gonunload && typeof exodusdblink == 'function') {
@@ -7561,29 +7569,21 @@ function systemerror(functionname, e) {
 			try {
 				var reportdb = new exodusdblink()
 				reportdb.request = 'EXECUTE\rGENERAL\rSYSTEM_ERROR'
-				// Full technical text as request data (backend sysmsg → support email)
+				// data = full technical text; xhttp.php hijacks this request (not listen)
 				reported = !!(await reportdb.send(technical))
 			} catch (e4) {
 				reported = false
+			} finally {
+				gexodus_reporting_system_error = false
 			}
-			gexodus_reporting_system_error = false
 		}
 		if (!gonunload) {
-			// Success → "support has been informed"; else show technical (for now)
 			var usermsg = reported ? gexodus_system_error_user_msg : technical
 			try {
 				usermsg = String(usermsg).replace(/\r\n/g, '\n')
 			} catch (e3) { }
-			// Log again if alert shows technical (report failed) so stack is not only in the dialog
-			if (!reported) {
-				try {
-					console.log('EXODUS systemerror (report failed; shown to user):\n' + technical)
-				} catch (e5) { }
-			}
 			alert(usermsg)
 		}
-		//if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
-		//if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
 		if (gstepping || (gusername == 'EXODUS'))
 			debugger
 	})()
