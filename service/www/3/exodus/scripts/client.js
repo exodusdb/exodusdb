@@ -1718,7 +1718,7 @@ function exodus_looks_like_system_error(msg) {
 function exodus_user_facing_msg(msg) {
 	if (!exodus_looks_like_system_error(msg))
 		return msg
-	// Always friendly UI; technical text in console (EXODUS can open DevTools)
+	// Always log technical text (friendly UI may hide it from the alert/note)
 	try {
 		console.log('EXODUS system error (hidden from user):\n' + String(msg))
 	} catch (e) { }
@@ -7545,11 +7545,11 @@ function systemerror(functionname, e) {
 			}
 		}
 	}
-	// Same user path as server System Error: friendly UI when support report OK;
-	// technical detail always in console. Report uses a side dblink so a busy main db is fine.
+	// Full technical + stack for support report / DevTools. Always console.log —
+	// not only when the WUI alert is the friendly (hidden) message.
 	var technical = 'System Error: ' + functionname + '\n' + msg
 	try {
-		console.log(technical)
+		console.log('EXODUS systemerror (always):\n' + technical)
 	} catch (e2) { }
 
 	// Return a promise so await systemerror() waits for report + alert when desired.
@@ -7574,6 +7574,12 @@ function systemerror(functionname, e) {
 			try {
 				usermsg = String(usermsg).replace(/\r\n/g, '\n')
 			} catch (e3) { }
+			// Log again if alert shows technical (report failed) so stack is not only in the dialog
+			if (!reported) {
+				try {
+					console.log('EXODUS systemerror (report failed; shown to user):\n' + technical)
+				} catch (e5) { }
+			}
 			alert(usermsg)
 		}
 		//if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
