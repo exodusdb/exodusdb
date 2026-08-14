@@ -78,6 +78,15 @@ func main() {
 		// Deliberate VarError for WUI system-error path (systemconfiguration Server error Test)
 		throw VarUnassigned("ERROR_TEST");
 
+	} else if (mode == "SYSTEM_ERROR") {
+
+		// Client systemerror() posts full technical text in data_ for support email.
+		// (Later xhttp.php may handle SYSTEM_ERROR without a live db process.)
+		if (data_)
+			call sysmsg(data_, "WUI System Error");
+		else
+			call sysmsg("(empty)", "WUI System Error");
+
 	} else if (mode == "TRANTEST") {
 
 		/* TRANTEST - check speed and accuracy of "concurrent" updates by mass updating a single record.

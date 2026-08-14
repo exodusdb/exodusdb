@@ -7498,6 +7498,9 @@ async function exodusinterval_async_sync(command) {
 	}, 'interval ' + command)
 }
 
+// Guard: SYSTEM_ERROR report must not re-enter systemerror if the side request fails.
+var gexodus_reporting_system_error = false
+
 function systemerror(functionname, e) {
 	if (typeof functionname == 'undefined')
 		functionname = 'undefined'
@@ -7542,22 +7545,42 @@ function systemerror(functionname, e) {
 			}
 		}
 	}
-	// Same user path as server System Error: friendly UI; technical detail in console
+	// Same user path as server System Error: friendly UI when support report OK;
+	// technical detail always in console. Report uses a side dblink so a busy main db is fine.
 	var technical = 'System Error: ' + functionname + '\n' + msg
 	try {
 		console.log(technical)
 	} catch (e2) { }
-	if (!gonunload) {
-		var usermsg = gexodus_system_error_user_msg
-		try {
-			usermsg = String(usermsg).replace(/\r\n/g, '\n')
-		} catch (e3) { }
-		alert(usermsg)
-	}
-	//if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
-	//if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
-	if (gstepping || (gusername == 'EXODUS'))
-		debugger
+
+	// Return a promise so await systemerror() waits for report + alert when desired.
+	// Sync call sites still fire the report; alert runs when the side request finishes.
+	return (async function systemerror_report_and_alert() {
+		var reported = false
+		if (!gexodus_reporting_system_error && !gonunload && typeof exodusdblink == 'function') {
+			gexodus_reporting_system_error = true
+			try {
+				var reportdb = new exodusdblink()
+				reportdb.request = 'EXECUTE\rGENERAL\rSYSTEM_ERROR'
+				// Full technical text as request data (backend sysmsg → support email)
+				reported = !!(await reportdb.send(technical))
+			} catch (e4) {
+				reported = false
+			}
+			gexodus_reporting_system_error = false
+		}
+		if (!gonunload) {
+			// Success → "support has been informed"; else show technical (for now)
+			var usermsg = reported ? gexodus_system_error_user_msg : technical
+			try {
+				usermsg = String(usermsg).replace(/\r\n/g, '\n')
+			} catch (e3) { }
+			alert(usermsg)
+		}
+		//if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
+		//if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
+		if (gstepping || (gusername == 'EXODUS'))
+			debugger
+	})()
 }
 
 // Implementation of $$. Class-based (exodusid_*) so one logical name can have many nodes
