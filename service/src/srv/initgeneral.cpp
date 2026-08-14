@@ -1772,6 +1772,10 @@ subr dosystests() {
 //   ;;  optional: To list ;; Cc list  (sendmail splits on ";;" into to + cc)
 // Empty line/file = suppress mail. Missing file = PHP fails so WUI shows technical.
 //
+// Test System Error emails when disabled.cfg is present (file is empty after init):
+// edit ~/hosts/<host>/work/support.cfg first line to the desired address(es).
+// Active until the next service restart (initgeneral rewrites this file).
+//
 // Consumer
 // --------
 // xhttp.php intercepts EXECUTE GENERAL SYSTEM_ERROR, syslog/error_log always, then

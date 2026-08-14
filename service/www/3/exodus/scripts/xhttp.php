@@ -788,7 +788,10 @@ function xhttp_report_wui_system_error($username, $database, $remoteaddr, $data_
 		@closelog();
 	}
 
-	// work/support.cfg (initgeneral); first non-# line = addrs; empty = suppress; missing = fail
+	// work/support.cfg (written by initgeneral writesupportcfg).
+	// First non-# line = addrs (; lists, ;; then Cc); empty = suppress; missing = fail.
+	// Test when disabled.cfg is present (cfg empty after init): put the desired
+	// address(es) on the first line of work/support.cfg — active until next service restart.
 	$to = null;
 	$path = ($exodusrootpath ? $exodusrootpath . 'work' . $gslash . 'support.cfg' : '');
 	if ($path && is_readable($path) && ($raw = @file_get_contents($path)) !== false) {
