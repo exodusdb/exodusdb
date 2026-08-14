@@ -385,6 +385,8 @@ function exodus_dict_date(dicti,params) {
 //   exodus_dict_number(di, { signed: true, max: 100 })             // → min -100, max 100
 //   exodus_dict_integer(di, { max: 100 })         // counts: decimals 0 + plain
 //   exodus_dict_decimal(di, { decimals: 2 })      // plain fractional (via dict_number)
+//   exodus_dict_percent(di)                       // 0–100; max 100 if unset
+//   exodus_dict_percent(di, { decimals: 2 })      // e.g. COMMISSION_PERCENT
 //   exodus_dict_number(di, { max: 100 })
 //   exodus_dict_number(di)  // all defaults
 //
@@ -417,6 +419,26 @@ function exodus_dict_decimal(dicti, opts) {
  }
  if (typeof bag.plain == 'undefined')
   bag.plain = true
+ return exodus_dict_number(dicti, bag)
+}
+
+// 0–100 scale (commission, tax %, discount %, ratings, share). Via dict_number.
+// Adds max:100 if bag does not already set max. decimals optional (e.g. 2 for
+// COMMISSION_PERCENT); omit to allow 0/1/2… places like bare NUMBER.
+//   exodus_dict_percent(di)
+//   exodus_dict_percent(di, { decimals: 2 })
+//   exodus_dict_percent(di, { decimals: 1, min: 1 })  // max still 100 unless set
+function exodus_dict_percent(dicti, opts) {
+ if (!opts)
+  opts = {}
+ exodusassertobject(dicti, 'exodus_dict_percent', 'dicti')
+ var bag = {}
+ for (var k in opts) {
+  if (Object.prototype.hasOwnProperty.call(opts, k))
+   bag[k] = opts[k]
+ }
+ if (typeof bag.max == 'undefined' || bag.max == null || bag.max === '')
+  bag.max = 100
  return exodus_dict_number(dicti, bag)
 }
 
