@@ -1,0 +1,143 @@
+#!/bin/bash
+set -euxo pipefail
+PS4='+ [./debug:$LINENO ${DB_CODE:-${1-}} ${SECONDS}s] '
+
+: ─────────────────────────────────────────────────────────────────────────────────
+: Attach a debugger to a running serve_any
+: ─────────────────────────────────────────────────────────────────────────────────
+:	'Syntax is ./debug [DBNAME]'
+:
+:	'Example:  ./debug           #attach to test if running'
+:
+:	'Example:  ./debug c2comms   #attach to c2comms if running'
+:
+:	'Example:  ./debug c2comms_test  #attach to c2comms_test if running'
+:
+:	DBNAME is used as-is. Default test. No _test suffix is added.
+:
+:	Does not stop or restart the service. Attach stops the process.
+:	Set breakpoints, then continue with c. Quit the debugger to leave it running.
+:
+:	APP_CODE from environment. Default exo. Prefer EXO_DEBUGGER, else lldb, else gdb.
+:
+
+	export APP_CODE=${APP_CODE:-exo}
+
+	export DB_CODE=${1:-test}		#default to the test database
+
+	SITE_DIR=${DB_CODE%_test}		#hosts dir without _test suffix
+	WORK_DIR=$(readlink -f "$HOME/hosts/$SITE_DIR/work" 2>/dev/null || true)
+
+:
+: Choose debugger
+: ─────────────────────────────────────────────────────────────────────────────────
+:
+	DEBUGGER=${EXO_DEBUGGER:-}
+	if [ -z "$DEBUGGER" ]; then
+		if command -v lldb >/dev/null 2>&1; then
+			DEBUGGER=lldb
+		elif command -v gdb >/dev/null 2>&1; then
+			DEBUGGER=gdb
+		else
+:
+: No lldb/gdb on PATH - set EXO_DEBUGGER
+:
+			exit 1
+		fi
+	fi
+
+:
+: Find serve_any for this APP_CODE and DB_CODE
+: ─────────────────────────────────────────────────────────────────────────────────
+:
+:	Match argv. cwd alone is ambiguous. live and test share hosts work dir.
+:
+	candidates=
+	for pid in $(pgrep -f 'serve_any' 2>/dev/null || true); do
+		[ -d /proc/$pid ] || continue
+		cmdline=$(tr '\0' ' ' < /proc/$pid/cmdline 2>/dev/null || true)
+		case $cmdline in
+		*lldb*|*gdb*) continue ;;
+		esac
+		case $cmdline in
+		*serve_any*) ;;
+		*) continue ;;
+		esac
+		case $cmdline in
+		*"serve_${APP_CODE} "*|*"serve_${APP_CODE}") ;;
+		*) continue ;;
+		esac
+		case $cmdline in
+		*" ${DB_CODE} "*|*" ${DB_CODE}") ;;
+		*) continue ;;
+		esac
+		candidates="$candidates $pid"
+	done
+	candidates=${candidates# }
+
+	if [ -z "$candidates" ]; then
+:
+: No running serve_any for APP_CODE=$APP_CODE DB_CODE=$DB_CODE
+: Start with ./run $DB_CODE or ensure the service is up
+: Known serve_any:
+:
+		for pid in $(pgrep -f 'serve_any' 2>/dev/null || true); do
+			[ -d /proc/$pid ] || continue
+			cmdline=$(tr '\0' ' ' < /proc/$pid/cmdline 2>/dev/null || true)
+			case $cmdline in
+			*serve_any*) ;;
+			*) continue ;;
+			esac
+			case $cmdline in
+			*/bin/bash*|*/bin/sh*|*lldb*|*gdb*) continue ;;
+			esac
+:
+:	$pid $cmdline
+:
+		done
+		exit 1
+	fi
+
+:
+: Prefer process in hosts work dir else highest pid
+: ─────────────────────────────────────────────────────────────────────────────────
+:
+	pid=
+	if [ -n "$WORK_DIR" ] && [ -d "$WORK_DIR" ]; then
+		for p in $candidates; do
+			cwd=$(readlink -f /proc/$p/cwd 2>/dev/null || true)
+			if [ "$cwd" = "$WORK_DIR" ]; then
+				pid=$p
+				break
+			fi
+		done
+	fi
+	if [ -z "$pid" ]; then
+		pid=$(echo $candidates | tr ' ' '\n' | sort -n | tail -1)
+	fi
+
+	exe=$(readlink -f /proc/$pid/exe 2>/dev/null || true)
+	cwd=$(readlink -f /proc/$pid/cwd 2>/dev/null || true)
+	cmdline=$(tr '\0' ' ' < /proc/$pid/cmdline 2>/dev/null || true)
+
+:
+: Attach $DEBUGGER to pid=$pid
+: APP_CODE=$APP_CODE DB_CODE=$DB_CODE
+: cwd=$cwd
+: exe=$exe
+: cmd=$cmdline
+: Process will STOP on attach - set breakpoints then continue c
+: ─────────────────────────────────────────────────────────────────────────────────
+:
+	case $DEBUGGER in
+	lldb|lldb*)
+		if [ -n "$exe" ] && [ -x "$exe" ]; then
+			exec lldb -p "$pid" "$exe"
+		else
+			exec lldb -p "$pid"
+		fi
+		;;
+	*)
+		exec gdb -q -p "$pid"
+		;;
+	esac
