@@ -8848,8 +8848,9 @@ function cancel_backpage_event(event) {
 	//exodus_resume(false, 'cancel_backpage_event')
 	resolvePendingConfirm(false, 'cancel_backpage_event')
 
-	//make sure there is some history remains
-	history.pushState(null, null, window.location.pathname);
+	// History entry so Back/popstate dismisses the popup (not navigate away) — mobile has no Esc.
+	// Keep search+hash: pathname alone drops ?MODE=… (e.g. mediadiary.htm?MODE=CERTIFICATEFILE).
+	history.pushState(null, null, window.location.pathname + window.location.search + window.location.hash);
 
 	return
 }
@@ -9417,11 +9418,11 @@ async function decide_onload(decide_args) {
 	decide_last_option_element = selections[ii]
 	client_focuson(selections[ii])
 
-	//ensure some history exists so that the "backpage/backbutton"
-	//"popstate" event occurs. See above
+	// History entry so Back/popstate dismisses the popup (not navigate away) — mobile has no Esc.
+	// See cancel_backpage_event. Keep search+hash: pathname alone drops ?MODE=… etc.
 	if (typeof ghistorypushed == 'undefined') {
 		ghistorypushed = true
-		history.pushState(null, null, window.location.pathname);
+		history.pushState(null, null, window.location.pathname + window.location.search + window.location.hash);
 	}
 
 	addeventlistener(exodusconfirmdiv, 'keydown', decide_document_onkeydown)
