@@ -7662,18 +7662,23 @@ function exoconfirm_scrollpane() {
 	return div && (div.querySelector('.exoconfirm_body') || div)
 }
 
-// Drag confirm/decide shell by icon or question only. No position memory
-// (each open still CSS-centred). Leaves body/footer/table free for clicks.
+// Move (icon/question) + resize (four borders). No position/size memory —
+// each open is CSS-centred again. Body/footer/table stay free for clicks.
 function exoconfirm_install_drag(div) {
 	if (!div || div.getAttribute('exo_confirm_drag') == '1')
 		return
 	div.setAttribute('exo_confirm_drag', '1')
 
-	var dragging = false
+	// mode: '' | 'move' | 'n'|'s'|'e'|'w'|combos
+	var mode = ''
 	var originX = 0
 	var originY = 0
 	var startLeft = 0
 	var startTop = 0
+	var startW = 0
+	var startH = 0
+	var minW = 200
+	var minH = 120
 
 	function pin_to_pixels() {
 		var r = div.getBoundingClientRect()
@@ -7683,62 +7688,160 @@ function exoconfirm_install_drag(div) {
 		div.style.bottom = 'auto'
 		div.style.left = r.left + 'px'
 		div.style.top = r.top + 'px'
+		div.style.width = r.width + 'px'
+		div.style.height = r.height + 'px'
+		div.style.maxWidth = 'none'
+		div.style.maxHeight = 'none'
+		div.style.minWidth = minW + 'px'
+		div.style.minHeight = minH + 'px'
+	}
+
+	function viewport() {
+		return {
+			vw: window.innerWidth || document.documentElement.clientWidth || 0,
+			vh: window.innerHeight || document.documentElement.clientHeight || 0
+		}
 	}
 
 	function onmove(event) {
-		if (!dragging)
+		if (!mode)
 			return
 		event = getevent(event)
-		var nx = startLeft + (event.clientX - originX)
-		var ny = startTop + (event.clientY - originY)
-		var w = div.offsetWidth
-		var h = div.offsetHeight
-		var vw = window.innerWidth || document.documentElement.clientWidth || 0
-		var vh = window.innerHeight || document.documentElement.clientHeight || 0
-		// Keep a strip of the dialog on-screen
-		if (nx > vw - 40)
-			nx = vw - 40
-		if (ny > vh - 40)
-			ny = vh - 40
-		if (nx + w < 40)
-			nx = 40 - w
-		if (ny < 0)
-			ny = 0
-		div.style.left = nx + 'px'
-		div.style.top = ny + 'px'
+		var dx = event.clientX - originX
+		var dy = event.clientY - originY
+		var vp = viewport()
+		var left = startLeft
+		var top = startTop
+		var w = startW
+		var h = startH
+
+		if (mode == 'move') {
+			left = startLeft + dx
+			top = startTop + dy
+			if (left > vp.vw - 40)
+				left = vp.vw - 40
+			if (top > vp.vh - 40)
+				top = vp.vh - 40
+			if (left + w < 40)
+				left = 40 - w
+			if (top < 0)
+				top = 0
+			div.style.left = left + 'px'
+			div.style.top = top + 'px'
+			return
+		}
+
+		// Resize from one or two edges (corners use two letters)
+		if (mode.indexOf('e') >= 0)
+			w = startW + dx
+		if (mode.indexOf('w') >= 0) {
+			w = startW - dx
+			left = startLeft + dx
+		}
+		if (mode.indexOf('s') >= 0)
+			h = startH + dy
+		if (mode.indexOf('n') >= 0) {
+			h = startH - dy
+			top = startTop + dy
+		}
+		if (w < minW) {
+			if (mode.indexOf('w') >= 0)
+				left = startLeft + (startW - minW)
+			w = minW
+		}
+		if (h < minH) {
+			if (mode.indexOf('n') >= 0)
+				top = startTop + (startH - minH)
+			h = minH
+		}
+		if (w > vp.vw - 20)
+			w = vp.vw - 20
+		if (h > vp.vh - 20)
+			h = vp.vh - 20
+		if (left < 0) {
+			if (mode.indexOf('w') >= 0)
+				w += left
+			left = 0
+		}
+		if (top < 0) {
+			if (mode.indexOf('n') >= 0)
+				h += top
+			top = 0
+		}
+		if (left + w > vp.vw)
+			w = vp.vw - left
+		if (top + h > vp.vh)
+			h = vp.vh - top
+		if (w < minW)
+			w = minW
+		if (h < minH)
+			h = minH
+		div.style.left = left + 'px'
+		div.style.top = top + 'px'
+		div.style.width = w + 'px'
+		div.style.height = h + 'px'
 	}
 
 	function onup() {
-		if (!dragging)
+		if (!mode)
 			return
-		dragging = false
+		mode = ''
 		div.classList.remove('exo_confirm_dragging')
+		div.classList.remove('exo_confirm_resizing')
 		document.removeEventListener('mousemove', onmove, true)
 		document.removeEventListener('mouseup', onup, true)
 	}
 
-	function ondown(event) {
+	function start_gesture(event, newMode) {
 		event = getevent(event)
 		if (event.button != null && event.button !== 0)
 			return
 		pin_to_pixels()
-		dragging = true
-		div.classList.add('exo_confirm_dragging')
+		mode = newMode
 		originX = event.clientX
 		originY = event.clientY
 		startLeft = parseFloat(div.style.left) || 0
 		startTop = parseFloat(div.style.top) || 0
+		startW = div.offsetWidth
+		startH = div.offsetHeight
+		if (mode == 'move')
+			div.classList.add('exo_confirm_dragging')
+		else
+			div.classList.add('exo_confirm_resizing')
 		document.addEventListener('mousemove', onmove, true)
 		document.addEventListener('mouseup', onup, true)
 		return exocancelevent(event)
 	}
 
+	function ondown_move(event) {
+		return start_gesture(event, 'move')
+	}
+
+	function ondown_resize(event) {
+		var t = event.target || event.srcElement
+		var edges = t && t.getAttribute && t.getAttribute('data-exo-rsz')
+		if (!edges)
+			return
+		return start_gesture(event, edges)
+	}
+
 	var icon = div.querySelector('.exoconfirm_iconcol')
 	var question = div.querySelector('#question1')
 	if (icon)
-		addeventlistener(icon, 'mousedown', ondown)
+		addeventlistener(icon, 'mousedown', ondown_move)
 	if (question)
-		addeventlistener(question, 'mousedown', ondown)
+		addeventlistener(question, 'mousedown', ondown_move)
+
+	// Four borders + corners (corner = two letters)
+	var edges = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw']
+	for (var i = 0; i < edges.length; i++) {
+		var strip = document.createElement('div')
+		strip.className = 'exo_confirm_rsz exo_confirm_rsz_' + edges[i]
+		strip.setAttribute('data-exo-rsz', edges[i])
+		strip.setAttribute('aria-hidden', 'true')
+		addeventlistener(strip, 'mousedown', ondown_resize)
+		div.appendChild(strip)
+	}
 }
 
 // Scroll a table row into view below a sticky thead (scrollIntoView nearest

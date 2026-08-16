@@ -1597,6 +1597,44 @@ input[type=checkbox]:focus-visible {
     cursor: grabbing;
     cursor: -webkit-grabbing;
 }
+/* Resize hit strips: four borders + corners (positioned on .exoconfirmdiv). */
+.exo_confirm_rsz {
+    position: absolute;
+    z-index: 3;
+    background: transparent;
+}
+.exo_confirm_rsz_n {
+    top: 0; left: 8px; right: 8px; height: 6px;
+    cursor: ns-resize;
+}
+.exo_confirm_rsz_s {
+    bottom: 0; left: 8px; right: 8px; height: 6px;
+    cursor: ns-resize;
+}
+.exo_confirm_rsz_e {
+    right: 0; top: 8px; bottom: 8px; width: 6px;
+    cursor: ew-resize;
+}
+.exo_confirm_rsz_w {
+    left: 0; top: 8px; bottom: 8px; width: 6px;
+    cursor: ew-resize;
+}
+.exo_confirm_rsz_ne {
+    top: 0; right: 0; width: 10px; height: 10px;
+    cursor: nesw-resize;
+}
+.exo_confirm_rsz_nw {
+    top: 0; left: 0; width: 10px; height: 10px;
+    cursor: nwse-resize;
+}
+.exo_confirm_rsz_se {
+    bottom: 0; right: 0; width: 10px; height: 10px;
+    cursor: nwse-resize;
+}
+.exo_confirm_rsz_sw {
+    bottom: 0; left: 0; width: 10px; height: 10px;
+    cursor: nesw-resize;
+}
 /* Outer shell: icon + prompt column (divs — not a table, so option <tr> hit-testing stays local) */
 .exoconfirm_layout {
     width: 100%;
