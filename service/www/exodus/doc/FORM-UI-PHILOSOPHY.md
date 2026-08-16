@@ -20,7 +20,7 @@ Common transforms:
 |------------|-------------------|
 | `<input id="FIELD">` with dict `align='T'` | Contenteditable `<span>` (flowing text) |
 | Nested `<table>` with `exogroupno` fields | `TABLE[exogroupno]` / `#exogroupN` |
-| Top-level `TABLE.exodusform` | Often wrapped in `div.exodusformpane` by `exoduswrapformpanes()` in `client.js` |
+| Top-level `TABLE.exodusform` | Often wrapped in `div.exodusformpane` by `exowrapformpanes()` in `client.js` |
 
 **Implication:** inline styles on `<input>` in HTM (e.g. `max-width`) are often **discarded** when the field becomes a `<span>`. Dict properties and page CSS must target the **final** element (`.exodusid_FIELD`, column `td` classes, etc.).
 
@@ -37,7 +37,7 @@ div.exodusformpane          ← outer rounded frame (owns the outside edge)
 
 ### Pane (`exodusformpane`)
 
-- Inserted by `exoduswrapformpanes()` (one shell per sibling *run* of top-level forms with only `<br>`/whitespace between; same rules as coalesce). Pre-authored panes left alone; `exoduscoalesceformpanes()` still merges those if needed.
+- Inserted by `exowrapformpanes()` (one shell per sibling *run* of top-level forms with only `<br>`/whitespace between; same rules as coalesce). Pre-authored panes left alone; `exocoalesceformpanes()` still merges those if needed.
 - **No flash of bare/wrong layout:** until `html.exodus-panes-ready` (set after wrap), `TABLE.exodusform` / `.exodusformpane` use `visibility: hidden` (`global.css`). Forms stay measurable during onload; first paint is not an unmerged narrow shell.
 - Pane: `width: max-content` only — **follow contents**; border encloses every form. Do not `max-width` / `overflow-x` the **pane**.
 - Form tables inside the pane may use `max-width: calc(100vw − …)` so flexible text columns wrap when the form would exceed the screen; the pane still tracks that (capped) table width.
@@ -63,7 +63,7 @@ div.exodusformpane          ← outer rounded frame (owns the outside edge)
 ### Embedded groups (`TABLE[exogroupno]` inside a form cell)
 
 - Host cell gets `border: none` and `padding: 0` via `:has(> TABLE[exogroupno])` in `global.css`.
-- `exodusclear_embeddedtable_hostborders()` in `client.js` also clears inline borders on host cell/row.
+- `exoclear_embeddedtable_hostborders()` in `client.js` also clears inline borders on host cell/row.
 - Inner group table often has **no** `exodusform` class and **no** `<thead>` (e.g. ledgerprint account picker).
 - Inner cells are **not** direct children of the outer grid — they do **not** get the outer `> tbody > tr > td` border rule unless you add rules explicitly.
 
@@ -151,7 +151,7 @@ element.style.overflowWrap = 'break-word';
 | `global.css` | Form face, pane shell, td/th grid, embedded host-cell rules, pane edge stripping |
 | `scripts/dbform.js` | Dict bind, group tables, span min-width, insert/delete row, `form_filter` |
 | `scripts/db.js` | `exo_dict_text`, `dictrec`, dict helpers |
-| `scripts/client.js` | `exoduswrapformpanes`, `exoduscoalesceformpanes`, `exodusclear_embeddedtable_hostborders` |
+| `scripts/client.js` | `exowrapformpanes`, `exocoalesceformpanes`, `exoclear_embeddedtable_hostborders` |
 | `template.htm` | Minimal form page pattern |
 
 **Vertical alignment** — `global.css` sets `vertical-align: top` on all `TABLE.exodusform`, `TABLE.exotable`, and `TABLE[exogroupno]` cells and rows (including nested tables). Do not add inline `valign` or `vertical-align` in HTM unless a page needs a deliberate exception.

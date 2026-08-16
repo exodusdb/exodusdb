@@ -410,7 +410,7 @@ Calendar.prototype.create = function() {
 		}
 		if (kc == 27) {
 			dp.hide();
-			return exoduscancelevent(e);
+			return exocancelevent(e);
 		}
 		if (kc == 9)
 			return true; // Tab through month/year/buttons
@@ -429,7 +429,7 @@ Calendar.prototype.create = function() {
 			return true;
 		}
 
-		exoduscancelevent(e);
+		exocancelevent(e);
 		var d = new Date(dp._currentDate);
 		d.setDate(d.getDate() + step);
 		dp.setCurrentDate(d);

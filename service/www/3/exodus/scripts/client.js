@@ -340,11 +340,11 @@ function exodus_client_init() {
 	//can extract cookied immediately
 	if (!glogincode) glogincode = ''
 	if (!glogincode) {
-		glogincode = exodusgetcookie2('logincode', 'EXODUSlogincode')
+		glogincode = exogetcookie2('logincode', 'EXODUSlogincode')
 	}
 	if (!gdataset) gdataset = ''
 	if (!gdataset) {
-		gdataset = exodusgetcookie2('dataset')
+		gdataset = exogetcookie2('dataset')
 	}
 	setdateformat()
 
@@ -386,7 +386,7 @@ function exodus_client_init() {
 		if (window.matchMedia)
 			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { theme_toggle(login_theme()) })
 	} else {
-		theme_toggle(exodusgetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
+		theme_toggle(exogetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
 	}
 
 	// Before global.css: page/form body only. No field color/border !important —
@@ -430,7 +430,7 @@ function exodus_client_init() {
 
 	//save location except if logging in
 	if (typeof gnosavelocation == 'undefined' && !window.dialogArguments && EXODUSlocation != './exodus/') {
-		//if (gdataset) exodussetcookie('','EXODUS',escape(location),'ll',true)
+		//if (gdataset) exosetcookie('','EXODUS',escape(location),'ll',true)
 	}
 
 	glogging = false
@@ -458,14 +458,14 @@ async function window_onbeforeprint() {
 	await clientfunctions_setstyle()
 }
 
-async function exoduslogout_onclick() {
+async function exologout_onclick() {
 
 	//cancel any automatic login
-	exodussetcookie('', 'EXODUS', '', 'a')
+	exosetcookie('', 'EXODUS', '', 'a')
 
 	//decide where to login again
 	var newwindowlocation = '../index.html'
-	var system = exodusgetcookie2('', 'EXODUSsystem', null)
+	var system = exogetcookie2('', 'EXODUSsystem', null)
 	if (system && system != 'ADAGENCY')
 		newwindowlocation += '??' + system
 
@@ -553,7 +553,7 @@ function exodus_start_keepalive() {
 async function sessionkeepalive() {
 
 	//last connection (updated on every db.send — so active forms rarely need a pure KEEPALIVE)
-	var lastconnection = exodusgetcookie2('lc', 'EXODUSlc', '')
+	var lastconnection = exogetcookie2('lc', 'EXODUSlc', '')
 	if (lastconnection == 'undefined')
 		lastconnection = ''
 	lc = lastconnection
@@ -580,13 +580,13 @@ async function sessionkeepalive() {
 
 }
 
-function exodussetexpression(elementsorelementid, attributename, expression) {
+function exosetexpression(elementsorelementid, attributename, expression) {
 
 	//check element exists
 	if (!elementsorelementid) {
 		void exodus_begin(function () {
-			return exoui_invalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
-		}, 'exodussetexpression missing element')
+			return exoui_invalid('missing element in exosetexpression ' + attributename + ' ' + expression)
+		}, 'exosetexpression missing element')
 		return
 	}
 
@@ -621,7 +621,7 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 	var attributepart = style ? attributename.slice(6) : attributename
 	for (var ii = 0; ii < elements.length; ii++) {
 		if (typeof elements[ii] == 'string')
-			exodussetexpression(elements[ii], attributename, expression)
+			exosetexpression(elements[ii], attributename, expression)
 		else {
 
 			// some engines leave a stub that throws when used
@@ -645,7 +645,7 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 }
 
 var gsetexpressioninterval = []
-function exodussetexpression2(elementids, attributename, expression) {
+function exosetexpression2(elementids, attributename, expression) {
 
 	var elementids2
 	if (typeof elementids == 'string')
@@ -678,29 +678,29 @@ function exodussetexpression2(elementids, attributename, expression) {
 	var style = attributename.slice(0, 6) == 'style:'
 	var attributepart = style ? attributename.slice(6) : attributename
 
-	exodussetexpression2b(elementid, allelements, style, attributepart, expression)
+	exosetexpression2b(elementid, allelements, style, attributepart, expression)
 
 }
 
-function exodussetexpression2b(expressionid, elements, style, attributename, expression) {
+function exosetexpression2b(expressionid, elements, style, attributename, expression) {
 
-	gsetexpressioninterval[expressionid] = exodussetinterval(
+	gsetexpressioninterval[expressionid] = exosetinterval(
 
 		//build a closure containing all the elements to be updated
 		//and to be called at intervals
 		function anon_from_exodussetexpression2b() {
 			// Interval tick: Gate A only when idle (skip if busy — expression UI is optional).
 			void exodus_begin_if_idle(function () {
-				return exodussetexpression2c(elements, style, attributename, expression)
-			}, 'exodussetexpression2c')
+				return exosetexpression2c(elements, style, attributename, expression)
+			}, 'exosetexpression2c')
 		}
 		, 250)//every quarter second
 }
 
 //this is called at intervals
-async function exodussetexpression2c(elements, style, attributename, expression) {
+async function exosetexpression2c(elements, style, attributename, expression) {
 	//set the attribute expression for all elements
-	var result = await exodusevaluate(expression)
+	var result = await exoevaluate(expression)
 	//console.log(expression+' is '+result+')
 	if (attributename == 'disabled')
 		1 == 1
@@ -713,7 +713,7 @@ async function exodussetexpression2c(elements, style, attributename, expression)
 
 }
 
-function exodusenabledandvisible(element0, allowreadonly) {
+function exoenabledandvisible(element0, allowreadonly) {
 	var element = element0
 	if (typeof element == 'string') {
 		element = document.getElementsByName(element0)[0]
@@ -722,7 +722,7 @@ function exodusenabledandvisible(element0, allowreadonly) {
 			if (!element) {
 				element = $$(element0)
 				if (!element) {
-					systemerror('exodusenabledandvisible() cannot getElementsByName ' + element0)
+					systemerror('exoenabledandvisible() cannot getElementsByName ' + element0)
 				}
 			}
 		}
@@ -838,7 +838,7 @@ function dbsend_cancel_xhttp(requestid) {
 	// Separate exodusdblink + fire-and-forget: must not use main db or enter Gate A.
 	var canceldb = new exodusdblink()
 	canceldb.request = requestid ? ('CANCEL\r' + requestid) : 'CANCEL'
-	exodusfireandforget(canceldb.send(), 'dbsend_cancel_xhttp')
+	exofireandforget(canceldb.send(), 'dbsend_cancel_xhttp')
 }
 
 // Release per-request modal wait state owned by db.send (not KEEPALIVE/RELOCK/CANCEL).
@@ -1150,7 +1150,7 @@ function modalblock_destroy() {
 	var blocker = $$('uiblockerdiv')
 	if (blocker) {
 		//YIELD//console.log('UNBLOCKING UI')
-		exodusremovenode(blocker)
+		exoremovenode(blocker)
 		//console.log('parent window ui unblocked')
 	}
 
@@ -1495,7 +1495,7 @@ function exodus_next(value, source) {
 }
 
 function displayresponsedata_sync(request, data) {
-	exodusinvokesynctarget(displayresponsedata, [request, data], 'displayresponsedata')
+	exoinvokesynctarget(displayresponsedata, [request, data], 'displayresponsedata')
 }
 
 async function displayresponsedata(request, data) {
@@ -1519,7 +1519,7 @@ async function displayresponsedata(request, data) {
 
 function openwindow_sync(request, data) {
 	//LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
-	return exodusinvokesynctargetreturn(openwindow, [request, data], 'openwindow_sync ' + request)
+	return exoinvokesynctargetreturn(openwindow, [request, data], 'openwindow_sync ' + request)
 }
 
 //function to simplify passing a db request (with optional data)
@@ -1554,7 +1554,7 @@ async function windowopenkey(url, key) {
 
 function windowopen_sync(url, parameters, style) {
 	//LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
-	return exodusinvokesynctargetreturn(windowopen, [url, parameters, style], 'windowopen_sync')
+	return exoinvokesynctargetreturn(windowopen, [url, parameters, style], 'windowopen_sync')
 }
 
 var gwindowopenparameters
@@ -1655,7 +1655,7 @@ function exodus_ensure_readable_blank(win) {
 
 //wrapper function to replace window.open()
 //to give warning if cannot open ... because of pop blockers etc.
-function exodusbreak(cmd, funcname, position) {
+function exobreak(cmd, funcname, position) {
 
 	if (!gstepping) return
 
@@ -1692,7 +1692,7 @@ function exodusbreak(cmd, funcname, position) {
 }
 
 function assertelement(element, funcname, varname) {
-	exodusassertobject(element, funcname, varname)
+	exoassertobject(element, funcname, varname)
 	if (!element.tagName) {
 		return systemerror('assertelement()', 'In ' + funcname + ', ' + varname + ' is not an element.')
 	}
@@ -1910,7 +1910,7 @@ function add_theme_toggle_btn() {
 
 	function flip() {
 		theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
-		exodussetcookie('', gthemecookiekey, (gisdarktheme ? 1 : ''), 'dt', true)
+		exosetcookie('', gthemecookiekey, (gisdarktheme ? 1 : ''), 'dt', true)
 		exodus_sync_theme_btn_icon(img, btn)
 	}
 	btn.addEventListener('click', flip)
@@ -2083,10 +2083,10 @@ function exodus_chrome_from_cookies() {
 	var ff = ''
 	var fs = ''
 	var fc = ''
-	if (typeof exodusgetcookie2 == 'function') {
-		ff = exodusgetcookie2('ff')
-		fs = exodusgetcookie2('fs')
-		fc = exodusgetcookie2('fc')
+	if (typeof exogetcookie2 == 'function') {
+		ff = exogetcookie2('ff')
+		fs = exogetcookie2('fs')
+		fc = exogetcookie2('fc')
 	}
 	exodus_chrome_apply_font(ff, fs)
 	exodus_chrome_apply_color(fc)
@@ -2106,18 +2106,18 @@ async function clientfunctions_setstyle() {
 }
 
 async function clientfunctions_getglobals() {
-	gcompanycode = exodusgetcookie2('cc')
-	gncompanies = exodusgetcookie2('nc')
-	gperiod = exodusgetcookie2('pd')
-	gbasecurr = exodusgetcookie2('bc')
-	gshowzeros = exodusgetcookie2('bc')
-	gbasefmt = exodusgetcookie2('bf')
-	gmarketcode = exodusgetcookie2('mk')
-	gmaincurrcode = exodusgetcookie2('mc')
-	gdatasetname = exodusgetcookie2('db')
-	gmenucodes = exodusgetcookie2('m')
-	gmaxstrsize = Number(exodusgetcookie2('ms'))
-	gtz = exodusgetcookie2('tz').split(fm)
+	gcompanycode = exogetcookie2('cc')
+	gncompanies = exogetcookie2('nc')
+	gperiod = exogetcookie2('pd')
+	gbasecurr = exogetcookie2('bc')
+	gshowzeros = exogetcookie2('bc')
+	gbasefmt = exogetcookie2('bf')
+	gmarketcode = exogetcookie2('mk')
+	gmaincurrcode = exogetcookie2('mc')
+	gdatasetname = exogetcookie2('db')
+	gmenucodes = exogetcookie2('m')
+	gmaxstrsize = Number(exogetcookie2('ms'))
+	gtz = exogetcookie2('tz').split(fm)
 	if (gtz.join('')) {
 		gtz[0] = Number(gtz[0])
 		if (gtz[1])
@@ -2228,10 +2228,10 @@ async function clientfunctions_windowonload() {
 
 	//already done in global script
 	//	if (!glogincode)
-	//		glogincode = exodusgetcookie2('logincode', 'EXODUSlogincode', null)
+	//		glogincode = exogetcookie2('logincode', 'EXODUSlogincode', null)
 
 	//loginalert('wol'+glogincode)
-	//	gdataset = exodusgetcookie2('dataset')
+	//	gdataset = exogetcookie2('dataset')
 
 	await clientfunctions_getglobals()
 
@@ -2241,9 +2241,9 @@ async function clientfunctions_windowonload() {
 	//In case previous window didnt successfully unlock its record in onbeforeunload
 	//Could be turned off hoping synchronous unlock in window_onunload is sufficiently reliable
 	// to avoid need for double unlocking
-	var pending = exodusgetcookie(glogincode, 'EXODUSpending')
+	var pending = exogetcookie(glogincode, 'EXODUSpending')
 	if (pending) {
-		exodussetcookie(glogincode, 'EXODUSpending', '')
+		exosetcookie(glogincode, 'EXODUSpending', '')
 		console.log(pending)
 		db.request = pending
 		await db.send()
@@ -2252,8 +2252,8 @@ async function clientfunctions_windowonload() {
 	await clientfunctions_setstyle()
 
 	//if (gautofitwindow && document.getElementById('autofitwindowelement'))
-	//	exodussettimeout('exodusautofitwindow()', 10)
-	//exodussetinterval('exodusautofitwindow()', 10)
+	//	exosettimeout('exodusautofitwindow()', 10)
+	//exosetinterval('exodusautofitwindow()', 10)
 
 	// Fixed top menubar for main windows only (not modal dialogs).
 	// Form actions: dbform — under the form when on-screen, else top menubar.
@@ -2276,7 +2276,7 @@ async function clientfunctions_windowonload() {
 	try {
 		if (typeof formfunctions_onload == 'function')
 			await formfunctions_onload()
-		exoduswrapformpanes()
+		exowrapformpanes()
 		if (typeof form_update_wide_layout == 'function')
 			form_update_wide_layout()
 	} finally {
@@ -2327,7 +2327,7 @@ async function clientfunctions_windowonload() {
 		exodus_update_auth_button()
 		//if no dbform
 		if (typeof gdictfilename == 'undefined')
-			addeventlistener(temp2, 'click', 'exoduslogout_onclick')
+			addeventlistener(temp2, 'click', 'exologout_onclick')
 
 		//button for menu
 		if (gmenucodes && gmenucodes != 'EXIT2') {
@@ -2348,7 +2348,7 @@ async function clientfunctions_windowonload() {
 			//gexodus_menubar.insertBefore(dropdown_menu_span, gexodus_menubar.firstChild)
 
 			//dont rely on onload event ... poll every 100ms to see if iframe is loaded
-			gmenuonloader = exodussetinterval('menuonload()', 100)
+			gmenuonloader = exosetinterval('menuonload()', 100)
 		}
 
 		// Form pages use dbform document_onkeydown for Alt+letter. Pure client pages
@@ -2516,7 +2516,7 @@ Array.prototype.exoxlate = async function arrayxlate(filename, fieldno, mode) {
 			if (rec === null)
 				continue
 			// Hit with body — xlate logic on cached record
-			results[keyn] = await exodusxlatelogic(filename, (key + fm + rec).split(fm), fieldno, mode, key)
+			results[keyn] = await exoxlatelogic(filename, (key + fm + rec).split(fm), fieldno, mode, key)
 		}
 		// Not in cache — batch SELECT later
 		else {
@@ -2565,7 +2565,7 @@ Array.prototype.exoxlate = async function arrayxlate(filename, fieldno, mode) {
 			var keyrec = recset[ii].split(fm)
 			var key = keyrec[0]
 			foundkeys[key] = true
-			var result = await exodusxlatelogic(filename, keyrec, fieldno, mode, key)
+			var result = await exoxlatelogic(filename, keyrec, fieldno, mode, key)
 
 			//store the results whereever they are needed
 			var keyn = 0
@@ -2600,17 +2600,17 @@ String.prototype.exoxlate = async function stringxlate(filename, fieldno, mode) 
 	key = this.toString()
 	if (key == '') return ''
 
-	exodusassertnumeric(fieldno, 'xlate', filename + ' ' + key)
+	exoassertnumeric(fieldno, 'xlate', filename + ' ' + key)
 
 	var record = []
 	await record.exoread(filename, this)
 	if (db.response.indexOf('file is not available') >= 0) systemerror('xlate', db.response)
 
-	return await exodusxlatelogic(filename, record, fieldno, mode, key)
+	return await exoxlatelogic(filename, record, fieldno, mode, key)
 
 }
 
-async function exodusxlatelogic(filename, record, fieldno, mode, key) {
+async function exoxlatelogic(filename, record, fieldno, mode, key) {
 	if (record.length) {
 		if (typeof fieldno != 'undefined') {
 			if (fieldno) {
@@ -2635,7 +2635,7 @@ async function exodusxlatelogic(filename, record, fieldno, mode, key) {
 
 }
 
-async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, filtertitle, maxnrecs) {
+async function exofilepopup(filename, cols, coln, sortselectionclause, many, filtertitle, maxnrecs) {
 	//filename is required
 	//cols is required (array of arrays)
 	//eg [['COMPANY_NAME','Company Name'],['COMPANY_CODE','Company Code']]
@@ -2709,12 +2709,12 @@ function exodusdblink() {
 	//maybe preset by php in some heading script
 
 	//used in cache and elsewhere
-	if (!gdataset) gdataset = exodusgetcookie2('dataset')
-	//gusername = exodusgetcookie2('username')
-	gusername = exodusgetcookie2('username') || gusername
-	//alert('xyz2 EXODUS2/username='+exodusgetcookie2('username'))
+	if (!gdataset) gdataset = exogetcookie2('dataset')
+	//gusername = exogetcookie2('username')
+	gusername = exogetcookie2('username') || gusername
+	//alert('xyz2 EXODUS2/username='+exogetcookie2('username'))
 	//alert(document.cookie)
-	gsystem = exodusgetcookie2('', 'EXODUSsystem', null) || gsystem
+	gsystem = exogetcookie2('', 'EXODUSsystem', null) || gsystem
 
 	// alert(gdataset+'*'+gusername+'*'+gsystem)
 	this.dataset = gdataset
@@ -2750,8 +2750,8 @@ function exodusdblink() {
 	//otherwise setup environment for file messaging
 
 	//try and get the username, password and dataset
-	this.password = exodusgetcookie2('password')
-	this.timeout = exodusgetcookie2('timeout')
+	this.password = exogetcookie2('password')
+	this.timeout = exogetcookie2('timeout')
 
 	//default timeout is 10 minutes (NB GIVEWAY timeout is hard coded to 10 mins?)
 	var defaulttimeoutmins = 10
@@ -2791,18 +2791,18 @@ function exodusdblink() {
 async function dblogout() {
 
 	//remove username etc
-	//exodussetcookie('','EXODUS',gdataset,'dataset',true)
+	//exosetcookie('','EXODUS',gdataset,'dataset',true)
 
 	//remove last page
-	//exodussetcookie('','EXODUS','','ll',true)
+	//exosetcookie('','EXODUS','','ll',true)
 
-	exodussetcookie(glogincode, 'EXODUS2', '', 'username')
-	//alert('xyz EXODUS2/username='+exodusgetcookie2('username'))
+	exosetcookie(glogincode, 'EXODUS2', '', 'username')
+	//alert('xyz EXODUS2/username='+exogetcookie2('username'))
 
 	//remove settings
 	//alert('before clear '+document.cookie)
-	exodussetcookie(glogincode, 'EXODUS2', '')
-	exodussetcookie(glogincode, 'EXODUS', '')
+	exosetcookie(glogincode, 'EXODUS2', '')
+	exosetcookie(glogincode, 'EXODUS', '')
 	//alert('after clear '+document.cookie)
 
 }
@@ -2816,9 +2816,9 @@ async function exodusdblink_login(username, password, dataset, system) {
 	if (!dataset && gdataset)
 		dataset = gdataset
 	if (!dataset)
-		dataset = exodusgetcookie2('dataset', 'EXODUS', '')
+		dataset = exogetcookie2('dataset', 'EXODUS', '')
 	if (!system)
-		system = exodusgetcookie2('', 'EXODUSsystem', null)
+		system = exogetcookie2('', 'EXODUSsystem', null)
 	var arguments = ['', '', dataset, '', '', '', system]
 	var failed = false
 
@@ -2838,7 +2838,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 			// Refuse resume: leave this form, full login shell (same for all callers,
 			// including typeahead under evaluate — no force_an_exit throw).
 			// Yes path: cookie auto-login or modal index.html, then send retries.
-			exodussettimeout('window.location.assign("../index.html")', 1)
+			exosettimeout('window.location.assign("../index.html")', 1)
 
 			//try to avoid unlocking on exit
 			glocked = false
@@ -2861,11 +2861,11 @@ async function exodusdblink_login(username, password, dataset, system) {
 	while (true) {
 
 		arguments[4] = datasets
-		if (!(typeof event != 'undefined' && event && event.shiftKey) && !failed && (exodusgetcookie2('a', 'EXODUS', '') == 'true' || username)) {
-			arguments[0] = username ? username : exodusgetcookie2('u', 'EXODUS', '')
-			arguments[1] = password ? password : exodusgetcookie2('p', 'EXODUS', '')
+		if (!(typeof event != 'undefined' && event && event.shiftKey) && !failed && (exogetcookie2('a', 'EXODUS', '') == 'true' || username)) {
+			arguments[0] = username ? username : exogetcookie2('u', 'EXODUS', '')
+			arguments[1] = password ? password : exogetcookie2('p', 'EXODUS', '')
 			arguments[2] = dataset
-			arguments[5] = exodusgetcookie2('a', 'EXODUS', '')
+			arguments[5] = exogetcookie2('a', 'EXODUS', '')
 			arguments[6] = system
 		}
 		else {
@@ -2888,7 +2888,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 					await exoui_invalid(logindb.response)
 					return 0
 				}
-				datasets = exodusxml2obj(logindb.data)
+				datasets = exoxml2obj(logindb.data)
 			}
 
 			arguments[4] = datasets
@@ -2902,7 +2902,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 		if (!arguments) return 0
 
 		glogincode = (arguments[2] + '*' + arguments[0] + '*').replace(/ /g, '')
-		exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
+		exosetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
 		logindb.request = 'LOGIN\r' + arguments[0] + '\r' + arguments[1] + '\r' + arguments[2] + '\r' + arguments[3] + '\r\r' + arguments[5]
 
@@ -2936,10 +2936,10 @@ async function exodusdblink_login(username, password, dataset, system) {
 				//temp+='&p='
 				//temp+='&a='
 			}
-			exodussetcookie('', 'EXODUS', temp, '')
+			exosetcookie('', 'EXODUS', temp, '')
 
 			//temporary cookie for menu
-			exodussetcookie(glogincode, 'EXODUS2', logindb.data)
+			exosetcookie(glogincode, 'EXODUS2', logindb.data)
 
 			await clientfunctions_getglobals()
 
@@ -2948,9 +2948,9 @@ async function exodusdblink_login(username, password, dataset, system) {
 			if (document.protocolcode == 'file') {
 				this.password = arguments[1]
 				temp += '&password=' + this.password
-				//this.timeout=exodusgetcookie2('timeout')
+				//this.timeout=exogetcookie2('timeout')
 			}
-			exodussetcookie(glogincode, 'EXODUS2', temp)
+			exosetcookie(glogincode, 'EXODUS2', temp)
 
 			//quit success
 			return 1
@@ -3052,7 +3052,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 	var ignoreresult = (typeof this.request == 'string') && (this.request.slice(0, 6) == 'RELOCK' || this.request.slice(0, 9) == 'KEEPALIVE' || this.request.slice(0, 6) == 'CANCEL')
 	//indicate to refresher when last activity was
 	if (ignoreresult)
-		exodussetcookie('', 'EXODUSlc', new Date(), 'lc')
+		exosetcookie('', 'EXODUSlc', new Date(), 'lc')
 
 	//prevent reuse
 	if (this.requesting) {
@@ -3465,7 +3465,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 	}
 
 	//indicate to refresher when last activity was
-	exodussetcookie('', 'EXODUSlc', new Date(), 'lc')
+	exosetcookie('', 'EXODUSlc', new Date(), 'lc')
 
 	///if (result.split(' ')[0]=='OK' || result==1)
 	if (result.split(' ')[0] == 'OK' || result == 1) {
@@ -3513,7 +3513,7 @@ function dbready(windowx) {
 }
 
 // some browsers clear non-permanent cookies when a window.open child is closed
-function exodusfixcookie() {
+function exofixcookie() {
 	var cookies = document.cookie.split('; ')
 	var npreservedcookies = 0
 	var ntopreserve = 10
@@ -3530,12 +3530,12 @@ function exodusfixcookie() {
 	return true
 }
 
-function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
+function exosetcookie(loginsessionid, name, value, subkey, permanent) {
 
 	if (glogcookie)
 		console.log('EXODUSSETCOOKIE(' + loginsessionid + ', ' + name + ', ' + value + ', ' + subkey + ', ' + permanent + ')')
 
-	//exodusfixcookie()
+	//exofixcookie()
 
 	//for any particular permanent cookie it must consistently be set true otherwise possible loss of following cookies including ASPSESSION
 
@@ -3560,7 +3560,7 @@ function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
 			if (valuex) {
 				valuex = valuex.split('=')
 				if (valuex.length < 2) valuex[1] = ''
-				exodussetcookie(loginsessionid, name, valuex.slice(1).join('='), valuex[0], permanent)
+				exosetcookie(loginsessionid, name, valuex.slice(1).join('='), valuex[0], permanent)
 			}
 		}
 		return
@@ -3568,7 +3568,7 @@ function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
 
 	if (subkey) {
 		// crumbs are separated by ampersands
-		var crumbs = exodusgetcookie2('', name, loginsessionid).split('&')
+		var crumbs = exogetcookie2('', name, loginsessionid).split('&')
 		var emptycrumbn
 		for (var i2 = 0; i2 < crumbs.length; i2++) {
 			var crumb0 = crumbs[i2].split('=')[0]
@@ -3612,23 +3612,23 @@ function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
 
 }
 
-function exodusgetcookie2(subkey, key, loginsessionid) {
+function exogetcookie2(subkey, key, loginsessionid) {
 	if (!loginsessionid && loginsessionid !== null)
 		loginsessionid = glogincode
 	else if (loginsessionid === null)
 		loginsessionid = ''
 	if (!key)
 		key = 'EXODUS2'
-	var result = exodusgetcookie(loginsessionid, key, subkey)
-	///console.log('exodusgetcookie2('+loginsessionid+', '+key+', '+subkey+')='+result)
+	var result = exogetcookie(loginsessionid, key, subkey)
+	///console.log('exogetcookie2('+loginsessionid+', '+key+', '+subkey+')='+result)
 	return result
 }
 
 // Retrieve the value of the cookie with the specified name
-function exodusgetcookie(loginsessionid, key, subkey) {
+function exogetcookie(loginsessionid, key, subkey) {
 
 	if (glogcookie)
-		var log = 'exodusgetcookie(' + loginsessionid + ', ' + key + ', ' + subkey + ')'
+		var log = 'exogetcookie(' + loginsessionid + ', ' + key + ', ' + subkey + ')'
 
 	//var cookie0='GET COOKIE session:'+loginsessionid+' key:'+key+' subkey:'+subkey
 	//alert(cookie0)
@@ -3703,7 +3703,7 @@ async function exoui_decide(question, data, cols, returncoln, defaultreply, many
 		return await exoui_invalid('No records found')
 
 	if (typeof data == 'string' && data.slice(0, 8) == '<records')
-		data = exodusxml2obj(data)
+		data = exoxml2obj(data)
 
 	//xml2obj returns records in .group1
 	if (data.group1)
@@ -3718,12 +3718,12 @@ async function exoui_decide(question, data, cols, returncoln, defaultreply, many
 
 	if (!inverted)
 		inverted = false
-	var dialogargs = exoduscloneobj([question, data, cols, returncoln, defaultreply, many, inverted])
+	var dialogargs = exocloneobj([question, data, cols, returncoln, defaultreply, many, inverted])
 	dialogargs.logincode = glogincode
 
 	//var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
 
-	var results = await exodusconfirm2(dialogargs)
+	var results = await exoconfirm2(dialogargs)
 	if (typeof results == 'undefined')
 		results = ''
 
@@ -4073,9 +4073,9 @@ function exodus_typeahead_parserows(data, colids) {
 		return []
 
 	if (data.indexOf('<RECORD>') >= 0 || data.indexOf('<records') >= 0) {
-		if (typeof exodusxml2obj != 'function')
+		if (typeof exoxml2obj != 'function')
 			return []
-		var obj = exodusxml2obj(data)
+		var obj = exoxml2obj(data)
 		if (!obj || !obj.group1 || !obj.group1.length)
 			return []
 		var rows = []
@@ -4249,7 +4249,7 @@ function cleardropdown(element, all) {
 	while (element.childNodes.length > (all ? 0 : 1)) {
 		//  element.childNodes[0].removeNode(true)
 		//element.removeChild(element.childNodes[0])
-		exodusremovenode(element.childNodes[0])
+		exoremovenode(element.childNodes[0])
 	}
 	if (element.childNodes.length) {
 		element.childNodes[0].value = ""
@@ -4442,7 +4442,7 @@ function addoption(element, value, text) {
 
 }
 
-function exodusxml2obj(xmltext) {
+function exoxml2obj(xmltext) {
 
 	var dataobj = new Object
 	dataobj.group1 = []
@@ -4471,7 +4471,7 @@ function exodusxml2obj(xmltext) {
 
 }
 
-async function exodussetdropdown(element, request, colarray, selectedvalues, noautoselection) {
+async function exosetdropdown(element, request, colarray, selectedvalues, noautoselection) {
 
 	if (!(checkisdropdown(element)))
 		return (0)
@@ -4479,9 +4479,9 @@ async function exodussetdropdown(element, request, colarray, selectedvalues, noa
 	db.request = request
 	if (await db.send()) {
 
-		//console.log('exodussetdropdown:'+db.data)
+		//console.log('exosetdropdown:'+db.data)
 
-		dataobj = exodusxml2obj(db.data)
+		dataobj = exoxml2obj(db.data)
 
 		//xmltemp=new ActiveXObject('Microsoft.XMLDOM')
 		//xmltemp.loadXML(db.data.replace(/\&/g,'+'))
@@ -4510,7 +4510,7 @@ function getdropdown0(element) {
 
 }
 
-function exodusgetdropdown(element, mode) {
+function exogetdropdown(element, mode) {
 	if (!(is(mode)))
 		mode = 'selected'//otherwise 'all'
 	var selectedvalues = []
@@ -4561,8 +4561,8 @@ async function exoui_confirm(question, defaultbutton, yesbuttontitle, nobuttonti
 
 	console.log(question)
 
-	// In-window popup (exodusconfirm2) for questions and text/password input.
-	return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image, default_icons)
+	// In-window popup (exoconfirm2) for questions and text/password input.
+	return await exoconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image, default_icons)
 
 }
 
@@ -4670,7 +4670,7 @@ function showcache() {
 var gcachepruneintervalsecs = 100
 var gmaxcachesize = 1024000
 var gmaxcachen = 100
-exodussetinterval('trimcache()', gcachepruneintervalsecs * 1000)
+exosetinterval('trimcache()', gcachepruneintervalsecs * 1000)
 function trimcache() {
 
 	if (!gcache) return
@@ -4959,10 +4959,10 @@ async function sorttable(event, order) {
 		var sortdata = datarows[rown][colid].text
 		if (dictitemlength) {
 			if (sortdata) {
-				var temp = new exodusamount(sortdata)
+				var temp = new exoamount(sortdata)
 				sortdata = temp.amount.split('.')
 				if (!sortdata[1]) sortdata[1] = ''
-				sortdata = temp.unit + exodusspace(dictitemlength - sortdata[0].length) + sortdata[0] + temp.amount
+				sortdata = temp.unit + exospace(dictitemlength - sortdata[0].length) + sortdata[0] + temp.amount
 			}
 		}
 		else {
@@ -4993,7 +4993,7 @@ async function sorttable(event, order) {
 
 		//right justify the rown number assume max 999999
 		var temp = rown.toString()
-		//temp = exodusspace(6 - temp.length) + temp
+		//temp = exospace(6 - temp.length) + temp
 		temp = ('000000' + temp).slice(-6)
 
 		//save the two column array for sorting
@@ -5072,7 +5072,7 @@ function menuhide(element) {
 
 	//gmenucodes FINANCE,SUPPORT,MEDIAANALYSIS,MEDIA,JOBS,TIMESHEETS,HELP
 	if (!element.menuok) {
-		okmenus = exodusgetcookie2('m')
+		okmenus = exogetcookie2('m')
 		//if (gusername!='EXODUS')
 		//	okmenus=okmenus.replace('FINANCE,','')
 		okmenus = okmenus.split(',')
@@ -5207,7 +5207,7 @@ function menuonmouseover(event, menuoption) {
 		if (gnmenus) {
 			gnmenus = 0
 			menuclose()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 	}
 
@@ -5314,7 +5314,7 @@ function menufocus(menu) {
 	//if given an element save it global and set timeout callback
 	if (menu) {
 		gmenuelement = menu
-		exodussettimeout('menufocus()', 1)
+		exosettimeout('menufocus()', 1)
 		return
 	}
 
@@ -5329,7 +5329,7 @@ function menuonmouseout(event) {
 	event = getevent(event)
 
 	gnmenus = 0
-	gmenutimeout = exodussettimeout('menuclose()', 1000)
+	gmenutimeout = exosettimeout('menuclose()', 1000)
 	//window.event.srcElement.style.color='black'
 }
 
@@ -5382,15 +5382,15 @@ function menuonkeydown(event, menu, key) {
 	if (esckey || (!horizontal && leftkey)) {
 		if (menu.parentNode.parentNode.highlightedelement) {
 			menuonmouseover(event, menu.parentNode.parentNode.highlightedelement)
-			//exodussettimeout('menuonkeydown(13)',10)
+			//exosettimeout('menuonkeydown(13)',10)
 			//attempt to press Enter on it
 			//menuonkeydown(menu.parentNode.parentNode,13)
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 		else {
 			gnmenus = 0
 			menuclose()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 	}
 
@@ -5430,7 +5430,7 @@ function menuonkeydown(event, menu, key) {
 			if (!menuoption.href && !menuoption.onclick)
 				menuonmouseover(event, menuoption)
 		}
-		return exoduscancelevent(event)
+		return exocancelevent(event)
 	}
 
 	//right/left/up/down arrows and home/end
@@ -5485,7 +5485,7 @@ function menuonkeydown(event, menu, key) {
 
 		menuchangeoption(menu, newmenuoption)
 
-		return exoduscancelevent(event)
+		return exocancelevent(event)
 
 	}
 
@@ -5524,7 +5524,7 @@ function menuchangeoption(menu, newmenuoption) {
 	if (!true) {
 		//menu.focus()
 		gmenuelement = menu
-		exodussettimeout('menufocus()', 10)
+		exosettimeout('menufocus()', 10)
 	}
 	menu.onkeydown = menuonkeydown
 	//menu.addEventListener('keydown',menuonkeydown)
@@ -5556,18 +5556,18 @@ async function exodus_menubar_keydown(event) {
 	var keycode = event.keyCode ? event.keyCode : event.which
 
 	if (keycode == 77 && $$('menubutton') && typeof menuonmouseover == 'function') {
-		exoduscancelevent(event)
+		exocancelevent(event)
 		window.scrollTo(0, 0)
-		exodussettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
+		exosettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
 		return false
 	}
-	if (keycode == 71 && typeof exoduslogout_onclick == 'function') {
-		exoduscancelevent(event)
-		await exoduslogout_onclick()
+	if (keycode == 71 && typeof exologout_onclick == 'function') {
+		exocancelevent(event)
+		await exologout_onclick()
 		return false
 	}
 	if (keycode == 82 && typeof refreshcache_onclick == 'function') {
-		exoduscancelevent(event)
+		exocancelevent(event)
 		await refreshcache_onclick()
 		return false
 	}
@@ -5587,7 +5587,7 @@ async function exodus_menubar_keydown(event) {
 	var fn = window[mb.id.slice(0, -6) + '_onclick']
 	if (typeof fn != 'function')
 		return true
-	exoduscancelevent(event)
+	exocancelevent(event)
 	await fn(event)
 	return false
 }
@@ -5747,12 +5747,12 @@ async function refreshcache_onclick() {
 	return true
 }
 
-function exoduscancelevent(event) {
+function exocancelevent(event) {
 
 	//should error maybe
 	event = getevent(event)
 	if (!event) {
-		//console.log('exoduscancelevent QUITTING - no event!')
+		//console.log('exocancelevent QUITTING - no event!')
 		return false
 	}
 
@@ -5816,9 +5816,9 @@ function getevent(event) {
 
 }
 
-function exodusformpaneof(tablex) {
+function exoformpaneof(tablex) {
 
-	// Return the visible shell around a form table when exoduswrapformpanes() has wrapped it.
+	// Return the visible shell around a form table when exowrapformpanes() has wrapped it.
 	var parent = tablex && tablex.parentNode
 	if (!parent || !parent.className)
 		return tablex
@@ -5827,7 +5827,7 @@ function exodusformpaneof(tablex) {
 	return tablex
 }
 
-function exodusform_is_inside_exodusform(tablex) {
+function exoform_is_inside_exodusform(tablex) {
 
 	var el = tablex && tablex.parentNode
 	while (el) {
@@ -5852,7 +5852,7 @@ function exodus_is_formpane_run_sep(node) {
 	return false
 }
 
-function exoduscoalesceformpanes() {
+function exocoalesceformpanes() {
 
 	// Merge sibling .exodusformpane shells (only br/ws/comment between) into one rounded frame.
 	// A plain <span></span> between panes keeps separate shells (schedules.htm).
@@ -5914,7 +5914,7 @@ function exodus_is_wrappable_exodusform(tablex) {
 	// Top-level TABLE.exodusform not already inside a pane (or nested in another form).
 	if (!tablex || !tablex.className || (' ' + tablex.className + ' ').indexOf(' exodusform ') < 0)
 		return false
-	if (exodusform_is_inside_exodusform(tablex))
+	if (exoform_is_inside_exodusform(tablex))
 		return false
 	var parent = tablex.parentNode
 	if (!parent)
@@ -6256,7 +6256,7 @@ function form_wide_layout_wire_resize() {
 	})
 }
 
-function exoduswrapformpanes() {
+function exowrapformpanes() {
 
 	// One pane per sibling *run* of top-level forms (same rules as coalesce:
 	// only br/ws/comment between). Build each shell in a single step.
@@ -6328,8 +6328,8 @@ function exoduswrapformpanes() {
 		flushrun()
 	}
 
-	exoduscoalesceformpanes()
-	exodusclear_embeddedtable_hostborders()
+	exocoalesceformpanes()
+	exoclear_embeddedtable_hostborders()
 	exodus_mark_form_edge_rows()
 }
 
@@ -6433,7 +6433,7 @@ function exodus_mark_form_edge_rows() {
 	}
 }
 
-function exodusclear_embeddedtable_hostborders() {
+function exoclear_embeddedtable_hostborders() {
 
 	// Static exotable / embedded group tables: strip inline borders on the host row/cell
 	var tables = document.getElementsByTagName('TABLE')
@@ -6631,7 +6631,7 @@ function exodus_browser_chrome_keydown_capture(event) {
 	// Decide locks px width; reflow after zoom (resize/visualViewport also refit)
 	var conf = $$('exodusconfirmdiv')
 	if (conf && conf.classList && conf.classList.contains('exodusconfirm_decide'))
-		window.setTimeout(function () { exodusconfirm_fit_decide_popup(true) }, 0)
+		window.setTimeout(function () { exoconfirm_fit_decide_popup(true) }, 0)
 }
 
 function exodus_ensure_browser_chrome_keydown() {
@@ -6937,15 +6937,15 @@ function starteventhandler(eventfunctionname, functionx) {
 			// Contract when a *startevent helper is present:
 			//   null  — that popup is not open
 			//   true  — allow browser default (e.g. copy); no form logic
-			//   false — swallow (exoduscancelevent)
+			//   false — swallow (exocancelevent)
 			// Calendar: keys on its div; form uses form_closepopups for Esc.
 			// ---------------------------------------------------------------
-			if (typeof exodusconfirm_startevent == 'function') {
-				var confEv = exodusconfirm_startevent(event)
+			if (typeof exoconfirm_startevent == 'function') {
+				var confEv = exoconfirm_startevent(event)
 				if (confEv === true)
 					return true
 				if (confEv === false)
-					return exoduscancelevent(event)
+					return exocancelevent(event)
 			}
 
 			if (typeof colors_popup_startevent == 'function') {
@@ -6953,7 +6953,7 @@ function starteventhandler(eventfunctionname, functionx) {
 				if (colorEv === true)
 					return true
 				if (colorEv === false)
-					return exoduscancelevent(event)
+					return exocancelevent(event)
 			}
 
 			// Let native <select> complete open/toggle; do not start a new flight.
@@ -6974,7 +6974,7 @@ function starteventhandler(eventfunctionname, functionx) {
 			++gblockevents_skipped_n
 			logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
 
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 
 		}//end of event blocking
 
@@ -6987,13 +6987,13 @@ function starteventhandler(eventfunctionname, functionx) {
 
 		// Sync handler (e.g. onbeforeunload text): run to completion, no gate.
 		var result = functionx(event)
-		if (exodusisgeneratoriterator(result)) {
+		if (exoisgeneratoriterator(result)) {
 			systemerror(
 				'starteventhandler',
 				'function* handlers are no longer supported (' + eventdescription
 				+ '). Convert to async function.'
 			)
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 		if (result)
 			event.returnValue = result
@@ -7021,16 +7021,16 @@ var gpendingDialogOwner
 
 // --- async/generator bridge helpers (asyncjs migration) ---
 
-function exodusisasyncfunction(fn) {
+function exoisasyncfunction(fn) {
 	return fn && fn.constructor && fn.constructor.name === 'AsyncFunction'
 }
 
-function exodusisgeneratoriterator(value) {
+function exoisgeneratoriterator(value) {
 	return value && typeof value.next === 'function' && typeof value.throw === 'function'
 		&& value.constructor && value.constructor.name === 'Generator'
 }
 
-function exodusispromise(value) {
+function exoispromise(value) {
 	return value && typeof value.then === 'function'
 }
 
@@ -7230,18 +7230,18 @@ function exodus_begin_if_idle(asyncHandler, location) {
 
 // Internal bridge from *_sync / HTML attribute handlers — not a fourth gate.
 // Async → exodus_begin; else sync (generators rejected stage 6).
-function exodusinvokesynctarget(target, args, location) {
+function exoinvokesynctarget(target, args, location) {
 	args = args || []
-	if (exodusisasyncfunction(target)) {
+	if (exoisasyncfunction(target)) {
 		void exodus_begin(function () { return target.apply(null, args) }, location)
 		return
 	}
 	var result = target.apply(null, args)
-	if (exodusisgeneratoriterator(result)) {
-		systemerror('exodusinvokesynctarget', 'function* removed (stage 6) at ' + location)
+	if (exoisgeneratoriterator(result)) {
+		systemerror('exoinvokesynctarget', 'function* removed (stage 6) at ' + location)
 		return
 	}
-	if (exodusispromise(result)) {
+	if (exoispromise(result)) {
 		void exodus_begin(function () { return result }, location)
 		return result
 	}
@@ -7249,55 +7249,55 @@ function exodusinvokesynctarget(target, args, location) {
 }
 
 // Invoke from a legacy *_sync() bridge that returns a value to its caller.
-function exodusinvokesynctargetreturn(target, args, location) {
+function exoinvokesynctargetreturn(target, args, location) {
 	args = args || []
-	if (exodusisasyncfunction(target))
+	if (exoisasyncfunction(target))
 		return exodus_begin(function () { return target.apply(null, args) }, location)
 	var result = target.apply(null, args)
-	if (exodusisgeneratoriterator(result)) {
-		systemerror('exodusinvokesynctargetreturn', 'function* removed (stage 6) at ' + location)
+	if (exoisgeneratoriterator(result)) {
+		systemerror('exoinvokesynctargetreturn', 'function* removed (stage 6) at ' + location)
 		return false
 	}
-	if (exodusispromise(result))
+	if (exoispromise(result))
 		return exodus_begin(function () { return result }, location)
 	return result
 }
 
 // Normalise a call result inside an async function (await promise only).
-async function exodusawaitresult(result, location) {
+async function exoawaitresult(result, location) {
 	if (!result) return result
-	if (exodusispromise(result))
+	if (exoispromise(result))
 		return await result
-	if (exodusisgeneratoriterator(result)) {
-		systemerror('exodusawaitresult', 'function* removed (stage 6) at ' + location)
+	if (exoisgeneratoriterator(result)) {
+		systemerror('exoawaitresult', 'function* removed (stage 6) at ' + location)
 		return false
 	}
 	return result
 }
 
 // Fire-and-forget for unload etc. — no UI blocking.
-function exodusfireandforget(result, location) {
+function exofireandforget(result, location) {
 	if (!result) return
-	if (exodusispromise(result)) {
+	if (exoispromise(result)) {
 		void result.catch(function (e) {
-			console.log('exodusfireandforget ' + location + ': ' + (e.description || e.message || e))
+			console.log('exofireandforget ' + location + ': ' + (e.description || e.message || e))
 		})
 		return
 	}
-	if (exodusisgeneratoriterator(result))
-		systemerror('exodusfireandforget', 'function* removed (stage 6) at ' + location)
+	if (exoisgeneratoriterator(result))
+		systemerror('exofireandforget', 'function* removed (stage 6) at ' + location)
 }
 
 // Historical name: async → Gate A. Generators no longer accepted (stage 6).
-function exodusneweventhandler(eventhandler, location) {
+function exoneweventhandler(eventhandler, location) {
 	++geventn
 	logevent(' ')
 	logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
-	if (exodusisasyncfunction(eventhandler))
+	if (exoisasyncfunction(eventhandler))
 		return exodus_begin(eventhandler, location)
-	if (exodusisgeneratoriterator(eventhandler)) {
+	if (exoisgeneratoriterator(eventhandler)) {
 		systemerror(
-			'exodusneweventhandler',
+			'exoneweventhandler',
 			'function* / generators removed (stage 6) at ' + location
 			+ '. Convert to async function.'
 		)
@@ -7340,7 +7340,7 @@ function addeventlistener(element, eventname, functionx) {
 }
 
 /*
-function exodusgetattribute(element,attributename) {
+function exogetattribute(element,attributename) {
 
 var attribute=element.getAttribute(attributename)
 if (!attribute)
@@ -7380,7 +7380,7 @@ function GetAttribute(element, attName, valueIfNull) {
 	return (oValue == null ? valueIfNull : oValue);
 }
 
-function exodusremoveelementsbyid(id) {
+function exoremoveelementsbyid(id) {
 	while (true) {
 		var tt = document.getElementById(id)
 		if (!tt)
@@ -7389,7 +7389,7 @@ function exodusremoveelementsbyid(id) {
 	}
 }
 
-function exodusremovenode(element) {
+function exoremovenode(element) {
 	element.parentNode.removeChild(element)
 }
 
@@ -7407,34 +7407,34 @@ function HTMLDecode(text) {
 	return text.replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&')
 }
 
-function exodusint2date(exodusdate) {
+function exoint2date(exodate) {
 	//problem unless automatic daylight saving time change is switched off
 	//both the following return the same date!!!
 	//zzz need to find a more reliable algorithm
 	//alert(new Date(1967,11,31+14361))
 	//alert(new Date(1967,11,31+14362))
-	//return new Date(1967,11,31+(+exodusdate))
+	//return new Date(1967,11,31+(+exodate))
 
 	//var date=new Date(0)
 	//date.setUTCFullYear(1967)
 	//date.setUTCMonth(11)
-	//date.setUTCDate(31+(+exodusdate))
+	//date.setUTCDate(31+(+exodate))
 	//return date
 
-	return new Date(Date.UTC(1967, 11, 31 + parseInt(exodusdate, 10)))
+	return new Date(Date.UTC(1967, 11, 31 + parseInt(exodate, 10)))
 
 }
 
 // Thin timeout wrapper. Prefer await inside the current Gate A flight.
 // Preferred deferral of async work (stage 3):
 //   exodus_begin_when_idle(myfunc, 'label', { delay_ms: ms })
-//   or exodussettimeout(myAsyncFn, ms)  — AsyncFunction → when_idle then begin
+//   or exosettimeout(myAsyncFn, ms)  — AsyncFunction → when_idle then begin
 // String 'await …' / 'yield* …' is legacy (eval via new Function); do not add more.
-function exodussettimeout(command, milliseconds) {
+function exosettimeout(command, milliseconds) {
 	if (glogsettimeout)
 		console.log('exodussetimeout(' + command + ')')
 	if (typeof command == 'function') {
-		if (exodusisasyncfunction(command)) {
+		if (exoisasyncfunction(command)) {
 			var label = 'timeout ' + (command.name || 'fn')
 			// Must not one-shot begin while still airborne (silent miss → when_idle).
 			return window.setTimeout(function () {
@@ -7448,23 +7448,23 @@ function exodussettimeout(command, milliseconds) {
 		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
 		return window.setTimeout(function () {
 			exodus_begin_when_idle(function () {
-				return exodustimeout_async_run(command)
+				return exotimeout_async_run(command)
 			}, 'timeout ' + command, { delay_ms: 0 })
 		}, milliseconds)
 	}
 	return window.setTimeout(command, milliseconds)
 }
 
-// LEGACY: evaluate a string expression under Gate A (via exodussettimeout string path).
-async function exodustimeout_async_run(command) {
+// LEGACY: evaluate a string expression under Gate A (via exosettimeout string path).
+async function exotimeout_async_run(command) {
 	var fn = new Function('return ' + command)
 	return await fn()
 }
 
 // Interval wrapper. Prefer function callbacks; AsyncFunction → exodus_begin_if_idle each tick.
-function exodussetinterval(command, milliseconds) {
+function exosetinterval(command, milliseconds) {
 	if (typeof command == 'function') {
-		if (exodusisasyncfunction(command)) {
+		if (exoisasyncfunction(command)) {
 			var label = 'interval ' + (command.name || 'fn')
 			return window.setInterval(function () {
 				void exodus_begin_if_idle(command, label)
@@ -7476,14 +7476,14 @@ function exodussetinterval(command, milliseconds) {
 		exodus_flight_log('LEGACY STRING INTERVAL "' + command + '"')
 		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
 		return window.setInterval(function () {
-			void exodusinterval_async_sync(command)
+			void exointerval_async_sync(command)
 		}, milliseconds)
 	}
 	return window.setInterval(command, milliseconds)
 }
 
 // LEGACY: string expression under Gate A when idle (relock/keepalive style).
-async function exodusinterval_async_sync(command) {
+async function exointerval_async_sync(command) {
 	if (g_exodus_flow || gblockevents) {
 		exodus_flight_log('SKIP interval "' + command + '" (busy)')
 		return
@@ -7657,7 +7657,7 @@ function exodus_getinnertext(element) {
 	return text
 }
 
-function exodusconfirm_scrollpane() {
+function exoconfirm_scrollpane() {
 	var div = $$('exodusconfirmdiv')
 	return div && (div.querySelector('.exodusconfirm_body') || div)
 }
@@ -7682,7 +7682,7 @@ function exodus_scroll_row_below_sticky_thead(tr, scrollpane, thead) {
 		scrollpane.scrollTop += (trRect.bottom - paneRect.bottom)
 }
 
-function exodusconfirm_footerwrap(content) {
+function exoconfirm_footerwrap(content) {
 	// Buttons only — left edge shared via one-row two-col shell (icon | everything).
 	return content
 }
@@ -7817,31 +7817,31 @@ function exodus_set_icon_element(el, specOrUrl) {
 }
 
 // Decide Select: green check (mask)
-function exodusconfirm_ok_image() {
+function exoconfirm_ok_image() {
 	return exodus_icon_html(exodus_icon_spec('confirm-ok.svg', 'green'))
 }
 // Decide Cancel: red X mask
-function exodusconfirm_cancel_image() {
+function exoconfirm_cancel_image() {
 	return exodus_icon_html(exodus_icon_spec('record-close.svg', 'red'))
 }
 // Confirm Yes/OK (positive) — Save label uses menubar tray icon (record-save.svg), else check
-function exodusconfirm_yes_image(buttontext) {
+function exoconfirm_yes_image(buttontext) {
 	var plain = String(buttontext == null ? '' : buttontext).replace(/<[^>]*>/g, '')
 	plain = plain.replace(/\s+/g, ' ').trim()
 	if (plain.toLowerCase() == 'save')
 		return exodus_icon_html(exodus_icon_spec('record-save.svg', 'green'))
-	return exodusconfirm_ok_image()
+	return exoconfirm_ok_image()
 }
 // Confirm No: orange X if Cancel also shown, else red X
-function exodusconfirm_no_image(hasCancelButton) {
+function exoconfirm_no_image(hasCancelButton) {
 	return exodus_icon_html(exodus_icon_spec('record-close.svg', hasCancelButton ? 'orange' : 'red'))
 }
 // Confirm Cancel (Esc) — red U-turn
-function exodusconfirm_back_image() {
+function exoconfirm_back_image() {
 	return exodus_icon_html(exodus_icon_spec('confirm-back.svg', 'red'))
 }
 
-function exodusconfirm_focusable_elements() {
+function exoconfirm_focusable_elements() {
 
 	var confirm=$$('exodusconfirmdiv')
 	if (!confirm)
@@ -7864,9 +7864,9 @@ function exodusconfirm_focusable_elements() {
 	return list
 }
 
-function exodusconfirm_focus_endpoint(first) {
+function exoconfirm_focus_endpoint(first) {
 
-	var list=exodusconfirm_focusable_elements()
+	var list=exoconfirm_focusable_elements()
 	if (!list.length)
 		return false
 	client_focuson(first?list[0]:list[list.length-1])
@@ -7882,29 +7882,29 @@ function exodusconfirm_focus_endpoint(first) {
 // ---------------------------------------------------------------------------
 var gexodusconfirm_plain_keydown_capture = false
 
-function exodusconfirm_install_plain_keydown() {
+function exoconfirm_install_plain_keydown() {
 	if (gexodusconfirm_plain_keydown_capture)
 		return
-	document.addEventListener('keydown', exodusconfirm_plain_keydown, true)
+	document.addEventListener('keydown', exoconfirm_plain_keydown, true)
 	gexodusconfirm_plain_keydown_capture = true
 }
 
-function exodusconfirm_uninstall_plain_keydown() {
+function exoconfirm_uninstall_plain_keydown() {
 	if (!gexodusconfirm_plain_keydown_capture)
 		return
-	document.removeEventListener('keydown', exodusconfirm_plain_keydown, true)
+	document.removeEventListener('keydown', exoconfirm_plain_keydown, true)
 	gexodusconfirm_plain_keydown_capture = false
 }
 
 // Capture-phase: handle keys for plain confirm before form/Gate A sees them.
 // AGENTS.md HIGH PRIORITY: typing needs capture true AND startevent true (both).
-function exodusconfirm_plain_keydown(event) {
+function exoconfirm_plain_keydown(event) {
 
 	var conf = document.getElementById('exodusconfirmdiv')
 	if (!conf || (conf.classList && conf.classList.contains('exodusconfirm_decide')))
 		return
 
-	var r = exodusconfirm_keymap(event)
+	var r = exoconfirm_keymap(event)
 	// true = typing/copy: leave default action; do not stopPropagation (target needs key)
 	if (r === null || r === true)
 		return
@@ -7924,7 +7924,7 @@ function exodusconfirm_plain_keydown(event) {
 //   - swallows form shortcuts while any confirm is up
 //   - Esc-cancels decide when focus is outside the popup
 // Return null = no confirm; true = allow browser; false = swallow form path.
-function exodusconfirm_startevent(event) {
+function exoconfirm_startevent(event) {
 
 	var confirmdiv = document.getElementById('exodusconfirmdiv')
 	if (!confirmdiv)
@@ -7943,7 +7943,7 @@ function exodusconfirm_startevent(event) {
 		var dkey = event.keyCode ? event.keyCode : event.which
 		if (dkey == 27) {
 			window.setTimeout(function () {
-				resolvePendingConfirm('', 'exodusconfirm_startevent Esc decide')
+				resolvePendingConfirm('', 'exoconfirm_startevent Esc decide')
 			}, 1)
 			return false
 		}
@@ -7967,7 +7967,7 @@ function exodusconfirm_startevent(event) {
 // Shared key map for plain confirm (OK/Yes/No/text). Used by capture handler.
 // null = not our event type / not open; true = allow browser (type/copy);
 // false = action taken or swallow.
-function exodusconfirm_keymap(event) {
+function exoconfirm_keymap(event) {
 
 	if (!document.getElementById('exodusconfirmdiv'))
 		return null
@@ -7996,14 +7996,14 @@ function exodusconfirm_keymap(event) {
 
 	// Tab: cycle text field and buttons (works even when nothing focused yet)
 	if (keycode == 9) {
-		exodusconfirm_focus_cycle(!!event.shiftKey)
+		exoconfirm_focus_cycle(!!event.shiftKey)
 		return false
 	}
 
 	// Arrows: same cycle as Tab, unless caret is in the confirm text field
 	if ((keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)
 		&& !(istextinput && active && active.id == 'exodusconfirmdiv_textinput')) {
-		exodusconfirm_focus_cycle(keycode == 37 || keycode == 38)
+		exoconfirm_focus_cycle(keycode == 37 || keycode == 38)
 		return false
 	}
 
@@ -8077,7 +8077,7 @@ function exodusconfirm_keymap(event) {
 
 	// Home/End
 	if (keycode == 36 || keycode == 35) {
-		exodusconfirm_focus_endpoint(keycode == 36)
+		exoconfirm_focus_endpoint(keycode == 36)
 		return false
 	}
 
@@ -8085,15 +8085,15 @@ function exodusconfirm_keymap(event) {
 }
 
 // document_onkeydown belt: swallow form keys while confirm open (capture already acted).
-function exodusconfirm_document_keydown(event) {
-	return exodusconfirm_startevent(event)
+function exoconfirm_document_keydown(event) {
+	return exoconfirm_startevent(event)
 }
 
 // Tab / Shift+Tab within the open confirm (not decide lists — those have their own handler).
 // If nothing in the dialog is focused yet, Tab focuses the first control (first button).
-function exodusconfirm_focus_cycle(reverse) {
+function exoconfirm_focus_cycle(reverse) {
 
-	var list=exodusconfirm_focusable_elements()
+	var list=exoconfirm_focusable_elements()
 	if (!list.length)
 		return false
 	var active=document.activeElement
@@ -8124,14 +8124,14 @@ function exodusconfirm_focus_cycle(reverse) {
 // Explicit default only: 1 / 2 / 3. Empty, 0, or omitted → no prefocus.
 // Button numbers: 1=positive (OK/Yes), 2=negative (No), 3=cancel (Cancel).
 // OK/Cancel dialogs have no negative: default 2 means Cancel (Windows MB_OKCANCEL).
-function exodusconfirm_has_default_button(defaultbuttonn) {
+function exoconfirm_has_default_button(defaultbuttonn) {
 	var n=Number(defaultbuttonn)
 	return n===1||n===2||n===3
 }
 
-function exodusconfirm_default_button_element(defaultbuttonn) {
+function exoconfirm_default_button_element(defaultbuttonn) {
 
-	if (!exodusconfirm_has_default_button(defaultbuttonn))
+	if (!exoconfirm_has_default_button(defaultbuttonn))
 		return null
 	var defn=Number(defaultbuttonn)
 	if (defn==2)
@@ -8143,8 +8143,8 @@ function exodusconfirm_default_button_element(defaultbuttonn) {
 
 var gexodusconfirm_scrollhint_resize
 
-function exodusconfirm_update_scroll_hints() {
-	var scrollpane = exodusconfirm_scrollpane()
+function exoconfirm_update_scroll_hints() {
+	var scrollpane = exoconfirm_scrollpane()
 	var wrap = $$('exodusconfirm_scrollhint_wrap')
 	if (!scrollpane || !wrap)
 		return
@@ -8171,7 +8171,7 @@ function exodusconfirm_update_scroll_hints() {
 	wrap.setAttribute('aria-hidden', canDown ? 'false' : 'true')
 }
 
-function exodusconfirm_fit_decide_popup(force) {
+function exoconfirm_fit_decide_popup(force) {
 
 	var div=$$('exodusconfirmdiv')
 	var table=$$('decide_table1')
@@ -8208,21 +8208,21 @@ function exodusconfirm_fit_decide_popup(force) {
 	div.style.width=Math.min(want, maxw)+'px'
 	div.style.maxHeight=maxh+'px'
 	div.setAttribute('exodusconfirm_fitted','1')
-	exodusconfirm_update_scroll_hints()
+	exoconfirm_update_scroll_hints()
 }
 
-function exodusconfirm_bind_scroll_hints() {
-	exodusconfirm_unbind_scroll_hints()
+function exoconfirm_bind_scroll_hints() {
+	exoconfirm_unbind_scroll_hints()
 
-	var scrollpane = exodusconfirm_scrollpane()
+	var scrollpane = exoconfirm_scrollpane()
 	if (!scrollpane || !$$('exodusconfirm_scrollhint_wrap'))
 		return
 
 	// fit_decide_popup already refreshes the ▼ hint
-	exodusconfirm_fit_decide_popup()
-	scrollpane.addEventListener('scroll', exodusconfirm_update_scroll_hints, { passive: true })
+	exoconfirm_fit_decide_popup()
+	scrollpane.addEventListener('scroll', exoconfirm_update_scroll_hints, { passive: true })
 	gexodusconfirm_scrollhint_resize=function() {
-		exodusconfirm_fit_decide_popup(true)
+		exoconfirm_fit_decide_popup(true)
 	}
 	window.addEventListener('resize', gexodusconfirm_scrollhint_resize, { passive: true })
 	// Zoom often updates visualViewport without (or before) window.resize
@@ -8232,7 +8232,7 @@ function exodusconfirm_bind_scroll_hints() {
 	} catch (e) { }
 }
 
-function exodusconfirm_unbind_scroll_hints() {
+function exoconfirm_unbind_scroll_hints() {
 	if (gexodusconfirm_scrollhint_resize) {
 		window.removeEventListener('resize', gexodusconfirm_scrollhint_resize)
 		try {
@@ -8245,7 +8245,7 @@ function exodusconfirm_unbind_scroll_hints() {
 
 // Popup is temporary chrome: remember where the user was, restore after close.
 // Raw .focus / setSelectionRange only — no form validate, no client_focuson chain.
-function exodusconfirm_capture_invoker() {
+function exoconfirm_capture_invoker() {
 
 	var ae = document.activeElement
 	if (!ae || ae === document.body || ae === document.documentElement)
@@ -8265,7 +8265,7 @@ function exodusconfirm_capture_invoker() {
 	return saved
 }
 
-function exodusconfirm_release_invoker(saved) {
+function exoconfirm_release_invoker(saved) {
 
 	if (!saved || !saved.el)
 		return
@@ -8304,7 +8304,7 @@ function exodusconfirm_release_invoker(saved) {
 	}, 1)
 }
 
-async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc, default_icons) {
+async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc, default_icons) {
 
 	//performs "in-window" questions, selections and inputs
 	//replaces (or called by)
@@ -8313,7 +8313,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	// default_icons: role icons on Yes/No/Cancel-style buttons (default true; false for multi-choice labels)
 
 	// Capture before any focus into the popup shell
-	var invoker_focus = exodusconfirm_capture_invoker()
+	var invoker_focus = exoconfirm_capture_invoker()
 
 	if (typeof default_icons == 'undefined')
 		default_icons = true
@@ -8453,7 +8453,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
 
 		// Hotkey letter: pure button = bare letter; text-input confirm = Alt+letter only.
-		// (See exodusconfirm_keymap accessLetter CHANGE LOG — do not flip-flop.)
+		// (See exoconfirm_keymap accessLetter CHANGE LOG — do not flip-flop.)
 		var letter
 		var marked = String(buttontext).match(/<[uU]>(.)<\/[uU]>/)
 		if (!marked)
@@ -8494,11 +8494,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		var iconhtml = ''
 		if (default_icons) {
 			if (buttonn == 1)
-				iconhtml = exodusconfirm_yes_image(buttontext)
+				iconhtml = exoconfirm_yes_image(buttontext)
 			else if (buttonn == 2)
-				iconhtml = exodusconfirm_no_image(!!cancelbuttonx)
+				iconhtml = exoconfirm_no_image(!!cancelbuttonx)
 			else if (buttonn == 3)
-				iconhtml = exodusconfirm_back_image()
+				iconhtml = exoconfirm_back_image()
 		}
 
 		html += '>'
@@ -8534,24 +8534,24 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		// Icon+label graphicbuttons (mask-tinted mono icons).
 		// "Select" not "OK" — avoids confusion when an option is itself named Cancel.
 		// Bare letters type-to-filter; Select/Cancel via Enter/Esc/F9 or Alt+S / Alt+C.
-		footerhtml = exodusconfirm_footerwrap(
+		footerhtml = exoconfirm_footerwrap(
 			'<span id="decide_okbutton" tabindex="0" class="graphicbutton"'
 			+ ' title="Press Enter, Ctrl+Enter, F9 or Alt+S">'
-			+ exodusconfirm_ok_image()
+			+ exoconfirm_ok_image()
 			+ '<span id="decide_okbutton_label"><u>S</u>elect</span>'
 			+ '</span>'
 			+ '<span id="decide_cancelbutton" tabindex="0" class="graphicbutton"'
 			+ ' title="Press Esc or Alt+C (Esc clears type-filter first)">'
-			+ exodusconfirm_cancel_image()
+			+ exoconfirm_cancel_image()
 			+ '<span id="decide_cancelbutton_label"><u>C</u>ancel</span>'
 			+ '</span>')
 	} else if (istextinput) {
 		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
 		bodyinner += '\
 						<input id="exodusconfirmdiv_textinput" size="60" style="display: block;">'
-		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
+		footerhtml = exoconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	} else {
-		footerhtml = exodusconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
+		footerhtml = exoconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	}
 
 	var scrollhinthtml = ''
@@ -8593,16 +8593,16 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		textinput.autocomplete = texthidden ? 'new-password' : 'off'
 		// Enter in the field = OK (including empty string — historical confirm.htm behaviour).
 		// Esc = Cancel. Document-level handler also covers this while gblockevents is set.
-		textinput.onkeydown = function exodusconfirm_textinput_onkeydown(event) {
+		textinput.onkeydown = function exoconfirm_textinput_onkeydown(event) {
 			event = getevent(event)
 			var keycode = event.keyCode ? event.keyCode : event.which
 			if (keycode == 13) {
 				window.setTimeout(exodus_confirm_function1_sync, 1)
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 			if (keycode == 27) {
 				window.setTimeout(exodus_confirm_function3_sync, 1)
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 			return true
 		}
@@ -8621,12 +8621,12 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		// (decide_fail_no_options may already have removed the shell before invalid)
 		if (typeof response != 'undefined') {
 			if (div && div.parentNode)
-				exodusremovenode(div)
-			exodusconfirm_release_invoker(invoker_focus)
+				exoremovenode(div)
+			exoconfirm_release_invoker(invoker_focus)
 			return response
 		}
 
-		exodusconfirm_bind_scroll_hints()
+		exoconfirm_bind_scroll_hints()
 
 	}
 
@@ -8635,12 +8635,12 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	//if case too much to fit vertically on the screen, use scrollbars on the body only
 	//for messages show the bottom of the message; footer buttons stay visible
 	//for popup lists, show the top of the list
-	var scrollpane = exodusconfirm_scrollpane()
+	var scrollpane = exoconfirm_scrollpane()
 	if (!decide_args)
 		scrollpane.scrollTop = scrollpane.scrollHeight
 
-	//div.onkeydown=function exodusconfirm_onkeydown(event) {
-	//	exoduscancelevent(event)
+	//div.onkeydown=function exoconfirm_onkeydown(event) {
+	//	exocancelevent(event)
 	//}
 
 	//YIELD RIGHT HERE!
@@ -8662,11 +8662,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	gexodusconfirmdefaultbutton = defaultbuttonn || 1
 
 	blockmodalui_sync()
-	form_blockevents(true, 'exodusconfirm2')
+	form_blockevents(true, 'exoconfirm2')
 	// Plain confirm: capture keydown owns Enter/Esc (not the form gblockevents maze).
 	// Decide lists use decide_document_onkeydown on the div instead.
 	if (!decide_args)
-		exodusconfirm_install_plain_keydown()
+		exoconfirm_install_plain_keydown()
 
 	// Text-input confirm: caret in field (after modal lock).
 	if (istextinput) {
@@ -8693,7 +8693,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		window.setTimeout(exodusconfirm_park_text_focus, 50)
 	} else if (!decide_args) {
 		// Default button, or sole OK (note/invalid) so focus matches Enter behaviour
-		var defbtn = exodusconfirm_default_button_element(defaultbuttonn)
+		var defbtn = exoconfirm_default_button_element(defaultbuttonn)
 		if (!defbtn && nbuttons == 1)
 			defbtn = document.getElementById('positivebutton')
 		if (defbtn)
@@ -8705,15 +8705,15 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 		response = await confirmPromise
 	} finally {
 		if (!decide_args)
-			exodusconfirm_uninstall_plain_keydown()
+			exoconfirm_uninstall_plain_keydown()
 		gpendingConfirmResolve = null
 		gpendingConfirmOwner = null
 		gexodusconfirmdefaultbutton = null
-		form_blockevents(false, 'exodusconfirm2')
+		form_blockevents(false, 'exoconfirm2')
 		unblockmodalui_sync()
-		exodusconfirm_unbind_scroll_hints()
-		exodusremovenode(div)
-		exodusconfirm_release_invoker(invoker_focus)
+		exoconfirm_unbind_scroll_hints()
+		exoremovenode(div)
+		exoconfirm_release_invoker(invoker_focus)
 	}
 
 	// Text input: OK → string (incl. ''); Cancel → false.
@@ -8824,7 +8824,7 @@ function exodus_confirm_function(buttonno, event) {
 
 	console.log('exodus_confirm_function buttonno:' + buttonno)
 	event = getevent(event)
-	exoduscancelevent(event)
+	exocancelevent(event)
 	//exodus_resume(buttonno, 'exodus_confirm_function')
 	resolvePendingConfirm(buttonno, 'exodus_confirm_function')
 }
@@ -8843,7 +8843,7 @@ function cancel_backpage_event(event) {
 	}
 
 	//remove the popup and its controlling generator/coroutine
-	//exodusremovenode(exodusconfirmdiv)
+	//exoremovenode(exodusconfirmdiv)
 	//geventhandler = false
 	//exodus_resume(false, 'cancel_backpage_event')
 	resolvePendingConfirm(false, 'cancel_backpage_event')
@@ -8867,7 +8867,7 @@ async function decide_fail_no_options() {
 	}
 	var shell = $$('exodusconfirmdiv')
 	if (shell)
-		exodusremovenode(shell)
+		exoremovenode(shell)
 	return await exoui_invalid('No records found.')
 }
 
@@ -8950,8 +8950,8 @@ function decide_copy_text_sync(event, text) {
 	} catch (e) {
 		return false
 	}
-	if (typeof exoduscancelevent == 'function')
-		return exoduscancelevent(event) || true
+	if (typeof exocancelevent == 'function')
+		return exocancelevent(event) || true
 	if (event.preventDefault)
 		event.preventDefault()
 	return true
@@ -9092,7 +9092,7 @@ async function decide_onload(decide_args) {
 	if (typeof decide_returncolid == 'number') {
 		var tt = cols[decide_returncolid]
 		//dont convert if column ids are numeric since presumably the returncolid is an id not a columnno
-		if (tt && tt[0] && !exodusnum(tt[0]))
+		if (tt && tt[0] && !exonum(tt[0]))
 			decide_returncolid = tt[0]
 	}
 
@@ -9322,11 +9322,11 @@ async function decide_onload(decide_args) {
 				value = value.text
 
 			//date conversion
-			if (colinfo[2] == 'DATE' && exodusnum(value))
+			if (colinfo[2] == 'DATE' && exonum(value))
 				value = DATE(value)
 
 			//time conversion
-			if (colinfo[2] == 'TIME' && exodusnum(value))
+			if (colinfo[2] == 'TIME' && exonum(value))
 				value = TIME(value)
 
 			//oCell.innerHTML=value
@@ -9369,13 +9369,13 @@ async function decide_onload(decide_args) {
 	// Footer actions: only close the popup (popup-local; form path is blocked).
 	var okbutton = $$('decide_okbutton')
 	okbutton.onclick = function (event) {
-		exoduscancelevent(getevent(event))
+		exocancelevent(getevent(event))
 		decide_close(decide_getreturnvalues())
 		return false
 	}
 	var cancelbutton = $$('decide_cancelbutton')
 	cancelbutton.onclick = function (event) {
-		exoduscancelevent(getevent(event))
+		exocancelevent(getevent(event))
 		decide_close('')
 		return false
 	}
@@ -9389,7 +9389,7 @@ async function decide_onload(decide_args) {
 		return await decide_fail_no_options()
 	}
 
-	//exodussettimeout('exodusautofitwindow()', 10)
+	//exosettimeout('exodusautofitwindow()', 10)
 
 	var selections = document.getElementsByName('decide_selection')
 
@@ -9616,7 +9616,7 @@ async function decide_onload(decide_args) {
 
 		//necessary to prevent unchecking by something unknown higher up
 		//event.cancelBubble=true
-		exoduscancelevent(event)
+		exocancelevent(event)
 
 		if (doingall)
 			return lastrank
@@ -9631,7 +9631,7 @@ async function decide_onload(decide_args) {
 		element.checked = true
 		decide_last_option_element = element
 		decide_close(element.getAttribute('decide_returnvalue'))
-		return exoduscancelevent(event)
+		return exocancelevent(event)
 	}
 
 	function decide_document_onmouseover(event) {
@@ -9667,7 +9667,7 @@ async function decide_onload(decide_args) {
 	function decide_document_onmouse(event, mode) {
 
 		event = getevent(event)
-		exoduscancelevent(event)
+		exocancelevent(event)
 
 		if (decide_hover_locked)
 			return
@@ -9698,7 +9698,7 @@ async function decide_onload(decide_args) {
 		if (decide_selection_in_list())
 			return
 		if (event.target && event.target.type == 'checkbox' && typeof forceCheck !== 'boolean')
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 
 		var trtag = getancestor(event.target, 'tr')
 		if (!trtag || trtag.getAttribute('decide_row') == null)
@@ -9720,13 +9720,13 @@ async function decide_onload(decide_args) {
 
 		decide_last_option_element = element
 		client_focuson(element)
-		return exoduscancelevent(event)
+		return exocancelevent(event)
 	}
 
 	function decide_document_ondblclick(event) {
 		decide_document_onclick(event, true)
 		decide_close(decide_getreturnvalues())
-		return exoduscancelevent(event)
+		return exocancelevent(event)
 	}
 
 	function decide_getreturnvalues() {
@@ -9881,7 +9881,7 @@ async function decide_onload(decide_args) {
 		newelement = lastVisible
 
 		var newoptionno = newelement.getAttribute('decide_optionno')
-		var scrollpane = exodusconfirm_scrollpane()
+		var scrollpane = exoconfirm_scrollpane()
 		var newn = -1
 		for (si = 0; si < selections.length; ++si) {
 			if (selections[si] == newelement) {
@@ -9935,10 +9935,10 @@ async function decide_onload(decide_args) {
 	//purely to suppress any automatic checkbox ticking by the browser
 	//so we can control it in onkeydown
 	function decide_document_onkeyup(event) {
-		return exoduscancelevent(event)
+		return exocancelevent(event)
 	}
 	function decide_document_onmouseup(event) {
-		return exoduscancelevent(event)
+		return exocancelevent(event)
 	}
 
 	function decide_focus_option_endpoint(first) {
@@ -9967,7 +9967,7 @@ async function decide_onload(decide_args) {
 		if (!newelement)
 			return false
 		idx=Array.prototype.indexOf.call(selection2,newelement)
-		var scrollpane=exodusconfirm_scrollpane()
+		var scrollpane=exoconfirm_scrollpane()
 		if (scrollpane) {
 			if (idx==0||newelement.getAttribute('decide_optionno')==1)
 				scrollpane.scrollTop=0
@@ -10109,7 +10109,7 @@ async function decide_onload(decide_args) {
 				try { client_focuson(okb) } catch (e) { }
 		}
 		// Refit + refresh ▼ (fit calls update_scroll_hints)
-		exodusconfirm_fit_decide_popup(true)
+		exoconfirm_fit_decide_popup(true)
 	}
 
 	function decide_document_onkeydown(event) {
@@ -10126,7 +10126,7 @@ async function decide_onload(decide_args) {
 		// Ctrl/Cmd+A: select whole decide list (incl. scrolled), not the page
 		if ((event.ctrlKey || event.metaKey) && !event.altKey && keycode == 65) {
 			if (decide_select_all_list())
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 		}
 
 		// Tab: list (one stop) -> Select -> Cancel -> list (Shift reverses).
@@ -10174,7 +10174,7 @@ async function decide_onload(decide_args) {
 			else
 				client_focuson(dest)
 
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// Arrows on footer buttons (Select / Cancel / All): cycle among those only.
@@ -10207,7 +10207,7 @@ async function decide_onload(decide_args) {
 				var destA = footerBtns[nexti]
 				try { destA.focus() } catch (e) {}
 				client_focuson(destA)
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 			// else fall through: arrows on options / body still move the list
 		}
@@ -10217,16 +10217,16 @@ async function decide_onload(decide_args) {
 			if (decide_filter_text) {
 				decide_filter_text = ''
 				decide_apply_filter()
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 			decide_cancel_onclick_sync()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// Alt+C = Cancel (bare C is free for type-filter)
 		if (keycode == 67 && event.altKey && !event.ctrlKey && !event.metaKey) {
 			decide_cancel_onclick_sync()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// F9 / Ctrl+Enter / Alt+S = Select (bare S is free for type-filter)
@@ -10234,24 +10234,24 @@ async function decide_onload(decide_args) {
 			|| (keycode == 13 && event.ctrlKey)
 			|| (keycode == 83 && event.altKey && !event.ctrlKey && !event.metaKey)) {
 			decide_ok_onclick_sync()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// Alt+A = All (multi-select only; bare A is free for type-filter)
 		if (keycode == 65 && event.altKey && !event.ctrlKey && !event.metaKey) {
 			if (decide_returnmany)
 				decide_all_onclick_sync(event)
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// Home/End: first/last option (like Ctrl+PgUp/Ctrl+PgDn focus)
 		if (keycode == 36) {
 			decide_focus_option_endpoint(true)
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 		if (keycode == 35) {
 			decide_focus_option_endpoint(false)
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		var selections = document.getElementsByName('decide_selection')
@@ -10266,22 +10266,22 @@ async function decide_onload(decide_args) {
 			var allb2 = decide_all_button()
 			if (okb2 && (element === okb2 || okb2.contains(element))) {
 				decide_ok_onclick_sync()
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 			if (canb2 && (element === canb2 || canb2.contains(element))) {
 				decide_cancel_onclick_sync()
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 			if (allb2 && (element === allb2 || allb2.contains(element))) {
 				decide_all_onclick_sync(event)
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 		}
 
 		//ctrl+enter and f9 is ok ... so is space if not !returnmany
 		if (keycode == 120 || (keycode == 13 && event.ctrlKey) || (keycode == 32 && !decide_returnmany)) {
 			decide_ok_onclick_sync()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// Backspace: always shorten type-filter first (even when no matches /
@@ -10289,16 +10289,16 @@ async function decide_onload(decide_args) {
 		if (keycode == 8 && decide_filter_text) {
 			decide_filter_text = decide_filter_text.slice(0, -1)
 			decide_apply_filter()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// multi Backspace: reverse Enter — up one (wrap) then toggle. Not clear-all (Del/F8).
 		if (decide_returnmany && keycode == 8) {
 			if (!decide_move_option(-1, 1, false, true))
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			if (decide_last_option_element)
 				decide_checkbox_select(event, decide_last_option_element)
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// Type-to-filter: letters always; digits/space/- etc only once filter is active.
@@ -10317,10 +10317,10 @@ async function decide_onload(decide_args) {
 					var stEmpty = $$('decide_filter_status')
 					if (stEmpty && stEmpty.classList
 						&& stEmpty.classList.contains('decide_filter_empty'))
-						return exoduscancelevent(event)
+						return exocancelevent(event)
 					decide_filter_text += ch
 					decide_apply_filter()
-					return exoduscancelevent(event)
+					return exocancelevent(event)
 				}
 			}
 		}
@@ -10349,14 +10349,14 @@ async function decide_onload(decide_args) {
 					break
 				}
 			}
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 		// multi: Space toggles checkbox only (stay on row). Enter toggles + move down (Shift+Enter up).
 		if (decide_returnmany && (keycode == 32 || keycode == 13)) {
 			decide_checkbox_select(event)
 			if (keycode == 32)
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			if (event.shiftKey)
 				keycode = 38//fake up
 			else
@@ -10431,7 +10431,7 @@ async function decide_onload(decide_args) {
 					}
 				}
 				if (!lastVisible || lastVisible == element)
-					return exoduscancelevent(event)
+					return exocancelevent(event)
 				decide_last_option_element = lastVisible
 				try {
 					lastVisible.focus()
@@ -10441,7 +10441,7 @@ async function decide_onload(decide_args) {
 					client_focuson(lastVisible)
 				}
 				// PgUp/Dn: scan without changing radio (historical)
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 
 			// Up/Down (and faked from Enter multi): radio checks; multi focus only; wrap ends.
@@ -10449,9 +10449,9 @@ async function decide_onload(decide_args) {
 			var selectRadio = !decide_returnmany
 			var wrap = !(keycode == 33 || keycode == 34)
 			if (!decide_move_option(direction, steps, selectRadio, wrap))
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 
 		}
 
@@ -10459,7 +10459,7 @@ async function decide_onload(decide_args) {
 		if (!decide_returnmany) {
 			if (keycode == 13) {
 				decide_ok_onclick_sync()
-				return exoduscancelevent(event)
+				return exocancelevent(event)
 			}
 			return
 		}
@@ -10467,7 +10467,7 @@ async function decide_onload(decide_args) {
 		// Del or F8: restore entry checks (not clear-all)
 		if (keycode == 46 || keycode == 119) {
 			decide_restore_entry_state()
-			return exoduscancelevent(event)
+			return exocancelevent(event)
 		}
 
 	}
@@ -10591,11 +10591,11 @@ function logout() {
 
 function setdateformat() {
 
-	gfirstdayofweek = exodusgetcookie2('fd')
+	gfirstdayofweek = exogetcookie2('fd')
 	if (!gfirstdayofweek) gfirstdayofweek = 1
 	gfirstdayofweek = Number(gfirstdayofweek)
 
-	var dateformat = exodusgetcookie2('df')
+	var dateformat = exogetcookie2('df')
 	//international and default
 	if (!dateformat || dateformat.slice(0, 2) == '31') {
 		gdatedaypos = 0
@@ -10626,7 +10626,7 @@ function DATE(mode, value, params) {
 
 	//can handle an array of values
 	if (typeof value == 'object')
-		return exodusconvarray(DATE, mode, value, params)
+		return exoconvarray(DATE, mode, value, params)
 
 	//not == which would disallow 0 which is 31/12/1967
 	if (value === '')
@@ -10962,7 +10962,7 @@ function TIME(mode, value, params) {
 
 	//can handle an array of values
 	if (typeof value == 'object')
-		return exodusconvarray(TIME, mode, value, params)
+		return exoconvarray(TIME, mode, value, params)
 	/*
 	//can handle an array of values
 	if (typeof(value)=='object') {
@@ -11082,7 +11082,7 @@ function PERIOD_OF_TIME(mode, value, params) {
 
 	//can handle an array of values
 	if (typeof value == 'object')
-		return exodusconvarray(PERIOD_OF_TIME, mode, value, params)
+		return exoconvarray(PERIOD_OF_TIME, mode, value, params)
 	/*
 	//can handle an array of values
 	if (typeof(value)=='object') {
@@ -11103,7 +11103,7 @@ function PERIOD_OF_TIME(mode, value, params) {
 	if (mode == 'ICONV') {
 
 		//if already numeric then simply return it
-		if (exodusnum(value)) return value
+		if (exonum(value)) return value
 
 		//allow slash, dash, space and comma as well as ":" for separator
 		value = value.exoconvert('/- ,', '::::')
@@ -11115,7 +11115,7 @@ function PERIOD_OF_TIME(mode, value, params) {
 		mins = value[1]
 
 		//check numeric otherwise return undefined
-		if (!(exodusnum(hours) || !exodusnum(mins))) {
+		if (!(exonum(hours) || !exonum(mins))) {
 			return null
 		}
 
@@ -11124,7 +11124,7 @@ function PERIOD_OF_TIME(mode, value, params) {
 	}
 	else {
 
-		if (!(exodusnum(value))) {
+		if (!(exonum(value))) {
 			//out=''
 			//status()=2
 			return null

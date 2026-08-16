@@ -247,7 +247,7 @@ async function authorisation_postdisplay() {
         var keys = await gds.getall('KEYS')
         for (var ln = keys.length - 1; ln >= 0; --ln) {
             if (keys[ln] || !userids[ln])
-                exodussetreadonly('USER_ID', gmsg, '', ln)
+                exosetreadonly('USER_ID', gmsg, '', ln)
         }
     }
 

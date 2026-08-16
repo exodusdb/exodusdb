@@ -19,7 +19,7 @@ async function system_dict_datasetcode(di, many, orcurrent, test) {
 async function system_pop_datasetcode(many, orcurrent) {
     if (!(await system_getdatasets())) return false
 
-    var popdata = exoduscloneobj(gdatasets)
+    var popdata = exocloneobj(gdatasets)
     if (orcurrent) {
         popdata[0].splice(0, 0, 'Current')
         popdata[1].splice(0, 0, 'CURRENT')
@@ -124,7 +124,7 @@ async function system_pop_users(many, withtask, haslocks, sselect) {
     var sortselect = system_users_sortselect(withtask, haslocks, sselect)
     var selcol0 = 1
 
-    return await exodusfilepopup('USERS', [['USER_NAME', 'User Name'], ['USER_CODE', 'User Code'], ['DEPARTMENT_CODE2', 'Department'], ['EMAIL_ADDRESS', 'Email'], ['LAST_LOGIN_DATETIME', 'Last Login Datetime'], ['LAST_LOGIN_LOCATION', 'Last Login Location']], selcol0, sortselect, many)
+    return await exofilepopup('USERS', [['USER_NAME', 'User Name'], ['USER_CODE', 'User Code'], ['DEPARTMENT_CODE2', 'Department'], ['EMAIL_ADDRESS', 'Email'], ['LAST_LOGIN_DATETIME', 'Last Login Datetime'], ['LAST_LOGIN_LOCATION', 'Last Login Location']], selcol0, sortselect, many)
 }
 
 // USER_CODE typeahead: reuse general_typeahead_master (CACHE SELECT + wordstart). Needs general.js.
@@ -165,7 +165,7 @@ async function system_getdepartments(deptoptions) {
     gdepts = [[], [], []]
     var nusers = security[1].length
     var groupusers = []
-    var datetoday = exodusdate()
+    var datetoday = exodate()
     //for (var usern = 2; usern <= nusers; ++usern) {
     for (var usern = 0; usern <= nusers; ++usern) {
         var userid = security[1][usern]

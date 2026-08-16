@@ -40,7 +40,7 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 | JS API / architecture | `service/www/exodus/doc/PROGRAMMERS_OVERVIEW.md` |
 | Form CSS | `service/www/3/exodus/global.css` |
 | Form automation | `service/www/3/exodus/scripts/dbform.js` |
-| Pane wrap | `service/www/3/exodus/scripts/client.js` (`exoduswrapformpanes`) |
+| Pane wrap | `service/www/3/exodus/scripts/client.js` (`exowrapformpanes`) |
 | Web HTML notes | `service/www/exodus/doc/forms.htm` (and peers) |
 | C++/var docs | `doc/` (see `doc/README.md`) |
 
@@ -275,7 +275,7 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 
 | Product | Open signal | Key owner | Form path role |
 |--------|-------------|-----------|----------------|
-| **Plain confirm** (OK, Yes/No, text, invalid, Wait) | `#exodusconfirmdiv` without `.exodusconfirm_decide` | **Document capture** while open: `exodusconfirm_install_plain_keydown` → `exodusconfirm_keymap` (install in `exodusconfirm2`, uninstall in `finally`) | **Swallow only** (`exodusconfirm_startevent` does not reimplement OK/Cancel) |
+| **Plain confirm** (OK, Yes/No, text, invalid, Wait) | `#exodusconfirmdiv` without `.exodusconfirm_decide` | **Document capture** while open: `exoconfirm_install_plain_keydown` → `exoconfirm_keymap` (install in `exoconfirm2`, uninstall in `finally`) | **Swallow only** (`exoconfirm_startevent` does not reimplement OK/Cancel) |
 | **Decide list** | `.exodusconfirm_decide` / `#decide_table1` | **Handlers on the confirm div** (`decide_document_on*`) | Swallow; **Esc** if focus is outside (bubble never reaches the div) |
 | **Colour / calendar** | product open flags | Product helpers / handlers on their DOM | Form isolates; do not invent a second key map in `starteventhandler` |
 
@@ -306,7 +306,7 @@ These were broken and fixed together. Treat as **one contract**. If you change o
 - Pure button (OK/Cancel, Yes/No): bare **O/C/Y/N**, Esc, F9; focused button Enter/Space.
 - Text-input confirm: type letters including O/C; **Alt+O / Alt+C**; Cancel aborts; empty OK string path; Esc; Enter in field.
 
-**Code:** `client.js` — `exoui_input`, `exodusconfirm_plain_keydown`, `exodusconfirm_startevent`, `exodusconfirm_keymap` (`accessLetter` CHANGE LOG). Call-site example: `media.js` `media_pop_materials`.
+**Code:** `client.js` — `exoui_input`, `exoconfirm_plain_keydown`, `exoconfirm_startevent`, `exoconfirm_keymap` (`accessLetter` CHANGE LOG). Call-site example: `media.js` `media_pop_materials`.
 
 ### Menubar / form icons (theme2)
 

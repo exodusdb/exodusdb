@@ -549,7 +549,7 @@ if (typeof (form_preinit) == 'function')
 //add a script for the data file definition in case not included in the main html
 if (typeof gmodule == 'undefined') {
     gmodule = ''
-    exodussettimeout('formfunctions_onload', 10)
+    exosettimeout('formfunctions_onload', 10)
 }
 if (typeof gdictfilename == 'undefined' || !gdictfilename)
     gdictfilename = gdatafilename
@@ -722,7 +722,7 @@ function render_formbuttons() {
 
 // Call after form_postdisplay / custom buttons / pane wrap: if the action bar is
 // under the form but not fully on-screen, put it in the top menubar.
-// Idempotent when already top. client.js re-runs this after exoduswrapformpanes.
+// Idempotent when already top. client.js re-runs this after exowrapformpanes.
 // Geometry from the *face* (source is off-screen).
 function form_keep_action_buttons_on_screen() {
     if (gformbuttonsplace !== 'bottom')
@@ -870,7 +870,7 @@ async function formfunctions_onload() {
     // Caret while still on field (validate runs after focus already moved)
     addeventlistener(document.body, 'focusout', 'form_onfocusout_capture')
 
-    gds = new exodusdatasource
+    gds = new exodatasource
     gds.onreadystatechange = gds_onreadystatechange
 
     //flag to later events that onload has not finished (set true at end of window_onload)
@@ -884,7 +884,7 @@ async function formfunctions_onload() {
 
     //form customisation
     if (typeof form_onload == 'function') {
-        if (!(await exodusevaluate('await form_onload()', 'await form_onload()')))
+        if (!(await exoevaluate('await form_onload()', 'await form_onload()')))
             return
     }
 
@@ -893,8 +893,8 @@ async function formfunctions_onload() {
         db.login()
 
     //done in client.js after db
-    //gbasecurr=exodusgetcookie2('bc')
-    //gbasefmt=exodusgetcookie2('bf')
+    //gbasecurr=exogetcookie2('bc')
+    //gbasefmt=exogetcookie2('bf')
 
     //check a parameter
     if (typeof gmodule == 'undefined') {
@@ -915,7 +915,7 @@ async function formfunctions_onload() {
     }
 
     var dictfunctionname = 'dict_' + gdictfilename
-    var dictarray = await exodusevaluate(dictfunctionname + '(gparameters)', 'formfunctions_onload');
+    var dictarray = await exoevaluate(dictfunctionname + '(gparameters)', 'formfunctions_onload');
     gro = new exodusrecord(dictarray, gdatafilename)
 
     gds.dict = gro.dict
@@ -1151,7 +1151,7 @@ async function formfunctions_onload() {
             var exodusdropdown = element.getAttribute('exodropdown')
             if (exodusdropdown) {
 
-                exodusassertobject(element, 'formfunctions_onload', 'element (exodusdropdown)')
+                exoassertobject(element, 'formfunctions_onload', 'element (exodusdropdown)')
                 if (typeof exodusdropdown == 'string')
                     exodusdropdown = exodusdropdown.split(fm)
                 var request = exodusdropdown[0]
@@ -1174,7 +1174,7 @@ async function formfunctions_onload() {
                 selectelement.id = element.id
 
                 //create all the options of the element
-                await exodussetdropdown(selectelement, 'CACHE\r' + request, colarray, '', noautoselection)
+                await exosetdropdown(selectelement, 'CACHE\r' + request, colarray, '', noautoselection)
 
                 element = selectelement
                 //    element.innerHTML=element.innerHTML+' '
@@ -1414,7 +1414,7 @@ async function formfunctions_onload() {
                 )
             ) {
                 if (popupExpr || freeSelectPopup) {
-                    //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
+                    //conversion is a routine eg [await exofilepopup(filename,cols,coln,sortselect] [popup.clients]
                     // valign: wrap under .exodata → CSS .exodata > *; chrome flex-start for icon+host.
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealPopup = true
@@ -1445,7 +1445,7 @@ async function formfunctions_onload() {
                     systemerror('formfunction_onload', exoquote(fieldname) + ' link must be a string')
                 }
                 else {
-                    //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
+                    //conversion is a routine eg [await exofilepopup(filename,cols,coln,sortselect] [popup.clients]
                     // valign: .exodata > * + chrome flex-start (same as F7 block above).
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealLink = true
@@ -1906,7 +1906,7 @@ async function formfunctions_onload() {
                             && !tablex.getAttribute('no' + insertdelete + 'row')
                         ) {
                             tablex.setAttribute('no' + insertdelete + 'row', true)
-                            exodusremoveelementsbyid(insertdelete + 'rowbutton' + groupno)
+                            exoremoveelementsbyid(insertdelete + 'rowbutton' + groupno)
                         }
                     }
 
@@ -2002,7 +2002,7 @@ async function formfunctions_onload() {
                         tablex.style.width = 'max-content'
                     var t = ''
                     t += '<span style="white-space: nowrap">'
-                    //if (!(exodusgetattribute(element,'exodusnoinsertrow')))
+                    //if (!(exogetattribute(element,'exodusnoinsertrow')))
                     if (hasIns) {
                         t += exodus_icon_html(ginsertrowimage, null,
                             ' id="insertrowbutton' + groupno + '"'
@@ -2010,7 +2010,7 @@ async function formfunctions_onload() {
                             + ' exodusonclick="await insertrow_onclick(event)"'
                             + ' style="cursor:pointer;vertical-align:top"')
                     }
-                    //if (!(exodusgetattribute(element,'exodusnodeleterow')))
+                    //if (!(exogetattribute(element,'exodusnodeleterow')))
                     if (hasDel) {
                         t += exodus_icon_html(gdeleterowimage, null,
                             ' id="deleterowbutton' + groupno + '"'
@@ -2279,19 +2279,19 @@ async function formfunctions_onload() {
     formbuttons_install()
 
     //program the various buttons to be visible when enabled
-    exodussetexpression(saverecord, 'style:display', 'saverecord.getAttribute("disabled")?"none":""')
-    exodussetexpression(closerecord, 'style:display', 'closerecord.getAttribute("disabled")?"none":""')
+    exosetexpression(saverecord, 'style:display', 'saverecord.getAttribute("disabled")?"none":""')
+    exosetexpression(closerecord, 'style:display', 'closerecord.getAttribute("disabled")?"none":""')
 
     //program printsend button to be invisible when disabled
     if (printsendrecord)
-        exodussetexpression(printsendrecord, 'style:display', 'printsendrecord.getAttribute("disabled")?"none":""')
+        exosetexpression(printsendrecord, 'style:display', 'printsendrecord.getAttribute("disabled")?"none":""')
 
     //program new/release/delete buttons to be invisible if disabled
     if (gKeyNodes) {
-        exodussetexpression(newrecord, 'style:display', 'newrecord.getAttribute("disabled")?"none":""')
-        exodussetexpression(editreleaserecord, 'style:display', 'editreleaserecord.getAttribute("disabled")?"none":""')
+        exosetexpression(newrecord, 'style:display', 'newrecord.getAttribute("disabled")?"none":""')
+        exosetexpression(editreleaserecord, 'style:display', 'editreleaserecord.getAttribute("disabled")?"none":""')
         if (deleterecord)
-            exodussetexpression(deleterecord, 'style:display', 'deleterecord.getAttribute("disabled")?"none":""')
+            exosetexpression(deleterecord, 'style:display', 'deleterecord.getAttribute("disabled")?"none":""')
     }
 
     if (firstrecord)
@@ -2314,7 +2314,7 @@ async function formfunctions_onload() {
             //find the first openfunction (visible or not)
             if (openfunction = gKeyNodes[keyn].getAttribute('exoopenfunction'))
                 break
-            if (exodusenabledandvisible(gKeyNodes[keyn])) {
+            if (exoenabledandvisible(gKeyNodes[keyn])) {
                 //count the number of visible keys
                 nvisiblekeys++
                 //remember the first visible non-empty popupfunction ("" is pad-only)
@@ -2404,7 +2404,7 @@ async function formfunctions_onload() {
     //start focused on the first key field
     if (gKeyNodes) {
         gstartelement = gKeyNodes[0]
-        if (!(exodusenabledandvisible(gstartelement)))
+        if (!(exoenabledandvisible(gstartelement)))
             gstartelement = gfirstnonkeyelement
     }
     else
@@ -2419,7 +2419,7 @@ async function formfunctions_onload() {
     //if form has a custom postinit routine
     if (typeof form_postinit == 'function') {
         //login('form_postinit before')
-        var postinitok = await exodusevaluate('await form_postinit()', 'form_functions()');
+        var postinitok = await exoevaluate('await form_postinit()', 'form_functions()');
         //logout('form_postinit after')
 
         // Explicit false = abort (e.g. Cancel on a setup prompt). Do not set ginitok
@@ -2486,7 +2486,7 @@ async function formfunctions_onload() {
             //crash after this routine returns
             await cleardoc()
 
-            //exodussettimeout('await opendoc(' + exoquote(gparameters.key.replace(/\\/g, '\\\\')) + ')', 1)
+            //exosettimeout('await opendoc(' + exoquote(gparameters.key.replace(/\\/g, '\\\\')) + ')', 1)
             //we cant allow another event like focus to occur before this event is over
             //because there is only one geventhandler to rememeber which yielding function is pending resumption
             //therefore call opendoc immediately - seems to cause no problem
@@ -2804,7 +2804,7 @@ function form_digit_accesskey_capture_keydown(event) {
         return
 
     var targetel = element
-    // Activation needs Gate A (exodusevaluate / dbio).
+    // Activation needs Gate A (exoevaluate / dbio).
     if (typeof exodus_begin == 'function') {
         void exodus_begin(async function form_digit_accesskey_activate(ev) {
             await form_activate_accesskey_control(ev, targetel)
@@ -2827,7 +2827,7 @@ async function form_activate_accesskey_control(event, element) {
     var onclickexpression = target.getAttribute('exodusonclick')
     if (onclickexpression) {
         // Same path as document_onclick / form_activate_focused_action_button
-        await exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
+        await exoevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
         return true
     }
 
@@ -2873,7 +2873,7 @@ async function setfirstlastcolumn(groupno) {
         //shouldnt this also be restricted to elements with exodusfieldno?
         if (
             !gfields[screenfn].getAttribute('exoreadonly')
-            && exodusenabledandvisible(gfields[screenfn].id)
+            && exoenabledandvisible(gfields[screenfn].id)
         )
             tablex.setAttribute('exoduslastinputcolscreenfn', screenfn)
     }
@@ -2970,7 +2970,7 @@ async function element_exodussetdropdown(element, request, noautoselection) {
     var request = 'CACHE\r' + dropdown[0]
     var colarray = dropdown[1].split('\r')
 
-    await exodussetdropdown(element, request, colarray, '', noautoselection)
+    await exosetdropdown(element, request, colarray, '', noautoselection)
 
 }
 
@@ -3250,7 +3250,7 @@ async function newrecordfocus() {
     }
 
     //prevent focussing on hidden keys
-    if (!(exodusenabledandvisible(element)))
+    if (!(exoenabledandvisible(element)))
         element = gstartelement
 
     window.scrollTo(0, 0)
@@ -3261,7 +3261,7 @@ async function newrecordfocus() {
         tt = tt.id
     //increased to 100 to avoid "xxx is required" when key provided in dialog window
     //by allowing any initial opendoc to do its work first
-    exodussettimeout('focuson("' + tt + '")', 100)
+    exosettimeout('focuson("' + tt + '")', 100)
 
     //logout('newrecordfocus')
 
@@ -3297,7 +3297,7 @@ async function tablex_onreadystatechange(event) {
 async function printsendrecord_onclick(event) {
 
     event = getevent(event)
-    exoduscancelevent(event)
+    exocancelevent(event)
 
     //work out the print function else return
     var printfunction = gKeyNodes && gKeyNodes[0].getAttribute('exoprintfunction')
@@ -3314,14 +3314,14 @@ async function printsendrecord_onclick(event) {
         return
     }
     //alert('DEBUG: printfunction')
-    await exodusevaluate(printfunction, 'await printsendrecord_onclick()');
+    await exoevaluate(printfunction, 'await printsendrecord_onclick()');
 
 }
 
 async function listrecord_onclick(event) {
 
     event = getevent(event)
-    exoduscancelevent(event)
+    exocancelevent(event)
 
     //work out the print function else return
     var listfunction = gKeyNodes && gKeyNodes[0].getAttribute('exolistfunction')
@@ -3335,7 +3335,7 @@ async function listrecord_onclick(event) {
         focusongpreviouselement()
         return
     }
-    await exodusevaluate(listfunction, 'await listrecord_onclick()');
+    await exoevaluate(listfunction, 'await listrecord_onclick()');
 
 }
 
@@ -3393,18 +3393,18 @@ function window_onunload_sync() {
         return
 
     //save gdataset in case we are refreshing and the parent window isnt there to get it from
-    exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
+    exosetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
-    //unlock any document before unloading (fire-and-forget async via exodusfireandforget)
+    //unlock any document before unloading (fire-and-forget async via exofireandforget)
     if (glocked) {
 
         //Save unlock request for following window to perform hopefully
         //in case following code doesnt successfully unlock its record in onbeforeunload
         var pending = ['UNLOCK', gro.filename, gkey, gro.sessionid].join('\r')
-        exodussetcookie(glogincode, 'EXODUSpending', pending)
+        exosetcookie(glogincode, 'EXODUSpending', pending)
 
         console.log('trying to unlock ' + gkey + ' immediately but async request doesnt seem to reach server reliably while unloading')
-        exodusfireandforget(unlockdoc(), 'window_onunload_sync unlockdoc')
+        exofireandforget(unlockdoc(), 'window_onunload_sync unlockdoc')
 
         //or cancel any pending request
     } else if (gxhttp && gxhttp.status != 200) {
@@ -3446,9 +3446,9 @@ async function document_onclick(event) {
     if (onclickexpression) {
         //replace trailing "()" with "(event)" to pass event
         //simulating how document.onclick="funcx()" passes event into funcx()
-        //exodusevaluate3 will then be able to arrange that
+        //exoevaluate3 will then be able to arrange that
         // the noclick function can refer to the event variable
-        result = await exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event);
+        result = await exoevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event);
     }
 
     //logout('document_onclick ' + event.target.id)
@@ -3494,7 +3494,7 @@ async function document_onkeypress(event) {
     //console.log('onkeypress '+keycode)
     ////try to block ctrl+N from opening a new page but doesnt work
     //if (event.ctrlKey && keycode == 110)
-    //    return exoduscancelevent(event)
+    //    return exocancelevent(event)
 
     return false
 }
@@ -3510,19 +3510,19 @@ async function document_onkeydown(event) {
     // Same contract as starteventhandler helpers: null / true / false.
     // Confirm always available (client.js); colour only if colors.js loaded.
     // Calendar: Esc handled later via form_closepopups — no calendar helper yet.
-    if (typeof exodusconfirm_document_keydown == 'function') {
-        var confKey = exodusconfirm_document_keydown(event)
+    if (typeof exoconfirm_document_keydown == 'function') {
+        var confKey = exoconfirm_document_keydown(event)
         if (confKey === true)
             return true
         if (confKey === false)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
     }
     if (typeof colors_popup_document_keydown == 'function') {
         var colorKey = colors_popup_document_keydown(event)
         if (colorKey === true)
             return true
         if (colorKey === false)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
     }
 
     return await document_onkeydown2(event)
@@ -3558,7 +3558,7 @@ async function form_activate_focused_action_button(event, element) {
         return false
 
     // Same path as document_onclick for exodusonclick controls
-    await exodusevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
+    await exoevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
     return true
 }
 
@@ -3652,12 +3652,12 @@ async function document_onkeydown2(event) {
 
     // Miss-tinted field: no additional character entry (class is the marker)
     if (form_miss_tint_keydown(event) === false)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     // Find-as-you-type panel: Esc / arrows / Enter before form navigation
     var taKey = form_typeahead_keydown(event)
     if (taKey === false)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     // Alt+0…9: handled in form_digit_accesskey_capture_keydown (native capture,
     // outside Gate A). Not repeated here — preventDefault must not wait on async.
@@ -3667,7 +3667,7 @@ async function document_onkeydown2(event) {
     // (Alt+digit is handled in form_digit_accesskey_capture_keydown — not here.)
     if (typeof form_onkeydown == 'function') {
         if (!(await form_onkeydown(event))) {
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
     }
 
@@ -3698,13 +3698,13 @@ async function document_onkeydown2(event) {
     //F6 is now link
     if (keycode == 117) {
         await exoui_link(event)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //F7 is now popup (used to be F2 in DOS) also replaces windows standard alt+down combination
     if (keycode == 118 || (event.altKey && keycode == 40 && element.tagName == 'SELECT')) {
         await exoui_popup(event)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     // Alt+Up/Down pan always; Alt+Left/Right only when .exodusform-wide (else history).
@@ -3712,18 +3712,18 @@ async function document_onkeydown2(event) {
     //close (F8)
     if (keycode == 119) {
         await closedoc('CLEAR')
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+k or alt+home is goto top (but alt+home goes to home page and cannot be cancelled)
     if ((keycode == 75 && event.altKey) || (keycode == 36 && event.altKey)) {
-        exodussettimeout('focuson(gstartelement.id)', 1)
-        return exoduscancelevent(event)
+        exosettimeout('focuson(gstartelement.id)', 1)
+        return exocancelevent(event)
     }
 
     // menu bar Alt hot keys
     if (event.altKey && ! event.shiftKey && [71, 78, 76, 79, 83, 67, 82, 69, 77, 80, 88].exolocate(gkeycode)) {
-        exoduscancelevent(event)
+        exocancelevent(event)
         var found = true
         //alt+m main menu
         if (gkeycode == 77) {
@@ -3752,15 +3752,15 @@ async function document_onkeydown2(event) {
                 form_blockevents(true,'onkeydown2 not mouse')
             } else
             */
-            exodussettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
+            exosettimeout('menuonmouseover(null,$$("menubutton"),13)', 1)
             //menubutton.click()
         }
         //was done by accesskeys on hidden buttons but firefox requires shift+alt for access
         // unless configure http://kb.mozillazine.org/Ui.key.contentAccess
         // dont use timeout since allows the user interface to resume and send ANOTHER event in FF3
-        //else if (gkeycode==76) exodussettimeout('await exoduslogout_onclick()',1)
+        //else if (gkeycode==76) exosettimeout('await exologout_onclick()',1)
         //Logout and List swapped to be G and L respectively
-        else if (gkeycode == 71) await exoduslogout_onclick()//g
+        else if (gkeycode == 71) await exologout_onclick()//g
         // Form-action bar: same path as face clicks (formbutton_op → render)
         else if (gkeycode == 78) await formbutton_op(newrecord_onclick)//n
         else if (gkeycode == 79) await formbutton_op(openrecord_onclick)//o
@@ -3773,43 +3773,43 @@ async function document_onkeydown2(event) {
         else if (gkeycode == 82) await refreshcache_onclick()//r
         else
             found = false
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+{ is first record
     if (keycode == 219 && event.altKey && event.shiftKey) {
         await formbutton_op(firstrecord_onclick, event)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+} is last record
     if (keycode == 221 && event.altKey && event.shiftKey) {
         await formbutton_op(lastrecord_onclick, event)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+[ is previous record
     if (keycode == 219 && event.altKey) {
         await formbutton_op(previousrecord_onclick, event)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+] is next record
     if (keycode == 221 && event.altKey) {
         await formbutton_op(nextrecord_onclick, event)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+^ is select record
     if (keycode == 54 && event.altKey && event.shiftKey) {
         await formbutton_op(selectrecord_onclick, event)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+end is goto bottom
     if (keycode == 35 && event.altKey) {
-        exodussettimeout('focuson(gfinalinputelement.id)', 1)
-        return exoduscancelevent(event)
+        exosettimeout('focuson(gfinalinputelement.id)', 1)
+        return exocancelevent(event)
     }
 
     //F12 is exodus debug key
@@ -3820,19 +3820,19 @@ async function document_onkeydown2(event) {
         if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
             gstepping = !gstepping
             wstatus('stepping=' + gstepping)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         //ctrl+shift+F12 - break
-        //force error and into exodusbreak
+        //force error and into exobreak
         if (event.shiftKey && event.ctrlKey) {
             gstepping = true
-            var _b = exodusbreak('', 'F12', '');
-            if (exodusisasyncfunction(_b))
+            var _b = exobreak('', 'F12', '');
+            if (exoisasyncfunction(_b))
                 exodus_begin_when_idle(_b, 'F12', { delay_ms: 0 })
             else if (_b && typeof _b.next === 'function')
                 systemerror('document_onkeydown', 'function* break handler removed (stage 6)')
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         //alt+shift+F12 - show event log
@@ -3844,7 +3844,7 @@ async function document_onkeydown2(event) {
                 if (windowx)
                     windowx.document.body.innerHTML = geventlog
             }
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         temp = element
@@ -3865,7 +3865,7 @@ async function document_onkeydown2(event) {
                 windowx.document.body.innerHTML = encodehtmlcodes(temp.outerHTML ? temp.outerHTML : temp.innerHTML)
         }
 
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     }
 
@@ -3879,7 +3879,7 @@ async function document_onkeydown2(event) {
             && (textrange = document.selection.createRange()).text != '') {
             textrange.collapse(false)
             textrange.select()
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         //.selectionStart throws and error on ff/chrome/standard on radio/checkbox etc
@@ -3900,7 +3900,7 @@ async function document_onkeydown2(event) {
                     element.selectionStart = 0
                     element.selectionEnd = 999999999
                 }
-                return exoduscancelevent(event)
+                return exocancelevent(event)
             }
         }
 
@@ -3918,12 +3918,12 @@ async function document_onkeydown2(event) {
                 //following removes any selection
                 selection.collapseToEnd();
             }
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         } else if (document.selection && document.body.createTextRange) {
             range = document.body.createTextRange();
             range.moveToElementText(element);
             range.select();
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
     }
@@ -3934,7 +3934,7 @@ async function document_onkeydown2(event) {
         //first update the current field
         //otherwise the db is updated without the last entry!!!
         if (!(await validateupdate()))
-            return exoduscancelevent(event)
+            return exocancelevent(event)
 
         //prevent document save unless the save button is enabled
         if (!(saverecord.getAttribute('disabled'))) {
@@ -3942,7 +3942,7 @@ async function document_onkeydown2(event) {
             await formbutton_op(saverecord_onclick)
         }
 
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     }
 
@@ -3953,7 +3953,7 @@ async function document_onkeydown2(event) {
         //close any "modal" popups
         if (await form_closepopups()) {
             //prevent normal esc handling
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         // Text Esc undo (old): same field as gpreviouselement → restore gpreviousvalue.
@@ -4000,7 +4000,7 @@ async function document_onkeydown2(event) {
                     if (!(await validateupdate())) {
                         // Validation failed: put UI back to live choice (gds unchanged)
                         setvalue(element, value)
-                        return exoduscancelevent(event)
+                        return exocancelevent(event)
                     }
                     // Like text Esc after uncommitted type — undo of that sole touch source
                     if (clearTouched)
@@ -4009,7 +4009,7 @@ async function document_onkeydown2(event) {
                 // Focus follows restored control (radio: form_radio_tab_target via focuson)
                 focuson(element)
                 form_typeahead_cancel()
-                return exoduscancelevent(event)
+                return exocancelevent(event)
             }
             // at arrival — fall through to closerecord
         // TEXTAREA: no field-level Esc undo (multi-line; do not wipe whole edit).
@@ -4040,7 +4040,7 @@ async function document_onkeydown2(event) {
                     settouched(false)
 
                 //prevent normal esc handling
-                exoduscancelevent(event)
+                exocancelevent(event)
 
                 // Full-select restored value (dates already did via INPUT.select;
                 // free-text SPAN needs selectNodeContents). Similar: document_onfocus.
@@ -4061,13 +4061,13 @@ async function document_onkeydown2(event) {
                 }
                 catch (e) { }
 
-                return exoduscancelevent(event)
+                return exocancelevent(event)
             }
         }
 
         await formbutton_op(closerecord_onclick)
 
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     }
 
@@ -4081,24 +4081,24 @@ async function document_onkeydown2(event) {
         if (keycode == 13 && (event.ctrlKey || event.metaKey) && !event.altKey) {
             if (saverecord && !saverecord.getAttribute('disabled'))
                 await formbutton_op(saverecord_onclick)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
         // Form action focused: Shift+Enter = previous (like Up); bare Enter/Space activate.
         if (keycode == 13 && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
             focusprevious(element)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
         if ((keycode == 13 || keycode == 32) && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {
             if (await form_activate_focused_action_button(event, element))
-                return exoduscancelevent(event)
+                return exocancelevent(event)
         }
         if (keycode == 37 || keycode == 38) {
             focusprevious(element)
-            return exoduscancelevent()
+            return exocancelevent()
         }
         if (keycode == 39 || keycode == 40) {
             focusnext(element)
-            return exoduscancelevent()
+            return exocancelevent()
         }
         return true
     }
@@ -4126,7 +4126,7 @@ async function document_onkeydown2(event) {
         //get the recordset
         var rs = gds.data['group' + ggroupno]
         if (!rs) {
-            exoduscancelevent(event)
+            exocancelevent(event)
             return await exoui_invalid('Group number on non-group field')
         }
         //zzz if "paging" should be offset by subtracting record number of first row
@@ -4135,7 +4135,7 @@ async function document_onkeydown2(event) {
 
         var nrows = grows.length
         var pagesize = tablex.dataPagesize ? tablex.dataPagesize : 999999
-        var pagen = exodusint(grecn / pagesize)
+        var pagen = exoint(grecn / pagesize)
         var npages = Math.ceil((rs.length) / pagesize)
 
         var tablex_firstinputcolscreenfn = form_getfirstinputcolscreenfn(tablex)
@@ -4168,7 +4168,7 @@ async function document_onkeydown2(event) {
 
         }
 
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //alt+Y is copy previous record/column
@@ -4176,7 +4176,7 @@ async function document_onkeydown2(event) {
         if (grecn > 0) {
             setvalue(element, await getpreviousrow(element.id, { skipblanks: true }))
             try { element.select() } catch (e) { }
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
     }
 
@@ -4194,12 +4194,12 @@ async function document_onkeydown2(event) {
         // forwards from first / backwards from last — same col if enabled+visible
         for (var ii = startrown; ii >= 0 && ii < grows.length; ii += increment) {
             var cellelement = grows[ii].exodusfields && grows[ii].exodusfields[id]
-            if (cellelement && exodusenabledandvisible(cellelement)) {
+            if (cellelement && exoenabledandvisible(cellelement)) {
                 focuson(cellelement)
                 break
             }
         }
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     // Enter on TEXTAREA
@@ -4226,7 +4226,7 @@ async function document_onkeydown2(event) {
         if (event.keyCode != keycode) {
             var direction = event.shiftKey * -2 + 1
             focusdirection(direction, element)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
     }
 
@@ -4234,7 +4234,7 @@ async function document_onkeydown2(event) {
     // Shift+Tab still navigates. Before last-row empty first-col skip so blank rows indent.
     if (keycode == 9 && !event.ctrlKey && !event.altKey && !event.shiftKey
         && form_try_insert_tab_char(element)) {
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //tab or down or enter on first or last col of LAST row is special
@@ -4243,7 +4243,7 @@ async function document_onkeydown2(event) {
 
             //down on select handled by browser, not EXODUS
             if (keycode == 40 && element.tagName == 'SELECT')
-                return exoduscancelevent(event)
+                return exocancelevent(event)
 
             //on last column - add a row
             //exodusfirstinputcolscreenfn
@@ -4254,20 +4254,20 @@ async function document_onkeydown2(event) {
                 && getvalue(firstcolelement) != ''
             ) {
                 if (glocked || !gKeyNodes) {
-                    //exodusaddrow(ggroupno)
+                    //exoaddrow(ggroupno)
                     if (!(await form_insertrow(event, true)))
-                        return exoduscancelevent(event)
+                        return exocancelevent(event)
                     //continue on to focus on it
                     //var nextelement=$$(gfields[tablex.getAttribute('exodusfirstinputcolscreenfn')].id)[grecn+1]
                     //focuson(nextelement)
                     focusnext()
-                    return exoduscancelevent(event)
+                    return exocancelevent(event)
                 }
             }
             //on first column, if empty - go to next field after current table
             if (element.getAttribute('exodusscreenfn') == tablex_firstinputcolscreenfn && getvalue(element) == '') {
                 focusdirection(1, element, ggroupno)
-                return exoduscancelevent(event)
+                return exocancelevent(event)
             }
         }
     }
@@ -4288,19 +4288,19 @@ async function document_onkeydown2(event) {
                 //await savedoc()
                 await formbutton_op(saverecord_onclick)
             }
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         // Enter on last field wraps to first (not form OK/Cancel — those are Tab/arrows only)
         if (!event.shiftKey && element == gfinalinputelement && (ggroupno == 0 || (ggroupno > 0 && grecn == gnrecs))) {
             focuson(gstartelement)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         //shift+enter on 1st field → end (or OK via focusdirection wrap / DOM order)
         if (event.shiftKey && element == gstartelement) {
             focusdirection(-1, element)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
         /*
                 var keyEvt = document.createEvent("KeyboardEvent");
@@ -4348,7 +4348,7 @@ async function document_onkeydown2(event) {
             focusdirection(direction, element, notgroupno)
             //window.setTimeout('await tabit2()',1)
 
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
         //dont return because enter key has some special processing on rows below
@@ -4359,7 +4359,7 @@ async function document_onkeydown2(event) {
     // Tab: same focusdirection path as Enter-as-tab (form actions are stops when tabIndex >= 0).
     if (keycode == 9 && !event.ctrlKey && !event.altKey) {
         focusdirection(event.shiftKey ? -1 : 1, element)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     // Horizontal radio: Up/Down = field leave (same focusdirection as Enter/Tab).
@@ -4370,7 +4370,7 @@ async function document_onkeydown2(event) {
         && !event.ctrlKey && !event.shiftKey && !event.altKey) {
         // keep gkeycode 38/40 so readonly-skip knows back vs forward
         focusdirection(keycode == 38 ? -1 : 1, element)
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //all remaining key events are related to loaded records
@@ -4409,7 +4409,7 @@ async function document_onkeydown2(event) {
                 focusprevious()
             else
                 focusnext()
-            return exoduscancelevent(event)
+            return exocancelevent(event)
         }
 
     }
@@ -4434,7 +4434,7 @@ async function document_onkeydown2(event) {
             focusnext()
 
         //prevent the key from being processed as a cursor movement
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     }
 
@@ -4453,7 +4453,7 @@ async function document_onkeydown2(event) {
             else
                 focusnext(element, scope)
         }
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     //PGUP/PGDN/UP/DOWN/LEFT/RIGHT
@@ -4471,12 +4471,12 @@ async function document_onkeydown2(event) {
             //not on first column, focus next column
             if (element.getAttribute('exodusscreenfn') != tablex_firstinputcolscreenfn) {
                 focusnext(element)
-                return exoduscancelevent(event)
+                return exocancelevent(event)
             }
 
             //on first column, add a new row
             if (glocked || !gKeyNodes) {
-                //exodusaddrow(ggroupno)
+                //exoaddrow(ggroupno)
                 await form_insertrow(event, true)
                 //and continue to focus on it
             }
@@ -4488,7 +4488,7 @@ async function document_onkeydown2(event) {
             return//exodus like button with no id?
 
         var pagesize = tablex.dataPagesize ? tablex.dataPagesize : 999999
-        var pagen = exodusint(grecn / pagesize)
+        var pagen = exoint(grecn / pagesize)
         var npages = Math.ceil((rs.length) / pagesize)
 
         //pgdn or down arrow
@@ -4538,7 +4538,7 @@ async function document_onkeydown2(event) {
                     //up
                     if (keycode == 38) {
                         var newrown = rown - 1
-                        while (newrown > 0 && !exodusenabledandvisible(grows[newrown])) {
+                        while (newrown > 0 && !exoenabledandvisible(grows[newrown])) {
                             newrown--
                         }
                         focuson(grows[newrown].exodusfields[id])
@@ -4572,7 +4572,7 @@ async function document_onkeydown2(event) {
 
         //allow various control and shift key combinations
         if (!event.ctrlKey && !event.shiftKey && !event.altKey)
-            return exoduscancelevent(event)
+            return exocancelevent(event)
 
     }
 
@@ -4586,7 +4586,7 @@ async function document_onkeydown2(event) {
     if (event.ctrlKey && (keycode == 73 || keycode == 45) && rowx) {
         var button = rowx.exodusfields['insertrowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
-            exoduscancelevent(event)
+            exocancelevent(event)
             await form_insertrow(event)
         }
         return false
@@ -4597,7 +4597,7 @@ async function document_onkeydown2(event) {
     if (event.ctrlKey && (keycode == 68 || keycode == 46) && rowx) {
         var button = rowx.exodusfields['deleterowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
-            exoduscancelevent(event)
+            exocancelevent(event)
             await form_deleterow(event, event.target)
         }
         return false
@@ -4613,7 +4613,7 @@ async function document_onkeydown2(event) {
                 && element.getAttribute('exofieldno') != 0
             ))) {
         if (![9, 16, 17, 18, 20, 35, 36, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123].exolocate(keycode)) {
-            exoduscancelevent(event)
+            exocancelevent(event)
             if (gKeyNodes && !glocked) {
                 return await readonlydocmsg()
             }
@@ -4643,7 +4643,7 @@ function form_getfirstinputcolscreenfn(tablex, last) {
             continue
 
         //capture only enabled and visible elements
-        if (exodusenabledandvisible(element)) {
+        if (exoenabledandvisible(element)) {
             sfn = sfns[ii]
             //if first then skip out as soon as found one
             if (!last)
@@ -4889,7 +4889,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
             }
         }
 
-        if (!exodusenabledandvisible(nextelement))
+        if (!exoenabledandvisible(nextelement))
             continue
 
 
@@ -5363,7 +5363,7 @@ async function newrecord_onclick() {
                 gds.setdefaulted(keyid, null, true)
             }
             //focus on the key element
-            //exodussettimeout('focuson("' + gKeyNodes[0].id + '")', 200)
+            //exosettimeout('focuson("' + gKeyNodes[0].id + '")', 200)
             //return true
             //skip the above to allow focussing on first non-key element because prompts them with a message
         }
@@ -5377,9 +5377,9 @@ async function newrecord_onclick() {
     //if new clicked while on gfirstnonkeyelement ensure that focussing on it triggers read record
     //gpreviouselement=null
     if (gstartelement && gstartelement.id)
-        exodussettimeout('focuson("' + gstartelement.id + '")', 100)
+        exosettimeout('focuson("' + gstartelement.id + '")', 100)
 
-    exodussettimeout('focuson("' + tt + '")', 200)
+    exosettimeout('focuson("' + tt + '")', 200)
 
     //await newrecordfocus()
     return true
@@ -5437,7 +5437,7 @@ async function saverecord_onclick() {
 
         //custom postwrite function
         if (typeof form_postwrite == 'function') {
-            if (!(await exodusevaluateall('await form_postwrite()')))
+            if (!(await exoevaluateall('await form_postwrite()')))
                 return false
         }
         //otherwise automatic option to print if available
@@ -5455,7 +5455,7 @@ async function saverecord_onclick() {
 
     //custom prewrite function
     if (typeof (form_prewrite) == 'function') {
-        if (!(await exodusevaluateall('await form_prewrite()', 'await saverecord_onclick()')))
+        if (!(await exoevaluateall('await form_prewrite()', 'await saverecord_onclick()')))
             return false
     }
 
@@ -5475,12 +5475,12 @@ async function saverecord_onclick() {
     //custom write and postwrite routine
     if (typeof form_write == 'function') {
 
-        if (!(await exodusevaluateall('await form_write()', 'await saverecord_onclick()')))
+        if (!(await exoevaluateall('await form_write()', 'await saverecord_onclick()')))
             return false
         settouched(false)
 
         if (typeof (form_postwrite) == 'function') {
-            await exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
+            await exoevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
         }
 
         return true
@@ -5502,7 +5502,7 @@ async function saverecord_onclick() {
 
     //if postwrite routine
     if (typeof (form_postwrite) == 'function') {
-        await exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
+        await exoevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
     }
 
     //otherwise, if no postwrite function then assume that
@@ -5595,7 +5595,7 @@ async function deleterecord_onclick(event) {
     event = getevent(event)
 
     if (!(await deletedoc()))
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     //prune the cache to reselect any deleted record
     prunecache('SELECT\r' + gdatafilename + '\r')
@@ -5603,7 +5603,7 @@ async function deleterecord_onclick(event) {
 
     //custom postdelete function
     if (typeof form_postdelete == 'function') {
-        if (!(await exodusevaluateall('await form_postdelete()')))
+        if (!(await exoevaluateall('await form_postdelete()')))
             return false
     }
 
@@ -5692,7 +5692,7 @@ async function opendoc_body(newkey) {
 
     //focus on key (last if more than one) element if opendoc2 fails
     if (!opened) {
-        exodussettimeout('try{gKeyNodes[gKeyNodes.length-1].focus()}catch(e){}', 10)
+        exosettimeout('try{gKeyNodes[gKeyNodes.length-1].focus()}catch(e){}', 10)
         return false
     }
 
@@ -5752,7 +5752,7 @@ async function opendoc2(newkey0) {
     if (typeof (form_preread) == 'function') {
 
         ///log('preread external key=' + gkeyexternal + ' internalkey=' + gkey)
-        if (!(await exodusevaluateall('await form_preread()', 'await opendoc2()')))
+        if (!(await exoevaluateall('await form_preread()', 'await opendoc2()')))
             return false //logout('opendoc2 - preread false')
 
     }
@@ -5843,7 +5843,7 @@ async function opendoc2(newkey0) {
 
         if (glocked)
         await unlockdoc()
-        exoduscancelevent(event)
+        exocancelevent(event)
         return false //logout('opendoc - user chose not to create new record')
         }
         */
@@ -5902,7 +5902,7 @@ async function opendoc2(newkey0) {
     //postread
     if (typeof form_postread == 'function') {
         grecn = null
-        if (!(await exodusevaluateall('await form_postread()', 'await opendoc2()')))
+        if (!(await exoevaluateall('await form_postread()', 'await opendoc2()')))
         //if (!(await form_postread()))
         {
             if (glocked)
@@ -5961,7 +5961,7 @@ async function opendoc2(newkey0) {
     //postdisplay (in opendoc2 and cleardoc) — after gds.load; use for bound-DOM / per-row work
     if (typeof form_postdisplay == 'function') {
         grecn = null
-        if (!(await exodusevaluateall('await form_postdisplay()', 'await opendoc2()'))) {
+        if (!(await exoevaluateall('await form_postdisplay()', 'await opendoc2()'))) {
             if (glocked)
                 await unlockdoc()//fail safe
             await cleardoc()
@@ -6382,7 +6382,7 @@ async function cleardoc() {
     //postdisplay in cleardoc and postinit — after gds.load; use for bound-DOM / per-row work
     if (typeof form_postdisplay == 'function') {
         grecn = null
-        await exodusevaluateall('await form_postdisplay()', 'await formfunctions_onload()');
+        await exoevaluateall('await form_postdisplay()', 'await formfunctions_onload()');
     }
 
     // Wide decide for bound and unbound (skeleton on empty). Journals can be
@@ -6621,7 +6621,7 @@ async function form_run_onchange(element, onchangexpr) {
     form_typeahead_dblink_reset()
     var ok
     try {
-        ok = await exodusevaluate(onchangexpr, 'form_run_onchange ' + element.id)
+        ok = await exoevaluate(onchangexpr, 'form_run_onchange ' + element.id)
     } catch (e) {
         console.log('form_run_onchange', element.id, e)
         return
@@ -7255,7 +7255,7 @@ function form_typeahead_copy_text_sync(event, text) {
     } catch (e) {
         return false
     }
-    return exoduscancelevent(event) || true
+    return exocancelevent(event) || true
 }
 
 function form_typeahead_row_pick(event) {
@@ -7538,7 +7538,7 @@ async function validateall(mode) {
                     // setting attribute disabled to "" in modern browsers!
                     //&& !element.getAttribute('disabled')
                     && !element.disabled
-                    && exodusenabledandvisible(element)) {
+                    && exoenabledandvisible(element)) {
                     missingelement = element
                     if (groupno == 0)
                         break
@@ -7585,7 +7585,7 @@ async function validateall(mode) {
             && mode != 'filldefaults'
             && !nrowsfound
             && rowrequired
-            && exodusenabledandvisible($$('exogroup' + groupno))
+            && exoenabledandvisible($$('exogroup' + groupno))
         ) {
             var missingelement = rows[0][firstcolumnname].element
             await exoui_invalid('At least one ' + missingelement.getAttribute('exotitle') + ' is required.')
@@ -7612,7 +7612,7 @@ async function writedoc(unlock) {
     goldvalue = ''
     gvalue = ''
     if (typeof (form_prewrite) == 'function') {
-        if (!(await exodusevaluateall('await form_prewrite()', 'await writedoc()'))) return false
+        if (!(await exoevaluateall('await form_prewrite()', 'await writedoc()'))) return false
         ///log('form_prewrite - after')
     }
 
@@ -7835,7 +7835,7 @@ function focuson(element) {
     // (setdefault is async — must be awaited from a Gate A flight if re-enabled)
 
     gfocusonelement = element
-    exodussettimeout('focuson2()', 10)
+    exosettimeout('focuson2()', 10)
 
     //logout('focuson ' + element.id)
 
@@ -7852,7 +7852,7 @@ function focuson2() {
     //console.log('focuson2 ' + focusonelement.tagName + ' ' + focusonelement.id)
 
     //allowreadonly=true
-    if (!(exodusenabledandvisible(focusonelement, true)))
+    if (!(exoenabledandvisible(focusonelement, true)))
         return focusnext(focusonelement)
 
     try {
@@ -7931,7 +7931,7 @@ async function document_onfocus(event) {
     if (!ginitok)
         return
 
-    exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
+    exosetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
     //window.status=new Date()+' '+glogincode
 
     //var text = 'document_onfocus' + ' tag:' + event.target.tagName + ' id:' + event.target.id + (gpreviouselement ? ' gpreviouselement:' + gpreviouselement.id : '')
@@ -7962,7 +7962,7 @@ async function document_onfocus(event) {
             ///log('minor problem is that this prevents click on ckeditor from triggering a record read')
             if (gKeyNodes && !gkey) {
                 ///log('timeout to focus on last key element')
-                exodussettimeout('try{gKeyNodes[gKeyNodes.length-1].focus()}catch(e){}', 10)
+                exosettimeout('try{gKeyNodes[gKeyNodes.length-1].focus()}catch(e){}', 10)
                 return false //logout('document_onfocus')
             }
             elementid = elementid.slice(0, -8)
@@ -7998,7 +7998,7 @@ async function document_onfocus(event) {
         form_scroll_log_msg('document_onfocus EXIT gopening')
         //ignore this until fix resuming after ok/cancel
         //logout('document_onfocus')
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     ///log('drop down any "modal" popup divs')
@@ -8096,7 +8096,7 @@ async function document_onfocus(event) {
         if (nextkey && (gloaded && nextkey != gkey) || (!gloaded && element.getAttribute('exofieldno') != 0))
         //if (key&&(gloaded&&key!=gkey)||(!gloaded))
         {
-            //exodussettimeout('await opendoc()',100)
+            //exosettimeout('await opendoc()',100)
             form_scroll_log_msg('document_onfocus EXIT opendoc', nextkey)
             await opendoc(nextkey)
             return false //logout('document_onfocus' + ' ' + exoquote(elementid) + ' new record')
@@ -8444,7 +8444,7 @@ async function validateupdate() {
     
             //return false and just allow opendoc to happen
     
-            //exodussettimeout('await opendoc("'+nextkey+'")',1)
+            //exosettimeout('await opendoc("'+nextkey+'")',1)
             //alert('DEBUG: settimeout opendoc gkey:'+gkey+' nextkey:'+nextkey)
             //settimeout results in overlapping xmlhttp requests in FF 3.0.3
             //eg alt+P
@@ -8483,7 +8483,7 @@ async function validateupdate() {
     //logout('validateupdate - done')
 
     //if (gautofitwindow)
-    //    exodussettimeout('exodusautofitwindow()', 1)
+    //    exosettimeout('exodusautofitwindow()', 1)
 
     // Quiet miss was for live typeahead only; committed value is accepted.
     form_typeahead_clear_miss()
@@ -8577,7 +8577,7 @@ async function earlyupdate() {
 }
 
 // Tab order for "is this field before that one?" in checkrequired.
-// exodussetreadonly sets tabIndex -1 (saved oldtabindex); without restoring
+// exosetreadonly sets tabIndex -1 (saved oldtabindex); without restoring
 // that sequence, focusing a readonly field (e.g. autonumber VOUCHER_NO) made
 // no prior field look "before" it — skipped required checks and opendoc side effects.
 function form_effective_tabindex(el) {
@@ -8666,7 +8666,7 @@ async function checkrequired(elements, element, groupno) {
                     // setdefault donotupdate, still-empty via getvalue not gds.
                     var keyEntry = gKeyNodes && !gloaded
                         && element2.getAttribute('exofieldno') === '0'
-                    if (!(await setdefault(element2, keyEntry)) && exodusenabledandvisible(element2)) {
+                    if (!(await setdefault(element2, keyEntry)) && exoenabledandvisible(element2)) {
                         focuson(element2)
                         return false
                     }
@@ -8679,7 +8679,7 @@ async function checkrequired(elements, element, groupno) {
                     if (element2.getAttribute('exorequired') && !element2.getAttribute('exoreadonly') && stillEmpty) {
 
                         //disabled or invisible elements may be blank and required (even after setdefault)
-                        if (element2.disabled || element2.getAttribute('disabled') || !exodusenabledandvisible(element2))
+                        if (element2.disabled || element2.getAttribute('disabled') || !exoenabledandvisible(element2))
                             return true
 
                         //put up a message unless is the first column of a row
@@ -8945,7 +8945,7 @@ function getvalue(element, recn) {
 
 }
 
-function exodussetreadonly(elements, msg, options, recn) {
+function exosetreadonly(elements, msg, options, recn) {
 
     //note: cannot set readonly off if the dictionary says that it is readonly
 
@@ -8961,7 +8961,7 @@ function exodussetreadonly(elements, msg, options, recn) {
         for (var ii = 0; ii < gfields.length; ii++) {
             if (Number(gfields[ii].getAttribute('exogroupno')) == elementx
                 && Number(gfields[ii].getAttribute('exofieldno'))
-                && (!(exodussetreadonly(gfields[ii].id, msg, options, recn))))
+                && (!(exosetreadonly(gfields[ii].id, msg, options, recn))))
                 return false
         }
         return true
@@ -8976,7 +8976,7 @@ function exodussetreadonly(elements, msg, options, recn) {
             //only give error if it is not even in the dictionary
             //so that we can remove fields from the screen without changing the setreadonly field lists
             if (!(gds.dictitem(elementxstring)))
-                return systemerror('exodussetreadonly()', exoquote(elements) + ' is not in the form')
+                return systemerror('exosetreadonly()', exoquote(elements) + ' is not in the form')
             return false
         }
 
@@ -8987,7 +8987,7 @@ function exodussetreadonly(elements, msg, options, recn) {
             if (typeof elementx.length == 'undefined')
                 elementx = [elementx]
             for (var ii = 0; ii < recn.length; ii++) {
-                if (!(exodussetreadonly(elementx[recn[ii]], msg, options)))
+                if (!(exosetreadonly(elementx[recn[ii]], msg, options)))
                     return false
             }
             return true
@@ -8996,7 +8996,7 @@ function exodussetreadonly(elements, msg, options, recn) {
         if (!elementx.tagName && typeof recn != 'undefined' && recn != null && recn !== '') {
             elementx = elementx[recn]
             if (typeof elementx == 'undefined') {
-                return systemerror('exodussetreadonly(' + elements + ',' + msg + ',' + recn + ')')
+                return systemerror('exosetreadonly(' + elements + ',' + msg + ',' + recn + ')')
             }
             elementx = [elementx]
         }
@@ -9008,9 +9008,9 @@ function exodussetreadonly(elements, msg, options, recn) {
     //if (typeof elementx=='object'&&elementx.length&&!elementx.name)
     if (typeof elementx == 'object' && elementx.length && !elementx.getAttribute) {
         for (var ii = 0; ii < elementx.length; ii++) {
-            //if (!(exodussetreadonly(elementx[ii],msg,options,recn))) return false
+            //if (!(exosetreadonly(elementx[ii],msg,options,recn))) return false
             //dont stop just because one doesnt exist
-            exodussetreadonly(elementx[ii], msg, options, recn)
+            exosetreadonly(elementx[ii], msg, options, recn)
         }
         return true
     }
@@ -9170,7 +9170,7 @@ async function readonly_onchange(event) {
 
     await exoui_invalid(readonlymsg)
 
-    return exoduscancelevent(event)
+    return exocancelevent(event)
 
 }
 
@@ -9421,7 +9421,7 @@ async function getdefault(element) {
     //login('getdefault ' + element.id)
 
     //calculate default
-    var defaultvalue = await exodusevaluate(defaultvalueexpression, 'await getdefault(' + element.id + ')');
+    var defaultvalue = await exoevaluate(defaultvalueexpression, 'await getdefault(' + element.id + ')');
 
     //select elements always have a default
     if (element.tagName == 'SELECT') {
@@ -9588,7 +9588,7 @@ function settouched_core(value, savebuttonactive) {
 
     //if (gautofitwindow && !gautofitwindowpending) {
     //    gautofitwindowpending = true
-    //    exodussettimeout('exodusautofitwindow()', 1)
+    //    exosettimeout('exodusautofitwindow()', 1)
     //}
 
 }
@@ -9810,7 +9810,7 @@ async function validate(element) {
             gvalue = gvalue.replace(/[\x00-\x1F]/g, '')
 
             //prevent anything that is effectively 0 unless it is a checkbox
-            if (element.type != 'checkbox' && exodusnum(gvalue) && !Number(gvalue)) {
+            if (element.type != 'checkbox' && exonum(gvalue) && !Number(gvalue)) {
                 await exoui_invalid(elementtitle + ' cannot be zero')
                 return false //logout('validate')
             }
@@ -9859,7 +9859,7 @@ async function validate(element) {
     //log('required check')
     if (gvalue == ''
         && element.getAttribute('exorequired')
-        && exodusenabledandvisible(element)) {
+        && exoenabledandvisible(element)) {
         await exoui_invalid(elementtitle + ' is required...')
         return false //logout('validate')
     }
@@ -9921,7 +9921,7 @@ async function validate(element) {
         var expression = convarray[0] + '(' + '"ICONV","' + value + '","' + convopts + '")'
 
         gmsg = ''
-        ivalue = await exodusevaluate(expression, 'await validate(' + element.id + ') iconv');
+        ivalue = await exoevaluate(expression, 'await validate(' + element.id + ') iconv');
         if (typeof ivalue == 'undefined') {
             return false //logout('validate - system error in input conversion')
         }
@@ -9948,7 +9948,7 @@ async function validate(element) {
         if (typeof elementvalidation == 'function')
             ok = elementvalidation()
         else
-            ok = await exodusevaluate(elementvalidation, 'await validate() functioncode');
+            ok = await exoevaluate(elementvalidation, 'await validate() functioncode');
 
         if (gvalue == null)
             await exoui_warning(element.id + ' validation routine returned gvalue=null')
@@ -10083,7 +10083,7 @@ async function validateoconv(element, ivalue) {
     var expression = convarray[0] + '(' + '"OCONV","' + ivalue + '","' + convopts + '")'
 
     gmsg = ''
-    var ovalue = await exodusevaluate(expression, 'validateoconv ' + (element && element.id))
+    var ovalue = await exoevaluate(expression, 'validateoconv ' + (element && element.id))
     if (typeof ovalue == 'undefined') {
         await exoui_invalid(exoquote(ivalue) + ' output conversion failed (undefined)\n' + gmsg)
         return false
@@ -10218,21 +10218,21 @@ async function calcfields(fieldns) {
 }
 
 //version to make grecn null and restore it afterwards
-async function exodusevaluateall(functioncode, callerfunctionname) {
+async function exoevaluateall(functioncode, callerfunctionname) {
     var storegrecn = grecn
     grecn = null
-    var result = await exodusevaluate(functioncode, callerfunctionname)
+    var result = await exoevaluate(functioncode, callerfunctionname)
     grecn = storegrecn
     return result
 }
 
-async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thisobject) {
+async function exoevaluate(functionorcode, callerfunctionname, arg1name, arg1, thisobject) {
 
     //wrapper to call custom functions or expressions (eg validation etc)
     //arg1name and arg1 are optional way of getting data into
     // arguments or variable listed in function source if functionorcode is code (text)
 
-    //returns result of exodusevaluate
+    //returns result of exoevaluate
     //displays message if the function does not return something and returns ''
     //failure results in error message and returns undefined!!!
     // or if gstepping then dump to de-bugger
@@ -10240,7 +10240,7 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
     var result
 
     if (typeof functionorcode == 'undefined') {
-        systemerror('exodusevaluate()', 'The required argument "functionorcode" is missing. Called from\n' + callerfunctionname)
+        systemerror('exoevaluate()', 'The required argument "functionorcode" is missing. Called from\n' + callerfunctionname)
         if (gstepping || gusername == 'EXODUS') crashhere
         return
     }
@@ -10259,7 +10259,7 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
 
         //special code to return today's date
         if (functionorcode == 'TODAY')
-            return exodusdate()
+            return exodate()
 
         if (functionorcode == '')
             return ''
@@ -10268,18 +10268,18 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
     //if (gstepping||(!ginitok&&gusername=='EXODUS'))
     // if (true||gstepping||gusername=='EXODUS')
     if (gstepping || gusername == 'EXODUS' || gusername == 'STEVE')
-        result = await exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
+        result = await exoevaluate3(functionorcode, null, arg1name, arg1, thisobject)
     else {
 
         //var e
         try {
-            result = await exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
+            result = await exoevaluate3(functionorcode, null, arg1name, arg1, thisobject)
         }
         catch (e) {
             //chrome exception is not available except inside catch clause
             //} if (e) {
             //if (typeof callerfunctionname == 'undefined') callerfunctionname = '"not specified"'
-            systemerror('exodusevaluate()' + functionorcode, e)
+            systemerror('exoevaluate()' + functionorcode, e)
             return await exoui_invalid()
         }
 
@@ -10292,7 +10292,7 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
 //var gcatcherrors=true//use try/catch to show errors to users on screen
 var gcatcherrors = false//avoid try/catch thereby allowing javascript error line number etc to show in console and/or be caught by debugger
 
-async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobject) {
+async function exoevaluate3(functionorcode, functionname, arg1name, arg1, thisobject) {
 
     //arg1name and arg1 are 'event' and event in some use cases
     //in order to pass event into exodusonclick functions
@@ -10326,7 +10326,7 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
         }
         functionx = new Function(arg1name, functioncode)
     } catch (e) {
-        return systemerror('exodusevaluate3()\n' + functioncode, e)
+        return systemerror('exoevaluate3()\n' + functioncode, e)
     }
     //we pass in the value of the argument when calling the function
     //return functionx.apply(this,arg1)
@@ -10424,7 +10424,7 @@ async function form_deleterow(event, element) {
     //setdisabledandhidden(editreleaserecord,false)
 
     var pagesize = tablex.dataPagesize ? tablex.dataPagesize : 999999
-    var pagen = exodusint(grecn / pagesize)
+    var pagen = exoint(grecn / pagesize)
 
     var id
     if (event.target.name)
@@ -10671,7 +10671,7 @@ async function insertallrows2(elements, values, fromrecn) {
 
 }
 
-function exodusaddrow(groupno) {
+function exoaddrow(groupno) {
     var tablex = $$('exogroup' + groupno)
     if (!tablex || tablex.getAttribute('noinsertrow'))
         return false
@@ -11040,7 +11040,7 @@ async function exoui_link(event, element) {
 
     //login('exoui_link')
 
-    exoduscancelevent(event)
+    exocancelevent(event)
 
     //search next then previous siblings for popup
     //if (element.type!='text') element=element.previousSibling
@@ -11073,7 +11073,7 @@ async function exoui_link(event, element) {
     if (!(element.getAttribute('exolowercase')))
         gvalue = gvalue.toUpperCase()
 
-    var reply = await exodusevaluate(element.getAttribute('exolink'), 'await exoui_link()');
+    var reply = await exoevaluate(element.getAttribute('exolink'), 'await exoui_link()');
 
     //logout('exoui_link')
 
@@ -11081,7 +11081,7 @@ async function exoui_link(event, element) {
 
 }
 
-function exodusfieldpopupallowed(element) {
+function exofieldpopupallowed(element) {
 
     if (!element || !element.getAttribute)
         return false
@@ -11092,7 +11092,7 @@ function exodusfieldpopupallowed(element) {
     if (element.disabled || element.getAttribute('disabled'))
         return false
 
-    // skip fields made non-tabbable (incl. exodussetreadonly)
+    // skip fields made non-tabbable (incl. exosetreadonly)
     if (element.tabIndex === -1)
         return false
 
@@ -11107,7 +11107,7 @@ async function exoui_popup(event, element) {
 
     //login('exoui_popup')
 
-    exoduscancelevent(event)
+    exocancelevent(event)
 
     //search current and following siblings for popup
     if (!element) {
@@ -11149,7 +11149,7 @@ async function exoui_popup(event, element) {
     }
 
     // quit if field is not editable (readonly, disabled, or non-tabbable)
-    if (!exodusfieldpopupallowed(element)) {
+    if (!exofieldpopupallowed(element)) {
         var readonly = element.getAttribute('exoreadonly')
         if (readonly && readonly != 'true')
             await exoui_invalid(readonly)
@@ -11253,7 +11253,7 @@ async function exoui_popup(event, element) {
     if (await validateupdate())
         focusnext(element)
     gvalidatingpopup = false
-    //exodussettimeout('focusnext()',10)
+    //exosettimeout('focusnext()',10)
     //await validateupdate()
 
     //logout('exoui_popup')
@@ -11271,7 +11271,7 @@ async function exoui_popup2(element) {
 
     //evaluate popup expression if provided
     if (expression) {
-        var reply = await exodusevaluate(expression, 'await exoui_popup2()');
+        var reply = await exoevaluate(expression, 'await exoui_popup2()');
     }
 
     //otherwise build a list and select from the SELECT
@@ -11413,8 +11413,8 @@ async function getkeyexternal() {
 
 async function debug(v) {
     if (!(confirm(v))) {
-        var _b = exodusbreak();
-        if (exodusisasyncfunction(_b))
+        var _b = exobreak();
+        if (exoisasyncfunction(_b))
             await exodus_begin(_b, 'break')
         else if (_b && typeof _b.next === 'function')
             systemerror('debug', 'function* break handler removed (stage 6)')
@@ -11510,7 +11510,7 @@ function getrecn(element) {
         systemerror('getrecn', element[0].id + ' ' + element[0].tagName + ' ' + element[0].innerHTML + ' is not an object')
     }
 
-    exodusassertobject(element, 'getrecn', 'element')
+    exoassertobject(element, 'getrecn', 'element')
     //returns null if element not part of a table
 
     var recn
@@ -11980,7 +11980,7 @@ function calendar_checkInDatePicker_onchange_sync() {
 
 async function form_popcalendar2() {
 
-    if (!gpreviouselement || !exodusfieldpopupallowed(gpreviouselement))
+    if (!gpreviouselement || !exofieldpopupallowed(gpreviouselement))
         return false
 
     var datevalue = gvalue.toString().exoiconv('[DATE]')
@@ -12012,7 +12012,7 @@ async function form_popcalendar2() {
     calendar_checkInDatePicker._calDiv.focus()
     //calendar_checkInDatePicker._calDiv.setActive()
     //NB activeElement not available everywhere
-    //xyz=exodussetinterval('window.status=document.activeElement.outerHTML',10)
+    //xyz=exosetinterval('window.status=document.activeElement.outerHTML',10)
     return false
 
 }
@@ -12115,7 +12115,7 @@ async function form_get_index(filename, fieldname) {
     if (!db.data || db.data == '<records></records>')
         return ''
 
-    return exodusxml2obj(db.data)
+    return exoxml2obj(db.data)
 
 }
 
@@ -12298,7 +12298,7 @@ function form_copy_text_field_sync(event) {
     } catch (e) {
         return false
     }
-    return exoduscancelevent(event) || true
+    return exocancelevent(event) || true
 }
 
 async function document_oncopy(event) {
@@ -12336,7 +12336,7 @@ async function document_oncopy(event) {
     //return true if handled EVEN IF FAILED
     //return false to allow normal handler below
     if (await form_oncopy(event)) {
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
     return true
@@ -12416,7 +12416,7 @@ async function form_oncopy_generic(event) {
     ///event.clipboardData.setData('text/html', '<b>Hello, world!</b>');
 
     //prevent any data from selection being copied normally
-    exoduscancelevent(event)
+    exocancelevent(event)
 
     return false
 
@@ -12435,7 +12435,7 @@ async function document_onpaste(event) {
                 && element.selectionEnd > element.selectionStart
         } catch (e) { }
         if (!missPasteOk) {
-            exoduscancelevent(event)
+            exocancelevent(event)
             return false
         }
     }
@@ -12447,7 +12447,7 @@ async function document_onpaste(event) {
 		if (msg == 'true') {
 			msg = 'This is a read-only field'
 		}
-        exoduscancelevent()
+        exocancelevent()
    	    return await exoui_invalid(msg)
 	}
 
@@ -12487,7 +12487,7 @@ async function document_onpaste(event) {
 
     //return true to suppress normal handler EVEN IF FAILED
     if (await form_onpaste(event))
-        return exoduscancelevent(event)
+        return exocancelevent(event)
 
     //in case we selected a text node
     if (!element.getAttribute && element.parentNode.getAttribute)
@@ -12516,7 +12516,7 @@ async function document_onpaste(event) {
     document.execCommand('paste', false, text)
 
     //dont continue to normal paste
-    return exoduscancelevent(event)
+    return exocancelevent(event)
 
     */
 }
@@ -12612,7 +12612,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
         return true
 
     //from here on we do NOT want normal paste to happen afterwards
-    exoduscancelevent()
+    exocancelevent()
 
     //skip if no clipboard
     var clipboarddata = gevent.clipboardData ? gevent.clipboardData : window.clipboardData
@@ -12710,7 +12710,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     ////////
     var savegrecn = grecn
     var p = importdata_function(data);
-    var result = await exodusawaitresult(p, 'importdata');
+    var result = await exoawaitresult(p, 'importdata');
 
     await calcfields()
 
@@ -12874,7 +12874,7 @@ async function form_onpaste_generic_importdata(data) {
         //add a new row if last row is not blank
         //var rown = gds.data.group1.length - 1
         //if (await gds.get1('VEHICLE_CODE', rown)) {
-        //    exodusaddrow(1)
+        //    exoaddrow(1)
         //    rown += 1
         //}
         if (ninserted)

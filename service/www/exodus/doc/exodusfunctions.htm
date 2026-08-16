@@ -128,15 +128,15 @@
 	duplicates)&nbsp;
 </P>
 <H2>Functions</H2>
-<H3>function exodusconv(type,value,conversion)</H3>
+<H3>function exoconv(type,value,conversion)</H3>
 <P>returns a&nbsp;value or array of values after conversion(s)</P>
 <P>type is ICONV or OCONV</P>
 <P>value is a value or array of values</P>
 <P>conversion is a conversion or array of conversions</P>
 <P>each value is converted by all conversions</P>
-<H3>function exodusnumber(arg1)</H3>
+<H3>function exonumber(arg1)</H3>
 <P>returns anything converted to a number or systemerror if cannot</P>
-<H3>function exodusnum(arg1)</H3>
+<H3>function exonum(arg1)</H3>
 <P>return&nbsp;true if numeric&nbsp; false if not</P>
 <P>a number is&nbsp;one or more&nbsp;digits and optionally one "." and optionally 
 	one prefixed "-"&nbsp;
@@ -146,23 +146,23 @@
 </P>
 <H3>function exoquote(string)</H3>
 <P>return the argument surrounded by double quotes</P>
-<H3>function exodusspace(length)
+<H3>function exospace(length)
 </H3>
 <P>returns a&nbsp;string of N spaces
 </P>
-<H3>function exodusstr(str1,length)
+<H3>function exostr(str1,length)
 </H3>
 <P>returns a&nbsp;string of N strings
 </P>
 <H3>function decodehtmlcodes(string1)</H3>
 <H3>function joinarrays(array1,array2)</H3>
 <P>join an array with string sep (standard join() is single char sep)</P>
-<H3>function exodusmod(number1,number2)</H3>
+<H3>function exomod(number1,number2)</H3>
 <P>returns modulus of number1 and number2 (number1%number2)</P>
-<H3>function exodusint(number)</H3>
+<H3>function exoint(number)</H3>
 <P>returns the mathematical floor of the number (Math.floor(number)</P>
-<P>exodusint(2.7) is 2</P>
-<P>exodusint(-2.7 is 3</P>
+<P>exoint(2.7) is 2</P>
+<P>exoint(-2.7 is 3</P>
 <H3>function exosingular(string)</H3>
 <P>returns the singular form of the plural noun in string according to some common 
 	English rules. Not correct for all cases.</P>
@@ -173,21 +173,21 @@
 	the same</P>
 <H3>function isnt(value)</H3>
 <P>equivalent to !is()</P>
-<H3>function exodusosread(filename)</H3>
+<H3>function exoosread(filename)</H3>
 <P>returns the unmodified contents of any given operating system file</P>
 <P>not available in web mode</P>
-<H3>function exodusoswrite(filename,string)</H3>
+<H3>function exooswrite(filename,string)</H3>
 <P>creates or replaces any given operating system file</P>
 <P>not available in web mode</P>
-<H3>function exodusdate(year,month,day)</H3>
+<H3>function exodate(year,month,day)</H3>
 <P>if <EM>mode</EM>&nbsp; is undefined returns the current 
 	system&nbsp;date&nbsp;as&nbsp;seconds&nbsp;since midnight otherwise returns the 
 	current date in external format defined by mode. See DATE()</P>
-<H3>function exodustime(mode)</H3>
+<H3>function exotime(mode)</H3>
 <P>if <EM>mode</EM>&nbsp; is undefined returns the current system 
 	time&nbsp;as&nbsp;seconds&nbsp;since midnight otherwise returns the current 
 	time in external format defined by mode. See TIME()</P>
-<H3>function exodusjulianperiod(period,maxperiodno)</H3>
+<H3>function exojulianperiod(period,maxperiodno)</H3>
 <P>given a period in format pp/YY or pp/YYYY</P>
 <P>return the julian period (eg 9/2002 is 2002*maxperiod+9)
 </P>
@@ -295,18 +295,18 @@
 <P>input internal format is 99 and external format is 9999</P>
 <P>mode is not used</P>
 <H2>Objects</H2>
-<H3>exodusamount(string)</H3>
+<H3>exoamount(string)</H3>
 <P>given a string like "999USD"</P>
 <P>returns an object</P>
 <P>object.amount=999<br />
 	object.unit="USD"<br />
 	object.string="999USD"</P>
-<H3>exodustimers(ntimers)</H3>
+<H3>exotimers(ntimers)</H3>
 <P>returns an array of timers</P>
 <P>object.start(timern)</P>
 <P>object.stop(timern)</P>
 <P>object.display()</P>
-<H3>exodustimer()</H3>
+<H3>exotimer()</H3>
 <P>object.start()</P>
 <P>object.stop()</P>
 <P>object.elapsedtime</P>
@@ -315,7 +315,7 @@
 <P>tostatement</P>
 <P>decodehtmlcodes</P>
 <P>&nbsp;</P>
-<P>exodusassertobject</P>
-<P>exodusassertfunctionname</P>
-<P>exodusassertstring</P>
-<P>exodusassertnumeric</P>
+<P>exoassertobject</P>
+<P>exoassertfunctionname</P>
+<P>exoassertstring</P>
+<P>exoassertnumeric</P>

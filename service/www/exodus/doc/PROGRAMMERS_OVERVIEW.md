@@ -158,7 +158,7 @@ Optional background work (session keepalive, relock) uses `exodus_begin_if_idle`
 
 Generators are **removed** (stage 6). Framework and app modules use `async`/`await` only. Form hooks (`form_predeleterow`, etc.) and dict `functioncode` must be async or sync — not generators.
 
-**Do not** use free-running `setTimeout(async () => …)` or rely on `exodussettimeout('await myfunc()')` as a second event system. Prefer `await myfunc()` inside the current handler. If you must defer after the current flight (e.g. next `opendoc`, popup → openrecord), use:
+**Do not** use free-running `setTimeout(async () => …)` or rely on `exosettimeout('await myfunc()')` as a second event system. Prefer `await myfunc()` inside the current handler. If you must defer after the current flight (e.g. next `opendoc`, popup → openrecord), use:
 
 ```js
 exodus_begin_when_idle(myfunc, 'label', { delay_ms: 10 })
@@ -168,7 +168,7 @@ That retries until Gate A is free, then `exodus_begin`. If still busy after 30s 
 
 Required `exodus_begin` while another flight is airborne (and the wait list is full) also **systemerror**s. Optional background work uses `exodus_begin_if_idle` (silent skip is intentional).
 
-**`form_postread` vs `form_postdisplay`:** `opendoc2` runs `form_postread` → `gds.load` → `form_postdisplay`. Anything that needs bound DOM rows (`form_filter`, per-row `exodussetreadonly`, signature/logo images) belongs in `form_postdisplay`, not same-flight `await` from `form_postread`.
+**`form_postread` vs `form_postdisplay`:** `opendoc2` runs `form_postread` → `gds.load` → `form_postdisplay`. Anything that needs bound DOM rows (`form_filter`, per-row `exosetreadonly`, signature/logo images) belongs in `form_postdisplay`, not same-flight `await` from `form_postread`.
 
 ### Modal Dialogs
 
@@ -225,7 +225,7 @@ Typical request shapes (same CR separators throughout):
 |--------|-------------|
 | `SELECT\rfile\rsortselect\rcollist\rXML` | Dropdowns, app lists (`general.js` currencies, etc.) |
 | `SELECT\rfile\rsortselect\rcollist\rXML\rmaxnrecs` | Optional 6th field = max records |
-| `CACHE\rSELECT\rfile\rsort\rcollist\rXML\rmaxnrecs` | `exodusfilepopup` (CACHE prefix is stripped server-side) |
+| `CACHE\rSELECT\rfile\rsort\rcollist\rXML\rmaxnrecs` | `exofilepopup` (CACHE prefix is stripped server-side) |
 | `SELECT\rfile\r\rRECORD` | Read records by key list in `db.data` |
 | `EXECUTE\rmodule\rcommand\r…` | Backend programs |
 | `READ\rfile\rkey` / `CACHE\rREAD\r…` | Single record |
@@ -251,7 +251,7 @@ On success `db.send()` is truthy; `db.data` holds the body (often XML for SELECT
 
 Code: `client.js` — `exodusdblink_login`, both send transports’ `Please login` branches; typeahead `form_typeahead_dblink()`; `xhttp.php` session release.
 
-Cookies are used heavily for dataset, username, globals (`exodusgetcookie2`, `exodussetcookie`).
+Cookies are used heavily for dataset, username, globals (`exogetcookie2`, `exosetcookie`).
 
 ## 5. Dictionary-Driven Forms (The Main Pattern)
 

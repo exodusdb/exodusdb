@@ -1,7 +1,7 @@
 //Copyright NEOSYS All Rights Reserved.//
 
 async function form_postinit() {
-    //exodussettimeout('focuson("NOTES")', 1000)
+    //exosettimeout('focuson("NOTES")', 1000)
     gparameters.key='SYSTEM.CFG'
     return true
 }
@@ -171,7 +171,7 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.validation = function sysconfig_val_EMAIL_DOMAINS() {
         var punctuation = "'" + '`!"$%^&*()_+=[]{};:@#~,<>/?\\|'
         //ie dont allow punctuation except space and -
-        gvalue = gvalue.exoconvert(punctuation, exodusspace(punctuation.length)).exotrim()
+        gvalue = gvalue.exoconvert(punctuation, exospace(punctuation.length)).exotrim()
         return true
     }
 

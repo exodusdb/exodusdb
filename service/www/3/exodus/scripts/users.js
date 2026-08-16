@@ -4,7 +4,7 @@ async function form_postinit() {
 
     // Own-user open is via gparameters.key set in dict_USERS (dbform opendoc path).
     // Only leftover: optional what's-new window after login cookie.
-    gwhatsnew = exodusgetcookie2('wn').toLowerCase()
+    gwhatsnew = exogetcookie2('wn').toLowerCase()
     if (gwhatsnew) {
         if (window.location.href.toString().slice(0, 5) == 'file:')
             gwhatsnew = 'file:///' + gwhatsnew
@@ -12,8 +12,8 @@ async function form_postinit() {
             //gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.indexOf('\\data\\'))
             //gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.replace('\\','/').indexOf('/data/'))
         }
-        exodussetcookie(glogincode, 'EXODUS2', '', 'wn')
-        exodussetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
+        exosetcookie(glogincode, 'EXODUS2', '', 'wn')
+        exosetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
         // Defer open so form finishes init; takeoff when Gate A free (fail loud if not)
         exodus_begin_when_idle(function () { return windowopen(gwhatsnew) }, 'users whatsnew', {
             delay_ms: 1000
@@ -27,7 +27,7 @@ async function form_postinit() {
 async function form_postdisplay() {
 
     //enable/disable password changing button
-    //exodussetexpression('button_password', 'disabled', '!gusers_authorisation_update&&gkey!=gusername')
+    //exosetexpression('button_password', 'disabled', '!gusers_authorisation_update&&gkey!=gusername')
     $$('button_password').disabled=!gusers_authorisation_update&&gkey!=gusername
 
     $expiryelement = $$('expiryelement')
@@ -79,9 +79,9 @@ async function form_postwrite() {
     var bodyColor = store(await gds.getx('SCREEN_BODY_COLOR'))
     var screenFont = store(await gds.getx('SCREEN_FONT'))
     var screenFontSize = store(await gds.getx('SCREEN_FONT_SIZE'))
-    exodussetcookie(glogincode, 'EXODUS2', bodyColor, 'fc')
-    exodussetcookie(glogincode, 'EXODUS2', screenFont, 'ff')
-    exodussetcookie(glogincode, 'EXODUS2', screenFontSize, 'fs')
+    exosetcookie(glogincode, 'EXODUS2', bodyColor, 'fc')
+    exosetcookie(glogincode, 'EXODUS2', screenFont, 'ff')
+    exosetcookie(glogincode, 'EXODUS2', screenFontSize, 'fs')
     // Same path as every other screen entry
     if (typeof exodus_chrome_from_cookies == 'function')
         exodus_chrome_from_cookies()
@@ -105,7 +105,7 @@ async function users_postdisplay() {
     $expiryelement.innerHTML = ''//also done in form_postdisplay because this function doesnt get called after await cleardoc()?
 
     var userexpirydate=await gds.getx('EXPIRY_DATE')
-    if (userexpirydate && userexpirydate <= exodusdate()) {
+    if (userexpirydate && userexpirydate <= exodate()) {
         $expiryelement.innerHTML = '<strong style="color:Highlight">EXPIRED ' + userexpirydate.exooconv('[DATE]') + '</strong>'
     } else {
         var reminderdays = 6
@@ -115,7 +115,7 @@ async function users_postdisplay() {
             $expiryelement.innerHTML = '<strong style="color:var(--exodus-icon-green,#22b014)">ACTIVE</strong>'
         } else {
             var text=''
-            var expirydays = (exodusint(passwordexpires) - exodusdate())
+            var expirydays = (exoint(passwordexpires) - exodate())
             if (expirydays < 0)
              text='Password has EXPIRED'
             else if (expirydays == 0)

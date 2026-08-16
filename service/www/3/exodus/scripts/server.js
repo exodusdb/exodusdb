@@ -198,10 +198,10 @@ function exodusdblink_send_byfile(data) {
 
             //save the username, password and dataset for following sessions
             if (this.documentprotocolcode == 'file') {
-                exodussetcookie(glogincode, 'EXODUS2', 'username', this.username)
-                exodussetcookie(glogincode, 'EXODUS2', 'password', this.password)
-                exodussetcookie(glogincode, 'EXODUS2', 'dataset', this.dataset)
-                exodussetcookie('', 'EXODUSsystem', this.system)
+                exosetcookie(glogincode, 'EXODUS2', 'username', this.username)
+                exosetcookie(glogincode, 'EXODUS2', 'password', this.password)
+                exosetcookie(glogincode, 'EXODUS2', 'dataset', this.dataset)
+                exosetcookie('', 'EXODUSsystem', this.system)
             }
             else {
                 // Session('username') = this.username
@@ -356,7 +356,7 @@ function exodusdblink_send_byfile(data) {
             //make a random file name
             do {
                 //~*.htm files are not backed up in FILEMAN
-                linkfilename = '~' + exodusrnd(9999999, 1000000)
+                linkfilename = '~' + exornd(9999999, 1000000)
                 linkfilename = datalocation + datasetdir + linkfilename
             } while (gfso.FileExists(linkfilename + '.*'))
 
@@ -786,20 +786,20 @@ function exodusdblink_startdb() {
 
 }
 
-function exodusrnd(max, min) {
+function exornd(max, min) {
     //return a random integer between 0 (or min) and max-1
     if (!min) min = 0
     max = max - 1
     return (Math.floor(min + Math.random() * (max - min + 1)))
 }
 
-function exodusoswrite(string, filename) {
+function exooswrite(string, filename) {
     tf = gfso.CreateTextFile(filename, 1)
     tf.Write(string)
     tf.Close()
 }
 
-function exodusosread(filename) {
+function exoosread(filename) {
     var text = ''
     try {
         var tf = gfso.OpenTextFile(filename)
@@ -839,7 +839,7 @@ function getdatasets(exodusrootpath, systemcode) {
     //get an array of datasets
     //location of \exodus folder
     var proglocation = (exodusrootpath + 'exodus\\').toUpperCase()
-    var datasets = exodusosread(proglocation + systemcode + '.vol')
+    var datasets = exoosread(proglocation + systemcode + '.vol')
     //.split('\r')[0]
     //backward compatible with old text format
     var fm = String.fromCharCode(254)

@@ -331,7 +331,7 @@ function colors_popup_n_step(stepDir) {
 	return steps[idx]
 }
 
-// Match exodusconfirm2: modal shield + form_blockevents.
+// Match exoconfirm2: modal shield + form_blockevents.
 function colors_popup_modal_on() {
 	if (colors_popup._modalOn)
 		return
@@ -729,7 +729,7 @@ function colors_popup_startevent(event) {
 		if (event.ctrlKey && (event.which == 67 || keycode == 67))
 			return true
 
-		// Confirm-style hotkeys (see exodusconfirm_startevent)
+		// Confirm-style hotkeys (see exoconfirm_startevent)
 		// Esc / F7 = Cancel
 		if (keycode == 27 || keycode == 118) {
 			void colors_popup_cancel()
@@ -1541,9 +1541,9 @@ function colors_popup_capture_form_body() {
 		if (formBody)
 			return formBody
 	} catch (e) { }
-	if (typeof exodusgetcookie2 == 'function') {
+	if (typeof exogetcookie2 == 'function') {
 		try {
-			var fc = exodusgetcookie2('fc')
+			var fc = exogetcookie2('fc')
 			if (fc != null && String(fc) !== '')
 				return String(fc)
 		} catch (e2) { }
@@ -1721,7 +1721,7 @@ async function colors_pop_color_open(gen) {
 		field = document.getElementById(field.getAttribute('data-exodus-color-swatch-for')) || field
 	if (!field)
 		return false
-	if (typeof exodusfieldpopupallowed == 'function' && !exodusfieldpopupallowed(field)
+	if (typeof exofieldpopupallowed == 'function' && !exofieldpopupallowed(field)
 		&& field.getAttribute('data-exodus-color-field') != '1')
 		return false
 	colors_popup_show(field)

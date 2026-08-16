@@ -61,7 +61,7 @@ async function test_run(cmdcode) {
  $count=$$('count_'+cmdcode)
  $count.innerText='0'
  
- var n=exodusint(test_getvalue('ntests'))
+ var n=exoint(test_getvalue('ntests'))
  //var cmd=test_getvalue('cmd_element') 
  if (cmdcode=='CUSTOM')
     cmd=$customcommand.value
@@ -72,7 +72,7 @@ async function test_run(cmdcode) {
  // custom box (and pasted text) has literal \r; request fields need real CR
  cmd=String(cmd).replace(/\\r/g,'\r')
     
- //timer1=new exodustimer()
+ //timer1=new exotimer()
  timer=new Date
  var minimum=false
  var maximum=false

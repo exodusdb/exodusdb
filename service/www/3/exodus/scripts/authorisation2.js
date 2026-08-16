@@ -58,8 +58,8 @@ async function user_setpassword(savemode,element) {
     var vowels='AEIOUY'
     for (var i=0;i<(minpasslen/2);i++) {
 
-     newpassword+=consonants.substr(exodusrnd(consonants.length),1)
-     newpassword+=vowels.substr(exodusrnd(vowels.length),1)
+     newpassword+=consonants.substr(exornd(consonants.length),1)
+     newpassword+=vowels.substr(exornd(vowels.length),1)
     }
     
     // default_icons false: "generate another" is not a No/reject

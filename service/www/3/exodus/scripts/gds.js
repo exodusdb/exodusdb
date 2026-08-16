@@ -1,7 +1,7 @@
 //Copyright NEOSYS All Rights Reserved.
 
 //////////////////
-function exodusdatasource() {
+function exodatasource() {
 
     this.data = null
     this.onreadystatechange = null
@@ -63,14 +63,14 @@ async function gds_evaluate(functionx) {
         return true
 
     //this=whatever gds object the evaluate method has been called on
-    //because of .apply() in exodusevaluate3
-    var result=await exodusevaluate(
+    //because of .apply() in exoevaluate3
+    var result=await exoevaluate(
         functionx,   //function string or object
         'gds_evaluate',//for debugging
         'gds',  //any "gds" variable in the function code will actually access
         this,   //this (the current default gds object)
         this)   //any "this" variable in the function code will access this
-                // (the local gds object) because of exodusevaluate3's .apply()
+                // (the local gds object) because of exoevaluate3's .apply()
 
     return result
 }
@@ -133,7 +133,7 @@ async function gds_getall(name, oldtext) {
 //purpose is to return a value when given a specific recn ... not a 1 item array like getx does
 async function gds_get1(name, recn, oldtext) {
     if (recn)
-        exodusassertnumeric(recn,'gds_get1','recn')
+        exoassertnumeric(recn,'gds_get1','recn')
     return (await this.getx(name,recn,oldtext))[0]
 }
 
@@ -143,7 +143,7 @@ async function gds_getx(name, recn, oldtext) {
 
     //if no data section then return nothing
     //eg in postinit setting expressions based on gds before there is any data section
-    //exodussetexpression('currencycode_span','innerText','await gds.getx("CURRENCY_CODE")')
+    //exosetexpression('currencycode_span','innerText','await gds.getx("CURRENCY_CODE")')
     //(not necessary now that cleardoc is *always* called in forminit
     //if (!this.data) return ''
 
@@ -362,7 +362,7 @@ async function gds_setx(element, recn, values) {
 
     //check recn is null or numeric
     if (recn != null)
-        exodusassertnumeric(recn, 'setx', 'recn')
+        exoassertnumeric(recn, 'setx', 'recn')
 
     //get the cells to be updated 
     var cells = this.getcells(element, recn)
@@ -393,7 +393,7 @@ function gds_setdefaulted(element, recn, trueorfalse) {
     //nb setting a value to '' also clears the "defaulted" property
 
     //check recn is null or numeric
-    if (recn != null) exodusassertnumeric(recn, 'setx', 'recn')
+    if (recn != null) exoassertnumeric(recn, 'setx', 'recn')
 
     //get the cells to be updated 
     var cells = this.getcells(element, recn)
@@ -523,7 +523,7 @@ async function gds_setx2(cells, values, forced) {
         var afterupdate = this.dictitem(cells.dictid).afterupdate
         if (afterupdate) {
             try {
-                await exodusawaitresult(afterupdate(cells, values), 'afterupdate in gds_setx')
+                await exoawaitresult(afterupdate(cells, values), 'afterupdate in gds_setx')
             }
             catch (e) {
                 systemerror(e.description + ' ' + e.number, 'in afterupdate() in await gds_setx(' + cells.dictid + ')')
@@ -991,7 +991,7 @@ async function gds_bind(datasource, elements, rownx) {
         this.blankrowx(rows[0], firstrow, false)
         var emptyrow = firstrow.cloneNode(true)
 
-        //gtimers=new exodustimers(10)
+        //gtimers=new exotimers(10)
         //alert('nrows:'+rows.length)
         for (var rown = 0; rown < rows.length; rown++) {
             //alert('rown:'+rown)

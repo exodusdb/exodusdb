@@ -124,7 +124,7 @@
             the data might be a db request string prefixed with '@'
         </p>
         <h3>
-            function* exodusfilepopup(filename,cols,coln,sortselectionclause,many)</h3>
+            function* exofilepopup(filename,cols,coln,sortselectionclause,many)</h3>
         <p>
             given a filename, sort/selection statement and column names pops up a table for
             the user to select row(s) or value(s)</p>
@@ -132,39 +132,39 @@
             <strong>many</strong> if true will allow the user to select more than one item</p>
         <h3>
             <h3>
-                function* exodussetdropdown(element,request,colarray,selectedvalues,noautoselection)</h3>
+                function* exosetdropdown(element,request,colarray,selectedvalues,noautoselection)</h3>
             <h3>
-                function exodusgetdropdown(element,mode)</h3>
+                function exogetdropdown(element,mode)</h3>
         </h3>
         <h2>
             <h3>
-                function exodussetexpression(elementsorelementid, attributename, expression)</h3>
+                function exosetexpression(elementsorelementid, attributename, expression)</h3>
         </h2>
         <p>
             can be used to set the display property of elements to a suitable expression
         </p>
         <h3>
-            function exodussetcookie(glogincode,key, value,subkey)</h3>
+            function exosetcookie(glogincode,key, value,subkey)</h3>
         <p>
             useful function to manage cookies</p>
         <p>
             subkey is optional</p>
         <h3>
-            function exodusgetcookie2(subkey,key,glogincode)</h3>
+            function exogetcookie2(subkey,key,glogincode)</h3>
         <p>
             useful function to manage cookies</p>
         <p>
             subkey is optional, key defaults to 'EXODUS2' and glogincode defaults to glogincode</p>
         <h2>
             <h3>
-                function exodusenabledandvisible(element)</h3>
+                function exoenabledandvisible(element)</h3>
         </h2>
         <p>
             returns whether an element is enabled and visible
         </p>
         <h2>
             <h3>
-                function exodusxml2obj(xmltext)</h3>
+                function exoxml2obj(xmltext)</h3>
         </h2>
         <p>
             returns exodus&nbsp;general purpose data object given an xml&nbsp;text string</p>
@@ -529,7 +529,7 @@
             written for the server side application.</p>
         <p>
             Verifies that the <em>username</em> and <em>password</em> are valid for the specified
-            dataset and sets a cookie called EXODUS4 using exodussetcookie(glogincode,'EXODUS2',db.data).</p>
+            dataset and sets a cookie called EXODUS4 using exosetcookie(glogincode,'EXODUS2',db.data).</p>
         <p>
             On the server&nbsp;a custom database procedure called LOGIN.NET&nbsp;is run, if
             available,&nbsp;to provide the text of the cookie&nbsp;or cancel the login if required.</p>
@@ -567,7 +567,7 @@
         <p>
         </p>
         <h3>
-            exodusdatasource</h3>
+            exodatasource</h3>
         <p>
             For EXODUS forms the main form data is automatically&nbsp;available as the global
             variable <strong>gds. </strong>You&nbsp;may create your own <em>exodus_obj_source</em>

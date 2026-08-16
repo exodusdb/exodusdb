@@ -173,7 +173,7 @@ async function showuploadtable() {
  if (!(await exoui_security('UPLOAD CREATE')))
     return await exoui_invalid(gmsg)
 
- exodusformpaneof($table_upload).style.display=''
+ exoformpaneof($table_upload).style.display=''
  $form1.filedata.focus()
  $button_showupload.style.display='none'
  $audiovisualextensionselement.innerText='('+gaudiovisualextensions.join(' ')+')'
@@ -213,7 +213,7 @@ async function upload_onclick() {
  //check file to upload entered
  var sourcefilename=$form1.filedata.value
  if (!sourcefilename) {
-  exoduscancelevent()//prevent submit
+  exocancelevent()//prevent submit
   return await exoui_invalid('Please browse for a file name to upload first')
  }
 

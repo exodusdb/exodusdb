@@ -158,7 +158,7 @@ function exo_dict_year(dicti,from,to,defaultyear) {
 
  if (!from) from=0
  if (!to) to=0
- exodusassertobject(dicti,'exo_dict_year','dicti')
+ exoassertobject(dicti,'exo_dict_year','dicti')
  // Year dropdown: install value;title list as conversion (not a live [NUMBER…] field).
  // Brief [NUMBER,0] seed then replace — same “numeric then select” pattern as other
  // code that wants number-ish align/width defaults before the option list owns conversion.
@@ -166,7 +166,7 @@ function exo_dict_year(dicti,from,to,defaultyear) {
  dicti.conversion='[NUMBER,0]'
  dicti.align='R'
  dicti.length=4
- var curryear=exodusdate().exooconv('[DATE,YEAR]')
+ var curryear=exodate().exooconv('[DATE,YEAR]')
  var years=''
  for (var year=curryear+to;year>=curryear+from;year--) {
 
@@ -259,7 +259,7 @@ function exo_dict_period(di,mode,otherperiodid,conversion) {
  if (!mode) mode=''
  if (!otherperiodid) otherperiodid=''
  if (!conversion) conversion=''
- exodusassertobject(di,'exo_dict_period','di')
+ exoassertobject(di,'exo_dict_period','di')
  di.conversion='[PERIOD_OF_YEAR]'
  if (typeof di.align == 'undefined' || di.align === '' || di.align == null)
   di.align='R'
@@ -270,7 +270,7 @@ function exo_dict_period(di,mode,otherperiodid,conversion) {
 function exo_dict_year_period(di,mode) {
 
  if (!mode) mode=''
- exodusassertobject(di,'exo_dict_yearperiod','di')
+ exoassertobject(di,'exo_dict_yearperiod','di')
  di.conversion='[YEAR_PERIOD,'+mode+']'
  di.align='R'
  di.length=7
@@ -314,8 +314,8 @@ async function exo_val_period(mode,otherperiodid) {
    }
   }
 
-  var otherjulianperiod=exodusjulianperiod(othervalue.join('/'),gmaxperiodno)
-  var julianperiod=exodusjulianperiod(value.join('/'),gmaxperiodno)
+  var otherjulianperiod=exojulianperiod(othervalue.join('/'),gmaxperiodno)
+  var julianperiod=exojulianperiod(value.join('/'),gmaxperiodno)
 
   //prevent toperiod less than fromperiod
   if (mode=='FROM'&julianperiod>otherjulianperiod) othervalue=value
@@ -337,7 +337,7 @@ async function exo_val_period(mode,otherperiodid) {
 
 function exo_dict_yesno(dicti,defaultvalue,type) {
 
- exodusassertobject(dicti,'exo_dict_yesno','dicti')
+ exoassertobject(dicti,'exo_dict_yesno','dicti')
  if (!type) type='dropdown' 
  if (typeof defaultvalue=='undefined') defaultvalue='"Y"'
  defaultvalue=defaultvalue.toString()
@@ -357,7 +357,7 @@ function exo_dict_date(dicti,params) {
 
  if (typeof params=='undefined') params=''
 
- exodusassertobject(dicti,'exo_dict_date','dicti')
+ exoassertobject(dicti,'exo_dict_date','dicti')
  dicti.conversion='[DATE,'+params+']'
  // Right like amounts/columns of fixed date strings. Callers may set di.align after.
  dicti.align = 'R'
@@ -394,7 +394,7 @@ function exo_dict_date(dicti,params) {
 function exo_dict_integer(dicti, opts) {
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exo_dict_integer', 'dicti')
+ exoassertobject(dicti, 'exo_dict_integer', 'dicti')
  var bag = {}
  for (var k in opts) {
   if (Object.prototype.hasOwnProperty.call(opts, k))
@@ -411,7 +411,7 @@ function exo_dict_integer(dicti, opts) {
 function exo_dict_decimal(dicti, opts) {
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exo_dict_decimal', 'dicti')
+ exoassertobject(dicti, 'exo_dict_decimal', 'dicti')
  var bag = {}
  for (var k in opts) {
   if (Object.prototype.hasOwnProperty.call(opts, k))
@@ -431,7 +431,7 @@ function exo_dict_decimal(dicti, opts) {
 function exo_dict_percent(dicti, opts) {
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exo_dict_percent', 'dicti')
+ exoassertobject(dicti, 'exo_dict_percent', 'dicti')
  var bag = {}
  for (var k in opts) {
   if (Object.prototype.hasOwnProperty.call(opts, k))
@@ -446,7 +446,7 @@ function exo_dict_number(dicti, opts) {
 
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exo_dict_number', 'dicti')
+ exoassertobject(dicti, 'exo_dict_number', 'dicti')
 
  // Same defaults as former positional (undefined → ''). Callers should omit keys,
  // not pass empty placeholders.
@@ -505,7 +505,7 @@ function exo_dict_number(dicti, opts) {
 // exostyle "text".
 function exo_dict_text(dicti, length, rows) {
 
- exodusassertobject(dicti, 'exo_dict_text', 'dicti')
+ exoassertobject(dicti, 'exo_dict_text', 'dicti')
  dicti.align = 'T'
  if (typeof length != 'undefined')
   dicti.length = length
@@ -527,7 +527,7 @@ function exo_dict_text(dicti, length, rows) {
 // Unlike free-text SPAN, length is a min-width floor (not only wide soft max).
 function exo_dict_textarea(di, nrows, length) {
 
- exodusassertobject(di, 'exo_dict_textarea', 'di')
+ exoassertobject(di, 'exo_dict_textarea', 'di')
  if (typeof nrows == 'undefined')
   nrows = 3
  di.align = 'T'
@@ -546,7 +546,7 @@ function exo_dict_textarea(di, nrows, length) {
 // (floor 6ch same as number). Free-text wide soft-max is text-only.
 function exo_dict_code(di) {
 
- exodusassertobject(di, 'exo_dict_code', 'di')
+ exoassertobject(di, 'exo_dict_code', 'di')
  di.align = 'T'
  di.rows = 1
  di.lowercase = false
@@ -1186,7 +1186,7 @@ function addfield(rec,fieldname,fieldtext) {
             var um=String(checktemp).match(/^([-+]?[0-9.]+)([A-Za-z]+)$/)
             if (um) checktemp=um[1]
            }
-           if (!(exodusnum(checktemp))) {
+           if (!(exonum(checktemp))) {
 
             alert(name+' '+exoquote(temp)+' is not a '+conversion.slice(1,-1).toLowerCase()+'.')
             return 0
@@ -1283,7 +1283,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
 
  if (!group4) group4=''
   
- exodusassertstring(code0,dictrec,code0)
+ exoassertstring(code0,dictrec,code0)
 // if (typeof code0!='string'||code0.match(/(^NUMBER$)|(^DATE$)|(^TIME$)|(^PERIOD_OF_YEAR$)|(^PERIOD_OF_TIME$)|(^TIME_OF_DAY$)/))
 // {
 //  alert(exoquote(code0)+' invalid dictionary code')

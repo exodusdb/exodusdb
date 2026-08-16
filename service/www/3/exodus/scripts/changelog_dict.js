@@ -3,7 +3,7 @@
 async function changelog_pop_number(many) {
 
  //no way to return say the last 1000 records, so we request to return all
- return await exodusfilepopup('CHANGELOG',[['NUMBER'],['DATE'],['KEYWORDS'],['TEXT']],0,'BY-DSND NUMBER',many,'',0)
+ return await exofilepopup('CHANGELOG',[['NUMBER'],['DATE'],['KEYWORDS'],['TEXT']],0,'BY-DSND NUMBER',many,'',0)
 }
 
 async function changelog_list() {
@@ -26,7 +26,7 @@ async function dict_CHANGELOG() {
  //di.required=true
  exo_dict_number(di, { decimals: 2 })
  di.validcharacters='1234567890.'
- di.defaultvalue=exodusdate().exoquote()
+ di.defaultvalue=exodate().exoquote()
  di.popup='await changelog_pop_number(true)'
  di.listfunction='await changelog_list()'
  

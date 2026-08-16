@@ -35,7 +35,7 @@ From `~/exodus`:
 
 ```bash
 # Form + client: Alt/Ctrl, F-keys, cancel paths
-rg -n "altKey|ctrlKey|metaKey|keycode ==|F5|F6|F7|F8|F9|F12|preventDefault|exoduscancelevent|history|zoom|accesskey|browser_chrome|scroll_viewport" \
+rg -n "altKey|ctrlKey|metaKey|keycode ==|F5|F6|F7|F8|F9|F12|preventDefault|exocancelevent|history|zoom|accesskey|browser_chrome|scroll_viewport" \
   service/www/3/exodus/scripts/dbform.js \
   service/www/3/exodus/scripts/client.js
 

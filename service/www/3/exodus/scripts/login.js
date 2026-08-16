@@ -24,7 +24,7 @@ async function formfunctions_onload() {
     gsystem = ghref[2]
 
     if (!gsystem)
-        gsystem = exodusgetcookie2('', 'EXODUSsystem',null)
+        gsystem = exogetcookie2('', 'EXODUSsystem',null)
     if (!gsystem || gsystem == 'UNDEFINED')
         gsystem = 'ADAGENCY'
     gsystem = gsystem.toUpperCase()
@@ -92,18 +92,18 @@ async function formfunctions_onload() {
     else {
         //gsystem=ghref[2]
         //if (!gsystem) gsystem='ADAGENCY'
-        datasetcode = exodusgetcookie('EXODUS','dataset')
+        datasetcode = exogetcookie('EXODUS','dataset')
         //guess/default the datasetcode to the first part of the domain name for the first time or after clearing cookies
         if (!datasetcode) {
             //datasetcode = window.location.host.toString().split('.')[0].toUpperCase().substr(0,8)
             datasetcode = window.location.host.toString().split('.')[0]
-            if (typeof exodusgetcookie == 'undefined')
+            if (typeof exogetcookie == 'undefined')
                 datasetcode = datasetcode.substr(0,8).toUpperCase()
         }
-        await exodussetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
-        if (startinglocation != 'login' && exodusgetcookie2('a', 'EXODUS', '') == 'true') {
-            gusername_element.value = exodusgetcookie2('u', 'EXODUS', '')
-            gpassword_element.value = exodusgetcookie2('p', 'EXODUS', '')
+        await exosetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
+        if (startinglocation != 'login' && exogetcookie2('a', 'EXODUS', '') == 'true') {
+            gusername_element.value = exogetcookie2('u', 'EXODUS', '')
+            gpassword_element.value = exogetcookie2('p', 'EXODUS', '')
             if (gusername_element.value && gpassword_element.value) {
                 gautologin_element.checked = true
             }
@@ -113,12 +113,12 @@ async function formfunctions_onload() {
             gpassword_element.value = ''
             gautologin_element.checked = false
         }
-        //if (gautologin_element.checked!=true) exodussetcookie('','EXODUS','','ll',true)
+        //if (gautologin_element.checked!=true) exosetcookie('','EXODUS','','ll',true)
     }
 
     gwaitdiv.style.display = "none"
 
-    exodussettimeout('gusername_element.disabled?gpassword_element.focus():gusername_element.focus()', 100)
+    exosettimeout('gusername_element.disabled?gpassword_element.focus():gusername_element.focus()', 100)
     
     if (gusername_element.disabled) {
         gpassword_element.focus()
@@ -167,7 +167,7 @@ async function passwordreset_onclick(event) {
     //await exoui_showmodaldialog(EXODUSlocation+'passwordreset.htm')
     var usercode = gusername_element.value.toUpperCase()
     if (!usercode) {
-        exodussettimeout('gusername_element.focus()', 100)
+        exosettimeout('gusername_element.focus()', 100)
         gusername_element.focus()
         gusername_element.select()
         return await exoui_invalid('Username is required')
@@ -195,7 +195,7 @@ async function document_onkeydown(event) {
     //Enter or F9 moves on or clicks login — stay in Gate A (do not timeout-spawn)
     if (gkeycode == 13 || gkeycode == 120) {
         await dblogin()
-        return exoduscancelevent(event)
+        return exocancelevent(event)
     }
 
 }
@@ -222,13 +222,13 @@ async function login_onclick() {
     //prevent form being submitted
     //event.cancelBubble=true
     //event.returnValue=false
-    //exoduscancelevent(event)
+    //exocancelevent(event)
 
-    var datasetx = exodusgetdropdown(gdataset_element)
+    var datasetx = exogetdropdown(gdataset_element)
 
 	// Remember the last database logged into if not a test database
     if (datasetx.substr(-5) != '_test')
-       exodussetcookie('EXODUS','dataset',datasetx,'',true)
+       exosetcookie('EXODUS','dataset',datasetx,'',true)
 
     // Ensure login fields are not empty
     if (!gusername_element.value) {
@@ -279,7 +279,7 @@ async function login_onclick() {
         //and multiple logins to the same db with different usernames but only one login per username per database
         //also may exist in ABP LEDGER2 on server in reports to generate drill down code
         glogincode = (datasetx + '*' + gusername_element.value + '*').replace(/ /g,'')
-        exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
+        exosetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
         db.request = 'LOGIN\r' + gusername_element.value + '\r' + gpassword_element.value + '\r' + datasetx + '\r' + authno + '\r' + gsystem + '\r' + gportno + '\rnewpass'
         if (await db.send()) {
@@ -308,13 +308,13 @@ async function login_onclick() {
             }
 
             //permanent
-            exodussetcookie('', 'EXODUS', temp, '', true)
+            exosetcookie('', 'EXODUS', temp, '', true)
 
             //temporary cookie for menu, gcompany etc
-            exodussetcookie(glogincode, 'EXODUS2', db.data)
+            exosetcookie(glogincode, 'EXODUS2', db.data)
 
             //mv.APPLICATION
-            var tt = exodusgetcookie2('ap', '', glogincode)
+            var tt = exogetcookie2('ap', '', glogincode)
             if (tt) {
                 gsystem = tt;
             }
@@ -327,11 +327,11 @@ async function login_onclick() {
             var temp = 'dataset=' + datasetx + '&username=' + gusername_element.value + '&system=' + gsystem
             if (document.protocolcode == 'file') temp += '&password=' + gpassword_element.value
 
-            exodussetcookie(glogincode, 'EXODUS2', temp)
+            exosetcookie(glogincode, 'EXODUS2', temp)
 
             //save gdataset so that opening page knows what database we are in/get cookies for
             //not really necessary since set above now
-            exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
+            exosetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
             //loginalert('default set '+glogincode)
 
             //work out the starting location
@@ -339,12 +339,12 @@ async function login_onclick() {
             if (startinglocation == 'login')
                 startinglocation = ''
             else if (!startinglocation)
-                startinglocation = unescape(exodusgetcookie2('ll', 'EXODUS', ''))
+                startinglocation = unescape(exogetcookie2('ll', 'EXODUS', ''))
             //if (!startinglocation||(window.event&&window.event.shiftKey)) startinglocation=EXODUSlocation+'users.htm'
             // Shift+skip uses window.event when present
             if (!startinglocation || (window.event && window.event.shiftKey)) {
                 startinglocation = EXODUSlocation
-                if (exodusgetcookie2('m').split(',')[0] == 'TIMESHEETS')
+                if (exogetcookie2('m').split(',')[0] == 'TIMESHEETS')
                     startinglocation += '../jobs/timesheets.htm'
                 else
                     startinglocation = EXODUSlocation + 'users.htm'
@@ -386,8 +386,8 @@ async function login_onclick() {
                 var choice=await exoui_invalid(db.response.split('|').join('\n'))
             }
             if (choice == 2) {
-                //exodussettimeout('gpasswordreset_button.click()',100)
-                exodussettimeout('gpasswordreset_link.click()',100)
+                //exosettimeout('gpasswordreset_button.click()',100)
+                exosettimeout('gpasswordreset_link.click()',100)
             } else {
                 gpassword_element.focus()
                 gpassword_element.select()
@@ -404,7 +404,7 @@ async function login_onclick() {
 async function hidepassword(chainexpression) {
     if (gsavedpasswordelement) {
         showpassword_sync()
-        exodussettimeout(chainexpression,1)
+        exosettimeout(chainexpression,1)
         return true
     }
     return false

@@ -46,7 +46,7 @@ async function dict_WHATSNEW() {
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',3)
  exo_dict_date(di,'FROM=FROM_DATE')
- di.defaultvalue=exodusdate().exooconv('[DATE]')
+ di.defaultvalue=exodate().exooconv('[DATE]')
   
  di=dict[++din]=dictrec('COMPANY_CODE', 'F',4)
  di.defaultvalue=gcompanycode.exoquote()
