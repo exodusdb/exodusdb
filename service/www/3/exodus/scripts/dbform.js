@@ -5664,7 +5664,8 @@ async function opendoc_body(newkey) {
             newkey1 = newkey
         else
             newkey1 = newkey[0]
-        var sepchar = gKeyNodes[0].exoduskeypart ? '*' : gKeyNodes[0].exoduswordsep
+        // dict attrs via Attribute API (not expandos — cloneNode keeps attributes only)
+        var sepchar = gKeyNodes[0].getAttribute('exoduskeypart') ? '*' : gKeyNodes[0].getAttribute('exoduswordsep')
         if (sepchar && newkey1.split(sepchar).length != gKeyNodes.length) {
             systemerror('opendoc', newkey1.exodusquote() + ' does not have the correct number of key parts (' + gKeyNodes.length + ')')
             return false
