@@ -213,7 +213,7 @@
         <p>
         </p>
         <h3>
-            exodusdblink</h3>
+            exodblink</h3>
         <p>
             This is the basic&nbsp;object used&nbsp;to send and receive&nbsp;requests, responses
             and&nbsp;data&nbsp;to and from&nbsp;the server.</p>
@@ -226,17 +226,17 @@
         <p>
         </p>
         <p>
-            exodusdblink.request - request string to be sent to the server<br />
+            exodblink.request - request string to be sent to the server<br />
         </p>
         <p>
         </p>
         <p>
-            exodusdblink.response - returned from the server
+            exodblink.response - returned from the server
         </p>
         <p>
         </p>
         <p>
-            exodusdblink.data - returned from the server
+            exodblink.data - returned from the server
         </p>
         <p>
         </p>
@@ -245,20 +245,20 @@
         <p>
         </p>
         <p>
-            exodusdblink.send(datastring)
+            exodblink.send(datastring)
         </p>
         <p>
-            exodusdblink.login(username,password,dataset,system)</p>
+            exodblink.login(username,password,dataset,system)</p>
         <p>
             see also function* dblogout()</p>
         <h4>
             Example JavaScript</h4>
         <blockquote dir="ltr" style="margin-right: 0px">
             <p>
-                var exodusdblink1=new exodusdblink()<br />
-                exodusdblink1.request="TEST"<br />
-                if (!(exodusdblink1("DUMMYDATA"))) return await exoui_invalid(db.response)<br />
-                alert(exodusdblink1.data)
+                var exodblink1=new exodblink()<br />
+                exodblink1.request="TEST"<br />
+                if (!(exodblink1("DUMMYDATA"))) return await exoui_invalid(db.response)<br />
+                alert(exodblink1.data)
             </p>
         </blockquote>
         <h4>
@@ -374,7 +374,7 @@
             WRITEU leaves the record locked with the same sessionid whereas WRITE automatically
             unlocks it after calling the custom postwrite routine if any.</p>
         <p>
-            The record data is passed in the exodusdblink.send(data) parameter.</p>
+            The record data is passed in the exodblink.send(data) parameter.</p>
         <p>
             There are no security checks as the <em>sessionid </em>indicates that security was
             checked already on READU<br />
@@ -571,7 +571,7 @@
         <p>
             For EXODUS forms the main form data is automatically&nbsp;available as the global
             variable <strong>gds. </strong>You&nbsp;may create your own <em>exodus_obj_source</em>
-            objects if you wish but the <em>exodusrecord</em> object is&nbsp;simpler to use.&nbsp;The
+            objects if you wish but the <em>exorecord</em> object is&nbsp;simpler to use.&nbsp;The
             very simple <em>await array.exoread() </em>method can be used to obtain records from
             the server in a simple array object.</p>
         <p>

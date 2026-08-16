@@ -566,7 +566,7 @@ async function sessionkeepalive() {
 	//call server if time to keep alive
 	var time = new Date
 	if (time >= nextconnection && typeof db != 'undefined') {
-		var tempdb = new exodusdblink()
+		var tempdb = new exodblink()
 		tempdb.request = 'KEEPALIVE'
 		await tempdb.send()
 		exodus_flight_log('keepalive SEND')
@@ -835,8 +835,8 @@ var g_exodus_waitcancel_n = 0
 function dbsend_cancel_xhttp(requestid) {
 
 	// CANCEL with request id, or bare CANCEL (xhttp resolves id from session _active_xhttp).
-	// Separate exodusdblink + fire-and-forget: must not use main db or enter Gate A.
-	var canceldb = new exodusdblink()
+	// Separate exodblink + fire-and-forget: must not use main db or enter Gate A.
+	var canceldb = new exodblink()
 	canceldb.request = requestid ? ('CANCEL\r' + requestid) : 'CANCEL'
 	exofireandforget(canceldb.send(), 'dbsend_cancel_xhttp')
 }
@@ -2235,8 +2235,8 @@ async function clientfunctions_windowonload() {
 
 	await clientfunctions_getglobals()
 
-	db = new exodusdblink
-	//gusername is set in exodusdblink
+	db = new exodblink
+	//gusername is set in exodblink
 
 	//In case previous window didnt successfully unlock its record in onbeforeunload
 	//Could be turned off hoping synchronous unlock in window_onunload is sufficiently reliable
@@ -2698,13 +2698,13 @@ async function exofilepopup(filename, cols, coln, sortselectionclause, many, fil
 //////////////////////
 
 //similar function in xhttp.asp
-function exodusdblink() {
+function exodblink() {
 
 	this.request = ''
 	this.data = ''
 	this.response = ''
 	this.documentprotocolcode = document.protocolcode
-	this.login = exodusdblink_login
+	this.login = exodblink_login
 
 	//maybe preset by php in some heading script
 
@@ -2727,7 +2727,7 @@ function exodusdblink() {
 		// native XMLHttpRequest
 		try {
 			this.XMLHTTP = new XMLHttpRequest()
-			this.send = exodusdblink_send_byhttp_using_xmlhttp
+			this.send = exodblink_send_byhttp_using_xmlhttp
 			return
 		}
 		catch (e) { }
@@ -2735,12 +2735,12 @@ function exodusdblink() {
 		// ActiveX XMLHTTP fallback
 		try {
 			this.XMLHTTP = new ActiveXObject('Microsoft.XMLHTTP')
-			this.send = exodusdblink_send_byhttp_using_xmlhttp
+			this.send = exodblink_send_byhttp_using_xmlhttp
 		}
 
 		//asp forms
 		catch (e) {
-			this.send = exodusdblink_send_byhttp_using_forms
+			this.send = exodblink_send_byhttp_using_forms
 		}
 
 		return
@@ -2760,8 +2760,8 @@ function exodusdblink() {
 		this.timeout = defaulttimeoutmins * 60 * 1000
 
 
-	this.send = exodusdblink_send_byfile
-	this.start = exodusdblink_startdb
+	this.send = exodblink_send_byfile
+	this.start = exodblink_startdb
 
 	try {
 		gfso = new ActiveXObject('Scripting.FileSystemObject')
@@ -2807,10 +2807,10 @@ async function dblogout() {
 
 }
 
-async function exodusdblink_login(username, password, dataset, system) {
+async function exodblink_login(username, password, dataset, system) {
 
 	//get list of datasets from server
-	var logindb = new exodusdblink
+	var logindb = new exodblink
 	var datasets = ''
 
 	if (!dataset && gdataset)
@@ -2959,10 +2959,10 @@ async function exodusdblink_login(username, password, dataset, system) {
 	}
 }
 
-async function exodusdblink_send_byhttp_using_forms(data) {
+async function exodblink_send_byhttp_using_forms(data) {
 
 	//log(this.request)
-	//alert('exodusdblink_send_byhttp_using_forms\n...\n'+this.request+'\n...\n'+ data)
+	//alert('exodblink_send_byhttp_using_forms\n...\n'+this.request+'\n...\n'+ data)
 	this.data = data ? data : ''
 
 	//request is required
@@ -3045,7 +3045,7 @@ async function exodusdblink_send_byhttp_using_forms(data) {
 
 var gxhttp
 
-async function exodusdblink_send_byhttp_using_xmlhttp(data) {
+async function exodblink_send_byhttp_using_xmlhttp(data) {
 
 	//log(this.request)
 
@@ -3204,7 +3204,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 					}
 				};
 				xhttp.onerror = function (e) {
-					const detail = 'ERROR exodusdblink_send_byhttp_using_xmlhttp ' + (xhttp.status || '0') + ' ' + (xhttp.statusText || 'network error');
+					const detail = 'ERROR exodblink_send_byhttp_using_xmlhttp ' + (xhttp.status || '0') + ' ' + (xhttp.statusText || 'network error');
 					console.error(detail);
 					if (self) {
 						self.response = detail;
@@ -3217,7 +3217,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 					resolve(detail);
 				};
 				xhttp.ontimeout = function () {
-					const detail = 'TIMEOUT exodusdblink_send_byhttp_using_xmlhttp ' + thisrequest;
+					const detail = 'TIMEOUT exodblink_send_byhttp_using_xmlhttp ' + thisrequest;
 					console.error(detail);
 					if (self) {
 						self.response = detail;
@@ -3226,7 +3226,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 					resolve(detail);
 				};
 				xhttp.onabort = function (e) {
-					const detail = 'ABORT exodusdblink_send_byhttp_using_xmlhttp ' + (xhttp.statusText || '');
+					const detail = 'ABORT exodblink_send_byhttp_using_xmlhttp ' + (xhttp.statusText || '');
 					console.error(detail);
 					xhttpaborted = true
 					if (self) {
@@ -3349,7 +3349,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
 			dbmodalblocked = false
 
 			// The transport signal (result) is 'ok' on success path or a descriptive
-			// string (e.g. "ERROR exodusdblink...") on network failure. We still largely
+			// string (e.g. "ERROR exodblink...") on network failure. We still largely
 			// ignore the signal value itself (original code did too) and rely on:
 			// - xhttp.responseXML / responseText for normal responses
 			// - this.response having been populated in the XHR error handlers above
@@ -7564,10 +7564,10 @@ function systemerror(functionname, e) {
 	// Send OK → friendly "support informed"; fail → alert full technical text.
 	return (async function systemerror_report_and_alert() {
 		var reported = false
-		if (!gexodus_reporting_system_error && !gonunload && typeof exodusdblink == 'function') {
+		if (!gexodus_reporting_system_error && !gonunload && typeof exodblink == 'function') {
 			gexodus_reporting_system_error = true
 			try {
-				var reportdb = new exodusdblink()
+				var reportdb = new exodblink()
 				reportdb.request = 'EXECUTE\rGENERAL\rSYSTEM_ERROR'
 				// data = full technical text; xhttp.php hijacks this request (not listen)
 				reported = !!(await reportdb.send(technical))

@@ -77,7 +77,7 @@ function getexodusrootpath(documentlocation) {
 function xlog() {
 }
 
-function exodusdblink_send_byfile(data) {
+function exodblink_send_byfile(data) {
 
     if (typeof gfso == 'undefined' || !gfso) return
 
@@ -208,7 +208,7 @@ function exodusdblink_send_byfile(data) {
                 // Session('password') = this.password
                 // Session('dataset') = this.dataset
                 // Session('system') = this.system
-                //to be restored as follows in the 'on server' version of exodusdblink
+                //to be restored as follows in the 'on server' version of exodblink
             }
         }
 
@@ -617,7 +617,7 @@ function exodusdblink_send_byfile(data) {
 //then returns 'OK' or someother message to indicate failure
 //negative response would be bad username, password or dataset
 ///////////////////////////////////////////////////////////////
-function exodusdblink_startdb() {
+function exodblink_startdb() {
 
     var cannotfinddatabaseresponse = 'ERROR: SERVER CONFIGURATION ERROR - CANNOT FIND DATABASE ON SERVER'.toUpperCase()
     if (this.exodusrootpath == null) {
@@ -720,7 +720,7 @@ function exodusdblink_startdb() {
     var responsefilename = proglocation + this.localhostname + '.$2'
 
     //delete the response file
-    if (!(osdelete(responsefilename, 'exodusdblink_startdb init'))) {
+    if (!(osdelete(responsefilename, 'exodblink_startdb init'))) {
         //throw(e)
         this.response = gmsg
         return false
@@ -765,7 +765,7 @@ function exodusdblink_startdb() {
             file.Close()
 
             //delete the response file
-            if (!(osdelete(responsefilename, 'exodusdblink_startdb exit'))) {
+            if (!(osdelete(responsefilename, 'exodblink_startdb exit'))) {
                 //throw(e)
                 this.response = gmsg
                 return false

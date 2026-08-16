@@ -916,7 +916,7 @@ async function formfunctions_onload() {
 
     var dictfunctionname = 'dict_' + gdictfilename
     var dictarray = await exoevaluate(dictfunctionname + '(gparameters)', 'formfunctions_onload');
-    gro = new exodusrecord(dictarray, gdatafilename)
+    gro = new exorecord(dictarray, gdatafilename)
 
     gds.dict = gro.dict
 
@@ -6507,8 +6507,8 @@ var gform_oninput_delegated = false
 var gform_typeahead_db = null
 
 function form_typeahead_dblink() {
-    if (!gform_typeahead_db && typeof exodusdblink == 'function') {
-        gform_typeahead_db = new exodusdblink()
+    if (!gform_typeahead_db && typeof exodblink == 'function') {
+        gform_typeahead_db = new exodblink()
         // Quiet: no blockmodalui on send (avoids scroll-to-top every key)
         gform_typeahead_db.quiet = true
         // Typeahead I/O is client-cacheable by full request string (gcache cleared
@@ -7712,7 +7712,7 @@ async function relockdoc() {
 
     grelockingdoc = true
 
-    var relockdb = new exodusdblink()
+    var relockdb = new exodblink()
     relockdb.request = 'RELOCK\r' + gdatafilename + '\r' + gkey + '\r' + gro.sessionid + '\r' + glocktimeoutinmins
     //document.bgcolor='green'
     var result

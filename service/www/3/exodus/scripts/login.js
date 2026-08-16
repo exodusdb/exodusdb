@@ -34,7 +34,7 @@ async function formfunctions_onload() {
     //+'; path=/'
     //expires=Sun, 31 Dec 2100 23:59:59 GMT'
 
-    db = new exodusdblink
+    db = new exodblink
 
     gusername_element = $$('usernameelement')
     gpassword_element = $$('passwordelement')
@@ -264,7 +264,7 @@ async function login_onclick() {
 
     while (true) {
 
-        var db = new exodusdblink
+        var db = new exodblink
         //  db.system=gsystem
 
         ghref = document.location.href.split('?')

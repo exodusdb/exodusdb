@@ -553,7 +553,7 @@ function exo_dict_code(di) {
  di.exostyle = 'code'
 }
 
-function exodusrecord(dictarray,filename) {
+function exorecord(dictarray,filename) {
 
  this.dict=dictarray
  this.filename=filename
@@ -563,7 +563,7 @@ function exodusrecord(dictarray,filename) {
  this.defaultrevstr=''
  this.data=null
  this.readenvironment=''
- this.dictitem=exodusrecord_dictitem
+ this.dictitem=exorecord_dictitem
  this.dict.groups=[]
  this.dict.fieldandwordns=[]
  this.dict.fieldnos=new Object//not [] otherwise dictitem() finds array properties
@@ -718,7 +718,7 @@ function exodusrecord(dictarray,filename) {
         if (e.description)
             msg+=e.description
         msg+='\n\n'+functioncode
-        return systemerror('exodusrecord()',msg)
+        return systemerror('exorecord()',msg)
     }
    }
    
@@ -753,7 +753,7 @@ function exodusrecord(dictarray,filename) {
 
 //READU
 ////////
-exodusrecord.prototype.readu=async function exodusrecord_readu() {
+exorecord.prototype.readu=async function exorecord_readu() {
 
  //gets lock if possible and reads
  return /**/ await this.read(true)
@@ -761,7 +761,7 @@ exodusrecord.prototype.readu=async function exodusrecord_readu() {
 
 //READ
 //////
-exodusrecord.prototype.read=async function exodusrecord_read(withlock) {
+exorecord.prototype.read=async function exorecord_read(withlock) {
  
  this.sessionid=''
  this.data=null
@@ -796,7 +796,7 @@ exodusrecord.prototype.read=async function exodusrecord_read(withlock) {
 
 //used after read (and write with a new record)
 //to process the response and data into key and obj
-exodusrecord.prototype.postread=function exodusrecord_postread() {
+exorecord.prototype.postread=function exorecord_postread() {
 
  //save the record string
  this.revstr=db.data
@@ -843,7 +843,7 @@ exodusrecord.prototype.postread=function exodusrecord_postread() {
  
 //WRITEU
 ////////
-exodusrecord.prototype.writeu=async function exodusrecord_writeu() {
+exorecord.prototype.writeu=async function exorecord_writeu() {
 
  //writes and unlocks
  return /**/ await this.writex(true)
@@ -851,7 +851,7 @@ exodusrecord.prototype.writeu=async function exodusrecord_writeu() {
 
 //WRITE
 ////////
-exodusrecord.prototype.write=async function exodusrecord_write() {
+exorecord.prototype.write=async function exorecord_write() {
 
  //writes and leaves lock (zzz is this implemented in DOS LISTEN yet?)
  return /**/ await this.writex(false)
@@ -859,7 +859,7 @@ exodusrecord.prototype.write=async function exodusrecord_write() {
 
 //WRITEX
 ////////
-exodusrecord.prototype.writex=async function exodusrecord_writex(withunlock) {
+exorecord.prototype.writex=async function exorecord_writex(withunlock) {
 
  if (no(this.data)) {
   this.response="data not defined in writex"
@@ -909,7 +909,7 @@ exodusrecord.prototype.writex=async function exodusrecord_writex(withunlock) {
 
  //REV2OBJ
  /////////
- exodusrecord.prototype.rev2obj=function exodusrecord_rev2obj() {
+ exorecord.prototype.rev2obj=function exorecord_rev2obj() {
 
   //returns this.data and 1 ... or 0
   
@@ -1022,7 +1022,7 @@ exodusrecord.prototype.writex=async function exodusrecord_writex(withunlock) {
           //if (temp.charCodeAt(0)==0)
           if (temp.indexOf(String.fromCharCode(0))>=0) {
 
-           systemerror('exodusrecord_rev2obj()','char(0) in data from server in '+name+' length:'+temp.length)
+           systemerror('exorecord_rev2obj()','char(0) in data from server in '+name+' length:'+temp.length)
            return 0
           }
          
@@ -1072,7 +1072,7 @@ function addfield(rec,fieldname,fieldtext) {
 
  //OBJ2REV
  /////////
- exodusrecord.prototype.obj2rev=function exodusrecord_obj2rev() {
+ exorecord.prototype.obj2rev=function exorecord_obj2rev() {
  
   //uses the dictionary to convert the object into a single revelation string in revstr
 
@@ -1250,7 +1250,7 @@ function addfield(rec,fieldname,fieldtext) {
 
 }
 
-function exodusrecord_dictitem(dictitemname)
+function exorecord_dictitem(dictitemname)
 //given a dictionary item name, returns a single dictionary item
 // if not found then return ''
 {
@@ -1403,7 +1403,7 @@ async function reado(filename,key,fieldno) {
  //var nvalues=group.length
 
 //function to clear all values that are not copyable (ie status fields)
-exodusrecord.prototype.initialise=function exodusrecord_initialise(row) {
+exorecord.prototype.initialise=function exorecord_initialise(row) {
 
  if (!row) row=this.data
  

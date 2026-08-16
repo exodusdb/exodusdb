@@ -538,7 +538,7 @@ async function gds_setx2(cells, values, forced) {
 
 //LOAD
 //////
-async function gds_load(exodusrecordobject1) {
+async function gds_load(exorecordobject1) {
     //alert('gds_load')
     //login('load')
 
@@ -549,11 +549,11 @@ async function gds_load(exodusrecordobject1) {
         /**/ await this.onreadystatechange()
 
     //grab the dict and dictitem method
-    this.dict = exodusrecordobject1.dict
-    this.dictitem = exodusrecordobject1.dictitem
+    this.dict = exorecordobject1.dict
+    this.dictitem = exorecordobject1.dictitem
     
     //bind newdatasource to the HTML screen
-    this.data = exodusrecordobject1.data
+    this.data = exorecordobject1.data
     /**/ await this.bind(this.data, '', 0)
 
     //trigger completion event

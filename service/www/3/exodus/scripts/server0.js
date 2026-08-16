@@ -9,10 +9,10 @@ async function debug(msg,end) {
  if (end) Response.End()
 }
 
-db=new exodusdblink
+db=new exodblink
 
-//see also exodusdblink in client.js for file access
-function exodusdblink() {
+//see also exodblink in client.js for file access
+function exodblink() {
  
  this.request=''
  this.data=''
@@ -38,8 +38,8 @@ function exodusdblink() {
  //used in cache
  gdataset=this.dataset
  
- this.send = exodusdblink_send_byfile
- this.start = exodusdblink_startdb
+ this.send = exodblink_send_byfile
+ this.start = exodblink_startdb
  this.documentprotocolcode='HTTP'
  
  gfso = new ActiveXObject('Scripting.FileSystemObject')

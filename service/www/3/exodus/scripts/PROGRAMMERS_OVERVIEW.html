@@ -84,7 +84,7 @@
 <h2>1. Overview and Architecture</h2>
 
 <ul>
-    <li><strong>Core file:</strong> <code>client.js</code> — Must be included <strong>first</strong>. Core globals, Gate A/B, <code>exodusdblink</code>, <code>exoui_showmodaldialog</code>, security, cookies, utilities, string/array prototypes.</li>
+    <li><strong>Core file:</strong> <code>client.js</code> — Must be included <strong>first</strong>. Core globals, Gate A/B, <code>exodblink</code>, <code>exoui_showmodaldialog</code>, security, cookies, utilities, string/array prototypes.</li>
     <li><strong>Form automation:</strong> <code>dbform.js</code> + helpers in <code>db.js</code> — Dictionary-driven (<code>dict_*</code>) CRUD forms, MV groups, validation, buttons.</li>
     <li><strong>Communication bridge:</strong> <code>xhttp.php</code> (and .asp variants). Client sends XML (<code>&lt;token&gt;</code>, <code>&lt;request&gt;</code>, <code>&lt;data&gt;</code>); bridge writes temp files; backend processes and responds via <code>.1</code>/<code>.2</code>/<code>.3</code> files.</li>
     <li><strong>Async model (Gate A):</strong> Event handlers and deferred async work enter via <code>exodus_begin</code> (exclusive owner; <code>g_exodus_flow_queue_max = 0</code> means <strong>no queuing</strong> — second start while airborne is <strong>skipped</strong>). Prefer <code>async function myfunc() { ... await someOperation() ... }</code> and <code>await</code> inside the same flight. Do <strong>not</strong> start free-floating async that does DB/UI work.</li>
@@ -254,7 +254,7 @@ exoui_windowclose(['multiple', 'values']);
 
 <h2>4. Database Access</h2>
 
-<pre><code>var db = new exodusdblink();   // auto-picks XMLHTTP or file mode
+<pre><code>var db = new exodblink();   // auto-picks XMLHTTP or file mode
 
 db.request = 'EXECUTE\rGENERAL\rMYCOMMAND\rparam1\rparam2';
 db.data    = 'optional payload (multivalue ok)';

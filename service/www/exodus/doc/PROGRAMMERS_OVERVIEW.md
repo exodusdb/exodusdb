@@ -18,7 +18,7 @@ The framework originated in an era of older browsers and cooperative generators;
 
 ## 1. Overview and Architecture
 
-- **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodusdblink`, `exoui_showmodaldialog`, security, cookies, utilities, string/array prototypes.
+- **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodblink`, `exoui_showmodaldialog`, security, cookies, utilities, string/array prototypes.
 - **Form automation:** `dbform.js` + helpers in `db.js` — Dictionary-driven (`dict_*`) CRUD forms, MV groups, validation, buttons.
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
 - **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is a **visible `systemerror`**, not a silent skip). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work. Avoid parallel starts at the source (check `g_exodus_flow` / use `exodus_begin_if_idle` for optional work).
@@ -196,14 +196,14 @@ Key functions:
 
 Dialogs are the primary navigation/composition mechanism.
 
-## 4. Database Access (`exodusdblink` / XMLHTTP)
+## 4. Database Access (`exodblink` / XMLHTTP)
 
-`client.js` provides `exodusdblink`: browser pages set `db.request` (and optional `db.data`), then `await db.send()`. Transport is XMLHTTP to `scripts/xhttp.php` in normal browser mode (file mode is legacy).
+`client.js` provides `exodblink`: browser pages set `db.request` (and optional `db.data`), then `await db.send()`. Transport is XMLHTTP to `scripts/xhttp.php` in normal browser mode (file mode is legacy).
 
 **Field separators are the real CR character** (ASCII 13). In JS source that is the two-character escape `\r` inside a string literal:
 
 ```js
-var db = new exodusdblink();   // auto-picks XMLHTTP or file mode
+var db = new exodblink();   // auto-picks XMLHTTP or file mode
 
 // Real CR between fields — not the two characters backslash + "r"
 db.request = 'EXECUTE\rGENERAL\rMYCOMMAND\rparam1\rparam2';
@@ -245,11 +245,11 @@ On success `db.send()` is truthy; `db.data` holds the body (often XML for SELECT
    - **No** — full-page `index.html`, return false (async unwind; no `force_an_exit` throw under evaluate). Post-login start is index logic (often `users.htm`), not return-to-form.
 3. Typeahead `quiet` = no modal **shield** per keystroke only — **not** skip reauth or skip handling `!send` after fail.
 
-**Typeahead parallel dblink:** uniquely uses a **private** `exodusdblink` (`form_typeahead_dblink` / `gform_typeahead_db`) so client-side main `db`/`gds` is not blocked by keystroke I/O. It still shares the **same PHP session cookie**. PHP would serialize concurrent requests on that session unless `xhttp.php` releases the lock early (`session_write_close()` before the long `.1` poll for non-LOGIN). So typeahead and main-channel traffic are **queued/interlaced on the server** under one session identity — parallel client channels, not a separate login. Reauth and failure paths stay universal.
+**Typeahead parallel dblink:** uniquely uses a **private** `exodblink` (`form_typeahead_dblink` / `gform_typeahead_db`) so client-side main `db`/`gds` is not blocked by keystroke I/O. It still shares the **same PHP session cookie**. PHP would serialize concurrent requests on that session unless `xhttp.php` releases the lock early (`session_write_close()` before the long `.1` poll for non-LOGIN). So typeahead and main-channel traffic are **queued/interlaced on the server** under one session identity — parallel client channels, not a separate login. Reauth and failure paths stay universal.
 
 **Hard case (one Gate A):** Resume confirm / modal login are interactive UI **nested under** `await db.send` (and often typeahead → evaluate), with automatic retry. Confirm/modal depth and orphan force-cancel looking like No are real risks. Prefer fixing call sites and failure paths over a second gate or silent swallow.
 
-Code: `client.js` — `exodusdblink_login`, both send transports’ `Please login` branches; typeahead `form_typeahead_dblink()`; `xhttp.php` session release.
+Code: `client.js` — `exodblink_login`, both send transports’ `Please login` branches; typeahead `form_typeahead_dblink()`; `xhttp.php` session release.
 
 Cookies are used heavily for dataset, username, globals (`exogetcookie2`, `exosetcookie`).
 
