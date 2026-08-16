@@ -7,8 +7,8 @@ async function form_postinit() {
 }
 
 async function form_postdisplay() {
-    showhide('databasesection', (!gexodus_server && (await gds.getall('SCOPE'))=='SYSTEM.CFG'))
-    showhide(['backupsection','old_server'], !gexodus_server)
+    showhide('databasesection', (!gexo_server && (await gds.getall('SCOPE'))=='SYSTEM.CFG'))
+    showhide(['backupsection','old_server'], !gexo_server)
     return true
 }
 

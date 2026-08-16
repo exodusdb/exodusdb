@@ -1169,9 +1169,9 @@ function colors_popup_create() {
 		return b
 	}
 	// Order: OK (positive/F9/Ctrl+Enter) · Default (F8) · Cancel (Esc) — like exoui_confirm
-	var btnOk = mkBtn('OK', 'exodus-color-popup-ok', 'O', 'F9 or Ctrl+Enter')
-	var btnClear = mkBtn('Default', 'exodus-color-popup-clear', 'D', 'F8')
-	var btnCancel = mkBtn('Cancel', 'exodus-color-popup-cancel', 'C', 'Esc')
+	var btnOk = mkBtn('OK', 'exocolor-popup-ok', 'O', 'F9 or Ctrl+Enter')
+	var btnClear = mkBtn('Default', 'exocolor-popup-clear', 'D', 'F8')
+	var btnCancel = mkBtn('Cancel', 'exocolor-popup-cancel', 'C', 'Esc')
 	row.appendChild(btnOk)
 	row.appendChild(btnClear)
 	row.appendChild(btnCancel)

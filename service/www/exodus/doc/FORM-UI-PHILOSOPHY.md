@@ -71,13 +71,13 @@ When a line appears “under” an embedded group, inspect the **parent outer `<
 
 ### Multivalue rows: do not attach listeners to group fields
 
-`gds.addrow` / `insertrow` / `bindgroup` build lines with **`cloneNode(true)`**. That copies **attributes** (`exodusfieldno`, `exodusonchange`, `exoui_popup`, …) but **not** `addEventListener` handlers.
+`gds.addrow` / `insertrow` / `bindgroup` build lines with **`cloneNode(true)`**. That copies **attributes** (`exofieldno`, `exoonchange`, `exoui_popup`, …) but **not** `addEventListener` handlers.
 
 **Do not** wire product or framework behaviour only via per-element listeners on `groupno > 0` fields in `formfunctions_onload` — after insert/delete/Ctrl+D the new row looks bound but silent.
 
 **Prefer (in order):**
 
-1. **Document / table delegation** — one listener; filter on attributes (e.g. `form_oninput` on `document` for fields with `exodusfieldno` / `exodusonchange`).
+1. **Document / table delegation** — one listener; filter on attributes (e.g. `form_oninput` on `document` for fields with `exofieldno` / `exoonchange`).
 2. **Attributes + existing form path** — `exo_onclick`, `exoui_popup`, dict `validation` / `onchange` already re-read from the element.
 3. **Reattach in `setupnewrow` only if unavoidable** — that is the clone seam; keep it tiny and attribute-driven.
 

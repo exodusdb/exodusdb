@@ -729,7 +729,7 @@ function exorecord(dictarray,filename) {
     validation=globalfunctionname+'()'
    }
 
-   // live find-as-you-type → store string expression (copydictitem → exodusonchange)
+   // live find-as-you-type → store string expression (copydictitem → exoonchange)
    if (typeof onchange == 'function') {
 
     var globalonchangename=filename+'_'+name+'_onchange'

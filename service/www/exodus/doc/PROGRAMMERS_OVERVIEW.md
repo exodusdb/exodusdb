@@ -21,10 +21,10 @@ The framework originated in an era of older browsers and cooperative generators;
 - **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodblink`, `exoui_showmodaldialog`, security, cookies, utilities, string/array prototypes.
 - **Form automation:** `dbform.js` + helpers in `db.js` — Dictionary-driven (`dict_*`) CRUD forms, MV groups, validation, buttons.
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
-- **Async model (Gate A):** Event handlers and deferred async work enter via `exo_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is a **visible `systemerror`**, not a silent skip). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work. Avoid parallel starts at the source (check `g_exodus_flow` / use `exo_begin_if_idle` for optional work).
+- **Async model (Gate A):** Event handlers and deferred async work enter via `exo_begin` (exclusive owner; `g_exo_flow_queue_max = 0` means **no queuing** — second start while airborne is a **visible `systemerror`**, not a silent skip). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work. Avoid parallel starts at the source (check `g_exo_flow` / use `exo_begin_if_idle` for optional work).
 - **Wait/Cancel (Gate B):** Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on `db.send` XHR. No main-line form dbio from Gate B.
 - **Public commencement API (only three):** `exo_begin` (business), `exo_begin_if_idle` (background), `exo_begin_waitcancel` (Wait/Cancel). No fourth entry path. `startAsyncFlow` is a deprecated alias of `exo_begin`.
-- **Flight log:** Quiet by default. Enable with `?logflights=1` or `glogflights=true` in the console (`[exodus flight] TAKEOFF|LANDING|SKIP|…`).
+- **Flight log:** Quiet by default. Enable with `?logflights=1` or `glogflights=true` in the console (`[exo flight] TAKEOFF|LANDING|SKIP|…`).
 - **No generators:** `function*` / `yield*` are not supported. Use `async`/`await` only. Accidental generators fail with `systemerror` (stage 6).
 - **UI conventions:** Modal dialogs, `class="exoform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
@@ -148,9 +148,9 @@ async function save_onclick() {
 - Bare call of an async function **without** `await` is a bug (you get a Promise, not a result).
 - Nested `await` inside one flight is correct; a second *commencement* while busy is a **bug signal** (`queue_max = 0` → `systemerror` dialog). Do not treat that dialog as something to silence in Gate A — stop initiating the second start.
 
-DOM events, HTM `*_sync` bridges, and deferred work all enter **Gate A** (`exo_begin`). Nested `await` stays on that one flight. `g_exodus_flow_queue_max` is wait-list capacity only: **0 = no queuing** (current); raise later if multi-flight wait is wanted.
+DOM events, HTM `*_sync` bridges, and deferred work all enter **Gate A** (`exo_begin`). Nested `await` stays on that one flight. `g_exo_flow_queue_max` is wait-list capacity only: **0 = no queuing** (current); raise later if multi-flight wait is wanted.
 
-**Parallel starts:** avoid at the source. Capture/sync code outside a flight must not call `exo_begin` while `g_exodus_flow` is set (return/ignore, or use `exo_begin_if_idle` / `exo_begin_when_idle`). Gate A does **not** quietly drop conflicting takeoffs — races surface as error messages on purpose so bad call sites get fixed.
+**Parallel starts:** avoid at the source. Capture/sync code outside a flight must not call `exo_begin` while `g_exo_flow` is set (return/ignore, or use `exo_begin_if_idle` / `exo_begin_when_idle`). Gate A does **not** quietly drop conflicting takeoffs — races surface as error messages on purpose so bad call sites get fixed.
 
 Optional background work (session keepalive, relock) uses `exo_begin_if_idle` — **skip** if busy (never uses the queue).
 

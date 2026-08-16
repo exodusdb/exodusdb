@@ -287,8 +287,8 @@ Array.prototype.exomultiply = function (array2) {
 }
 
 //function exodivide()
-Array.prototype.exodivide = arrayexodusdivide
-function arrayexodusdivide(array2, divzero) {
+Array.prototype.exodivide = arrayexodivide
+function arrayexodivide(array2, divzero) {
     var results = []
     var nn = this.length
     var isarray = typeof array2 == 'object'
@@ -1241,8 +1241,8 @@ function exodate(year, month, day) {
 
 }
 
-String.prototype.exoiconv = stringexodusiconv
-function stringexodusiconv(conversion) {
+String.prototype.exoiconv = stringexoiconv
+function stringexoiconv(conversion) {
     return exoiconv(this.toString(), conversion)
 }
 
@@ -1250,9 +1250,9 @@ function exoiconv(value, conversion) {
     return exoconv('ICONV', value, conversion)
 }
 
-String.prototype.exooconv = stringexodusoconv
-Number.prototype.exooconv = stringexodusoconv
-function stringexodusoconv(conversion) {
+String.prototype.exooconv = stringexooconv
+Number.prototype.exooconv = stringexooconv
+function stringexooconv(conversion) {
     return exooconv(this.toString(), conversion)
 }
 

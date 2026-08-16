@@ -30,7 +30,7 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //   pure DATE — measure "11/11/1111"
 //   period   — measure "11/1111" (PERIOD_OF_YEAR / YEAR_PERIOD / FINANCIAL_PERIOD)
 //   "8"  digit-ish — TIME / DATE_TIME
-//   "0"  average  — exoduslowercase is set and not "false"
+//   "0"  average  — exolowercase is set and not "false"
 //   "M"  max char — other INPUTs
 //
 // =============================================================================
@@ -341,7 +341,7 @@ function form_glue_name_to_prev_code_chrome(nameEl) {
         return
     // Prior sibling is F7/F6 chrome wrap (icons and/or pad slots)
     if (!prev.querySelector
-        || !prev.querySelector('[isexoduspopup="1"], [isexoduslink="1"], .exofieldchrome-pad'))
+        || !prev.querySelector('[isexopopup="1"], [isexolink="1"], .exofieldchrome-pad'))
         return
     // Keep name on the flex line; allow shrink when the cell is tight
     if (nameEl.style.display === 'block')
@@ -580,17 +580,17 @@ function form_formbuttons_place() {
 function form_place_menubar_session() {
     if (typeof gdatasetname == 'undefined' && typeof gusername == 'undefined')
         return
-    if (typeof add_exodus_menubar == 'function')
-        add_exodus_menubar()
-    if (!gexodus_menubar)
+    if (typeof add_exo_menubar == 'function')
+        add_exo_menubar()
+    if (!gexo_menubar)
         return
 
-    var old = gexodus_menubar.querySelector('.exo_menubar_session')
+    var old = gexo_menubar.querySelector('.exo_menubar_session')
     if (old)
         old.parentNode.removeChild(old)
 
     // Remove prior clear divs so we can re-append clear as the last child
-    var clears = gexodus_menubar.querySelectorAll('.exo_menubar_clear')
+    var clears = gexo_menubar.querySelectorAll('.exo_menubar_clear')
     for (var ci = 0; ci < clears.length; ci++)
         clears[ci].parentNode.removeChild(clears[ci])
 
@@ -615,12 +615,12 @@ function form_place_menubar_session() {
         else
             trailing.appendChild(span)
     } else {
-        gexodus_menubar.appendChild(span)
+        gexo_menubar.appendChild(span)
     }
 
     var clear = document.createElement('div')
     clear.className = 'exo_menubar_clear'
-    gexodus_menubar.appendChild(clear)
+    gexo_menubar.appendChild(clear)
 
     // Session-only bars (modal search.htm) and late content must push body below the fixed bar
     if (typeof adjust_bodymargin == 'function')
@@ -751,7 +751,7 @@ function form_move_action_buttons_to_top() {
     // Unbound Save/Close stay .graphicbutton when moved up (do not flatten).
     // Bound form tools are already .menubutton.
 
-    add_exodus_menubar()
+    add_exo_menubar()
 
     var oldface = $$('formbuttonsdiv_face')
     if (oldface && oldface.parentNode)
@@ -781,11 +781,11 @@ function form_move_action_buttons_to_top() {
     // Race: form_keep / rAF often runs *after* client.js inserts .hamburger_menu;
     // insertBefore(firstChild) then put List left of Menu. Always park after Menu
     // when present; if Menu is added later it still insertBefore(firstChild) itself.
-    var menu = gexodus_menubar.querySelector('.hamburger_menu')
+    var menu = gexo_menubar.querySelector('.hamburger_menu')
     if (menu)
-        gexodus_menubar.insertBefore(topbar, menu.nextSibling)
+        gexo_menubar.insertBefore(topbar, menu.nextSibling)
     else
-        gexodus_menubar.insertBefore(topbar, gexodus_menubar.firstChild)
+        gexo_menubar.insertBefore(topbar, gexo_menubar.firstChild)
     form_place_menubar_session()
 
     formbuttons_install()
@@ -959,7 +959,7 @@ async function formfunctions_onload() {
             }
         }
 
-        //force cursor on exodustype B for button
+        //force cursor on exotype B for button
         if (element.getAttribute('exotype') == 'B' && element.style)
             element.style.cursor = 'pointer'
 
@@ -1434,7 +1434,7 @@ async function formfunctions_onload() {
                     element2.style.cursor = 'pointer'
 
                     //addeventlistener(element2,'click','exoui_popup')
-                    element2.setAttribute('isexoduspopup', '1')
+                    element2.setAttribute('isexopopup', '1')
 
                 }
             }
@@ -1461,7 +1461,7 @@ async function formfunctions_onload() {
                     element2.style.cursor = 'pointer'
 
                     //addeventlistener(element2,'click','exoui_link')
-                    element2.setAttribute('isexoduslink', '1')
+                    element2.setAttribute('isexolink', '1')
 
                 }
             }
@@ -2002,7 +2002,7 @@ async function formfunctions_onload() {
                         tablex.style.width = 'max-content'
                     var t = ''
                     t += '<span style="white-space: nowrap">'
-                    //if (!(exogetattribute(element,'exodusnoinsertrow')))
+                    //if (!(exogetattribute(element,'exonoinsertrow')))
                     if (hasIns) {
                         t += exo_icon_html(ginsertrowimage, null,
                             ' id="insertrowbutton' + groupno + '"'
@@ -2010,7 +2010,7 @@ async function formfunctions_onload() {
                             + ' exo_onclick="await insertrow_onclick(event)"'
                             + ' style="cursor:pointer;vertical-align:top"')
                     }
-                    //if (!(exogetattribute(element,'exodusnodeleterow')))
+                    //if (!(exogetattribute(element,'exonodeleterow')))
                     if (hasDel) {
                         t += exo_icon_html(gdeleterowimage, null,
                             ' id="deleterowbutton' + groupno + '"'
@@ -2253,9 +2253,9 @@ async function formfunctions_onload() {
     formbuttons.innerHTML = buttonhtml
 
     if (gformbuttonsplace === 'top') {
-        add_exodus_menubar()
+        add_exo_menubar()
         // Form actions on the left; session + clear:left appended in form_place_menubar_session
-        gexodus_menubar.insertBefore(formbuttons, gexodus_menubar.firstChild)
+        gexo_menubar.insertBefore(formbuttons, gexo_menubar.firstChild)
         if (typeof adjust_bodymargin == 'function')
             adjust_bodymargin()
     } else {
@@ -2800,7 +2800,7 @@ function form_digit_accesskey_capture_keydown(event) {
 
     // Already in a Gate A flight (e.g. focus/validate) — event already cancelled;
     // do not start a concurrent flight or systemerror. User can press Alt+N again.
-    if (typeof g_exodus_flow != 'undefined' && g_exodus_flow)
+    if (typeof g_exo_flow != 'undefined' && g_exo_flow)
         return
 
     var targetel = element
@@ -2870,7 +2870,7 @@ async function setfirstlastcolumn(groupno) {
 
     for (var ii = 0; ii < gtables[groupno].length; ii++) {
         var screenfn = gtables[groupno][ii]
-        //shouldnt this also be restricted to elements with exodusfieldno?
+        //shouldnt this also be restricted to elements with exofieldno?
         if (
             !gfields[screenfn].getAttribute('exoreadonly')
             && exoenabledandvisible(gfields[screenfn].id)
@@ -2957,12 +2957,12 @@ async function updatedisplay(elements) {
 
 }
 
-async function element_exodussetdropdown(element, request, noautoselection) {
+async function element_exosetdropdown(element, request, noautoselection) {
 
     assertelement(element, 'element_setdropdown', 'element')
 
     if (!(element.getAttribute('exodropdown'))) {
-        systemerror('await element_exodussetdropdown()', element.id + ' has no dropdown')
+        systemerror('await element_exosetdropdown()', element.id + ' has no dropdown')
         return
     }
 
@@ -3431,10 +3431,10 @@ async function document_onclick(event) {
 
     var result
 
-    if (event.target.getAttribute('isexoduspopup'))
+    if (event.target.getAttribute('isexopopup'))
         result = await exoui_popup(event)
 
-    else if (event.target.getAttribute('isexoduslink'))
+    else if (event.target.getAttribute('isexolink'))
         result = await exoui_link(event)
 
     //call the first exo_onclick expression found in element then parents
@@ -3957,7 +3957,7 @@ async function document_onkeydown2(event) {
         }
 
         // Text Esc undo (old): same field as gpreviouselement → restore gpreviousvalue.
-        // Do not require element.name — free-text SPANs use id/exodusname; .name is not
+        // Do not require element.name — free-text SPANs use id/exoname; .name is not
         // reliable field identity (INPUT-era gate; broke journals OTHER_DETAILS etc.).
         // Radio/checkbox: same group/id still counts as same field.
         var escSameField = (element == gpreviouselement)
@@ -4985,7 +4985,7 @@ function form_ensure_radio_mouseup_focus() {
     document.addEventListener('mouseup', form_radio_mouseup_focus, true)
 }
 
-function form_radio_is_exodus_toggle(el) {
+function form_radio_is_exo_toggle(el) {
     if (!el || (el.type != 'radio' && el.type != 'checkbox') || el.disabled)
         return false
     if (el.getAttribute && el.getAttribute('exotype'))
@@ -4998,7 +4998,7 @@ function form_radio_mousedown_nofocus(event) {
     if (event.button != 0)
         return
     var t = event.target
-    if (!form_radio_is_exodus_toggle(t)) {
+    if (!form_radio_is_exo_toggle(t)) {
         gform_radio_md_target = null
         return
     }
@@ -5013,7 +5013,7 @@ function form_radio_mouseup_focus(event) {
     var t = event.target
     var md = gform_radio_md_target
     gform_radio_md_target = null
-    if (!md || t != md || !form_radio_is_exodus_toggle(t))
+    if (!md || t != md || !form_radio_is_exo_toggle(t))
         return
     if (document.activeElement != t)
         form_focus_noscroll(t)
@@ -7907,7 +7907,7 @@ function document_onfocus_sync(event) {
         form_scroll_log_msg('document_onfocus_sync', form_scroll_el_label(t),
             'gblockevents=', typeof gblockevents != 'undefined' ? gblockevents : '?')
     } catch (e) { }
-    var eventhandlerx = starteventhandler('exoduscode', document_onfocus)
+    var eventhandlerx = starteventhandler('exocode', document_onfocus)
     return eventhandlerx(event)
 }
 
@@ -7987,7 +7987,7 @@ async function document_onfocus(event) {
         'gkeycode=', gkeycode,
         'prev=', form_scroll_el_label(gpreviouselement))
     if (!(element.getAttribute('exotype'))) {
-        form_scroll_log_msg('document_onfocus EXIT no exodustype', form_scroll_el_label(element))
+        form_scroll_log_msg('document_onfocus EXIT no exotype', form_scroll_el_label(element))
         //logout('document_onfocus')
         return
     }
@@ -8483,7 +8483,7 @@ async function validateupdate() {
     //logout('validateupdate - done')
 
     //if (gautofitwindow)
-    //    exosettimeout('exodusautofitwindow()', 1)
+    //    exosettimeout('exoautofitwindow()', 1)
 
     // Quiet miss was for live typeahead only; committed value is accepted.
     form_typeahead_clear_miss()
@@ -9218,7 +9218,7 @@ function setvalue2(element, value) {
 
                 case 'text': {
 
-                    setexoduslink(element, value)
+                    setexolink(element, value)
                     element.value = value
                     // colour fields: keep swatch in step with bound text
                     if (element.getAttribute('data-exo-color-field') == '1'
@@ -9272,7 +9272,7 @@ function setvalue2(element, value) {
 
         case 'TEXTAREA': {
 
-            setexoduslink(element, value)
+            setexolink(element, value)
 
             //http://wiki.ckeditor.net/Developer%27s_Guide/Javascript_API
             if (typeof CKEDITOR != 'undefined') {
@@ -9296,7 +9296,7 @@ function setvalue2(element, value) {
 
         case 'SPAN': {
 
-            setexoduslink(element, value)
+            setexolink(element, value)
 
             if (element.getAttribute('exoimage')) {
                 var img = element.nextSibling
@@ -9378,7 +9378,7 @@ function getradiocheckboxelements(element) {
 
 }
 
-function setexoduslink(element, value) {
+function setexolink(element, value) {
     return//always display now
     /*    if (element.getAttribute('exolink')) {
             if (element.previousSibling && element.previousSibling.getAttribute('exolink')) {
@@ -9588,7 +9588,7 @@ function settouched_core(value, savebuttonactive) {
 
     //if (gautofitwindow && !gautofitwindowpending) {
     //    gautofitwindowpending = true
-    //    exosettimeout('exodusautofitwindow()', 1)
+    //    exosettimeout('exoautofitwindow()', 1)
     //}
 
 }

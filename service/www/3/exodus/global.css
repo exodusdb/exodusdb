@@ -804,7 +804,7 @@ BODY
  * Normal button face — one set of tokens for all raised actions:
  *   .exobutton / .exotab  — in-form / login / page HTML
  *   .graphicbutton             — unbound form Save/Close, confirm/decide
- * Restyle via --exodus-informbutton-* (LM :root / DM dark_mode) to hit all of them.
+ * Restyle via --exoinformbutton-* (LM :root / DM dark_mode) to hit all of them.
  */
 .exobutton,
 .exotab,
@@ -1208,8 +1208,8 @@ TABLE.exoform SPAN.clsReadOnly:empty::before {
 /* Scale fixed-pixel SVG/PNG icons with text (see --exoui-icon-size / glyph). */
 .graphicbutton img,
 .menubutton img,
-img[isexoduspopup="1"],
-img[isexoduslink="1"],
+img[isexopopup="1"],
+img[isexolink="1"],
 img[exotype="B"],
 img[exo_onclick],
 img[id^="insertrowbutton"],
@@ -1221,8 +1221,8 @@ img[id^="deleterowbutton"] {
     object-fit: contain;
 }
 /* Monochrome mask icons (same footprint as toolbar imgs) */
-.exoicon[isexoduspopup="1"],
-.exoicon[isexoduslink="1"],
+.exoicon[isexopopup="1"],
+.exoicon[isexolink="1"],
 .exoicon[exo_onclick],
 .exoicon[id^="insertrowbutton"],
 .exoicon[id^="deleterowbutton"] {
@@ -1924,7 +1924,7 @@ SPAN.calendar-date-committed[contenteditable] {
     border-color: #646ca8;
 }
 
-/* Bare BUTTON only — .graphicbutton uses --exodus-informbutton-* like .exobutton.
+/* Bare BUTTON only — .graphicbutton uses --exoinformbutton-* like .exobutton.
  * Continuum swatches are <button class="exocolor-cell"> for a11y, not chrome. */
 :root[data-theme="dark_mode"] BUTTON:not(.exobutton):not(.exotab):not(.exocolor-cell) {
     background-color: var(--exoinformbutton-bg-color);
@@ -2006,7 +2006,7 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 
 /* ========== Date picker popup (calendar.js); colour continuum reuses .calendar ==========
- * Shell/hover/divider = --exodus-popup-*; buttons = --exodus-informbutton-*.
+ * Shell/hover/divider = --exopopup-*; buttons = --exoinformbutton-*.
  * Only calendar-specific colour token: --exocalendar-today-color (defined on :root).
  */
 .calendar {

@@ -87,7 +87,7 @@
     <li><strong>Core file:</strong> <code>client.js</code> — Must be included <strong>first</strong>. Core globals, Gate A/B, <code>exodblink</code>, <code>exoui_showmodaldialog</code>, security, cookies, utilities, string/array prototypes.</li>
     <li><strong>Form automation:</strong> <code>dbform.js</code> + helpers in <code>db.js</code> — Dictionary-driven (<code>dict_*</code>) CRUD forms, MV groups, validation, buttons.</li>
     <li><strong>Communication bridge:</strong> <code>xhttp.php</code> (and .asp variants). Client sends XML (<code>&lt;token&gt;</code>, <code>&lt;request&gt;</code>, <code>&lt;data&gt;</code>); bridge writes temp files; backend processes and responds via <code>.1</code>/<code>.2</code>/<code>.3</code> files.</li>
-    <li><strong>Async model (Gate A):</strong> Event handlers and deferred async work enter via <code>exo_begin</code> (exclusive owner; <code>g_exodus_flow_queue_max = 0</code> means <strong>no queuing</strong> — second start while airborne is <strong>skipped</strong>). Prefer <code>async function myfunc() { ... await someOperation() ... }</code> and <code>await</code> inside the same flight. Do <strong>not</strong> start free-floating async that does DB/UI work.</li>
+    <li><strong>Async model (Gate A):</strong> Event handlers and deferred async work enter via <code>exo_begin</code> (exclusive owner; <code>g_exo_flow_queue_max = 0</code> means <strong>no queuing</strong> — second start while airborne is <strong>skipped</strong>). Prefer <code>async function myfunc() { ... await someOperation() ... }</code> and <code>await</code> inside the same flight. Do <strong>not</strong> start free-floating async that does DB/UI work.</li>
     <li><strong>Wait/Cancel (Gate B):</strong> Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on <code>db.send</code> XHR. No main-line form dbio from Gate B.</li>
     <li><strong>Public commencement API (only three):</strong> <code>exo_begin</code> (business), <code>exo_begin_if_idle</code> (background), <code>exo_begin_waitcancel</code> (Wait/Cancel). <code>startAsyncFlow</code> is a deprecated alias of <code>exo_begin</code>.</li>
     <li><strong>Flight log:</strong> Quiet by default. Enable with <code>?logflights=1</code> or <code>glogflights=true</code>.</li>
@@ -214,7 +214,7 @@ async function save_onclick() {
 <li>Bare call of an async function without <code>await</code> is a bug.</li>
 </ul>
 
-<p>DOM events, HTM <code>*_sync</code> bridges, and deferred work all enter <strong>Gate A</strong> (<code>exo_begin</code>). Nested <code>await</code> stays on that one flight. <code>g_exodus_flow_queue_max</code> is wait-list capacity only: <strong>0 = no queuing</strong> (current).</p>
+<p>DOM events, HTM <code>*_sync</code> bridges, and deferred work all enter <strong>Gate A</strong> (<code>exo_begin</code>). Nested <code>await</code> stays on that one flight. <code>g_exo_flow_queue_max</code> is wait-list capacity only: <strong>0 = no queuing</strong> (current).</p>
 
 <p>Optional background work (session keepalive, relock) uses <code>exo_begin_if_idle</code> — <strong>skip</strong> if busy (never uses the queue).</p>
 

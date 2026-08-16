@@ -348,8 +348,8 @@ function exo_client_init() {
 	}
 	setdateformat()
 
-	//gexodus_server = gdataset.toLowerCase() == gdataset
-	gexodus_server = typeof exoread != 'undefined'
+	//gexo_server = gdataset.toLowerCase() == gdataset
+	gexo_server = typeof exoread != 'undefined'
 
 	if (typeof gparameters == 'undefined')
 		gparameters = new Object
@@ -688,7 +688,7 @@ function exosetexpression2b(expressionid, elements, style, attributename, expres
 
 		//build a closure containing all the elements to be updated
 		//and to be called at intervals
-		function anon_from_exodussetexpression2b() {
+		function anon_from_exosetexpression2b() {
 			// Interval tick: Gate A only when idle (skip if busy — expression UI is optional).
 			void exo_begin_if_idle(function () {
 				return exosetexpression2c(elements, style, attributename, expression)
@@ -828,8 +828,8 @@ var gprocessing_waitcancel_active
 // Gate B — in-DOM Wait/Cancel while Gate A (or any owner) is in db.send lazy XHR wait.
 // Concurrent with Gate A by design. Must NEVER call exo_begin or main-line dbio.
 // Allowed: exoui_confirm UI, xhttp.abort(), fire-and-forget CANCEL on a separate link.
-var g_exodus_waitcancel = null
-var g_exodus_waitcancel_n = 0
+var g_exo_waitcancel = null
+var g_exo_waitcancel_n = 0
 
 // PHP-FPM: XHR abort is not reliably seen by xhttp.php — send an explicit CANCEL request too.
 function dbsend_cancel_xhttp(requestid) {
@@ -888,10 +888,10 @@ function exo_begin_waitcancel(source) {
 
 	source = source || 'uiblocker'
 
-	if (g_exodus_waitcancel || gprocessing_waitcancel_active) {
+	if (g_exo_waitcancel || gprocessing_waitcancel_active) {
 		exo_flight_log(
 			'WAITCANCEL ignored (already open'
-			+ (g_exodus_waitcancel ? ' B#' + g_exodus_waitcancel.n : '') + ')'
+			+ (g_exo_waitcancel ? ' B#' + g_exo_waitcancel.n : '') + ')'
 		)
 		return
 	}
@@ -908,7 +908,7 @@ function exo_begin_waitcancel(source) {
 		return
 	}
 
-	if (!g_exodus_flow)
+	if (!g_exo_flow)
 		exo_flight_log('WAITCANCEL while Gate A idle (db.send outside exo_begin?)')
 
 	// Fire-and-forget second stack — intentional dual-stack with Gate A.
@@ -917,12 +917,12 @@ function exo_begin_waitcancel(source) {
 
 async function exo_run_waitcancel(source) {
 
-	var n = ++g_exodus_waitcancel_n
-	g_exodus_waitcancel = { n: n, source: source }
+	var n = ++g_exo_waitcancel_n
+	g_exo_waitcancel = { n: n, source: source }
 	gprocessing_waitcancel_active = true
 
-	var ainfo = g_exodus_flow
-		? ('A#' + g_exodus_flow.n + ' "' + g_exodus_flow.location + '"')
+	var ainfo = g_exo_flow
+		? ('A#' + g_exo_flow.n + ' "' + g_exo_flow.location + '"')
 		: 'A idle'
 	exo_flight_log('WAITCANCEL OPEN B#' + n + ' (' + ainfo + ', via ' + source + ')')
 
@@ -953,7 +953,7 @@ async function exo_run_waitcancel(source) {
 		throw e
 	} finally {
 		gprocessing_waitcancel_active = false
-		g_exodus_waitcancel = null
+		g_exo_waitcancel = null
 		exo_flight_log('WAITCANCEL CLOSE B#' + n)
 	}
 }
@@ -1086,7 +1086,7 @@ function modalblock_create() {
 	modalblock_pin_body()
 	modalblock_bind_capture()
 
-	//keep focus off parent window and on child window or exodusdiv
+	//keep focus off parent window and on child window or exodiv
 	var guiblockermousedown = false
 	blocker.onmousedown = function uiblockerdiv_onmousedown() {
 		guiblockermousedown = true
@@ -1701,7 +1701,7 @@ function assertelement(element, funcname, varname) {
 
 // User-facing text when backend (or rare client) surface is a system/backtrace error.
 // Refine wording later; special exoui_confirm icon/mode may follow.
-var gexodus_system_error_user_msg =
+var gexo_system_error_user_msg =
 	'A system error has occurred.\r\n\r\n' +
 	'Technical support has been informed.\r\n\r\n' +
 	'You may try to ignore the message or contact technical support for more info.'
@@ -1722,7 +1722,7 @@ function exo_user_facing_msg(msg) {
 	try {
 		console.log('EXODUS system error (hidden from user):\n' + String(msg))
 	} catch (e) { }
-	return gexodus_system_error_user_msg
+	return gexo_system_error_user_msg
 }
 
 async function exoui_note(msg, mode) {
@@ -1810,10 +1810,10 @@ function exo_swap_tool_icons() {
 
 function exo_update_auth_button() {
 
-	var btn = $$('exoduslogoutbutton')
+	var btn = $$('exologoutbutton')
 	if (!btn)
 		return
-	var label = $$('exoduslogoutbutton_label')
+	var label = $$('exologoutbutton_label')
 	if (!gusername) {
 		if (label)
 			label.innerHTML = 'Login'
@@ -1872,19 +1872,19 @@ function exo_set_theme_icons() {
 // Equal CSS gap — no independent float:right packing (that made session↔theme↔logout uneven).
 function exo_menubar_trailing_cluster() {
 
-	if (!gexodus_menubar)
+	if (!gexo_menubar)
 		return null
-	var trail = gexodus_menubar.querySelector('.exo_menubar_trailing')
+	var trail = gexo_menubar.querySelector('.exo_menubar_trailing')
 	if (trail)
 		return trail
 	trail = document.createElement('span')
 	trail.className = 'exo_menubar_trailing'
 	// Before clear:left spacer if present; else at end of menubar
-	var clear = gexodus_menubar.querySelector('.exo_menubar_clear')
+	var clear = gexo_menubar.querySelector('.exo_menubar_clear')
 	if (clear)
-		gexodus_menubar.insertBefore(trail, clear)
+		gexo_menubar.insertBefore(trail, clear)
 	else
-		gexodus_menubar.appendChild(trail)
+		gexo_menubar.appendChild(trail)
 	return trail
 
 }
@@ -2139,15 +2139,15 @@ async function clientfunctions_getglobals() {
 		gthousands_regex = /,/gi
 }
 
-function add_exodus_menubar() {
+function add_exo_menubar() {
 
 	//if no exo_menubar element
 	//create a exo_menu span
 	// at the beginning of the body
 	// or after the first navbar element
 
-	gexodus_menubar = document.getElementById('exo_menu')
-	if (!gexodus_menubar) {
+	gexo_menubar = document.getElementById('exo_menu')
+	if (!gexo_menubar) {
 		var span = document.createElement('SPAN')
 		span.id = 'exo_menu'
 		// menubar design
@@ -2170,22 +2170,22 @@ function add_exodus_menubar() {
 			navbar1.parentNode.insertBefore(span, navbar1.nextSibling)
 		else
 			document.body.insertBefore(span, document.body.firstChild)
-		gexodus_menubar = document.getElementById('exo_menu')
+		gexo_menubar = document.getElementById('exo_menu')
 	}
 	// Modals (e.g. search.htm) create the bar late via form_place_menubar_session —
 	// still need body offset + resize/mutation wiring so content is not under the bar.
-	wire_exodus_bodymargin()
+	wire_exo_bodymargin()
 }
 
 // Adjust the body's top margin dynamically so that body is never overlapped by the menubar
 function adjust_bodymargin() {
-	gexodus_menubar = document.getElementById('exo_menu')
-	if (!gexodus_menubar)
+	gexo_menubar = document.getElementById('exo_menu')
+	if (!gexo_menubar)
 		return
-	var menuheight = gexodus_menubar.offsetHeight
+	var menuheight = gexo_menubar.offsetHeight
 	// Floated session/trailing can stick out if clearfix is incomplete — use visual extent
-	var barTop = gexodus_menubar.getBoundingClientRect().top
-	var kids = gexodus_menubar.children
+	var barTop = gexo_menubar.getBoundingClientRect().top
+	var kids = gexo_menubar.children
 	for (var i = 0; i < kids.length; i++) {
 		var extent = kids[i].getBoundingClientRect().bottom - barTop
 		if (extent > menuheight)
@@ -2197,21 +2197,21 @@ function adjust_bodymargin() {
 }
 
 // Once per window: resize + MutationObserver so late-built bars (modals) keep body clear.
-var g_exodus_bodymargin_wired = false
-function wire_exodus_bodymargin() {
-	gexodus_menubar = document.getElementById('exo_menu')
-	if (!gexodus_menubar)
+var g_exo_bodymargin_wired = false
+function wire_exo_bodymargin() {
+	gexo_menubar = document.getElementById('exo_menu')
+	if (!gexo_menubar)
 		return
 	adjust_bodymargin()
-	if (g_exodus_bodymargin_wired)
+	if (g_exo_bodymargin_wired)
 		return
-	g_exodus_bodymargin_wired = true
+	g_exo_bodymargin_wired = true
 	window.addEventListener('resize', adjust_bodymargin)
 	if (typeof MutationObserver == 'function') {
 		var observer = new MutationObserver(function () {
 			adjust_bodymargin()
 		})
-		observer.observe(gexodus_menubar, {
+		observer.observe(gexo_menubar, {
 			attributes: true,
 			childList: true,
 			subtree: true
@@ -2252,8 +2252,8 @@ async function clientfunctions_windowonload() {
 	await clientfunctions_setstyle()
 
 	//if (gautofitwindow && document.getElementById('autofitwindowelement'))
-	//	exosettimeout('exodusautofitwindow()', 10)
-	//exosetinterval('exodusautofitwindow()', 10)
+	//	exosettimeout('exoautofitwindow()', 10)
+	//exosetinterval('exoautofitwindow()', 10)
 
 	// Fixed top menubar for main windows only (not modal dialogs).
 	// Form actions: dbform — under the form when on-screen, else top menubar.
@@ -2261,14 +2261,14 @@ async function clientfunctions_windowonload() {
 	if (document.URL.includes(".htm") && !window.dialogArguments) {
 		// Also no menubar in other pages
 		if (!document.URL.match(/index|confirm|upload/)) {
-			add_exodus_menubar();
+			add_exo_menubar();
 		}
 	}
 
 	// Before form_functions_onload so content is not under a pre-existing bar.
-	// Modals (search.htm) often create #exo_menu later via add_exodus_menubar —
-	// wire_exodus_bodymargin runs again from there.
-	wire_exodus_bodymargin()
+	// Modals (search.htm) often create #exo_menu later via add_exo_menubar —
+	// wire_exo_bodymargin runs again from there.
+	wire_exo_bodymargin()
 
 	//trigger formfunctions_onload; wrap panes; only then reveal forms
 	// (html:not(.exopanes-ready) keeps bare/unmerged layout invisible — global.css).
@@ -2321,7 +2321,7 @@ async function clientfunctions_windowonload() {
 		//button to logout
 		var temp2 = document.createElement('span')
 		temp2.classList.add('logout_wrapper')
-		temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. Alt+G', 'G')
+		temp2.innerHTML = menubuttonhtml('exologout', glogoutimage, 'Lo<u>g</u>out', 'Logout. Alt+G', 'G')
 		trailing.appendChild(temp2)
 
 		exo_update_auth_button()
@@ -2335,7 +2335,7 @@ async function clientfunctions_windowonload() {
 			menu_span.classList.add('hamburger_menu')
 			menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. Alt+M', 'M')
 			//document.body.insertBefore(menu_span, document.body.firstChild)
-			gexodus_menubar.insertBefore(menu_span, gexodus_menubar.firstChild)
+			gexo_menubar.insertBefore(menu_span, gexo_menubar.firstChild)
 
 			//div to retrieve menu structure (insert into end of Menu button span)
 			var dropdown_menu_span = document.createElement('span')
@@ -2345,7 +2345,7 @@ async function clientfunctions_windowonload() {
 			var menuelement = $$('menubutton')
 			//why insert it into the menu button?
 			menuelement.insertBefore(dropdown_menu_span, null)
-			//gexodus_menubar.insertBefore(dropdown_menu_span, gexodus_menubar.firstChild)
+			//gexo_menubar.insertBefore(dropdown_menu_span, gexo_menubar.firstChild)
 
 			//dont rely on onload event ... poll every 100ms to see if iframe is loaded
 			gmenuonloader = exosetinterval('menuonload()', 100)
@@ -2449,7 +2449,7 @@ function menuonload() {
 
 }
 
-Array.prototype.exoread = async function array_exodusread(filename, key, fieldno, cache) {
+Array.prototype.exoread = async function array_exoread(filename, key, fieldno, cache) {
 
 	//unless returning one fieldno, always return at least n fields
 	//so that accessing fields that do not exist by [] returns ''
@@ -4295,7 +4295,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 
 	//dropdowndata can be a string (even '') with character seps :; or fm vm (used if vm or fm found)
 	//if null will not set new options, only select the selectedoptions
-	//exodusrequired false means add a blank option at the beginning
+	//exorequired false means add a blank option at the beginning
 
 	//element must be a select element
 	if (!(checkisdropdown(element))) {
@@ -4875,7 +4875,7 @@ function clearcache() {
 		gcache.values = new Object
 
 		if (typeof gcache.save != 'undefined')
-			gcache.save('\exoduscache')
+			gcache.save('\exocache')
 	}
 	catch (e) {
 		//logout('clearcache fail ' + e.description)
@@ -5166,8 +5166,8 @@ function menufitviewport(submenu) {
 	var pad = 6
 	var maxBottom = document.documentElement.clientHeight - pad
 	var minTop = pad
-	if (gexodus_menubar) {
-		var barBottom = gexodus_menubar.getBoundingClientRect().bottom + 2
+	if (gexo_menubar) {
+		var barBottom = gexo_menubar.getBoundingClientRect().bottom + 2
 		if (barBottom > minTop)
 			minTop = barBottom
 	}
@@ -5535,13 +5535,13 @@ function menuchangeoption(menu, newmenuoption) {
  * Non-form pages (no dbform document_onkeydown): Alt+M/G/R + tools that used
  * menubuttonhtml accesskey (e.g. Print Alt+P → id_onclick).
  */
-var gexodus_menubar_keydown_installed = false
+var gexo_menubar_keydown_installed = false
 
 function exo_menubar_ensure_keydown() {
 
-	if (gexodus_menubar_keydown_installed || typeof gdictfilename != 'undefined')
+	if (gexo_menubar_keydown_installed || typeof gdictfilename != 'undefined')
 		return
-	gexodus_menubar_keydown_installed = true
+	gexo_menubar_keydown_installed = true
 	addeventlistener(document, 'keydown', 'exo_menubar_keydown')
 }
 
@@ -5574,7 +5574,7 @@ async function exo_menubar_keydown(event) {
 	// accesskey button under bar → id_onclick (menubutton id ends in "button")
 	if (keycode < 65 || keycode > 90)
 		return true
-	var bar = gexodus_menubar || document.getElementById('exo_menu')
+	var bar = gexo_menubar || document.getElementById('exo_menu')
 	if (!bar)
 		return true
 	var letter = String.fromCharCode(keycode)
@@ -5596,15 +5596,15 @@ async function exo_menubar_keydown(event) {
 // if standard Menu/Refresh are not on the bar yet.
 function exo_menubar_add_button(id, imagesrc, name, title, accesskey) {
 
-	if (!gexodus_menubar)
-		add_exodus_menubar()
+	if (!gexo_menubar)
+		add_exo_menubar()
 	var wrap = document.createElement('span')
 	wrap.innerHTML = menubuttonhtml(id, imagesrc, name, title, accesskey)
-	var trail = gexodus_menubar.querySelector('.exo_menubar_trailing')
+	var trail = gexo_menubar.querySelector('.exo_menubar_trailing')
 	if (trail)
-		gexodus_menubar.insertBefore(wrap, trail)
+		gexo_menubar.insertBefore(wrap, trail)
 	else
-		gexodus_menubar.appendChild(wrap)
+		gexo_menubar.appendChild(wrap)
 	if (typeof gdictfilename == 'undefined')
 		addeventlistener(wrap, 'click', id + '_onclick')
 	if (typeof adjust_bodymargin == 'function')
@@ -5633,7 +5633,7 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	//there is no float:center?!
 	var style = ''
 	// logout button should not have a border on the right like the other buttons
-	if (id != 'exoduslogout' && align != 'center') {
+	if (id != 'exologout' && align != 'center') {
 		//var style = 'white-space:nowrap; padding-right: 7.5px;';
 		style = 'white-space:nowrap; padding: 5px;';
 	}
@@ -6599,7 +6599,7 @@ var gblockevents_flight_warn_ms = 120000
 // document_onkeydown. Stops propagation without preventDefault so the browser
 // still acts. Install once from client init.
 // ---------------------------------------------------------------------------
-var gexodus_browser_chrome_keydown_installed = false
+var gexo_browser_chrome_keydown_installed = false
 
 function exo_is_browser_chrome_keydown(event) {
 	if (!event || event.type != 'keydown')
@@ -6635,11 +6635,11 @@ function exo_browser_chrome_keydown_capture(event) {
 }
 
 function exo_ensure_browser_chrome_keydown() {
-	if (gexodus_browser_chrome_keydown_installed)
+	if (gexo_browser_chrome_keydown_installed)
 		return
 	if (!document.addEventListener)
 		return
-	gexodus_browser_chrome_keydown_installed = true
+	gexo_browser_chrome_keydown_installed = true
 	document.addEventListener('keydown', exo_browser_chrome_keydown_capture, true)
 }
 
@@ -6722,8 +6722,8 @@ function exo_gblockevents_holder() {
 			return 'calendar'
 	} catch (e3) { }
 	// Raw flight only if no known wait UI (true hang / never lands)
-	if (typeof g_exodus_flow != 'undefined' && g_exodus_flow)
-		return 'flight:' + (g_exodus_flow.location || g_exodus_flow.n)
+	if (typeof g_exo_flow != 'undefined' && g_exo_flow)
+		return 'flight:' + (g_exo_flow.location || g_exo_flow.n)
 	return null
 }
 
@@ -6737,8 +6737,8 @@ function exo_gblockevents_dump() {
 		+ ' nonzero_ms=' + age
 		+ ' raw_flight_ms=' + rawAge
 		+ ' skipped_events=' + gblockevents_skipped_n
-		+ ' flow=' + (typeof g_exodus_flow != 'undefined' && g_exodus_flow
-			? ('#' + g_exodus_flow.n + ' ' + g_exodus_flow.location) : 'null')
+		+ ' flow=' + (typeof g_exo_flow != 'undefined' && g_exo_flow
+			? ('#' + g_exo_flow.n + ' ' + g_exo_flow.location) : 'null')
 		+ ' holder=' + (exo_gblockevents_holder() || 'none')
 		+ ' modaldepth=' + (typeof gmodalblockdepth != 'undefined' ? gmodalblockdepth : '?')
 	)
@@ -7012,7 +7012,7 @@ var gpendingConfirmResolve
 // Owner of gpendingConfirmResolve: 'A' (Gate A business), 'B' (Gate B wait/cancel), or null.
 // Force-close paths must pass expectedOwner so A and B cannot cross-wire.
 var gpendingConfirmOwner
-var gexodusconfirmdefaultbutton
+var gexoconfirmdefaultbutton
 
 // For the child window / showmodaldialog leaf (next after confirm).
 var gpendingDialogResolve
@@ -7037,18 +7037,18 @@ function exoispromise(value) {
 // Gate A — exclusive main event flow (one plane). All business async
 // commencements enter here via exo_begin. Nested await inside the flight is fine.
 //
-// Model today: at most ONE active flight (g_exodus_flow). A separate wait list
-// (g_exodus_flow_queue) may hold jobs that start only after that flight lands.
+// Model today: at most ONE active flight (g_exo_flow). A separate wait list
+// (g_exo_flow_queue) may hold jobs that start only after that flight lands.
 // The active job is not counted in the wait list.
 //
-// g_exodus_flow_queue_max = wait-list capacity only:
+// g_exo_flow_queue_max = wait-list capacity only:
 //   0 = no queuing — second start while airborne is systemerror (debug signal)
 //   1 = at most one deferred takeoff, drained after land
 //   N = deeper FIFO
 //
 // Parallel starts: avoid at the source. Nested await in the current flight is
 // fine; a second exo_begin while airborne is not. Callers outside Gate A
-// (capture keydown, timers, etc.) must check g_exodus_flow / use
+// (capture keydown, timers, etc.) must check g_exo_flow / use
 // exo_begin_if_idle (optional) or exo_begin_when_idle (required after land).
 // Gate A does not silently ignore conflicts — systemerror is intentional so races
 // surface until the initiating call site is fixed.
@@ -7060,18 +7060,18 @@ function exoispromise(value) {
 // wait list.
 //
 // Gate B (wait/cancel) is a separate concurrent stack — see exo_begin_waitcancel.
-var g_exodus_flow = null
-var g_exodus_flow_queue = []
+var g_exo_flow = null
+var g_exo_flow_queue = []
 // FUTURE: set to 1+ to allow deferred takeoffs while a flight is airborne.
-var g_exodus_flow_queue_max = 0
-var g_exodus_flight_n = 0
+var g_exo_flow_queue_max = 0
+var g_exo_flight_n = 0
 
 function exo_flight_log(msg) {
 	// Quiet by default (stage 5). Enable: glogflights=true or ?logflights=1
 	if (glogflights && typeof console != 'undefined' && console.log)
-		console.log('[exodus flight] ' + msg)
+		console.log('[exo flight] ' + msg)
 	if (glogevents || glogflights)
-		logevent('[exodus flight] ' + msg)
+		logevent('[exo flight] ' + msg)
 }
 
 // Visible failure when required work cannot start (prefer this over silent no-op).
@@ -7081,7 +7081,7 @@ function exo_flight_skip_error(location, reason) {
 		+ ' current flight, or schedule with exo_begin_when_idle after land.'
 	exo_flight_log('SKIP ERROR "' + location + '": ' + reason)
 	if (typeof console != 'undefined' && console.error)
-		console.error('[exodus flight] ' + msg)
+		console.error('[exo flight] ' + msg)
 	systemerror('exo_begin', msg)
 }
 
@@ -7090,24 +7090,24 @@ function exo_flight_skip_error(location, reason) {
 // Skip is a hard visible error — required work must not vanish.
 function exo_begin(asyncHandler, location, event) {
 	location = location || 'unknown'
-	if (g_exodus_flow) {
-		// Only the wait list is size-limited; airborne is tracked in g_exodus_flow.
-		if (g_exodus_flow_queue.length >= g_exodus_flow_queue_max) {
+	if (g_exo_flow) {
+		// Only the wait list is size-limited; airborne is tracked in g_exo_flow.
+		if (g_exo_flow_queue.length >= g_exo_flow_queue_max) {
 			exo_flight_skip_error(
 				location,
-				'Already busy with flight #' + g_exodus_flow.n
-				+ ' "' + g_exodus_flow.location + '" (queue_max='
-				+ g_exodus_flow_queue_max + ').'
+				'Already busy with flight #' + g_exo_flow.n
+				+ ' "' + g_exo_flow.location + '" (queue_max='
+				+ g_exo_flow_queue_max + ').'
 			)
 			return Promise.resolve(null)
 		}
 		exo_flight_log(
-			'QUEUED "' + location + '" (airborne #' + g_exodus_flow.n
-			+ ' "' + g_exodus_flow.location + '", queue='
-			+ (g_exodus_flow_queue.length + 1) + '/' + g_exodus_flow_queue_max + ')'
+			'QUEUED "' + location + '" (airborne #' + g_exo_flow.n
+			+ ' "' + g_exo_flow.location + '", queue='
+			+ (g_exo_flow_queue.length + 1) + '/' + g_exo_flow_queue_max + ')'
 		)
 		return new Promise(function (resolve, reject) {
-			g_exodus_flow_queue.push({
+			g_exo_flow_queue.push({
 				asyncHandler: asyncHandler,
 				location: location,
 				event: event,
@@ -7131,12 +7131,12 @@ function exo_begin_when_idle(asyncHandler, location, options) {
 	var t0 = Date.now()
 
 	function try_start() {
-		if (g_exodus_flow) {
+		if (g_exo_flow) {
 			if (Date.now() - t0 > max_wait_ms) {
 				exo_flight_skip_error(
 					location,
 					'Still busy after ' + max_wait_ms + 'ms with flight #'
-					+ g_exodus_flow.n + ' "' + g_exodus_flow.location + '".'
+					+ g_exo_flow.n + ' "' + g_exo_flow.location + '".'
 				)
 				return
 			}
@@ -7151,8 +7151,8 @@ function exo_begin_when_idle(asyncHandler, location, options) {
 }
 
 async function exo_begin_run(asyncHandler, location, event) {
-	var n = ++g_exodus_flight_n
-	g_exodus_flow = { n: n, location: location }
+	var n = ++g_exo_flight_n
+	g_exo_flow = { n: n, location: location }
 	exo_flight_log('TAKEOFF #' + n + ' "' + location + '"')
 
 	form_blockevents(true, location)
@@ -7186,18 +7186,18 @@ async function exo_begin_run(asyncHandler, location, event) {
 		form_blockevents(false, location)
 		if (modalblock)
 			unblockmodalui_sync()
-		g_exodus_flow = null
+		g_exo_flow = null
 		exo_begin_drain()
 	}
 }
 
 function exo_begin_drain() {
-	if (g_exodus_flow || !g_exodus_flow_queue.length)
+	if (g_exo_flow || !g_exo_flow_queue.length)
 		return
-	var job = g_exodus_flow_queue.shift()
+	var job = g_exo_flow_queue.shift()
 	exo_flight_log(
 		'DEQUEUE "' + job.location + '" (remaining queue='
-		+ g_exodus_flow_queue.length + '/' + g_exodus_flow_queue_max + ')'
+		+ g_exo_flow_queue.length + '/' + g_exo_flow_queue_max + ')'
 	)
 	exo_begin_run(job.asyncHandler, job.location, job.event).then(job.resolve, job.reject)
 }
@@ -7214,10 +7214,10 @@ function startAsyncFlow(asyncHandler, location, event) {
 // overflow:hidden (expression2 ticks every 250ms were thrashing page scrollbars).
 function exo_begin_if_idle(asyncHandler, location) {
 	location = location || 'background'
-	if (g_exodus_flow) {
+	if (g_exo_flow) {
 		exo_flight_log(
-			'SKIP "' + location + '" (A#' + g_exodus_flow.n
-			+ ' "' + g_exodus_flow.location + '" airborne)'
+			'SKIP "' + location + '" (A#' + g_exo_flow.n
+			+ ' "' + g_exo_flow.location + '" airborne)'
 		)
 		return Promise.resolve(null)
 	}
@@ -7432,7 +7432,7 @@ function exoint2date(exodate) {
 // String 'await …' / 'yield* …' is legacy (eval via new Function); do not add more.
 function exosettimeout(command, milliseconds) {
 	if (glogsettimeout)
-		console.log('exodussetimeout(' + command + ')')
+		console.log('exosettimeout(' + command + ')')
 	if (typeof command == 'function') {
 		if (exoisasyncfunction(command)) {
 			var label = 'timeout ' + (command.name || 'fn')
@@ -7484,7 +7484,7 @@ function exosetinterval(command, milliseconds) {
 
 // LEGACY: string expression under Gate A when idle (relock/keepalive style).
 async function exointerval_async_sync(command) {
-	if (g_exodus_flow || gblockevents) {
+	if (g_exo_flow || gblockevents) {
 		exo_flight_log('SKIP interval "' + command + '" (busy)')
 		return
 	}
@@ -7499,7 +7499,7 @@ async function exointerval_async_sync(command) {
 }
 
 // Guard: SYSTEM_ERROR report must not re-enter systemerror if the side request fails.
-var gexodus_reporting_system_error = false
+var gexo_reporting_system_error = false
 
 function systemerror(functionname, e) {
 	if (typeof functionname == 'undefined')
@@ -7564,8 +7564,8 @@ function systemerror(functionname, e) {
 	// Send OK → friendly "support informed"; fail → alert full technical text.
 	return (async function systemerror_report_and_alert() {
 		var reported = false
-		if (!gexodus_reporting_system_error && !gonunload && typeof exodblink == 'function') {
-			gexodus_reporting_system_error = true
+		if (!gexo_reporting_system_error && !gonunload && typeof exodblink == 'function') {
+			gexo_reporting_system_error = true
 			try {
 				var reportdb = new exodblink()
 				reportdb.request = 'EXECUTE\rGENERAL\rSYSTEM_ERROR'
@@ -7574,11 +7574,11 @@ function systemerror(functionname, e) {
 			} catch (e4) {
 				reported = false
 			} finally {
-				gexodus_reporting_system_error = false
+				gexo_reporting_system_error = false
 			}
 		}
 		if (!gonunload) {
-			var usermsg = reported ? gexodus_system_error_user_msg : technical
+			var usermsg = reported ? gexo_system_error_user_msg : technical
 			try {
 				usermsg = String(usermsg).replace(/\r\n/g, '\n')
 			} catch (e3) { }
@@ -7782,7 +7782,7 @@ function exo_set_icon_element(el, specOrUrl) {
 		if (el.id)
 			span.id = el.id
 		// keep common attributes used on field chrome / static toolbar buttons
-		;['title', 'isexoduspopup', 'isexoduslink', 'exo_onclick', 'exodustype',
+		;['title', 'isexopopup', 'isexolink', 'exo_onclick', 'exotype',
 			'accesskey', 'exogroupno', 'style', 'class'].forEach(function (n) {
 			if (n == 'class' || n == 'style')
 				return
@@ -7880,20 +7880,20 @@ function exoconfirm_focus_endpoint(first) {
 // Independent of gblockevents / starteventhandler / document_onkeydown.
 // Decide lists keep decide_document_onkeydown on the div + Esc via startevent.
 // ---------------------------------------------------------------------------
-var gexodusconfirm_plain_keydown_capture = false
+var gexoconfirm_plain_keydown_capture = false
 
 function exoconfirm_install_plain_keydown() {
-	if (gexodusconfirm_plain_keydown_capture)
+	if (gexoconfirm_plain_keydown_capture)
 		return
 	document.addEventListener('keydown', exoconfirm_plain_keydown, true)
-	gexodusconfirm_plain_keydown_capture = true
+	gexoconfirm_plain_keydown_capture = true
 }
 
 function exoconfirm_uninstall_plain_keydown() {
-	if (!gexodusconfirm_plain_keydown_capture)
+	if (!gexoconfirm_plain_keydown_capture)
 		return
 	document.removeEventListener('keydown', exoconfirm_plain_keydown, true)
-	gexodusconfirm_plain_keydown_capture = false
+	gexoconfirm_plain_keydown_capture = false
 }
 
 // Capture-phase: handle keys for plain confirm before form/Gate A sees them.
@@ -8049,14 +8049,14 @@ function exoconfirm_keymap(event) {
 	// 3) Split: pure button popup → bare letter (and Alt+ still ok);
 	//           text-input confirm → Alt+letter only (bare letters type; text field path
 	//           above already returns true when focus is the input).
-	// WRONG: var accessLetter = gexodusconfirmletters && keyletter  // always bare
-	// WRONG: var accessLetter = event.altKey && gexodusconfirmletters && keyletter  // always Alt
-	var accessLetter = gexodusconfirmletters && keyletter
+	// WRONG: var accessLetter = gexoconfirmletters && keyletter  // always bare
+	// WRONG: var accessLetter = event.altKey && gexoconfirmletters && keyletter  // always Alt
+	var accessLetter = gexoconfirmletters && keyletter
 		&& (!istextinput || event.altKey)
 
 	// F9 / first-button letter: always positive (OK/Yes) — not bare Enter
 	if (keycode == 120
-		|| (accessLetter && keyletter == gexodusconfirmletters[1])) {
+		|| (accessLetter && keyletter == gexoconfirmletters[1])) {
 		window.setTimeout(exo_confirm_function1_sync, 1)
 		return false
 	}
@@ -8064,13 +8064,13 @@ function exoconfirm_keymap(event) {
 	// Bare Enter/Space with nothing focused: swallow, do not invent a button press
 
 	// CANCEL: Esc always; letter per accessLetter rules above
-	if (keycode == 27 || (accessLetter && keyletter == gexodusconfirmletters[3])) {
+	if (keycode == 27 || (accessLetter && keyletter == gexoconfirmletters[3])) {
 		window.setTimeout(exo_confirm_function3_sync, 1)
 		return false
 	}
 
 	// NEGATIVE: F8; letter per accessLetter rules above
-	if (keycode == 119 || (accessLetter && keyletter == gexodusconfirmletters[2])) {
+	if (keycode == 119 || (accessLetter && keyletter == gexoconfirmletters[2])) {
 		window.setTimeout(exo_confirm_function2_sync, 1)
 		return false
 	}
@@ -8141,7 +8141,7 @@ function exoconfirm_default_button_element(defaultbuttonn) {
 	return $$('positivebutton')||null
 }
 
-var gexodusconfirm_scrollhint_resize
+var gexoconfirm_scrollhint_resize
 
 function exoconfirm_update_scroll_hints() {
 	var scrollpane = exoconfirm_scrollpane()
@@ -8221,25 +8221,25 @@ function exoconfirm_bind_scroll_hints() {
 	// fit_decide_popup already refreshes the ▼ hint
 	exoconfirm_fit_decide_popup()
 	scrollpane.addEventListener('scroll', exoconfirm_update_scroll_hints, { passive: true })
-	gexodusconfirm_scrollhint_resize=function() {
+	gexoconfirm_scrollhint_resize=function() {
 		exoconfirm_fit_decide_popup(true)
 	}
-	window.addEventListener('resize', gexodusconfirm_scrollhint_resize, { passive: true })
+	window.addEventListener('resize', gexoconfirm_scrollhint_resize, { passive: true })
 	// Zoom often updates visualViewport without (or before) window.resize
 	try {
 		if (window.visualViewport)
-			window.visualViewport.addEventListener('resize', gexodusconfirm_scrollhint_resize, { passive: true })
+			window.visualViewport.addEventListener('resize', gexoconfirm_scrollhint_resize, { passive: true })
 	} catch (e) { }
 }
 
 function exoconfirm_unbind_scroll_hints() {
-	if (gexodusconfirm_scrollhint_resize) {
-		window.removeEventListener('resize', gexodusconfirm_scrollhint_resize)
+	if (gexoconfirm_scrollhint_resize) {
+		window.removeEventListener('resize', gexoconfirm_scrollhint_resize)
 		try {
 			if (window.visualViewport)
-				window.visualViewport.removeEventListener('resize', gexodusconfirm_scrollhint_resize)
+				window.visualViewport.removeEventListener('resize', gexoconfirm_scrollhint_resize)
 		} catch (e) { }
-		gexodusconfirm_scrollhint_resize = null
+		gexoconfirm_scrollhint_resize = null
 	}
 }
 
@@ -8340,7 +8340,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 	var nbuttons = 0
 	var buttons = []
 
-	gexodusconfirmletters = []
+	gexoconfirmletters = []
 
 	//check buttons
 	if (positivebuttonx)
@@ -8470,9 +8470,9 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 		}
 		if (letter) {
 			letter = letter.toUpperCase()
-			html += ' exodusletter="' + letter + '"'
+			html += ' exo_letter="' + letter + '"'
 		}
-		gexodusconfirmletters[buttonn] = letter
+		gexoconfirmletters[buttonn] = letter
 
 		// Tooltip matches keymap: bare letter when no text field; Alt+ when text-input.
 		html += ' title="Press '
@@ -8489,7 +8489,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 
 		//set the button number
 		html += ' exobuttonnumber="' + nbuttons + '"'
-		html += ' exodusyesnocancel="' + (buttonn % 3) + '"'
+		html += ' exo_yesnocancel="' + (buttonn % 3) + '"'
 
 		var iconhtml = ''
 		if (default_icons) {
@@ -8658,8 +8658,8 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 	})
 	gpendingConfirmResolve = confirmResolve
 	// Gate B wait/cancel owns this confirm when B is open; otherwise Gate A business.
-	gpendingConfirmOwner = (g_exodus_waitcancel || gprocessing_waitcancel_active) ? 'B' : 'A'
-	gexodusconfirmdefaultbutton = defaultbuttonn || 1
+	gpendingConfirmOwner = (g_exo_waitcancel || gprocessing_waitcancel_active) ? 'B' : 'A'
+	gexoconfirmdefaultbutton = defaultbuttonn || 1
 
 	blockmodalui_sync()
 	form_blockevents(true, 'exoconfirm2')
@@ -8708,7 +8708,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 			exoconfirm_uninstall_plain_keydown()
 		gpendingConfirmResolve = null
 		gpendingConfirmOwner = null
-		gexodusconfirmdefaultbutton = null
+		gexoconfirmdefaultbutton = null
 		form_blockevents(false, 'exoconfirm2')
 		unblockmodalui_sync()
 		exoconfirm_unbind_scroll_hints()
@@ -9389,7 +9389,7 @@ async function decide_onload(decide_args) {
 		return await decide_fail_no_options()
 	}
 
-	//exosettimeout('exodusautofitwindow()', 10)
+	//exosettimeout('exoautofitwindow()', 10)
 
 	var selections = document.getElementsByName('decide_selection')
 
