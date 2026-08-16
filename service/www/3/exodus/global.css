@@ -1582,6 +1582,21 @@ input[type=checkbox]:focus-visible {
     align-items: stretch;
     overflow: hidden;
 }
+/* Drag handles: icon + question only (not body list / footer).
+ * grab/grabbing — not move (often a four-arrow “resize” glyph). */
+.exoconfirmdiv .exoconfirm_iconcol,
+.exoconfirmdiv #question1 {
+    cursor: grab;
+    cursor: -webkit-grab;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.exoconfirmdiv.exo_confirm_dragging,
+.exoconfirmdiv.exo_confirm_dragging .exoconfirm_iconcol,
+.exoconfirmdiv.exo_confirm_dragging #question1 {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+}
 /* Outer shell: icon + prompt column (divs — not a table, so option <tr> hit-testing stays local) */
 .exoconfirm_layout {
     width: 100%;

@@ -7662,6 +7662,85 @@ function exoconfirm_scrollpane() {
 	return div && (div.querySelector('.exoconfirm_body') || div)
 }
 
+// Drag confirm/decide shell by icon or question only. No position memory
+// (each open still CSS-centred). Leaves body/footer/table free for clicks.
+function exoconfirm_install_drag(div) {
+	if (!div || div.getAttribute('exo_confirm_drag') == '1')
+		return
+	div.setAttribute('exo_confirm_drag', '1')
+
+	var dragging = false
+	var originX = 0
+	var originY = 0
+	var startLeft = 0
+	var startTop = 0
+
+	function pin_to_pixels() {
+		var r = div.getBoundingClientRect()
+		div.style.inset = 'auto'
+		div.style.margin = '0'
+		div.style.right = 'auto'
+		div.style.bottom = 'auto'
+		div.style.left = r.left + 'px'
+		div.style.top = r.top + 'px'
+	}
+
+	function onmove(event) {
+		if (!dragging)
+			return
+		event = getevent(event)
+		var nx = startLeft + (event.clientX - originX)
+		var ny = startTop + (event.clientY - originY)
+		var w = div.offsetWidth
+		var h = div.offsetHeight
+		var vw = window.innerWidth || document.documentElement.clientWidth || 0
+		var vh = window.innerHeight || document.documentElement.clientHeight || 0
+		// Keep a strip of the dialog on-screen
+		if (nx > vw - 40)
+			nx = vw - 40
+		if (ny > vh - 40)
+			ny = vh - 40
+		if (nx + w < 40)
+			nx = 40 - w
+		if (ny < 0)
+			ny = 0
+		div.style.left = nx + 'px'
+		div.style.top = ny + 'px'
+	}
+
+	function onup() {
+		if (!dragging)
+			return
+		dragging = false
+		div.classList.remove('exo_confirm_dragging')
+		document.removeEventListener('mousemove', onmove, true)
+		document.removeEventListener('mouseup', onup, true)
+	}
+
+	function ondown(event) {
+		event = getevent(event)
+		if (event.button != null && event.button !== 0)
+			return
+		pin_to_pixels()
+		dragging = true
+		div.classList.add('exo_confirm_dragging')
+		originX = event.clientX
+		originY = event.clientY
+		startLeft = parseFloat(div.style.left) || 0
+		startTop = parseFloat(div.style.top) || 0
+		document.addEventListener('mousemove', onmove, true)
+		document.addEventListener('mouseup', onup, true)
+		return exocancelevent(event)
+	}
+
+	var icon = div.querySelector('.exoconfirm_iconcol')
+	var question = div.querySelector('#question1')
+	if (icon)
+		addeventlistener(icon, 'mousedown', ondown)
+	if (question)
+		addeventlistener(question, 'mousedown', ondown)
+}
+
 // Scroll a table row into view below a sticky thead (scrollIntoView nearest
 // can leave the focused radio/row under sticky colheads on wheel/Up/Home).
 // +4px: radio/checkbox focus ring is 3px box-shadow; flush under thead clips it.
@@ -8579,6 +8658,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 
 	//insert and centralise the div after it has autosized itself
 	document.body.insertBefore(div, null)
+	exoconfirm_install_drag(div)
 
 	if (istextinput) {
 		var textinput = $$('exoconfirmdiv_textinput')
