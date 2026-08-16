@@ -2554,6 +2554,10 @@ async function formfunctions_onload() {
         // (e.g. draft keep after preview write).
         settouched(false)
 
+        // filldefaults/validation can finish with no focus (e.g. passed DOCUMENT_NO
+        // accepted without multi-hit decide). Land on start/first field.
+        form_ensure_open_focus()
+
     }
 
     if (gparameters.savebuttonvalue) {
@@ -3292,6 +3296,33 @@ async function newrecordfocus() {
 
     //logout('newrecordfocus')
 
+}
+
+// After open fill/validation: ensure some data field is focused.
+// Unbound forms (scheduleprint etc.) run newrecordfocus early (cleardoc), then
+// filldefaults/validation; multi-hit decide used to leave focus, quiet exact-key
+// paths do not — land on gstartelement / first non-key if nothing is focused.
+function form_ensure_open_focus() {
+    var ae = document.activeElement
+    if (ae && ae.getAttribute && ae.getAttribute('exofieldno')
+        && typeof exoenabledandvisible == 'function' && exoenabledandvisible(ae))
+        return
+    var el = gstartelement
+    if (!el || (typeof exoenabledandvisible == 'function' && !exoenabledandvisible(el)))
+        el = gfirstnonkeyelement
+    if (!el)
+        return
+    if (typeof el == 'string') {
+        el = $$(el)
+        if (el && el[0])
+            el = el[0]
+    }
+    if (!el)
+        return
+    if (el.id)
+        focuson(el.id)
+    else
+        focuson(el)
 }
 
 async function gds_onreadystatechange() {
