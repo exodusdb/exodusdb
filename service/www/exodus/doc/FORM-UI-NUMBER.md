@@ -1,7 +1,7 @@
 # FORM-UI-NUMBER — `[NUMBER…]` / `[DECIMAL…]` / `[INTEGER]`
 
 **Location:** `service/www/exodus/doc/`  
-**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `INTEGER`, `exodusround`), `db.js` (`exo_dict_number` / `_integer` / `_decimal`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
+**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `INTEGER`, `exoround`), `db.js` (`exo_dict_number` / `_integer` / `_decimal`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
 **Tests:** `service/www/3/exodus/scripts/test_number.js`  
 **See also:** [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [PROGRAMMERS_OVERVIEW.md](./PROGRAMMERS_OVERVIEW.md)
 
@@ -140,10 +140,10 @@ That includes:
 
 | Call site | Same rule |
 |-----------|-----------|
-| `.exodusoconv('[NUMBER]')` / `.exodusoconv('[NUMBER,…]')` | Fully formatted OCONV |
+| `.exooconv('[NUMBER]')` / `.exooconv('[NUMBER,…]')` | Fully formatted OCONV |
 | Bound field paint / `setx` with conversion `[NUMBER,…]` | Same |
 | `NUMBER('OCONV', value, params)` with default `display` | Same |
-| User messages, notes, invalid text built with `.exodusoconv('[NUMBER,…]')` | Same — intentional screen text |
+| User messages, notes, invalid text built with `.exooconv('[NUMBER,…]')` | Same — intentional screen text |
 
 **Not** “almost plain with optional commas.” Assume the result may contain **thousands separators and a locale decimal** and must not be fed back into arithmetic without ICONV (or avoid NUMBER mid-calc entirely — §6).
 
@@ -170,22 +170,22 @@ ICONV **strips** either grouping style before parse (accept plain or already-ext
 
 | Call | OCONV result shape |
 |------|--------------------|
-| `.exodusoconv('[NUMBER,…]')` / bind / setx / messages | **External:** ndecs + **full** `,.` or `.,` formatting when BASEFMT groups |
-| `.exodusoconv('[DECIMAL,…]')` / `DECIMAL(...)` | **Plain:** ndecs only, `.` decimal, **no** thousands — re-entrable for math |
-| `.exodusoconv('[INTEGER]')` / `INTEGER(...)` | **Plain:** 0 dp, no thousands |
+| `.exooconv('[NUMBER,…]')` / bind / setx / messages | **External:** ndecs + **full** `,.` or `.,` formatting when BASEFMT groups |
+| `.exooconv('[DECIMAL,…]')` / `DECIMAL(...)` | **Plain:** ndecs only, `.` decimal, **no** thousands — re-entrable for math |
+| `.exooconv('[INTEGER]')` / `INTEGER(...)` | **Plain:** 0 dp, no thousands |
 | `ROUND(...)` | legacy alias for `DECIMAL` |
 
 How DECIMAL/INTEGER ask NUMBER for plain / 0 dp is an **implementation detail** (`display` / `forced_ndecs` — not a public conversion parameter).  
 **No** `gnumber_oconv_display` / begin/end.
 
-**Document every `[NUMBER…]` OCONV as user-facing formatted output.** If you need plain digits for further calc or storage shape, use **`[DECIMAL…]`**, **`[INTEGER]`**, or **`exodusround`** — not NUMBER.
+**Document every `[NUMBER…]` OCONV as user-facing formatted output.** If you need plain digits for further calc or storage shape, use **`[DECIMAL…]`**, **`[INTEGER]`**, or **`exoround`** — not NUMBER.
 
 ---
 
 ## 6. Policy: do not OCONV to round mid-calc
 
-**Bad:** `(a + b).exodusoconv('[NUMBER,2]')` then more math — result may be `1,234.56` / `1.234,56`, not a plain number.  
-**Good:** `.exodusoconv('[DECIMAL,2]')` or pure `exodusround(n, 2)` then continue.
+**Bad:** `(a + b).exooconv('[NUMBER,2]')` then more math — result may be `1,234.56` / `1.234,56`, not a plain number.  
+**Good:** `.exooconv('[DECIMAL,2]')` or pure `exoround(n, 2)` then continue.
 
 Use **NUMBER** only for:
 
@@ -259,7 +259,7 @@ For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when 
 | Default non-negative | Empty min → **≥ 0** |
 | Allow negatives | Bag **`signed: true`** → min `SIGNED`, or min = **−max** when max set (not magic floors) |
 | Counts vs amounts | **integer** (plain 0 dp) vs **number** (full external format) vs **decimal** (plain frac) |
-| NUMBER OCONV | Always **fully formatted** external (`,.` / `.,` per BASEFMT) — including `.exodusoconv('[NUMBER…]')` in messages |
+| NUMBER OCONV | Always **fully formatted** external (`,.` / `.,` per BASEFMT) — including `.exooconv('[NUMBER…]')` in messages |
 | Bags | Omit defaults; no noisy `min: 0` |
 | Paint | Helper sets `exostyle` + default align; no post-helper align/length/exostyle |
 | Prefer helpers | Do not put `[NUMBER…]` / `[INTEGER…]` in `dictrec` conversion7 for live numeric fields |
@@ -313,7 +313,7 @@ Typical mature state after the bag migration wave:
 | Special raw forms (e.g. `[NUMBER,*]`) | Decide per field: helper bag, keep raw with a comment, or replace. |
 | `dict_number({ decimals: 0 })` without plain | May be intentional 0-dp **amount** (grouping). Pure counts → `dict_integer`. Signed 0-dp amounts → often still **number** + `signed: true`, not integer. |
 | Legacy `dictrec(…, 'R', length)` next to a helper | Redundant; length unused for number SPAN; align usually already set by helper when `groupno > 0`. Strip when touching the line. |
-| Mid-calc | Prefer DECIMAL / `exodusround`; NUMBER only for external / messages. |
+| Mid-calc | Prefer DECIMAL / `exoround`; NUMBER only for external / messages. |
 | Server C++ amount formatting | **Out of scope** of this JS conversion/helper rationalisation. |
 | Broad `dict_decimal` adoption | API ready; few call sites until plain fractional fields are walked deliberately. |
 
@@ -338,7 +338,7 @@ Typical mature state after the bag migration wave:
 |---------|--------|
 | `NUMBER` / `DECIMAL` / `INTEGER` / `ROUND` | `exodus.js` |
 | Dict helpers | `db.js` → `exo_dict_number` / `_integer` / `_decimal` |
-| Pure numeric round | `exodus.js` → `exodusround` |
+| Pure numeric round | `exodus.js` → `exoround` |
 | BASEFMT | `client.js` → `gbasefmt`, `gthousands_regex` |
 | DOM read | `dbform.js` → `getvalue` (external), `getvalue_internal` (ICONV) |
 | Number SPAN paint | `dbform.js` — `exostyle` number/code: floor 6ch, length unused |
@@ -353,7 +353,7 @@ Typical mature state after the bag migration wave:
 3. Allow negatives? → `signed: true` (do not invent floors).
 4. Drop dictrec conversion7 / align9 / length10 for that field; drop post-helper align / length / exostyle.
 5. Footer / header want R with blank group? → `di.align = 'R'` **before** helper.
-6. Mid-calc nearby? → DECIMAL or `exodusround`, not NUMBER (NUMBER OCONV is fully formatted `,.` / `.,`).
+6. Mid-calc nearby? → DECIMAL or `exoround`, not NUMBER (NUMBER OCONV is fully formatted `,.` / `.,`).
 7. User message amounts? → `[NUMBER…]` is correct (full format); do not treat the string as internal.
 8. Match indent of the `di =` line.
 

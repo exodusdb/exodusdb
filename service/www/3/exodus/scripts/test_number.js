@@ -72,8 +72,8 @@ if (typeof NUMBER != 'function') {
 var hasDecimal = typeof DECIMAL == 'function'
 var hasInteger = typeof INTEGER == 'function'
 var hasRound = typeof ROUND == 'function'
-var hasExodusround = typeof exodusround == 'function'
-var hasExodusroundMember = typeof Number.prototype.exodusround == 'function'
+var hasExodusround = typeof exoround == 'function'
+var hasExodusroundMember = typeof Number.prototype.exoround == 'function'
 
 gbasefmt = 'MD2,'
 gthousands_regex = /,/g
@@ -488,29 +488,29 @@ if (hasRound && hasDecimal) {
 }
 
 // ===========================================================================
-// exodusround
+// exoround
 // ===========================================================================
 
-console.log('\n=== exodusround ===')
+console.log('\n=== exoround ===')
 if (hasExodusround) {
     try {
-        if (exodusround(12.7) === 13)
-            check('exodusround default 0', exodusround(12.7), 13)
+        if (exoround(12.7) === 13)
+            check('exoround default 0', exoround(12.7), 13)
         else
-            skip('exodusround default 0', 'needs explicit ndecimals')
+            skip('exoround default 0', 'needs explicit ndecimals')
     } catch (e) {
-        skip('exodusround default 0', e.message)
+        skip('exoround default 0', e.message)
     }
-    check('exodusround(…, 2)', exodusround(1234567.895, 2), 1234567.9)
-    check('exodusround(-1.5, 0)', exodusround(-1.5, 0), -2)
+    check('exoround(…, 2)', exoround(1234567.895, 2), 1234567.9)
+    check('exoround(-1.5, 0)', exoround(-1.5, 0), -2)
 } else {
-    skip('exodusround', 'not defined')
+    skip('exoround', 'not defined')
 }
 if (hasExodusroundMember) {
-    check('(n).exodusround()', (1234567.6).exodusround(), 1234568)
-    check('string.exodusround(2)', '1234567.895'.exodusround(2), 1234567.9)
+    check('(n).exoround()', (1234567.6).exoround(), 1234568)
+    check('string.exoround(2)', '1234567.895'.exoround(2), 1234567.9)
 } else {
-    skip('.exodusround', 'not defined')
+    skip('.exoround', 'not defined')
 }
 
 // ---------------------------------------------------------------------------

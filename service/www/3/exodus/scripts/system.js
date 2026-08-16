@@ -58,8 +58,8 @@ async function system_val_datasetcode(many, orcurrent, test) {
 
     var values = many ? gvalue.split(':') : [gvalue]
     for (var ii = 0; ii < values.length; ii++) {
-        if (!gdatasets[1].exoduslocate(values[ii]))
-            return await exoui_invalid(values[ii].exodusquote() + ' is not a valid dataset code')
+        if (!gdatasets[1].exolocate(values[ii]))
+            return await exoui_invalid(values[ii].exoquote() + ' is not a valid dataset code')
     }
 
     return true
@@ -72,7 +72,7 @@ async function system_getdatasets(refresh) {
         db.request = 'EXECUTE\rGENERAL\rGETDATASETS'
         if (!(await db.send())) return await exoui_invalid(db.response)
         //split inverted
-        gdatasets = db.data.exodussplit(vm + sm, true)
+        gdatasets = db.data.exosplit(vm + sm, true)
     }
     return gdatasets.length > 0
 }
@@ -88,7 +88,7 @@ function system_users_sortselect(withtask, haslocks, sselect) {
     if (sselect)
         sortselect += ' AND ' + sselect
     if (withtask)
-        sortselect += ' AND WITH AUTHORISED_' + String(withtask).exodusconvert(' ', '_').toUpperCase()
+        sortselect += ' AND WITH AUTHORISED_' + String(withtask).exoconvert(' ', '_').toUpperCase()
     if (typeof haslocks == 'boolean')
         sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
     return 'BY RANK ' + sortselect.slice(5)
@@ -110,7 +110,7 @@ async function system_dict_usercode(di, many, withtask, haslocks, sselect) {
     if (typeof sselect == 'undefined' || sselect === '')
         sselect = '""'
     if ("'\"".indexOf(sselect.substr(0, 1)) == -1)
-        sselect = '"' + sselect.exodusswap('"', '\\"') + '"'
+        sselect = '"' + sselect.exoswap('"', '\\"') + '"'
     di.popup = 'await system_pop_users(' + many + ',"' + withtask + '",' + haslocks + ',' + sselect + ')'
     // Live typeahead via existing general_typeahead_master (session list + wordstart)
     di.onchange = 'await system_typeahead_users("' + withtask + '",' + haslocks + ',' + sselect + ')'
@@ -159,7 +159,7 @@ async function system_getdepartments(deptoptions) {
     var onlyactivegroups = deptoptions.indexOf('A') >= 0
 
     var security = []
-    if (!(await security.exodusread('DEFINITIONS', 'SECURITY*USERS')))
+    if (!(await security.exoread('DEFINITIONS', 'SECURITY*USERS')))
         return await exoui_invalid(security.exodusresponse)
     security = exodus_splitarray(security, [[[1, 9]], [[10, 11]]])
     gdepts = [[], [], []]
@@ -175,9 +175,9 @@ async function system_getdepartments(deptoptions) {
                 continue
             deptid = security[1][usern - 1]
             if (!withnumbers)
-                deptid = deptid.exodusconvert('0123456789', '').exodustrim()
+                deptid = deptid.exoconvert('0123456789', '').exotrim()
             if (deptid != '---' && deptid != '') {
-                if (!(gdepts[0].exoduslocate(deptid))) {
+                if (!(gdepts[0].exolocate(deptid))) {
                     gdepts[0].push(deptid)
                     gdepts[1].push(security[8][usern - 1])
                     gdepts[2].push(groupusers.join(','))
@@ -209,10 +209,10 @@ async function system_dict_departmentcode(di, many, deptoptions) {
         many = false
     if (!deptoptions)
         deptoptions = ''
-    di.popup = 'await system_pop_department(' + many + ',' + deptoptions.exodusquote() + ')'
-    di.validation = 'await system_val_department(' + deptoptions.exodusquote() + ')'
+    di.popup = 'await system_pop_department(' + many + ',' + deptoptions.exoquote() + ')'
+    di.validation = 'await system_val_department(' + deptoptions.exoquote() + ')'
     // Same dept list as F7 (SECURITY*USERS via system_getdepartments)
-    di.onchange = 'await system_typeahead_department(' + deptoptions.exodusquote() + ')'
+    di.onchange = 'await system_typeahead_department(' + deptoptions.exoquote() + ')'
 }
 
 async function system_pop_department(many, deptoptions) {
@@ -244,7 +244,7 @@ async function system_typeahead_department(deptoptions) {
 async function system_val_department(deptoptions) {
     if (!(await system_getdepartments(deptoptions)))
         return false
-    if (gvalue && !gdepartments.split(fm).exoduslocate(gvalue))
+    if (gvalue && !gdepartments.split(fm).exolocate(gvalue))
         return await exoui_invalid(gvalue + ' department does not exist')
     return true
 }

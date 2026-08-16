@@ -144,9 +144,9 @@ function exo_dict_index(di,filename,fieldname,many,allownew,warnnew) {
  if (typeof allownew == 'undefined') allownew=true
  if (typeof warnnew == 'undefined') warnnew=true
 
- if (!di.validation) di.validation='await form_val_index('+filename.exodusquote()+','+fieldname.exodusquote()+','+allownew+','+warnnew+')'
+ if (!di.validation) di.validation='await form_val_index('+filename.exoquote()+','+fieldname.exoquote()+','+allownew+','+warnnew+')'
 
- if (!di.popup) di.popup='await form_pop_index('+filename.exodusquote()+','+fieldname.exodusquote()+','+many+')'
+ if (!di.popup) di.popup='await form_pop_index('+filename.exoquote()+','+fieldname.exoquote()+','+many+')'
  
 }
 
@@ -166,7 +166,7 @@ function exo_dict_year(dicti,from,to,defaultyear) {
  dicti.conversion='[NUMBER,0]'
  dicti.align='R'
  dicti.length=4
- var curryear=exodusdate().exodusoconv('[DATE,YEAR]')
+ var curryear=exodusdate().exooconv('[DATE,YEAR]')
  var years=''
  for (var year=curryear+to;year>=curryear+from;year--) {
 
@@ -592,12 +592,12 @@ function exodusrecord(dictarray,filename) {
    for (var propname in temp) {
 
     if (!propname.match(validpropnames))
-        alert(exodusquote(propname)+' invalid dictionary property in '+name+' ignored')
+        alert(exoquote(propname)+' invalid dictionary property in '+name+' ignored')
     
     //check sequence A for ascending (D for descending not implemented yet)
-    if (propname=='sequence'&&!['A'].exoduslocate(sequence)) {
+    if (propname=='sequence'&&!['A'].exolocate(sequence)) {
 
-     alert(exodusquote(propname)+' invalid value '+sequence+' in '+name+' ignored')
+     alert(exoquote(propname)+' invalid value '+sequence+' in '+name+' ignored')
      sequence=''
     }
    }
@@ -605,7 +605,7 @@ function exodusrecord(dictarray,filename) {
    //check for duplicate dict ids
    if (typeof this.dict[name]!='undefined') {
 
-    throw(new Error(0,exodusquote(name)+' duplicate dictionary id not allowed'))
+    throw(new Error(0,exoquote(name)+' duplicate dictionary id not allowed'))
    }
 
    //save a pointer
@@ -679,7 +679,7 @@ function exodusrecord(dictarray,filename) {
    //if (fieldno==0) required=true
    
    if (!title)
-    title=name.replace(/_/gi,' ').exoduscapitalise()
+    title=name.replace(/_/gi,' ').exocapitalise()
    
    //save the dictitems by groupno to avoid scanning the whole dict
    //zzz this should be used in rev2obj and obj2rev
@@ -809,7 +809,7 @@ exodusrecord.prototype.postread=function exodusrecord_postread() {
  response=response.split(' ')
  
  //get sessionid from response
- var temp=response.exoduslocate('SESSIONID')
+ var temp=response.exolocate('SESSIONID')
  if (temp) {
 
   this.sessionid=response[temp]
@@ -818,14 +818,14 @@ exodusrecord.prototype.postread=function exodusrecord_postread() {
  }
 
  //get the sequential key provided by the server
- if ((temp=response.exoduslocate('RECORDKEY'))>0) {
+ if ((temp=response.exolocate('RECORDKEY'))>0) {
 
   this.key=response[temp].replace(/\{20\}/g,' ')
   response[temp-1]=''
   response[temp]=''
  }
 
- this.response=response.join(' ').exodustrim()
+ this.response=response.join(' ').exotrim()
  //to prevent RECORDKEY message popup on opening (company) versions
  db.response=this.response
  
@@ -1009,7 +1009,7 @@ exodusrecord.prototype.writex=async function exodusrecord_writex(withunlock) {
          }
          
          //extract keypart
-         if (keypart) temp=temp.exodusfield('*',keypart)
+         if (keypart) temp=temp.exofield('*',keypart)
          
          if(typeof(temp)=='undefined'||temp==null) {
 
@@ -1033,7 +1033,7 @@ exodusrecord.prototype.writex=async function exodusrecord_writex(withunlock) {
 
           if (wordsep!='') {
 
-           temp=temp.exodusfield(wordsep,wordno,nwords)
+           temp=temp.exofield(wordsep,wordno,nwords)
           }
           else {
 
@@ -1188,7 +1188,7 @@ function addfield(rec,fieldname,fieldtext) {
            }
            if (!(exodusnum(checktemp))) {
 
-            alert(name+' '+exodusquote(temp)+' is not a '+conversion.slice(1,-1).toLowerCase()+'.')
+            alert(name+' '+exoquote(temp)+' is not a '+conversion.slice(1,-1).toLowerCase()+'.')
             return 0
            }
           }
@@ -1201,7 +1201,7 @@ function addfield(rec,fieldname,fieldtext) {
           //if (wordsep)
           //{
           //NB noextend=true
-           temp=temp2.exodusfieldstore(wordsep,wordno,nwords,temp,true)
+           temp=temp2.exofieldstore(wordsep,wordno,nwords,temp,true)
           //}
           //else
           //{
@@ -1236,13 +1236,13 @@ function addfield(rec,fieldname,fieldtext) {
 
    if (rev[fieldn]!="") {
 
-    rev[fieldn]=rev[fieldn].join(vm).exodustrimr(vm)
+    rev[fieldn]=rev[fieldn].join(vm).exotrimr(vm)
    }
   }
 
   //join the fields into a single fm delimited string
   //zzz should remove excess fm and vm etc
-  this.revstr=rev.join(fm).exodustrimr(fm)
+  this.revstr=rev.join(fm).exotrimr(fm)
   
   return 1
  
@@ -1286,7 +1286,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
  exodusassertstring(code0,dictrec,code0)
 // if (typeof code0!='string'||code0.match(/(^NUMBER$)|(^DATE$)|(^TIME$)|(^PERIOD_OF_YEAR$)|(^PERIOD_OF_TIME$)|(^TIME_OF_DAY$)/))
 // {
-//  alert(exodusquote(code0)+' invalid dictionary code')
+//  alert(exoquote(code0)+' invalid dictionary code')
 // }
 
  //check not used elsewhere as a function
@@ -1297,7 +1297,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
 // if (typeof typeofcode0!='undefined')
  if (typeof typeofcode0=='function') {
 
-  alert(exodusquote(code0)+' dictionary ids must be unique but this is used elsewhere as '+typeofcode0)
+  alert(exoquote(code0)+' dictionary ids must be unique but this is used elsewhere as '+typeofcode0)
  }
  
  var newdictitem=new Object
@@ -1326,7 +1326,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
  if (!title3) {
 
   //dict[dictn].title=name.replace(/_/gi,' ')
-  title3=code0.replace(/_/gi,' ').exoduscapitalise()
+  title3=code0.replace(/_/gi,' ').exocapitalise()
  }
  
  newdictitem.name=code0
@@ -1356,7 +1356,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
   var words=code0.split('_')
   for (var wordn=0;wordn<words.length;++wordn) {
 
-   if (!(await exoui_security(gdatafilename.exodussingular()+' UPDATE '+words.slice(0,wordn+1).join(' ').exodusquote()))) {
+   if (!(await exoui_security(gdatafilename.exosingular()+' UPDATE '+words.slice(0,wordn+1).join(' ').exoquote()))) {
 
     newdictitem.readonly=gmsg
     break;

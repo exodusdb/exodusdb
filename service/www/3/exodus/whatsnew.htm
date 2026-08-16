@@ -15,13 +15,13 @@ async function whatsnew_pop_dates() {
     return await exoui_invalid(db.response)
 
  //convert to human date and put latest dates at top
- var versiondates=db.data.split(fm).exodusoconv('[DATE]').reverse()
+ var versiondates=db.data.split(fm).exooconv('[DATE]').reverse()
  
  var reply
  if (!(reply=await exoui_decide('From which EXODUS version date do you want to see whats new?',versiondates)))
     return false
  
- return versiondates[reply-1]//.exodusiconv('[DATE]')
+ return versiondates[reply-1]//.exoiconv('[DATE]')
   
 }
 
@@ -46,10 +46,10 @@ async function dict_WHATSNEW() {
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',3)
  exo_dict_date(di,'FROM=FROM_DATE')
- di.defaultvalue=exodusdate().exodusoconv('[DATE]')
+ di.defaultvalue=exodusdate().exooconv('[DATE]')
   
  di=dict[++din]=dictrec('COMPANY_CODE', 'F',4)
- di.defaultvalue=gcompanycode.exodusquote()
+ di.defaultvalue=gcompanycode.exoquote()
   
  return dict
  

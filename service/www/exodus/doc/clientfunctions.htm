@@ -173,7 +173,7 @@
         <p>
         </p>
         <h3>
-            await array.exodusread(filename,key,fieldno)</h3>
+            await array.exoread(filename,key,fieldno)</h3>
         <p>
             reads a record from the server into an array</p>
         <p>
@@ -182,14 +182,14 @@
         <p>
         </p>
         <h3>
-            await array.exodusxlate(filename,fieldno,mode)</h3>
+            await array.exoxlate(filename,fieldno,mode)</h3>
         <p>
         </p>
         returns an array of records from the server given an array of keys
         <p>
         </p>
         <h3>
-            await string.exodusxlate(filename,fieldno,mode)</h3>
+            await string.exoxlate(filename,fieldno,mode)</h3>
         <p>
             uses a string as a key to get a field or record from the server</p>
         <p>
@@ -572,7 +572,7 @@
             For EXODUS forms the main form data is automatically&nbsp;available as the global
             variable <strong>gds. </strong>You&nbsp;may create your own <em>exodus_obj_source</em>
             objects if you wish but the <em>exodusrecord</em> object is&nbsp;simpler to use.&nbsp;The
-            very simple <em>await array.exodusread() </em>method can be used to obtain records from
+            very simple <em>await array.exoread() </em>method can be used to obtain records from
             the server in a simple array object.</p>
         <p>
             This object represents a record with fields and multivalues like @RECORD but contains

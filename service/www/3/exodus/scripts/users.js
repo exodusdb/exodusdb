@@ -40,7 +40,7 @@ async function form_postdisplay() {
     if (gkey==gusername) {
         var loginstatus=await gds.getall('LOGIN_RESULT')
         loginstatus[0]=''//remove current login OK
-        //if (true||!loginstatus.exoduslocate('OK'))
+        //if (true||!loginstatus.exolocate('OK'))
         //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
     }
 
@@ -95,7 +95,7 @@ async function users_postdisplay() {
     var signatureimageelement = document.getElementById('signature_image')
     if (signatureimageelement) {
         signatureimageelement.src = ''
-        signatureimageelement.src = '../../images/'+gdataset+'/upload/users/' + gkey.exodusconvert(' ', '').toLowerCase() + '_signature.jpg'
+        signatureimageelement.src = '../../images/'+gdataset+'/upload/users/' + gkey.exoconvert(' ', '').toLowerCase() + '_signature.jpg'
     }
 
     //show only first five lines
@@ -106,7 +106,7 @@ async function users_postdisplay() {
 
     var userexpirydate=await gds.getx('EXPIRY_DATE')
     if (userexpirydate && userexpirydate <= exodusdate()) {
-        $expiryelement.innerHTML = '<strong style="color:Highlight">EXPIRED ' + userexpirydate.exodusoconv('[DATE]') + '</strong>'
+        $expiryelement.innerHTML = '<strong style="color:Highlight">EXPIRED ' + userexpirydate.exooconv('[DATE]') + '</strong>'
     } else {
         var reminderdays = 6
         var passwordexpires = await gds.getx('PASSWORD_EXPIRY_DATE')
@@ -141,7 +141,7 @@ async function users_upload_signature() {
     params = {}
     params.database = gdataset
     params.filename = 'USERS'
-    params.key = username.exodusconvert(' ', '') + '_signature'
+    params.key = username.exoconvert(' ', '') + '_signature'
     params.versionno = ''//newarchiveno
     params.updateallowed = true
     params.deleteallowed = true

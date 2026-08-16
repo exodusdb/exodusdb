@@ -21,10 +21,10 @@ var gfirstdayofweek
 var gcenturyyear = 50
 
 //returns an array of unique array elements from an array (removes duplicates)
-Array.prototype.exodusunique = function exodusunique(removeempty) {
+Array.prototype.exounique = function exounique(removeempty) {
     var uniquecodes = []
     for (var ii = 0; ii < this.length; ii++) {
-        if ((this[ii] == '' && removeempty) || !uniquecodes.exoduslocate(this[ii]))
+        if ((this[ii] == '' && removeempty) || !uniquecodes.exolocate(this[ii]))
             uniquecodes[uniquecodes.length] = this[ii]
     }
     return uniquecodes
@@ -39,7 +39,7 @@ function exodusamountinwords(amount) {
     //if zero return 'Zero'
     if (! +amount) return 'Zero'
 
-    amount = amount.toString().exodusconvert('-', '')
+    amount = amount.toString().exoconvert('-', '')
 
     var words = ''
 
@@ -70,16 +70,16 @@ function exodusamountinwords(amount) {
         if (units <= 20) words += text[+units + 1]
         else {
             words += text[19 + (+units.slice(-2, -1))]
-            if (units.toString().exodusright(1) != '0') words += '-' + text[(+units.slice(-1)) + 1]
+            if (units.toString().exoright(1) != '0') words += '-' + text[(+units.slice(-1)) + 1]
         }
     }
 
     //subunits
     if (exodusint(amount) != amount) {
-        words += ' .' + amount.toString().exodusfield('.', 2)
+        words += ' .' + amount.toString().exofield('.', 2)
     }
 
-    return words.exodustrim()
+    return words.exotrim()
 
 }
 
@@ -101,7 +101,7 @@ function exodusjulianperiod(period, maxperiodno) {
     if (period.length < 2) period[1] = ''
     //if (!maxperiodno) maxperiodno=gcompany.maxperiodno
     if (!maxperiodno) maxperiodno = 12
-    return (period[1].exodusaddcent() - 0) * maxperiodno + (period[0] - 0)
+    return (period[1].exoaddcent() - 0) * maxperiodno + (period[0] - 0)
 }
 
 function exodusrnd(max, min) {
@@ -133,10 +133,10 @@ function badchars(input,badchars) {
 if (!input) return false
 
 if (!badchars) badchars="'"+'~!@#$%^&*()_+|\\{}[]:";,?'
-var input2=input.exodusconvert(badchars)
+var input2=input.exoconvert(badchars)
 if (input2!=input) {
 
-return !await exoui_invalid('Sorry, you cannot use\n'+input.exodusconvert(input2)+' characters in key fields')
+return !await exoui_invalid('Sorry, you cannot use\n'+input.exoconvert(input2)+' characters in key fields')
 }
 
 return false
@@ -144,7 +144,7 @@ return false
 }
 */
 
-Number.prototype.exodusdivide0isblank = function (divider) {
+Number.prototype.exodivide0isblank = function (divider) {
 
     if (!this) return 0
 
@@ -152,7 +152,7 @@ Number.prototype.exodusdivide0isblank = function (divider) {
     if (typeof divider == 'string') {
         var divider2 = +divider
         if (isNaN(divider2)) {
-            return systemerror('exodusdivide0isblank()', 'divider "' + divider + '" is not an number')
+            return systemerror('exodivide0isblank()', 'divider "' + divider + '" is not an number')
             //return divider2
         }
         divider = divider2
@@ -164,7 +164,7 @@ Number.prototype.exodusdivide0isblank = function (divider) {
 
 }
 
-String.prototype.exoduscapitalise = function exoduscapitalise() {
+String.prototype.exocapitalise = function exocapitalise() {
     //converts BRAND_CODE to Brand code
     var string = this.toString()
     return string.toLowerCase().replace(/\b[a-z]|_[a-z]/g, function (s) { return s.toUpperCase(); });
@@ -243,8 +243,8 @@ function tostatement() {
 //ARRAY FUNCTIONS
 /////////////////
 
-//function exodusadd()
-Array.prototype.exodusadd = function exodusadd(array2) {
+//function exoadd()
+Array.prototype.exoadd = function exoadd(array2) {
     var results = []
     var nn = this.length
     var isarray = typeof array2 == 'object'
@@ -257,8 +257,8 @@ Array.prototype.exodusadd = function exodusadd(array2) {
     return results
 }
 
-//function exodussubtract()
-Array.prototype.exodussubtract = function (array2) {
+//function exosubtract()
+Array.prototype.exosubtract = function (array2) {
     var results = []
     var nn = this.length
     var isarray = typeof array2 == 'object'
@@ -270,15 +270,15 @@ Array.prototype.exodussubtract = function (array2) {
     return results
 }
 
-//function exodusmultiply()
-Array.prototype.exodusmultiply = function (array2) {
+//function exomultiply()
+Array.prototype.exomultiply = function (array2) {
     var results = []
     var nn = this.length
     var isarray = typeof array2 == 'object'
     if (isarray && array2.length > nn) nn = array2.length
     for (var ii = 0; ii < nn; ii++) {
         var multiplier = isarray ? array2[ii] : array2
-        //should really test for numeric multiplier and in exodusdivide etc
+        //should really test for numeric multiplier and in exodivide etc
         if (typeof this[ii] == 'undefined') this[ii] = 0
         if (this[ii]) results[ii] = this[ii] * Number(multiplier)
         else results[ii] = this[ii]
@@ -286,8 +286,8 @@ Array.prototype.exodusmultiply = function (array2) {
     return results
 }
 
-//function exodusdivide()
-Array.prototype.exodusdivide = arrayexodusdivide
+//function exodivide()
+Array.prototype.exodivide = arrayexodusdivide
 function arrayexodusdivide(array2, divzero) {
     var results = []
     var nn = this.length
@@ -303,7 +303,7 @@ function arrayexodusdivide(array2, divzero) {
                 }
                 else {
                     if (typeof divzero == 'undefined' || divzero == 'error') {
-                        systemerror('exodusdivide', this[i] + ' cannot be divided by "' + divisor + '"')
+                        systemerror('exodivide', this[i] + ' cannot be divided by "' + divisor + '"')
                         results[ii] = ''
                     }
                     else {
@@ -322,9 +322,9 @@ function arrayexodusdivide(array2, divzero) {
     return results
 }
 
-Number.prototype.exodussum = function exodussumnumber() { return this }
+Number.prototype.exosum = function exodussumnumber() { return this }
 
-String.prototype.exodussum = function exodussumstring(sepchar) {
+String.prototype.exosum = function exodussumstring(sepchar) {
 
     if (this == '')
         return 0
@@ -333,13 +333,13 @@ String.prototype.exodussum = function exodussumstring(sepchar) {
     if (!sepchar)
         sepchar = vm//this should be ',' really
     if (this.indexOf(sepchar) >= 0)
-        return this.split(sepchar).exodussum()
+        return this.split(sepchar).exosum()
 
     return exodusnumber(this)
 
 }
 
-Array.prototype.exodussum = function exodussumarray(sepchar) {
+Array.prototype.exosum = function exodussumarray(sepchar) {
     //adds up all array elements including subarrays recursively
     //any "string arrays" (with the given sepchar) are handled as well
 
@@ -349,7 +349,7 @@ Array.prototype.exodussum = function exodussumarray(sepchar) {
     //add 'em up (recursively)
     var total = 0
     for (var i = 0; i < this.length; i++)
-        total += this[i].exodussum(sepchar)
+        total += this[i].exosum(sepchar)
 
     //got a small number error of 1.5e-10 once adding up just 11 2 digit decimal amounts
     if (Math.abs(total) < 0.00000001)
@@ -380,21 +380,21 @@ function encodehtmlcodes(htmlcodes) {
     return htmlcodes
 }
 
-Array.prototype.exodussplit = function exodussplitarray(seps, invert) {
+Array.prototype.exosplit = function exodussplitarray(seps, invert) {
     var newarray = []
     for (var i = 0; i < this.length; i++) {
         var cell=this[i]
         //if (!cell)
         if (typeof cell == 'undefined')
-            systemerror('this['+i+']='+this[i]+' undefined','exodussplit('+this+')')
-        if (!cell.exodussplit)
-            systemerror('this['+i+']='+this[i]+' missing exodussplit','exodussplit('+this+')')
-        newarray[i] = cell.exodussplit(seps, invert)
+            systemerror('this['+i+']='+this[i]+' undefined','exosplit('+this+')')
+        if (!cell.exosplit)
+            systemerror('this['+i+']='+this[i]+' missing exosplit','exosplit('+this+')')
+        newarray[i] = cell.exosplit(seps, invert)
     }
     return newarray
 }
 
-Array.prototype.exodusinvert = function exodusinvert(defaultvalue) {
+Array.prototype.exoinvert = function exoinvert(defaultvalue) {
     if (typeof defaultvalue == 'undefined')
         defaultvalue = ''
     var invertedarray=[]
@@ -433,11 +433,11 @@ Array.prototype.exodusinvert = function exodusinvert(defaultvalue) {
     return invertedarray
 }
 
-String.prototype.exodussplit = function exodussplit(seps, invert) {
+String.prototype.exosplit = function exosplit(seps, invert) {
 
-    //return exodussplit(this.toString(),seps)
+    //return exosplit(this.toString(),seps)
 
-    //exodusassertstring(this,'exodussplit','string')
+    //exodusassertstring(this,'exosplit','string')
     var str1 = this.toString()
 
     if (str1 == '') return []
@@ -452,7 +452,7 @@ String.prototype.exodussplit = function exodussplit(seps, invert) {
     if (seps.length > 1) {
         //seps=seps.slice(1)
         for (var i = 0; i < array.length; i++) {
-            array[i] = array[i].exodussplit(seps.slice(1))
+            array[i] = array[i].exosplit(seps.slice(1))
         }
     }
 
@@ -472,14 +472,14 @@ String.prototype.exodussplit = function exodussplit(seps, invert) {
         }
         array = invertedarray
         */
-        array = array.exodusinvert()
+        array = array.exoinvert()
     }
 
     return array
 
 }
 
-Array.prototype.exodusjoin = function exodusjoin(seps, invert) {
+Array.prototype.exojoin = function exojoin(seps, invert) {
 
     //this is a multilevel join suited for converting 2d arrays to fm/vm separated strings
     //invert not implemented yet
@@ -494,20 +494,20 @@ Array.prototype.exodusjoin = function exodusjoin(seps, invert) {
         var typeofthisi = typeof this[i]
         if (typeofthisi == 'string') toparray[i] = this[i]
         else if (typeofthisi == 'number') toparray[i] = this[i].toString()
-        else toparray[i] = this[i].exodusjoin(otherseps)
+        else toparray[i] = this[i].exojoin(otherseps)
     }
 
     return toparray.join(seps.slice(0, 1))
 
 }
 
-Array.prototype.exodustrim = function exodustrimarray(trimchar) {
+Array.prototype.exotrim = function exodustrimarray(trimchar) {
     var newarray = []
     var jj = -1
     for (var ii = 0; ii < this.length; ii++) {
         var cell = this[ii]
         if (cell) {
-            cell=cell.exodustrim(trimchar)
+            cell=cell.exotrim(trimchar)
             if (cell.length)
                 newarray[++jj] = cell
         }
@@ -515,7 +515,7 @@ Array.prototype.exodustrim = function exodustrimarray(trimchar) {
     return newarray
 }
 
-Array.prototype.exodustrimr = function exodustrimrarray() {
+Array.prototype.exotrimr = function exodustrimrarray() {
     var jj = this.length - 1
     for (; jj >= 0; jj--) {
         if (this[jj]) break;
@@ -523,23 +523,23 @@ Array.prototype.exodustrimr = function exodustrimrarray() {
     return this.slice(0, jj + 1)
 }
 
-String.prototype.exodustrimf = function exodustrimf(char0) {
-    return this.exodustrim(char0, 'L')
+String.prototype.exotrimf = function exotrimf(char0) {
+    return this.exotrim(char0, 'L')
 }
 
-String.prototype.exodustrimb = function exodustrimb(char0) {
-    return this.exodustrim(char0, 'R')
+String.prototype.exotrimb = function exotrimb(char0) {
+    return this.exotrim(char0, 'R')
 }
 
-String.prototype.exodustriml = function exodustriml(char0) {
-    return this.exodustrim(char0, 'L')
+String.prototype.exotriml = function exotriml(char0) {
+    return this.exotrim(char0, 'L')
 }
 
-String.prototype.exodustrimr = function exodustrimr(char0) {
-    return this.exodustrim(char0, 'R')
+String.prototype.exotrimr = function exotrimr(char0) {
+    return this.exotrim(char0, 'R')
 }
 
-String.prototype.exodustrim = function exodustrim(char0, mode) {
+String.prototype.exotrim = function exotrim(char0, mode) {
     //char0 can be a string list of characters to trim
     
     //mode undefined or A trim all characters
@@ -587,10 +587,10 @@ String.prototype.exodustrim = function exodustrim(char0, mode) {
 }
 
 /*
-String.prototype.exodustrimr=exodustrimr
+String.prototype.exotrimr=exotrimr
 
 //trim trailing characters
-function exodustrimr(char0) {
+function exotrimr(char0) {
 
 if (typeof char0=='undefined') char0=' '
 if (char0=='') return this.toString()
@@ -629,8 +629,8 @@ return("")
 }
 */
 
-Number.prototype.exodusquote = exodusquotemethod
-String.prototype.exodusquote = exodusquotemethod
+Number.prototype.exoquote = exodusquotemethod
+String.prototype.exoquote = exodusquotemethod
 function exodusquotemethod(char0, char1) {
     if (typeof char0 == 'undefined') char0 = '"'
     if (typeof char1 == 'undefined') char1 = char0
@@ -645,14 +645,14 @@ function exodusquotemethod(char0, char1) {
 
 }
 
-String.prototype.exodusxmlquote = exodusxmlquotemethod
+String.prototype.exoxmlquote = exodusxmlquotemethod
 function exodusxmlquotemethod(char0, char1) {
 
-    return this.toString().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').exodusquote(char0, char1)
+    return this.toString().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').exoquote(char0, char1)
 
 }
 
-Array.prototype.exodusquote = exodusquotearray
+Array.prototype.exoquote = exodusquotearray
 function exodusquotearray(char0, char1) {
 
     if (typeof char0 == 'undefined') char0 = '"'
@@ -661,7 +661,7 @@ function exodusquotearray(char0, char1) {
     //quote the elements of the array
     var results = []
     for (var i = 0; i < this.length; i++) {
-        results[i] = ((typeof this[i] == 'undefined') ? 'undefined' : this[i]).exodusquote(char0, char1)
+        results[i] = ((typeof this[i] == 'undefined') ? 'undefined' : this[i]).exoquote(char0, char1)
     }
 
     //return as a single string
@@ -670,7 +670,7 @@ function exodusquotearray(char0, char1) {
 }
 
 //add double quotes
-function exodusquote(arg1, arg2) {
+function exoquote(arg1, arg2) {
     if (!arg2) arg2 = '"'
     return '"' + arg1 + '"'
 }
@@ -680,7 +680,7 @@ function exodusquote(arg1, arg2) {
 /////////////////
 
 //round a number to n decimal places
-function exodusround(number, ndecimals) {
+function exoround(number, ndecimals) {
     //return Math.round(number*Math.pow(10,ndecimals))/Math.pow(10,ndecimals)
     if (typeof ndecimals == 'undefined')
         ndecimals = 0
@@ -689,12 +689,12 @@ function exodusround(number, ndecimals) {
     return number2
 }
 
-// Member form — mid-calc integer/dp round (prefer over .exodusoconv('[INTEGER]'))
-Number.prototype.exodusround = function (ndecimals) {
-    return exodusround(+this, ndecimals)
+// Member form — mid-calc integer/dp round (prefer over .exooconv('[INTEGER]'))
+Number.prototype.exoround = function (ndecimals) {
+    return exoround(+this, ndecimals)
 }
-String.prototype.exodusround = function (ndecimals) {
-    return exodusround(+this, ndecimals)
+String.prototype.exoround = function (ndecimals) {
+    return exoround(+this, ndecimals)
 }
 
 //convert to number
@@ -771,17 +771,17 @@ function exodusassertfunctionname(arg1, funcname, varname) {
     }
     catch (e) {
     }
-    return systemerror(funcname, varname + ' ' + exodusquote(arg1) + ' is not a function name')
+    return systemerror(funcname, varname + ' ' + exoquote(arg1) + ' is not a function name')
 }
 
 function exodusassertstring(arg1, funcname, varname) {
     if (typeof (arg1) != 'string')
-        return systemerror(funcname, varname + ' ' + exodusquote(arg1) + ' is not a string')
+        return systemerror(funcname, varname + ' ' + exoquote(arg1) + ' is not a string')
 }
 
 function exodusassertnumeric(arg1, funcname, varname) {
     if (!(exodusnum(arg1)))
-        return systemerror(funcname, varname + ' ' + exodusquote(arg1) + ' is not numeric')
+        return systemerror(funcname, varname + ' ' + exoquote(arg1) + ' is not numeric')
 }
 
 function exodusmod(num, div) {
@@ -962,7 +962,7 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
     catch (e) { }
 
     if (params[0] == '' || typeof params[0] == 'undefined')
-        params[0] = value.toString().replace(/[^0-9.]/gi, '').exodusfield('.', 2, 1).length.toString()
+        params[0] = value.toString().replace(/[^0-9.]/gi, '').exofield('.', 2, 1).length.toString()
 
     if (!(exodusnum(value))) {
         if (allowCurrency && !unitSuffix) {
@@ -1013,7 +1013,7 @@ function NUMBER(mode, value, params, display, forced_ndecs) {
 
         if (params[0].match(/^\d+$/)) {
             var ndecimals = exodusnumber(params[0])
-            value = exodusround(value, ndecimals)
+            value = exoround(value, ndecimals)
             if (ndecimals > 0) {
                 var temp = value.toString().split(".")
                 if (temp.length == 1)
@@ -1184,10 +1184,10 @@ function exodusaddunits(a, b) {
             var bx = new exodusamount(b[bn])
             if (bx.unit == ax.unit) {
                 if (bx.amount.length || ax.amount.length) {
-                    ndecs = ax.amount.exodusfield('.', 2).length
-                    bndecs = bx.amount.exodusfield('.', 2).length
+                    ndecs = ax.amount.exofield('.', 2).length
+                    bndecs = bx.amount.exofield('.', 2).length
                     if (bndecs > ndecs) ndecs = bndecs
-                    if (exodusnum(ax.amount) && exodusnum(bx.amount)) b[bn] = (Number(bx.amount) + Number(ax.amount)).exodusoconv('[DECIMAL,' + ndecs + ']') + ax.unit
+                    if (exodusnum(ax.amount) && exodusnum(bx.amount)) b[bn] = (Number(bx.amount) + Number(ax.amount)).exooconv('[DECIMAL,' + ndecs + ']') + ax.unit
                 }
                 else {
                     b[bn] = ax.unit
@@ -1196,7 +1196,7 @@ function exodusaddunits(a, b) {
             }
             else if (bx.unit >= ax.unit) break
         } // next bn
-        if (bx.unit != ax.unit) b = b.exodusinsert(bn + 1, ax.amount + ax.unit)
+        if (bx.unit != ax.unit) b = b.exoinsert(bn + 1, ax.amount + ax.unit)
 
     } // next an
 
@@ -1212,7 +1212,7 @@ function exodustime(mode) {
     //var now = Number(new Date()) - (new Date()).getTimezoneOffset() * 60000
     var result = now.getHours() * 60 * 60 + now.getMinutes() * 60 + now.getSeconds()
 
-    if (mode) result = result.exodusoconv('[DATE,' + mode + ']')
+    if (mode) result = result.exooconv('[DATE,' + mode + ']')
 
     return result
 
@@ -1241,36 +1241,36 @@ function exodusdate(year, month, day) {
 
 }
 
-String.prototype.exodusiconv = stringexodusiconv
+String.prototype.exoiconv = stringexodusiconv
 function stringexodusiconv(conversion) {
-    return exodusiconv(this.toString(), conversion)
+    return exoiconv(this.toString(), conversion)
 }
 
-function exodusiconv(value, conversion) {
+function exoiconv(value, conversion) {
     return exodusconv('ICONV', value, conversion)
 }
 
-String.prototype.exodusoconv = stringexodusoconv
-Number.prototype.exodusoconv = stringexodusoconv
+String.prototype.exooconv = stringexodusoconv
+Number.prototype.exooconv = stringexodusoconv
 function stringexodusoconv(conversion) {
-    return exodusoconv(this.toString(), conversion)
+    return exooconv(this.toString(), conversion)
 }
 
-function exodusoconv(value, conversion) {
+function exooconv(value, conversion) {
     return exodusconv('OCONV', value, conversion)
 }
 
-Array.prototype.exodusoconv = exodusoconvarray
+Array.prototype.exooconv = exodusoconvarray
 function exodusoconvarray(conversion) {
     var result = []
-    for (i = 0; i < this.length; i++) result[i] = this[i].toString().exodusoconv(conversion)
+    for (i = 0; i < this.length; i++) result[i] = this[i].toString().exooconv(conversion)
     return result
 }
 
-Array.prototype.exodusiconv = exodusiconvarray
+Array.prototype.exoiconv = exodusiconvarray
 function exodusiconvarray(conversion) {
     var result = []
-    for (i = 0; i < this.length; i++) result[i] = this[i].toString().exodusiconv(conversion)
+    for (i = 0; i < this.length; i++) result[i] = this[i].toString().exoiconv(conversion)
     return result
 }
 
@@ -1281,7 +1281,7 @@ function exodusconv(mode, value, conversion) {
         return value
 
     if (typeof (conversion) == 'undefined') {
-        alert('Conversion for ' + exodusquote(value) + ' is undefined\nNo conversion performed.')
+        alert('Conversion for ' + exoquote(value) + ' is undefined\nNo conversion performed.')
         return value
     }
 
@@ -1359,36 +1359,36 @@ function exodusconv(mode, value, conversion) {
         }
     }
 
-    systemerror('exodusconv()', exodusquote(conversion) + 'conversion is unknown, value=' + value)
+    systemerror('exodusconv()', exoquote(conversion) + 'conversion is unknown, value=' + value)
 
     return value
 
 }
 
 //replace
-String.prototype.exodusreplace = function exodusreplace(fieldno, valueno, subvalueno, replacestring) {
+String.prototype.exoreplace = function exoreplace(fieldno, valueno, subvalueno, replacestring) {
 
     if (subvalueno) {
         if (!fieldno) fieldno = 1
         if (!valueno) valueno = 1
-        var value = this.exodusextract(fieldno, valueno)
-        replacestring = value.exodusfieldstore(sm, subvalueno, 1, replacestring)
+        var value = this.exoextract(fieldno, valueno)
+        replacestring = value.exofieldstore(sm, subvalueno, 1, replacestring)
     }
 
     if (valueno) {
-        var field = this.exodusextract(fieldno)
-        replacestring = field.exodusfieldstore(vm, valueno, 1, replacestring)
+        var field = this.exoextract(fieldno)
+        replacestring = field.exofieldstore(vm, valueno, 1, replacestring)
         if (!fieldno) fieldno = 1
     }
 
-    return this.exodusfieldstore(fm, fieldno, 1, replacestring)
+    return this.exofieldstore(fm, fieldno, 1, replacestring)
 
 }
 
 //fieldstore
 
-String.prototype.exodusfieldstore = exodusfieldstore
-function exodusfieldstore(sep, start, length, insertstring, noextend) {
+String.prototype.exofieldstore = exofieldstore
+function exofieldstore(sep, start, length, insertstring, noextend) {
 
     //standardise sep to one character
     sep = sep.toString().substr(0, 1)
@@ -1436,26 +1436,26 @@ function exodusfieldstore(sep, start, length, insertstring, noextend) {
 
 }
 
-Array.prototype.exodusfieldstore = exodusfieldstorearray
+Array.prototype.exofieldstore = exodusfieldstorearray
 function exodusfieldstorearray(sep, start, length, insertstring) {
     var result = []
-    for (i = 0; i < this.length; i++) result[i] = this[i].exodusfieldstore(sep, start, length, insertstring)
+    for (i = 0; i < this.length; i++) result[i] = this[i].exofieldstore(sep, start, length, insertstring)
     return result
 }
 
 //field on array returns array of fields
 //can work recursively on arrays of arrays
-Array.prototype.exodusfield = function exodusfieldarray(sep, start, length) {
+Array.prototype.exofield = function exodusfieldarray(sep, start, length) {
 
     var newarray = []
     for (var i = 0; i < this.length; i++)
-        newarray[i] = this[i].toString().exodusfield(sep, start, length)
+        newarray[i] = this[i].toString().exofield(sep, start, length)
     return newarray
 
 }
 
 //field on string returns string
-String.prototype.exodusfield = function exodusfieldstring(sep, start, length) {
+String.prototype.exofield = function exodusfieldstring(sep, start, length) {
 
     //nb "typeof this" is "object" even for strings!
 
@@ -1485,7 +1485,7 @@ String.prototype.exodusfield = function exodusfieldstring(sep, start, length) {
 
 //locate
 
-String.prototype.exoduslocate = exoduslocatestring
+String.prototype.exolocate = exoduslocatestring
 function exoduslocatestring(value, order, sep, startfrom) {
 
     //quick return
@@ -1493,11 +1493,11 @@ function exoduslocatestring(value, order, sep, startfrom) {
 
     if (typeof sep == 'undefined') sep = vm
 
-    return this.split(sep).exoduslocate(value, order, startfrom)
+    return this.split(sep).exolocate(value, order, startfrom)
 
 }
 
-Array.prototype.exoduslocate = exoduslocatearray
+Array.prototype.exolocate = exoduslocatearray
 function exoduslocatearray(value, order, startfrom) {
 
     //returns position (1 based!) in array (0 based!) or zero if not found
@@ -1544,12 +1544,12 @@ function exoduslocatearray(value, order, startfrom) {
 
 //extract
 
-String.prototype.exodusextract = exodusextractstring
+String.prototype.exoextract = exodusextractstring
 function exodusextractstring(fieldn, valuen, subvaluen) {
-    return this.split(fm).exodusextract(fieldn, valuen, subvaluen)
+    return this.split(fm).exoextract(fieldn, valuen, subvaluen)
 }
 
-Array.prototype.exodusextract = exodusextractarray
+Array.prototype.exoextract = exodusextractarray
 function exodusextractarray(fieldn, valuen, subvaluen) {
 
     //extracts the n'th field (1 based!) or '' if not defined
@@ -1585,7 +1585,7 @@ function exodusextractarray(fieldn, valuen, subvaluen) {
 }
 
 //delete (index 1 based!)
-Array.prototype.exodusdelete = exodusdeletearray
+Array.prototype.exodelete = exodusdeletearray
 function exodusdeletearray(index) {
     var newarray = this.slice(0, index - 1)
     var remainder = this.slice(index)
@@ -1594,7 +1594,7 @@ function exodusdeletearray(index) {
 }
 
 //insert (1 based!)
-Array.prototype.exodusinsert = exodusinsertarray
+Array.prototype.exoinsert = exodusinsertarray
 function exodusinsertarray(index, values) {
 
     if (typeof values != 'object') values = [values]
@@ -1612,41 +1612,41 @@ function exodusinsertarray(index, values) {
 
 /* not used anywhere?
 //locate
-function exoduslocate(value,values) {
+function exolocate(value,values) {
 
 if (values==null) return false
 if (typeof(values)!='object'&&typeof(values)!='string') return value==values
-return values.exoduslocate(value)
+return values.exolocate(value)
 }
 */
 
 //plural
 
 //given a number!=1 or boolean=true return the string with (s) appended (or a given suffix)
-String.prototype.exodusplural = function exodusplural(n, suffix) {
+String.prototype.exoplural = function exoplural(n, suffix) {
     return this + (((typeof n == 'boolean' && !n) || n == 1) ? '' : (suffix ? suffix : 's'))
 }
 
-String.prototype.exodussingular = exodussingular
-function exodussingular() {
+String.prototype.exosingular = exosingular
+function exosingular() {
     temp = this.toString()
 
-    if (temp.exodusright(2) == 'ES') {
+    if (temp.exoright(2) == 'ES') {
 
         //COMPANIES=COMPANY
         //ADDRESSES=ADDRESS
-        if (temp.exodusright(3) == 'IES') temp = temp.slice(0, -3) + 'Y'
-        else if (temp.exodusright(4) == 'SSES') temp = temp.slice(0, -2)
-        else if (temp.exodusright(4) == 'SHES') temp = temp.slice(0, -2)
-        else if (temp.exodusright(4) == 'CHES') temp = temp.slice(0, -2)
+        if (temp.exoright(3) == 'IES') temp = temp.slice(0, -3) + 'Y'
+        else if (temp.exoright(4) == 'SSES') temp = temp.slice(0, -2)
+        else if (temp.exoright(4) == 'SHES') temp = temp.slice(0, -2)
+        else if (temp.exoright(4) == 'CHES') temp = temp.slice(0, -2)
         else temp = temp.slice(0, -1)
 
     }
     else {
 
-        if (temp.exodusright(1) == 'S') {
+        if (temp.exoright(1) == 'S') {
             //ANALYSIS, DOS
-            if (temp.exodusright(2) != 'IS' && temp.exodusright(2) != 'OS') temp = temp.slice(0, -1)
+            if (temp.exoright(2) != 'IS' && temp.exoright(2) != 'OS') temp = temp.slice(0, -1)
         }
 
     }
@@ -1657,7 +1657,7 @@ function exodussingular() {
 
 //right
 
-String.prototype.exodusright = exodusstringright
+String.prototype.exoright = exodusstringright
 function exodusstringright(len) {
     var str = this.toString()
     return str.slice(str.length - len)
@@ -1718,13 +1718,13 @@ function is(value) {
 }
 
 //swap
-Array.prototype.exodusswap = function exodusswaparray(swapfrom, swapto) {
+Array.prototype.exoswap = function exodusswaparray(swapfrom, swapto) {
     var result = []
-    for (i = 0; i < this.length; i++) result[i] = this[i].exodusswap(swapfrom, swapto)
+    for (i = 0; i < this.length; i++) result[i] = this[i].exoswap(swapfrom, swapto)
     return result
 }
 
-String.prototype.exodusswap = function exodusswapstring(swapfrom, swapto) {
+String.prototype.exoswap = function exodusswapstring(swapfrom, swapto) {
     //should this be made case sensitive or an option added?
 
     if (!swapfrom) return this
@@ -1739,13 +1739,13 @@ String.prototype.exodusswap = function exodusswapstring(swapfrom, swapto) {
 }
 
 //convert
-Array.prototype.exodusconvert = function exodusconvertarray(convertfrom, convertto) {
+Array.prototype.exoconvert = function exodusconvertarray(convertfrom, convertto) {
     var result = []
-    for (i = 0; i < this.length; i++) result[i] = this[i].exodusconvert(convertfrom, convertto)
+    for (i = 0; i < this.length; i++) result[i] = this[i].exoconvert(convertfrom, convertto)
     return result
 }
 
-String.prototype.exodusconvert = function exodusconvertstring(str1, str2) {
+String.prototype.exoconvert = function exodusconvertstring(str1, str2) {
 
     if (!str2) str2 = ''
 
@@ -1765,27 +1765,27 @@ String.prototype.exodusconvert = function exodusconvertstring(str1, str2) {
     return result
 }
 
-Array.prototype.exodusdcount = function exodusdcountarray(str2) {
+Array.prototype.exodcount = function exodusdcountarray(str2) {
     var result = []
     for (var ii = 0; ii < this.length; ii++) {
-        result[ii] = this[ii].exodusdcount(str2)
+        result[ii] = this[ii].exodcount(str2)
     }
     return result
 }
 
-String.prototype.exodusdcount = function exodusdcountstring(str2) {
-    return this.exoduscount(str2) + (this.length ? 1 : 0)
+String.prototype.exodcount = function exodusdcountstring(str2) {
+    return this.exocount(str2) + (this.length ? 1 : 0)
 }
 
-Array.prototype.exoduscount = function exoduscountarray(str2) {
+Array.prototype.exocount = function exoduscountarray(str2) {
     var result = []
     for (var ii = 0; ii < this.length; ii++) {
-        result[ii] = this[ii].exoduscount(str2)
+        result[ii] = this[ii].exocount(str2)
     }
     return result
 }
 
-String.prototype.exoduscount = function exoduscount(str2) {
+String.prototype.exocount = function exocount(str2) {
     var str1 = this.toString()
     if (typeof (str1) == 'undefined' || typeof (str2) == '') return 0
     if (str1 == '' || str2 == '') return 0
@@ -1797,8 +1797,8 @@ String.prototype.exoduscount = function exoduscount(str2) {
     return count
 }
 
-String.prototype.exodusaddcent = exodusaddcentmethod
-Number.prototype.exodusaddcent = exodusaddcentmethod
+String.prototype.exoaddcent = exodusaddcentmethod
+Number.prototype.exoaddcent = exodusaddcentmethod
 function exodusaddcentmethod(type) {
     if (!type) type = 'OCONV'
     var result = ADDCENT(type, this.toString())
@@ -1825,13 +1825,13 @@ function ADDCENT(type, input, mode) {
     if (parseFloat(input) < 0) input = (parseFloat(input) + 2000).toString()
 
     //standardise the separators
-    input = input.exodusconvert('-/', '  ')
+    input = input.exoconvert('-/', '  ')
 
     //two numbers means 99/99
-    if (input.exoduscount(' ') == 1) input = input.exodusconvert(' ', '/')
+    if (input.exocount(' ') == 1) input = input.exoconvert(' ', '/')
 
     //four numbers means 99/99-99/99
-    if (input.exoduscount(' ') == 3) {
+    if (input.exocount(' ') == 3) {
         input = input.split(' ')
         input = input[0] + '/' + input[1] + '-' + input[2] + '/' + input[3]
     }
@@ -1840,9 +1840,9 @@ function ADDCENT(type, input, mode) {
 
     //range of periods 1/98-3/98
     if (input.indexOf('-') >= 0) {
-        var out1 = ADDCENT(type, input.exodusfield('-', 1), mode)
+        var out1 = ADDCENT(type, input.exofield('-', 1), mode)
         if (out1 == null) return null
-        var out2 = ADDCENT(type, input.exodusfield('-', 2), mode)
+        var out2 = ADDCENT(type, input.exofield('-', 2), mode)
         if (out2 == null) return null
         return out1 + '-' + out2
     }
@@ -1850,8 +1850,8 @@ function ADDCENT(type, input, mode) {
     //remove any prefixed period number '1/99'
     var prefix = ''
     if (input.indexOf('/') >= 0) {
-        prefix = input.exodusfield('/', 1) + '/'
-        input = input.exodusfield('/', 2)
+        prefix = input.exofield('/', 1) + '/'
+        input = input.exofield('/', 2)
     }
 
     //if not all digits then error
@@ -1947,7 +1947,7 @@ function PERIOD_OF_YEAR(type, input, mode) {
 
             //if the entered month is after the mode month then default to the previous year
             //causes problem on agencyfilter.htm
-            //if (input[0].exodusaddcent() > mode[0].exodusaddcent()) {
+            //if (input[0].exoaddcent() > mode[0].exoaddcent()) {
             //    input[1] = (input[1] - 1).toString()
             //}
         }
@@ -1967,7 +1967,7 @@ function PERIOD_OF_YEAR(type, input, mode) {
     //T=period[1,'/']
     //if (year<1||month>journal.maxperiod||!(T MATCHES '0N'))
     //{
-    // gmsg='PLEASE ENTER A PERIOD, OR PERIOD/YEAR|EG. '+exodusquote(gcompany.currperiod)+' or '+exodusquote(gcompany.currperiodyear)
+    // gmsg='PLEASE ENTER A PERIOD, OR PERIOD/YEAR|EG. '+exoquote(gcompany.currperiod)+' or '+exoquote(gcompany.currperiodyear)
     // return null
     //}
 
@@ -1976,7 +1976,7 @@ function PERIOD_OF_YEAR(type, input, mode) {
     for (var i = 1; i <= maxmth; i++) {
         mths[i - 1] = i.toString()
     }
-    if (!mths.exoduslocate(month))
+    if (!mths.exolocate(month))
         return null
 
     //check year ... ICONV converts to 2 digits, OCONV converts to 4 digits
@@ -2023,7 +2023,7 @@ function YEAR_PERIOD(type, input, mode) {
             month = month.substr(1)
 
         //check month
-        if (!['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].exoduslocate(month))
+        if (!['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].exolocate(month))
             return null
 
         //check year ... ICONV converts to 2 digits, OCONV converts to 4 digits
@@ -2034,7 +2034,7 @@ function YEAR_PERIOD(type, input, mode) {
         if (year == null)
             return null
 
-        return year + '.' + ('00' + month).exodusright(2)
+        return year + '.' + ('00' + month).exoright(2)
 
     }
 
@@ -2075,7 +2075,7 @@ function YEARPERIOD(type, input, mode) {
         if (month.substr(0, 1) == '0') month = month.substr(1)
 
         //check month
-        if (!['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].exoduslocate(month)) {
+        if (!['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].exolocate(month)) {
             return null
         }
 
@@ -2083,8 +2083,8 @@ function YEARPERIOD(type, input, mode) {
         year = ADDCENT(type, year, mode)
         if (year == null) return null
 
-        //return year+'.'+('00'+month).exodusright(2)
-        return year + ('00' + month).exodusright(2)
+        //return year+'.'+('00'+month).exoright(2)
+        return year + ('00' + month).exoright(2)
 
     }
 

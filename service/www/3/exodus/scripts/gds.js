@@ -40,12 +40,12 @@ function exodusdatasource() {
 //this is because rapid readability is vastly better due to sequence of sourcefieldname->filename/fieldno
 async function gds_xlate(sourcefieldname,targetfilename,targetfieldno,mode){
     var keys=await this.getx(sourcefieldname)
-    return await keys.exodusxlate(targetfilename,targetfieldno,mode)
+    return await keys.exoxlate(targetfilename,targetfieldno,mode)
 }
 
 async function gds_rexlate(sourcefieldname,targetfilename,targetfieldno,mode){
     var keys=await this.regetx(sourcefieldname)
-    return await keys.exodusxlate(targetfilename,targetfieldno,mode)
+    return await keys.exoxlate(targetfilename,targetfieldno,mode)
 }
 
 async function gds_evaluate(functionx) {
@@ -84,7 +84,7 @@ async function gds_regetx(dictitemorid, recn) {
     if (typeof dictitem == 'string') {
         dictitem = this.dictitem(dictitem)
         if (!dictitem) {
-            systemerror('await gds_regetx()', exodusquote(dictitemorid) + ' is not in the ' + gdatafilename + ' dictionary.')
+            systemerror('await gds_regetx()', exoquote(dictitemorid) + ' is not in the ' + gdatafilename + ' dictionary.')
             return ''
         }
     }
@@ -240,7 +240,7 @@ function gds_getcells(dbelementordbelementid, recn) {
         {
             var dictitem = this.dictitem(dbelementordbelementid)
             if (!dictitem) {
-                systemerror('getcells', exodusquote(dbelementordbelementid) + ' db element is missing')
+                systemerror('getcells', exoquote(dbelementordbelementid) + ' db element is missing')
                 //logout('getcells - no db element - returning []')
                 return []
             }
@@ -490,7 +490,7 @@ async function gds_setx2(cells, values, forced) {
                     var ivalue = value
                     value = await oconvertvalue(value, conversion, screenelement)
                     if (value == null) {
-                        systemerror('await gds_setx2("' + screenelement.id + '") ' + exodusquote(ivalue) + ' is not a ' + conversion)
+                        systemerror('await gds_setx2("' + screenelement.id + '") ' + exoquote(ivalue) + ' is not a ' + conversion)
                         return
                     }
                 }
@@ -504,7 +504,7 @@ async function gds_setx2(cells, values, forced) {
                     if (newdependents) {
                         newdependents = newdependents.split(';')
                         for (var depn = 0; depn < newdependents.length; depn++) {
-                            if (!gdependents.exoduslocate(newdependents[depn]))
+                            if (!gdependents.exolocate(newdependents[depn]))
                                 gdependents[gdependents.length] = newdependents[depn]
                         }
                     }
@@ -937,9 +937,9 @@ async function gds_bind(datasource, elements, rownx) {
                 //conversions (NUMBER OCONV defaults display=true — grouping on paint)
                 var conversion = element.getAttribute('exoconversion')
                 if (value != '' && typeof (conversion) == 'string' && conversion.substr(0, 1) == '[') {
-                    value2 = value.exodusoconv(conversion)
+                    value2 = value.exooconv(conversion)
                     if (value2 == null) {
-                        return systemerror('bind()', 'bind("' + element.id + '") ' + exodusquote(value) + ' is not a valid internal ' + conversion.slice(1, -1) + ' value')
+                        return systemerror('bind()', 'bind("' + element.id + '") ' + exoquote(value) + ' is not a valid internal ' + conversion.slice(1, -1) + ' value')
                     }
                     value = value2
                 }

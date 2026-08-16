@@ -478,7 +478,7 @@ var g_radio_arrival_anchor = null
 var g_radio_arrival_value = ''
 var gdependents = []
 // insertallrows multi-entry: suspend calcfields so S-field xlate runs once mass
-// (grecn null + array.exodusxlate) at end or after mid-loop validation fail.
+// (grecn null + array.exoxlate) at end or after mid-loop validation fail.
 var gcalcfields_suspend = 0
 var gcalcfields_pending = null // null | true (all) | [fieldn,…]
 var gKeyNodes = false//init will get an array of key nodes if any
@@ -982,7 +982,7 @@ async function formfunctions_onload() {
             if (!dictitem) {
                 //dont error if id not in dictionary because could be non form element but do error if datafld specified
                 if (datafld)
-                    systemerror('formfunctions_onload()', 'Form element ' + exodusquote(fieldname) + ' is not in the ' + exodusquote(gdictfilename) + ' dictionary\nor is not in the correct group.')
+                    systemerror('formfunctions_onload()', 'Form element ' + exoquote(fieldname) + ' is not in the ' + exoquote(gdictfilename) + ' dictionary\nor is not in the correct group.')
                 continue
             }
 
@@ -992,7 +992,7 @@ async function formfunctions_onload() {
             if (gKeyNodes) {
                 var words = fieldname.split('_')
                 for (var wordn = 0; wordn < words.length; ++wordn) {
-                    if (!(await exoui_security(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()))) {
+                    if (!(await exoui_security(gdatafilename.exosingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exoquote()))) {
                         dictitem.readonly = gmsg
                         break;
                     }
@@ -1009,7 +1009,7 @@ async function formfunctions_onload() {
                 //TODO should check all and not just ignore previously built radio or checkboxes
                 var temp0 = temp[0] ? temp[0] : temp
                 if (temp0.type != 'radio' && temp0.type != 'checkbox') {
-                    systemerror('name ' + exodusquote(fieldname) + ' is already in use elsewhere\n' + eval(temp).toString().slice(0, 100) + '\n...')
+                    systemerror('name ' + exoquote(fieldname) + ' is already in use elsewhere\n' + eval(temp).toString().slice(0, 100) + '\n...')
                     continue
                 }
             }
@@ -1077,7 +1077,7 @@ async function formfunctions_onload() {
                 //gdefault=await getdefault(element)
 
                 //build html for multiple inputs
-                var options = (element.getAttribute('exoradio') ? element.getAttribute('exoradio') : element.getAttribute('exocheckbox')).exodussplit(':;')
+                var options = (element.getAttribute('exoradio') ? element.getAttribute('exoradio') : element.getAttribute('exocheckbox')).exosplit(':;')
                 var temp = ''
                 var elementtype = element.getAttribute('exoradio') ? 'radio' : 'checkbox'
                 for (var ii = 0; ii < options.length; ii++) {
@@ -1096,7 +1096,7 @@ async function formfunctions_onload() {
                     // mark for mouseup-focus handler (expanded radios have no other marker)
                     temp += ' exotype=F'
                     if (typeof (options[ii][0]) != 'undefined')
-                        temp += ' value=' + options[ii][0].toString().exodusquote()
+                        temp += ' value=' + options[ii][0].toString().exoquote()
 
                     //set default but it has to be done again in cleardoc anyway
                     //if (gdefault==options[ii][0]) temp+=' checked=true'
@@ -1262,8 +1262,8 @@ async function formfunctions_onload() {
                     if (gds.dict.fieldandwordns[fieldandwordn] != element.id) {
 
                         if (typeof gds.dict.fieldandwordns[fieldandwordn] != 'undefined') {
-                            //throw(new Error(0,exodusquote(name)+' duplicate dictionary field and word no '+fieldandwordn+' is not allowed'))
-                            systemerror('formfunction_onload', exodusquote(name) + ' duplicate dictionary name, field no, word no ' + fieldandwordn + ' is not allowed without .allowduplicatefieldno=true\n' + (gds.dict.fieldandwordns[fieldandwordn]))
+                            //throw(new Error(0,exoquote(name)+' duplicate dictionary field and word no '+fieldandwordn+' is not allowed'))
+                            systemerror('formfunction_onload', exoquote(name) + ' duplicate dictionary name, field no, word no ' + fieldandwordn + ' is not allowed without .allowduplicatefieldno=true\n' + (gds.dict.fieldandwordns[fieldandwordn]))
                         }
 
                         //save a field pointer
@@ -1442,7 +1442,7 @@ async function formfunctions_onload() {
             //add button before element for link (or after if right justified)
             if (linkExpr) {
                 if (typeof element.getAttribute('exolink') != 'string') {
-                    systemerror('formfunction_onload', exodusquote(fieldname) + ' link must be a string')
+                    systemerror('formfunction_onload', exoquote(fieldname) + ' link must be a string')
                 }
                 else {
                     //conversion is a routine eg [await exodusfilepopup(filename,cols,coln,sortselect] [popup.clients]
@@ -1792,13 +1792,13 @@ async function formfunctions_onload() {
                 //prevent group 0 element in rows of a multivalued table
                 //while (tablex)
                 //{
-                // if (Number(tablex.getAttribute('exogroupno'))) systemerror('formfunction_onload()',exodusquote(element.name)+' is not multivalued and cannot be in a multivalued TABLE')
+                // if (Number(tablex.getAttribute('exogroupno'))) systemerror('formfunction_onload()',exoquote(element.name)+' is not multivalued and cannot be in a multivalued TABLE')
                 // tablex=getancestor(tablex,'TABLE')
                 //}
 
                 //prevent group 0 element in rows of a multivalued table
                 if (rowx && Number(rowx.getAttribute('exogroupno')))
-                    systemerror('formfunction_onload()', exodusquote(element.name) + ' is not multivalued and cannot be in a multivalued TABLE')
+                    systemerror('formfunction_onload()', exoquote(element.name) + ' is not multivalued and cannot be in a multivalued TABLE')
 
                 datasrcelements[datasrcelements.length] = element
 
@@ -1811,7 +1811,7 @@ async function formfunctions_onload() {
 
                 //locate the table element in the parents
                 if (tablex == null) {
-                    systemerror('formfunction_onload()', exodusquote(element.name) + ' is multivalued and must exist inside a TABLE element')
+                    systemerror('formfunction_onload()', exoquote(element.name) + ' is multivalued and must exist inside a TABLE element')
                 }
 
                 //add sorting button to column title
@@ -2033,7 +2033,7 @@ async function formfunctions_onload() {
                     //locate the TR element in the parents
                     var trx = getancestor(element, 'tr')
                     if (trx == null)
-                        systemerror('formfunction_onload()', exodusquote(element.name) + ' is multivalued and must exist inside a TABLE element')
+                        systemerror('formfunction_onload()', exoquote(element.name) + ' is multivalued and must exist inside a TABLE element')
 
                     trx.insertBefore(insertdeletebuttons, trx.firstChild)
 
@@ -2486,7 +2486,7 @@ async function formfunctions_onload() {
             //crash after this routine returns
             await cleardoc()
 
-            //exodussettimeout('await opendoc(' + exodusquote(gparameters.key.replace(/\\/g, '\\\\')) + ')', 1)
+            //exodussettimeout('await opendoc(' + exoquote(gparameters.key.replace(/\\/g, '\\\\')) + ')', 1)
             //we cant allow another event like focus to occur before this event is over
             //because there is only one geventhandler to rememeber which yielding function is pending resumption
             //therefore call opendoc immediately - seems to cause no problem
@@ -3722,7 +3722,7 @@ async function document_onkeydown2(event) {
     }
 
     // menu bar Alt hot keys
-    if (event.altKey && ! event.shiftKey && [71, 78, 76, 79, 83, 67, 82, 69, 77, 80, 88].exoduslocate(gkeycode)) {
+    if (event.altKey && ! event.shiftKey && [71, 78, 76, 79, 83, 67, 82, 69, 77, 80, 88].exolocate(gkeycode)) {
         exoduscancelevent(event)
         var found = true
         //alt+m main menu
@@ -4612,7 +4612,7 @@ async function document_onkeydown2(event) {
                 && element.getAttribute('exofieldno')
                 && element.getAttribute('exofieldno') != 0
             ))) {
-        if (![9, 16, 17, 18, 20, 35, 36, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123].exoduslocate(keycode)) {
+        if (![9, 16, 17, 18, 20, 35, 36, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123].exolocate(keycode)) {
             exoduscancelevent(event)
             if (gKeyNodes && !glocked) {
                 return await readonlydocmsg()
@@ -5488,7 +5488,7 @@ async function saverecord_onclick() {
 
     //option to return the form data to a calling program
     //instead of sending to the database
-    if (window.dialogArguments && (!gparameters.savemode || !gparameters.savemode.exodusswap('CONFIRM', ''))) {
+    if (window.dialogArguments && (!gparameters.savemode || !gparameters.savemode.exoswap('CONFIRM', ''))) {
 
         //window.returnValue = gro.revstr
         //window.close()
@@ -5667,7 +5667,7 @@ async function opendoc_body(newkey) {
         // dict attrs via Attribute API (not expandos — cloneNode keeps attributes only)
         var sepchar = gKeyNodes[0].getAttribute('exokeypart') ? '*' : gKeyNodes[0].getAttribute('exowordsep')
         if (sepchar && newkey1.split(sepchar).length != gKeyNodes.length) {
-            systemerror('opendoc', newkey1.exodusquote() + ' does not have the correct number of key parts (' + gKeyNodes.length + ')')
+            systemerror('opendoc', newkey1.exoquote() + ' does not have the correct number of key parts (' + gKeyNodes.length + ')')
             return false
         }
     }
@@ -5682,8 +5682,8 @@ async function opendoc_body(newkey) {
 
     //add key into gkeys
     if (opened && gKeyNodes) {
-        if (!gkeys.exoduslocate(gkey)) {
-            gkeys = gkeys.exodusinsert(gkeyn + 1 + 1, gkey)
+        if (!gkeys.exolocate(gkey)) {
+            gkeys = gkeys.exoinsert(gkeyn + 1 + 1, gkey)
             await setgkeys(gkeys)
             if (gkeys.length > 1)
                 gkeyn++
@@ -5795,8 +5795,8 @@ async function opendoc2(newkey0) {
 
     if (db.response.toUpperCase().slice(0, 16) == 'ERROR: NO RECORD') {
         if (gupdateonlymode) {
-            //await exoui_invalid(exodusquote(gkeyexternal)+' does not exist.')
-            await exoui_invalid(exodusquote(await getkeyexternal()) + ' does not exist.')
+            //await exoui_invalid(exoquote(gkeyexternal)+' does not exist.')
+            await exoui_invalid(exoquote(await getkeyexternal()) + ' does not exist.')
             //('opendoc2 - cannot create new record because gupdateonlymode is true')
             return false
         }
@@ -5832,14 +5832,14 @@ async function opendoc2(newkey0) {
                 }
             }
 
-            await exoui_invalid(exodusquote(gkeyexternal) + ' is being created by ' + lockholder + '.\r\n\r\nYou cannot view or update it until they have finished or cancel.')
+            await exoui_invalid(exoquote(gkeyexternal) + ' is being created by ' + lockholder + '.\r\n\r\nYou cannot view or update it until they have finished or cancel.')
             //logout('opendoc2 - cannot create new record because ' + lockholder + ' is creating it.')
             return false
         }
 
         /*
         //optionally cancel if (record does not exist
-        if (!(await exoui_okcancel('Document '+exodusquote(getkeyexternal)+' does not exist. Create a new document ?',2))) {
+        if (!(await exoui_okcancel('Document '+exoquote(getkeyexternal)+' does not exist. Create a new document ?',2))) {
 
         if (glocked)
         await unlockdoc()
@@ -5866,7 +5866,7 @@ async function opendoc2(newkey0) {
                 }
                 else {
                     if (db.response.toUpperCase().indexOf('CANNOT LOCK RECORD') >= 0) {
-                        if ((await exoui_confirm(exodusquote(gkeyexternal) + ' is being updated by ' + lockholder + '.\nOpen for viewing only?', 1, 'Yes', '', 'Cancel')) != 1) {
+                        if ((await exoui_confirm(exoquote(gkeyexternal) + ' is being updated by ' + lockholder + '.\nOpen for viewing only?', 1, 'Yes', '', 'Cancel')) != 1) {
                             return false //logout('opendoc2 - because it is being updated by ' + lockholder + ' and the user chose not to open it in read only mode')
                         }
                         //editreleaserecord.value='Edit'
@@ -5924,7 +5924,7 @@ async function opendoc2(newkey0) {
     if (!gds.isnewrecord)
         wstatus('Existing record')
 
-    document.title = gdoctitle + ' ' + gkeyexternal.exodusconvert('*', ' ')
+    document.title = gdoctitle + ' ' + gkeyexternal.exoconvert('*', ' ')
 
     //enable the delete and save buttons if locked
     //according to need
@@ -6152,7 +6152,7 @@ async function saveandorcleardoc_body(mode) {
 
             //confirm specific save
             if (gparameters.savemode == 'CONFIRM') {
-                if (!(await exoui_okcancel('OK to save ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1))) {
+                if (!(await exoui_okcancel('OK to save ' + exoquote(gkeyexternal.exoconvert('*', ' ')) + ' ?', 1))) {
                     //return false
                     return false //logout('saveandorcleardoc - user cancelled')
                 }
@@ -6177,7 +6177,7 @@ async function saveandorcleardoc_body(mode) {
                 action += discardtitle
             }
             var canceltitle = '<u>C</u>ancel'//Cancel
-            var response = await exoui_confirm(action + ' ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1, savetitle, discardtitle, canceltitle)
+            var response = await exoui_confirm(action + ' ' + exoquote(gkeyexternal.exoconvert('*', ' ')) + ' ?', 1, savetitle, discardtitle, canceltitle)
         }
 
         //user cancels
@@ -6444,7 +6444,7 @@ async function deletedoc() {
 
     //login('deletedoc')
 
-    var question = exodusquote(gkeyexternal) + '\nWarning! Are you SURE that you want to delete this document?'
+    var question = exoquote(gkeyexternal) + '\nWarning! Are you SURE that you want to delete this document?'
     if ((await exoui_yesno(question, 2)) != 1) {
         await exoui_invalid('The document has NOT been deleted\nbecause you did not confirm.')
         return false //logout('deletedoc - user cancelled')
@@ -6476,7 +6476,7 @@ async function deletedoc() {
     //deleting a record automatically unlocks it
     glocked = false
 
-    await exoui_warning(exodusquote(gkeyexternal) + ' has been deleted.')
+    await exoui_warning(exoquote(gkeyexternal) + ' has been deleted.')
 
     //close window if modal also in writedoc
     if (window.dialogArguments) {
@@ -7522,7 +7522,7 @@ async function validateall(mode) {
                         if (deps) {
                             deps = deps.split(';')
                             for (var depn = 0; depn < deps.length; depn++) {
-                                if (!gdependents.exoduslocate(deps[depn]))
+                                if (!gdependents.exolocate(deps[depn]))
                                     gdependents[gdependents.length] = deps[depn]
                             }
                         }
@@ -7625,8 +7625,8 @@ async function writedoc(unlock) {
     gro.data = gds.data
     if (!(/**/ await gro.writex(unlock))) {
 
-        //await exoui_note('Cannot save '+exodusquote(gkeyexternal)+' because: \r\r'+gro.response)
-        await exoui_invalid('Cannot save ' + exodusquote(gkeyexternal) + ' because: \n\n' + gro.response)
+        //await exoui_note('Cannot save '+exoquote(gkeyexternal)+' because: \r\r'+gro.response)
+        await exoui_invalid('Cannot save ' + exoquote(gkeyexternal) + ' because: \n\n' + gro.response)
 
         return false //logout('writedoc - write failed')
 
@@ -7812,7 +7812,7 @@ function focuson(element) {
             element2 = element2[0]
 
         if (!element2)
-            return false //logout('focuson - cannot getElementById ' + exodusquote(element))
+            return false //logout('focuson - cannot getElementById ' + exoquote(element))
 
         element = element2
     }
@@ -8099,7 +8099,7 @@ async function document_onfocus(event) {
             //exodussettimeout('await opendoc()',100)
             form_scroll_log_msg('document_onfocus EXIT opendoc', nextkey)
             await opendoc(nextkey)
-            return false //logout('document_onfocus' + ' ' + exodusquote(elementid) + ' new record')
+            return false //logout('document_onfocus' + ' ' + exoquote(elementid) + ' new record')
         }
     }
 
@@ -8348,7 +8348,7 @@ async function validateupdate() {
     // Leave-field validate owns the UI — cancel quiet search/panel (miss stays until pass/restore)
     form_typeahead_cancel()
 
-    //log('User/setdefault changed ' + id + '\nfrom ' + exodusquote(gpreviousvalue) + '\nto ' + exodusquote(newvalue))
+    //log('User/setdefault changed ' + id + '\nfrom ' + exoquote(gpreviousvalue) + '\nto ' + exoquote(newvalue))
     //check for prior required fields if a grouped element
     var elements
     if (Number(gpreviouselement.getAttribute('exogroupno'))) {
@@ -8737,7 +8737,7 @@ function getvalue_internal(element, recn) {
     if (typeof conversion != 'string' || conversion.slice(0, 1) != '[')
         return value
     try {
-        var iv = String(value).exodusiconv(conversion)
+        var iv = String(value).exoiconv(conversion)
         if (iv != null)
             return iv
     } catch (e) { }
@@ -8768,7 +8768,7 @@ function getvalue(element, recn) {
         var element0 = element
         var element = $$(element0)
         if (!element) {
-            systemerror('getvalue()', exodusquote(element0) + ' does not exist')
+            systemerror('getvalue()', exoquote(element0) + ' does not exist')
             return
         }
         //get first one only
@@ -8823,7 +8823,7 @@ function getvalue(element, recn) {
             switch (element.type) {
 
                 case 'text':
-                    //var tx = element.value.exodustrimr()
+                    //var tx = element.value.exotrimr()
 
                     //similar code in INPUT and SPAN
 					//always trim trailing white space
@@ -8874,7 +8874,7 @@ function getvalue(element, recn) {
 
                 default: {
 
-                    return systemerror('getvalue()', exodusquote(element.type) + ' invalid INPUT element type')
+                    return systemerror('getvalue()', exoquote(element.type) + ' invalid INPUT element type')
                 }
 
             }
@@ -8888,9 +8888,9 @@ function getvalue(element, recn) {
         //crlf becomes space to prevent entry of tm characters in text fields
         case 'SPAN':
             //if (element.isContentEditable)
-            //var value = element.innerText.replace(/([\r\n]+)/g, ' ').exodustrimr()
+            //var value = element.innerText.replace(/([\r\n]+)/g, ' ').exotrimr()
             //allow /r by itself but replace \\r\n combinations (to allow spans to have multiple lines)
-            //var value = element.innerText.replace(/\r\n/g, ' ').exodustrimr()
+            //var value = element.innerText.replace(/\r\n/g, ' ').exotrimr()
 
             //var value = element.innerText // can drop spaces in some engines
             // modern browsers (selectionStart etc.)
@@ -8903,9 +8903,9 @@ function getvalue(element, recn) {
                 var value = element.innerText
 
             // some engines use \r\n line marks; others \n
-            //value = value.replace(/\r\n/g, ' ').exodustrimr()
+            //value = value.replace(/\r\n/g, ' ').exotrimr()
             //else
-            //    var value = element.innerHTML.replace(/([\r\n]+)/g, ' ').exodustrimr()
+            //    var value = element.innerHTML.replace(/([\r\n]+)/g, ' ').exotrimr()
             //if (value == nbsp160)
             //    return "";
             //remove trailing spaces and end of lines
@@ -8934,12 +8934,12 @@ function getvalue(element, recn) {
                 }
             }
 
-            return element.value.exodustrimr()
+            return element.value.exotrimr()
         }
 
         default: {
 
-            return systemerror('getvalue()', exodusquote(element.tagName) + ' invalid tagName')
+            return systemerror('getvalue()', exoquote(element.tagName) + ' invalid tagName')
         }
     }
 
@@ -8976,7 +8976,7 @@ function exodussetreadonly(elements, msg, options, recn) {
             //only give error if it is not even in the dictionary
             //so that we can remove fields from the screen without changing the setreadonly field lists
             if (!(gds.dictitem(elementxstring)))
-                return systemerror('exodussetreadonly()', exodusquote(elements) + ' is not in the form')
+                return systemerror('exodussetreadonly()', exoquote(elements) + ' is not in the form')
             return false
         }
 
@@ -9190,7 +9190,7 @@ function setvalue(element, valueorvalues) {
         var elementid = element
         element = $$(element)
         if (!element) {
-            systemerror('setvalue', exodusquote(elementid) + ' element does not exist')
+            systemerror('setvalue', exoquote(elementid) + ' element does not exist')
             return
         }
     }
@@ -9232,7 +9232,7 @@ function setvalue2(element, value) {
                     var elements = getradiocheckboxelements(element)
                     for (var ii = 0; ii < elements.length; ii++) {
                         var element = elements[ii]
-                        if (value.exoduslocate(element.value.toString()) > 0) {
+                        if (value.exolocate(element.value.toString()) > 0) {
                             element.checked = true
                             value = element.value
                             if (value == 'undefined')
@@ -9255,7 +9255,7 @@ function setvalue2(element, value) {
                     var elements = getradiocheckboxelements(element)
                     for (var ii = 0; ii < elements.length; ii++) {
                         var element = elements[ii]
-                        if (value.exoduslocate(element.value.toString()) > 0)
+                        if (value.exolocate(element.value.toString()) > 0)
                             element.checked = true
                         else
                             element.checked = false
@@ -9343,7 +9343,7 @@ function setvalue2(element, value) {
 
         default: {
 
-            return systemerror('setvalue2()', exodusquote(element) + ' ' + exodusquote(element.tagName) + ' invalid tagName in setvalue2(' + element + ',' + value + ')')
+            return systemerror('setvalue2()', exoquote(element) + ' ' + exoquote(element.tagName) + ' invalid tagName in setvalue2(' + element + ',' + value + ')')
         }
 
     } //of switch
@@ -9432,7 +9432,7 @@ async function getdefault(element) {
     //don't default if unique and already present
     if (defaultvalue && element.getAttribute('exounique')) {
         var othervalues = getvalues(element.id)
-        if (othervalues.exoduslocate(defaultvalue))
+        if (othervalues.exolocate(defaultvalue))
             defaultvalue = ''
     }
 
@@ -9693,7 +9693,7 @@ async function setdefault(element, donotupdate) {
 
     //log(element.id + ' defaulted to ' + gdefault)
 
-    //logout('setdefault ' + element.id + ' ' + exodusquote(gdefault))
+    //logout('setdefault ' + element.id + ' ' + exoquote(gdefault))
 
     return true
 
@@ -9794,7 +9794,7 @@ async function validate(element) {
         var invalidcharacters=element.getAttribute('exoinvalidcharacters')+'\xF8\xF9\xFA\xFB'//\xFC\xFD\xFE\xFF'
 
         //ignore any valid characters
-        if (element.getAttribute('exovalidcharacters')) invalidcharacters=invalidcharacters.exodusconvert(element.getAttribute('exovalidcharacters'),'')
+        if (element.getAttribute('exovalidcharacters')) invalidcharacters=invalidcharacters.exoconvert(element.getAttribute('exovalidcharacters'),'')
 
         }
         else {
@@ -9820,35 +9820,35 @@ async function validate(element) {
         //generally dont allow any field marks (can allow specific ones by putting them in valid characters)
         var invalidcharacters = FMs
         if (element.type == 'checkbox')
-            invalidcharacters = invalidcharacters.exodusconvert(sm, '')
+            invalidcharacters = invalidcharacters.exoconvert(sm, '')
         if (element.getAttribute('exoinvalidcharacters')) {
             invalidcharacters += element.getAttribute('exoinvalidcharacters')
 
             //valid characters override invalid characters (but be careful not to allow field marks
             if (element.getAttribute('exovalidcharacters'))
-                invalidcharacters = invalidcharacters.exodusconvert(element.getAttribute('exovalidcharacters'), '')
+                invalidcharacters = invalidcharacters.exoconvert(element.getAttribute('exovalidcharacters'), '')
 
         }
 
-        var temp = gvalue.exodusconvert(invalidcharacters, '')
+        var temp = gvalue.exoconvert(invalidcharacters, '')
         if (temp != gvalue) {
             //   alert('Punctuation characters and spaces (except / - and #) are not allowed in key fields and have been removed\n')
             //var charsx=invalidcharacters
             //get unused invalid characters
-            var charsx = invalidcharacters.exodusconvert(gvalue, '')
+            var charsx = invalidcharacters.exoconvert(gvalue, '')
             //get used invalid characters
-            charsx = invalidcharacters.exodusconvert(charsx, '').exodusswap('|', '&#124;')
-            //.exodusswap(fm,'&u'+fm.charCodeAt(0)+';')
-            await exoui_invalid('The following characters are not allowed in ' + elementtitle + '.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exodusswap(' ', ' space ') + '&nbsp;</span><br />&nbsp;')
+            charsx = invalidcharacters.exoconvert(charsx, '').exoswap('|', '&#124;')
+            //.exoswap(fm,'&u'+fm.charCodeAt(0)+';')
+            await exoui_invalid('The following characters are not allowed in ' + elementtitle + '.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exoswap(' ', ' space ') + '&nbsp;</span><br />&nbsp;')
             return false //logout('validate')
         }
 
         //valid character check
         if (element.getAttribute('exovalidcharacters')) {
 
-            var temp = gvalue.exodusconvert(element.getAttribute('exovalidcharacters'), '')
+            var temp = gvalue.exoconvert(element.getAttribute('exovalidcharacters'), '')
             if (temp != '') {
-                await exoui_invalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exovalidcharacters').exodusswap('|', '&#124;') + '\"')
+                await exoui_invalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exovalidcharacters').exoswap('|', '&#124;') + '\"')
                 return false //logout('validate')
             }
         }
@@ -9879,7 +9879,7 @@ async function validate(element) {
         db.request = 'CACHE\rREAD\r' + filename + '\r' + key
         if (!(await db.send())) {
 
-            if (db.response.indexOf('NO RECORD') >= 0) db.response = exodusquote(gvalue) + ' ' + element.getAttribute('exotitle') + ' is not on file.'
+            if (db.response.indexOf('NO RECORD') >= 0) db.response = exoquote(gvalue) + ' ' + element.getAttribute('exotitle') + ' is not on file.'
 
             await exoui_invalid(db.response)
 
@@ -9929,7 +9929,7 @@ async function validate(element) {
         //null means failed to convert to internal value therefore invalid
         if (gvalue == null || ivalue == null) {
             //error message (use the conversion program name in the message)
-            await exoui_invalid(exodusquote(gvalue) + ' is not a valid ' + convarray[0].toLowerCase().replace(/_/g, ' ') + '\n\n' + gmsg)
+            await exoui_invalid(exoquote(gvalue) + ' is not a valid ' + convarray[0].toLowerCase().replace(/_/g, ' ') + '\n\n' + gmsg)
             return false //logout('validate - input conversion returned null')
         }
 
@@ -9972,8 +9972,8 @@ async function validate(element) {
         var ln
         //othervalues[grecn]='' //not needed because only validate if changed
         othervalues[grecn] = '' //put back because of a validation after a multiple choice popup fails
-        if (ln = othervalues.exoduslocate(gvalue)) {
-            gmsg = exodusquote(gvaluebeforeiconv) + ' is already used in line ' + ln + '.'
+        if (ln = othervalues.exolocate(gvalue)) {
+            gmsg = exoquote(gvaluebeforeiconv) + ' is already used in line ' + ln + '.'
             if (element.getAttribute('exononuniquewarning')) {
                 if (!(confirm('Warning:\n\n' + gmsg, 1))) {
                     //logout('validate - not unique warning')
@@ -10085,13 +10085,13 @@ async function validateoconv(element, ivalue) {
     gmsg = ''
     var ovalue = await exodusevaluate(expression, 'validateoconv ' + (element && element.id))
     if (typeof ovalue == 'undefined') {
-        await exoui_invalid(exodusquote(ivalue) + ' output conversion failed (undefined)\n' + gmsg)
+        await exoui_invalid(exoquote(ivalue) + ' output conversion failed (undefined)\n' + gmsg)
         return false
     }
 
     //null means failed to convert to external value therefore invalid
     if (ovalue == null) {
-        await exoui_invalid(exodusquote(ivalue) + ' is not a valid ' + convarray[0].toLowerCase() + '\n' + gmsg)
+        await exoui_invalid(exoquote(ivalue) + ' is not a valid ' + convarray[0].toLowerCase() + '\n' + gmsg)
         return false
     }
 
@@ -10337,7 +10337,7 @@ async function oconvertvalue(ivalue, conversion, element) {
     if (!conversion) return ivalue
     if (typeof (conversion) != 'string' || conversion.slice(0, 1) != '[') return ivalue
     // NUMBER OCONV defaults display=true (grouping). Use [DECIMAL,…] for plain.
-    return ivalue.exodusoconv(conversion)
+    return ivalue.exooconv(conversion)
 }
 
 async function deleterow_onclick(event) {
@@ -10641,7 +10641,7 @@ async function insertallrows2(elements, values, fromrecn) {
                     return false
                 //const conversion = gpreviouselement.getAttribute('exoconversion')
                 //if (conversion && conversion.substr(0,1) == '[')
-                //    newvalue = newvalue.exodusoconv(conversion)
+                //    newvalue = newvalue.exooconv(conversion)
                 setvalue(gpreviouselement,ovalue)
                 if ((!gKeyNodes || glocked) && !(await validateupdate()))
                     return false
@@ -11000,7 +11000,7 @@ async function nextrecord2_step(event, direction) {
             nextkeyn = 1
         }
         else {
-            nextkeyn = nextkeys.exoduslocate(selkeys[0]) - 1
+            nextkeyn = nextkeys.exolocate(selkeys[0]) - 1
         }
     }
     else {
@@ -11194,7 +11194,7 @@ async function exoui_popup(event, element) {
             var prevalues = ((await gds.getall(elementid))).slice(0, grecn)
             for (var ii = 0; ii < prevalues.length; ++ii) {
                 var replyn
-                if (replyn = reply.exoduslocate(prevalues[ii]))
+                if (replyn = reply.exolocate(prevalues[ii]))
                     reply.splice(replyn - 1, 1)
             }
             if (!reply.length)
@@ -11311,7 +11311,7 @@ async function exoui_popup2(element) {
         }
 
         //remove empty values
-        reply = reply.exodustrim('')
+        reply = reply.exotrim('')
 
         //minimum one value
         if (!reply.length)
@@ -11435,7 +11435,7 @@ async function getkey(mode) {
         }
         if (mode != 'oconv') {
             var conversion = gKeyNodes[ii].getAttribute('exoconversion')
-            if (conversion.slice(0, 1) == '[') temp = exodusiconv(temp, conversion)
+            if (conversion.slice(0, 1) == '[') temp = exoiconv(temp, conversion)
         }
         key[gKeyNodes[ii].getAttribute('exokeypart') - 1] = temp
     }
@@ -11466,9 +11466,9 @@ async function setkeyvalues(key) {
             key = String(key)
     }
     for (var ii = 0; ii < gKeyNodes.length; ii++) {
-        var temp = key.exodusfield('*', Number(gKeyNodes[ii].getAttribute('exokeypart')))
+        var temp = key.exofield('*', Number(gKeyNodes[ii].getAttribute('exokeypart')))
         //var conversion=gKeyNodes[ii].getAttribute('exoconversion')
-        //if (conversion.slice(0,1)=='[') temp=temp.exodusoconv(conversion)
+        //if (conversion.slice(0,1)=='[') temp=temp.exooconv(conversion)
         //setvalue(gKeyNodes[ii],temp)
         await gds.setx(gKeyNodes[ii].id, '', temp)
     }
@@ -11983,13 +11983,13 @@ async function form_popcalendar2() {
     if (!gpreviouselement || !exodusfieldpopupallowed(gpreviouselement))
         return false
 
-    var datevalue = gvalue.toString().exodusiconv('[DATE]')
+    var datevalue = gvalue.toString().exoiconv('[DATE]')
     var msdate = null
     if (datevalue) {
         msdate = new Date()
-        msdate.setDate(Number(datevalue.exodusoconv('[DATE,DOM]')))
-        msdate.setMonth(Number(datevalue.exodusoconv('[DATE,MONTH]') - 1))
-        msdate.setFullYear(Number(datevalue.exodusoconv('[DATE,YEAR]')))
+        msdate.setDate(Number(datevalue.exooconv('[DATE,DOM]')))
+        msdate.setMonth(Number(datevalue.exooconv('[DATE,MONTH]') - 1))
+        msdate.setFullYear(Number(datevalue.exooconv('[DATE,YEAR]')))
     }
 
     if (!calendar_checkInDatePicker) {
@@ -12084,7 +12084,7 @@ async function form_val_index(filename, fieldname, allownew) {
     //optionally change case
     for (var ii = 0; ii < indexvalues.length; ii++) {
         if (indexvalues[ii][fieldname].text.toUpperCase() == gvalue.toUpperCase()) {
-            if (!(reply = await exoui_confirm('Change the capitalisation of your entry?\n\nFrom: ' + gvalue.exodusquote() + '\n\n  To: ' + indexvalues[ii][fieldname].text.exodusquote(), 1)))
+            if (!(reply = await exoui_confirm('Change the capitalisation of your entry?\n\nFrom: ' + gvalue.exoquote() + '\n\n  To: ' + indexvalues[ii][fieldname].text.exoquote(), 1)))
                 return await exoui_invalid()
             if (reply == 1)
                 gvalue = indexvalues[ii][fieldname].text
@@ -12097,7 +12097,7 @@ async function form_val_index(filename, fieldname, allownew) {
         return await exoui_invalid(gvalue + ' ' + fieldname.toLowerCase() + ' does not exist')
 
     //confirm is new index value
-    if (gvalue && ((await exoui_yesno(' Is ' + exodusquote(gvalue) + ' to be a new ' + fieldname.toLowerCase() + ' for ' + filename.toLowerCase() + ' ?', 1)) != 1))
+    if (gvalue && ((await exoui_yesno(' Is ' + exoquote(gvalue) + ' to be a new ' + fieldname.toLowerCase() + ' for ' + filename.toLowerCase() + ' ?', 1)) != 1))
         return false
 
     return true
@@ -12131,10 +12131,10 @@ async function form_pop_index(filename, fieldname, many) {
     //get index values
     var indexvalues = await form_get_index(filename, fieldname)
     if (!indexvalues || indexvalues.group1.length == 0)
-        return await exoui_invalid('No ' + fieldname.toLowerCase().exodusconvert('_', ' ') + '(s) have been entered on ' + filename.toLowerCase().exodusconvert('._', '  ') + ' file yet')
+        return await exoui_invalid('No ' + fieldname.toLowerCase().exoconvert('_', ' ') + '(s) have been entered on ' + filename.toLowerCase().exoconvert('._', '  ') + ' file yet')
 
     //user selects index value(s)
-    var result = await exoui_decide2('', indexvalues, [[fieldname, fieldname.exoduscapitalise()]], 0, '', many)
+    var result = await exoui_decide2('', indexvalues, [[fieldname, fieldname.exocapitalise()]], 0, '', many)
 
     return result
 
@@ -12147,7 +12147,7 @@ async function copyrecord_onclick() {
 
     //read the record to be copied
     var copyrecord = []
-    if (!(await copyrecord.exodusread(gdatafilename, glastkey)))
+    if (!(await copyrecord.exoread(gdatafilename, glastkey)))
         return await exoui_invalid(copyrecord.exodusresponse)
 
     //remove any uncopyable data
@@ -12228,7 +12228,7 @@ function copydictitem(dictitem, element) {
 }
 
 function form_setdefault(str) {
-    gro.defaultrevstr = unescape(str.exodusconvert('`^]}\~', rm + fm + vm + sm + tm + stm))
+    gro.defaultrevstr = unescape(str.exoconvert('`^]}\~', rm + fm + vm + sm + tm + stm))
     return 'ok'
 }
 
@@ -12241,7 +12241,7 @@ async function form_postread_noteifdeleted(descending) {
     //descending means the latest log is inserted as first mv, which is the least common option, in PLAN/SCHEDULE/BATCHES
     var logn = descending ? 0 : -1
 
-    var note = 'This record was deleted by ' + (await gds.get1('USERNAME_UPDATED', logn)) + ' on ' + (await gds.get1('DATETIME_UPDATED', logn)).exodusoconv('[DATE_TIME]') + '.'
+    var note = 'This record was deleted by ' + (await gds.get1('USERNAME_UPDATED', logn)) + ' on ' + (await gds.get1('DATETIME_UPDATED', logn)).exooconv('[DATE_TIME]') + '.'
     note += '\n\nYou can restore it by saving it again'
     await exoui_note(note)
 
@@ -12400,7 +12400,7 @@ async function form_oncopy_generic(event) {
             else {
                 var cell = await gds.get1(dictid, ln)
                 if (colpars[2] && colpars[2].slice(0, 1) == '[')
-                    cell = cell.exodusoconv(colpars[2])
+                    cell = cell.exooconv(colpars[2])
                 txln.push(cell)
             }
         }
@@ -12557,7 +12557,7 @@ function form_copypaste_getcols(event, pasting) {
 	    //skip pasting values of non field type columns like symbolics
         	if (pasting && Number(element.getAttribute('exofieldno')) == 0)
             	continue
-        var elementtitle = element.id.exodusconvert('_', ' ')
+        var elementtitle = element.id.exoconvert('_', ' ')
         var conversion = element.getAttribute('exoconversion')
         var col = [element.id, elementtitle, conversion]
         cols.push(col)
@@ -12632,7 +12632,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
 
     //    //user pastes data
     //    if (!data) {
-    //        //args.SCHEDULE_TEXT = gscheduleimportdata.exodusconvert(tm,vm)
+    //        //args.SCHEDULE_TEXT = gscheduleimportdata.exoconvert(tm,vm)
     //        var args = {}
     //        data = await exoui_showmodaldialog('../media/schedules_import.htm', args)
     //        if (!data)
@@ -12643,7 +12643,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
 
     //convert pairs of double quotes to one double quote and remove surrounding double quotes
     //eg "30""" becomes 30"
-    //data = data.exodusswap('""', '&quote;').exodusconvert('"', '').exodusswap('&quote;', '"')
+    //data = data.exoswap('""', '&quote;').exoconvert('"', '').exoswap('&quote;', '"')
 
     //convert data to array and tidy up
     data = data.split('\n')
@@ -12658,10 +12658,10 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
         //line = line.replace(/^ +/, '').replace(/ +$/, '')
         //trim all space before and after all tabs
         //line = line.replace(/ +\t/g, '\t').replace(/\t +/g, '\t')
-        //unfortunately array.exodustrim removes empty cells
-        //line=line.exodustrim()
+        //unfortunately array.exotrim removes empty cells
+        //line=line.exotrim()
         for (var ii = line.length - 1; ii >= 0; --ii)
-            line[ii] = line[ii].exodustrim()
+            line[ii] = line[ii].exotrim()
 
         // skip blank lines
         //if (!line.join('')) {
@@ -12756,7 +12756,7 @@ async function form_onpaste_generic_validatedata(data) {
         if (!col.conversion)
             col.conversion = element0.getAttribute('exocheckbox')
         if (col.conversion && col.conversion.slice(0, 1) != '[')
-            col.conversion = col.conversion.exodussplit(':;')
+            col.conversion = col.conversion.exosplit(':;')
 
         col.filename = element0.getAttribute('exofilename')
         col.validation = element0.getAttribute('exovalidation')
@@ -12805,7 +12805,7 @@ async function form_onpaste_generic_validatedata(data) {
                 if (col.conversion) {
                     //things like [NUMBER,NDECS]
                     if (col.conversion.slice(0, 1) == '[') {
-                        ivalue = ovalue.exodusiconv(col.conversion)
+                        ivalue = ovalue.exoiconv(col.conversion)
                     }
                     //things like dropdowns and checkboxes
                     else {
@@ -12818,7 +12818,7 @@ async function form_onpaste_generic_validatedata(data) {
                                 ivalue = ovalue
                         }
                         if (ivalue == null) {
-                            gmsg = 'Allowable values are ' + col.conversion.exodusjoin(',=')
+                            gmsg = 'Allowable values are ' + col.conversion.exojoin(',=')
                         }
                     }
                     //blank any invalid values
@@ -12839,7 +12839,7 @@ async function form_onpaste_generic_validatedata(data) {
 
                     //warn and blank if not on file
                     var rec = []
-                    if (!(await rec.exodusread(col.filename, ivalue))) {
+                    if (!(await rec.exoread(col.filename, ivalue))) {
                         //'Format must be '+conversion.slice(1,-1).split(',')[0]
                         if (!(await form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ivalue, 'Code does not exist or cannot be accessed')))
                             return false

@@ -70,7 +70,7 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.lowercase = true;
     di.length = 12;
     //di.required=true; only required in Scope: CURRENT INSTALLATION. checked in form_prewrite
-    //if (gdataset!='BASIC') di.defaultvalue=gdataset.toLowerCase().exodusquote()
+    //if (gdataset!='BASIC') di.defaultvalue=gdataset.toLowerCase().exoquote()
 
     groupn=1
 
@@ -96,12 +96,12 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di = dict[++din] = dictrec('BACKUP_TIME_FROM', 'F', 73)
     exo_dict_time(di)
     di.length = 3
-    //di.defaultvalue='02:00'.exodusiconv('[TIME]').exodusquote()
+    //di.defaultvalue='02:00'.exoiconv('[TIME]').exoquote()
 
     di = dict[++din] = dictrec('BACKUP_TIME_UPTO', 'F', 74)
     exo_dict_time(di)
     di.length = 3
-    //di.defaultvalue='02:05'.exodusiconv('[TIME]').exodusquote()
+    //di.defaultvalue='02:05'.exoiconv('[TIME]').exoquote()
 
     di = dict[++din] = dictrec('BACKUP_DAY_OF_WEEK', 'F', 75)
     di.checkbox = '1;Mon:2;Tue:3;Wed:4;Thu:5;Fri:6;Sat:7;Sun'
@@ -171,7 +171,7 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.validation = function sysconfig_val_EMAIL_DOMAINS() {
         var punctuation = "'" + '`!"$%^&*()_+=[]{};:@#~,<>/?\\|'
         //ie dont allow punctuation except space and -
-        gvalue = gvalue.exodusconvert(punctuation, exodusspace(punctuation.length)).exodustrim()
+        gvalue = gvalue.exoconvert(punctuation, exodusspace(punctuation.length)).exotrim()
         return true
     }
 

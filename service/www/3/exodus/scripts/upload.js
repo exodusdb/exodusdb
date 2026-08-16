@@ -230,7 +230,7 @@ async function upload_onclick() {
  }
 
  //check file extensions
- if (!gaudiovisualextensions.exoduslocate(extension))
+ if (!gaudiovisualextensions.exolocate(extension))
   return await exoui_invalid('Files ending .'+extension+' are not allowed to be uploaded\r\rThe allowed file extensions are:\r\r'+gaudiovisualextensions.join(', '))
 
  var thumbnail=$$('thumbnail')
@@ -270,8 +270,8 @@ async function upload_onclick() {
   targetfilename+=extension
 
  var basefilename=targetfilename.split('\\').slice(-1)[0].split('/').slice(-1)[0].toLowerCase()
- //var mode=(gexistingextensions.exoduslocate(extension))?'UPDATE':'CREATE'
- var mode=(gexistingbasefilenames.exoduslocate(basefilename))?'UPDATE':'CREATE'
+ //var mode=(gexistingextensions.exolocate(extension))?'UPDATE':'CREATE'
+ var mode=(gexistingbasefilenames.exolocate(basefilename))?'UPDATE':'CREATE'
 
  var question='Uploading '+sourcefilename+' to '+targetfilename+'\r\r'
 
@@ -460,7 +460,7 @@ async function loadimages() {
    await adddeletebutton(filename)
 
   //image
-  if (gimageextensions.exoduslocate(fileextension)) {
+  if (gimageextensions.exolocate(fileextension)) {
 
    //br
    var br=document.createElement('br')

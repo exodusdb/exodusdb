@@ -349,7 +349,7 @@ function exodus_client_init() {
 	setdateformat()
 
 	//gexodus_server = gdataset.toLowerCase() == gdataset
-	gexodus_server = typeof exodusread != 'undefined'
+	gexodus_server = typeof exoread != 'undefined'
 
 	if (typeof gparameters == 'undefined')
 		gparameters = new Object
@@ -514,9 +514,9 @@ async function exoui_security(task) {
 	}
 
 	//fail if task not allowed
-	//if (task.slice(0,3)=='!!!'||gtasks.exoduslocate(task)||(gstepping&&!(confirm(task))))
-	if (task.slice(0, 3) == '!!!' || gtasks.exoduslocate(task)) {
-		gmsg = 'Sorry ' + gusername.exoduscapitalise() + ', you are not authorised to do\r' + task.exoduscapitalise()
+	//if (task.slice(0,3)=='!!!'||gtasks.exolocate(task)||(gstepping&&!(confirm(task))))
+	if (task.slice(0, 3) == '!!!' || gtasks.exolocate(task)) {
+		gmsg = 'Sorry ' + gusername.exocapitalise() + ', you are not authorised to do\r' + task.exocapitalise()
 		return false
 	}
 
@@ -2449,13 +2449,13 @@ function menuonload() {
 
 }
 
-Array.prototype.exodusread = async function array_exodusread(filename, key, fieldno, cache) {
+Array.prototype.exoread = async function array_exodusread(filename, key, fieldno, cache) {
 
 	//unless returning one fieldno, always return at least n fields
 	//so that accessing fields that do not exist by [] returns ''
 	var minnfields = 100
 
-	this.exodusresponse = exodusquote(key) + ' does not exist in the ' + filename.toLowerCase() + ' file.'
+	this.exodusresponse = exoquote(key) + ' does not exist in the ' + filename.toLowerCase() + ' file.'
 	if (key == '')
 		return false
 
@@ -2466,11 +2466,11 @@ Array.prototype.exodusread = async function array_exodusread(filename, key, fiel
 	db.request += 'READ\r' + filename + '\r' + key
 	if (!(await db.send())) {
 		if (db.response.indexOf('NO RECORD') >= 0) {
-			//var temp=filename.toLowerCase().exodussingular().replace(/_/,' ')
+			//var temp=filename.toLowerCase().exosingular().replace(/_/,' ')
 			return false
 		}
 		else {
-			if (db.response.indexOf('file is not available') >= 0) systemerror('exodusread', db.response)
+			if (db.response.indexOf('file is not available') >= 0) systemerror('exoread', db.response)
 			this.exodusresponse = db.response
 		}
 		return false
@@ -2494,7 +2494,7 @@ Array.prototype.exodusread = async function array_exodusread(filename, key, fiel
 }
 
 //xlate method for array of keys
-Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode) {
+Array.prototype.exoxlate = async function arrayxlate(filename, fieldno, mode) {
 
 	var keys = this
 	var results = []
@@ -2520,7 +2520,7 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 		}
 		// Not in cache — batch SELECT later
 		else {
-			if (!uncachedkeys.exoduslocate(key)) uncachedkeys[uncachedkeys.length] = key
+			if (!uncachedkeys.exolocate(key)) uncachedkeys[uncachedkeys.length] = key
 		}
 
 	}
@@ -2569,7 +2569,7 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 
 			//store the results whereever they are needed
 			var keyn = 0
-			while (keyn = keys.exoduslocate(key, '', keyn + 1)) {
+			while (keyn = keys.exolocate(key, '', keyn + 1)) {
 				results[keyn - 1] = result
 			}
 
@@ -2595,7 +2595,7 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 //fieldno 0 means return whole record as simple array
 //mode can be undefined, C (means return key if no record) and SUM means add up mvs
 //zzz SHOULD return '' if no record and null if there is any error
-String.prototype.exodusxlate = async function stringxlate(filename, fieldno, mode) {
+String.prototype.exoxlate = async function stringxlate(filename, fieldno, mode) {
 
 	key = this.toString()
 	if (key == '') return ''
@@ -2603,7 +2603,7 @@ String.prototype.exodusxlate = async function stringxlate(filename, fieldno, mod
 	exodusassertnumeric(fieldno, 'xlate', filename + ' ' + key)
 
 	var record = []
-	await record.exodusread(filename, this)
+	await record.exoread(filename, this)
 	if (db.response.indexOf('file is not available') >= 0) systemerror('xlate', db.response)
 
 	return await exodusxlatelogic(filename, record, fieldno, mode, key)
@@ -2620,7 +2620,7 @@ async function exodusxlatelogic(filename, record, fieldno, mode, key) {
 		}
 		//option to sum the result (good for adding up multivalues)
 		if (mode && mode == 'SUM') {
-			record = record.exodussum()
+			record = record.exosum()
 		}
 	}
 	else {
@@ -2650,14 +2650,14 @@ async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, 
 
 	//sortselectionclause can be an array of keys
 	if (typeof sortselectionclause == 'object')
-		sortselectionclause = sortselectionclause.join('" "').exodusquote()
+		sortselectionclause = sortselectionclause.join('" "').exoquote()
 
 	//get a list of col names sep by spaces
 	var collist = ''
 	for (var i = 0; i < cols.length; i++)
 		collist += ' ' + cols[i][0]
 	collist = collist.slice(1)
-	if (!collist.split(' ').exoduslocate('ID'))
+	if (!collist.split(' ').exolocate('ID'))
 		collist += ' ID'
 
 	//increased from 1000 since changelog records>1000 and no way to
@@ -4182,7 +4182,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
 
 		var value = cell.text
 
-		if (no(requiredvalues) || requiredvalues.exoduslocate(value)) {
+		if (no(requiredvalues) || requiredvalues.exolocate(value)) {
 			var option1 = document.createElement('option')
 			option1.value = value
 
@@ -4198,7 +4198,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
 
 			//indicate if selected
 			var selected = false
-			if (selectedvalues && selectedvalues.exoduslocate(value)) {
+			if (selectedvalues && selectedvalues.exolocate(value)) {
 				//option+=' selected=true'
 				option1.selected = true
 				anyselected = true
@@ -4303,7 +4303,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 		return false
 	}
 
-	////login('setdropdown3 '+element.id+' '+exodusquote(dropdowndata))
+	////login('setdropdown3 '+element.id+' '+exoquote(dropdowndata))
 	//login('setdropdown3 ' + element.id)
 
 	//dropdowndata may be an array of strings or a string with ;: seps for cols/rows respectively
@@ -4318,7 +4318,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 
 		//convert into an array
 		var sepchars = (dropdowndata.indexOf(vm) >= 0 || dropdowndata.indexOf(fm) >= 0) ? fm + vm : ':;'
-		dropdowndata = dropdowndata.exodussplit(sepchars)
+		dropdowndata = dropdowndata.exosplit(sepchars)
 
 	}
 
@@ -4359,13 +4359,13 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 			var value = dropdowndata[i][valuecoln]
 			if (!value)
 				value = ''
-			if (no(requiredvalues) || requiredvalues.exoduslocate(value)) {
+			if (no(requiredvalues) || requiredvalues.exolocate(value)) {
 
 				var text = dropdowndata[i][textcoln]
 				if (typeof (text) == 'undefined' || text == '') {
 					text = value
 					if (typeof text == 'undefined') text = ''
-					else text = text.toString().exodusconvert('_', ' ').exoduscapitalise()
+					else text = text.toString().exoconvert('_', ' ').exocapitalise()
 				}
 
 				addoption(element, value, text)
@@ -4384,8 +4384,8 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 			var selectedvalue = selectedvalues[j]
 			for (var i = 0; i < element.childNodes.length; i++) {
 				var option = element.childNodes[i]
-				//if (selectedvalues.exoduslocate(option.value)) option.selected=true
-				//if (selectedvalues.exoduslocate(option.text)) option.selected=true
+				//if (selectedvalues.exolocate(option.value)) option.selected=true
+				//if (selectedvalues.exolocate(option.text)) option.selected=true
 				if (option.value == selectedvalue || option.text == selectedvalue) {
 					try {
 						option.selected = true
@@ -5089,7 +5089,7 @@ function menuhide(element) {
 
 		//delete some menus
 		if (okmenus && okmenus.join() != '' && child.id && child.id.slice(0, 5) == 'menu_') {
-			if (!okmenus.exoduslocate(child.id.slice(5))) {
+			if (!okmenus.exolocate(child.id.slice(5))) {
 				//ignore failure due to too early key response
 				try {
 					child = element.removeChild(child)
@@ -5124,13 +5124,13 @@ function menuhide(element) {
 					//save an array of elements by accesskey in the menu
 					var underlineelement
 					if ((underlineelement = child.getElementsByTagName('U')).length) {
-						var menuaccesskey = underlineelement[0].innerText.exodustrim().slice(0, 1).toUpperCase()
+						var menuaccesskey = underlineelement[0].innerText.exotrim().slice(0, 1).toUpperCase()
 						var temp = element.exodusmenuaccesskeys[menuaccesskey]
 						if (gusername == 'EXODUS' && temp)
 							void exodus_begin(function () {
-								return exoui_note('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+								return exoui_note('Duplicate menu access key ' + menuaccesskey.exoquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
 							}, 'duplicate menu access key')
-							// alert('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
+							// alert('Duplicate menu access key ' + menuaccesskey.exoquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
 						element.exodusmenuaccesskeys[menuaccesskey] = child
 					}
 				}
@@ -5451,7 +5451,7 @@ function menuonkeydown(event, menu, key) {
 						break
 
 					//or break if the first letter matches the alpha code entered
-					if (newmenuoption.innerText.exodustrim().slice(0, 1).toUpperCase() == String.fromCharCode(key))
+					if (newmenuoption.innerText.exotrim().slice(0, 1).toUpperCase() == String.fromCharCode(key))
 						break
 
 				}
@@ -5471,7 +5471,7 @@ function menuonkeydown(event, menu, key) {
 						break
 
 					//ir break if the first letter matches matches the alpha code entered
-					if (newmenuoption.innerText.exodustrim().slice(0, 1).toUpperCase() == String.fromCharCode(key))
+					if (newmenuoption.innerText.exotrim().slice(0, 1).toUpperCase() == String.fromCharCode(key))
 						break
 
 				}
@@ -7530,7 +7530,7 @@ function systemerror(functionname, e) {
 	else {
 		var stack = new Error().stack
 		if (stack)
-			msg += '\n\n' + stack.toString()//.exodusconvert('\n\r','||')
+			msg += '\n\n' + stack.toString()//.exoconvert('\n\r','||')
 		else {
 			var caller
 			if (arguments && arguments.callee)
@@ -9018,7 +9018,7 @@ async function decide_onload(decide_args) {
 	var data = decide_args[1]
 	var cols = decide_args[2]
 	var decide_returncolid = decide_args[3]
-	var defaultreply = decide_args[4]//must be an array with method exoduslocate
+	var defaultreply = decide_args[4]//must be an array with method exolocate
 	var decide_returnmany = decide_args[5]
 	var decide_inverted = decide_args[6]
 
@@ -9146,7 +9146,7 @@ async function decide_onload(decide_args) {
 				title = ''
 			if (parseInt(title))
 				title = ''
-			title = title.exoduscapitalise().replace(/_/gi, ' ')
+			title = title.exocapitalise().replace(/_/gi, ' ')
 		}
 		oCell.innerHTML = title
 		oCell.className = 'decide_datacol'
@@ -9275,7 +9275,7 @@ async function decide_onload(decide_args) {
 		}
 		oCellxInput.setAttribute('decide_optionno', optionno)
 
-		if (defaultreply && defaultreply.exoduslocate(returnvalue))
+		if (defaultreply && defaultreply.exolocate(returnvalue))
 			oCellx.firstChild.checked = true
 
 		oCellx.firstChild.setAttribute('decide_returnvalue', returnvalue)
@@ -9332,7 +9332,7 @@ async function decide_onload(decide_args) {
 			//oCell.innerHTML=value
 			//use innerText otherwise things like <> in the data do not show
 			//oCell.innerText = value
-			//oCell.innerHTML = value.exodusconvert(vm+sm+tm,'   ')
+			//oCell.innerHTML = value.exoconvert(vm+sm+tm,'   ')
 			value = value.replace(ALLFMre, '<br/>')
 			oCell.innerHTML = value
 
@@ -9345,14 +9345,14 @@ async function decide_onload(decide_args) {
 
 			if (defaultreply) {
 				if (typeof decide_returncolid === '') {
-					if (defaultreply.exoduslocate(rown + 1))
+					if (defaultreply.exolocate(rown + 1))
 						oCellx.firstChild.checked = true
 				}
 				else {
 					//returncolid was being treated as onscreen col preventing proper defaulting
 					//if (value && coln === returncolid) {
 					if (value && (colinfo[0] == decide_returncolid || Number(colinfo[0]) == decide_returncolid)) {
-						if (defaultreply.exoduslocate(value))
+						if (defaultreply.exolocate(value))
 							oCellx.firstChild.checked = true
 					}
 				}
@@ -9773,8 +9773,8 @@ async function decide_onload(decide_args) {
 		if (returnvalues == null || returnvalues === ''
 			|| (typeof returnvalues == 'object' && !returnvalues.length))
 			returnvalues = ''
-		else if (typeof returnvalues == 'object' && returnvalues.exodustrim)
-			returnvalues = returnvalues.exodustrim('')
+		else if (typeof returnvalues == 'object' && returnvalues.exotrim)
+			returnvalues = returnvalues.exotrim('')
 
 		return returnvalues
 	}
@@ -10694,9 +10694,9 @@ function DATE(mode, value, params) {
 			if (typeof otherdate == 'object')
 				otherdate = otherdate[0]
 
-			//params=otherdate.exodusoconv('[DATE]').exodusfield('/',2,2)
+			//params=otherdate.exooconv('[DATE]').exofield('/',2,2)
 			//get month/year
-			params = otherdate.exodusoconv('[DATE,MONTH]') + '/' + otherdate.exodusoconv('[DATE,YEAR]')
+			params = otherdate.exooconv('[DATE,MONTH]') + '/' + otherdate.exooconv('[DATE,YEAR]')
 
 		}
 
@@ -10924,7 +10924,7 @@ function DATE(mode, value, params) {
 						result[gdatemonthpos] = ''
 					}
 				}
-				result = result.exodusjoin('/').exodustrim('/')
+				result = result.exojoin('/').exotrim('/')
 
 				//add day of week
 				var dow = ((value - 1) % 7) + 1
@@ -11016,7 +11016,7 @@ function TIME(mode, value, params) {
 			temp = temp.substr(0, 2) + ':' + temp.substr(2, 2)
 		if (temp.match(/^\d{6}$/))
 			temp = temp.substr(0, 2) + ':' + temp.substr(2, 2) + ':' + temp.substr(4, 2)
-		temp = temp.exodusconvert('. ', '::').split(':')
+		temp = temp.exoconvert('. ', '::').split(':')
 		if (!temp[1]) temp[1] = '00'
 		if (!temp.join(':').match(/(^\d{1,2}:\d{1,2}$)|(^\d{1,2}:\d{1,2}:\d{1,2}$)/)) return null
 
@@ -11064,7 +11064,7 @@ function DATE_TIME(mode, value, params) {
 				timebit += 86400
 			}
 		}
-		return datebit.exodusoconv('[DATE,' + params[0] + ']') + ' ' + timebit.exodusoconv('[TIME,' + params[1] + ']')
+		return datebit.exooconv('[DATE,' + params[0] + ']') + ' ' + timebit.exooconv('[TIME,' + params[1] + ']')
 	}
 	else {
 		//iconv not implemented yet
@@ -11106,7 +11106,7 @@ function PERIOD_OF_TIME(mode, value, params) {
 		if (exodusnum(value)) return value
 
 		//allow slash, dash, space and comma as well as ":" for separator
-		value = value.exodusconvert('/- ,', '::::')
+		value = value.exoconvert('/- ,', '::::')
 
 		value = value.split(':')
 		if (value.length < 2) value[1] = 0
@@ -11141,7 +11141,7 @@ function PERIOD_OF_TIME(mode, value, params) {
 		var result = value[0] + ':'
 		temp = value[1]
 		if (temp) temp = parseFloat('.' + temp)
-		temp = exodusround(temp * 60, 0)
+		temp = exoround(temp * 60, 0)
 		temp = '00' + temp
 		result += temp.slice(temp.length - 2)
 

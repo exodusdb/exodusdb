@@ -345,17 +345,17 @@ Current handling includes a 128-character limit on the combined directory+filena
 Many convenience methods are added to `String` and `Array` (primarily in `exodus.js` and `client.js`):
 
 ```js
-str.exodusfield(delim, n)
-str.exodusconvert(fromChars, toChars)
-str.exoduscapitalise()
-str.exodustrim([char])
-str.exodusquote()
-str.exodusxmlquote()
-arr.exoduslocate(item)
-arr.exodusunique()
-arr.exodussum()
-arr.exodusjoin(...)
-arr.exodustrim()
+str.exofield(delim, n)
+str.exoconvert(fromChars, toChars)
+str.exocapitalise()
+str.exotrim([char])
+str.exoquote()
+str.exoxmlquote()
+arr.exolocate(item)
+arr.exounique()
+arr.exosum()
+arr.exojoin(...)
+arr.exotrim()
 ... many more (xlate, sum, invert, etc.)
 ```
 

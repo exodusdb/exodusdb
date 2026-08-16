@@ -3,7 +3,7 @@
 <P>EXODUS has provided a series of method, functions and objects to simplify the 
 	recoding of Basic into javascript (also known as jscript)</P>
 <H2>Methods</H2>
-<H3>array/string.exodusextract(fieldno,valueno,subvalueno)</H3>
+<H3>array/string.exoextract(fieldno,valueno,subvalueno)</H3>
 <P>Extracts the field (1 based!) or '' if not defined</P>
 <P>fieldno, valueno and subvalue are all optional</P>
 <P>If fieldno is undefined then returns input as output
@@ -11,12 +11,12 @@
 <P>If fieldn is 0 then returns an array (string split by fm if necessary)</P>
 <P>and so on for the values and subvalues</P>
 <P>NB fieldno,valueno,subvalueno are 1 based not zero based</P>
-<H3>string.exodusreplace(fieldno,valueno,subvalueno,newdata)</H3>
+<H3>string.exoreplace(fieldno,valueno,subvalueno,newdata)</H3>
 <P>returns a string with the newdata inserted</P>
 <P>NB&nbsp;does not handle valueno or subvalueno yet</P>
 <P>NB fieldno,valueno,subvalueno are 1 based not zero based</P>
 <H3>
-	<H3>array/string.exodusfield(sep,start,length)</H3>
+	<H3>array/string.exofield(sep,start,length)</H3>
 </H3>
 <P>sep can be a single character to define the fields or&nbsp;'' to indicate 
 	characterwise operation</P>
@@ -24,7 +24,7 @@
 	returns an array</P>
 <P>NB&nbsp;start is 1 based not zero based</P>
 <H3>
-	<H3>array/string.exodusfieldstore(sep,start,length,insertstring)</H3>
+	<H3>array/string.exofieldstore(sep,start,length,insertstring)</H3>
 </H3>
 <P>sep can be a single character to define the fields or&nbsp;'' to indicate 
 	characterwise operation</P>
@@ -33,8 +33,8 @@
 	simply deleted and replaced with the insertstring as you would expect.</P>
 <P>if an array then the fieldstore is performed on each element of the array</P>
 <P>NB start is&nbsp;1 based not zero based</P>
-<H3>string.exoduslocate(string,order,sep,startfrom)</H3>
-<H3>array.exoduslocate(string,order,startfrom)</H3>
+<H3>string.exolocate(string,order,sep,startfrom)</H3>
+<H3>array.exolocate(string,order,startfrom)</H3>
 <P>NB ... returns 1 based index NOT 0 based</P>
 <P>returns 0 if string not found in array/string otherwise 1 if found in first 
 	position etc</P>
@@ -45,85 +45,85 @@
 </P>
 <P>sep defaults to vm for string objects</P>
 <P>startfrom defaults to 1 (again 1 based!)</P>
-<H3>array.exodusdelete(fieldno,valueno,subvalueno)</H3>
+<H3>array.exodelete(fieldno,valueno,subvalueno)</H3>
 <P>removes the nth element of the array</P>
 <P>NB fieldno,valueno,subvalueno are 1 based not zero based</P>
 <P>NB&nbsp;does not handle valueno or subvalueno yet</P>
 <P>NB fieldno,valueno,subvalueno are 1 based not zero based</P>
-<H3>string.exodusright(nchars)</H3>
+<H3>string.exoright(nchars)</H3>
 <P>returns a string representing the rightmost nchars of the string</P>
-<H3>string/array.exodusswap(string1,string2)</H3>
+<H3>string/array.exoswap(string1,string2)</H3>
 <P>returns an array if given an array</P>
-<H3>string/array.exodusconvert(string1,string2)</H3>
+<H3>string/array.exoconvert(string1,string2)</H3>
 <P>converts the characters in string1 to the respective characters in string3 or 
 	deletes them if string2 is shorter than string1</P>
 <P>returns an array if given an array</P>
-<H3>string/array.exoduscount(string2)</H3>
+<H3>string/array.exocount(string2)</H3>
 <P>returns the number of times that string2 occurs in a string or arrays of strings</P>
 <H3>
-	<H3>string/array.exodusdcount(string2)</H3>
+	<H3>string/array.exodcount(string2)</H3>
 </H3>
 <P>returns the number of&nbsp;fields separated by&nbsp;string2 that occur in a 
 	string or arrays of strings</P>
-<H3>string.exodusaddcent(type)</H3>
+<H3>string.exoaddcent(type)</H3>
 <P>type is ICONV or defaults to OCONV</P>
-<H3>string.exoduscapitalise()</H3>
+<H3>string.exocapitalise()</H3>
 <P>converts the first character of each word to capitals and the rest to lower case 
 	and returns a string</P>
-<H3>string.exodusplural(n,suffix)</H3>
+<H3>string.exoplural(n,suffix)</H3>
 <P>returns a string with the suffix added if n is not 1 or is boolean false. suffix 
 	defaults to "s"</P>
 <H3>array1.tostatement()</H3>
-<H3>array1.exodusadd(array2)</H3>
+<H3>array1.exoadd(array2)</H3>
 <P>like +++ adds two arrays in parallel and returns an array</P>
-<H3>array1.exodussubtract(array2)</H3>
+<H3>array1.exosubtract(array2)</H3>
 <P>like&nbsp;---&nbsp;subtracts array2 from array1&nbsp;in parallel and returns an 
 	array</P>
-<H3>array1.exodusmultiply(array2)</H3>
+<H3>array1.exomultiply(array2)</H3>
 <P>like *** multiplies&nbsp;two arrays in parallel and returns an array</P>
-<H3>array1.exodusdivide(array2)</H3>
+<H3>array1.exodivide(array2)</H3>
 <P>like&nbsp;/// divides array1 by array2&nbsp;in parallel and returns an array</P>
-<H3>number.exodusdivide0isblank(divisor)</H3>
+<H3>number.exodivide0isblank(divisor)</H3>
 <P>returns the number divided by the divisor or&nbsp;"" if the divisor is zero</P>
-<H3>string/number/array.exodussum(sepchar)</H3>
+<H3>string/number/array.exosum(sepchar)</H3>
 <P>adds all elements and returns a number</P>
-<H3>string/array.exodussplit(sepchars,invert)</H3>
+<H3>string/array.exosplit(sepchars,invert)</H3>
 <P>returns an array with the element split into subelements (multiple levels, one 
 	for each character in sepchars)</P>
 <P><EM>invert</EM> defaults to false, otherwise if <EM>sepchars</EM> is two 
 	characters the rows and columns of the returned array are inverted</P>
 <P>used to convert fm, vm etc separated strings to multilevel arrays</P>
-<H3>array/string.exodusjoin(sepchars)</H3>
+<H3>array/string.exojoin(sepchars)</H3>
 <P>returns an string with elements of an array and any subelements joined with 
 	sepchars .. one char for each level</P>
 <P>used to&nbsp;convert multilevel arrays to fm, vm etc separated strings</P>
-<H3>string.exodustrim(char,mode)</H3>
+<H3>string.exotrim(char,mode)</H3>
 <P>removes leading, trailing and excess char or spaces if char is not defined and 
 	returns a string</P>
 <P>mode A or undefined means trim all leading, trailing and excess inner characters<br />
 	mode&nbsp;L means trim all leading characters<br />
 	mode&nbsp;R means trim all trailing characters</P>
-<H3>string.exodustrimf(char)<br />
-	string.exodustriml(char)</H3>
+<H3>string.exotrimf(char)<br />
+	string.exotriml(char)</H3>
 <P>removes leading (leftmost) chars or spaces if char not defined and returns a 
 	string</P>
-<H3>string.exodustrimb(char)<br />
-	string.exodustrimr(char)</H3>
+<H3>string.exotrimb(char)<br />
+	string.exotrimr(char)</H3>
 <P>removes trailing (rightmost) chars or spaces if char not defined and returns a 
 	string</P>
-<H3>array.exodustrim()</H3>
+<H3>array.exotrim()</H3>
 <P>removes blank or unassigned elements of an array</P>
 <h3>
-    array.exodustrimr()</h3>
+    array.exotrimr()</h3>
 <P>
     removes blank or unassigned elements at the end of an array</p>
-<H3>number/string/array.exodusquote(char)</H3>
+<H3>number/string/array.exoquote(char)</H3>
 <P>if provided an array, returns a string separated by spaces eg "AAA" "BBB" "CCC"</P>
-<H3>number/string/array.exodusoconv(conversion)</H3>
+<H3>number/string/array.exooconv(conversion)</H3>
 <P>returns the external format of the object</P>
-<H3>number/string/array.exodusiconv(conversion)</H3>
+<H3>number/string/array.exoiconv(conversion)</H3>
 <P>returns the&nbsp;internal format of the object</P>
-<H3>array.exodusunique()</H3>
+<H3>array.exounique()</H3>
 <P>//returns an array of unique array elements from an array (removes 
 	duplicates)&nbsp;
 </P>
@@ -141,10 +141,10 @@
 <P>a number is&nbsp;one or more&nbsp;digits and optionally one "." and optionally 
 	one prefixed "-"&nbsp;
 </P>
-<H3>function exodusround(number,ndecimals)</H3>
+<H3>function exoround(number,ndecimals)</H3>
 <P>returns a number rounded to a given number of decimal places
 </P>
-<H3>function exodusquote(string)</H3>
+<H3>function exoquote(string)</H3>
 <P>return the argument surrounded by double quotes</P>
 <H3>function exodusspace(length)
 </H3>
@@ -163,7 +163,7 @@
 <P>returns the mathematical floor of the number (Math.floor(number)</P>
 <P>exodusint(2.7) is 2</P>
 <P>exodusint(-2.7 is 3</P>
-<H3>function exodussingular(string)</H3>
+<H3>function exosingular(string)</H3>
 <P>returns the singular form of the plural noun in string according to some common 
 	English rules. Not correct for all cases.</P>
 <H3>function no(value)</H3>

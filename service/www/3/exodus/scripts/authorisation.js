@@ -4,8 +4,8 @@
 async function authorisation_changeallemaildomains() {
     var oldemails = await gds.getall('EMAIL_ADDRESS')
     //replace all ";xxxxx@" with ; to end up with ; separated list of domains
-    var olddomains = (';' + oldemails.join(';')).replace(/;.*?@/gi, ';').exodustrim(';')
-    olddomains = olddomains.split(';').exodusunique()
+    var olddomains = (';' + oldemails.join(';')).replace(/;.*?@/gi, ';').exotrim(';')
+    olddomains = olddomains.split(';').exounique()
     var reply = await exoui_decide('Change which domain?', olddomains)
     if (!reply)
         return await exoui_invalid()
@@ -21,7 +21,7 @@ async function authorisation_changeallemaildomains() {
         }
         break;
     }
-    var newemails = oldemails.join(fm).exodusswap(olddomain, newdomain).split(fm)
+    var newemails = oldemails.join(fm).exoswap(olddomain, newdomain).split(fm)
     if (newemails != oldemails) {
         await gds.setx('EMAIL_ADDRESS', null, newemails)
         settouched(true)
@@ -84,7 +84,7 @@ async function user_showtasks(event) {
     if (!taskid)
         return false
 
-    var recn = (await gds.getall('TASK_ID')).exoduslocate(taskid) - 1
+    var recn = (await gds.getall('TASK_ID')).exolocate(taskid) - 1
     if (recn < 0)
         return false
 
@@ -156,10 +156,10 @@ async function form_prewrite() {
             continue
 
         //work backwards through user keys so we can more easily remove duplicates
-        userkeys=userkeys.exodusconvert(';',' ').split(' ')
+        userkeys=userkeys.exoconvert(';',' ').split(' ')
         for (var userkeyn=userkeys.length-1;userkeyn>=0;--userkeyn) {
             userkey=userkeys[userkeyn]
-            var accumn1=accumkeys.exoduslocate(userkey)
+            var accumn1=accumkeys.exolocate(userkey)
             if (!accumn1) {
                 accumkeys.push(userkey)
                 accumusers.push(userid)
@@ -187,7 +187,7 @@ async function form_prewrite() {
     var origuserids = gro.revstr.split(fm)[0].split(vm)
     for (var usern = userids.length - 1; usern >= 0; --usern) {
         if (emails[usern]) {
-            newusers = !origuserids.exoduslocate(userids[usern])
+            newusers = !origuserids.exolocate(userids[usern])
         }
         if (newusers)
             break
@@ -211,7 +211,7 @@ async function form_postread() {
 
     gtasks_otherkeys = (await gds.getx('TEMP_OTHER_KEYS')).split(' ')
 
-    gtasks_usern = (await gds.getall('USER_ID')).exoduslocate(gusername) - 1
+    gtasks_usern = (await gds.getall('USER_ID')).exolocate(gusername) - 1
     if (gtasks_usern < 0) gtasks_usern = 999999
 
     gtasks_updatehighergroups = await exoui_security('AUTHORISATION UPDATE HIGHER GROUPS')
@@ -262,7 +262,7 @@ async function user_val_userid() {
 
     //prevent duplicates/allow move
     var usernames = await gds.getall('USER_ID')
-    var otherln1 = usernames.exoduslocate(gvalue)
+    var otherln1 = usernames.exolocate(gvalue)
     if (otherln1) {
         var msg = gvalue + ' already exists in line ' + otherln1
 
@@ -292,7 +292,7 @@ async function user_val_userid() {
         return await exoui_invalid('User name cannot include "EXODUS"')
 
     //prevent hidden users
-    if (gtasks_otheruserids.exoduslocate(gvalue))
+    if (gtasks_otheruserids.exolocate(gvalue))
         return await exoui_invalid(gvalue + ' user already exists in another group')
 
     //have to reenter password
@@ -317,12 +317,12 @@ async function user_val_userid() {
 
     async function user_haskeys() {
         if (!gvalue) return true
-        gvalue = gvalue.exodustrim()
+        gvalue = gvalue.exotrim()
         var keys = gvalue.split(' ')
         for (var keyn = 0; keyn < keys.length; keyn++) {
-            var key = keys[keyn].exodustrim()
-            if ((key == 'EXODUS' && gusername != 'EXODUS') || gtasks_otherkeys.exoduslocate(key))
-                return await exoui_invalid('You are not authorised to use key ' + key.exodusquote())
+            var key = keys[keyn].exotrim()
+            if ((key == 'EXODUS' && gusername != 'EXODUS') || gtasks_otherkeys.exolocate(key))
+                return await exoui_invalid('You are not authorised to use key ' + key.exoquote())
             keys[keyn] = key
         }
         gvalue = keys.join(' ')
