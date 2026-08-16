@@ -11727,6 +11727,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
             return false
         }
         textrange = elem.select()
+        // room to type; filterall/unfilter restore size 3 (HTM default)
         elem.size = 10
         return true
     }
