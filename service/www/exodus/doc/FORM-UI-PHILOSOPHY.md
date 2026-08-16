@@ -78,7 +78,7 @@ When a line appears “under” an embedded group, inspect the **parent outer `<
 **Prefer (in order):**
 
 1. **Document / table delegation** — one listener; filter on attributes (e.g. `form_oninput` on `document` for fields with `exodusfieldno` / `exodusonchange`).
-2. **Attributes + existing form path** — `exodusonclick`, `exoui_popup`, dict `validation` / `onchange` already re-read from the element.
+2. **Attributes + existing form path** — `exo_onclick`, `exoui_popup`, dict `validation` / `onchange` already re-read from the element.
 3. **Reattach in `setupnewrow` only if unavoidable** — that is the clone seam; keep it tiny and attribute-driven.
 
 Same trap applies to any experimental live-typing / typeahead work on multivalue codes.

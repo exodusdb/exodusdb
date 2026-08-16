@@ -5654,8 +5654,8 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	if (accesskey)
 		tx += ' accesskey="' + accesskey + '"'
 
-	//tx += ' exodusonclick=' + id + '_onclick(event)"'
-	tx += ' exodusonclick="'
+	//tx += ' exo_onclick=' + id + '_onclick(event)"'
+	tx += ' exo_onclick="'
 	tx += 'await '
 	tx += id + '_onclick(event)"'
 
@@ -5689,10 +5689,10 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	if (accesskey) {
 		//tx += '<button xtabindex=-1 style="background-color:white; height:1px; width:1px; border-style:none; margin:0px ;padding:0px"'
 		// hide access keys on screen
-		// Same Gate A entry as visible menubutton: await inside exodusonclick (not raw markup).
+		// Same Gate A entry as visible menubutton: await inside exo_onclick (not raw markup).
 		tx += '<button xtabindex=-1 style="display:none;"'
 		tx += ' accesskey="' + accesskey + '"'
-		tx += ' exodusonclick="await ' + id + '_onclick(event)"'
+		tx += ' exo_onclick="await ' + id + '_onclick(event)"'
 		tx += '></button>'
 	}
 
@@ -7782,7 +7782,7 @@ function exo_set_icon_element(el, specOrUrl) {
 		if (el.id)
 			span.id = el.id
 		// keep common attributes used on field chrome / static toolbar buttons
-		;['title', 'isexoduspopup', 'isexoduslink', 'exodusonclick', 'exodustype',
+		;['title', 'isexoduspopup', 'isexoduslink', 'exo_onclick', 'exodustype',
 			'accesskey', 'exogroupno', 'style', 'class'].forEach(function (n) {
 			if (n == 'class' || n == 'style')
 				return
@@ -8177,7 +8177,7 @@ function exoconfirm_fit_decide_popup(force) {
 	var table=$$('decide_table1')
 	if (!div||!table||!div.classList.contains('exodusconfirm_decide'))
 		return
-	if (div.getAttribute('exodusconfirm_fitted')&&!force)
+	if (div.getAttribute('exo_confirm_fitted')&&!force)
 		return
 
 	// Drop previous pixel lock so the table can measure at natural size after zoom
@@ -8207,7 +8207,7 @@ function exoconfirm_fit_decide_popup(force) {
 		want=Math.max(want, footer.scrollWidth+iconw+24)
 	div.style.width=Math.min(want, maxw)+'px'
 	div.style.maxHeight=maxh+'px'
-	div.setAttribute('exodusconfirm_fitted','1')
+	div.setAttribute('exo_confirm_fitted','1')
 	exoconfirm_update_scroll_hints()
 }
 

@@ -426,7 +426,7 @@
                                                 <input id="TEST_DATABASE_CODE" />
                                             </td>
                                             <td>
-                                                <button id="button_copynow" exogroupno="1" exotype='B' exodusonclick='await sysconfig_copynow()'
+                                                <button id="button_copynow" exogroupno="1" exotype='B' exo_onclick='await sysconfig_copynow()'
                                                     class="exodusbutton" type="button">
                                                     Copy now</button>
                                             </td>
@@ -471,10 +471,10 @@
                 <td>
                     Server error:
                     <button id="button_server_error_test" exotype="B" class="exodusbutton" type="button"
-                        exodusonclick="await server_error_test()">Test</button>
+                        exo_onclick="await server_error_test()">Test</button>
                     &nbsp;&nbsp;Browser error:
                     <button id="button_browser_error_test" exotype="B" class="exodusbutton" type="button"
-                        exodusonclick="await browser_test_error()">Test</button>
+                        exo_onclick="await browser_test_error()">Test</button>
                 </td>
             </tr>
         </table>

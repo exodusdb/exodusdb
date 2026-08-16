@@ -675,7 +675,7 @@ async function formbutton_op(op, event) {
     }
 }
 
-// Deep-clone source → face; strip id and accesskey; wrap exodusonclick via formbutton_op.
+// Deep-clone source → face; strip id and accesskey; wrap exo_onclick via formbutton_op.
 function render_formbuttons() {
     var source = $$('formbuttonsdiv')
     var face = $$('formbuttonsdiv_face')
@@ -695,15 +695,15 @@ function render_formbuttons() {
         if (node.getAttribute('accesskey'))
             node.removeAttribute('accesskey')
         // await openrecord_onclick(event) → await formbutton_op(openrecord_onclick, event)
-        var oc = node.getAttribute('exodusonclick')
+        var oc = node.getAttribute('exo_onclick')
         if (oc) {
             var m = oc.match(/^\s*await\s+([A-Za-z_$][\w$]*)\s*\((.*)\)\s*$/)
             if (m) {
                 var args = m[2].replace(/^\s+|\s+$/g, '')
                 if (args)
-                    node.setAttribute('exodusonclick', 'await formbutton_op(' + m[1] + ', ' + args + ')')
+                    node.setAttribute('exo_onclick', 'await formbutton_op(' + m[1] + ', ' + args + ')')
                 else
-                    node.setAttribute('exodusonclick', 'await formbutton_op(' + m[1] + ')')
+                    node.setAttribute('exo_onclick', 'await formbutton_op(' + m[1] + ')')
             }
         }
     }
@@ -796,7 +796,7 @@ function form_move_action_buttons_to_top() {
 
 // Extra form action next to OK/Cancel in #formbuttonsdiv. Call from form_postinit (not raw HTML).
 // spec: { id, text, title, accesskey, image, onclick, disabled, insert }
-// Element id is id+"button". Click: onclick expression (same as old HTML exodusonclick),
+// Element id is id+"button". Click: onclick expression (same as old HTML exo_onclick),
 // or omit onclick to use an existing id_onclick (e.g. proforma → proforma_onclick).
 function form_add_action_button(spec) {
 
@@ -837,9 +837,9 @@ function form_add_action_button(spec) {
         var expr = String(spec.onclick).replace(/^\s+/, '')
         if (expr.slice(0, 6) !== 'await ')
             expr = 'await ' + expr
-        var nodes = button.parentNode.querySelectorAll('[exodusonclick]')
+        var nodes = button.parentNode.querySelectorAll('[exo_onclick]')
         for (var i = 0; i < nodes.length; i++)
-            nodes[i].setAttribute('exodusonclick', expr)
+            nodes[i].setAttribute('exo_onclick', expr)
     }
 
     if (!gKeyNodes)
@@ -1136,7 +1136,7 @@ async function formfunctions_onload() {
                         //addeventlistener(element, 'focus', 'document_onfocus')
                         //addlistener doesnt work on rows since cloning rows doesnt clone listeners
                         //addeventlistener(element, 'click', 'onclickradiocheckbox')
-                        element.setAttribute('exodusonclick', 'await onclickradiocheckbox()')
+                        element.setAttribute('exo_onclick', 'await onclickradiocheckbox()')
                     }
 
                 }
@@ -1768,10 +1768,10 @@ async function formfunctions_onload() {
             var screenfn = gfields.length
             gfields[screenfn] = element
 
-            //element.setAttribute('exodusscreenfn',gfields.length-1)
+            //element.setAttribute('exo_screenfn',gfields.length-1)
             //why -1 ???
-            element.setAttribute('exodusscreenfn', screenfn)
-            //gfields[screenfn].setAttribute('exodusscreenfn',screenfn)
+            element.setAttribute('exo_screenfn', screenfn)
+            //gfields[screenfn].setAttribute('exo_screenfn',screenfn)
 
             var rowx = getancestor(element, 'TR')
             var tablex = getancestor(rowx, 'TABLE')
@@ -1832,7 +1832,7 @@ async function formfunctions_onload() {
                     element2.id = 'sortbutton_' + Number(element.getAttribute('exogroupno'))
                     element2.title = 'Sort by ' + element.getAttribute('exotitle')
                     //addeventlistener(element2, 'click', 'sorttable')
-                    element2.setAttribute('exodusonclick', 'await sorttable(event)')
+                    element2.setAttribute('exo_onclick', 'await sorttable(event)')
                     element2.sorttableelementid = element.id
                     gsortimages[element.id] = element2
 
@@ -1850,15 +1850,15 @@ async function formfunctions_onload() {
                 if (!element.getAttribute('exoreadonly') && element.tagName.match(gdatatagnames)) {
                     //spans are only input if .isContentEditable
                     if (element.tagName != 'SPAN' || element.isContentEditable) {
-                        tablex.setAttribute('exoduslastinputcolscreenfn', element.getAttribute('exodusscreenfn'))
-                        //element.setAttribute('exodusislastinputcolumn',true)
+                        tablex.setAttribute('exo_lastinputcolscreenfn', element.getAttribute('exo_screenfn'))
+                        //element.setAttribute('exo_islastinputcolumn',true)
                     }
                 }
                 //nb textarea.isContentEditable is false! so need to test for .type='textarea' or .tagName
 
                 //need to know the first data entry column
                 if (
-                    !tablex.getAttribute('exodusfirstinputcolscreenfn')
+                    !tablex.getAttribute('exo_firstinputcolscreenfn')
                     && !element.getAttribute('exoreadonly')
                     && element.tagName.match(gdatatagnames)
                 ) {
@@ -1867,8 +1867,8 @@ async function formfunctions_onload() {
                         element.tagName != 'SPAN'
                         || element.isContentEditable
                     ) {
-                        tablex.setAttribute('exodusfirstinputcolscreenfn', element.getAttribute('exodusscreenfn'))
-                        element.setAttribute('exodusisfirstinputcolumn', true)
+                        tablex.setAttribute('exo_firstinputcolscreenfn', element.getAttribute('exo_screenfn'))
+                        element.setAttribute('exo_isfirstinputcolumn', true)
                     }
                 }
 
@@ -1944,7 +1944,7 @@ async function formfunctions_onload() {
                     tablex.setAttribute('name', 'group' + groupno)
                     tablex.id = 'exogroup' + groupno
                     datasrcelements[datasrcelements.length] = tablex
-                    tablex.setAttribute('exodusdependents', '')
+                    tablex.setAttribute('exo_dependents', '')
 
                     // Embedded group table inside an outer exodusform cell — drop host row/cell inline borders
                     var hostcell = tablex.parentNode
@@ -2007,7 +2007,7 @@ async function formfunctions_onload() {
                         t += exo_icon_html(ginsertrowimage, null,
                             ' id="insertrowbutton' + groupno + '"'
                             + ' title="Insert a new row here ' + t2 + '"'
-                            + ' exodusonclick="await insertrow_onclick(event)"'
+                            + ' exo_onclick="await insertrow_onclick(event)"'
                             + ' style="cursor:pointer;vertical-align:top"')
                     }
                     //if (!(exogetattribute(element,'exodusnodeleterow')))
@@ -2015,7 +2015,7 @@ async function formfunctions_onload() {
                         t += exo_icon_html(gdeleterowimage, null,
                             ' id="deleterowbutton' + groupno + '"'
                             + ' title="Delete this row ' + t3 + '"'
-                            + ' exodusonclick="await deleterow_onclick(event)"'
+                            + ' exo_onclick="await deleterow_onclick(event)"'
                             + ' style="cursor:pointer;vertical-align:top"')
                     }
                     t += '</span>'
@@ -2044,7 +2044,7 @@ async function formfunctions_onload() {
                         pgupdownbuttons.width = '1%'
                     var t = ''
                     t += '<button id=exogroup' + groupno + 'showall class=exodusbutton'
-                    t += ' style=display:none exodusonclick="await form_filter(\'unfilter\',' + groupno + ')"'
+                    t += ' style=display:none exo_onclick="await form_filter(\'unfilter\',' + groupno + ')"'
                     t += '>Show All</button>'
 
                     if (groupno == 1 && typeof gallowfilter != 'undefined' && gallowfilter) {
@@ -2113,9 +2113,9 @@ async function formfunctions_onload() {
     //using document.getElementsByClassName()
     id2classname()
 
-    //zero all the dependents (nb exodusdependents is used in gds.js once)
+    //zero all the dependents (nb exo_dependents is used in gds.js once)
     for (var ii = 0; ii < gfields.length; ii++)
-        gfields[ii].setAttribute('exodusdependents', '')
+        gfields[ii].setAttribute('exo_dependents', '')
 
     //for each calculated field add its field number
     // to all elements whose name (in double or single quotes)
@@ -2132,13 +2132,13 @@ async function formfunctions_onload() {
                 var field2 = gfields[fieldn2]
                 if (functioncode.indexOf('"' + field2.getAttribute('exoname') + '"', 0) >= 0
                     || functioncode.indexOf("'" + field2.getAttribute('exoname') + "'", 0) >= 0) {
-                    var deps = field2.getAttribute('exodusdependents')
+                    var deps = field2.getAttribute('exo_dependents')
                     if (deps)
                         deps += ';'
                     else
                         deps = ''
                     deps += fieldn
-                    field2.setAttribute('exodusdependents', deps)
+                    field2.setAttribute('exo_dependents', deps)
 
                     if (
                         Number(field2.getAttribute('exogroupno'))
@@ -2146,13 +2146,13 @@ async function formfunctions_onload() {
                         Number(field.getAttribute('exogroupno')) != Number(field2.getAttribute('exogroupno'))
                     ) {
                         var tablex = getancestor(field2, 'TABLE')
-                        var deps = tablex.getAttribute('exodusdependents')
+                        var deps = tablex.getAttribute('exo_dependents')
                         if (deps)
                             deps += ';'
                         else
                             deps = ''
                         deps += fieldn
-                        tablex.setAttribute('exodusdependents', deps)
+                        tablex.setAttribute('exo_dependents', deps)
                     }
 
                 }
@@ -2505,7 +2505,7 @@ async function formfunctions_onload() {
 
         // Framework open prefill (this flight only):
         // 1) cleardoc — empty load (full calcfields once), gparameters setx, form_postdisplay
-        // 2) filldefaults — cell.text only + mark exodusdependents into gdependents
+        // 2) filldefaults — cell.text only + mark exo_dependents into gdependents
         // 3) limited calcfields(gdependents) then updatedisplay (not a second full calc)
         // That sequence is complete when the awaits below return. We do not detect
         // later custom work (e.g. leave-field validation that expands SCHEDULE_NO);
@@ -2581,12 +2581,12 @@ function form_accesskey_usable(element) {
     return true
 }
 
-// Element that should receive activation (exodusonclick host, or the control itself).
+// Element that should receive activation (exo_onclick host, or the control itself).
 function form_accesskey_action_target(element) {
 
     var target = element
     while (target && target !== document && target !== document.body) {
-        if (target.getAttribute && target.getAttribute('exodusonclick'))
+        if (target.getAttribute && target.getAttribute('exo_onclick'))
             return target
         target = target.parentNode
     }
@@ -2824,7 +2824,7 @@ async function form_activate_accesskey_control(event, element) {
     if (!target)
         return false
 
-    var onclickexpression = target.getAttribute('exodusonclick')
+    var onclickexpression = target.getAttribute('exo_onclick')
     if (onclickexpression) {
         // Same path as document_onclick / form_activate_focused_action_button
         await exoevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
@@ -2875,7 +2875,7 @@ async function setfirstlastcolumn(groupno) {
             !gfields[screenfn].getAttribute('exoreadonly')
             && exoenabledandvisible(gfields[screenfn].id)
         )
-            tablex.setAttribute('exoduslastinputcolscreenfn', screenfn)
+            tablex.setAttribute('exo_lastinputcolscreenfn', screenfn)
     }
 
 }
@@ -3437,10 +3437,10 @@ async function document_onclick(event) {
     else if (event.target.getAttribute('isexoduslink'))
         result = await exoui_link(event)
 
-    //call the first exodusonclick expression found in element then parents
+    //call the first exo_onclick expression found in element then parents
     var target = event.target
     do {
-        var onclickexpression = target.getAttribute('exodusonclick')
+        var onclickexpression = target.getAttribute('exo_onclick')
         target = target.parentNode
     } while (!onclickexpression && target && target.parentNode && target.parentNode.getAttribute)
     if (onclickexpression) {
@@ -3528,7 +3528,7 @@ async function document_onkeydown(event) {
     return await document_onkeydown2(event)
 }
 
-// Enter/Space on a focused form-action control (menubutton/graphicbutton with exodusonclick).
+// Enter/Space on a focused form-action control (menubutton/graphicbutton with exo_onclick).
 // Not real <button>s — browser will not activate them. Only when already focused.
 async function form_activate_focused_action_button(event, element) {
 
@@ -3539,7 +3539,7 @@ async function form_activate_focused_action_button(event, element) {
     while (btn && btn !== document && btn !== document.body) {
         if (btn.classList
             && (btn.classList.contains('graphicbutton') || btn.classList.contains('menubutton'))
-            && btn.getAttribute('exodusonclick'))
+            && btn.getAttribute('exo_onclick'))
             break
         btn = btn.parentNode
     }
@@ -3553,11 +3553,11 @@ async function form_activate_focused_action_button(event, element) {
     if (btn.style && btn.style.display == 'none')
         return false
 
-    var onclickexpression = btn.getAttribute('exodusonclick')
+    var onclickexpression = btn.getAttribute('exo_onclick')
     if (!onclickexpression)
         return false
 
-    // Same path as document_onclick for exodusonclick controls
+    // Same path as document_onclick for exo_onclick controls
     await exoevaluate(onclickexpression.replace(/\(\)$/, '(event)'), null, 'event', event)
     return true
 }
@@ -4246,11 +4246,11 @@ async function document_onkeydown2(event) {
                 return exocancelevent(event)
 
             //on last column - add a row
-            //exodusfirstinputcolscreenfn
+            //exo_firstinputcolscreenfn
             var firstcolelement = rowx.exodusfields[gfields[gtables[ggroupno][0]].id]
             if ((glocked || !gKeyNodes)
-                //&& element.getAttribute('exodusscreenfn') == tablex.getAttribute('exoduslastinputcolscreenfn')
-                && element.getAttribute('exodusscreenfn') == tablex_lastinputcolscreenfn
+                //&& element.getAttribute('exo_screenfn') == tablex.getAttribute('exo_lastinputcolscreenfn')
+                && element.getAttribute('exo_screenfn') == tablex_lastinputcolscreenfn
                 && getvalue(firstcolelement) != ''
             ) {
                 if (glocked || !gKeyNodes) {
@@ -4258,14 +4258,14 @@ async function document_onkeydown2(event) {
                     if (!(await form_insertrow(event, true)))
                         return exocancelevent(event)
                     //continue on to focus on it
-                    //var nextelement=$$(gfields[tablex.getAttribute('exodusfirstinputcolscreenfn')].id)[grecn+1]
+                    //var nextelement=$$(gfields[tablex.getAttribute('exo_firstinputcolscreenfn')].id)[grecn+1]
                     //focuson(nextelement)
                     focusnext()
                     return exocancelevent(event)
                 }
             }
             //on first column, if empty - go to next field after current table
-            if (element.getAttribute('exodusscreenfn') == tablex_firstinputcolscreenfn && getvalue(element) == '') {
+            if (element.getAttribute('exo_screenfn') == tablex_firstinputcolscreenfn && getvalue(element) == '') {
                 focusdirection(1, element, ggroupno)
                 return exocancelevent(event)
             }
@@ -4338,7 +4338,7 @@ async function document_onkeydown2(event) {
                 //enter on first column if required and no default skips (TODO and not rowrequired) first field after the table)
                 if (ggroupno
                     && element.getAttribute('exorequired')
-                    && element.getAttribute('exodusscreenfn') == tablex_firstinputcolscreenfn
+                    && element.getAttribute('exo_screenfn') == tablex_firstinputcolscreenfn
                     && !getvalue(element)
                 ) {
                     notgroupno = ggroupno
@@ -4441,10 +4441,10 @@ async function document_onkeydown2(event) {
     //left arrow and right arrow in tables, except on SELECT since they change it
     if (ggroupno != 0 && rown >= 0 && (keycode == 37 || keycode == 39) && !event.ctrlKey && !event.shiftKey && !event.altKey && element.tagName != 'SELECT') {
         //if not on the sole input element in the row (isfirst and islast)
-        //if (!element.getAttribute('exodusisfirstinputcolumn') || !element.getAttribute('exodusislastinputcolumn')) {
+        //if (!element.getAttribute('exo_isfirstinputcolumn') || !element.getAttribute('exo_islastinputcolumn')) {
 
-        //if (!element.getAttribute('exodusisfirstinputcolumn') || element.getAttribute('exodusscreenfn') != tablex.getAttribute('exoduslastinputcolscreenfn')) {
-        var screenfn = element.getAttribute('exodusscreenfn')
+        //if (!element.getAttribute('exo_isfirstinputcolumn') || element.getAttribute('exo_screenfn') != tablex.getAttribute('exo_lastinputcolscreenfn')) {
+        var screenfn = element.getAttribute('exo_screenfn')
         if (screenfn != tablex_firstinputcolscreenfn || screenfn != tablex_lastinputcolscreenfn) {
 
             var scope = grows[grecn].getElementsByTagName('*')
@@ -4469,7 +4469,7 @@ async function document_onkeydown2(event) {
         if (keycode == 40 && grecn == (grows.length - 1)) {
 
             //not on first column, focus next column
-            if (element.getAttribute('exodusscreenfn') != tablex_firstinputcolscreenfn) {
+            if (element.getAttribute('exo_screenfn') != tablex_firstinputcolscreenfn) {
                 focusnext(element)
                 return exocancelevent(event)
             }
@@ -4626,7 +4626,7 @@ async function document_onkeydown2(event) {
 
 }//document_onkeydown2
 
-//return the first or last enabled and visible input exodusscreenfn given a table element
+//return the first or last enabled and visible input exo_screenfn given a table element
 //or the precalculated ones if none
 function form_getlastinputcolscreenfn(tablex) {
     return form_getfirstinputcolscreenfn(tablex, true)
@@ -4656,7 +4656,7 @@ function form_getfirstinputcolscreenfn(tablex, last) {
         return sfn
 
     //otherwise return the precalculated defaults
-    return tablex.getAttribute(last ? 'exoduslastinputcolscreenfn' : 'exodusfirstinputcolscreenfn')
+    return tablex.getAttribute(last ? 'exo_lastinputcolscreenfn' : 'exo_firstinputcolscreenfn')
 }
 
 //checks and blocks if document is readonly
@@ -4824,7 +4824,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
         // *hidden* field, so "last" visible (e.g. STATIONERY) uses focusdirection and would hit OK.
         var formActionTabStop = nextelement.classList
             && (nextelement.classList.contains('graphicbutton') || nextelement.classList.contains('menubutton'))
-            && nextelement.getAttribute('exodusonclick')
+            && nextelement.getAttribute('exo_onclick')
             && nextelement.tabIndex >= 0
             && gkeycode != 13
 
@@ -4933,7 +4933,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
                 var tablex = gtables[nextgroupno].tablex
                 if (tablex) {
                     var tablex_lastinputcolscreenfn = form_getlastinputcolscreenfn(tablex)
-                    if (nextelement.getAttribute('exodusscreenfn') == tablex_lastinputcolscreenfn) {
+                    if (nextelement.getAttribute('exo_screenfn') == tablex_lastinputcolscreenfn) {
                         var tablex_firstinputcolscreenfn = form_getfirstinputcolscreenfn(tablex)
                         var firstinputcolid = gfields[tablex_firstinputcolscreenfn].id
                         var row = tablex.tBodies[0].getElementsByTagName('tr')[getrecn(nextelement)]
@@ -4990,7 +4990,7 @@ function form_radio_is_exodus_toggle(el) {
         return false
     if (el.getAttribute && el.getAttribute('exotype'))
         return true
-    var oc = el.getAttribute && el.getAttribute('exodusonclick')
+    var oc = el.getAttribute && el.getAttribute('exo_onclick')
     return !!(oc && oc.indexOf('onclickradiocheckbox') >= 0)
 }
 
@@ -5220,10 +5220,10 @@ function scrollintoview_hrect(element, cell) {
         } catch (e) { }
         if (firstSfn == null || firstSfn === '' || typeof firstSfn == 'undefined')
             firstSfn = gtables[groupno][0]
-        var isFirst = element.getAttribute('exodusisfirstinputcolumn')
+        var isFirst = element.getAttribute('exo_isfirstinputcolumn')
             || (gfields[firstSfn]
                 && (element.id == gfields[firstSfn].id
-                    || String(element.getAttribute('exodusscreenfn')) == String(firstSfn)))
+                    || String(element.getAttribute('exo_screenfn')) == String(firstSfn)))
         if (isFirst) {
             var tr = null
             try {
@@ -7518,7 +7518,7 @@ async function validateall(mode) {
                         cell.text = gdefault
                         // Mark dependents only (no setx/paint) — same list as setx2/validateupdate.
                         // Unbound open uses calcfields(gdependents) instead of a second full calc.
-                        var deps = element.getAttribute('exodusdependents')
+                        var deps = element.getAttribute('exo_dependents')
                         if (deps) {
                             deps = deps.split(';')
                             for (var depn = 0; depn < deps.length; depn++) {
@@ -8636,8 +8636,8 @@ async function checkrequired(elements, element, groupno) {
 
         //don't check current but continue looking for lower tabindexed fields
         //if (element2==element) //this does not work because gfields<> bound table elements for rows
-        //if (element2.getAttribute('exodusscreenfn')==element.getAttribute('exodusscreenfn'))
-        //check ids because exodusscreenfn is repeated in gfields for radio 4,4,4
+        //if (element2.getAttribute('exo_screenfn')==element.getAttribute('exo_screenfn'))
+        //check ids because exo_screenfn is repeated in gfields for radio 4,4,4
         //but not in the 2nd and subsequent repeated form elements 4,5,6
         if (element2.id == element.id) {
             foundelement = true
@@ -8683,7 +8683,7 @@ async function checkrequired(elements, element, groupno) {
                             return true
 
                         //put up a message unless is the first column of a row
-                        if (true || !(element2.getAttribute('exodusisfirstinputcolumn'))) {
+                        if (true || !(element2.getAttribute('exo_isfirstinputcolumn'))) {
                             // Message then focuson only. Do not rewrite
                             // gpreviouselement/gonfocuselement here: focuson →
                             // document_onfocus leave-fields the real previous
@@ -9660,7 +9660,7 @@ async function setdefault(element, donotupdate) {
     }
 
     //save the default for use eg by custom validation routines to avoid work
-    element.setAttribute('exodusdefault', gdefault)
+    element.setAttribute('exo_default', gdefault)
 
     //set the value (externally only)
     //await gds.setx(element,grecn,gdefault)
@@ -10194,7 +10194,7 @@ async function calcfields(fieldns) {
             if (field.getAttribute('exofunctioncode')) {
 
                 //add dependents of dependents to the list to recalc
-                var deps = field.getAttribute('exodusdependents')
+                var deps = field.getAttribute('exo_dependents')
                 if (deps) {
                     deps = deps.split(';')
                     for (var depn = 0; depn < deps.length; depn++) {
@@ -10295,7 +10295,7 @@ var gcatcherrors = false//avoid try/catch thereby allowing javascript error line
 async function exoevaluate3(functionorcode, functionname, arg1name, arg1, thisobject) {
 
     //arg1name and arg1 are 'event' and event in some use cases
-    //in order to pass event into exodusonclick functions
+    //in order to pass event into exo_onclick functions
     if (!arg1name)
         arg1name = 'dummyarg1name'
     if (!arg1)
@@ -10460,7 +10460,7 @@ async function form_deleterow(event, element) {
         }
     }
 
-    var deps = tablex.getAttribute('exodusdependents')
+    var deps = tablex.getAttribute('exo_dependents')
     if (deps) {
 
         await calcfields(deps.split(';'))
@@ -10658,7 +10658,7 @@ async function insertallrows2(elements, values, fromrecn) {
     //recalculate any dependents
     var dependentfieldnos = ''
     for (var ii = 0; ii < elements.length; ii++) {
-        var deps = elements[ii].getAttribute('exodusdependents')
+        var deps = elements[ii].getAttribute('exo_dependents')
         if (deps)
             dependentfieldnos += ';' + deps
     }
@@ -10777,12 +10777,12 @@ async function form_insertrow(event, append) {
     // Following row(s) hidden → expand instead of insert, except:
     //   • dblclick value filter (table.exo_filter_colid): always insert
     //     (c137c49b — filter hide is not fold; insert after filter)
-    //   • fold-on-open [+] (exodusexpand) while Show All up: expand those
+    //   • fold-on-open [+] (exo_expand) while Show All up: expand those
     //   • not filtered: expand (indent/legacy hide)
     var valueFilter = !!(tablex && tablex.exo_filter_colid)
     var insertbtn = grows[grecn] && grows[grecn].exodusfields
         && grows[grecn].exodusfields['insertrowbutton' + groupno]
-    var expandAffordance = insertbtn && insertbtn.getAttribute('exodusexpand')
+    var expandAffordance = insertbtn && insertbtn.getAttribute('exo_expand')
     if (grecn < (nrows - 1) && grows[grecn + 1].style.display == 'none'
         && !valueFilter
         && (expandAffordance || !form_group_is_filtered(tablex, groupno))) {
@@ -10890,13 +10890,13 @@ function setinsertimage(mode, row, groupno) {
 
     if (mode == 'expand') {
         insertimage = exo_set_icon_element(insertimage, gexpandrowimage)
-        insertimage.setAttribute('exodusexpand', '1')
+        insertimage.setAttribute('exo_expand', '1')
         //duplicate keycodes in 3 places
         insertimage.title = 'Expand hidden rows here (Ctrl+I or Ctrl+Insert)'
     }
     else {
         insertimage = exo_set_icon_element(insertimage, ginsertrowimage)
-        insertimage.removeAttribute('exodusexpand')
+        insertimage.removeAttribute('exo_expand')
         //duplicate keycodes in 3 places
         insertimage.title = 'Insert a new row here (Ctrl+I or Ctrl+Insert)'
     }
@@ -11295,7 +11295,7 @@ async function exoui_popup2(element) {
         var elgroupno = Number(element.getAttribute('exogroupno'))
         if (elgroupno) {
             var tableelement = gtables[elgroupno].tableelement
-            var multipleselection = tableelement && tableelement.getAttribute('exoduslastinputcolscreenfn') == tableelement.getAttribute('exodusfirstinputcolscreenfn')
+            var multipleselection = tableelement && tableelement.getAttribute('exo_lastinputcolscreenfn') == tableelement.getAttribute('exo_firstinputcolscreenfn')
         }
 
         //get the response(s)
@@ -12452,7 +12452,7 @@ async function document_onpaste(event) {
 	}
 
     //only supporting form_paste in first column
-    if (!element.getAttribute('exodusisfirstinputcolumn')) {
+    if (!element.getAttribute('exo_isfirstinputcolumn')) {
         //perform normal paste before any yielding is done which loses it
         // paste Gate A skips following input — re-run form_oninput after insert
         window.setTimeout(function () { void form_oninput({ target: element }) }, 0)
@@ -12546,7 +12546,7 @@ function form_copypaste_getcols(event, pasting) {
     //    return false
 
     //only cut/paste on first col
-    //if (!element.getAttribute('exodusisfirstinputcolumn'))
+    //if (!element.getAttribute('exo_isfirstinputcolumn'))
     //    return false
 
     //get table columns

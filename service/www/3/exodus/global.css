@@ -1211,7 +1211,7 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
 img[isexoduspopup="1"],
 img[isexoduslink="1"],
 img[exotype="B"],
-img[exodusonclick],
+img[exo_onclick],
 img[id^="insertrowbutton"],
 img[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);
@@ -1223,7 +1223,7 @@ img[id^="deleterowbutton"] {
 /* Monochrome mask icons (same footprint as toolbar imgs) */
 .exodus-icon[isexoduspopup="1"],
 .exodus-icon[isexoduslink="1"],
-.exodus-icon[exodusonclick],
+.exodus-icon[exo_onclick],
 .exodus-icon[id^="insertrowbutton"],
 .exodus-icon[id^="deleterowbutton"] {
     height: var(--exodus-ui-icon-size);

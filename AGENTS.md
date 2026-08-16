@@ -250,7 +250,7 @@ Only when the user has **just** asked for a light framework adaptation of keyboa
 - Do **not** trust `gfinalinputelement` / `gstartelement` identity alone after `form_postinit` (pages like search reorder rows; “last field” is “walker finds nothing else before wrap”).
 - Key-specific behaviour already uses **`gkeycode`** (e.g. Enter skips buttons). Extend that pattern: Tab-only vs Enter/arrows, not a new code path.
 - **Reuse field-level selection state** (`form_field_all_selected` / whole-field vs editing) for left/right, multiline up/down, and Tab-as-data — do not invent a second “is editing?” per key.
-- Form actions are **SPANs** (`.menubutton` / `.graphicbutton` + `exodusonclick`), not native `<button>`s — the walker already visits them if the skip list allows.
+- Form actions are **SPANs** (`.menubutton` / `.graphicbutton` + `exo_onclick`), not native `<button>`s — the walker already visits them if the skip list allows.
 - If the first idea needs a new named helper + special-case call site, **pause** and re-read the existing walker/filter first — then take the shared helper if the contract is truly identical.
 
 ### Gate A / DOM events (do not layer hacks)

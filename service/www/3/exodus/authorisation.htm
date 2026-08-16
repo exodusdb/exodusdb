@@ -64,9 +64,9 @@
         <div class="exodustabs" id="authorisation_tabs">
             <div class="exodustabs_bar" role="tablist">
                 <button type="button" role="tab" class="exodustab exodustab_active"
-                    id="authorisation_tabbtn_users" exodusonclick="authorisation_tabs_show_sync('users')">Users</button>
+                    id="authorisation_tabbtn_users" exo_onclick="authorisation_tabs_show_sync('users')">Users</button>
                 <button type="button" role="tab" class="exodustab"
-                    id="authorisation_tabbtn_tasks" exodusonclick="authorisation_tabs_show_sync('tasks')">Tasks</button>
+                    id="authorisation_tabbtn_tasks" exo_onclick="authorisation_tabs_show_sync('tasks')">Tasks</button>
             </div>
             <div class="exodustab_panel exodustab_active" id="authorisation_tabpanel_users" role="tabpanel">
         <input style="display: none" id="KEY" />
@@ -86,7 +86,7 @@
                         User Name:<br />
                         Email Address:<br />
                         <input id="button_changeemaildomain" title="Change email domain name" class="exodusbutton"
-                            type="button" exotype="B" value="Change domain" exodusonclick="await authorisation_changeallemaildomains()">
+                            type="button" exotype="B" value="Change domain" exo_onclick="await authorisation_changeallemaildomains()">
                     </td>
                     <th>
                         Last Login
@@ -105,10 +105,10 @@
                     </td>
                     <td>
                         <input id="button_password" exogroupno="1" title="Set the password for the user"
-                            exodusonclick="await user_setpassword(false,this)" class="exodusbutton" type="button"
+                            exo_onclick="await user_setpassword(false,this)" class="exodusbutton" type="button"
                             exotype="B" value="Password" />
                         <input id="button_tasks" exogroupno="1" title="See user's authorised tasks" class="exodusbutton"
-                            type="button" exotype="B" value="Tasks" exodusonclick="await user_showtasks()" />
+                            type="button" exotype="B" value="Tasks" exo_onclick="await user_showtasks()" />
                     </td>
                     <td>
                         <input id="USER_NAME" />

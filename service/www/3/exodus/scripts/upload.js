@@ -185,7 +185,7 @@ async function audiovisual_open(event) {
 
  event=getevent(event)
 
- var imagen=event.target.getAttribute('exodusimagen')
+ var imagen=event.target.getAttribute('exo_imagen')
  var element=$$('audiovisuallink'+imagen)
  if (element.click)
   element.click()
@@ -453,7 +453,7 @@ async function loadimages() {
   $images.insertBefore(button, null)
   button.value='Open'
   addeventlistener(button,'click','audiovisual_open')
-  button.setAttribute('exodusimagen',imagen)
+  button.setAttribute('exo_imagen',imagen)
 
   //delete may be allowed
   if (gparameters.deleteallowed)

@@ -500,7 +500,7 @@ async function gds_setx2(cells, values, forced) {
 
                 //add new dependents to list if not already there
                 if (rown == 0) {
-                    var newdependents = screenelement.getAttribute('exodusdependents')
+                    var newdependents = screenelement.getAttribute('exo_dependents')
                     if (newdependents) {
                         newdependents = newdependents.split(';')
                         for (var depn = 0; depn < newdependents.length; depn++) {
