@@ -6686,8 +6686,7 @@ var gform_typeahead_rows = []
 var gform_typeahead_focusn = -1
 var gform_typeahead_mousedown = false
 var gform_typeahead_scroll_listening = false
-// Ignore mouseover until real mousemove: on open, and after keyboard row move
-// (scroll-under-cursor would otherwise steal the key highlight — same as decide).
+// mouseover ignored while locked (open + keyboard); mousemove unlocks.
 var gform_typeahead_hover_locked = false
 
 function form_typeahead_ensure() {
@@ -6704,7 +6703,7 @@ function form_typeahead_ensure() {
     div.onmouseup = function () {
         gform_typeahead_mousedown = false
     }
-    // Real pointer move only — not scroll-under-cursor / arrival under stationary mouse
+    // Real pointer move only — not list open under a stationary mouse
     div.onmousemove = function () {
         gform_typeahead_hover_locked = false
     }
@@ -7143,7 +7142,7 @@ function form_typeahead_show(element, cols, rows, returncoln) {
         trs[i].onmouseover = form_typeahead_row_hover
         trs[i].onclick = form_typeahead_row_pick
     }
-    // Arrival: keep auto-highlight for Enter; ignore mouse until real mousemove
+    // Arrival: auto-highlight for Enter; mouseover ignored until mousemove unlocks
     gform_typeahead_hover_locked = true
     // Highlight now so Enter before rAF still applies the match / first row.
     if (autoFocus >= 0)
@@ -7320,7 +7319,7 @@ function form_typeahead_row_pick(event) {
     return false
 }
 
-// fromkeys: arrows/Pg/Home/End steal highlight and lock until real mousemove (decide).
+// fromkeys: arrows/Pg/Home/End steal highlight and lock until mousemove.
 function form_typeahead_set_focus(n, fromkeys) {
 
     var div = gform_typeahead_div

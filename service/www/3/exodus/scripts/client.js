@@ -9409,6 +9409,8 @@ async function decide_onload(decide_args) {
 	var decide_last_option_element = null
 	// Must init before return — handlers below are hoisted but var assignment after return never runs
 	var decide_filter_text = ''
+	// mouseover ignored while locked; mousemove unlocks (init before return undefined)
+	var decide_hover_locked = false
 	for (var ii = 0; ii < selections.length; ++ii)
 		if (selections[ii].checked)
 			break
@@ -9453,6 +9455,15 @@ async function decide_onload(decide_args) {
 		// Radio: check + focus; multi-select: focus only. No wrap (arrows wrap).
 		return decide_move_option(direction, 1, !decide_returnmany, false)
 	}
+
+	// Arrival hover before return (stmts after return never run; only fn decls hoist)
+	var decide_open_tr = decide_last_option_element
+		? getancestor(decide_last_option_element, 'tr')
+		: null
+	if (decide_open_tr)
+		decide_set_row_hover(decide_open_tr, true)
+	else
+		decide_hover_locked = true
 
 	//returning undefined indicates that we need to yield and wait for decide_ok_onclick_sync etc to resume
 	//returning false indicates some problem
@@ -9642,15 +9653,12 @@ async function decide_onload(decide_args) {
 		return decide_document_onmouse(event, 'out')
 	}
 
-	// After keyboard/wheel row move, ignore mouseover/out until a real mousemove
-	// (scroll-under-cursor would otherwise steal or strip the highlight).
-	var decide_hover_locked = false
-
+	// decide_hover_locked declared above (before return undefined).
 	function decide_document_onmousemove() {
 		decide_hover_locked = false
 	}
 
-	// One row highlight: mouseover steals after unlock; arrows/wheel set + lock.
+	// One row highlight: mouseover steals after unlock; arrows/wheel/open lock.
 	function decide_set_row_hover(tr, fromkeys) {
 		var tbody = $$('decide_table1body1')
 		if (tbody) {
