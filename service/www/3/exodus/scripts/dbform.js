@@ -3650,6 +3650,22 @@ async function document_onkeydown2(event) {
     if (gstepping)
         wstatus(gkeycode)
 
+    // Enter on contenteditable (number/code/text SPAN hosts): same contract as INPUT
+    // and as Enter→tab below (non-TEXTAREA = leave field). Must preventDefault before
+    // any await — Gate A + form_onkeydown made the later Enter→tab cancel too late, so
+    // the browser ran insertParagraph (EXCH_RATE became 1<br><br>). TEXTAREA keeps Enter.
+    if (keycode == 13) {
+        var cel = event.target
+        if (cel && cel.tagName != 'TEXTAREA'
+            && (cel.isContentEditable
+                || (cel.tagName == 'SPAN' && cel.getAttribute
+                    && cel.getAttribute('contenteditable')))) {
+            if (event.preventDefault)
+                event.preventDefault()
+            event.returnValue = false
+        }
+    }
+
     // Miss-tinted field: no additional character entry (class is the marker)
     if (form_miss_tint_keydown(event) === false)
         return exocancelevent(event)
