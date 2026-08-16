@@ -18,7 +18,7 @@ The framework originated in an era of older browsers and cooperative generators;
 
 ## 1. Overview and Architecture
 
-- **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodusdblink`, `exodusshowmodaldialog`, security, cookies, utilities, string/array prototypes.
+- **Core file:** `client.js` — Must be included **first**. Core globals, Gate A/B, `exodusdblink`, `exoui_showmodaldialog`, security, cookies, utilities, string/array prototypes.
 - **Form automation:** `dbform.js` + helpers in `db.js` — Dictionary-driven (`dict_*`) CRUD forms, MV groups, validation, buttons.
 - **Communication bridge:** `xhttp.php` (and .asp variants). Client sends XML (`<token>`, `<request>`, `<data>`); bridge writes temp files; backend processes and responds via `.1`/`.2`/`.3` files.
 - **Async model (Gate A):** Event handlers and deferred async work enter via `exodus_begin` (exclusive owner; `g_exodus_flow_queue_max = 0` means **no queuing** — second start while airborne is a **visible `systemerror`**, not a silent skip). Prefer `async function myfunc() { ... await someOperation() ... }` and `await` inside the same flight. Do **not** start free-floating async that does DB/UI work. Avoid parallel starts at the source (check `g_exodus_flow` / use `exodus_begin_if_idle` for optional work).
@@ -28,7 +28,7 @@ The framework originated in an era of older browsers and cooperative generators;
 - **No generators:** `function*` / `yield*` are not supported. Use `async`/`await` only. Accidental generators fail with `systemerror` (stage 6).
 - **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
-- **Security model:** PHP sessions (the real auth) + namespaced tokens. `exodussecurity('TASK')`. Once a valid session exists, the web layer trusts it.
+- **Security model:** PHP sessions (the real auth) + namespaced tokens. `exoui_security('TASK')`. Once a valid session exists, the web layer trusts it.
 - **Globals:** `gusername`, `gdataset`, `gparameters`, `greadonlymode`, many others set from cookies or passed in.
 
 The scripts support both browser HTTP mode and `file://` local mode (for development/testing).
@@ -110,14 +110,14 @@ Common additional includes (from examples):
 
 ```js
 async function myFunction() {
-  var ok = await exodusokcancel('Are you sure?', 1);
+  var ok = await exoui_okcancel('Are you sure?', 1);
   if (!ok) return;
 
   if (!(await db.send())) {
-    return await exodusinvalid(db.response);
+    return await exoui_invalid(db.response);
   }
 
-  var choice = await exodusdecide('Select', dataArray);
+  var choice = await exoui_decide('Select', dataArray);
 }
 ```
 
@@ -179,19 +179,19 @@ var params = {
   readonly: true,
   mycustom: 'value'
 };
-var returnedValue = await exodusshowmodaldialog('somedialog.htm', params);
+var returnedValue = await exoui_showmodaldialog('somedialog.htm', params);
 
 // In the dialog page, read:
 if (gparameters.key) { ... }
 
 // Close and return value(s) to caller
-exoduswindowclose('a result string');
-exoduswindowclose(['multiple', 'values']);
+exoui_windowclose('a result string');
+exoui_windowclose(['multiple', 'values']);
 ```
 
 Key functions:
-- `exodusshowmodaldialog(url, arguments)`
-- `exoduswindowclose(returnValue)`
+- `exoui_showmodaldialog(url, arguments)`
+- `exoui_windowclose(returnValue)`
 - `exodus_setchildwin_returnvalue(...)`
 
 Dialogs are the primary navigation/composition mechanism.
@@ -210,7 +210,7 @@ db.request = 'EXECUTE\rGENERAL\rMYCOMMAND\rparam1\rparam2';
 db.data    = 'optional payload (multivalue ok)';
 
 if (!(await db.send())) {
-  return await exodusinvalid(db.response);
+  return await exoui_invalid(db.response);
 }
 
 var resultData = db.data;
@@ -235,12 +235,12 @@ On success `db.send()` is truthy; `db.data` holds the body (often XML for SELECT
 
 ### Every `db.send` must have a failure path
 
-**Rule:** no request is success-only. Callers handle `!(await db.send())` (or equivalent): `exodusinvalid`, typeahead miss/hide, `return false`, etc. “This is only typeahead / quiet / background — ignore fail” is a bug.
+**Rule:** no request is success-only. Callers handle `!(await db.send())` (or equivalent): `exoui_invalid`, typeahead miss/hide, `return false`, etc. “This is only typeahead / quiet / background — ignore fail” is a bug.
 
 **Session lost (`Please login`)** is one failure mode handled **inside** dblink for **all** sends (main `db` and typeahead private/`quiet` link) — same path:
 
 1. `send` calls `login()` still inside the send loop; on success the **same request is retried**.
-2. **Resume login as {user}?** (`exodusyesno`, default Yes):
+2. **Resume login as {user}?** (`exoui_yesno`, default Yes):
    - **Yes** — cookie auto-login if remembered, else **modal** `index.html`; then retry.
    - **No** — full-page `index.html`, return false (async unwind; no `force_an_exit` throw under evaluate). Post-login start is index logic (often `users.htm`), not return-to-form.
 3. Typeahead `quiet` = no modal **shield** per keystroke only — **not** skip reauth or skip handling `!send` after fail.
@@ -307,8 +307,8 @@ See `empty_dataform.htm`, `empty_fileform.htm`, and `template.htm` for complete 
 ## 6. Security
 
 ```js
-if (!(await exodussecurity('EDIT CUSTOMERS'))) {
-  return await exodusinvalid(gmsg);
+if (!(await exoui_security('EDIT CUSTOMERS'))) {
+  return await exoui_invalid(gmsg);
 }
 ```
 
@@ -331,7 +331,7 @@ var params = {
   maxheight: 200
 };
 
-var returnedTargetFilename = await exodusshowmodaldialog('../exodus/upload.htm', params);
+var returnedTargetFilename = await exoui_showmodaldialog('../exodus/upload.htm', params);
 ```
 
 The upload posts to `upload.php` (which now safely derives its own redirect target). The result is the target filename that was written.
@@ -362,12 +362,12 @@ arr.exodustrim()
 See `exodus.js` and searches for `exodus` prototype methods.
 
 Other frequent utilities:
-- `await exodusinvalid(msg)`
-- `await exodusnote(msg)`
-- `await exoduswarning(msg)`
-- `await exodusokcancel(msg, default)`
-- `await exodusdecide(question, data, ...)`
-- `exoduswindowclose(value)`
+- `await exoui_invalid(msg)`
+- `await exoui_note(msg)`
+- `await exoui_warning(msg)`
+- `await exoui_okcancel(msg, default)`
+- `await exoui_decide(question, data, ...)`
+- `exoui_windowclose(value)`
 - `exodus_begin(asyncFn, 'label')` — **public #1** Gate A business (`systemerror` if busy when `queue_max` is 0)
 - `exodus_begin_if_idle(asyncFn, 'label')` — **public #2** optional background; skip if busy
 - `exodus_begin_waitcancel(source)` — **public #3** Gate B Wait/Cancel only (from uiblocker)
@@ -388,14 +388,14 @@ Preferred pattern:
 
 ```js
 if (!(await someOperation())) {
-  return await exodusinvalid(db.response || 'Something went wrong');
+  return await exoui_invalid(db.response || 'Something went wrong');
 }
 ```
 
 Helpers:
-- `exodusinvalid(msg)` — usually stops and shows error
-- `exodusnote(msg)`
-- `exoduswarning(msg)`
+- `exoui_invalid(msg)` — usually stops and shows error
+- `exoui_note(msg)`
+- `exoui_warning(msg)`
 
 ## 11. Best Practices & Gotchas
 

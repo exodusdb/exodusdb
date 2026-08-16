@@ -32,14 +32,14 @@ async function system_pop_datasetcode(many, orcurrent) {
     var returncoln = 1
     var defaultreply = ''
     var inverted = true
-    var datasetcode = await exodusdecide('Which dataset' + (many ? '(s' : '') + ' do you want?' + tt, popdata, cols, returncoln, defaultreply, many, inverted)
+    var datasetcode = await exoui_decide('Which dataset' + (many ? '(s' : '') + ' do you want?' + tt, popdata, cols, returncoln, defaultreply, many, inverted)
     return datasetcode
 }
 
 async function system_val_datasetcode(many, orcurrent, test) {
 
     if (gvalue == 'CURRENT') {
-        if (!orcurrent) return await exodusinvalid('"CURRENT" is not allowed here')
+        if (!orcurrent) return await exoui_invalid('"CURRENT" is not allowed here')
         return true
     }
 
@@ -47,19 +47,19 @@ async function system_val_datasetcode(many, orcurrent, test) {
         return false
 
     if (gvalue != 'CURRENT' && gvalue.indexOf('CURRENT') >= 0)
-        return await exodusinvalid('You cannot choose CURRENT and other datasets')
+        return await exoui_invalid('You cannot choose CURRENT and other datasets')
 
     if (typeof test == 'boolean') {
         if (test && gvalue && gvalue.substr(-5) != '_test')
-            return await exodusinvalid('You can only choose TEST databases here')
+            return await exoui_invalid('You can only choose TEST databases here')
         else if (!test && gvalue.substr(-5) == '_test')
-            return await exodusinvalid('You cannot choose TEST databases here')
+            return await exoui_invalid('You cannot choose TEST databases here')
     }
 
     var values = many ? gvalue.split(':') : [gvalue]
     for (var ii = 0; ii < values.length; ii++) {
         if (!gdatasets[1].exoduslocate(values[ii]))
-            return await exodusinvalid(values[ii].exodusquote() + ' is not a valid dataset code')
+            return await exoui_invalid(values[ii].exodusquote() + ' is not a valid dataset code')
     }
 
     return true
@@ -70,7 +70,7 @@ var gdatasets
 async function system_getdatasets(refresh) {
     if (refresh || !gdatasets) {
         db.request = 'EXECUTE\rGENERAL\rGETDATASETS'
-        if (!(await db.send())) return await exodusinvalid(db.response)
+        if (!(await db.send())) return await exoui_invalid(db.response)
         //split inverted
         gdatasets = db.data.exodussplit(vm + sm, true)
     }
@@ -160,7 +160,7 @@ async function system_getdepartments(deptoptions) {
 
     var security = []
     if (!(await security.exodusread('DEFINITIONS', 'SECURITY*USERS')))
-        return await exodusinvalid(security.exodusresponse)
+        return await exoui_invalid(security.exodusresponse)
     security = exodus_splitarray(security, [[[1, 9]], [[10, 11]]])
     gdepts = [[], [], []]
     var nusers = security[1].length
@@ -220,9 +220,9 @@ async function system_pop_department(many, deptoptions) {
         many = false
     if (!(await system_getdepartments(deptoptions)))
         return false
-    //return await exodusdecide('', gdepartments.split(fm), '', 0, '', many)
+    //return await exoui_decide('', gdepartments.split(fm), '', 0, '', many)
     var cols = [[0, 'Department'], [1, 'Name'], [2, 'Users with email']]
-    return await exodusdecide('', gdepts, cols, 0, gvalue, many, true)
+    return await exoui_decide('', gdepts, cols, 0, gvalue, many, true)
 }
 
 // Department/group typeahead: we already have the list (system_getdepartments → gdepts).
@@ -245,6 +245,6 @@ async function system_val_department(deptoptions) {
     if (!(await system_getdepartments(deptoptions)))
         return false
     if (gvalue && !gdepartments.split(fm).exoduslocate(gvalue))
-        return await exodusinvalid(gvalue + ' department does not exist')
+        return await exoui_invalid(gvalue + ' department does not exist')
     return true
 }

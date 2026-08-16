@@ -14,7 +14,7 @@ async function form_postdisplay() {
 
 async function form_prewrite() {
     if ((await gds.getx('SCOPE'))=='SYSTEM.CFG' && !(await gds.getx('HOST_NAME')))
-        return await exodusinvalid('Host Name is required when Scope is "Current Installation"')
+        return await exoui_invalid('Host Name is required when Scope is "Current Installation"')
     return true
 }
 
@@ -35,13 +35,13 @@ async function sysconfig_copynow(event) {
     question+='\n although not a critical issue, damaged files in the target database.'
     question+='\n\nLarge, actively updated databases must only be copied using\nthe overnight "Automatic Copy" configuration option.'
     question+='\n\nOK to copy '+fromdatabase+' -> '+todatabase+' now?'
-    if (!(await exodusyesno(question,2)))
+    if (!(await exoui_yesno(question,2)))
         return false
     
     db.request='EXECUTE\rGENERAL\rFILEMAN\rCOPYDB\r'+fromdatabase
     if (!(await db.send()))
-        return await exodusinvalid(db.response)
-    await exodusnote(db.response.slice(2))
+        return await exoui_invalid(db.response)
+    await exoui_note(db.response.slice(2))
 }
 
 async function dict_SYSTEMCONFIGURATION(parameters) {

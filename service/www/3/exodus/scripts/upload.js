@@ -117,7 +117,7 @@ async function form_onkeydown(event) {
 
  if (event.keyCode==27)
   //return window.close()
-  return exoduswindowclose()
+  return exoui_windowclose()
 }
 
 async function formfunctions_onload() {
@@ -170,8 +170,8 @@ async function formfunctions_onload() {
 
 async function showuploadtable() {
 
- if (!(await exodussecurity('UPLOAD CREATE')))
-    return await exodusinvalid(gmsg)
+ if (!(await exoui_security('UPLOAD CREATE')))
+    return await exoui_invalid(gmsg)
 
  exodusformpaneof($table_upload).style.display=''
  $form1.filedata.focus()
@@ -198,11 +198,11 @@ async function audiovisual_delete(event) {
  var filename=event.target.getAttribute('exofilename')
 
  //confirm!
- if (!(await exodusyesno(filename+'\rWarning! Are you SURE that you want to irrevocably delete this file permanently?\r\rNote: This is irreversible!',2))) return await exodusinvalid()
+ if (!(await exoui_yesno(filename+'\rWarning! Are you SURE that you want to irrevocably delete this file permanently?\r\rNote: This is irreversible!',2))) return await exoui_invalid()
 
  db.request='EXECUTE\rGENERAL\rDELETEUPLOAD\r'+filename.toLowerCase()
  if (!(await db.send()))
-  return await exodusinvalid(db.response)
+  return await exoui_invalid(db.response)
 
  await loadimages()
 
@@ -214,7 +214,7 @@ async function upload_onclick() {
  var sourcefilename=$form1.filedata.value
  if (!sourcefilename) {
   exoduscancelevent()//prevent submit
-  return await exodusinvalid('Please browse for a file name to upload first')
+  return await exoui_invalid('Please browse for a file name to upload first')
  }
 
  //split off the actual file name
@@ -226,17 +226,17 @@ async function upload_onclick() {
  //so prevent such files being uploaded (from non-NTFS workstations like mac and linux)
  // /[/<>:"\?\\\*\|]/g
  if (sourcefilename.match(/[/<>:"\?\\\*\|]/g)) {
-  return await exodusinvalid('Sorry but the following characters are not allowed in file names being uploaded\r/ ? < > \\ : * &vert; "')
+  return await exoui_invalid('Sorry but the following characters are not allowed in file names being uploaded\r/ ? < > \\ : * &vert; "')
  }
 
  //check file extensions
  if (!gaudiovisualextensions.exoduslocate(extension))
-  return await exodusinvalid('Files ending .'+extension+' are not allowed to be uploaded\r\rThe allowed file extensions are:\r\r'+gaudiovisualextensions.join(', '))
+  return await exoui_invalid('Files ending .'+extension+' are not allowed to be uploaded\r\rThe allowed file extensions are:\r\r'+gaudiovisualextensions.join(', '))
 
  var thumbnail=$$('thumbnail')
  if ((gparameters.maxheight || gparameters.minheight) && !thumbnail.height) {
     msg='Cannot determine image height for file '+sourcefilename
-    return await exodusinvalid(msg)
+    return await exoui_invalid(msg)
  }
  if (gparameters.maxheight && thumbnail.height>gparameters.maxheight)
    var msg='too large'
@@ -246,7 +246,7 @@ async function upload_onclick() {
     msg='The image is '+msg+'. It is '+thumbnail.width + ' wide x ' + thumbnail.height+' high in pixels'
     msg+='\n\nThe image file must be between '+gparameters.minheight+' and '+gparameters.maxheight+' PIXELS HIGH'
     msg+='\n\nThere is no restriction on width.'
-    return await exodusinvalid(msg)
+    return await exoui_invalid(msg)
  }
 
  /*if (gparameters.originalkeyversionno.slice(-1)!='\\')
@@ -277,10 +277,10 @@ async function upload_onclick() {
 
  //confirm update
  if (mode=='UPDATE') {
-  if (!(await exodusyesno(question+'Warning! Are you SURE that you want to irrevocably overwrite the existing file permanently?\rThis action cannot be undone!',2)))
-    return await exodusinvalid()
+  if (!(await exoui_yesno(question+'Warning! Are you SURE that you want to irrevocably overwrite the existing file permanently?\rThis action cannot be undone!',2)))
+    return await exoui_invalid()
  } else {
-  //if (!(await exodusokcancel(question+'\rOK to upload this file now?',1))) return await exodusinvalid()
+  //if (!(await exoui_okcancel(question+'\rOK to upload this file now?',1))) return await exoui_invalid()
  }
 
  //ensure folders are made because upload may not be able to make them
@@ -293,11 +293,11 @@ async function upload_onclick() {
   +'\r'+gparameters.ensurenotlocked
 
   if (!(await db.send()))
-   return await exodusinvalid(db.response)
+   return await exoui_invalid(db.response)
  }
 
  //check allowed to update/create
- //if (!(await exodussecurity('MATERIAL '+mode))) return await exodusinvalid(gmsg)
+ //if (!(await exoui_security('MATERIAL '+mode))) return await exoui_invalid(gmsg)
 
  //set the target filename
  $form1.filename.value=targetfilename
@@ -398,7 +398,7 @@ async function loadimages() {
     db.request+='\rNEW'
 
  if (!(await db.send()))
-  return await exodusinvalid(db.response)
+  return await exoui_invalid(db.response)
 
  var imagedata=(fm+db.data).split(fm)
 
@@ -487,7 +487,7 @@ async function loadimages() {
 async function adddeletebutton(filename) {
 
  //add a delete button
- if (await exodussecurity('UPLOAD DELETE')) {
+ if (await exoui_security('UPLOAD DELETE')) {
 
   var button=document.createElement('input')
   button.type="button"
@@ -506,7 +506,7 @@ async function general_postupload() {
  alert('general_postload in upload.js\nInform EXODUS Support')
  if (gparameters.versionno||gparameters.closeafterupload)
   //return window.close()
-  return exoduswindowclose()
+  return exoui_windowclose()
  else
   await loadimages()
 }

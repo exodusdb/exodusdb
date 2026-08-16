@@ -12,13 +12,13 @@ async function whatsnew_pop_dates() {
  //get a unique list of EXODUS version dates installed
  db.request='EXECUTE\rGENERAL\rGETVERSIONDATES'
  if (!(await db.send()))
-    return await exodusinvalid(db.response)
+    return await exoui_invalid(db.response)
 
  //convert to human date and put latest dates at top
  var versiondates=db.data.split(fm).exodusoconv('[DATE]').reverse()
  
  var reply
- if (!(reply=await exodusdecide('From which EXODUS version date do you want to see whats new?',versiondates)))
+ if (!(reply=await exoui_decide('From which EXODUS version date do you want to see whats new?',versiondates)))
     return false
  
  return versiondates[reply-1]//.exodusiconv('[DATE]')

@@ -80,9 +80,9 @@ async function send_onclick(immediatemode) {
  else {
 
   if (result)
-   await exodusnote(db.data)
+   await exoui_note(db.data)
   else
-   await exodusinvalid(db.response+'\r'+db.data)
+   await exoui_invalid(db.response+'\r'+db.data)
  }
  
 }

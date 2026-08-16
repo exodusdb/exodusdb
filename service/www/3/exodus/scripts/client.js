@@ -324,7 +324,7 @@ function exodus_client_init() {
 	stm = FMs[5]
 
 	// Modal dialog args (if this window is a modal child). See
-	// exodus_acquire_modal_dialog_arguments / exodusshowmodaldialog.
+	// exodus_acquire_modal_dialog_arguments / exoui_showmodaldialog.
 	// Page code should read gparameters; window.dialogArguments is rebound for legacy.
 	gDialogArguments = exodus_acquire_modal_dialog_arguments()
 	if (gDialogArguments)
@@ -484,14 +484,14 @@ async function exoduslogout_onclick() {
 
 var gmsg
 var gtasks
-async function exodussecurity(task) {
+async function exoui_security(task) {
 
 	//return empty gmsg if authorised
 	gmsg = ''
 
 	//look for ancient source code
 	if (task.indexOf(' FILE ') >= 0)
-		await exoduswarning('FILE should not be in task ' + task)
+		await exoui_warning('FILE should not be in task ' + task)
 
 	//make sure task list is loaded (clearing cache also clears gtasks for convenience)
 	if (!gtasks) {
@@ -499,7 +499,7 @@ async function exodussecurity(task) {
 		if (!(await db.send())) {
 			gtasks = ''
 			gmsg = db.response
-			await exodusinvalid(gmsg)
+			await exoui_invalid(gmsg)
 			return false
 		}
 		gtasks = db.data.split(fm)[0].split(vm)
@@ -585,7 +585,7 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 	//check element exists
 	if (!elementsorelementid) {
 		void exodus_begin(function () {
-			return exodusinvalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
+			return exoui_invalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
 		}, 'exodussetexpression missing element')
 		return
 	}
@@ -827,7 +827,7 @@ var gprocessing_waitcancel_active
 
 // Gate B — in-DOM Wait/Cancel while Gate A (or any owner) is in db.send lazy XHR wait.
 // Concurrent with Gate A by design. Must NEVER call exodus_begin or main-line dbio.
-// Allowed: exodusconfirm UI, xhttp.abort(), fire-and-forget CANCEL on a separate link.
+// Allowed: exoui_confirm UI, xhttp.abort(), fire-and-forget CANCEL on a separate link.
 var g_exodus_waitcancel = null
 var g_exodus_waitcancel_n = 0
 
@@ -931,7 +931,7 @@ async function exodus_run_waitcancel(source) {
 	var requestid = gchildwin.xhttprequestid
 
 	try {
-		var response = await exodusconfirm('Processing. Please wait.', 1, 'Wait', 'Cancel')
+		var response = await exoui_confirm('Processing. Please wait.', 1, 'Wait', 'Cancel')
 
 		// Wait=1: keep request running (also when dbsend_release_modal force-resolves on complete)
 		if (response != 1) {
@@ -1295,7 +1295,7 @@ function getdialogstyle_sync(dialogstyle) {
 // ---------------------------------------------------------------------------
 // Modal dialog arguments — one bag, one live child at a time.
 //
-// Parent (exodusshowmodaldialog):
+// Parent (exoui_showmodaldialog):
 //   dialogArgumentsForChild = bag   // primary; child can re-pull after hard refresh
 //   gchildwin = window.open(...)
 //   gchildwin.dialogArguments = bag // secondary; can race first load; lost on refresh
@@ -1333,7 +1333,7 @@ function exodus_acquire_modal_dialog_arguments() {
 	return bag
 }
 
-async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
+async function exoui_showmodaldialog(url, dialogargs, dialogstyle) {
 
 	if (!dialogargs)
 		var dialogargs = new Object
@@ -1388,7 +1388,7 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 		var result = await dialogPromise
 		gpendingDialogResolve = null
 		gpendingDialogOwner = null
-		console.log('exodusshowmodaldialog result is ' + result)
+		console.log('exoui_showmodaldialog result is ' + result)
 
 		// Closed / blocked popup — no return value (was Safari-only UA sniff)
 		if (typeof result == 'undefined')
@@ -1398,7 +1398,7 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 
 	}
 	catch (e) {
-		console.log('caught error in exodusshowmodaldialog: ' + e)
+		console.log('caught error in exoui_showmodaldialog: ' + e)
 		//alert('Please enable popups for this site (1)\n\nError:'+(e.description?e.description:e))
 		//alert('Please enable popups for this site (1)\n\nError:'+(e.description?e.description:e)+'\n\n'+url+'\n\n'+arguments)
 		return
@@ -1410,7 +1410,7 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 }
 
 //called by child windows to return result to the parent before closing
-function exoduswindowclose(returnvalues) {
+function exoui_windowclose(returnvalues) {
 
 	//window.opener.gchildwin_returnvalue = returnvalues
 	if (window.opener) {
@@ -1505,13 +1505,13 @@ async function displayresponsedata(request, data) {
 
 	db.request = request
 	if (!(await db.send(data))) {
-		await exodusinvalid(db.response)
+		await exoui_invalid(db.response)
 		return false
 	}
 	if (db.data)
-		await exodusnote(db.data)
+		await exoui_note(db.data)
 	else
-		await exodusnote(db.response.slice(2))
+		await exoui_note(db.response.slice(2))
 
 	return true
 
@@ -1530,12 +1530,12 @@ async function openwindow(request, data) {
 		data = ''
 	db.request = request
 	if (!(await db.send(data))) {
-		await exodusinvalid(db.response)
+		await exoui_invalid(db.response)
 		return false
 	}
 
 	if (db.response != 'OK')
-		await exodusnote(db.response.slice(3))
+		await exoui_note(db.response.slice(3))
 
 	if (db.data) {
 		var urls = db.data.split(fm)
@@ -1700,7 +1700,7 @@ function assertelement(element, funcname, varname) {
 }
 
 // User-facing text when backend (or rare client) surface is a system/backtrace error.
-// Refine wording later; special exodusconfirm icon/mode may follow.
+// Refine wording later; special exoui_confirm icon/mode may follow.
 var gexodus_system_error_user_msg =
 	'A system error has occurred.\r\n\r\n' +
 	'Technical support has been informed.\r\n\r\n' +
@@ -1725,10 +1725,10 @@ function exodus_user_facing_msg(msg) {
 	return gexodus_system_error_user_msg
 }
 
-async function exodusnote(msg, mode) {
+async function exoui_note(msg, mode) {
 
 	//if (!msg) return false
-	//allow return await exodusnote() to be opposite of return await exodusinvalid()
+	//allow return await exoui_note() to be opposite of return await exoui_invalid()
 	if (!msg)
 		return true
 
@@ -1745,7 +1745,7 @@ async function exodusnote(msg, mode) {
 
 	msg = exodus_user_facing_msg(msg)
 
-	await exodusconfirm(msg, 1, 'OK', '', '', null, false, mode)
+	await exoui_confirm(msg, 1, 'OK', '', '', null, false, mode)
 
 	return true
 
@@ -1754,19 +1754,19 @@ async function exodusnote(msg, mode) {
 //''''''''
 //'INVALID
 //''''''''
-async function exodusinvalid(msg) {
+async function exoui_invalid(msg) {
 	//displays a message if provided and returns false
-	await exodusnote(msg, 'critical')
+	await exoui_note(msg, 'critical')
 	return false
 }
 
 //''''''''
 //'WARNING
 //''''''''
-async function exoduswarning(msg) {
+async function exoui_warning(msg) {
 	//displays a message if provided and returns true
-	//so you can use it like "return await exoduswarning(msg)" to save a line
-	return await exodusnote(msg, 'warning')
+	//so you can use it like "return await exoui_warning(msg)" to save a line
+	return await exoui_note(msg, 'warning')
 }
 
 function theme_toggle_title(dark) {
@@ -2670,7 +2670,7 @@ async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, 
 	db.request = 'CACHE\rSELECT\r' + filename.toUpperCase() + '\r' + sortselectionclause + '\r' + collist + '\rXML\r' + maxnrecs
 	//db.request='CACHE\rSELECT\r'+filename.toUpperCase()+'\r'+sortselectionclause+'\r'+collist+' ID'
 	if (!(await db.send())) {
-		await exodusinvalid(db.response)
+		await exoui_invalid(db.response)
 		return null
 	}
 
@@ -2681,7 +2681,7 @@ async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, 
 			msg += '\nfor ' + filtertitle
 		else if (sortselectionclause.indexOf('WITH COMPANY_CODE') >= 0)
 			msg += '\nfor the chosen company'
-		await exodusinvalid(msg)
+		await exoui_invalid(msg)
 		return null
 	}
 
@@ -2689,7 +2689,7 @@ async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, 
 	if (filtertitle)
 		question = 'Which do you want?' + filtertitle
 
-	return await exodusdecide2(question, db.data, cols, coln, '', many)
+	return await exoui_decide2(question, db.data, cols, coln, '', many)
 
 }
 
@@ -2833,7 +2833,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 		if (glocked && gtouched)
 			question += '\n\nWarning! Your current work on ' + gkey + ' will be lost if you dont resume login.'
 		question += '\n\nResume login as ' + gusername + '?'
-		if (!(await exodusyesno(question, 1))) {
+		if (!(await exoui_yesno(question, 1))) {
 
 			// Refuse resume: leave this form, full login shell (same for all callers,
 			// including typeahead under evaluate — no force_an_exit throw).
@@ -2847,7 +2847,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 			this.requesting = false
 			db.requesting = false
 
-			await exodusinvalid()
+			await exoui_invalid()
 			// Async callers (send → typeahead → evaluate) return false cleanly;
 			// page navigation follows. Do not throw undefined force_an_exit___…
 			// (that became System Error under typeahead onchange evaluate).
@@ -2885,7 +2885,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 			if (!datasets) {
 				logindb.request = 'GETDATASETS'
 				if (!(await logindb.send())) {
-					await exodusinvalid(logindb.response)
+					await exoui_invalid(logindb.response)
 					return 0
 				}
 				datasets = exodusxml2obj(logindb.data)
@@ -2894,7 +2894,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 			arguments[4] = datasets
 
 			url = '../index.html'
-			arguments = await exodusshowmodaldialog(url, arguments)
+			arguments = await exoui_showmodaldialog(url, arguments)
 
 		}
 
@@ -2910,7 +2910,7 @@ async function exodusdblink_login(username, password, dataset, system) {
 			var msg = logindb.response
 			if (!msg)
 				msg = 'Invalid username or password'
-			var response = await exodusinvalid(msg)
+			var response = await exoui_invalid(msg)
 			failed = true
 		}
 		else {
@@ -2989,7 +2989,7 @@ async function exodusdblink_send_byhttp_using_forms(data) {
 
 		//var params='dialogHeight:100px; dialogWidth:200px; center:Yes; help:No; resizable:No; status:No'
 		//params='dialogHeight: 201px; dialogWidth: 201px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-		var reply = await exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data])  // now async path
+		var reply = await exoui_showmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data])  // now async path
 		if (!reply) {
 			this.data = ''
 			this.response = ('ERROR: Request to server failed')
@@ -3676,7 +3676,7 @@ function exodusgetcookie(loginsessionid, key, subkey) {
 }
 
 //from "client.js" may also be copied in some "client.js" less windows
-async function exodusdecide(question, data, cols, returncoln, defaultreply, many, inverted) {
+async function exoui_decide(question, data, cols, returncoln, defaultreply, many, inverted) {
 	//data and cols are [[]] or [] or revstr or a;1:b;2 string
 	//data cells .text property will be used if present
 	//returncoln '' means return row number(s) - 1 based
@@ -3691,7 +3691,7 @@ async function exodusdecide(question, data, cols, returncoln, defaultreply, many
 	if (typeof data == 'string' && data.slice(0, 1) == '@') {
 		db.request = data.slice(1)
 		if (!(await db.send())) {
-			await exodusinvalid(db.response)
+			await exoui_invalid(db.response)
 			return null
 		}
 		data = db.data
@@ -3700,7 +3700,7 @@ async function exodusdecide(question, data, cols, returncoln, defaultreply, many
 
 	//abort if no records found
 	if (data == '' || data == '<records>\r\n</records>')
-		return await exodusinvalid('No records found')
+		return await exoui_invalid('No records found')
 
 	if (typeof data == 'string' && data.slice(0, 8) == '<records')
 		data = exodusxml2obj(data)
@@ -3753,7 +3753,7 @@ function rearray(array) {
 //
 // request — full db.request string (caller builds module/file/val/select/cmd);
 //           omit when options.rows or options.data supplies the list
-// cols    — same shape as exodusdecide: [[fieldn|id, title], ...] or 'ID NAME'
+// cols    — same shape as exoui_decide: [[fieldn|id, title], ...] or 'ID NAME'
 // coln    — data field index (or dict id string) written on pick; default 0
 // options —
 //   wordstart  true → keep only rows where any word in any cell starts with key
@@ -4110,7 +4110,7 @@ function exodus_typeahead_parserows(data, colids) {
 	return out
 }
 
-async function exodusdecide2(question, data, cols, returncoln, defaultreply, many) {
+async function exoui_decide2(question, data, cols, returncoln, defaultreply, many) {
 
 	//new in-window style popup
 	//if row columns are not numeric then convert numeric return column number into named column in data rows
@@ -4124,7 +4124,7 @@ async function exodusdecide2(question, data, cols, returncoln, defaultreply, man
 		//if (!returncoln)
 		//	returncoln=0
 	}
-	var results = await exodusdecide(question, data, cols, returncoln, defaultreply, many)
+	var results = await exoui_decide(question, data, cols, returncoln, defaultreply, many)
 
 	//callers of decide2 expect reply in array
 	if (results && (typeof results == 'string' || typeof results == 'number'))
@@ -4175,7 +4175,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
 	for (var i = 0; i < records.length; i++) {
 		var cell = records[i][valuecolname]
 		if (typeof (cell) == 'undefined') {
-			await exodusinvalid('Error: "' + valuecolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (1')
+			await exoui_invalid('Error: "' + valuecolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (1')
 			systemerror('Error: "' + valuecolname + '" not in data line ' + i + ' "' + records[i] + '" for setdropdown2 for "' + element.id + '" (1)')
 			return (0)
 		}
@@ -4188,7 +4188,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
 
 			var cell = records[i][textcolname]
 			if (typeof (cell) == 'undefined') {
-				await exodusinvalid('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2')
+				await exoui_invalid('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2')
 				systemerror('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2)')
 				return (0)
 			}
@@ -4278,7 +4278,7 @@ function checkisdropdown(element) {
 
 	if (typeof (element) != 'object' || element.tagName != 'SELECT') {
 		void exodus_begin(function () {
-			return exodusinvalid('Error: The target is not a SELECT tag')
+			return exoui_invalid('Error: The target is not a SELECT tag')
 		}, 'checkisdropdown')
 		return false
 	}
@@ -4347,7 +4347,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 	if (typeof (requiredvalues) == 'undefined') requiredvalues = []
 	if (typeof (requiredvalues) != 'object') requiredvalues = [requiredvalues]
 
-	//await exodusinvalid(selectedvalues.join())
+	//await exoui_invalid(selectedvalues.join())
 	//method
 	////////
 
@@ -4491,7 +4491,7 @@ async function exodussetdropdown(element, request, colarray, selectedvalues, noa
 			element.setAttribute('exodropdown', '')
 	}
 	else {
-		await exodusinvalid(db.response)
+		await exoui_invalid(db.response)
 	}
 	return true
 }
@@ -4526,8 +4526,8 @@ function exodusgetdropdown(element, mode) {
 	return selectedvalues
 }
 
-// One-line text prompt (OK / Cancel). See AGENTS.md HIGH PRIORITY confirm/exodusinput.
-// DO NOT change return values without grepping every exodusinput caller:
+// One-line text prompt (OK / Cancel). See AGENTS.md HIGH PRIORITY confirm/exoui_input.
+// DO NOT change return values without grepping every exoui_input caller:
 //   OK → string (may be ''); Cancel → false
 // WRONG when empty OK is intentional (e.g. material code "OK if not known"):
 //   if (!reply) { /* default path */ }   // Cancel takes default path → "no records found"
@@ -4535,22 +4535,22 @@ function exodusgetdropdown(element, mode) {
 //   if (typeof reply != 'string') return …  // Cancel only
 //   // reply is string, maybe ''
 // Similar: media.js media_pop_materials, allocation2.js filtertext.
-async function exodusinput(question, text, texthidden) {
+async function exoui_input(question, text, texthidden) {
 	if (!text) text = ''
-	return await exodusconfirm(question, '', 'OK', '', 'Cancel', text, texthidden)
+	return await exoui_confirm(question, '', 'OK', '', 'Cancel', text, texthidden)
 }
 
-async function exodusyesno(question, defaultbutton) {
-	return ((await exodusconfirm(question, defaultbutton, 'Yes', 'No')) == 1);
+async function exoui_yesno(question, defaultbutton) {
+	return ((await exoui_confirm(question, defaultbutton, 'Yes', 'No')) == 1);
 }
 
-async function exodusokcancel(question, defaultbutton) {
-	return await exodusconfirm(question, defaultbutton, 'OK', '', 'Cancel')
+async function exoui_okcancel(question, defaultbutton) {
+	return await exoui_confirm(question, defaultbutton, 'OK', '', 'Cancel')
 }
 
 // default_icons (9th, default true): role icons on footer buttons — 1=check, 2=cross, 3=goback.
 // Pass false when labels are alternatives (Before/After, One/Many, Save only vs …) not Yes/No/Cancel.
-async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image, default_icons) {
+async function exoui_confirm(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image, default_icons) {
 
 	//clean up question
 	if (!question)
@@ -4902,15 +4902,15 @@ async function sorttable(event, order) {
 
 	if (typeof form_presort == 'function') {
 		if (!(await form_presort(colid)))
-			return await exodusinvalid()
+			return await exoui_invalid()
 	}
 
 	//determine the groupno
 	var dictitem = gds.dictitem(colid)
-	if (!dictitem) return await exodusinvalid()
+	if (!dictitem) return await exoui_invalid()
 	var groupno = dictitem.groupno
 	if (!groupno)
-		return await exodusinvalid(colid + ' is not multivalued for sorting')
+		return await exoui_invalid(colid + ' is not multivalued for sorting')
 
 	//window.status = 'Sorting, please wait ...'
 	console.log('Sorting, please wait ...');
@@ -4971,7 +4971,7 @@ async function sorttable(event, order) {
 
 				//refuse to sort in reverse if indented
 				if (order == 'up') {
-					return await exodusinvalid('Cannot reverse sort when any data is indented')
+					return await exoui_invalid('Cannot reverse sort when any data is indented')
 				}
 
 				var prefix = ''
@@ -5053,7 +5053,7 @@ async function sorttable(event, order) {
 
 	if (typeof form_postsort == 'function') {
 		if (!(await form_postsort(colid)))
-			return await exodusinvalid()
+			return await exoui_invalid()
 	}
 
 	//window.status = ''
@@ -5128,7 +5128,7 @@ function menuhide(element) {
 						var temp = element.exodusmenuaccesskeys[menuaccesskey]
 						if (gusername == 'EXODUS' && temp)
 							void exodus_begin(function () {
-								return exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+								return exoui_note('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
 							}, 'duplicate menu access key')
 							// alert('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
 						element.exodusmenuaccesskeys[menuaccesskey] = child
@@ -5740,10 +5740,10 @@ function setgraphicbutton(button, labeltext, src) {
 
 async function refreshcache_onclick() {
 	if (clearcache())
-		await exodusnote('All EXODUS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
+		await exoui_note('All EXODUS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
 	// \r\rN.B. EXODUS forms and scripts will remain cached and may\rbe updated when you close and reopen all browser\rwindows - depending on the cache settings in your browser.')
 	else
-		await exodusnote('Cannot clear cache.')
+		await exoui_note('Cannot clear cache.')
 	return true
 }
 
@@ -6681,12 +6681,12 @@ function form_blockevents_hist_push(kind, depth, callername, callinfo) {
 
 // Known long-lived holders of gblockevents (not orphans).
 // Order matters: real wait UI before raw flight — schedule Book line keeps Gate A
-// open for the whole exodusshowmodaldialog session; lazy db.send keeps it open
+// open for the whole exoui_showmodaldialog session; lazy db.send keeps it open
 // for the whole XHR (Wait/Cancel). Those are not stuck flights.
 // Confirm/decide also sit inside a flight; classify them before raw flight so
 // a long decide does not systemerror as "long flight".
 function exodus_gblockevents_holder() {
-	// Parent awaiting exodusshowmodaldialog close (gpendingDialogResolve set)
+	// Parent awaiting exoui_showmodaldialog close (gpendingDialogResolve set)
 	try {
 		if (typeof gpendingDialogResolve != 'undefined' && gpendingDialogResolve)
 			return 'modal_dialog'
@@ -7955,7 +7955,7 @@ function exodusconfirm_startevent(event) {
 		return false
 	if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
 		return true
-	// WRONG (broke all typing in exodusinput — material code prompt etc.):
+	// WRONG (broke all typing in exoui_input — material code prompt etc.):
 	// return false
 	// RIGHT: when focus is the text field, allow browser (capture already left key un-cancelled).
 	var textel = document.getElementById('exodusconfirmdiv_textinput')
@@ -8308,8 +8308,8 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 
 	//performs "in-window" questions, selections and inputs
 	//replaces (or called by)
-	//exodusconfirm: questions (yes/no/cancel) and one line inputs
-	//exodusdecide/exodusdecide2: selections
+	//exoui_confirm: questions (yes/no/cancel) and one line inputs
+	//exoui_decide/exoui_decide2: selections
 	// default_icons: role icons on Yes/No/Cancel-style buttons (default true; false for multi-choice labels)
 
 	// Capture before any focus into the popup shell
@@ -8651,7 +8651,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
 	// Phase 1.2: convert the confirm/decide UI leaf to Promise-driven.
 	// The various click/key handlers now resolve this promise (via resolvePendingConfirm).
 	// fromPromise feeds the value to the existing generator machinery exactly as before.
-	// All higher wrappers (exodusconfirm, decide*, yesno, input, filepopup etc.) and
+	// All higher wrappers (exoui_confirm, decide*, yesno, input, filepopup etc.) and
 	var confirmResolve
 	var confirmPromise = new Promise((resolve) => {
 		confirmResolve = resolve
@@ -8855,7 +8855,7 @@ function cancel_backpage_event(event) {
 	return
 }
 
-// Decide shell is mounted before rows are built; remove it before exodusinvalid
+// Decide shell is mounted before rows are built; remove it before exoui_invalid
 // so the pale list popup does not sit behind the invalid dialog.
 async function decide_fail_no_options() {
 	gdecide_onwheel = null
@@ -8868,7 +8868,7 @@ async function decide_fail_no_options() {
 	var shell = $$('exodusconfirmdiv')
 	if (shell)
 		exodusremovenode(shell)
-	return await exodusinvalid('No records found.')
+	return await exoui_invalid('No records found.')
 }
 
 // --- Decide list select-all / copy (same idea as form typeahead) ---

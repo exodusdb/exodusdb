@@ -164,20 +164,20 @@ async function passwordreset_onclick(event) {
     
     //var args={}
     //args.USER_ID=gusername_element.value
-    //await exodusshowmodaldialog(EXODUSlocation+'passwordreset.htm')
+    //await exoui_showmodaldialog(EXODUSlocation+'passwordreset.htm')
     var usercode = gusername_element.value.toUpperCase()
     if (!usercode) {
         exodussettimeout('gusername_element.focus()', 100)
         gusername_element.focus()
         gusername_element.select()
-        return await exodusinvalid('Username is required')
+        return await exoui_invalid('Username is required')
     }
     var oldpass = gpassword_element.value
-    var email = await exodusinput('Password reset for database "' + gdataset_element.value + '"\n\nWhat is your registered email address?')
+    var email = await exoui_input('Password reset for database "' + gdataset_element.value + '"\n\nWhat is your registered email address?')
     if (!email)
         return
     if (email.indexOf('@') < 0)
-        return await exodusinvalid('Email address must contain an @ character')
+        return await exoui_invalid('Email address must contain an @ character')
     gpassword_element.value = email
     //await dblogin()
     await login_onclick()
@@ -249,7 +249,7 @@ async function login_onclick() {
     if (gusername_element.value.includes(' ')) {
         gusername_element.focus();
         gusername_element.select();
-        return await exodusinvalid("<b>Wrong username or password</b> \r → Check details and try again.");
+        return await exoui_invalid("<b>Wrong username or password</b> \r → Check details and try again.");
     }
 
     var authno = ''
@@ -259,7 +259,7 @@ async function login_onclick() {
         var response=[gusername_element.value, gpassword_element.value, datasetx, authno, '', gautologin_element.checked, gsystem]
         //window.returnValue = response
         //return window.close()
-        return exoduswindowclose(response)
+        return exoui_windowclose(response)
     }
 
     while (true) {
@@ -288,7 +288,7 @@ async function login_onclick() {
 
             //any login messages/reminders/warnings
             if (db.response != 'OK') {
-                await exoduswarning(db.response.slice(3))
+                await exoui_warning(db.response.slice(3))
             }
 
             //cannot set cookie in modal dialog so this also has to be done in caller (clientfunctions)
@@ -366,9 +366,9 @@ async function login_onclick() {
         //quit login if actually a password reset
         if (db.response.indexOf('Password Reset ') >= 0) {
             if (db.response.indexOf('Password Reset Failed') >= 0)
-                return await exodusinvalid(db.response)
+                return await exoui_invalid(db.response)
             else
-                return await exodusnote(db.response)
+                return await exoui_note(db.response)
         }
 
         //option to relogin with authorisation number
@@ -380,10 +380,10 @@ async function login_onclick() {
         }
         else {
             if (db.response.toLowerCase().indexOf('password')>=0) {
-                //var choice=await exodusconfirm(db.response.split('|').join('\n'),1,'Try a different password, database or user code','Reset Password')
-                var choice=await exodusinvalid(db.response.split('|').join('\n'))
+                //var choice=await exoui_confirm(db.response.split('|').join('\n'),1,'Try a different password, database or user code','Reset Password')
+                var choice=await exoui_invalid(db.response.split('|').join('\n'))
             } else {
-                var choice=await exodusinvalid(db.response.split('|').join('\n'))
+                var choice=await exoui_invalid(db.response.split('|').join('\n'))
             }
             if (choice == 2) {
                 //exodussettimeout('gpasswordreset_button.click()',100)

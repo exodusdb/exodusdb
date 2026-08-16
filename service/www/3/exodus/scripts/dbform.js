@@ -992,7 +992,7 @@ async function formfunctions_onload() {
             if (gKeyNodes) {
                 var words = fieldname.split('_')
                 for (var wordn = 0; wordn < words.length; ++wordn) {
-                    if (!(await exodussecurity(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()))) {
+                    if (!(await exoui_security(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()))) {
                         dictitem.readonly = gmsg
                         break;
                     }
@@ -1376,7 +1376,7 @@ async function formfunctions_onload() {
             if (element.tagName == 'SPAN' && element.getAttribute('exotype') == 'S')
                 element.tabIndex = -1
 
-            // F7/F6 chrome (dict di.popup / di.link → exoduspopup / exoduslink):
+            // F7/F6 chrome (dict di.popup / di.link → exoui_popup / exoui_link):
             //   non-empty string → real find/link icon + handler
             //   di.popup='' / di.link='' → pad that slot (with real other chrome, or alone)
             //   false/null → suppress (copydictitem: no attribute). Omit → nothing.
@@ -1433,7 +1433,7 @@ async function formfunctions_onload() {
                     element2.title += ' (F7)'
                     element2.style.cursor = 'pointer'
 
-                    //addeventlistener(element2,'click','exoduspopup')
+                    //addeventlistener(element2,'click','exoui_popup')
                     element2.setAttribute('isexoduspopup', '1')
 
                 }
@@ -1460,7 +1460,7 @@ async function formfunctions_onload() {
                     element2.title = 'Open this ' + element.getAttribute('exotitle') + ' (F6)'
                     element2.style.cursor = 'pointer'
 
-                    //addeventlistener(element2,'click','exoduslink')
+                    //addeventlistener(element2,'click','exoui_link')
                     element2.setAttribute('isexoduslink', '1')
 
                 }
@@ -2426,7 +2426,7 @@ async function formfunctions_onload() {
         // or continue load — otherwise the form appears ready with empty/wrong data.
         if (postinitok === false) {
             if (window.dialogArguments || (typeof gisdialog != 'undefined' && gisdialog))
-                exoduswindowclose()
+                exoui_windowclose()
             return false
         }
 
@@ -2866,7 +2866,7 @@ async function setfirstlastcolumn(groupno) {
 
     var tablex = $$('exogroup' + groupno)
     if (!tablex)
-        await exodusinvalid('await setfirstlastcolumn() table' + groupno + ' is missing')
+        await exoui_invalid('await setfirstlastcolumn() table' + groupno + ' is missing')
 
     for (var ii = 0; ii < gtables[groupno].length; ii++) {
         var screenfn = gtables[groupno][ii]
@@ -3432,10 +3432,10 @@ async function document_onclick(event) {
     var result
 
     if (event.target.getAttribute('isexoduspopup'))
-        result = await exoduspopup(event)
+        result = await exoui_popup(event)
 
     else if (event.target.getAttribute('isexoduslink'))
-        result = await exoduslink(event)
+        result = await exoui_link(event)
 
     //call the first exodusonclick expression found in element then parents
     var target = event.target
@@ -3697,13 +3697,13 @@ async function document_onkeydown2(event) {
 
     //F6 is now link
     if (keycode == 117) {
-        await exoduslink(event)
+        await exoui_link(event)
         return exoduscancelevent(event)
     }
 
     //F7 is now popup (used to be F2 in DOS) also replaces windows standard alt+down combination
     if (keycode == 118 || (event.altKey && keycode == 40 && element.tagName == 'SELECT')) {
-        await exoduspopup(event)
+        await exoui_popup(event)
         return exoduscancelevent(event)
     }
 
@@ -4127,7 +4127,7 @@ async function document_onkeydown2(event) {
         var rs = gds.data['group' + ggroupno]
         if (!rs) {
             exoduscancelevent(event)
-            return await exodusinvalid('Group number on non-group field')
+            return await exoui_invalid('Group number on non-group field')
         }
         //zzz if "paging" should be offset by subtracting record number of first row
         grecn = rown
@@ -4618,7 +4618,7 @@ async function document_onkeydown2(event) {
                 return await readonlydocmsg()
             }
             else if (element.getAttribute('exoreadonly') != 'true') {
-                await exodusinvalid(element.getAttribute('exoreadonly'))
+                await exoui_invalid(element.getAttribute('exoreadonly'))
             }
             return false
         }
@@ -5443,7 +5443,7 @@ async function saverecord_onclick() {
         //otherwise automatic option to print if available
         else {
             //TODO put this back as a form level opt in
-            //   if (printsendrecord&&!printsendrecord.getAttribute('disabled')&&(await exodusyesno('Print/Send '+gkeyexternal+' ?',2))) await printsendrecord_onclick()
+            //   if (printsendrecord&&!printsendrecord.getAttribute('disabled')&&(await exoui_yesno('Print/Send '+gkeyexternal+' ?',2))) await printsendrecord_onclick()
         }
 
         return true
@@ -5461,7 +5461,7 @@ async function saverecord_onclick() {
 
     //option to confirm
     if (gparameters.confirm || gparameters.savemode && gparameters.savemode.indexOf('CONFIRM') >= 0) {
-        if (!(await exodusyesno('OK to continue?', 2)))
+        if (!(await exoui_yesno('OK to continue?', 2)))
             return false
     }
 
@@ -5493,7 +5493,7 @@ async function saverecord_onclick() {
         //window.returnValue = gro.revstr
         //window.close()
         //return false
-        return exoduswindowclose(gro.revstr)
+        return exoui_windowclose(gro.revstr)
     }
 
     //standard unbound write routine
@@ -5521,7 +5521,7 @@ async function saverecord_onclick() {
     if (closeafter) {
         //window.returnValue=true
         //window.close()
-        exoduswindowclose(true)
+        exoui_windowclose(true)
     }
 
     return true
@@ -5533,12 +5533,12 @@ async function unbound_form_write() {
     //send the instructions for processing and open the report
     db.request = 'EXECUTE\r' + gmodule + '\r' + gdatafilename
     if (!(await db.send(gro.revstr))) {
-        await exodusinvalid(db.response)
+        await exoui_invalid(db.response)
         return false
     }
     settouched(false)
     if (db.response.slice(0, 3) == 'OK ') {
-        await exodusnote(db.response.slice(3))
+        await exoui_note(db.response.slice(3))
     }
 
     return true
@@ -5558,7 +5558,7 @@ async function closerecord_onclick() {
         // to skip (search, agencyfilter, settings, upload, schedulefind/print, consolidation).
         if (gtouched) {
             if (!gparameters.discardable) {
-                var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
+                var response = await exoui_confirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
                 if (response != 2) return false
             }
             settouched(false)// discard chosen / discardable — avoid a second Q in closedoc
@@ -5579,7 +5579,7 @@ async function closerecord_onclick() {
             //close the window
             //window.returnValue = returnvalue
             //return window.close() && false
-            return exoduswindowclose(returnvalue)
+            return exoui_windowclose(returnvalue)
         }
 
     }
@@ -5788,15 +5788,15 @@ async function opendoc2(newkey0) {
             await unlockdoc()//fail safe
 
         //logout('opendoc2 - no data')
-        return await exodusinvalid(gro.response)
+        return await exoui_invalid(gro.response)
     }
 
     var lockholder = getlockholder(db.response)
 
     if (db.response.toUpperCase().slice(0, 16) == 'ERROR: NO RECORD') {
         if (gupdateonlymode) {
-            //await exodusinvalid(exodusquote(gkeyexternal)+' does not exist.')
-            await exodusinvalid(exodusquote(await getkeyexternal()) + ' does not exist.')
+            //await exoui_invalid(exodusquote(gkeyexternal)+' does not exist.')
+            await exoui_invalid(exodusquote(await getkeyexternal()) + ' does not exist.')
             //('opendoc2 - cannot create new record because gupdateonlymode is true')
             return false
         }
@@ -5805,20 +5805,20 @@ async function opendoc2(newkey0) {
 
             //cannot create records if cannot lock them
             if (db.response.toUpperCase().indexOf('LOCK NOT AUTHORISED') >= 0) {
-                await exodusinvalid('Sorry, you are not authorised to create new records in this file.')
+                await exoui_invalid('Sorry, you are not authorised to create new records in this file.')
                 return false //logout('opendoc2 - cannot create new record because lock not authorised')
             }
 
             //may not be authorised to read a record
             if (db.response.toUpperCase().indexOf('NOT AUTHORISED') >= 0) {
-                await exodusinvalid(db.response)
+                await exoui_invalid(db.response)
                 return false //logout('opendoc2 - cannot access record because not authorised')
             }
 
             //cannot create a record in read only mode or update only mode
             if (greadonlymode || gupdateonlymode || gpreventcreation) {
-                //await exodusinvalid('Sorry, '+gkeyexternal+' does not exist and\nyou are not authorised to create new records in this file.')
-                await exodusinvalid('Sorry, ' + (await getkeyexternal()) + ' does not exist and\nyou are not authorised to create new records in this file.')
+                //await exoui_invalid('Sorry, '+gkeyexternal+' does not exist and\nyou are not authorised to create new records in this file.')
+                await exoui_invalid('Sorry, ' + (await getkeyexternal()) + ' does not exist and\nyou are not authorised to create new records in this file.')
                 return false //logout('opendoc2 - cannot create new record in read only mode')
             }
 
@@ -5832,14 +5832,14 @@ async function opendoc2(newkey0) {
                 }
             }
 
-            await exodusinvalid(exodusquote(gkeyexternal) + ' is being created by ' + lockholder + '.\r\n\r\nYou cannot view or update it until they have finished or cancel.')
+            await exoui_invalid(exodusquote(gkeyexternal) + ' is being created by ' + lockholder + '.\r\n\r\nYou cannot view or update it until they have finished or cancel.')
             //logout('opendoc2 - cannot create new record because ' + lockholder + ' is creating it.')
             return false
         }
 
         /*
         //optionally cancel if (record does not exist
-        if (!(await exodusokcancel('Document '+exodusquote(getkeyexternal)+' does not exist. Create a new document ?',2))) {
+        if (!(await exoui_okcancel('Document '+exodusquote(getkeyexternal)+' does not exist. Create a new document ?',2))) {
 
         if (glocked)
         await unlockdoc()
@@ -5866,7 +5866,7 @@ async function opendoc2(newkey0) {
                 }
                 else {
                     if (db.response.toUpperCase().indexOf('CANNOT LOCK RECORD') >= 0) {
-                        if ((await exodusconfirm(exodusquote(gkeyexternal) + ' is being updated by ' + lockholder + '.\nOpen for viewing only?', 1, 'Yes', '', 'Cancel')) != 1) {
+                        if ((await exoui_confirm(exodusquote(gkeyexternal) + ' is being updated by ' + lockholder + '.\nOpen for viewing only?', 1, 'Yes', '', 'Cancel')) != 1) {
                             return false //logout('opendoc2 - because it is being updated by ' + lockholder + ' and the user chose not to open it in read only mode')
                         }
                         //editreleaserecord.value='Edit'
@@ -5875,9 +5875,9 @@ async function opendoc2(newkey0) {
                     }
                     else {
                         if (db.response.toString().slice(0, 2) != 'OK')
-                            return await exodusinvalid(db.response)
+                            return await exoui_invalid(db.response)
                         else
-                            await exodusnote(db.response.toString().slice(2))
+                            await exoui_note(db.response.toString().slice(2))
                     }
                 }
             }
@@ -6057,7 +6057,7 @@ async function savedoc_body(mode) {
         return false
 
     if (gKeyNodes && (!gtouched || !glocked) && !gallowsavewithoutchanges) {
-        await exodusinvalid('Nothing to be saved.\n\nPlease enter or change some data first or just click Close')
+        await exoui_invalid('Nothing to be saved.\n\nPlease enter or change some data first or just click Close')
         return false
     }
 
@@ -6121,7 +6121,7 @@ async function saveandorcleardoc_body(mode) {
     // so the glocked Save/Discard path never runs — still ask before wipe unless
     // gparameters.discardable (light criteria/settings modals).
     if (!glocked && gtouched && clear && !gparameters.discardable) {
-        var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
+        var response = await exoui_confirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
         if (response != 2) {
             focusongpreviouselement()
             return false
@@ -6152,7 +6152,7 @@ async function saveandorcleardoc_body(mode) {
 
             //confirm specific save
             if (gparameters.savemode == 'CONFIRM') {
-                if (!(await exodusokcancel('OK to save ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1))) {
+                if (!(await exoui_okcancel('OK to save ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1))) {
                     //return false
                     return false //logout('saveandorcleardoc - user cancelled')
                 }
@@ -6177,7 +6177,7 @@ async function saveandorcleardoc_body(mode) {
                 action += discardtitle
             }
             var canceltitle = '<u>C</u>ancel'//Cancel
-            var response = await exodusconfirm(action + ' ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1, savetitle, discardtitle, canceltitle)
+            var response = await exoui_confirm(action + ' ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1, savetitle, discardtitle, canceltitle)
         }
 
         //user cancels
@@ -6220,7 +6220,7 @@ async function saveandorcleardoc_body(mode) {
             //close the window
             //window.returnValue=''
             //return window.close() && false
-            return exoduswindowclose(window.returnValue)
+            return exoui_windowclose(window.returnValue)
 
         }
 
@@ -6436,17 +6436,17 @@ async function deletedoc() {
 
     //prevent delete if not locked
     if (!glocked)
-        return await exodusinvalid(await readonlydocmsg())
+        return await exoui_invalid(await readonlydocmsg())
 
     //prevent delete if new record
     if (gds.isnewrecord)
-        return await exodusinvalid('You cannot delete this document because it hasnt been saved')
+        return await exoui_invalid('You cannot delete this document because it hasnt been saved')
 
     //login('deletedoc')
 
     var question = exodusquote(gkeyexternal) + '\nWarning! Are you SURE that you want to delete this document?'
-    if ((await exodusyesno(question, 2)) != 1) {
-        await exodusinvalid('The document has NOT been deleted\nbecause you did not confirm.')
+    if ((await exoui_yesno(question, 2)) != 1) {
+        await exoui_invalid('The document has NOT been deleted\nbecause you did not confirm.')
         return false //logout('deletedoc - user cancelled')
     }
 
@@ -6459,8 +6459,8 @@ async function deletedoc() {
     db.request = 'DELETE\r' + gdatafilename + '\r' + gkey + '\r\r' + gro.sessionid
     if (!(await db.send())) {
 
-        //await exodusnote(db.response)
-        await exodusinvalid(db.response)
+        //await exoui_note(db.response)
+        await exoui_invalid(db.response)
 
         //start the relocker again
         startrelocker()
@@ -6471,12 +6471,12 @@ async function deletedoc() {
 
     //any warnings are appended after response like 'OK xxx'
     if (db.response != 'OK' && typeof form_postdelete == 'undefined')
-        await exoduswarning(db.response.slice(2))
+        await exoui_warning(db.response.slice(2))
 
     //deleting a record automatically unlocks it
     glocked = false
 
-    await exoduswarning(exodusquote(gkeyexternal) + ' has been deleted.')
+    await exoui_warning(exodusquote(gkeyexternal) + ' has been deleted.')
 
     //close window if modal also in writedoc
     if (window.dialogArguments) {
@@ -6486,7 +6486,7 @@ async function deletedoc() {
         //close the window
         //window.returnValue = 'DELETE ' + savekey
         //return window.close()
-        return exoduswindowclose('DELETE ' + savekey)
+        return exoui_windowclose('DELETE ' + savekey)
 
     }
 
@@ -6632,7 +6632,7 @@ async function form_run_onchange(element, onchangexpr) {
 }
 
 // ---------------------------------------------------------------------------
-// Find-as-you-type suggest panel (non-modal; not exodusdecide)
+// Find-as-you-type suggest panel (non-modal; not exoui_decide)
 // Panel is fixed in the viewport but re-anchored on scroll/resize so it stays
 // glued under the field (window or nested overflow scroll).
 // ---------------------------------------------------------------------------
@@ -7036,7 +7036,7 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     gform_typeahead_focusn = -1
     var autoFocus = form_typeahead_auto_focusn(element, rows, returncoln)
 
-    // col[0] may be a numeric field index into the row (same as exodusdecide / ACCOUNTLIST).
+    // col[0] may be a numeric field index into the row (same as exoui_decide / ACCOUNTLIST).
     // col[1] is the title when col is [id, title, …].
     var html = '<table class="exodus_typeahead_table" cellspacing="0" cellpadding="0">'
     html += '<thead><tr class="exodus_typeahead_head">'
@@ -7443,7 +7443,7 @@ async function form_onchangeselect(event) {
     }
 
     if (!(await validateupdate(event)))
-        return await exodusinvalid()
+        return await exoui_invalid()
 
     //encourage changing key or key part in a SELECT to change record
     if (gpreviouselement.getAttribute('exofieldno') == '0')
@@ -7555,7 +7555,7 @@ async function validateall(mode) {
 
             //fail if any missing data
             if (missingelement && (!allowemptyrows || anydata)) {
-                await exodusinvalid(missingelement.getAttribute('exotitle') + ' is required.')
+                await exoui_invalid(missingelement.getAttribute('exotitle') + ' is required.')
                 focuson(missingelement)
                 return false //logout('validateall ' + mode)
             }
@@ -7567,7 +7567,7 @@ async function validateall(mode) {
                 && rown < (rows.length - 1)) {
                 if (!allowemptyrows) {
                     var missingelement = rows[0][firstcolumnname].element
-                    await exodusinvalid('Empty rows are not allowed for ' + missingelement.getAttribute('exotitle'))
+                    await exoui_invalid('Empty rows are not allowed for ' + missingelement.getAttribute('exotitle'))
                     focuson(missingelement)
                     return false //logout('validateall ' + mode + ' empty row')
                 }
@@ -7588,7 +7588,7 @@ async function validateall(mode) {
             && exodusenabledandvisible($$('exogroup' + groupno))
         ) {
             var missingelement = rows[0][firstcolumnname].element
-            await exodusinvalid('At least one ' + missingelement.getAttribute('exotitle') + ' is required.')
+            await exoui_invalid('At least one ' + missingelement.getAttribute('exotitle') + ' is required.')
             focuson(missingelement)
             return false //logout('validateall ' + mode + ' no rows')
         }
@@ -7625,8 +7625,8 @@ async function writedoc(unlock) {
     gro.data = gds.data
     if (!(/**/ await gro.writex(unlock))) {
 
-        //await exodusnote('Cannot save '+exodusquote(gkeyexternal)+' because: \r\r'+gro.response)
-        await exodusinvalid('Cannot save ' + exodusquote(gkeyexternal) + ' because: \n\n' + gro.response)
+        //await exoui_note('Cannot save '+exodusquote(gkeyexternal)+' because: \r\r'+gro.response)
+        await exoui_invalid('Cannot save ' + exodusquote(gkeyexternal) + ' because: \n\n' + gro.response)
 
         return false //logout('writedoc - write failed')
 
@@ -7634,7 +7634,7 @@ async function writedoc(unlock) {
 
     //any warnings are appended after response like 'OK xxx'
     if (gro.response != 'OK' && typeof form_postwrite == 'undefined') {
-        await exoduswarning(gro.response.slice(2))
+        await exoui_warning(gro.response.slice(2))
     }
 
     //if a cached is written then remove it from the cache (could update it instead?)
@@ -7733,10 +7733,10 @@ async function relockdoc() {
             setdisabledandhidden(saverecord, true)
             setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
             setdisabledandhidden(deleterecord, true)
-            await exoduswarning(response)
+            await exoui_warning(response)
         }
         else {
-            await exodusnote(response)
+            await exoui_note(response)
         }
 
     }
@@ -7769,7 +7769,7 @@ async function unlockdoc() {
             db.request = 'UNLOCK\r' + gdatafilename + '\r' + gkey + '\r' + gro.sessionid
             if (await db.send())
                 break
-            if (!(await exodusyesno('Cannot release document - try again?\n\n' + db.response))) break
+            if (!(await exoui_yesno('Cannot release document - try again?\n\n' + db.response))) break
         }
     }
 
@@ -8690,7 +8690,7 @@ async function checkrequired(elements, element, groupno) {
                             // (incl. default-painted key) and runs opendoc when
                             // appropriate. Stealing previous to "suppress re-entry"
                             // early-exits that path.
-                            await exodusinvalid(element2.getAttribute('exotitle') + ' is required..')
+                            await exoui_invalid(element2.getAttribute('exotitle') + ' is required..')
                         }
 
                         focuson(element2)
@@ -9168,7 +9168,7 @@ async function readonly_onchange(event) {
 
     setvalue(gpreviouselement, gpreviousvalue)
 
-    await exodusinvalid(readonlymsg)
+    await exoui_invalid(readonlymsg)
 
     return exoduscancelevent(event)
 
@@ -9440,7 +9440,7 @@ async function getdefault(element) {
     if (typeof defaultvalue == 'number')
         defaultvalue = defaultvalue.toString()
     if (typeof defaultvalue != 'string') {
-        await exodusinvalid(element.id + ' default returned is ' + typeof defaultvalue + ' - "" used\nExpression:' + defaultvalueexpression)
+        await exoui_invalid(element.id + ' default returned is ' + typeof defaultvalue + ' - "" used\nExpression:' + defaultvalueexpression)
         defaultvalue = ''
     }
 
@@ -9729,7 +9729,7 @@ async function onbeforeupdate(element) {
         setvalue(gpreviouselement, gpreviousvalue)
         await readonlydocmsg()
         //logout('onbeforeupdate')
-        return await exodusinvalid('')
+        return await exoui_invalid('')
     }
 
     //post entry processing
@@ -9811,7 +9811,7 @@ async function validate(element) {
 
             //prevent anything that is effectively 0 unless it is a checkbox
             if (element.type != 'checkbox' && exodusnum(gvalue) && !Number(gvalue)) {
-                await exodusinvalid(elementtitle + ' cannot be zero')
+                await exoui_invalid(elementtitle + ' cannot be zero')
                 return false //logout('validate')
             }
         }
@@ -9839,7 +9839,7 @@ async function validate(element) {
             //get used invalid characters
             charsx = invalidcharacters.exodusconvert(charsx, '').exodusswap('|', '&#124;')
             //.exodusswap(fm,'&u'+fm.charCodeAt(0)+';')
-            await exodusinvalid('The following characters are not allowed in ' + elementtitle + '.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exodusswap(' ', ' space ') + '&nbsp;</span><br />&nbsp;')
+            await exoui_invalid('The following characters are not allowed in ' + elementtitle + '.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exodusswap(' ', ' space ') + '&nbsp;</span><br />&nbsp;')
             return false //logout('validate')
         }
 
@@ -9848,7 +9848,7 @@ async function validate(element) {
 
             var temp = gvalue.exodusconvert(element.getAttribute('exovalidcharacters'), '')
             if (temp != '') {
-                await exodusinvalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exovalidcharacters').exodusswap('|', '&#124;') + '\"')
+                await exoui_invalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exovalidcharacters').exodusswap('|', '&#124;') + '\"')
                 return false //logout('validate')
             }
         }
@@ -9860,7 +9860,7 @@ async function validate(element) {
     if (gvalue == ''
         && element.getAttribute('exorequired')
         && exodusenabledandvisible(element)) {
-        await exodusinvalid(elementtitle + ' is required...')
+        await exoui_invalid(elementtitle + ' is required...')
         return false //logout('validate')
     }
 
@@ -9881,7 +9881,7 @@ async function validate(element) {
 
             if (db.response.indexOf('NO RECORD') >= 0) db.response = exodusquote(gvalue) + ' ' + element.getAttribute('exotitle') + ' is not on file.'
 
-            await exodusinvalid(db.response)
+            await exoui_invalid(db.response)
 
             return false //logout('validate - not on file ' + gvalue)
 
@@ -9929,7 +9929,7 @@ async function validate(element) {
         //null means failed to convert to internal value therefore invalid
         if (gvalue == null || ivalue == null) {
             //error message (use the conversion program name in the message)
-            await exodusinvalid(exodusquote(gvalue) + ' is not a valid ' + convarray[0].toLowerCase().replace(/_/g, ' ') + '\n\n' + gmsg)
+            await exoui_invalid(exodusquote(gvalue) + ' is not a valid ' + convarray[0].toLowerCase().replace(/_/g, ' ') + '\n\n' + gmsg)
             return false //logout('validate - input conversion returned null')
         }
 
@@ -9951,10 +9951,10 @@ async function validate(element) {
             ok = await exodusevaluate(elementvalidation, 'await validate() functioncode');
 
         if (gvalue == null)
-            await exoduswarning(element.id + ' validation routine returned gvalue=null')
+            await exoui_warning(element.id + ' validation routine returned gvalue=null')
         if (!ok || gvalue == null) {
             grecn = storegrecn
-            await exodusinvalid()
+            await exoui_invalid()
             //logout('validate - validation function code returned false or gvalue as null')
             return false
         }
@@ -9977,12 +9977,12 @@ async function validate(element) {
             if (element.getAttribute('exononuniquewarning')) {
                 if (!(confirm('Warning:\n\n' + gmsg, 1))) {
                     //logout('validate - not unique warning')
-                    return await exodusinvalid()
+                    return await exoui_invalid()
                 }
             }
             else {
                 //logout('validate - not unique')
-                return await exodusinvalid(gmsg)
+                return await exoui_invalid(gmsg)
             }
         }
     }
@@ -10000,14 +10000,14 @@ async function validate(element) {
                 && gvalue < temp) {
                 //    alert(typeof gvalue+' '+gvalue+' < '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
-                return await exodusinvalid(title + ' cannot be less than ' + title + ' in the previous row above')
+                return await exoui_invalid(title + ' cannot be less than ' + title + ' in the previous row above')
             }
             var temp
             if ((temp = await getnextrow('', { skipblanks: true, internal: true }))
                 && gvalue > temp) {
                 //    alert(typeof gvalue+' '+gvalue+' > '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
-                return await exodusinvalid(title + ' cannot be greater than ' + title + ' in the next row below')
+                return await exoui_invalid(title + ' cannot be greater than ' + title + ' in the next row below')
             }
         }
     }
@@ -10085,13 +10085,13 @@ async function validateoconv(element, ivalue) {
     gmsg = ''
     var ovalue = await exodusevaluate(expression, 'validateoconv ' + (element && element.id))
     if (typeof ovalue == 'undefined') {
-        await exodusinvalid(exodusquote(ivalue) + ' output conversion failed (undefined)\n' + gmsg)
+        await exoui_invalid(exodusquote(ivalue) + ' output conversion failed (undefined)\n' + gmsg)
         return false
     }
 
     //null means failed to convert to external value therefore invalid
     if (ovalue == null) {
-        await exodusinvalid(exodusquote(ivalue) + ' is not a valid ' + convarray[0].toLowerCase() + '\n' + gmsg)
+        await exoui_invalid(exodusquote(ivalue) + ' is not a valid ' + convarray[0].toLowerCase() + '\n' + gmsg)
         return false
     }
 
@@ -10280,7 +10280,7 @@ async function exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1
             //} if (e) {
             //if (typeof callerfunctionname == 'undefined') callerfunctionname = '"not specified"'
             systemerror('exodusevaluate()' + functionorcode, e)
-            return await exodusinvalid()
+            return await exoui_invalid()
         }
 
     }
@@ -10686,11 +10686,11 @@ async function readonlydocmsg() {
 
     //readonly after key has been entered
     if (gKeyNodes || gkey)
-        return await exodusinvalid('This document is currently "read only"')
+        return await exoui_invalid('This document is currently "read only"')
 
     //readonly before key has been entered
     else if (!gkey)
-        return await exodusinvalid('Please open a document first')
+        return await exoui_invalid('Please open a document first')
 }
 
 // True if any bound F field on this group data row has non-blank text.
@@ -10764,7 +10764,7 @@ async function form_insertrow(event, append) {
             var rowdata = grouprows && grouprows[rown]
             if (form_group_row_has_data(rowdata)) {
                 // default_icons false: Before/After are alternatives, not Yes/No
-                var choice = await exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel', null, null, null, false)
+                var choice = await exoui_confirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel', null, null, null, false)
                 if (!choice)
                     return false
                 if (choice == 2)
@@ -10929,7 +10929,7 @@ async function openrecord_onclick() {
 
     var reply
     //get a reply or return false
-    if ((reply = await exoduspopup2(openrecord)) == null)
+    if ((reply = await exoui_popup2(openrecord)) == null)
         return false //logout('openrecord')
 
     //forget it if no change
@@ -10993,7 +10993,7 @@ async function nextrecord2_step(event, direction) {
 
     //goto one of many ... or if select many then reduce list to those selected
     if (direction == 0) {
-        var selkeys = await exodusdecide('', gkeys, [[0, 'Key']], 0, '', many = true)
+        var selkeys = await exoui_decide('', gkeys, [[0, 'Key']], 0, '', many = true)
         if (!selkeys) return false
         if (selkeys.length > 1) {
             nextkeys = selkeys
@@ -11034,11 +11034,11 @@ async function nextrecord2_step(event, direction) {
 
 }
 
-async function exoduslink(event, element) {
+async function exoui_link(event, element) {
 
     event = getevent(event)
 
-    //login('exoduslink')
+    //login('exoui_link')
 
     exoduscancelevent(event)
 
@@ -11059,12 +11059,12 @@ async function exoduslink(event, element) {
 
     //quit if no link defined
     if (!element || !element.getAttribute('exolink'))
-        return false //logout('exoduslink - no link')
+        return false //logout('exoui_link - no link')
 
     //prevent popups except on the key field unless a record is present
     if (gKeyNodes && !gloaded && element.getAttribute('exofieldno') != 0) {
         focuson(gKeyNodes[0])
-        return false //logout('exoduslink - no record')
+        return false //logout('exoui_link - no record')
     }
 
     grecn = getrecn(element)
@@ -11073,9 +11073,9 @@ async function exoduslink(event, element) {
     if (!(element.getAttribute('exolowercase')))
         gvalue = gvalue.toUpperCase()
 
-    var reply = await exodusevaluate(element.getAttribute('exolink'), 'await exoduslink()');
+    var reply = await exodusevaluate(element.getAttribute('exolink'), 'await exoui_link()');
 
-    //logout('exoduslink')
+    //logout('exoui_link')
 
     return
 
@@ -11099,13 +11099,13 @@ function exodusfieldpopupallowed(element) {
     return true
 }
 
-async function exoduspopup(event, element) {
+async function exoui_popup(event, element) {
 
     event = getevent(event)
 
     //element is only provided from f7/alt+down keyboard events
 
-    //login('exoduspopup')
+    //login('exoui_popup')
 
     exoduscancelevent(event)
 
@@ -11129,41 +11129,41 @@ async function exoduspopup(event, element) {
 
     //quit if no element
     if (!element)
-        return false //logout('exoduspopup - no element')
+        return false //logout('exoui_popup - no element')
 
     //log('check no missing data in group 0 always')
     if (!(await checkrequired(gfields, element, 0)))
-        return false //logout('exoduspopup' + ' ' + element.id + ' a prior element is visible and required but is blank (1)')
+        return false //logout('exoui_popup' + ' ' + element.id + ' a prior element is visible and required but is blank (1)')
 
     //validateupdate previous field
     //if (element.id!=gpreviouselement.id)
     if (element != gpreviouselement) {
         if (!(await validateupdate()))
-            return false //logout('exoduspopup - validateupdate failed')
+            return false //logout('exoui_popup - validateupdate failed')
     }
 
     //cannot update anything but key field if not locked or save button not enabled
     if (element.getAttribute('exofieldno') != 0 && gKeyNodes && (!glocked || saverecord.getAttribute('disabled'))) {
         await readonlydocmsg()
-        return false //logout('exoduspopup - read only document')
+        return false //logout('exoui_popup - read only document')
     }
 
     // quit if field is not editable (readonly, disabled, or non-tabbable)
     if (!exodusfieldpopupallowed(element)) {
         var readonly = element.getAttribute('exoreadonly')
         if (readonly && readonly != 'true')
-            await exodusinvalid(readonly)
-        return false //logout('exoduspopup - read only')
+            await exoui_invalid(readonly)
+        return false //logout('exoui_popup - read only')
     }
 
     //quit if no popup defined
     if (!element.getAttribute('exopopup') && element.tagName != 'SELECT')
-        return false //logout('exoduspopup - no popup')
+        return false //logout('exoui_popup - no popup')
 
     //prevent popups except on the key field unless a record is present
     if (gKeyNodes && !gloaded && element.getAttribute('exofieldno') != 0) {
         focuson(gKeyNodes[0])
-        return false //logout('exoduspopup - no record')
+        return false //logout('exoui_popup - no record')
     }
 
     grecn = getrecn(element)
@@ -11174,10 +11174,10 @@ async function exoduspopup(event, element) {
 
     //get a reply or return false
     /////////////////////////////
-    if ((reply = await exoduspopup2(element)) == null) {
+    if ((reply = await exoui_popup2(element)) == null) {
         //    alert('xxx')
         focuson(element)
-        return false //logout('exoduspopup - no reply')
+        return false //logout('exoui_popup - no reply')
     }
 
     //update the element multiple selections qqq
@@ -11198,7 +11198,7 @@ async function exoduspopup(event, element) {
                     reply.splice(replyn - 1, 1)
             }
             if (!reply.length)
-                return false //logout('exoduspopup - no new selections')
+                return false //logout('exoui_popup - no new selections')
         }
 
         await insertallrows(element, reply, grecn)
@@ -11210,7 +11210,7 @@ async function exoduspopup(event, element) {
             element = element[0]
         focusdirection(1, element, Number(element.getAttribute('exogroupno')))
 
-        //logout('exoduspopup - insert all rows')
+        //logout('exoui_popup - insert all rows')
         return true
 
     }
@@ -11223,19 +11223,19 @@ async function exoduspopup(event, element) {
     //if (reply==getvalue(element))
     if (reply == gpreviousvalue) {
         focusnext()
-        return false //logout('exoduspopup - no change')
+        return false //logout('exoui_popup - no change')
     }
 
     //do not change key if user chooses not to unload an existing document
     if (element.getAttribute('exofieldno') == 0 && gloaded && !(await closedoc('OPEN')))
-        return false //logout('exoduspopup - user cancelled unloaddoc')
+        return false //logout('exoui_popup - user cancelled unloaddoc')
 
     //output convert it
     if (element.getAttribute('exoconversion')) {
         reply = await validateoconv(element, reply)
         // validateoconv returns false on fail (not only null/undefined)
         if (reply === false || reply == null || typeof reply == 'undefined')
-            return false //logout('exoduspopup - oconv failed')
+            return false //logout('exoui_popup - oconv failed')
     }
 
     //setup next onfocus to validateupdate
@@ -11256,11 +11256,11 @@ async function exoduspopup(event, element) {
     //exodussettimeout('focusnext()',10)
     //await validateupdate()
 
-    //logout('exoduspopup')
+    //logout('exoui_popup')
 
 }
 
-async function exoduspopup2(element) {
+async function exoui_popup2(element) {
 
     //given a SELECT item or element with a popupfunction to evaluate, returns a reply or null
 
@@ -11271,7 +11271,7 @@ async function exoduspopup2(element) {
 
     //evaluate popup expression if provided
     if (expression) {
-        var reply = await exodusevaluate(expression, 'await exoduspopup2()');
+        var reply = await exodusevaluate(expression, 'await exoui_popup2()');
     }
 
     //otherwise build a list and select from the SELECT
@@ -11299,7 +11299,7 @@ async function exoduspopup2(element) {
         }
 
         //get the response(s)
-        reply = await exodusdecide2('', selectvalues, '1', '', '', multipleselection)
+        reply = await exoui_decide2('', selectvalues, '1', '', '', multipleselection)
 
         //have to do this to cancel the standard dropdown if they press alt+down then press escape on the popup
         if (!reply)
@@ -11343,7 +11343,7 @@ async function exoduspopup2(element) {
                 // Always One for now (skip One/Many confirm). Restore prompt to re-enable Many.
                 var openall = 1
                 // default_icons false: One/Many are alternatives, not Yes/No
-                //openall = await exodusconfirm('Open all in one tab?', 1, 'One', 'Many', '', null, null, null, false)
+                //openall = await exoui_confirm('Open all in one tab?', 1, 'One', 'Many', '', null, null, null, false)
                 //if (!openall)
                 //    return false
                 if (openall == 2) {
@@ -11739,10 +11739,10 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     if (typeof colidorgroupno != 'number' && (mode == 'filter' || mode == 'unfilter')) {
         var dictitem = gds.dictitem(colid)
         //if (!dictitem)
-        // return await exodusinvalid(colid+' dictitem does not exist in await form_filter()')
+        // return await exoui_invalid(colid+' dictitem does not exist in await form_filter()')
         groupno = dictitem.groupno
         if (!groupno)
-            return await exodusinvalid()//colid+' is not multivalued for sorting'
+            return await exoui_invalid()//colid+' is not multivalued for sorting'
     }
     else {
         groupno = colidorgroupno
@@ -11754,13 +11754,13 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     //prefilter
     if (typeof form_prefilter == 'function') {
         if (!(form_prefilter(mode, colid)))
-            return await exodusinvalid()
+            return await exoui_invalid()
     }
 
     //get the table rows
     var tablex = $$('exogroup' + groupno)
     if (!tablex) {
-        // systemerror (not exodusinvalid): full stack — usually table never bound (exogroupno / id)
+        // systemerror (not exoui_invalid): full stack — usually table never bound (exogroupno / id)
         systemerror('form_filter', String(colid) + ' is not part of a table'
             + ' (mode=' + mode + ' groupno=' + groupno + ' id=exogroup' + groupno + ')')
         return false
@@ -11958,8 +11958,8 @@ var calendar_checkInDatePicker
 
 async function form_pop_calendar() {
     // Non-modal UI that must outlive this click flight. Opening inside the same
-    // flight flashes: LANDING → exoduspopup focuson(date) → form_closepopups hides it.
-    // Contract: return null so exoduspopup refocuses the date field first; open after
+    // flight flashes: LANDING → exoui_popup focuson(date) → form_closepopups hides it.
+    // Contract: return null so exoui_popup refocuses the date field first; open after
     // that focus chain settles (same timing as the old setTimeout open).
     exodus_begin_when_idle(form_popcalendar2, 'form_popcalendar2', { delay_ms: 100 })
     return null
@@ -12017,7 +12017,7 @@ async function form_popcalendar2() {
 
 }
 
-// Drop form-owned popup chrome (not OS dialogs, not exodusconfirm).
+// Drop form-owned popup chrome (not OS dialogs, not exoui_confirm).
 // Return true if any closed (so Esc does not continue to field-undo / close record).
 //
 // Calendar-class popups: owned DOM + form_closepopups. Confirm uses its own
@@ -12034,7 +12034,7 @@ async function form_closepopups() {
         }
         catch (e) {
             if (gusername == 'EXODUS')
-                await exodusnote('couldnt drop calendar\n' + e.description)
+                await exoui_note('couldnt drop calendar\n' + e.description)
         }
         anyclosed = true
 
@@ -12051,7 +12051,7 @@ async function form_closepopups() {
         }
         catch (e) {
             if (gusername == 'EXODUS')
-                await exodusnote('couldnt drop colour popup\n' + e.description)
+                await exoui_note('couldnt drop colour popup\n' + e.description)
         }
         anyclosed = true
     }
@@ -12084,8 +12084,8 @@ async function form_val_index(filename, fieldname, allownew) {
     //optionally change case
     for (var ii = 0; ii < indexvalues.length; ii++) {
         if (indexvalues[ii][fieldname].text.toUpperCase() == gvalue.toUpperCase()) {
-            if (!(reply = await exodusconfirm('Change the capitalisation of your entry?\n\nFrom: ' + gvalue.exodusquote() + '\n\n  To: ' + indexvalues[ii][fieldname].text.exodusquote(), 1)))
-                return await exodusinvalid()
+            if (!(reply = await exoui_confirm('Change the capitalisation of your entry?\n\nFrom: ' + gvalue.exodusquote() + '\n\n  To: ' + indexvalues[ii][fieldname].text.exodusquote(), 1)))
+                return await exoui_invalid()
             if (reply == 1)
                 gvalue = indexvalues[ii][fieldname].text
             return true
@@ -12094,10 +12094,10 @@ async function form_val_index(filename, fieldname, allownew) {
 
     //option to allow/prevent new index values
     if (!allownew)
-        return await exodusinvalid(gvalue + ' ' + fieldname.toLowerCase() + ' does not exist')
+        return await exoui_invalid(gvalue + ' ' + fieldname.toLowerCase() + ' does not exist')
 
     //confirm is new index value
-    if (gvalue && ((await exodusyesno(' Is ' + exodusquote(gvalue) + ' to be a new ' + fieldname.toLowerCase() + ' for ' + filename.toLowerCase() + ' ?', 1)) != 1))
+    if (gvalue && ((await exoui_yesno(' Is ' + exodusquote(gvalue) + ' to be a new ' + fieldname.toLowerCase() + ' for ' + filename.toLowerCase() + ' ?', 1)) != 1))
         return false
 
     return true
@@ -12108,7 +12108,7 @@ async function form_get_index(filename, fieldname) {
 
     db.request = 'CACHE\rGETINDEXVALUESXML\r' + filename + '\r' + fieldname
     if (!(await db.send())) {
-        await exodusinvalid(db.response)
+        await exoui_invalid(db.response)
         return ''
     }
 
@@ -12131,10 +12131,10 @@ async function form_pop_index(filename, fieldname, many) {
     //get index values
     var indexvalues = await form_get_index(filename, fieldname)
     if (!indexvalues || indexvalues.group1.length == 0)
-        return await exodusinvalid('No ' + fieldname.toLowerCase().exodusconvert('_', ' ') + '(s) have been entered on ' + filename.toLowerCase().exodusconvert('._', '  ') + ' file yet')
+        return await exoui_invalid('No ' + fieldname.toLowerCase().exodusconvert('_', ' ') + '(s) have been entered on ' + filename.toLowerCase().exodusconvert('._', '  ') + ' file yet')
 
     //user selects index value(s)
-    var result = await exodusdecide2('', indexvalues, [[fieldname, fieldname.exoduscapitalise()]], 0, '', many)
+    var result = await exoui_decide2('', indexvalues, [[fieldname, fieldname.exoduscapitalise()]], 0, '', many)
 
     return result
 
@@ -12143,12 +12143,12 @@ async function form_pop_index(filename, fieldname, many) {
 async function copyrecord_onclick() {
 
     if (!gkey || !glastkey || !gds.isnewrecord || gtouched)
-        return await exodusinvalid('To copy a record you must:\n\n1. Open the record to copy\n2. Start a new record&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n3. Click the Copy button&nbsp;&nbsp;&nbsp;&nbsp;')
+        return await exoui_invalid('To copy a record you must:\n\n1. Open the record to copy\n2. Start a new record&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n3. Click the Copy button&nbsp;&nbsp;&nbsp;&nbsp;')
 
     //read the record to be copied
     var copyrecord = []
     if (!(await copyrecord.exodusread(gdatafilename, glastkey)))
-        return await exodusinvalid(copyrecord.exodusresponse)
+        return await exoui_invalid(copyrecord.exodusresponse)
 
     //remove any uncopyable data
     for (var dictname in gds.dict) {
@@ -12159,7 +12159,7 @@ async function copyrecord_onclick() {
 
     //validate copy
     if (!(await form_copyrecord(copyrecord)))
-        return await exodusinvalid()
+        return await exoui_invalid()
 
     //load the new record
     gro.revstr = copyrecord.slice(1).join(fm)
@@ -12243,7 +12243,7 @@ async function form_postread_noteifdeleted(descending) {
 
     var note = 'This record was deleted by ' + (await gds.get1('USERNAME_UPDATED', logn)) + ' on ' + (await gds.get1('DATETIME_UPDATED', logn)).exodusoconv('[DATE_TIME]') + '.'
     note += '\n\nYou can restore it by saving it again'
-    await exodusnote(note)
+    await exoui_note(note)
 
     gallowsavewithoutchanges = true
     settouched(false, true)//change style of Save button
@@ -12448,7 +12448,7 @@ async function document_onpaste(event) {
 			msg = 'This is a read-only field'
 		}
         exoduscancelevent()
-   	    return await exodusinvalid(msg)
+   	    return await exoui_invalid(msg)
 	}
 
     //only supporting form_paste in first column
@@ -12634,7 +12634,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     //    if (!data) {
     //        //args.SCHEDULE_TEXT = gscheduleimportdata.exodusconvert(tm,vm)
     //        var args = {}
-    //        data = await exodusshowmodaldialog('../media/schedules_import.htm', args)
+    //        data = await exoui_showmodaldialog('../media/schedules_import.htm', args)
     //        if (!data)
     //            return true
     //        data = data.replace(tm, '\n')
@@ -12680,7 +12680,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     data.startln = 1
     if (nlines < data.startln + 1) {
         //await form_undopaste(beforepaste_element,beforepaste_value)
-        await exodusinvalid('Not enough lines to import')
+        await exoui_invalid('Not enough lines to import')
         return true
     }
 
@@ -12695,13 +12695,13 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
         return true
 
     if (data.length <= 1) {
-        await exodusinvalid('Nothing to import')
+        await exoui_invalid('Nothing to import')
         return true
     }
 
     //option to quit if any invalid items
     if (ninvalid) {
-        if (!(await exodusyesno('There were ' + ninvalid + ' invalid items\nDo you want to continue?\n\n(Invalid items will be imported as blank)')))
+        if (!(await exoui_yesno('There were ' + ninvalid + ' invalid items\nDo you want to continue?\n\n(Invalid items will be imported as blank)')))
             return true
     }
 
@@ -12722,7 +12722,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
 }
 
 async function form_onpaste_ignore_cancel(rown, coln, coltitle, data, msg) {
-    return await exodusokcancel('WARNING! in Row:' + (rown + 1) + ' Col:' + (coln + 1) + '\n\n' + coltitle + ' = "' + data + '"\n\n' + msg, 'Ignore', 'Cancel')
+    return await exoui_okcancel('WARNING! in Row:' + (rown + 1) + ' Col:' + (coln + 1) + '\n\n' + coltitle + ' = "' + data + '"\n\n' + msg, 'Ignore', 'Cancel')
 }
 
 async function form_onpaste_generic_validatedata(data) {
@@ -12779,7 +12779,7 @@ async function form_onpaste_generic_validatedata(data) {
         var allcoltx = []
         for (var coln = 0; coln < ncols; ++coln)
             allcoltx.push(data.cols[coln][1])
-        return await exodusinvalid('No recognisable columns in data\n\nPossible columns: ' + allcoltx.join(', '))
+        return await exoui_invalid('No recognisable columns in data\n\nPossible columns: ' + allcoltx.join(', '))
     }
 
     //for each line of pasted data

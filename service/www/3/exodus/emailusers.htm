@@ -77,7 +77,7 @@
 
         }
         async function form_prewrite() {
-            return await exodusokcancel('Ok to send email ?', 2)
+            return await exoui_okcancel('Ok to send email ?', 2)
         }
         async function form_postwrite() {
             await deleteallrows(ggroupidgroupn)

@@ -136,7 +136,7 @@ if (!badchars) badchars="'"+'~!@#$%^&*()_+|\\{}[]:";,?'
 var input2=input.exodusconvert(badchars)
 if (input2!=input) {
 
-return !await exodusinvalid('Sorry, you cannot use\n'+input.exodusconvert(input2)+' characters in key fields')
+return !await exoui_invalid('Sorry, you cannot use\n'+input.exodusconvert(input2)+' characters in key fields')
 }
 
 return false

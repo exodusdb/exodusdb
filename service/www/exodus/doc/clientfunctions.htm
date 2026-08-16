@@ -43,7 +43,7 @@
         <h2>
             Functions</h2>
         <h3>
-            function* exodussecurity(taskname)</h3>
+            function* exoui_security(taskname)</h3>
         <p>
         </p>
         Returns true if current user (in gusername) is allowed to do the task or false if
@@ -53,13 +53,13 @@
         <p>
         </p>
         <h3>
-            function* exodusnote(msg)</h3>
+            function* exoui_note(msg)</h3>
         <p>
         </p>
         <p>
             Gives&nbsp;the user a&nbsp;message and returns true</p>
         <h3>
-            function* exoduswarning(msg)</h3>
+            function* exoui_warning(msg)</h3>
         <p>
         </p>
         <p>
@@ -67,13 +67,13 @@
         <p>
         </p>
         <h3>
-            function* exodusinvalid(msg)</h3>
+            function* exoui_invalid(msg)</h3>
         <p>
         </p>
         <p>
             Gives&nbsp;the user a&nbsp;message with a red&nbsp;stop&nbsp;icon and returns false</p>
         <h3>
-            function* exodusinput(question,text,texthidden)</h3>
+            function* exoui_input(question,text,texthidden)</h3>
         <p>
             Returns a string input by the user or false if user cancels</p>
         <p>
@@ -82,21 +82,21 @@
             <strong>texthidden</strong> is true or false (default)</p>
         <h2>
             <h3>
-                function* exodusokcancel(question,defaultbutton)
+                function* exoui_okcancel(question,defaultbutton)
             </h3>
         </h2>
         <p>
             returns 1 if user presses OK or 0 if they press Cancel</p>
         <h2>
             <h3>
-                function* exodusyesno(question,defaultbutton)</h3>
+                function* exoui_yesno(question,defaultbutton)</h3>
         </h2>
         <p>
             returns true if user presses&nbsp;Yes or false if they press No. defaultbutton is
             optional and 1 for Yes, 2 for No.</p>
         <h2>
             <h3>
-                function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle,
+                function* exoui_confirm(question, defaultbutton, yesbuttontitle, nobuttontitle,
                 cancelbuttontitle)</h3>
         </h2>
         <p>
@@ -104,7 +104,7 @@
             press Cancel</p>
         <h2>
             <h3>
-                function* exodusdecide(question,data,cols,returncoln,defaultreply,many,inverted)</h3>
+                function* exoui_decide(question,data,cols,returncoln,defaultreply,many,inverted)</h3>
         </h2>
         <p>
             pops up a table for the user to select row(s) or value(s) from</p>
@@ -257,7 +257,7 @@
             <p>
                 var exodusdblink1=new exodusdblink()<br />
                 exodusdblink1.request="TEST"<br />
-                if (!(exodusdblink1("DUMMYDATA"))) return await exodusinvalid(db.response)<br />
+                if (!(exodusdblink1("DUMMYDATA"))) return await exoui_invalid(db.response)<br />
                 alert(exodusdblink1.data)
             </p>
         </blockquote>

@@ -15,7 +15,7 @@ async function dict_PARTS() {
  di.unique=true
  di.validation=async function () {
 
-  if (gvalue==gkey) return await exodusinvalid('Sorry, parts cannot be made of each other')
+  if (gvalue==gkey) return await exoui_invalid('Sorry, parts cannot be made of each other')
  }
  
  di=dict[++din]=dictrec('SUB_PART_NAME','S','','',1)

@@ -19,9 +19,9 @@ async function backup_start() {
 
  db.request='BACKUP'
  if (!(await db.send()))
-  return await exodusinvalid(db.response)
+  return await exoui_invalid(db.response)
  
- await exodusnote(db.response)
+ await exoui_note(db.response)
  
 }
 

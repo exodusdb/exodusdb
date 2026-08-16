@@ -291,7 +291,7 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 
 Smoke when touching this: OK-only invalid Enter+click; Yes/No; text input Enter/Esc; decide arrows/Select/Esc; Wait/Cancel if easy.
 
-### HIGH PRIORITY — confirm / `exodusinput` (do not flip-flop)
+### HIGH PRIORITY — confirm / `exoui_input` (do not flip-flop)
 
 These were broken and fixed together. Treat as **one contract**. If you change one line, re-check the whole smoke list. Prefer **commented-out wrong code + CHANGE LOG in comments** next to the fix over silent perfection (churn without history is how we flip-flop).
 
@@ -300,13 +300,13 @@ These were broken and fixed together. Treat as **one contract**. If you change o
 | **Typing while `gblockevents`** | Capture allows key (`keymap` true) but bubble `startevent` always `false` → `preventDefault` kills characters | Capture: no `preventDefault` when typing. Bubble: `startevent` **true** if focus is `#exodusconfirmdiv_textinput` |
 | **Access letters** | (1) Bare O/C always → kills typing. (2) Alt+ only always → pure button needs Alt+C | **Split:** pure button confirm (no text field) → **bare letter** (Alt+ also ok). Text-input confirm → **Alt+letter only**; bare letters type when focus is the field |
 | **Enter** | Bare Enter always OK | Enter OK only: focused footer button, or text field Enter/F9; no silent target |
-| **`exodusinput` return** | Cancel and empty OK both “falsy” | OK → `string` (may `''`); Cancel → `false`. Empty-OK paths: `typeof x == 'string'` / `x === false` — **never** `if (!x)` when empty means continue |
+| **`exoui_input` return** | Cancel and empty OK both “falsy” | OK → `string` (may `''`); Cancel → `false`. Empty-OK paths: `typeof x == 'string'` / `x === false` — **never** `if (!x)` when empty means continue |
 
 **Smoke (mandatory if you touch confirm/input):**
 - Pure button (OK/Cancel, Yes/No): bare **O/C/Y/N**, Esc, F9; focused button Enter/Space.
 - Text-input confirm: type letters including O/C; **Alt+O / Alt+C**; Cancel aborts; empty OK string path; Esc; Enter in field.
 
-**Code:** `client.js` — `exodusinput`, `exodusconfirm_plain_keydown`, `exodusconfirm_startevent`, `exodusconfirm_keymap` (`accessLetter` CHANGE LOG). Call-site example: `media.js` `media_pop_materials`.
+**Code:** `client.js` — `exoui_input`, `exodusconfirm_plain_keydown`, `exodusconfirm_startevent`, `exodusconfirm_keymap` (`accessLetter` CHANGE LOG). Call-site example: `media.js` `media_pop_materials`.
 
 ### Menubar / form icons (theme2)
 

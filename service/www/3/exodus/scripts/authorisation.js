@@ -6,17 +6,17 @@ async function authorisation_changeallemaildomains() {
     //replace all ";xxxxx@" with ; to end up with ; separated list of domains
     var olddomains = (';' + oldemails.join(';')).replace(/;.*?@/gi, ';').exodustrim(';')
     olddomains = olddomains.split(';').exodusunique()
-    var reply = await exodusdecide('Change which domain?', olddomains)
+    var reply = await exoui_decide('Change which domain?', olddomains)
     if (!reply)
-        return await exodusinvalid()
+        return await exoui_invalid()
     var olddomain = olddomains[reply - 1]
     var newdomain = ''
     while (true) {
-        newdomain = await exodusinput('Change ' + olddomain + ' to what?', newdomain)
+        newdomain = await exoui_input('Change ' + olddomain + ' to what?', newdomain)
         if (!newdomain)
-            return await exodusinvalid()
+            return await exoui_invalid()
         if (!newdomain.match(/^[^\. -_][\w.-]*\.[a-z]{2,}$/)) {
-            await exodusinvalid(newdomain + ' is not a valid email domain name.\rPut something like mycompany.com')
+            await exoui_invalid(newdomain + ' is not a valid email domain name.\rPut something like mycompany.com')
             continue;
         }
         break;
@@ -78,9 +78,9 @@ async function user_showtasks(event) {
 
     db.request = 'EXECUTE\rGENERAL\rGETTASKS\r\r' + userid
     if (!(await db.send()))
-        return await exodusinvalid(db.response)
+        return await exoui_invalid(db.response)
 
-    var taskid = await exodusdecide('Tasks authorised for ' + userid, db.data, [[0, 'Task'], [1, 'Lock']], 0, '', '', inverted = true)
+    var taskid = await exoui_decide('Tasks authorised for ' + userid, db.data, [[0, 'Task'], [1, 'Lock']], 0, '', '', inverted = true)
     if (!taskid)
         return false
 
@@ -123,13 +123,13 @@ async function form_prewrite() {
     var userids = await gds.getall('USER_ID')
         
     //prevent insertion of blank lines if not authorised
-    if (!(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) {
+    if (!(await exoui_security('AUTHORISATION UPDATE GROUPS'))) {
         var userrows = gds.data.group1
         for (var rown = userrows.length - 1; rown >= 0; --rown) {
             //new rows have gds.data.group1.db_ordinal.text blank
             if (userids[rown] == '' && userrows[rown].db_ordinal.text == '') {
                 focuson($$('USER_ID')[rown])
-                return await exodusinvalid('User in line ' + (rown + 1) + ' must not be left blank\r\r' + gmsg)
+                return await exoui_invalid('User in line ' + (rown + 1) + ' must not be left blank\r\r' + gmsg)
             }
         }
     }
@@ -168,10 +168,10 @@ async function form_prewrite() {
                 var question='Duplicate key "'+userkey+'" on user '+userids[usern]+' is not required'
                 if (userids[usern]!=accumusers[accumn1-1])
                     question+='|because it is already granted to '+accumusers[accumn1-1]+' at a lower level.'
-                var response=await exodusconfirm(question,1,'<u>R</u>emove','<u>L</u>eave','Cancel')
+                var response=await exoui_confirm(question,1,'<u>R</u>emove','<u>L</u>eave','Cancel')
                 if (!response){
                     focuson($$('KEYS')[usern])
-                    return await exodusinvalid()
+                    return await exoui_invalid()
                 }
                 if (response==1) {
                     userkeys.splice(userkeyn,1)
@@ -193,10 +193,10 @@ async function form_prewrite() {
             break
     }
     if (!newusers)
-        return await exodusokcancel('OK to save?', 1)
+        return await exoui_okcancel('OK to save?', 1)
 
     // default_icons false: Email vs Save only are alternatives, not Yes/No
-    var reply = await exodusconfirm('OK to save?', 3, 'Email new users', 'Save only', 'Cancel', null, null, null, false)
+    var reply = await exoui_confirm('OK to save?', 3, 'Email new users', 'Save only', 'Cancel', null, null, null, false)
     if (!reply)
         return false
 
@@ -214,7 +214,7 @@ async function form_postread() {
     gtasks_usern = (await gds.getall('USER_ID')).exoduslocate(gusername) - 1
     if (gtasks_usern < 0) gtasks_usern = 999999
 
-    gtasks_updatehighergroups = await exodussecurity('AUTHORISATION UPDATE HIGHER GROUPS')
+    gtasks_updatehighergroups = await exoui_security('AUTHORISATION UPDATE HIGHER GROUPS')
 
     // authorisation_postdisplay (form_filter / per-row readonly) runs in form_postdisplay
     // after gds.load — was historically setTimeout, not same-flight postread await.
@@ -242,7 +242,7 @@ async function authorisation_postdisplay() {
 
     //prevent changing username of groups ("users" with keys) or group separator lines (blank lines)
     if (gds.dictitem('USER_ID') && gds.dictitem('KEYS')
-        && !(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) {
+        && !(await exoui_security('AUTHORISATION UPDATE GROUPS'))) {
         var userids = await gds.getall('USER_ID')
         var keys = await gds.getall('KEYS')
         for (var ln = keys.length - 1; ln >= 0; --ln) {
@@ -268,11 +268,11 @@ async function user_val_userid() {
 
         //prevent moving above yourself unless allowed access to higher groups
         //but this cannot really happen since you could not insert or change higher than yourself in the first place
-        //if (otherln1-1<grecn&&!gtasks_updatehighergroups) return await exodusinvalid(msg)
+        //if (otherln1-1<grecn&&!gtasks_updatehighergroups) return await exoui_invalid(msg)
 
         //check user wants to move the account here
-        if ((await exodusyesno(msg + '\r\rDo you want to move it here?', 2)) != 1)
-            return await exodusinvalid()
+        if ((await exoui_yesno(msg + '\r\rDo you want to move it here?', 2)) != 1)
+            return await exoui_invalid()
 
         //copy the other row here  
         var datarow = gds.updaterow('copy', gds.data.group1[grecn], gds.data.group1[otherln1 - 1])
@@ -286,19 +286,19 @@ async function user_val_userid() {
     }
 
     if (gvalue != '---' && 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(gvalue.slice(0, 1)) < 0)
-        return await exodusinvalid('Username must start with an alphabetic letter A-Z')
+        return await exoui_invalid('Username must start with an alphabetic letter A-Z')
 
     if (gusername.indexOf('EXODUS') < 0 && gvalue.indexOf('EXODUS') + 1)
-        return await exodusinvalid('User name cannot include "EXODUS"')
+        return await exoui_invalid('User name cannot include "EXODUS"')
 
     //prevent hidden users
     if (gtasks_otheruserids.exoduslocate(gvalue))
-        return await exodusinvalid(gvalue + ' user already exists in another group')
+        return await exoui_invalid(gvalue + ' user already exists in another group')
 
     //have to reenter password
     //passwords are all blank in the UI except those created in the UI before saving
     var newpass=await gds.get1('PASSWORD',grecn)
-    if (goldvalue && !newpass && (await exodusokcancel('If you change the user code,\nany existing password will no longer be usable.\nA new password will have to be created.', 2))!=1)
+    if (goldvalue && !newpass && (await exoui_okcancel('If you change the user code,\nany existing password will no longer be usable.\nA new password will have to be created.', 2))!=1)
         return false
 
         return true
@@ -322,7 +322,7 @@ async function user_val_userid() {
         for (var keyn = 0; keyn < keys.length; keyn++) {
             var key = keys[keyn].exodustrim()
             if ((key == 'EXODUS' && gusername != 'EXODUS') || gtasks_otherkeys.exoduslocate(key))
-                return await exodusinvalid('You are not authorised to use key ' + key.exodusquote())
+                return await exoui_invalid('You are not authorised to use key ' + key.exodusquote())
             keys[keyn] = key
         }
         gvalue = keys.join(' ')
@@ -359,10 +359,10 @@ async function user_val_userid() {
     async function form_preinsertrow1() {
 
         //double check prevent addition of users
-        if (!(await exodussecurity('USER CREATE'))) return await exodusinvalid(gmsg)
+        if (!(await exoui_security('USER CREATE'))) return await exoui_invalid(gmsg)
 
         //prevent addition of users above yourself
-        if (!gtasks_updatehighergroups && grecn <= gtasks_usern) return await exodusinvalid('You cannot insert users above yourself')
+        if (!gtasks_updatehighergroups && grecn <= gtasks_usern) return await exoui_invalid('You cannot insert users above yourself')
 
         return true
 
@@ -376,16 +376,16 @@ async function user_val_userid() {
             return true
 
         //double check prevent deletion of users
-        if (!(await exodussecurity('USER DELETE')))
-            return await exodusinvalid(gmsg)
+        if (!(await exoui_security('USER DELETE')))
+            return await exoui_invalid(gmsg)
 
         //prevent deletion of yourself and higher users
         if (!gtasks_updatehighergroups && grecn <= gtasks_usern)
-            return await exodusinvalid('You cannot delete yourself or higher users')
+            return await exoui_invalid('You cannot delete yourself or higher users')
 
         //cannot delete group separator/blank lines or lines with keys
-        if ((((await gds.get1('USER_ID')) == '') || (await gds.get1('KEYS'))) && !(await exodussecurity('AUTHORISATION UPDATE GROUPS')))
-            return await exodusinvalid('You cannot delete this line because\r' + gmsg)
+        if ((((await gds.get1('USER_ID')) == '') || (await gds.get1('KEYS'))) && !(await exoui_security('AUTHORISATION UPDATE GROUPS')))
+            return await exoui_invalid('You cannot delete this line because\r' + gmsg)
 
         return true
 
@@ -397,8 +397,8 @@ async function user_val_userid() {
         if (!(await task_authorised()))
             return false
 
-        if ((await gds.get1('LOCKS')) && !(await exodussecurity('AUTHORISATION UPDATE LOCKS')))
-            return await exodusinvalid('You cannot delete this line because\r' + gmsg)
+        if ((await gds.get1('LOCKS')) && !(await exoui_security('AUTHORISATION UPDATE LOCKS')))
+            return await exoui_invalid('You cannot delete this line because\r' + gmsg)
 
         return true
 
@@ -411,8 +411,8 @@ async function user_val_userid() {
         if (!task)
             return true
 
-        if (!(await exodussecurity(task)))
-            return await exodusinvalid('You cannot delete, change or add tasks that\ryou are not authorised to do yourself\r\r' + task)
+        if (!(await exoui_security(task)))
+            return await exoui_invalid('You cannot delete, change or add tasks that\ryou are not authorised to do yourself\r\r' + task)
 
         return true
     }
@@ -420,7 +420,7 @@ async function user_val_userid() {
     async function task_checkrank() {
 
         //prevent modification of users above yourself
-        if (!gtasks_updatehighergroups && grecn < gtasks_usern) return await exodusinvalid('You cannot modify users above yourself')
+        if (!gtasks_updatehighergroups && grecn < gtasks_usern) return await exoui_invalid('You cannot modify users above yourself')
 
         return true
 

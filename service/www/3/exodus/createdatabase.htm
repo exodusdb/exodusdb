@@ -62,7 +62,7 @@
 
         }
         async function form_prewrite() {
-            return await exodusokcancel('Are you sure ?', 2)
+            return await exoui_okcancel('Are you sure ?', 2)
         }
         async function form_postwrite() {
 			await cleardoc()
@@ -70,14 +70,14 @@
         }
         async function database_val_olddatabasecode(){
             if (gvalue==gdataset) {
-                return await exodusinvalid('The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.');
+                return await exoui_invalid('The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.');
             }
             return true
         }
 		//allow lowercase alphanumeric only
 		async function database_val_newdatabasecode(){
 			if (!gvalue.match('^[0-9a-z]+$')){
-				return await exodusinvalid('New Database code must be lowercase alphanumeric')
+				return await exoui_invalid('New Database code must be lowercase alphanumeric')
 				//return false
 			}
 			return true

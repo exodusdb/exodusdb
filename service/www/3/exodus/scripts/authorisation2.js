@@ -6,27 +6,27 @@ var gtasks_newpassword
 async function user_setpassword(savemode,element) {
 
  if (!gkey)
-  return await exodusinvalid('Please select a user first')
+  return await exoui_invalid('Please select a user first')
  
  if (!glocked)
-  return await exodusinvalid('This record is currently read-only')
+  return await exoui_invalid('This record is currently read-only')
  
  //grecn=element?getrecn(element):null
  
  var userid=await gds.getx('USER_ID',grecn)
  if (typeof userid!='string') userid=userid[0]
  if (!userid)
-  //return await exodusinvalid('Please select a user first')
-  return await exodusinvalid('This is a group separator line\rYou can only set the password on user lines')
+  //return await exoui_invalid('Please select a user first')
+  return await exoui_invalid('This is a group separator line\rYou can only set the password on user lines')
  
- if (userid!=gusername&&!(await exodussecurity('AUTHORISATION UPDATE')))
-  return await exodusinvalid()
+ if (userid!=gusername&&!(await exoui_security('AUTHORISATION UPDATE')))
+  return await exoui_invalid()
  
  var newpassword=''
  
  var minpasslen=4
  var reply=1
- if (await exodussecurity('AUTHORISATION INVENT OWN PASSWORDS')) reply=await exodusdecide('','Generate random password:Enter your own password')
+ if (await exoui_security('AUTHORISATION INVENT OWN PASSWORDS')) reply=await exoui_decide('','Generate random password:Enter your own password')
  if (!reply)
     return false
 
@@ -37,13 +37,13 @@ async function user_setpassword(savemode,element) {
    //user inputs password
    while (true) {
 
-    newpassword=await exodusinput('Please enter a new case-INSENSITIVE password for '+userid+'\rMinimum '+minpasslen+' alphanumeric characters.)',newpassword,true)
+    newpassword=await exoui_input('Please enter a new case-INSENSITIVE password for '+userid+'\rMinimum '+minpasslen+' alphanumeric characters.)',newpassword,true)
     if (!newpassword)
         return false
     newpassword=newpassword.toUpperCase()
     if (newpassword.length>=minpasslen)
      break
-    await exodusinvalid('The minimum password length is '+minpasslen)
+    await exoui_invalid('The minimum password length is '+minpasslen)
    }
    
   }
@@ -63,7 +63,7 @@ async function user_setpassword(savemode,element) {
     }
     
     // default_icons false: "generate another" is not a No/reject
-    if (!(reply=await exodusconfirm('The new password for '+userid+' will be\r\r'+newpassword+'\r\rRemember the new password!\r\rPassword is case-insensitive',1,'OK','No, generate another','Cancel',null,null,null,false)))
+    if (!(reply=await exoui_confirm('The new password for '+userid+' will be\r\r'+newpassword+'\r\rRemember the new password!\r\rPassword is case-insensitive',1,'OK','No, generate another','Cancel',null,null,null,false)))
         return false
     if (reply==1)
         break
@@ -72,7 +72,7 @@ async function user_setpassword(savemode,element) {
   }
   
   var newpassword2=''
-  newpassword2=await exodusinput('Enter your new password to confirm\ror press Esc to Cancel\r\rRemember the new password!\r\rPassword is case-INSENSITIVE',newpassword2,true)
+  newpassword2=await exoui_input('Enter your new password to confirm\ror press Esc to Cancel\r\rRemember the new password!\r\rPassword is case-INSENSITIVE',newpassword2,true)
 
   if (!newpassword2)
    return false
@@ -81,7 +81,7 @@ async function user_setpassword(savemode,element) {
   if (newpassword2==newpassword)
     break
 
-  await exodusinvalid('You did not enter the same password\rPlease try again')
+  await exoui_invalid('You did not enter the same password\rPlease try again')
   
  }
 
@@ -94,13 +94,13 @@ async function user_setpassword(savemode,element) {
 
  if (savemode) {
 
-  if (!(await exodusokcancel('Change password?',1)))
-   return await exodusinvalid()
+  if (!(await exoui_okcancel('Change password?',1)))
+   return await exoui_invalid()
   await saverecord_onclick()
  }
  else {
 
-  await exodusnote('The new password will not be effective\runless and until you save this document')
+  await exoui_note('The new password will not be effective\runless and until you save this document')
  }
 
  return true

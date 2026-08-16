@@ -153,7 +153,7 @@ async function users_upload_signature() {
     params.minheight = 50//pixels
     params.maxheight = 200//pixels
 
-    var targetfilename = await exodusshowmodaldialog('../exodus/upload.htm', params)
+    var targetfilename = await exoui_showmodaldialog('../exodus/upload.htm', params)
     if (gkey)
         await users_postdisplay()
     if (!targetfilename)

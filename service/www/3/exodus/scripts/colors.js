@@ -20,14 +20,14 @@ function colors_restore_saved_screencolor() {
 
 // Custom validators: always call base val first (di.validation replaces base).
 async function colors_val_screencolor() {
-	if (!(await exodus_val_color())) return await exodusinvalid()
+	if (!(await exodus_val_color())) return await exoui_invalid()
 	// Preview only. Empty after Default → system body via CSS fallback.
 	colors_apply_screencolor(gvalue)
 	return true
 }
 
 async function colors_val_screenfont() {
-	if (!(await exodus_val_font())) return await exodusinvalid()
+	if (!(await exodus_val_font())) return await exoui_invalid()
 	if (typeof exodus_chrome_apply_font == 'function')
 		exodus_chrome_apply_font(gvalue, await gds.getx('SCREEN_FONT_SIZE'))
 	else if (typeof exodus_set_style == 'function')
@@ -85,10 +85,10 @@ async function exodus_val_color() {
 		return true
 	var maxLen = colors_max_name_length()
 	if (gvalue.length > maxLen)
-		return await exodusinvalid('Colour must be at most ' + maxLen + ' characters')
+		return await exoui_invalid('Colour must be at most ' + maxLen + ' characters')
 	if (colors_is_valid_css_color(gvalue))
 		return true
-	return await exodusinvalid(gvalue + ' is not a recognised color')
+	return await exoui_invalid(gvalue + ' is not a recognised color')
 }
 
 function exodus_dict_font(di) {
@@ -127,13 +127,13 @@ async function exodus_pop_font(required, many) {
         var ttt = tt[ii].split(';')
         ttt[1] = ''
         ttt[2] = '<div width=100% style="font:' + ttt[0] + '">' + ttt[0]
-        //exclude this since it still works without it and it triggers XML mode in exodusdecide2
+        //exclude this since it still works without it and it triggers XML mode in exoui_decide2
         //ttt[2]+='</div>'
         tt[ii] = ttt.join(vm)
     }
     tt = tt.join(fm)
 
-    return await exodusdecide2('', tt, [[2, '']], 0, '', many)
+    return await exoui_decide2('', tt, [[2, '']], 0, '', many)
 
 }
 
@@ -197,13 +197,13 @@ async function colors_pop_color_decide(required, many) {
     for (var ii = tt.length - 1; ii >= 0; ii--) {
         var ttt = tt[ii].split(';')
         ttt[2] = '<div width=100% style="background-color:' + ttt[0] + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'//+ttt[1]
-        //exclude this since it still works without it and it triggers XML mode in exodusdecide2
+        //exclude this since it still works without it and it triggers XML mode in exoui_decide2
         //ttt[2]+='</div>'
         tt[ii] = ttt.join(vm)
     }
     tt = tt.join(fm)
 
-    return await exodusdecide2('', tt, [[2, ''], [1, ''], [0, '']], 1, '', many)
+    return await exoui_decide2('', tt, [[2, ''], [1, ''], [0, '']], 1, '', many)
 
 }
 
@@ -1152,7 +1152,7 @@ function colors_popup_create() {
 
 	var row = document.createElement('div')
 	row.className = 'exodus-color-popup-actions'
-	// Confirm-style: underline hotkey letter, title "Press X or Fkey" (exodusconfirm)
+	// Confirm-style: underline hotkey letter, title "Press X or Fkey" (exoui_confirm)
 	function mkBtn(label, cls, letter, funckey) {
 		var b = document.createElement('button')
 		b.type = 'button'
@@ -1168,7 +1168,7 @@ function colors_popup_create() {
 		b.setAttribute('data-exodus-letter', letter)
 		return b
 	}
-	// Order: OK (positive/F9/Ctrl+Enter) · Default (F8) · Cancel (Esc) — like exodusconfirm
+	// Order: OK (positive/F9/Ctrl+Enter) · Default (F8) · Cancel (Esc) — like exoui_confirm
 	var btnOk = mkBtn('OK', 'exodus-color-popup-ok', 'O', 'F9 or Ctrl+Enter')
 	var btnClear = mkBtn('Default', 'exodus-color-popup-clear', 'D', 'F8')
 	var btnCancel = mkBtn('Cancel', 'exodus-color-popup-cancel', 'C', 'Esc')

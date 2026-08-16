@@ -28,14 +28,14 @@ async function exodus_val_url(protocol) {
 
   var regexp=new RegExp(protocol+'\:\/\/.','i')
   if (!gvalue.match(regexp)) {
-   return await exodusinvalid('Should start with '+protocol+'://')
+   return await exoui_invalid('Should start with '+protocol+'://')
   }
   return true
  }
   
  var regexp=new RegExp('((http)|(https))'+'\:\/\/.','i')
  if (!gvalue.match(regexp)) {
-   return await exodusinvalid('Should start with http:// or https://')
+   return await exoui_invalid('Should start with http:// or https://')
  }
  
  return true
@@ -46,8 +46,8 @@ async function exodus_val_html() {
     element.innerHTML=gvalue
     var normalisedhtml=element.innerHTML
     if (normalisedhtml!=gvalue) {
-        if ((await exodusokcancel('Something is not exactly right with that code.\nConvert to standardised HTML?\n(required)',1))!=1)
-            return await exodusinvalid()
+        if ((await exoui_okcancel('Something is not exactly right with that code.\nConvert to standardised HTML?\n(required)',1))!=1)
+            return await exoui_invalid()
         gvalue=element.innerHTML
     }
     return true
@@ -83,7 +83,7 @@ async function exodus_val_diskdrive() {
 
  gvalue=gvalue.slice(0,1).toUpperCase()
  //if (!gvalue.match(/^[ABCDEFGHIJKLMNOPQRSTUVWXYZ](:)?$/))
-  //return await exodusinvalid('Please enter a letter A-Z')
+  //return await exoui_invalid('Please enter a letter A-Z')
 
  if (gvalue.length==1&&gvalue!='0') gvalue+=':'
 
@@ -125,7 +125,7 @@ async function exodus_val_emailaddress(sepchar) {
    var msg=value+'\rEmail address must be in the format xxxxxx@xxxxxx.xxx'
    if (sepchar)
     msg+=' '+sepchar+'...'
-   return await exodusinvalid(msg)
+   return await exoui_invalid(msg)
   }
  }
  gvalue=values.join(sepchar)
@@ -1356,7 +1356,7 @@ function dictrec(code0,type1,fieldno2,title3,group4,keypart5,x6,conversion7,func
   var words=code0.split('_')
   for (var wordn=0;wordn<words.length;++wordn) {
 
-   if (!(await exodussecurity(gdatafilename.exodussingular()+' UPDATE '+words.slice(0,wordn+1).join(' ').exodusquote()))) {
+   if (!(await exoui_security(gdatafilename.exodussingular()+' UPDATE '+words.slice(0,wordn+1).join(' ').exodusquote()))) {
 
     newdictitem.readonly=gmsg
     break;

@@ -8,10 +8,10 @@ async function dict_USERS() {
  var di
  var groupn
 
- var istimesheetadmin=await exodussecurity('TIMESHEET ADMINISTRATION')
+ var istimesheetadmin=await exoui_security('TIMESHEET ADMINISTRATION')
  var timesheetadminreadonlymsg=gmsg
  
- gusers_authorisation_update=await exodussecurity('AUTHORISATION UPDATE')
+ gusers_authorisation_update=await exoui_security('AUTHORISATION UPDATE')
  var updateallowed=false
 
  di=dict[++din]=dictrec('USER_ID','F',0)
@@ -23,7 +23,7 @@ async function dict_USERS() {
   && typeof gusername == 'string' && gusername)
   gparameters.key = gusername
  di.invalidcharacters='*'
- if (await exodussecurity('AUTHORISATION ACCESS')) {
+ if (await exoui_security('AUTHORISATION ACCESS')) {
   updateallowed=gusers_authorisation_update
   // F7 popup + typeahead (same as emailusers); expired skipped via LIVE_USER
   await system_dict_usercode(di)

@@ -84,7 +84,7 @@
 <h2>1. Overview and Architecture</h2>
 
 <ul>
-    <li><strong>Core file:</strong> <code>client.js</code> — Must be included <strong>first</strong>. Core globals, Gate A/B, <code>exodusdblink</code>, <code>exodusshowmodaldialog</code>, security, cookies, utilities, string/array prototypes.</li>
+    <li><strong>Core file:</strong> <code>client.js</code> — Must be included <strong>first</strong>. Core globals, Gate A/B, <code>exodusdblink</code>, <code>exoui_showmodaldialog</code>, security, cookies, utilities, string/array prototypes.</li>
     <li><strong>Form automation:</strong> <code>dbform.js</code> + helpers in <code>db.js</code> — Dictionary-driven (<code>dict_*</code>) CRUD forms, MV groups, validation, buttons.</li>
     <li><strong>Communication bridge:</strong> <code>xhttp.php</code> (and .asp variants). Client sends XML (<code>&lt;token&gt;</code>, <code>&lt;request&gt;</code>, <code>&lt;data&gt;</code>); bridge writes temp files; backend processes and responds via <code>.1</code>/<code>.2</code>/<code>.3</code> files.</li>
     <li><strong>Async model (Gate A):</strong> Event handlers and deferred async work enter via <code>exodus_begin</code> (exclusive owner; <code>g_exodus_flow_queue_max = 0</code> means <strong>no queuing</strong> — second start while airborne is <strong>skipped</strong>). Prefer <code>async function myfunc() { ... await someOperation() ... }</code> and <code>await</code> inside the same flight. Do <strong>not</strong> start free-floating async that does DB/UI work.</li>
@@ -94,7 +94,7 @@
     <li><strong>No generators:</strong> <code>function*</code> / <code>yield*</code> are not supported — use <code>async</code>/<code>await</code> only (stage 6).</li>
     <li><strong>UI conventions:</strong> Modal dialogs, <code>class="exodusform"</code> tables, input <code>id</code>s matching dictionary codes, heavy use of <code>gparameters</code>.</li>
     <li><strong>Data delimiters:</strong> <code>rm</code>, <code>fm</code>, <code>vm</code>, <code>sm</code>, <code>tm</code>, <code>stm</code> (and their regex versions).</li>
-    <li><strong>Security model:</strong> PHP sessions (the real auth) + namespaced tokens. <code>exodussecurity('TASK')</code>. Once a valid session exists, the web layer trusts it.</li>
+    <li><strong>Security model:</strong> PHP sessions (the real auth) + namespaced tokens. <code>exoui_security('TASK')</code>. Once a valid session exists, the web layer trusts it.</li>
     <li><strong>Globals:</strong> <code>gusername</code>, <code>gdataset</code>, <code>gparameters</code>, <code>greadonlymode</code>, many others set from cookies or passed in.</li>
 </ul>
 
@@ -179,14 +179,14 @@
 <h3>Basic usage</h3>
 
 <pre><code>async function myFunction() {
-  var ok = await exodusokcancel('Are you sure?', 1);
+  var ok = await exoui_okcancel('Are you sure?', 1);
   if (!ok) return;
 
   if (!(await db.send())) {
-    return await exodusinvalid(db.response);
+    return await exoui_invalid(db.response);
   }
 
-  var choice = await exodusdecide('Select', dataArray);
+  var choice = await exoui_decide('Select', dataArray);
 }
 </code></pre>
 
@@ -233,20 +233,20 @@ var params = {
   readonly: true,
   mycustom: 'value'
 };
-var returnedValue = await exodusshowmodaldialog('somedialog.htm', params);
+var returnedValue = await exoui_showmodaldialog('somedialog.htm', params);
 
 // In the dialog page, read:
 if (gparameters.key) { ... }
 
 // Close and return value(s) to caller
-exoduswindowclose('a result string');
-exoduswindowclose(['multiple', 'values']);
+exoui_windowclose('a result string');
+exoui_windowclose(['multiple', 'values']);
 </code></pre>
 
 <p>Key functions:</p>
 <ul>
-    <li><code>exodusshowmodaldialog(url, arguments)</code></li>
-    <li><code>exoduswindowclose(returnValue)</code></li>
+    <li><code>exoui_showmodaldialog(url, arguments)</code></li>
+    <li><code>exoui_windowclose(returnValue)</code></li>
     <li><code>exodus_setchildwin_returnvalue(...)</code></li>
 </ul>
 
@@ -260,7 +260,7 @@ db.request = 'EXECUTE\rGENERAL\rMYCOMMAND\rparam1\rparam2';
 db.data    = 'optional payload (multivalue ok)';
 
 if (!(await db.send())) {
-  return await exodusinvalid(db.response);
+  return await exoui_invalid(db.response);
 }
 
 var resultData = db.data;
@@ -335,8 +335,8 @@ var message    = db.response;
 
 <h2>6. Security</h2>
 
-<pre><code>if (!(await exodussecurity('EDIT CUSTOMERS'))) {
-  return await exodusinvalid(gmsg);
+<pre><code>if (!(await exoui_security('EDIT CUSTOMERS'))) {
+  return await exoui_invalid(gmsg);
 }
 </code></pre>
 
@@ -360,7 +360,7 @@ var message    = db.response;
   maxheight: 200
 };
 
-var returnedTargetFilename = await exodusshowmodaldialog('../exodus/upload.htm', params);
+var returnedTargetFilename = await exoui_showmodaldialog('../exodus/upload.htm', params);
 </code></pre>
 
 <p>The upload posts to <code>upload.php</code> (which now safely derives its own redirect target). The result is the target filename that was written.</p>
@@ -391,12 +391,12 @@ arr.exodustrim()
 
 <p>Other frequent utilities:</p>
 <ul>
-    <li><code>await exodusinvalid(msg)</code></li>
-    <li><code>await exodusnote(msg)</code></li>
-    <li><code>await exoduswarning(msg)</code></li>
-    <li><code>await exodusokcancel(msg, default)</code></li>
-    <li><code>await exodusdecide(question, data, ...)</code></li>
-    <li><code>exoduswindowclose(value)</code></li>
+    <li><code>await exoui_invalid(msg)</code></li>
+    <li><code>await exoui_note(msg)</code></li>
+    <li><code>await exoui_warning(msg)</code></li>
+    <li><code>await exoui_okcancel(msg, default)</code></li>
+    <li><code>await exoui_decide(question, data, ...)</code></li>
+    <li><code>exoui_windowclose(value)</code></li>
     <li><code>exodus_begin(asyncFn, 'label')</code> — <strong>public #1</strong> Gate A business</li>
     <li><code>exodus_begin_if_idle(asyncFn, 'label')</code> — <strong>public #2</strong> optional background; skip if busy</li>
     <li><code>exodus_begin_waitcancel(source)</code> — <strong>public #3</strong> Gate B Wait/Cancel only</li>
@@ -419,15 +419,15 @@ arr.exodustrim()
 <p>Preferred pattern:</p>
 
 <pre><code>if (!(await someOperation())) {
-  return await exodusinvalid(db.response || 'Something went wrong');
+  return await exoui_invalid(db.response || 'Something went wrong');
 }
 </code></pre>
 
 <p>Helpers:</p>
 <ul>
-    <li><code>exodusinvalid(msg)</code> — usually stops and shows error</li>
-    <li><code>exodusnote(msg)</code></li>
-    <li><code>exoduswarning(msg)</code></li>
+    <li><code>exoui_invalid(msg)</code> — usually stops and shows error</li>
+    <li><code>exoui_note(msg)</code></li>
+    <li><code>exoui_warning(msg)</code></li>
 </ul>
 
 <h2>11. Best Practices & Gotchas</h2>

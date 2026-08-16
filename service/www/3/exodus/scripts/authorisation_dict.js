@@ -21,15 +21,15 @@ async function dict_AUTHORISATION(parameters) {
     di.link = 'await windowopenkey("../exodus/users.htm")'
     //need to allow to move user up/down
     //di.unique=true
-    di.noinsertrow = !(await exodussecurity('USER CREATE'))
+    di.noinsertrow = !(await exoui_security('USER CREATE'))
     //allow deleting blank rows if allowed to create users but how to stop them creating new groups or joining groups 
-    di.nodeleterow = !(await exodussecurity('USER DELETE')) && di.noinsertrow
+    di.nodeleterow = !(await exoui_security('USER DELETE')) && di.noinsertrow
     //di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890-'
     di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-'
     di.allowemptyrows = true
 
     di = dict[++din] = dictrec('KEYS', 'F', 2, '', usersgroupn)
-    if (!(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
+    if (!(await exoui_security('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
     exodus_dict_code(di)
     di.validation = 'await user_val_keys()'
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
@@ -48,7 +48,7 @@ async function dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('HOURLY_RATE', 'F', 5, '', usersgroupn)
 
     di = dict[++din] = dictrec('IP_NUMBERS', 'F', 6, '', usersgroupn)
-    if (!(await exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
+    if (!(await exoui_security('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
     exodus_dict_ipno(di, true, true, true)
     di.length = 40
 
@@ -69,7 +69,7 @@ async function dict_AUTHORISATION(parameters) {
     di.unique = true
     di.length = 40
     di.validation = 'await task_val_taskid()'
-    if (!(await exodussecurity('AUTHORISATION UPDATE LOCKS'))) {
+    if (!(await exoui_security('AUTHORISATION UPDATE LOCKS'))) {
         di.readonly = gmsg
         di.nodeleterow = true
         di.noinsertrow = true
@@ -90,7 +90,7 @@ async function dict_AUTHORISATION(parameters) {
 
     di = dict[++din] = dictrec('LOCKS', 'F', 11, '', tasksgroupn)
     di.validation = 'await task_val_lock()'
-    if (!(await exodussecurity('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
+    if (!(await exoui_security('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
     di.validcharacters='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ '
 
@@ -107,7 +107,7 @@ async function dict_AUTHORISATION(parameters) {
 
     di = dict[++din] = dictrec('PASSWORD_AUTOEXPIRY_DAYS', 'F', 25)
     exodus_dict_integer(di)
-    if (!(await exodussecurity('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
+    if (!(await exoui_security('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
 
     di = dict[++din] = dictrec('EMAIL_NEW_USERS', 'F', 26)
     di.conversion = ';Ask:1;Yes:0;No'
