@@ -1,17 +1,17 @@
 
 // Preview / apply LM form body (session only). Cookies written only on users Save.
-// Empty / Default → CSS :root default (exodus_chrome_apply_color removes override).
+// Empty / Default → CSS :root default (exo_chrome_apply_color removes override).
 function colors_apply_screencolor(value) {
-	if (typeof exodus_chrome_apply_color == 'function')
-		exodus_chrome_apply_color(value)
-	else if (typeof exodus_set_style == 'function')
-		exodus_set_style('screencolor', value)
+	if (typeof exo_chrome_apply_color == 'function')
+		exo_chrome_apply_color(value)
+	else if (typeof exo_set_style == 'function')
+		exo_set_style('screencolor', value)
 }
 
 // Discard / clear / postdisplay: full chrome from cookies (fc + ff + fs).
 function colors_restore_saved_chrome() {
-	if (typeof exodus_chrome_from_cookies == 'function')
-		exodus_chrome_from_cookies()
+	if (typeof exo_chrome_from_cookies == 'function')
+		exo_chrome_from_cookies()
 }
 // Old name — colour-only callers
 function colors_restore_saved_screencolor() {
@@ -28,18 +28,18 @@ async function colors_val_screencolor() {
 
 async function colors_val_screenfont() {
 	if (!(await exo_val_font())) return await exoui_invalid()
-	if (typeof exodus_chrome_apply_font == 'function')
-		exodus_chrome_apply_font(gvalue, await gds.getx('SCREEN_FONT_SIZE'))
-	else if (typeof exodus_set_style == 'function')
-		exodus_set_style('screenfont', gvalue, await gds.getx('SCREEN_FONT_SIZE'))
+	if (typeof exo_chrome_apply_font == 'function')
+		exo_chrome_apply_font(gvalue, await gds.getx('SCREEN_FONT_SIZE'))
+	else if (typeof exo_set_style == 'function')
+		exo_set_style('screenfont', gvalue, await gds.getx('SCREEN_FONT_SIZE'))
 	return true
 }
 
 async function colors_val_screenfontsize() {
-	if (typeof exodus_chrome_apply_font == 'function')
-		exodus_chrome_apply_font(await gds.getx('SCREEN_FONT'), gvalue)
-	else if (typeof exodus_set_style == 'function')
-		exodus_set_style('screenfont', await gds.getx('SCREEN_FONT'), gvalue)
+	if (typeof exo_chrome_apply_font == 'function')
+		exo_chrome_apply_font(await gds.getx('SCREEN_FONT'), gvalue)
+	else if (typeof exo_set_style == 'function')
+		exo_set_style('screenfont', await gds.getx('SCREEN_FONT'), gvalue)
 	return true
 }
 
@@ -73,7 +73,7 @@ function colors_is_valid_css_color(v) {
 // Base colour field validation. Wired by exo_dict_color when di.validation is
 // unset. Custom di.validation must call this first.
 // Empty / "Default" → "". Named colours and other valid CSS colours stay as-is
-// (framework / exodus_set_style have long accepted them). Invalid rejected.
+// (framework / exo_set_style have long accepted them). Invalid rejected.
 // Length capped to the longest name in the allowed colour list.
 async function exo_val_color() {
 	if (gvalue == null)
@@ -99,7 +99,7 @@ function exo_dict_font(di) {
 	//get fonts
 	var tt = ''
 	if (!di.required) tt += ';Default:'
-	tt = exodus_get_fonts(tt)
+	tt = exo_get_fonts(tt)
 
 	di.conversion = tt
 
@@ -120,7 +120,7 @@ async function exo_pop_font(required, many) {
     //get colors
     var tt = ''
     if (!required) tt += ';Default:'
-    tt = exodus_get_fonts(tt)
+    tt = exo_get_fonts(tt)
 
     tt = tt.split(':')
     for (ii = tt.length - 1; ii >= 0; ii--) {
@@ -137,13 +137,13 @@ async function exo_pop_font(required, many) {
 
 }
 
-// Longest label in exodus_get_colors (names + #rrggbb). Cached after first call.
+// Longest label in exo_get_colors (names + #rrggbb). Cached after first call.
 function colors_max_name_length() {
 	if (colors_max_name_length._n)
 		return colors_max_name_length._n
 	var max = 7 // #rrggbb
 	try {
-		var tt = exodus_get_colors('')
+		var tt = exo_get_colors('')
 		var parts = tt.split(':')
 		for (var i = 0; i < parts.length; i++) {
 			var segs = parts[i].split(';')
@@ -191,7 +191,7 @@ async function colors_pop_color_decide(required, many) {
 
     var tt = ''
     if (!required) tt += ';Default:'
-    tt = exodus_get_colors(tt)
+    tt = exo_get_colors(tt)
 
     tt = tt.split(':')
     for (var ii = tt.length - 1; ii >= 0; ii--) {
@@ -222,7 +222,7 @@ async function colors_pop_color_decide(required, many) {
 
 // Inject colors.css once when this script loads (same directory as global.css).
 function colors_ensure_stylesheet() {
-	if (document.getElementById('exodus_colors_css'))
+	if (document.getElementById('exo_colors_css'))
 		return
 	var href = ''
 	try {
@@ -240,7 +240,7 @@ function colors_ensure_stylesheet() {
 	if (!href)
 		return
 	var link = document.createElement('link')
-	link.id = 'exodus_colors_css'
+	link.id = 'exo_colors_css'
 	link.rel = 'stylesheet'
 	link.type = 'text/css'
 	link.href = href
@@ -462,7 +462,7 @@ function colors_popup_monitor_text_color(hex) {
 	}
 }
 
-// Sticky-thead head direction for this form-body sample (same threshold as exodus_set_form_head_direction).
+// Sticky-thead head direction for this form-body sample (same threshold as exo_set_form_head_direction).
 function colors_popup_monitor_head_direction(hex) {
 	try {
 		var r = parseInt(hex.slice(1, 3), 16)
@@ -511,7 +511,7 @@ function colors_popup_live_body() {
 	var field = colors_popup._field
 	if (!field || field.id != 'SCREEN_BODY_COLOR')
 		return
-	// Sync apply — must not queue via exodus_begin or a late hover flight
+	// Sync apply — must not queue via exo_begin or a late hover flight
 	// re-applies after Default/OK and leaves the form body on a continuum colour.
 	// Session form body only; cookie still waits for users form_postwrite on save.
 	colors_apply_screencolor(hex)
@@ -1114,7 +1114,7 @@ function colors_popup_create() {
 	if (colors_popup._div)
 		return
 	var div = document.createElement('div')
-	div.id = 'exodus_color_popup'
+	div.id = 'exo_color_popup'
 	div.className = 'exodus-color-popup calendar'
 	div.tabIndex = 1
 	div.setAttribute('role', 'dialog')
@@ -1700,12 +1700,12 @@ async function exo_pop_color(required, many) {
 	if (colors_popup._closedAt && (Date.now() - colors_popup._closedAt) < 450)
 		return null
 
-	if (typeof exodus_begin_when_idle == 'function')
-		exodus_begin_when_idle(function () {
+	if (typeof exo_begin_when_idle == 'function')
+		exo_begin_when_idle(function () {
 			return colors_pop_color_open(gen)
 		}, 'colors_pop_color_open', { delay_ms: 100 })
 	else
-		void exodus_begin(function () {
+		void exo_begin(function () {
 			return colors_pop_color_open(gen)
 		}, 'colors_pop_color_open')
 	return null
@@ -1728,7 +1728,7 @@ async function colors_pop_color_open(gen) {
 	return false
 }
 
-function exodus_get_colors(tt) {
+function exo_get_colors(tt) {
     if (!tt) tt = ''
     tt += '#000000;Black:'
     tt += '#000080;Navy:'
@@ -1911,7 +1911,7 @@ function exodus_get_colors(tt) {
     return tt
 }
 
-function exodus_get_fonts(tt) {
+function exo_get_fonts(tt) {
     if (!tt) tt = ''
 
     tt += 'SANS SERIF,HELVETICA:'
@@ -2216,7 +2216,7 @@ function colors_install_swatch(field) {
 	swatch.addEventListener('click', function (ev) {
 		ev.preventDefault()
 		ev.stopPropagation()
-		void exodus_begin(async function () {
+		void exo_begin(async function () {
 			if (typeof setgpreviouselement == 'function')
 				setgpreviouselement(field)
 			// Same entry as F7 when panel already open = toggle close

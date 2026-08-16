@@ -307,7 +307,7 @@ div[align="center"] > .exodusformpane {
     width: max-content;
     margin: var(--exodus-form-pane-margin) auto;
 }
-/* Unbound form OK/List + Close bar — face is visible; source is .exodus_formbuttons_source */
+/* Unbound form OK/List + Close bar — face is visible; source is .exo_formbuttons_source */
 .exodusformactions,
 body > #formbuttonsdiv.exodusformactions,
 body > #formbuttonsdiv_face.exodusformactions {
@@ -366,7 +366,7 @@ body > #formbuttonsdiv_face .graphicbutton [data-source-id$="_label"] {
 }
 
 /* Real form-action strip: mutated by existing code; out of layout (face is shown). */
-#formbuttonsdiv.exodus_formbuttons_source {
+#formbuttonsdiv.exo_formbuttons_source {
     position: fixed !important;
     left: -10000px !important;
     top: 0 !important;
@@ -537,7 +537,7 @@ TABLE.exodusform td:has(> span[contenteditable]) {
 }
 /*
  * No outer cell borders (pane is the frame). Border only — never background.
- *   L/R — .exodus-form-edge-left/right from exodus_mark_form_edge_rows()
+ *   L/R — .exodus-form-edge-left/right from exo_mark_form_edge_rows()
  *         (first/last cell with display != none). Do not use :first/:last-child:
  *         hidden trailers (e.g. schedules heading button/rating cells) leave the
  *         last *visible* side-by-side fieldstrip with a false right grid edge.
@@ -584,21 +584,21 @@ TABLE[exogroupno] > thead {
 }
 /* Decide list + typeahead: sticky in panel scroll, not page menubar offset */
 .exodusconfirmdiv #decide_table1 > thead,
-.exodus_typeahead_table > thead {
+.exo_typeahead_table > thead {
     position: sticky;
     top: 0;
     z-index: 11;
     box-shadow: 0 1px 0 lightgrey;
 }
 /* Sticky on th + opaque paint: less bleed of body text through/above heads while scrolling */
-.exodus_typeahead_table > thead th {
+.exo_typeahead_table > thead th {
     position: sticky;
     top: 0;
     z-index: 12;
 }
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead,
-:root[data-theme="dark_mode"] .exodus_typeahead_table > thead {
+:root[data-theme="dark_mode"] .exo_typeahead_table > thead {
     box-shadow: 0 1px 0 #5a6090;
 }
 /*
@@ -613,7 +613,7 @@ TABLE[exogroupno] > thead td {
 /* Decide + typeahead heads: step from popup shell (not form) */
 .exodusconfirmdiv #decide_table1 > thead th,
 .exodusconfirmdiv #decide_table1 > thead td,
-.exodus_typeahead_table > thead th {
+.exo_typeahead_table > thead th {
     background-color: var(--exodus-popup-bg-color);
     background-color: oklch(from var(--exodus-popup-bg-color)
         calc(l * 0.985)
@@ -622,7 +622,7 @@ TABLE[exogroupno] > thead td {
 }
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-form-head="lighter"] .exodusconfirmdiv #decide_table1 > thead td,
-:root[data-form-head="lighter"] .exodus_typeahead_table > thead th {
+:root[data-form-head="lighter"] .exo_typeahead_table > thead th {
     background-color: color-mix(in oklch, var(--exodus-popup-bg-color) 90%, white);
 }
 
@@ -633,7 +633,7 @@ TABLE
 }
 
 /* Find-as-you-type: same popup shell tokens as confirm/decide/calendar */
-.exodus_typeahead {
+.exo_typeahead {
     background: var(--exodus-popup-bg-color);
     color: inherit;
     border: 2px solid var(--exodus-popup-border-color);
@@ -648,14 +648,14 @@ TABLE
     padding: 0 4px 4px 4px;
 }
 /* Hit typeahead_limitn — footer copy only (no thick accent bar; was focus-orange) */
-.exodus_typeahead_truncated {
+.exo_typeahead_truncated {
     padding: 0.35em 0.5em 0.15em;
     font-size: 0.9em;
     opacity: 0.9;
     border-top: 1px solid var(--exodus-popup-divider-border-color);
     text-align: center;
 }
-.exodus_typeahead_table {
+.exo_typeahead_table {
     /* separate: sticky heads paint a solid layer (collapse lets row text bleed) */
     border-collapse: separate;
     border-spacing: 0;
@@ -663,8 +663,8 @@ TABLE
     max-width: 100%;
 }
 /* Column air + fold long cells (brand/description) — same idea as decide_datacol */
-.exodus_typeahead_table th,
-.exodus_typeahead_table td {
+.exo_typeahead_table th,
+.exo_typeahead_table td {
     padding: 0.25em 0.5em;
     max-width: 22em;
     vertical-align: top;
@@ -675,12 +675,12 @@ TABLE
     -webkit-user-select: text;
     user-select: text;
 }
-.exodus_typeahead_table th {
+.exo_typeahead_table th {
     font-weight: bold;
     text-align: left;
 }
 /* thead tint/sticky: shared with decide (#decide_table1 > thead) above */
-.exodus_typeahead_table tr[data-ta-row] {
+.exo_typeahead_table tr[data-ta-row] {
     cursor: pointer;
 }
 /* Row highlight: match decide_row_hover */
@@ -697,7 +697,7 @@ TABLE
 
 /* JS class only (decide_row_hover pattern). No :hover — stationary mouse +
  * PgUp/Dn scroll would paint under-cursor rows and dual-highlight with keys. */
-.exodus_typeahead_table tr.exodus_typeahead_focus td {
+.exo_typeahead_table tr.exo_typeahead_focus td {
     background-color: var(--exodus-popup-hover-bg-color);
 }
 
@@ -709,7 +709,7 @@ TABLE
     TABLE[exogroupno] > thead {
         position: static;
     }
-    #exodus_menu {
+    #exo_menu {
         display: none !important;
     }
     HTML, BODY {
@@ -719,7 +719,7 @@ TABLE
     }
 }
 
-/* Size: cookie fs → html font-size % (exodus_chrome_apply_font). Empty = 100%. */
+/* Size: cookie fs → html font-size % (exo_chrome_apply_font). Empty = 100%. */
 HTML {
     font-size: 100%;
 }
@@ -1254,7 +1254,7 @@ img[id^="deleterowbutton"] {
     background: transparent !important;
 }
 
-#exodus_menu {
+#exo_menu {
     outline: var(--exodus-outline-color) solid 1px !important;
     background: var(--exodus-menu-bg) !important;
     box-shadow: var(--exodus-menu-box-shadow);
@@ -1262,8 +1262,8 @@ img[id^="deleterowbutton"] {
     z-index: 999;
 }
 
-#exodus_menu .menubutton,
-#exodus_menu .graphicbutton {
+#exo_menu .menubutton,
+#exo_menu .graphicbutton {
     display: inline-flex;
     align-items: center;
     gap: 0.25em;
@@ -1271,17 +1271,17 @@ img[id^="deleterowbutton"] {
 }
 
 /* Same 2px box as face buttons; stroke invisible so Menu lines up with Save/OK. */
-#exodus_menu .menubutton {
+#exo_menu .menubutton {
     border: 2px solid transparent;
 }
 
-#exodus_menu .menubutton,
-#exodus_menu [id$="_label"] {
+#exo_menu .menubutton,
+#exo_menu [id$="_label"] {
     color: inherit;
 }
 
-#exodus_menu .menubutton img,
-#exodus_menu .graphicbutton img {
+#exo_menu .menubutton img,
+#exo_menu .graphicbutton img {
     height: var(--exodus-ui-icon-size);
     width: var(--exodus-ui-icon-size);
     box-sizing: border-box;
@@ -1291,7 +1291,7 @@ img[id^="deleterowbutton"] {
 }
 
 /* Form actions in menubar: face is the visible strip. */
-#exodus_menu #formbuttonsdiv_face {
+#exo_menu #formbuttonsdiv_face {
     float: left;
     display: inline-flex;
     align-items: center;
@@ -1300,21 +1300,21 @@ img[id^="deleterowbutton"] {
 
 /* Extra air when actions were moved up from under the form (unbound).
    No vertical rule — reads as an unwanted separator after Menu. */
-#exodus_menu #formbuttonsdiv_face.exodus_formbuttons_relocated {
+#exo_menu #formbuttonsdiv_face.exo_formbuttons_relocated {
     margin-left: 8px;
     padding-left: 8px;
 }
 
 /* Form chrome in menubar: bound tools (menubutton) + unbound actions (graphicbutton) */
-#exodus_menu #formbuttonsdiv_face .menubutton,
-#exodus_menu #formbuttonsdiv_face .graphicbutton {
+#exo_menu #formbuttonsdiv_face .menubutton,
+#exo_menu #formbuttonsdiv_face .graphicbutton {
     float: none;
     margin-left: 4px;
     margin-right: 4px;
 }
 
 /* Record nav: more air on the left so the group reads separate from New/Open… */
-#exodus_menu #formbuttonsdiv_face .exodus_recordnav_group {
+#exo_menu #formbuttonsdiv_face .exo_recordnav_group {
     margin-left: 12px;
     margin-right: 4px;
 }
@@ -1325,7 +1325,7 @@ img[id^="deleterowbutton"] {
  * Do NOT put !important on display — setgkeys() uses inline display:none when
  * gkeys.length <= 1; stylesheet !important would force them always visible.
  */
-.exodus_recordnav_group {
+.exo_recordnav_group {
     float: left;
     white-space: nowrap;
     display: inline-flex;
@@ -1333,13 +1333,13 @@ img[id^="deleterowbutton"] {
     gap: 0.15em; /* equal air between every control (icons and n-of-m) */
 }
 
-.exodus_recordnav_group > span {
+.exo_recordnav_group > span {
     display: inline-flex;
     align-items: center;
 }
 
-.exodus_recordnav_group .menubutton,
-.exodus_recordnav_group .graphicbutton {
+.exo_recordnav_group .menubutton,
+.exo_recordnav_group .graphicbutton {
     float: none !important;
     display: inline-flex;
     align-items: center;
@@ -1348,28 +1348,28 @@ img[id^="deleterowbutton"] {
     height: calc(var(--exodus-ui-icon-size) + 10px) !important;
     margin: 0.125em 0 !important; /* no L/R — gap owns horizontal */
     padding: 0 !important;        /* icon hit target = icon box; n-of-m pads itself */
-    /* beat #exodus_menu .menubutton { gap: 0.25em } so no phantom icon/label gap */
+    /* beat #exo_menu .menubutton { gap: 0.25em } so no phantom icon/label gap */
     gap: 0 !important;
 }
 
 /* Icon-only nav: kill the usual label gap after the mask (no text sibling). */
-.exodus_recordnav_group .menubutton .exodus-icon,
-.exodus_recordnav_group .graphicbutton .exodus-icon,
-.exodus_recordnav_group .menubutton > img,
-.exodus_recordnav_group .graphicbutton > img {
+.exo_recordnav_group .menubutton .exodus-icon,
+.exo_recordnav_group .graphicbutton .exodus-icon,
+.exo_recordnav_group .menubutton > img,
+.exo_recordnav_group .graphicbutton > img {
     margin-inline-end: 0 !important;
 }
 
 /* "n of m" — equal text pad; outer spacing still from group gap.
  * Face clone uses data-source-id (ids stay on hidden source). */
-.exodus_recordnav_group #selectrecordbutton,
-.exodus_recordnav_group [data-source-id="selectrecordbutton"] {
+.exo_recordnav_group #selectrecordbutton,
+.exo_recordnav_group [data-source-id="selectrecordbutton"] {
     padding-left: 0.3em !important;
     padding-right: 0.3em !important;
 }
 
-.exodus_recordnav_group #selectrecordbutton_label,
-.exodus_recordnav_group [data-source-id="selectrecordbutton_label"] {
+.exo_recordnav_group #selectrecordbutton_label,
+.exo_recordnav_group [data-source-id="selectrecordbutton_label"] {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1390,7 +1390,7 @@ img[id^="deleterowbutton"] {
 }
 
 /* Right menubar cluster: session | theme | refresh | logout */
-.exodus_menubar_trailing {
+.exo_menubar_trailing {
     float: right;
     display: flex;
     flex-direction: row;
@@ -1400,8 +1400,8 @@ img[id^="deleterowbutton"] {
     margin-left: 10px;
 }
 
-/* Database name + username: first flex child of .exodus_menubar_trailing */
-.exodus_menubar_session {
+/* Database name + username: first flex child of .exo_menubar_trailing */
+.exo_menubar_session {
     float: none;
     margin: 0 10px 0 0; /* keep session → theme a bit open */
     line-height: var(--exodus-ui-icon-size, 1.325em);
@@ -1410,10 +1410,10 @@ img[id^="deleterowbutton"] {
 }
 
 /* theme → refresh tight; refresh → logout a touch more open */
-.exodus_menubar_trailing > .theme_button {
+.exo_menubar_trailing > .theme_button {
     margin-right: 4px;
 }
-.exodus_menubar_trailing .refresh_wrapper {
+.exo_menubar_trailing .refresh_wrapper {
     float: none;
     margin: 0 6px 0 0;
     padding: 0;
@@ -1430,20 +1430,20 @@ img[id^="deleterowbutton"] {
 }
 
 /* Strip menubutton chrome so margins alone set spacing */
-.exodus_menubar_trailing .logout_wrapper .menubutton,
-.exodus_menubar_trailing .refresh_wrapper .menubutton {
+.exo_menubar_trailing .logout_wrapper .menubutton,
+.exo_menubar_trailing .refresh_wrapper .menubutton {
     margin: 0 !important;
     padding-left: 0.25em !important;
     padding-right: 0.25em !important;
 }
-.exodus_menubar_session_test {
+.exo_menubar_session_test {
     color: red;
 }
 /* After all floated menubar children so the bar's height includes them.
    clear:both (not only left) — session-only bars have float:right trailing
    and no left floats; clear:left left the bar height collapsed so body
    margin under-estimated and page titles sat under the fixed bar. */
-.exodus_menubar_clear {
+.exo_menubar_clear {
     clear: both;
     min-height: 1px;
 }
@@ -1869,7 +1869,7 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead th,
 :root[data-theme="dark_mode"] .exodusconfirmdiv #decide_table1 > thead td,
-:root[data-theme="dark_mode"] .exodus_typeahead_table > thead th {
+:root[data-theme="dark_mode"] .exo_typeahead_table > thead th {
     background-color: #303a5a;
 }
 
@@ -1932,8 +1932,8 @@ SPAN.calendar-date-committed[contenteditable] {
     color: var(--exodus-informbutton-color);
 }
 
-:root[data-theme="dark_mode"] #exodus_menu .menubutton:hover,
-:root[data-theme="dark_mode"] #exodus_menu .menubutton:focus {
+:root[data-theme="dark_mode"] #exo_menu .menubutton:hover,
+:root[data-theme="dark_mode"] #exo_menu .menubutton:focus {
     background-color: var(--exodus-menu-hover-bg-color);
 }
 
@@ -2158,7 +2158,7 @@ SPAN.calendar-date-committed[contenteditable] {
         position: static;
     }
 
-    #exodus_menu {
+    #exo_menu {
         display: none !important;
     }
 

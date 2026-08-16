@@ -257,11 +257,11 @@ Only when the user has **just** asked for a light framework adaptation of keyboa
 
 Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 
-- **Gate A** = exclusive async *business* flight (`exodus_begin`). `form_blockevents` prevents a *second flight*, not browser defaults for the control that just focused.
-- **Avoid parallel starts at the source.** Do not call `exodus_begin` while another flight is airborne. Nested `await` inside the current flight is correct; a second *commencement* is not. Capture/sync handlers outside Gate A (e.g. digit accesskeys) must **not** start a flight if `g_exodus_flow` is set — return/ignore. Optional background uses `exodus_begin_if_idle` (quiet skip). Required work that must run after land uses `exodus_begin_when_idle`.
-- **Parallel start → visible `systemerror`, not silent ignore.** With `queue_max = 0`, a conflicting `exodus_begin` shows a Gate A conflict dialog (debug signal). Do not “fix” races by teaching Gate A to swallow conflicts; fix the caller so it never takes off while busy.
+- **Gate A** = exclusive async *business* flight (`exo_begin`). `form_blockevents` prevents a *second flight*, not browser defaults for the control that just focused.
+- **Avoid parallel starts at the source.** Do not call `exo_begin` while another flight is airborne. Nested `await` inside the current flight is correct; a second *commencement* is not. Capture/sync handlers outside Gate A (e.g. digit accesskeys) must **not** start a flight if `g_exodus_flow` is set — return/ignore. Optional background uses `exo_begin_if_idle` (quiet skip). Required work that must run after land uses `exo_begin_when_idle`.
+- **Parallel start → visible `systemerror`, not silent ignore.** With `queue_max = 0`, a conflicting `exo_begin` shows a Gate A conflict dialog (debug signal). Do not “fix” races by teaching Gate A to swallow conflicts; fix the caller so it never takes off while busy.
 - **Focus is not modal.** Do not mount `#uiblockerdiv` on focus/activate flights (native `<select>` dies under a full-page overlay).
-- **Background is not modal.** `exodus_begin_if_idle` (expression2 poll, keepalive, relock) must not mount `#uiblockerdiv` / `overflow:hidden` either — that flashed page scrollbars every 250ms on wide forms (mediadiary).
+- **Background is not modal.** `exo_begin_if_idle` (expression2 poll, keepalive, relock) must not mount `#uiblockerdiv` / `overflow:hidden` either — that flashed page scrollbars every 250ms on wide forms (mediadiary).
 - **Same gesture:** focus runs *before* the click of that click. Cancelling that click → SELECT focus-only on first press. Allow native SELECT activation through while blocked; still do not start a new flight.
 - **Do not blur+refocus** a control that already holds `document.activeElement` (closes open listboxes). `focuson` / `focuson2` only re-assert when focus was lost.
 

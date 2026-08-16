@@ -2139,11 +2139,11 @@ function exotimer() {
 //ensure hashtags go on line breaks
 //hashtag is a (space followed by a # followed by NOT a space)
 //eg ..... #XXX will be broken onto a new line
-function exodus_HASHTAGS(type, input, mode) {
+function exo_HASHTAGS(type, input, mode) {
 
     //can handle an array of values but what about strings that appear as objects
     if (typeof input == 'object')
-        return exoconvarray(exodus_HASHTAGS, type, input, mode)
+        return exoconvarray(exo_HASHTAGS, type, input, mode)
 
     input = input.toString()
     if (input == '')
@@ -2169,7 +2169,7 @@ function exodus_HASHTAGS(type, input, mode) {
 
 }
 
-function exodus_splitarray(array, mvgroups, n) {
+function exo_splitarray(array, mvgroups, n) {
 
     if (typeof array == 'string') array = array.split(fm)
 

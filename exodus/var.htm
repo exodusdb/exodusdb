@@ -275,16 +275,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .k   { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword */
 .kc  { color: var(--keyword-cnst-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Constant */
 
-/* used in exodus_cpp.py EXTRA_DECLARATIONS 'func', 'subr', 'function', 'subroutine' */
+/* used in exo_cpp.py EXTRA_DECLARATIONS 'func', 'subr', 'function', 'subroutine' */
 .kd  { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /*Keyword.Declaration*/
 
 .kn  { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Namespace */
 .kp  { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Pseudo */
 
-/* used in exodus_cpp.py EXTRA_FLOW_CONTROL 'stop', 'abort', 'abortall', 'call', 'gosub' */
+/* used in exo_cpp.py EXTRA_FLOW_CONTROL 'stop', 'abort', 'abortall', 'call', 'gosub' */
 .kr  { color: var(--keyword-flow-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Reserved */
 
-/* used in exodus_cpp.py EXTRA_TYPES 'dim', 'var', '_var', 'rex', '_rex', 'let', 'in', 'out', 'io', 'qqqqqqq'
+/* used in exo_cpp.py EXTRA_TYPES 'dim', 'var', '_var', 'rex', '_rex', 'let', 'in', 'out', 'io', 'qqqqqqq'
 									'libraryinit', 'libraryexit',
 									 'commoninit', 'commonexit',
 									'dictinit', 'dictexit'*/
@@ -359,7 +359,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .ni  { color: var(--name-entity-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Entity */
 .ne  { color: var(--name-exception-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Exception */
 
-/* used in exodus_cpp.py EXTRAC_FUNCTIONS massive list*/
+/* used in exo_cpp.py EXTRAC_FUNCTIONS massive list*/
 .nf  { color: var(--name-class-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Function */
 
 .nl  { color: var(--name-label-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Label */
@@ -7332,7 +7332,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<code>var().breakon()</code></p></td>
 		<td>
 			<p>Install various interrupt handlers.</p>
-			<p>Automatically called in program/thread initialisation by exodus_main.</p>
+			<p>Automatically called in program/thread initialisation by exo_main.</p>
 			<dl>
 				<dt>SIGINT</dt>
 				<dd>Ctrl+C -&gt; "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"</dd>

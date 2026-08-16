@@ -8,8 +8,8 @@
         // Standard menubar tools are added after formfunctions_onload — defer Print.
         async function formfunctions_onload() {
             window.setTimeout(function () {
-                if (typeof exodus_menubar_add_button == 'function')
-                    exodus_menubar_add_button(
+                if (typeof exo_menubar_add_button == 'function')
+                    exo_menubar_add_button(
                         'helpkeyboard_print',
                         typeof gprintimage != 'undefined' ? gprintimage : null,
                         '<u>P</u>rint',

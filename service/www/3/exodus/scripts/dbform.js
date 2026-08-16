@@ -352,31 +352,31 @@ function form_glue_name_to_prev_code_chrome(nameEl) {
 }
 
 // Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Open/Edit/Delete.
-// (exodus_icon_spec / colours: client.js + --exodus-icon-* in global.css)
+// (exo_icon_spec / colours: client.js + --exodus-icon-* in global.css)
 gnewimage = gimagetheme + 'record-new_lm.svg' // painted multicolour — excluded from mask tint
 gopenimage = gimagetheme + 'record-open_lm.svg' // painted page + magnifier
 // F7/F6 field chrome: same grey as body text (--exodus-icon-neutral)
-gfindimage = exodus_icon_spec('field-find.svg', 'neutral')
-gcalendarimage = exodus_icon_spec('field-date.svg', 'neutral')
-gsaveimage = exodus_icon_spec('record-save.svg', 'green')
-gsavegreyimage = exodus_icon_spec('record-save.svg', 'lightgrey') // inactive Save
+gfindimage = exo_icon_spec('field-find.svg', 'neutral')
+gcalendarimage = exo_icon_spec('field-date.svg', 'neutral')
+gsaveimage = exo_icon_spec('record-save.svg', 'green')
+gsavegreyimage = exo_icon_spec('record-save.svg', 'lightgrey') // inactive Save
 // Painted multi-colour (overlapping sheets) — not a single CSS tint
 gcopyimage = gimagetheme + (gisdarktheme ? 'record-copy_dm.svg' : 'record-copy_lm.svg')
-gcloseimage = exodus_icon_spec('record-close.svg', 'red')
-greleaseimage = exodus_icon_spec('record-release.svg', 'blue') // was #1E97CC
+gcloseimage = exo_icon_spec('record-close.svg', 'red')
+greleaseimage = exo_icon_spec('record-release.svg', 'blue') // was #1E97CC
 geditimage = gimagetheme + 'record-edit_lm.svg' // painted multicolour
 gdeleteimage = gimagetheme + 'record-delete_lm.svg' // painted multicolour
-glistimage = exodus_icon_spec('file-list.svg', 'darkgrey')
-gprintsendimage = exodus_icon_spec('file-print.svg', 'darkgrey')
-ginsertrowimage = exodus_icon_spec('row-insert.svg', 'green')
-gdeleterowimage = exodus_icon_spec('row-delete.svg', 'red')
-gexpandrowimage = exodus_icon_spec('row-expand.svg', 'darkgrey')
-gsortimage = exodus_sortimage()
-glinkimage = exodus_icon_spec('field-link.svg', 'neutral')
-gfirstimage = exodus_icon_spec('nav-first.svg', 'blue')
-glastimage = exodus_icon_spec('nav-last.svg', 'blue')
-gnextimage = exodus_icon_spec('nav-next.svg', 'blue')
-gpreviousimage = exodus_icon_spec('nav-prev.svg', 'blue')
+glistimage = exo_icon_spec('file-list.svg', 'darkgrey')
+gprintsendimage = exo_icon_spec('file-print.svg', 'darkgrey')
+ginsertrowimage = exo_icon_spec('row-insert.svg', 'green')
+gdeleterowimage = exo_icon_spec('row-delete.svg', 'red')
+gexpandrowimage = exo_icon_spec('row-expand.svg', 'darkgrey')
+gsortimage = exo_sortimage()
+glinkimage = exo_icon_spec('field-link.svg', 'neutral')
+gfirstimage = exo_icon_spec('nav-first.svg', 'blue')
+glastimage = exo_icon_spec('nav-last.svg', 'blue')
+gnextimage = exo_icon_spec('nav-next.svg', 'blue')
+gpreviousimage = exo_icon_spec('nav-prev.svg', 'blue')
 // Painted New/Open/Edit/Delete need DM twin files
 if (gisdarktheme) {
 	gnewimage = gimagetheme + 'record-new_dm.svg'
@@ -574,7 +574,7 @@ function form_formbuttons_place() {
 }
 
 // Database name + username in the trailing menubar cluster (left of theme/logout).
-// Cluster is one float:right flex row with equal gap — see exodus_menubar_trailing_cluster.
+// Cluster is one float:right flex row with equal gap — see exo_menubar_trailing_cluster.
 // Never nest inside #formbuttonsdiv (float:left) — that pins the label to the form actions.
 // clear:both must come AFTER all floated menubar children (height for adjust_bodymargin).
 function form_place_menubar_session() {
@@ -585,12 +585,12 @@ function form_place_menubar_session() {
     if (!gexodus_menubar)
         return
 
-    var old = gexodus_menubar.querySelector('.exodus_menubar_session')
+    var old = gexodus_menubar.querySelector('.exo_menubar_session')
     if (old)
         old.parentNode.removeChild(old)
 
     // Remove prior clear divs so we can re-append clear as the last child
-    var clears = gexodus_menubar.querySelectorAll('.exodus_menubar_clear')
+    var clears = gexodus_menubar.querySelectorAll('.exo_menubar_clear')
     for (var ci = 0; ci < clears.length; ci++)
         clears[ci].parentNode.removeChild(clears[ci])
 
@@ -599,15 +599,15 @@ function form_place_menubar_session() {
         return
 
     var span = document.createElement('span')
-    span.className = 'exodus_menubar_session'
+    span.className = 'exo_menubar_session'
     // Codes are only "xxx" or "xxx_test"
     if (gdataset && String(gdataset).slice(-5) == '_test')
-        span.classList.add('exodus_menubar_session_test')
+        span.classList.add('exo_menubar_session_test')
     span.appendChild(document.createTextNode(text))
 
     // First child of trailing cluster: [session | theme | logout]
-    var trailing = (typeof exodus_menubar_trailing_cluster == 'function')
-        ? exodus_menubar_trailing_cluster()
+    var trailing = (typeof exo_menubar_trailing_cluster == 'function')
+        ? exo_menubar_trailing_cluster()
         : null
     if (trailing) {
         if (trailing.firstChild)
@@ -619,7 +619,7 @@ function form_place_menubar_session() {
     }
 
     var clear = document.createElement('div')
-    clear.className = 'exodus_menubar_clear'
+    clear.className = 'exo_menubar_clear'
     gexodus_menubar.appendChild(clear)
 
     // Session-only bars (modal search.htm) and late content must push body below the fixed bar
@@ -651,7 +651,7 @@ function formbuttons_install() {
     var source = $$('formbuttonsdiv')
     if (!source)
         return
-    source.classList.add('exodus_formbuttons_source')
+    source.classList.add('exo_formbuttons_source')
     source.inert = true
     formbuttons_place_face(source)
     render_formbuttons()
@@ -683,7 +683,7 @@ function render_formbuttons() {
         return
 
     var clone = source.cloneNode(true)
-    clone.classList.remove('exodus_formbuttons_source')
+    clone.classList.remove('exo_formbuttons_source')
 
     function scrub(node) {
         if (!node || node.nodeType !== 1)
@@ -717,7 +717,7 @@ function render_formbuttons() {
         face.appendChild(clone.firstChild)
 
     face.classList.toggle('exodusformactions', source.classList.contains('exodusformactions'))
-    face.classList.toggle('exodus_formbuttons_relocated', source.classList.contains('exodus_formbuttons_relocated'))
+    face.classList.toggle('exo_formbuttons_relocated', source.classList.contains('exo_formbuttons_relocated'))
 }
 
 // Call after form_postdisplay / custom buttons / pane wrap: if the action bar is
@@ -757,7 +757,7 @@ function form_move_action_buttons_to_top() {
     if (oldface && oldface.parentNode)
         oldface.parentNode.removeChild(oldface)
 
-    // #exodus_menu is a SPAN — keep formbuttonsdiv a SPAN for valid nesting
+    // #exo_menu is a SPAN — keep formbuttonsdiv a SPAN for valid nesting
     var topbar = bar
     if (bar.tagName !== 'SPAN') {
         topbar = document.createElement('SPAN')
@@ -774,8 +774,8 @@ function form_move_action_buttons_to_top() {
     }
 
     // Mark relocated so CSS can add spacing after Menu (not for native top bars)
-    topbar.classList.add('exodus_formbuttons_relocated')
-    topbar.classList.add('exodus_formbuttons_source')
+    topbar.classList.add('exo_formbuttons_relocated')
+    topbar.classList.add('exo_formbuttons_source')
 
     // Order: Menu | form actions (List/…) | trailing. Never left of Menu.
     // Race: form_keep / rAF often runs *after* client.js inserts .hamburger_menu;
@@ -1419,7 +1419,7 @@ async function formfunctions_onload() {
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealPopup = true
 
-                    var element2 = exodus_create_icon_element(
+                    var element2 = exo_create_icon_element(
                         fieldname.indexOf('DATE') >= 0 ? gcalendarimage : gfindimage
                     )
                     element2.id = element.id + '_popup'
@@ -1450,7 +1450,7 @@ async function formfunctions_onload() {
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealLink = true
 
-                    var element2 = exodus_create_icon_element(glinkimage)
+                    var element2 = exo_create_icon_element(glinkimage)
                     element.parentNode.insertBefore(element2, element)
                     element2.style.flexShrink = '0'
                     // di.popup='' → pad F7 slot before link (e.g. DATELIST)
@@ -1824,9 +1824,9 @@ async function formfunctions_onload() {
                     if (tlast && tlast.nodeType == 3)
                         tlast.nodeValue = String(tlast.nodeValue).replace(/\s+$/, '')
 
-                    var element2 = exodus_create_icon_element(gsortimage)
-                    if (typeof exodus_apply_sort_icon == 'function')
-                        element2 = exodus_apply_sort_icon(element2, '') || element2
+                    var element2 = exo_create_icon_element(gsortimage)
+                    if (typeof exo_apply_sort_icon == 'function')
+                        element2 = exo_apply_sort_icon(element2, '') || element2
                     titleelement.insertBefore(element2, null)
 
                     element2.id = 'sortbutton_' + Number(element.getAttribute('exogroupno'))
@@ -2004,7 +2004,7 @@ async function formfunctions_onload() {
                     t += '<span style="white-space: nowrap">'
                     //if (!(exogetattribute(element,'exodusnoinsertrow')))
                     if (hasIns) {
-                        t += exodus_icon_html(ginsertrowimage, null,
+                        t += exo_icon_html(ginsertrowimage, null,
                             ' id="insertrowbutton' + groupno + '"'
                             + ' title="Insert a new row here ' + t2 + '"'
                             + ' exodusonclick="await insertrow_onclick(event)"'
@@ -2012,7 +2012,7 @@ async function formfunctions_onload() {
                     }
                     //if (!(exogetattribute(element,'exodusnodeleterow')))
                     if (hasDel) {
-                        t += exodus_icon_html(gdeleterowimage, null,
+                        t += exo_icon_html(gdeleterowimage, null,
                             ' id="deleterowbutton' + groupno + '"'
                             + ' title="Delete this row ' + t3 + '"'
                             + ' exodusonclick="await deleterow_onclick(event)"'
@@ -2236,7 +2236,7 @@ async function formfunctions_onload() {
             buttonhtml += menubuttonhtml2('listrecord', glistimage, '<u>L</u>ist', 'List the current file. ' + AltorCtrl + '+L', 'L')
 
         //NAVIGATION multirecord — one group; CSS gap owns spacing (icon-only: empty label)
-        buttonhtml += '<span class="exodus_recordnav_group">'
+        buttonhtml += '<span class="exo_recordnav_group">'
         buttonhtml += menubuttonhtml2('firstrecord', gfirstimage, '', 'Open the first document. ' + AltorCtrl + '+{', '{')
         buttonhtml += menubuttonhtml2('previousrecord', gpreviousimage, '', 'Open the previous document. ' + AltorCtrl + '+[', '[')
         // Text only ("n of m"); CSS gap matches icon buttons — no spacer img
@@ -2805,8 +2805,8 @@ function form_digit_accesskey_capture_keydown(event) {
 
     var targetel = element
     // Activation needs Gate A (exoevaluate / dbio).
-    if (typeof exodus_begin == 'function') {
-        void exodus_begin(async function form_digit_accesskey_activate(ev) {
+    if (typeof exo_begin == 'function') {
+        void exo_begin(async function form_digit_accesskey_activate(ev) {
             await form_activate_accesskey_control(ev, targetel)
         }, 'digit accesskey ' + digit, event)
     } else {
@@ -3501,7 +3501,7 @@ async function document_onkeypress(event) {
 */
 //DOCUMENT ON KEY DOWN
 //////////////////////
-// Gate A (exodus_begin / gblockevents) already serializes keydown flights — no local mutex.
+// Gate A (exo_begin / gblockevents) already serializes keydown flights — no local mutex.
 async function document_onkeydown(event) {
 
     //document_onkeydown also occurs in non-form windows not using dbform.js - like upload.htm etc
@@ -3829,7 +3829,7 @@ async function document_onkeydown2(event) {
             gstepping = true
             var _b = exobreak('', 'F12', '');
             if (exoisasyncfunction(_b))
-                exodus_begin_when_idle(_b, 'F12', { delay_ms: 0 })
+                exo_begin_when_idle(_b, 'F12', { delay_ms: 0 })
             else if (_b && typeof _b.next === 'function')
                 systemerror('document_onkeydown', 'function* break handler removed (stage 6)')
             return exocancelevent(event)
@@ -4811,7 +4811,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
         // offsetWidth checks do not skip it — must skip by class or focus sticks.
         var inFormbuttonsSource = false
         for (var p = nextelement; p; p = p.parentNode) {
-            if (p.classList && p.classList.contains('exodus_formbuttons_source')) {
+            if (p.classList && p.classList.contains('exo_formbuttons_source')) {
                 inFormbuttonsSource = true
                 break
             }
@@ -6414,10 +6414,10 @@ async function resetsortimages(groupno) {
         return
     var elements = tablex.querySelectorAll('[id="sortbutton_' + groupno + '"]')
     for (var elementn = 0; elementn < elements.length; elementn++) {
-        if (typeof exodus_apply_sort_icon == 'function')
-            exodus_apply_sort_icon(elements[elementn], '')
+        if (typeof exo_apply_sort_icon == 'function')
+            exo_apply_sort_icon(elements[elementn], '')
         else
-            exodus_set_icon_element(elements[elementn], gsortimage)
+            exo_set_icon_element(elements[elementn], gsortimage)
     }
 
 }
@@ -6512,7 +6512,7 @@ function form_typeahead_dblink() {
         // Quiet: no blockmodalui on send (avoids scroll-to-top every key)
         gform_typeahead_db.quiet = true
         // Typeahead I/O is client-cacheable by full request string (gcache cleared
-        // on refresh / Alt+R). exodus_typeahead also prefixes CACHE\r.
+        // on refresh / Alt+R). exo_typeahead also prefixes CACHE\r.
         var _ta_send = gform_typeahead_db.send
         gform_typeahead_db.send = async function form_typeahead_send(data) {
             if (this.request && String(this.request).slice(0, 6) != 'CACHE\r')
@@ -6652,8 +6652,8 @@ function form_typeahead_ensure() {
     if (gform_typeahead_div)
         return gform_typeahead_div
     var div = document.createElement('div')
-    div.id = 'exodus_typeahead'
-    div.className = 'exodus_typeahead'
+    div.id = 'exo_typeahead'
+    div.className = 'exo_typeahead'
     div.style.display = 'none'
     div.onmousedown = function () {
         gform_typeahead_mousedown = true
@@ -7038,8 +7038,8 @@ function form_typeahead_show(element, cols, rows, returncoln) {
 
     // col[0] may be a numeric field index into the row (same as exoui_decide / ACCOUNTLIST).
     // col[1] is the title when col is [id, title, …].
-    var html = '<table class="exodus_typeahead_table" cellspacing="0" cellpadding="0">'
-    html += '<thead><tr class="exodus_typeahead_head">'
+    var html = '<table class="exo_typeahead_table" cellspacing="0" cellpadding="0">'
+    html += '<thead><tr class="exo_typeahead_head">'
     for (var c0 = 0; c0 < cols.length; c0++) {
         var coldef0 = cols[c0]
         var title = ''
@@ -7075,12 +7075,12 @@ function form_typeahead_show(element, cols, rows, returncoln) {
     }
     html += '</tbody></table>'
     if (truncated)
-        html += '<div class="exodus_typeahead_truncated">Showing first ' + typeahead_limitn + ' — type more to narrow</div>'
+        html += '<div class="exo_typeahead_truncated">Showing first ' + typeahead_limitn + ' — type more to narrow</div>'
     div.innerHTML = html
     if (truncated)
-        div.classList.add('exodus_typeahead_is_truncated')
+        div.classList.add('exo_typeahead_is_truncated')
     else
-        div.classList.remove('exodus_typeahead_is_truncated')
+        div.classList.remove('exo_typeahead_is_truncated')
     form_typeahead_place(element, div)
     div.style.display = ''
     // Must reset AFTER display is visible — scrollTop while display:none is ignored
@@ -7155,7 +7155,7 @@ function form_typeahead_select_all_list() {
     var div = gform_typeahead_div
     if (!div || div.style.display == 'none')
         return false
-    var table = div.querySelector('.exodus_typeahead_table')
+    var table = div.querySelector('.exo_typeahead_table')
     if (!table)
         return false
     if (window.getSelection && document.createRange) {
@@ -7291,20 +7291,20 @@ function form_typeahead_set_focus(n, fromkeys) {
     gform_typeahead_focusn = n
     for (var i = 0; i < trs.length; i++) {
         if (i == n)
-            trs[i].classList.add('exodus_typeahead_focus')
+            trs[i].classList.add('exo_typeahead_focus')
         else
-            trs[i].classList.remove('exodus_typeahead_focus')
+            trs[i].classList.remove('exo_typeahead_focus')
     }
     if (fromkeys)
         gform_typeahead_hover_locked = true
     // Keep highlight below sticky thead (same helper as decide)
     if (trs[n]) {
-        if (typeof exodus_scroll_row_below_sticky_thead == 'function')
-            exodus_scroll_row_below_sticky_thead(trs[n], gform_typeahead_div)
+        if (typeof exo_scroll_row_below_sticky_thead == 'function')
+            exo_scroll_row_below_sticky_thead(trs[n], gform_typeahead_div)
         else if (trs[n].scrollIntoView)
             trs[n].scrollIntoView({ block: 'nearest' })
         // Following row (if any) — or truncation footer after the last data row
-        var follow = trs[n + 1] || div.querySelector('.exodus_typeahead_truncated')
+        var follow = trs[n + 1] || div.querySelector('.exo_typeahead_truncated')
         if (follow) {
             var paneRect = div.getBoundingClientRect()
             var followRect = follow.getBoundingClientRect()
@@ -7690,7 +7690,7 @@ function startrelocker() {
     //2.2 ie try at least two relocks within the locktimeout period
     // Optional: skip if Gate A busy — never queue (form/lock state may have changed).
     grelocker = window.setInterval(function () {
-        void exodus_begin_if_idle(relockdoc, 'relockdoc')
+        void exo_begin_if_idle(relockdoc, 'relockdoc')
     }, glocktimeoutinmins / 2.2 * 60 * 1000)
 }
 
@@ -10775,11 +10775,11 @@ async function form_insertrow(event, append) {
     }
 
     // Following row(s) hidden → expand instead of insert, except:
-    //   • dblclick value filter (table.exodus_filter_colid): always insert
+    //   • dblclick value filter (table.exo_filter_colid): always insert
     //     (c137c49b — filter hide is not fold; insert after filter)
     //   • fold-on-open [+] (exodusexpand) while Show All up: expand those
     //   • not filtered: expand (indent/legacy hide)
-    var valueFilter = !!(tablex && tablex.exodus_filter_colid)
+    var valueFilter = !!(tablex && tablex.exo_filter_colid)
     var insertbtn = grows[grecn] && grows[grecn].exodusfields
         && grows[grecn].exodusfields['insertrowbutton' + groupno]
     var expandAffordance = insertbtn && insertbtn.getAttribute('exodusexpand')
@@ -10889,13 +10889,13 @@ function setinsertimage(mode, row, groupno) {
         return
 
     if (mode == 'expand') {
-        insertimage = exodus_set_icon_element(insertimage, gexpandrowimage)
+        insertimage = exo_set_icon_element(insertimage, gexpandrowimage)
         insertimage.setAttribute('exodusexpand', '1')
         //duplicate keycodes in 3 places
         insertimage.title = 'Expand hidden rows here (Ctrl+I or Ctrl+Insert)'
     }
     else {
-        insertimage = exodus_set_icon_element(insertimage, ginsertrowimage)
+        insertimage = exo_set_icon_element(insertimage, ginsertrowimage)
         insertimage.removeAttribute('exodusexpand')
         //duplicate keycodes in 3 places
         insertimage.title = 'Insert a new row here (Ctrl+I or Ctrl+Insert)'
@@ -10905,13 +10905,13 @@ function setinsertimage(mode, row, groupno) {
 
 // True while row filter is active (dblclick state and/or Show All visible).
 function form_group_is_filtered(tablex, groupno) {
-    if (tablex && tablex.exodus_filter_colid)
+    if (tablex && tablex.exo_filter_colid)
         return true
     // Prefer the bound multivalue table (exogroupN), not a nested TABLE ancestor.
     var gtable = (typeof groupno != 'undefined' && groupno !== '' && groupno != null)
         ? document.getElementById('exogroup' + groupno)
         : null
-    if (gtable && gtable.exodus_filter_colid)
+    if (gtable && gtable.exo_filter_colid)
         return true
     var showall = document.getElementById('exogroup' + groupno + 'showall')
     if (!showall)
@@ -11415,7 +11415,7 @@ async function debug(v) {
     if (!(confirm(v))) {
         var _b = exobreak();
         if (exoisasyncfunction(_b))
-            await exodus_begin(_b, 'break')
+            await exo_begin(_b, 'break')
         else if (_b && typeof _b.next === 'function')
             systemerror('debug', 'function* break handler removed (stage 6)')
     }
@@ -11683,13 +11683,13 @@ function form_group_leadin_display(tablex, show) {
 // when_idle: these handlers bypass starteventhandler/gblockevents, so a one-shot
 // begin during an open flight would systemerror; wait for land instead.
 function form_filter_onblur_sync(groupno, elem) {
-    exodus_begin_when_idle(function () {
+    exo_begin_when_idle(function () {
         return form_filter('filterall', groupno, null, null, elem)
     }, 'form_filter filterall', { delay_ms: 0 })
 }
 
 function form_filter_onfocus_sync(groupno, elem) {
-    exodus_begin_when_idle(function () {
+    exo_begin_when_idle(function () {
         return form_filter('filterfocus', groupno, null, null, elem)
     }, 'form_filter filterfocus', { delay_ms: 0 })
 }
@@ -11804,8 +11804,8 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         if (typeof tablexfilter != 'undefined' && tablexfilter)
             tablexfilter.size = 3
         // clear dblclick filter snapshot on the ruling table
-        tablex.exodus_filter_colid = ''
-        tablex.exodus_filter_value = ''
+        tablex.exo_filter_colid = ''
+        tablex.exo_filter_value = ''
         await calcfields()
         return true
     }
@@ -11840,12 +11840,12 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     // Dblclick same col + same value again → Show All (unfilter).
     // State lives on the multivalue TABLE (exogroupN).
     if (mode == 'filter' && !regexp && !maxrecn && !filterall) {
-        var prevCol = tablex.exodus_filter_colid
-        var prevVal = tablex.exodus_filter_value
+        var prevCol = tablex.exo_filter_colid
+        var prevVal = tablex.exo_filter_value
         if (prevCol === colid && String(prevVal) === String(value))
             return await form_filter('unfilter', groupno)
-        tablex.exodus_filter_colid = colid
-        tablex.exodus_filter_value = value
+        tablex.exo_filter_colid = colid
+        tablex.exo_filter_value = value
     }
 
     //hide unmatched rows
@@ -11961,7 +11961,7 @@ async function form_pop_calendar() {
     // flight flashes: LANDING → exoui_popup focuson(date) → form_closepopups hides it.
     // Contract: return null so exoui_popup refocuses the date field first; open after
     // that focus chain settles (same timing as the old setTimeout open).
-    exodus_begin_when_idle(form_popcalendar2, 'form_popcalendar2', { delay_ms: 100 })
+    exo_begin_when_idle(form_popcalendar2, 'form_popcalendar2', { delay_ms: 100 })
     return null
 }
 

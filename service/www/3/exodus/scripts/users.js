@@ -15,7 +15,7 @@ async function form_postinit() {
         exosetcookie(glogincode, 'EXODUS2', '', 'wn')
         exosetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
         // Defer open so form finishes init; takeoff when Gate A free (fail loud if not)
-        exodus_begin_when_idle(function () { return windowopen(gwhatsnew) }, 'users whatsnew', {
+        exo_begin_when_idle(function () { return windowopen(gwhatsnew) }, 'users whatsnew', {
             delay_ms: 1000
         })
     }
@@ -48,8 +48,8 @@ async function form_postdisplay() {
     // Discard and cleardoc re-enter postdisplay.
     if (typeof colors_restore_saved_chrome == 'function')
         colors_restore_saved_chrome()
-    else if (typeof exodus_chrome_from_cookies == 'function')
-        exodus_chrome_from_cookies()
+    else if (typeof exo_chrome_from_cookies == 'function')
+        exo_chrome_from_cookies()
 
     // After gds.load (not form_postread): form_filter and signature img need bound rows.
     await users_postdisplay()
@@ -73,8 +73,8 @@ async function form_postwrite() {
     gtasks_newpassword = false
 
     // Only cookie write site for screen chrome. Sanitize empty/Default/keywords → "".
-    var store = typeof exodus_chrome_cookie_store == 'function'
-        ? exodus_chrome_cookie_store
+    var store = typeof exo_chrome_cookie_store == 'function'
+        ? exo_chrome_cookie_store
         : function (v) { return v == null ? '' : String(v) }
     var bodyColor = store(await gds.getx('SCREEN_BODY_COLOR'))
     var screenFont = store(await gds.getx('SCREEN_FONT'))
@@ -83,8 +83,8 @@ async function form_postwrite() {
     exosetcookie(glogincode, 'EXODUS2', screenFont, 'ff')
     exosetcookie(glogincode, 'EXODUS2', screenFontSize, 'fs')
     // Same path as every other screen entry
-    if (typeof exodus_chrome_from_cookies == 'function')
-        exodus_chrome_from_cookies()
+    if (typeof exo_chrome_from_cookies == 'function')
+        exo_chrome_from_cookies()
 
     return true
 

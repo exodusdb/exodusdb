@@ -52,18 +52,18 @@ var gimagetheme = '../../exodus/images/theme2/'
  *   { mask, color } — black monochrome SVG, tinted via CSS --exodus-icon-*
  * Colour names: green, red, orange, blue, darkgrey, lightgrey, neutral
  */
-function exodus_icon_spec(mask, color) {
+function exo_icon_spec(mask, color) {
 	return { mask: mask, color: color || 'darkgrey' }
 }
-function exodus_is_icon_spec(x) {
+function exo_is_icon_spec(x) {
 	return !!(x && typeof x == 'object' && x.mask)
 }
 
-var gmenuimage = exodus_icon_spec('shell-menu.svg', 'darkgrey')
-var glogoutimage = exodus_icon_spec('shell-logout.svg', 'red')
-var gloginimage = exodus_icon_spec('shell-login.svg', 'green')
-var grefreshimage = exodus_icon_spec('shell-refresh.svg', 'green')
-var gprintimage = exodus_icon_spec('file-print.svg', 'darkgrey')
+var gmenuimage = exo_icon_spec('shell-menu.svg', 'darkgrey')
+var glogoutimage = exo_icon_spec('shell-logout.svg', 'red')
+var gloginimage = exo_icon_spec('shell-login.svg', 'green')
+var grefreshimage = exo_icon_spec('shell-refresh.svg', 'green')
+var gprintimage = exo_icon_spec('file-print.svg', 'darkgrey')
 var gthemeimage = gimagetheme + 'shell-theme_lm.svg' // painted sun/moon chrome
 // company icon uses a patterned SVG — keep painted (LM/DM twins)
 var gcompanyimage = gimagetheme + 'shell-company_lm.svg'
@@ -75,7 +75,7 @@ var gthemecookiekey = 'EXODUStheme'
 // First paint: apply EXODUStheme/dt before the rest of this file parses and before
 // body HTML is reached. Hard refresh otherwise flashes browser-default white
 // (especially with OS + Exodus both in night mode). Full theme_toggle runs later.
-;(function exodus_theme_firstpaint() {
+;(function exo_theme_firstpaint() {
 	try {
 		var dark = false
 		var raw = document.cookie || ''
@@ -105,7 +105,7 @@ var gthemecookiekey = 'EXODUStheme'
 		html.style.background = '#000'
 		// Style block before body exists — stops white canvas on hard refresh
 		var st = document.createElement('style')
-		st.id = 'exodus_dm_firstpaint'
+		st.id = 'exo_dm_firstpaint'
 		st.textContent = '@media screen{'
 			+ 'html[data-theme=dark_mode],html[data-theme=dark_mode] body{background:#000!important;color:#fff}'
 			+ '}'
@@ -115,15 +115,15 @@ var gthemecookiekey = 'EXODUStheme'
 	} catch (e) { }
 })()
 
-function exodus_sortimage(order) {
+function exo_sortimage(order) {
 
 	// Unsorted chevron: lightgrey (secondary). Active up/down: text colour.
 	var name = (order == 'up') ? 'sort-up.svg' : (order == 'down') ? 'sort-down.svg' : 'sort.svg'
 	var color = (order == 'up' || order == 'down') ? 'darkgrey' : 'lightgrey'
-	return exodus_icon_spec(name, color)
+	return exo_icon_spec(name, color)
 }
 
-function exodus_sort_order_of(el) {
+function exo_sort_order_of(el) {
 	if (!el)
 		return ''
 	var d = el.getAttribute && el.getAttribute('data-sort-order')
@@ -143,17 +143,17 @@ function exodus_sort_order_of(el) {
 	return ''
 }
 
-function exodus_apply_sort_icon(el, order) {
-	el = exodus_set_icon_element(el, exodus_sortimage(order))
+function exo_apply_sort_icon(el, order) {
+	el = exo_set_icon_element(el, exo_sortimage(order))
 	if (el && el.setAttribute)
 		el.setAttribute('data-sort-order', order || '')
 	return el
 }
 
-function exodus_refresh_sortimages() {
+function exo_refresh_sortimages() {
 
 	document.querySelectorAll('.exodus-icon[id^="sortbutton_"], img[id^="sortbutton_"]').forEach(function (el) {
-		exodus_apply_sort_icon(el, exodus_sort_order_of(el))
+		exo_apply_sort_icon(el, exo_sort_order_of(el))
 	})
 }
 
@@ -210,7 +210,7 @@ gtz[0] = new Date().getTimezoneOffset() * -60
 
 var gnpendingscripts = 0
 
-// Filled in exodus_client_init from modal bag (and URL query). Prefer this over dialogArguments.
+// Filled in exo_client_init from modal bag (and URL query). Prefer this over dialogArguments.
 var gparameters
 
 //var grecn should only be used in dbform.js. used here in ICONV special case
@@ -237,13 +237,13 @@ var gkeepalive_timer = null
 // 'yield* ' from dynamic strings (settimeout / functioncode attrs).
 var gyieldregex = /yield ?\*/g
 
-exodus_client_init()
+exo_client_init()
 
 //any global variable defined in this function must not of course be declare var here otherwise would be local function variables
-function exodus_client_init() {
+function exo_client_init() {
 
 	// Browser zoom keys: sync capture, out of form/Gate A key path (see client.js)
-	exodus_ensure_browser_chrome_keydown()
+	exo_ensure_browser_chrome_keydown()
 
 	// swapNode polyfill — still used by sort + ledgerprint
 	if (!document.swapNode) {
@@ -324,9 +324,9 @@ function exodus_client_init() {
 	stm = FMs[5]
 
 	// Modal dialog args (if this window is a modal child). See
-	// exodus_acquire_modal_dialog_arguments / exoui_showmodaldialog.
+	// exo_acquire_modal_dialog_arguments / exoui_showmodaldialog.
 	// Page code should read gparameters; window.dialogArguments is rebound for legacy.
-	gDialogArguments = exodus_acquire_modal_dialog_arguments()
+	gDialogArguments = exo_acquire_modal_dialog_arguments()
 	if (gDialogArguments)
 		window.dialogArguments = gDialogArguments
 
@@ -393,7 +393,7 @@ function exodus_client_init() {
 	// that stays after load and blocks focus underline and miss Highlight.
 	if (gisdarktheme) {
 		// @media screen only — must not win over @media print (white paper + light text = blank)
-		document.writeln('<style id="exodus_dm_flashguard">'
+		document.writeln('<style id="exo_dm_flashguard">'
 			+ '@media screen{'
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
 			// No TABLE.exodusform body fill — pane chrome + .exodata only (global.css)
@@ -402,7 +402,7 @@ function exodus_client_init() {
 	}
 
 	//style sheet
-	document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
+	document.writeln('<link id="exo_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
 
 	//general functions
 	if (!($$('generalfunctions'))) {
@@ -445,7 +445,7 @@ function exodus_client_init() {
 	}
 
 	//ensure http session is kept alive (optional — skip if Gate A busy; never queue)
-	exodus_start_keepalive()
+	exo_start_keepalive()
 
 	loadcache()
 
@@ -525,8 +525,8 @@ async function exoui_security(task) {
 }
 
 // Start/restart keepalive interval from current gkeepalivemins.
-// Call after changing gkeepalivemins in the console: gkeepalivemins=0.1; exodus_start_keepalive()
-function exodus_start_keepalive() {
+// Call after changing gkeepalivemins in the console: gkeepalivemins=0.1; exo_start_keepalive()
+function exo_start_keepalive() {
 
 	if (gkeepalive_timer) {
 		window.clearInterval(gkeepalive_timer)
@@ -540,12 +540,12 @@ function exodus_start_keepalive() {
 	if (ms < 1000)
 		ms = 1000
 
-	exodus_flight_log(
+	exo_flight_log(
 		'keepalive interval ' + ms + 'ms (gkeepalivemins=' + gkeepalivemins + ')'
 	)
 
 	gkeepalive_timer = window.setInterval(function () {
-		void exodus_begin_if_idle(sessionkeepalive, 'sessionkeepalive')
+		void exo_begin_if_idle(sessionkeepalive, 'sessionkeepalive')
 	}, ms)
 
 }
@@ -569,10 +569,10 @@ async function sessionkeepalive() {
 		var tempdb = new exodblink()
 		tempdb.request = 'KEEPALIVE'
 		await tempdb.send()
-		exodus_flight_log('keepalive SEND')
+		exo_flight_log('keepalive SEND')
 		console.log(time + ' Keep Alive')
 	} else {
-		exodus_flight_log(
+		exo_flight_log(
 			'keepalive tick not due yet (next '
 			+ nextconnection.toISOString() + ', gkeepalivemins=' + gkeepalivemins + ')'
 		)
@@ -584,7 +584,7 @@ function exosetexpression(elementsorelementid, attributename, expression) {
 
 	//check element exists
 	if (!elementsorelementid) {
-		void exodus_begin(function () {
+		void exo_begin(function () {
 			return exoui_invalid('missing element in exosetexpression ' + attributename + ' ' + expression)
 		}, 'exosetexpression missing element')
 		return
@@ -690,7 +690,7 @@ function exosetexpression2b(expressionid, elements, style, attributename, expres
 		//and to be called at intervals
 		function anon_from_exodussetexpression2b() {
 			// Interval tick: Gate A only when idle (skip if busy — expression UI is optional).
-			void exodus_begin_if_idle(function () {
+			void exo_begin_if_idle(function () {
 				return exosetexpression2c(elements, style, attributename, expression)
 			}, 'exosetexpression2c')
 		}
@@ -826,7 +826,7 @@ function loguiblockerwaitcancel_event(event, action) {
 var gprocessing_waitcancel_active
 
 // Gate B — in-DOM Wait/Cancel while Gate A (or any owner) is in db.send lazy XHR wait.
-// Concurrent with Gate A by design. Must NEVER call exodus_begin or main-line dbio.
+// Concurrent with Gate A by design. Must NEVER call exo_begin or main-line dbio.
 // Allowed: exoui_confirm UI, xhttp.abort(), fire-and-forget CANCEL on a separate link.
 var g_exodus_waitcancel = null
 var g_exodus_waitcancel_n = 0
@@ -864,32 +864,32 @@ function dbsend_release_modal(xhttp, dbmodalblocked) {
 // PUBLIC ASYNC COMMENCEMENT API (frozen — stage 2)
 // =================================================
 // Only these three start concurrent async work from the framework:
-//   exodus_begin(asyncFn, label[, event])     — Gate A business (exclusive)
-//   exodus_begin_if_idle(asyncFn, label)      — optional background; skip if busy
-//   exodus_begin_waitcancel(source)           — Gate B Wait/Cancel only
+//   exo_begin(asyncFn, label[, event])     — Gate A business (exclusive)
+//   exo_begin_if_idle(asyncFn, label)      — optional background; skip if busy
+//   exo_begin_waitcancel(source)           — Gate B Wait/Cancel only
 // Everything else (starteventhandler, *_sync bridges, timeouts) must funnel
 // into one of these. Do not add a fourth commencement path.
 //
-// Deferral helper (not a fourth gate — always ends in exodus_begin):
-//   exodus_begin_when_idle(fn, label[, { delay_ms, max_wait_ms }])
+// Deferral helper (not a fourth gate — always ends in exo_begin):
+//   exo_begin_when_idle(fn, label[, { delay_ms, max_wait_ms }])
 // Use for post-land work (opendoc next key, popup → openrecord, DATE peer setx).
 // Retries until Gate A is free; systemerror if still busy after max_wait_ms.
-// Prefer this over one-shot setTimeout→exodus_begin (silent SKIP with queue_max 0).
+// Prefer this over one-shot setTimeout→exo_begin (silent SKIP with queue_max 0).
 //
 // Do NOT convert historical setTimeout post-open hooks into same-flight await
 // from form_postread — that runs before gds.load. Prefer form_postdisplay.
 //
 // Fail loud: required Gate A takeoff that cannot run (busy + full wait list)
-// calls systemerror. Optional work uses exodus_begin_if_idle (silent skip OK).
+// calls systemerror. Optional work uses exo_begin_if_idle (silent skip OK).
 //
 // Gate B entry — only from uiblocker while a lazy db.send wait is active.
-// Does not go through exodus_begin (Gate A is airborne during db.send; Gate B must run now).
-function exodus_begin_waitcancel(source) {
+// Does not go through exo_begin (Gate A is airborne during db.send; Gate B must run now).
+function exo_begin_waitcancel(source) {
 
 	source = source || 'uiblocker'
 
 	if (g_exodus_waitcancel || gprocessing_waitcancel_active) {
-		exodus_flight_log(
+		exo_flight_log(
 			'WAITCANCEL ignored (already open'
 			+ (g_exodus_waitcancel ? ' B#' + g_exodus_waitcancel.n : '') + ')'
 		)
@@ -897,25 +897,25 @@ function exodus_begin_waitcancel(source) {
 	}
 
 	if ($$('exodusconfirmdiv')) {
-		exodus_flight_log('WAITCANCEL ignored (other confirm up)')
+		exo_flight_log('WAITCANCEL ignored (other confirm up)')
 		return
 	}
 
 	// Operational condition: modal db.send wait (gchildwin.lazy), not "Gate A only".
 	// Prefer A airborne; if idle, still allow (db.send may still bypass A via timeouts).
 	if (!gchildwin || !gchildwin.lazy || !gchildwin.xhttp) {
-		exodus_flight_log('WAITCANCEL ignored (no lazy db.send wait)')
+		exo_flight_log('WAITCANCEL ignored (no lazy db.send wait)')
 		return
 	}
 
 	if (!g_exodus_flow)
-		exodus_flight_log('WAITCANCEL while Gate A idle (db.send outside exodus_begin?)')
+		exo_flight_log('WAITCANCEL while Gate A idle (db.send outside exo_begin?)')
 
 	// Fire-and-forget second stack — intentional dual-stack with Gate A.
-	void exodus_run_waitcancel(source)
+	void exo_run_waitcancel(source)
 }
 
-async function exodus_run_waitcancel(source) {
+async function exo_run_waitcancel(source) {
 
 	var n = ++g_exodus_waitcancel_n
 	g_exodus_waitcancel = { n: n, source: source }
@@ -924,7 +924,7 @@ async function exodus_run_waitcancel(source) {
 	var ainfo = g_exodus_flow
 		? ('A#' + g_exodus_flow.n + ' "' + g_exodus_flow.location + '"')
 		: 'A idle'
-	exodus_flight_log('WAITCANCEL OPEN B#' + n + ' (' + ainfo + ', via ' + source + ')')
+	exo_flight_log('WAITCANCEL OPEN B#' + n + ' (' + ainfo + ', via ' + source + ')')
 
 	// Snapshot XHR for this wait — gchildwin may clear when the request completes.
 	var xhttp = gchildwin.xhttp
@@ -937,30 +937,30 @@ async function exodus_run_waitcancel(source) {
 		if (response != 1) {
 			if (gchildwin && gchildwin.xhttprequestid)
 				requestid = gchildwin.xhttprequestid
-			exodus_flight_log('WAITCANCEL CANCEL B#' + n)
+			exo_flight_log('WAITCANCEL CANCEL B#' + n)
 			try {
 				xhttp.abort()
 			} catch (e) { }
 			dbsend_cancel_xhttp(requestid)
 			// db.send releases modal state when the XHR abort completes.
 		} else {
-			exodus_flight_log('WAITCANCEL WAIT/COMPLETE B#' + n)
+			exo_flight_log('WAITCANCEL WAIT/COMPLETE B#' + n)
 		}
 	} catch (e) {
-		exodus_flight_log(
+		exo_flight_log(
 			'WAITCANCEL error B#' + n + ': ' + (e && (e.message || e.description || e))
 		)
 		throw e
 	} finally {
 		gprocessing_waitcancel_active = false
 		g_exodus_waitcancel = null
-		exodus_flight_log('WAITCANCEL CLOSE B#' + n)
+		exo_flight_log('WAITCANCEL CLOSE B#' + n)
 	}
 }
 
 // Legacy name — blocker and any old callers enter Gate B only.
 function uiblocker_waitcancel_dialog() {
-	exodus_begin_waitcancel('uiblocker_waitcancel_dialog')
+	exo_begin_waitcancel('uiblocker_waitcancel_dialog')
 }
 
 var gmodalblockdepth = 0
@@ -1072,7 +1072,7 @@ function modalblock_create() {
 	blocker.style.position = 'fixed'
 	blocker.style.top = '0'
 	blocker.style.left = '0'
-	blocker.style.zIndex = '1000'//above #exodus_menu (999), below .exodusconfirmdiv (1001)
+	blocker.style.zIndex = '1000'//above #exo_menu (999), below .exodusconfirmdiv (1001)
 	blocker.style.pointerEvents = 'auto'
 	blocker.id = 'uiblockerdiv'
 
@@ -1094,7 +1094,7 @@ function modalblock_create() {
 	blocker.onclick = function uiblockerdiv_onclick_sync(event) {
 
 		if ($$('exodusconfirmdiv')) {
-			window.setTimeout(exodus_confirm_outside_click_sync, 10)
+			window.setTimeout(exo_confirm_outside_click_sync, 10)
 		}
 		// Date picker: click outside (on modal shield) dismisses without commit
 		else if (typeof calendar_checkInDatePicker != 'undefined' && calendar_checkInDatePicker
@@ -1116,7 +1116,7 @@ function modalblock_create() {
 				}
 				guiblockermousedown = false
 				loguiblockerwaitcancel_event(event, 'opening in-dom wait/cancel')
-				exodus_begin_waitcancel('uiblockerdiv')
+				exo_begin_waitcancel('uiblockerdiv')
 			} else {
 				var actualwin = gchildwin
 
@@ -1141,7 +1141,7 @@ function modalblock_destroy() {
 		if (gpendingConfirmOwner === 'B')
 			resolvePendingConfirm(1, 'modalblock_destroy', 'B')
 		else if (gpendingConfirmOwner === 'A') {
-			exodus_flight_log('CONFIRM orphan A force-cancel on modal destroy')
+			exo_flight_log('CONFIRM orphan A force-cancel on modal destroy')
 			resolvePendingConfirm(0, 'modalblock_destroy', 'A')
 		} else
 			resolvePendingConfirm(0, 'modalblock_destroy')
@@ -1221,7 +1221,7 @@ function unblockmodalui_sync() {
 		gchildwin.actual.close()
 	// Do NOT clear gprocessing_waitcancel_active here — nested unblocks (confirm depth,
 	// Gate A finally) must not strip Gate B ownership mid-wait. Cleared only in
-	// exodus_run_waitcancel finally / resolve of owner B.
+	// exo_run_waitcancel finally / resolve of owner B.
 
 	if (gmodalblockdepth > 0)
 		--gmodalblockdepth
@@ -1301,7 +1301,7 @@ function getdialogstyle_sync(dialogstyle) {
 //   gchildwin.dialogArguments = bag // secondary; can race first load; lost on refresh
 //   finally: dialogArgumentsForChild = null
 //
-// Child (exodus_client_init via exodus_acquire_modal_dialog_arguments):
+// Child (exo_client_init via exo_acquire_modal_dialog_arguments):
 //   1. If opener.gchildwin === this window and not the lazy Wait/Cancel stub
 //      → use opener.dialogArgumentsForChild
 //   2. Else → window.dialogArguments (secondary inject)
@@ -1311,7 +1311,7 @@ function getdialogstyle_sync(dialogstyle) {
 // Non-modal opens use gwindowopenparameters (dbform), not this bag.
 // Nested modals: each child reads only its own opener’s bag.
 // ---------------------------------------------------------------------------
-function exodus_acquire_modal_dialog_arguments() {
+function exo_acquire_modal_dialog_arguments() {
 
 	var bag = null
 
@@ -1374,9 +1374,9 @@ async function exoui_showmodaldialog(url, dialogargs, dialogstyle) {
 		gchildwin.dialogArguments = dialogargs
 
 		// auto resume if the child window disappears — poll every n ms
-		window.setTimeout(exodus_autoresume, 100)
+		window.setTimeout(exo_autoresume, 100)
 
-		//wait here until exodus_autoresume detects that the child window is closed
+		//wait here until exo_autoresume detects that the child window is closed
 		// and passes its return value here
 		var dialogResolve
 		var dialogPromise = new Promise((resolve) => {
@@ -1415,11 +1415,11 @@ function exoui_windowclose(returnvalues) {
 	//window.opener.gchildwin_returnvalue = returnvalues
 	if (window.opener) {
 		window.opener.focus()//for MSEDGE
-		if (window.opener.exodus_setchildwin_returnvalue) {
+		if (window.opener.exo_setchildwin_returnvalue) {
 			if (typeof returnvalues == 'undefined')
 				returnvalues = ''
 			returnvalues.exodusisarray = true
-			window.opener.exodus_setchildwin_returnvalue(returnvalues)
+			window.opener.exo_setchildwin_returnvalue(returnvalues)
 		}
 	}
 	window.returnValue = returnvalues
@@ -1428,7 +1428,7 @@ function exoui_windowclose(returnvalues) {
 
 //parent window function called by childwindow to return result to parent window
 var gchildwin_returnvalue
-function exodus_setchildwin_returnvalue(returnvalue) {
+function exo_setchildwin_returnvalue(returnvalue) {
 	//gchildwin_returnvalue=returnvalue
 	//shallow copy array to avoid permissions issue when child windows closes in edge
 	if (returnvalue.exodusisarray) {
@@ -1443,11 +1443,11 @@ function exodus_setchildwin_returnvalue(returnvalue) {
 	}
 }
 
-function exodus_autoresume() {
+function exo_autoresume() {
 
 	// if child window still active then schedule another check later
 	if (gchildwin && !gchildwin.lazy && !gchildwin.closed) {
-		window.setTimeout(exodus_autoresume, 100)
+		window.setTimeout(exo_autoresume, 100)
 		return
 	}
 
@@ -1469,26 +1469,26 @@ function exodus_autoresume() {
 		gchildwin_returnvalue = undefined
 	}
 
-	//exodus_resume(returnvalue, 'exodus_autoresume')
-	resolvePendingDialog(returnvalue, 'exodus_autoresume', 'A')
+	//exo_resume(returnvalue, 'exo_autoresume')
+	resolvePendingDialog(returnvalue, 'exo_autoresume', 'A')
 
 }
 
 // Generator resume path removed (rationalisation stage 6, 2026-07-17).
 // Framework and app modules are async/await only. Stubs remain so accidental
 // calls fail loudly instead of silently no-op.
-function exodus_resume(value, source) {
+function exo_resume(value, source) {
 	systemerror(
-		'exodus_resume',
+		'exo_resume',
 		'Generator resume removed (stage 6). Source: ' + source
 		+ '. Convert remaining function* to async/await.'
 	)
 	return value
 }
 
-function exodus_next(value, source) {
+function exo_next(value, source) {
 	systemerror(
-		'exodus_next',
+		'exo_next',
 		'Generator step removed (stage 6). Source: ' + source
 	)
 	return { done: true, value: value }
@@ -1622,7 +1622,7 @@ async function windowopen(url, parameters, style) {
 		// under prefers-color-scheme: dark (broken default contrast). Fix the blank
 		// document once; callers just write content.
 		if (!url)
-			exodus_ensure_readable_blank(result)
+			exo_ensure_readable_blank(result)
 
 		return result
 
@@ -1637,7 +1637,7 @@ async function windowopen(url, parameters, style) {
 // Readable defaults for a blank document (about:blank or raw window.open()).
 // Use system Canvas/CanvasText so light and dark both contrast — not hard-coded
 // light, and not a debug-only patch on individual dump sites.
-function exodus_ensure_readable_blank(win) {
+function exo_ensure_readable_blank(win) {
 	if (!win || !win.document)
 		return
 	try {
@@ -1709,14 +1709,14 @@ var gexodus_system_error_user_msg =
 // System errors contain "System Error" near the start.
 // Server (listen) often wraps as "Error: System Error: …"; client systemerror uses
 // "System Error: …". Inspect first 50 chars so a short server prefix still matches.
-function exodus_looks_like_system_error(msg) {
+function exo_looks_like_system_error(msg) {
 	if (msg == null || msg === '')
 		return false
 	return String(msg).slice(0, 50).indexOf('System Error') >= 0
 }
 
-function exodus_user_facing_msg(msg) {
-	if (!exodus_looks_like_system_error(msg))
+function exo_user_facing_msg(msg) {
+	if (!exo_looks_like_system_error(msg))
 		return msg
 	// Always log technical text (friendly UI may hide it from the alert/note)
 	try {
@@ -1743,7 +1743,7 @@ async function exoui_note(msg, mode) {
 	msg = msg.toString().replace(FMre, '\r\n').replace(VMre, '\r\n')
 	msg = msg.replace(/\|/g, '\r\n')
 
-	msg = exodus_user_facing_msg(msg)
+	msg = exo_user_facing_msg(msg)
 
 	await exoui_confirm(msg, 1, 'OK', '', '', null, false, mode)
 
@@ -1776,7 +1776,7 @@ function theme_toggle_title(dark) {
 // Menubar theme control: theme-sun / theme-moon glyph inside shell-theme host.
 // Show current mode: sun in light, moon in dark (same as knob.innerHTML before).
 // Optional img/btn: required while building the control (not in document yet — getElementById fails).
-function exodus_sync_theme_btn_icon(img, btn) {
+function exo_sync_theme_btn_icon(img, btn) {
 
 	img = img || document.getElementById('theme_toggle_icon')
 	btn = btn || document.getElementById('theme_toggle_btn')
@@ -1787,7 +1787,7 @@ function exodus_sync_theme_btn_icon(img, btn) {
 		btn.title = theme_toggle_title(gisdarktheme)
 }
 
-function exodus_swap_tool_icons() {
+function exo_swap_tool_icons() {
 
 	// Static toolbar icons (e.g. reports.htm). Mono masks → tinted .exodus-icon spans.
 	var tools = [
@@ -1801,14 +1801,14 @@ function exodus_swap_tool_icons() {
 		var tool = tools[ti]
 		var sel = 'img[src*="/' + tool.file + '"]'
 		document.querySelectorAll(sel).forEach(function (img) {
-			var span = exodus_set_icon_element(img, exodus_icon_spec(tool.file, tool.color))
+			var span = exo_set_icon_element(img, exo_icon_spec(tool.file, tool.color))
 			if (span && span.style)
 				span.style.cursor = 'pointer'
 		})
 	}
 }
 
-function exodus_update_auth_button() {
+function exo_update_auth_button() {
 
 	var btn = $$('exoduslogoutbutton')
 	if (!btn)
@@ -1827,7 +1827,7 @@ function exodus_update_auth_button() {
 	}
 }
 
-function exodus_set_theme_icons() {
+function exo_set_theme_icons() {
 
 	// Monochrome icons: colours come from CSS vars (no path swap).
 	// Painted multi-colour: New/Open/Edit/Delete, Copy, theme, company
@@ -1843,8 +1843,8 @@ function exodus_set_theme_icons() {
 	if (typeof gopenimage != 'undefined')
 		gopenimage = gimagetheme + (gisdarktheme ? 'record-open_dm.svg' : 'record-open_lm.svg')
 	if (typeof gsortimage != 'undefined')
-		gsortimage = exodus_sortimage()
-	exodus_update_auth_button()
+		gsortimage = exo_sortimage()
+	exo_update_auth_button()
 	// Refresh painted <img> srcs if already in the DOM
 	if (typeof gnewimage != 'undefined') {
 		;['newrecord', 'openrecord', 'editreleaserecord', 'deleterecord', 'copyrecord'].forEach(function (id) {
@@ -1870,17 +1870,17 @@ function exodus_set_theme_icons() {
 
 // Right-side menubar cluster: session | theme | logout as one float:right flex row.
 // Equal CSS gap — no independent float:right packing (that made session↔theme↔logout uneven).
-function exodus_menubar_trailing_cluster() {
+function exo_menubar_trailing_cluster() {
 
 	if (!gexodus_menubar)
 		return null
-	var trail = gexodus_menubar.querySelector('.exodus_menubar_trailing')
+	var trail = gexodus_menubar.querySelector('.exo_menubar_trailing')
 	if (trail)
 		return trail
 	trail = document.createElement('span')
-	trail.className = 'exodus_menubar_trailing'
+	trail.className = 'exo_menubar_trailing'
 	// Before clear:left spacer if present; else at end of menubar
-	var clear = gexodus_menubar.querySelector('.exodus_menubar_clear')
+	var clear = gexodus_menubar.querySelector('.exo_menubar_clear')
 	if (clear)
 		gexodus_menubar.insertBefore(trail, clear)
 	else
@@ -1906,12 +1906,12 @@ function add_theme_toggle_btn() {
 	img.height = 18
 	btn.appendChild(img)
 	// Pass nodes: not in document yet, so getElementById would leave src empty (empty box)
-	exodus_sync_theme_btn_icon(img, btn)
+	exo_sync_theme_btn_icon(img, btn)
 
 	function flip() {
 		theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
 		exosetcookie('', gthemecookiekey, (gisdarktheme ? 1 : ''), 'dt', true)
-		exodus_sync_theme_btn_icon(img, btn)
+		exo_sync_theme_btn_icon(img, btn)
 	}
 	btn.addEventListener('click', flip)
 	btn.addEventListener('keydown', function (e) {
@@ -1924,14 +1924,14 @@ function add_theme_toggle_btn() {
 	return btn
 }
 
-function exodus_global_css_link() {
+function exo_global_css_link() {
 
-	return document.getElementById('exodus_global_css')
+	return document.getElementById('exo_global_css')
 		|| document.querySelector("link[href$='global.css']")
 
 }
 
-function exodus_clear_form_inline_theme() {
+function exo_clear_form_inline_theme() {
 
 	var tables = document.getElementsByTagName('TABLE')
 	for (var ii = 0; ii < tables.length; ii++) {
@@ -1955,15 +1955,15 @@ function theme_toggle(theme = 'default') {
 		// Drop firstpaint DM inline (color-scheme / black bg) so LM is not stuck dark
 		html.style.removeProperty('color-scheme')
 		html.style.removeProperty('background')
-		var fp = document.getElementById('exodus_dm_firstpaint')
+		var fp = document.getElementById('exo_dm_firstpaint')
 		if (fp && fp.parentNode)
 			fp.parentNode.removeChild(fp)
-		var fg = document.getElementById('exodus_dm_flashguard')
+		var fg = document.getElementById('exo_dm_flashguard')
 		if (fg && fg.parentNode)
 			fg.parentNode.removeChild(fg)
 		// Full LM chrome from cookies (colour + font + size)
-		exodus_chrome_from_cookies()
-		exodus_clear_form_inline_theme()
+		exo_chrome_from_cookies()
+		exo_clear_form_inline_theme()
 	} else {
 		gisdarktheme = true
 		html.setAttribute('data-theme', theme)
@@ -1976,14 +1976,14 @@ function theme_toggle(theme = 'default') {
 
 	// Monochrome icons recolor via CSS vars automatically.
 	// Painted multicolour (New/Edit/Delete, theme, …) still swap files.
-	// Static reports.htm add/delete/refresh: converted to mono tints in exodus_swap_tool_icons.
+	// Static reports.htm add/delete/refresh: converted to mono tints in exo_swap_tool_icons.
 	const xform_postload = document.readyState === 'complete'
 	if (xform_postload) {
-		exodus_swap_tool_icons()
-		exodus_refresh_sortimages()
+		exo_swap_tool_icons()
+		exo_refresh_sortimages()
 	}
 
-	exodus_set_theme_icons()
+	exo_set_theme_icons()
 
 	return true
 }
@@ -1991,7 +1991,7 @@ function theme_toggle(theme = 'default') {
 // Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
 // Deeper vs lighter from body luma; CSS owns the two formulas.
 // Call when setting a non-empty --exodus-form-bg-color.
-function exodus_set_form_head_direction(cssColor) {
+function exo_set_form_head_direction(cssColor) {
 	var s = String(cssColor == null ? '' : cssColor).replace(/\s+/g, '')
 	if (/^[0-9a-fA-F]{3}$/.test(s) || /^[0-9a-fA-F]{6}$/.test(s))
 		s = '#' + s
@@ -2016,7 +2016,7 @@ function exodus_set_form_head_direction(cssColor) {
 // ---------------------------------------------------------------------------
 
 // Empty / Default / CSS keywords → treat as "not available"
-function exodus_chrome_is_empty(v) {
+function exo_chrome_is_empty(v) {
 	if (v == null)
 		return true
 	v = String(v).trim()
@@ -2030,16 +2030,16 @@ function exodus_chrome_is_empty(v) {
 }
 
 // Value stored in cookie: empty string when not available
-function exodus_chrome_cookie_store(v) {
-	return exodus_chrome_is_empty(v) ? '' : String(v).trim()
+function exo_chrome_cookie_store(v) {
+	return exo_chrome_is_empty(v) ? '' : String(v).trim()
 }
 
 // LM form body only. Empty → removeProperty so CSS default #fdf5e6 applies.
-function exodus_chrome_apply_color(value) {
+function exo_chrome_apply_color(value) {
 	if (typeof gisdarktheme != 'undefined' && gisdarktheme)
 		return
 	var html = document.documentElement
-	if (exodus_chrome_is_empty(value)) {
+	if (exo_chrome_is_empty(value)) {
 		html.style.removeProperty('--exodus-form-bg-color')
 		html.style.removeProperty('--exodus-form-border-color')
 		html.removeAttribute('data-form-head')
@@ -2049,19 +2049,19 @@ function exodus_chrome_apply_color(value) {
 	value = String(value).trim()
 	html.style.setProperty('--exodus-form-bg-color', value)
 	html.style.setProperty('--exodus-form-border-color', '#d0d0d0')
-	exodus_set_form_head_direction(value)
+	exo_set_form_head_direction(value)
 	html.style.removeProperty('--exodus-cardcolor')
 }
 
 // Font family + size %. Empty family/size → CSS / browser default (remove override).
-function exodus_chrome_apply_font(family, size) {
+function exo_chrome_apply_font(family, size) {
 	var html = document.documentElement
-	if (exodus_chrome_is_empty(family))
+	if (exo_chrome_is_empty(family))
 		html.style.removeProperty('--exodus-screen-font-family')
 	else
 		html.style.setProperty('--exodus-screen-font-family', String(family).trim())
 
-	if (exodus_chrome_is_empty(size)) {
+	if (exo_chrome_is_empty(size)) {
 		html.style.removeProperty('font-size')
 		return
 	}
@@ -2079,7 +2079,7 @@ function exodus_chrome_apply_font(family, size) {
 }
 
 // Entry / theme→day / discard / post-save: cookies only.
-function exodus_chrome_from_cookies() {
+function exo_chrome_from_cookies() {
 	var ff = ''
 	var fs = ''
 	var fc = ''
@@ -2088,21 +2088,21 @@ function exodus_chrome_from_cookies() {
 		fs = exogetcookie2('fs')
 		fc = exogetcookie2('fc')
 	}
-	exodus_chrome_apply_font(ff, fs)
-	exodus_chrome_apply_color(fc)
+	exo_chrome_apply_font(ff, fs)
+	exo_chrome_apply_color(fc)
 }
 
-// Thin aliases — prefer exodus_chrome_* at new call sites.
-function exodus_set_style(mode, value, value2) {
+// Thin aliases — prefer exo_chrome_* at new call sites.
+function exo_set_style(mode, value, value2) {
 	if (mode == 'screencolor')
-		exodus_chrome_apply_color(value)
+		exo_chrome_apply_color(value)
 	else if (mode == 'screenfont')
-		exodus_chrome_apply_font(value, value2)
+		exo_chrome_apply_font(value, value2)
 }
 
 // Early in decide / decide2 / print
 async function clientfunctions_setstyle() {
-	exodus_chrome_from_cookies()
+	exo_chrome_from_cookies()
 }
 
 async function clientfunctions_getglobals() {
@@ -2141,15 +2141,15 @@ async function clientfunctions_getglobals() {
 
 function add_exodus_menubar() {
 
-	//if no exodus_menubar element
-	//create a exodus_menu span
+	//if no exo_menubar element
+	//create a exo_menu span
 	// at the beginning of the body
 	// or after the first navbar element
 
-	gexodus_menubar = document.getElementById('exodus_menu')
+	gexodus_menubar = document.getElementById('exo_menu')
 	if (!gexodus_menubar) {
 		var span = document.createElement('SPAN')
-		span.id = 'exodus_menu'
+		span.id = 'exo_menu'
 		// menubar design
 		//span.style.backgroundColor = '#f4f4f4';
 		span.style.backgroundColor = '#f0f0f0';
@@ -2170,7 +2170,7 @@ function add_exodus_menubar() {
 			navbar1.parentNode.insertBefore(span, navbar1.nextSibling)
 		else
 			document.body.insertBefore(span, document.body.firstChild)
-		gexodus_menubar = document.getElementById('exodus_menu')
+		gexodus_menubar = document.getElementById('exo_menu')
 	}
 	// Modals (e.g. search.htm) create the bar late via form_place_menubar_session —
 	// still need body offset + resize/mutation wiring so content is not under the bar.
@@ -2179,7 +2179,7 @@ function add_exodus_menubar() {
 
 // Adjust the body's top margin dynamically so that body is never overlapped by the menubar
 function adjust_bodymargin() {
-	gexodus_menubar = document.getElementById('exodus_menu')
+	gexodus_menubar = document.getElementById('exo_menu')
 	if (!gexodus_menubar)
 		return
 	var menuheight = gexodus_menubar.offsetHeight
@@ -2199,7 +2199,7 @@ function adjust_bodymargin() {
 // Once per window: resize + MutationObserver so late-built bars (modals) keep body clear.
 var g_exodus_bodymargin_wired = false
 function wire_exodus_bodymargin() {
-	gexodus_menubar = document.getElementById('exodus_menu')
+	gexodus_menubar = document.getElementById('exo_menu')
 	if (!gexodus_menubar)
 		return
 	adjust_bodymargin()
@@ -2266,7 +2266,7 @@ async function clientfunctions_windowonload() {
 	}
 
 	// Before form_functions_onload so content is not under a pre-existing bar.
-	// Modals (search.htm) often create #exodus_menu later via add_exodus_menubar —
+	// Modals (search.htm) often create #exo_menu later via add_exodus_menubar —
 	// wire_exodus_bodymargin runs again from there.
 	wire_exodus_bodymargin()
 
@@ -2280,7 +2280,7 @@ async function clientfunctions_windowonload() {
 		if (typeof form_update_wide_layout == 'function')
 			form_update_wide_layout()
 	} finally {
-		exodus_reveal_form_panes()
+		exo_reveal_form_panes()
 	}
 
 	// Unbound form actions under the form: form_keep runs once inside formfunctions_onload,
@@ -2298,11 +2298,11 @@ async function clientfunctions_windowonload() {
 	}
 
 	//add menu, logout and refresh buttons if not a popup, depending on gshowmenu, not /exodus/ location and no navbar elements
-	//if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
+	//if no exo_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
 	if (!window.dialogArguments && (typeof gshowmenu == 'undefined' || gshowmenu) && EXODUSlocation != './exodus/' && document.getElementsByClassName('navbar').length == 0) {
 
 		// Trailing cluster: theme | refresh | logout (equal gap)
-		var trailing = exodus_menubar_trailing_cluster()
+		var trailing = exo_menubar_trailing_cluster()
 
 		//button to theme toggle (sun/moon icon; no slider)
 		trailing.appendChild(add_theme_toggle_btn())
@@ -2324,7 +2324,7 @@ async function clientfunctions_windowonload() {
 		temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. Alt+G', 'G')
 		trailing.appendChild(temp2)
 
-		exodus_update_auth_button()
+		exo_update_auth_button()
 		//if no dbform
 		if (typeof gdictfilename == 'undefined')
 			addeventlistener(temp2, 'click', 'exologout_onclick')
@@ -2354,7 +2354,7 @@ async function clientfunctions_windowonload() {
 		// Form pages use dbform document_onkeydown for Alt+letter. Pure client pages
 		// (helpkeyboard, backup, …) need only the top-bar subset.
 		if (typeof gdictfilename == 'undefined')
-			exodus_menubar_ensure_keydown()
+			exo_menubar_ensure_keydown()
 
 	}
 
@@ -2365,7 +2365,7 @@ async function clientfunctions_windowonload() {
 		try { gwindowonload() }
 		catch (e) { }
 
-	exodus_swap_tool_icons()
+	exo_swap_tool_icons()
 
 	//logout('clientfunctions_windowonload')
 
@@ -3158,7 +3158,7 @@ async function exodblink_send_byhttp_using_xmlhttp(data) {
 		// STEP 1 of incremental async/await migration:
 		// The XHR network I/O is the isolated leaf. We drive ONLY the wait using
 		// a real Promise + the existing fromPromise adapter. This introduces await-capable
-		// transport without touching geventhandler, gblockevents, (legacy yield), exodus_resume,
+		// transport without touching geventhandler, gblockevents, (legacy yield), exo_resume,
 		// starteventhandler, UI modals, or any business logic yield* call sites. (legacy notes)
 		var netPromise
 		var dbmodalblocked = false
@@ -3211,7 +3211,7 @@ async function exodblink_send_byhttp_using_xmlhttp(data) {
 						self.result = '';
 					}
 					// Resolve with the rich detail (instead of bare 'error') so it appears in
-					// logevent("exodus_resume <in " + value + " from fromPromise") and any
+					// logevent("exo_resume <in " + value + " from fromPromise") and any
 					// higher trace. The caller only uses this for logs / final !OK return false.
 					// Also populates this.response immediately so callers see useful db.response.
 					resolve(detail);
@@ -3338,13 +3338,13 @@ async function exodblink_send_byhttp_using_xmlhttp(data) {
 			///////////////////////////////////////////////////////////////
 			// PAUSE HERE via fromPromise bridge.
 			// The netPromise resolves from XHR handlers; fromPromise feeds the value
-			// into the existing global geventhandler via exodus_resume exactly as before.
+			// into the existing global geventhandler via exo_resume exactly as before.
 			// This is the reliable first conversion of an async leaf to Promise-based code.
 			// All callers continue to use "await db.send(...)" in new paths (yield* for legacy generator paths).
 			///////////////////////////////////////////////////////////////
 			var result = await netPromise
 
-			//match master exodus_resume: close Wait/Cancel confirm and uiblocker when db access completes
+			//match master exo_resume: close Wait/Cancel confirm and uiblocker when db access completes
 			dbsend_release_modal(xhttp, dbmodalblocked)
 			dbmodalblocked = false
 
@@ -3747,9 +3747,9 @@ function rearray(array) {
 
 // Quiet find-as-you-type (non-modal). Framework only — no app knowledge.
 //
-//   await exodus_typeahead(request, cols)
-//   await exodus_typeahead(request, cols, coln)
-//   await exodus_typeahead(request, cols, coln, options)
+//   await exo_typeahead(request, cols)
+//   await exo_typeahead(request, cols, coln)
+//   await exo_typeahead(request, cols, coln, options)
 //
 // request — full db.request string (caller builds module/file/val/select/cmd);
 //           omit when options.rows or options.data supplies the list
@@ -3769,7 +3769,7 @@ function rearray(array) {
 // Always: STOPPED column drop, prefer_prefix (unless false), form_typeahead_show.
 // Response auto-detected: /ACCOUNTLIST/, XML <RECORD>, or FM/VM multi-hit.
 // Quiet: no decide/invalid. Empty/fail → hide (+ optional miss tint). Returns true always.
-async function exodus_typeahead(request, cols, coln, options) {
+async function exo_typeahead(request, cols, coln, options) {
 
 	if (typeof form_typeahead_show != 'function' || typeof form_typeahead_hide != 'function')
 		return true
@@ -3860,7 +3860,7 @@ async function exodus_typeahead(request, cols, coln, options) {
 	if (hasExplicitRows) {
 		rows = options.rows || []
 	} else if (hasdata) {
-		rows = exodus_typeahead_parserows(options.data, colids)
+		rows = exo_typeahead_parserows(options.data, colids)
 	} else {
 		var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
 		// Client CACHE by full request string (gcache cleared on page refresh / Alt+R).
@@ -3877,7 +3877,7 @@ async function exodus_typeahead(request, cols, coln, options) {
 				return true
 			return missOut()
 		}
-		rows = exodus_typeahead_parserows(tdb.data, colids)
+		rows = exo_typeahead_parserows(tdb.data, colids)
 	}
 
 	// Superseded by newer typeahead or leave-field validate
@@ -3924,7 +3924,7 @@ async function exodus_typeahead(request, cols, coln, options) {
 	}
 	// Master SELECT-all then filter: code/name word starts with typed key
 	if (options.wordstart)
-		rows = exodus_typeahead_wordstart(rows, keyAtStart)
+		rows = exo_typeahead_wordstart(rows, keyAtStart)
 	if (typeof options.filter == 'function')
 		rows = options.filter(rows, keyAtStart) || []
 	// Prefer rows whose identity cells start with key: pick col (the key/code
@@ -3942,7 +3942,7 @@ async function exodus_typeahead(request, cols, coln, options) {
 			if (rc >= 0 && pcols.indexOf(rc) < 0)
 				pcols.push(rc)
 		}
-		rows = exodus_typeahead_prefer_prefix(rows, keyAtStart, pcols)
+		rows = exo_typeahead_prefer_prefix(rows, keyAtStart, pcols)
 	}
 	if (!rows || !rows.length)
 		return missOut()
@@ -3956,7 +3956,7 @@ async function exodus_typeahead(request, cols, coln, options) {
 //   • whole-cell prefix (account/ledger codes: G12 → G123), or
 //   • any whitespace-word prefix (names: "DUBAI" in "DUBAI FZ").
 // Covers both code keys and name search in one filter.
-function exodus_typeahead_wordstart(rows, key) {
+function exo_typeahead_wordstart(rows, key) {
 	if (!rows || !rows.length)
 		return rows || []
 	if (key == null || key === '')
@@ -3999,7 +3999,7 @@ function exodus_typeahead_wordstart(rows, key) {
 // Promote rows where a key cell starts with typed key.
 // colns — optional list of row indices to test (default: all cells).
 // Callers/typeahead pass [0, pick] so market/supplier/etc. do not reorder.
-function exodus_typeahead_prefer_prefix(rows, key, colns) {
+function exo_typeahead_prefer_prefix(rows, key, colns) {
 	if (!rows || rows.length <= 1 || key == null || key === '')
 		return rows
 	var ku = String(key).replace(/^\s+|\s+$/g, '').toUpperCase()
@@ -4047,7 +4047,7 @@ function exodus_typeahead_prefer_prefix(rows, key, colns) {
 // /ACCOUNTLIST/  — prefix then FM rows / VM cells (e.g. FINDACCOUNT multi-hit)
 // XML            — <RECORD> / group1
 // else           — FM rows / VM cells (VAL multi-hit); fm+fm exact body → []
-function exodus_typeahead_parserows(data, colids) {
+function exo_typeahead_parserows(data, colids) {
 
 	if (data == null || data === '')
 		return []
@@ -4277,7 +4277,7 @@ function checkisdropdown(element) {
 	assertelement(element, 'checkisdropdown', 'element')
 
 	if (typeof (element) != 'object' || element.tagName != 'SELECT') {
-		void exodus_begin(function () {
+		void exo_begin(function () {
 			return exoui_invalid('Error: The target is not a SELECT tag')
 		}, 'checkisdropdown')
 		return false
@@ -4659,7 +4659,7 @@ function showcache() {
 	}
 	if (html) {
 		var win = window.open()
-		exodus_ensure_readable_blank(win)
+		exo_ensure_readable_blank(win)
 		if (win && win.document && win.document.body)
 			win.document.body.innerHTML = '<table>' + html + '</table>'
 	}
@@ -4929,7 +4929,7 @@ async function sorttable(event, order) {
 		//var clickedelement = document.getElementsByName('sortbutton_' + groupno)[0]
 
 			// Cycle: neutral/down → up → down (data-sort-order or mask URL)
-		var cur = exodus_sort_order_of(clickedelement)
+		var cur = exo_sort_order_of(clickedelement)
 		up2down = (cur == 'up')
 		var order = (cur == 'down') ? 'up' : 'down'
 	}
@@ -5031,7 +5031,7 @@ async function sorttable(event, order) {
 	//change the sort image now confirmed
 	try {
 		await resetsortimages(groupno)
-		exodus_apply_sort_icon(clickedelement, order)
+		exo_apply_sort_icon(clickedelement, order)
 	} catch (e) { }
 
 	//reorder data and table rows
@@ -5127,7 +5127,7 @@ function menuhide(element) {
 						var menuaccesskey = underlineelement[0].innerText.exotrim().slice(0, 1).toUpperCase()
 						var temp = element.exodusmenuaccesskeys[menuaccesskey]
 						if (gusername == 'EXODUS' && temp)
-							void exodus_begin(function () {
+							void exo_begin(function () {
 								return exoui_note('Duplicate menu access key ' + menuaccesskey.exoquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
 							}, 'duplicate menu access key')
 							// alert('Duplicate menu access key ' + menuaccesskey.exoquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
@@ -5537,15 +5537,15 @@ function menuchangeoption(menu, newmenuoption) {
  */
 var gexodus_menubar_keydown_installed = false
 
-function exodus_menubar_ensure_keydown() {
+function exo_menubar_ensure_keydown() {
 
 	if (gexodus_menubar_keydown_installed || typeof gdictfilename != 'undefined')
 		return
 	gexodus_menubar_keydown_installed = true
-	addeventlistener(document, 'keydown', 'exodus_menubar_keydown')
+	addeventlistener(document, 'keydown', 'exo_menubar_keydown')
 }
 
-async function exodus_menubar_keydown(event) {
+async function exo_menubar_keydown(event) {
 
 	event = getevent(event)
 	if (!event || !event.altKey || event.shiftKey || event.ctrlKey)
@@ -5574,7 +5574,7 @@ async function exodus_menubar_keydown(event) {
 	// accesskey button under bar → id_onclick (menubutton id ends in "button")
 	if (keycode < 65 || keycode > 90)
 		return true
-	var bar = gexodus_menubar || document.getElementById('exodus_menu')
+	var bar = gexodus_menubar || document.getElementById('exo_menu')
 	if (!bar)
 		return true
 	var letter = String.fromCharCode(keycode)
@@ -5594,13 +5594,13 @@ async function exodus_menubar_keydown(event) {
 
 // Non-form menubar tool. id → await id_onclick. setTimeout(0) from formfunctions_onload
 // if standard Menu/Refresh are not on the bar yet.
-function exodus_menubar_add_button(id, imagesrc, name, title, accesskey) {
+function exo_menubar_add_button(id, imagesrc, name, title, accesskey) {
 
 	if (!gexodus_menubar)
 		add_exodus_menubar()
 	var wrap = document.createElement('span')
 	wrap.innerHTML = menubuttonhtml(id, imagesrc, name, title, accesskey)
-	var trail = gexodus_menubar.querySelector('.exodus_menubar_trailing')
+	var trail = gexodus_menubar.querySelector('.exo_menubar_trailing')
 	if (trail)
 		gexodus_menubar.insertBefore(wrap, trail)
 	else
@@ -5609,7 +5609,7 @@ function exodus_menubar_add_button(id, imagesrc, name, title, accesskey) {
 		addeventlistener(wrap, 'click', id + '_onclick')
 	if (typeof adjust_bodymargin == 'function')
 		adjust_bodymargin()
-	exodus_menubar_ensure_keydown()
+	exo_menubar_ensure_keydown()
 	return wrap
 }
 
@@ -5664,8 +5664,8 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 	//alert(id+' '+tx)
 	// image: painted URL string, or monochrome { mask, color }
 	if (imagesrc) {
-		if (exodus_is_icon_spec(imagesrc))
-			tx += exodus_icon_html(imagesrc)
+		if (exo_is_icon_spec(imagesrc))
+			tx += exo_icon_html(imagesrc)
 		else
 			tx += '<IMG src=' + imagesrc + '>'
 	}
@@ -5715,16 +5715,16 @@ function setgraphicbutton(button, labeltext, src) {
 	var icon = button.querySelector('.exodus-icon')
 	var img = button.getElementsByTagName('IMG')[0]
 
-	if (exodus_is_icon_spec(src)) {
+	if (exo_is_icon_spec(src)) {
 		if (icon) {
-			exodus_icon_apply(icon, src)
+			exo_icon_apply(icon, src)
 		} else if (img) {
 			var span = document.createElement('span')
-			span.innerHTML = exodus_icon_html(src)
+			span.innerHTML = exo_icon_html(src)
 			span = span.firstChild
 			img.parentNode.replaceChild(span, img)
 		} else {
-			button.insertAdjacentHTML('afterbegin', exodus_icon_html(src))
+			button.insertAdjacentHTML('afterbegin', exo_icon_html(src))
 		}
 	} else {
 		// painted multicolour URL (New/Edit/Delete)
@@ -5840,7 +5840,7 @@ function exoform_is_inside_exodusform(tablex) {
 
 // Nodes that may sit between sibling forms without ending a pane run.
 // HTML comments used to break wrap/coalesce (bookings multi-section HTM).
-function exodus_is_formpane_run_sep(node) {
+function exo_is_formpane_run_sep(node) {
 	if (!node)
 		return false
 	if (node.nodeType == 8) // Comment
@@ -5895,7 +5895,7 @@ function exocoalesceformpanes() {
 				runseps.push(seps)
 				seps = []
 			}
-			else if (runpanes.length && exodus_is_formpane_run_sep(node)) {
+			else if (runpanes.length && exo_is_formpane_run_sep(node)) {
 				seps.push(node)
 			}
 			else {
@@ -5909,7 +5909,7 @@ function exocoalesceformpanes() {
 	}
 }
 
-function exodus_is_wrappable_exodusform(tablex) {
+function exo_is_wrappable_exodusform(tablex) {
 
 	// Top-level TABLE.exodusform not already inside a pane (or nested in another form).
 	if (!tablex || !tablex.className || (' ' + tablex.className + ' ').indexOf(' exodusform ') < 0)
@@ -5924,7 +5924,7 @@ function exodus_is_wrappable_exodusform(tablex) {
 	return true
 }
 
-function exodus_reveal_form_panes() {
+function exo_reveal_form_panes() {
 
 	// Allow painting after wrap+coalesce (pairs with global.css html:not(.exodus-panes-ready)).
 	try {
@@ -6262,12 +6262,12 @@ function exowrapformpanes() {
 	// only br/ws/comment between). Build each shell in a single step.
 	// Pre-authored .exodusformpane shells are left alone; coalesce still merges
 	// those if they sit with only br/ws/comment between them.
-	// Caller reveals via exodus_reveal_form_panes() after this returns.
+	// Caller reveals via exo_reveal_form_panes() after this returns.
 	var tables = document.getElementsByTagName('TABLE')
 	var candidates = []
 	var tablen
 	for (tablen = 0; tablen < tables.length; tablen++) {
-		if (exodus_is_wrappable_exodusform(tables[tablen]))
+		if (exo_is_wrappable_exodusform(tables[tablen]))
 			candidates.push(tables[tablen])
 	}
 
@@ -6316,7 +6316,7 @@ function exowrapformpanes() {
 				runseps.push(seps)
 				seps = []
 			}
-			else if (runforms.length && exodus_is_formpane_run_sep(node)) {
+			else if (runforms.length && exo_is_formpane_run_sep(node)) {
 				seps.push(node)
 			}
 			else {
@@ -6330,7 +6330,7 @@ function exowrapformpanes() {
 
 	exocoalesceformpanes()
 	exoclear_embeddedtable_hostborders()
-	exodus_mark_form_edge_rows()
+	exo_mark_form_edge_rows()
 }
 
 /*
@@ -6348,7 +6348,7 @@ function exowrapformpanes() {
  * and no text (costestimateprint trailing <tr><td colspan="2"></td></tr>).
  * Empty-cell spacers are display:none so they do not draw a bottom strip.
  */
-function exodus_mark_form_edge_rows() {
+function exo_mark_form_edge_rows() {
 
 	var panes = document.getElementsByClassName('exodusformpane')
 	for (var panen = 0; panen < panes.length; panen++) {
@@ -6483,7 +6483,7 @@ function nextelement(element) {
 
 function id2classname(element) {
 
-	//scan all elements adding id to classname as exodus_idname
+	//scan all elements adding id to classname as exo_idname
 	if (!element)
 		element = document.body
 	while (element = nextelement(element)) {
@@ -6558,7 +6558,7 @@ var gblockevents
 // Gate A diagnostics (stuck keyboard / mediadiary-style freezes):
 // always-on ring of block/unblock + callers; heartbeat detects orphan depth
 // (no flight/confirm/colors/calendar) and systemerror + auto-reset to 0.
-// Console: exodus_gblockevents_dump() / exodus_gblockevents_force0()
+// Console: exo_gblockevents_dump() / exo_gblockevents_force0()
 var gblockevents_hist = []
 var gblockevents_hist_max = 48
 var gblockevents_nonzero_since = 0
@@ -6601,7 +6601,7 @@ var gblockevents_flight_warn_ms = 120000
 // ---------------------------------------------------------------------------
 var gexodus_browser_chrome_keydown_installed = false
 
-function exodus_is_browser_chrome_keydown(event) {
+function exo_is_browser_chrome_keydown(event) {
 	if (!event || event.type != 'keydown')
 		return false
 	// Ctrl or Cmd (Mac); not Alt
@@ -6620,8 +6620,8 @@ function exodus_is_browser_chrome_keydown(event) {
 	return false
 }
 
-function exodus_browser_chrome_keydown_capture(event) {
-	if (!exodus_is_browser_chrome_keydown(event))
+function exo_browser_chrome_keydown_capture(event) {
+	if (!exo_is_browser_chrome_keydown(event))
 		return
 	// Do not preventDefault — browser zoom (etc.) must still run.
 	if (event.stopPropagation)
@@ -6634,13 +6634,13 @@ function exodus_browser_chrome_keydown_capture(event) {
 		window.setTimeout(function () { exoconfirm_fit_decide_popup(true) }, 0)
 }
 
-function exodus_ensure_browser_chrome_keydown() {
+function exo_ensure_browser_chrome_keydown() {
 	if (gexodus_browser_chrome_keydown_installed)
 		return
 	if (!document.addEventListener)
 		return
 	gexodus_browser_chrome_keydown_installed = true
-	document.addEventListener('keydown', exodus_browser_chrome_keydown_capture, true)
+	document.addEventListener('keydown', exo_browser_chrome_keydown_capture, true)
 }
 
 function form_blockevents_stack_snippet() {
@@ -6685,7 +6685,7 @@ function form_blockevents_hist_push(kind, depth, callername, callinfo) {
 // for the whole XHR (Wait/Cancel). Those are not stuck flights.
 // Confirm/decide also sit inside a flight; classify them before raw flight so
 // a long decide does not systemerror as "long flight".
-function exodus_gblockevents_holder() {
+function exo_gblockevents_holder() {
 	// Parent awaiting exoui_showmodaldialog close (gpendingDialogResolve set)
 	try {
 		if (typeof gpendingDialogResolve != 'undefined' && gpendingDialogResolve)
@@ -6727,7 +6727,7 @@ function exodus_gblockevents_holder() {
 	return null
 }
 
-function exodus_gblockevents_dump() {
+function exo_gblockevents_dump() {
 	var now = Date.now()
 	var age = gblockevents_nonzero_since ? (now - gblockevents_nonzero_since) : 0
 	var rawAge = gblockevents_raw_flight_since ? (now - gblockevents_raw_flight_since) : 0
@@ -6739,7 +6739,7 @@ function exodus_gblockevents_dump() {
 		+ ' skipped_events=' + gblockevents_skipped_n
 		+ ' flow=' + (typeof g_exodus_flow != 'undefined' && g_exodus_flow
 			? ('#' + g_exodus_flow.n + ' ' + g_exodus_flow.location) : 'null')
-		+ ' holder=' + (exodus_gblockevents_holder() || 'none')
+		+ ' holder=' + (exo_gblockevents_holder() || 'none')
 		+ ' modaldepth=' + (typeof gmodalblockdepth != 'undefined' ? gmodalblockdepth : '?')
 	)
 	for (var i = 0; i < gblockevents_hist.length; i++) {
@@ -6758,7 +6758,7 @@ function exodus_gblockevents_dump() {
 }
 
 // Manual unlock for console after a freeze (also used by heartbeat).
-function exodus_gblockevents_force0(reason) {
+function exo_gblockevents_force0(reason) {
 	var was = gblockevents || 0
 	gblockevents = 0
 	gblockevents_nonzero_since = 0
@@ -6767,11 +6767,11 @@ function exodus_gblockevents_force0(reason) {
 	gblockevents_stuck_reported = false
 	form_blockevents_hist_push('force0', 0, 'force0', reason || ('was=' + was))
 	if (typeof console != 'undefined' && console.log)
-		console.log('exodus_gblockevents_force0 was=' + was + ' ' + (reason || ''))
+		console.log('exo_gblockevents_force0 was=' + was + ' ' + (reason || ''))
 	return was
 }
 
-function exodus_gblockevents_heartbeat() {
+function exo_gblockevents_heartbeat() {
 	if (!gblockevents) {
 		gblockevents_stuck_reported = false
 		gblockevents_raw_flight_since = 0
@@ -6779,7 +6779,7 @@ function exodus_gblockevents_heartbeat() {
 	}
 	var now = Date.now()
 	var age = gblockevents_nonzero_since ? (now - gblockevents_nonzero_since) : 0
-	var holder = exodus_gblockevents_holder()
+	var holder = exo_gblockevents_holder()
 	// Track continuous *raw* flight only. Long Open→search (modal_dialog) then
 	// READU must not use total nonzero_ms (~6 min) as the long-flight clock.
 	if (holder && holder.indexOf('flight:') == 0) {
@@ -6804,7 +6804,7 @@ function exodus_gblockevents_heartbeat() {
 				'gblockevents long flight',
 				'Gate A raw flight ' + rawAge + 'ms under ' + holder
 				+ ' (nonzero_ms=' + age + '; no auto-reset — dump for bug report):\n'
-				+ exodus_gblockevents_dump()
+				+ exo_gblockevents_dump()
 			)
 		}
 		return
@@ -6813,8 +6813,8 @@ function exodus_gblockevents_heartbeat() {
 	if (age < gblockevents_orphan_ms || gblockevents_stuck_reported)
 		return
 	gblockevents_stuck_reported = true
-	var dump = exodus_gblockevents_dump()
-	var was = exodus_gblockevents_force0('orphan heartbeat was=' + gblockevents + ' age_ms=' + age)
+	var dump = exo_gblockevents_dump()
+	var was = exo_gblockevents_force0('orphan heartbeat was=' + gblockevents + ' age_ms=' + age)
 	// force0 cleared depth; re-log was in message
 	systemerror(
 		'gblockevents orphan auto-reset',
@@ -6829,7 +6829,7 @@ function form_blockevents_ensure_heartbeat() {
 		return
 	if (typeof window == 'undefined' || !window.setInterval)
 		return
-	gblockevents_heartbeat_id = window.setInterval(exodus_gblockevents_heartbeat, 2000)
+	gblockevents_heartbeat_id = window.setInterval(exo_gblockevents_heartbeat, 2000)
 }
 
 function form_blockevents(truefalse, callinfo) {
@@ -6874,7 +6874,7 @@ function form_blockevents(truefalse, callinfo) {
 // True when the event is the pointer activation of a native listbox that should
 // keep browser-default open/toggle behaviour while Gate A is already airborne.
 // Does not start a flight; only skips preventDefault.
-function exodus_native_select_activation(event) {
+function exo_native_select_activation(event) {
 
 	if (!event || !event.target || !event.target.tagName)
 		return false
@@ -6911,7 +6911,7 @@ function starteventhandler(eventfunctionname, functionx) {
 	// at the new geventhandler marker, using the same blocking.
 	const isAsyncTarget = functionx && functionx.constructor && functionx.constructor.name === 'AsyncFunction';
 
-	return function exodus_anon_sync_event_handler(event) {
+	return function exo_anon_sync_event_handler(event) {
 
 		event = getevent(event)
 		//YIELD//console.log('\n--- Event '+event.type+' ---')
@@ -6957,7 +6957,7 @@ function starteventhandler(eventfunctionname, functionx) {
 			}
 
 			// Let native <select> complete open/toggle; do not start a new flight.
-			if (exodus_native_select_activation(event)) {
+			if (exo_native_select_activation(event)) {
 				logevent('native SELECT activation while blocked: ' + eventdescription)
 				return true
 			}
@@ -6981,8 +6981,8 @@ function starteventhandler(eventfunctionname, functionx) {
 		//events are not blocked - create a new event handler
 
 		if (isAsyncTarget) {
-			// Async DOM handlers → Gate A only (public API: exodus_begin).
-			return exodus_begin(functionx, eventdescription + ' (async) in starteventhandler', event)
+			// Async DOM handlers → Gate A only (public API: exo_begin).
+			return exo_begin(functionx, eventdescription + ' (async) in starteventhandler', event)
 		}
 
 		// Sync handler (e.g. onbeforeunload text): run to completion, no gate.
@@ -7035,7 +7035,7 @@ function exoispromise(value) {
 }
 
 // Gate A — exclusive main event flow (one plane). All business async
-// commencements enter here via exodus_begin. Nested await inside the flight is fine.
+// commencements enter here via exo_begin. Nested await inside the flight is fine.
 //
 // Model today: at most ONE active flight (g_exodus_flow). A separate wait list
 // (g_exodus_flow_queue) may hold jobs that start only after that flight lands.
@@ -7047,9 +7047,9 @@ function exoispromise(value) {
 //   N = deeper FIFO
 //
 // Parallel starts: avoid at the source. Nested await in the current flight is
-// fine; a second exodus_begin while airborne is not. Callers outside Gate A
+// fine; a second exo_begin while airborne is not. Callers outside Gate A
 // (capture keydown, timers, etc.) must check g_exodus_flow / use
-// exodus_begin_if_idle (optional) or exodus_begin_when_idle (required after land).
+// exo_begin_if_idle (optional) or exo_begin_when_idle (required after land).
 // Gate A does not silently ignore conflicts — systemerror is intentional so races
 // surface until the initiating call site is fixed.
 //
@@ -7059,14 +7059,14 @@ function exoispromise(value) {
 // rejects parallel dbio (db.requesting). Until then: exclusive active + optional
 // wait list.
 //
-// Gate B (wait/cancel) is a separate concurrent stack — see exodus_begin_waitcancel.
+// Gate B (wait/cancel) is a separate concurrent stack — see exo_begin_waitcancel.
 var g_exodus_flow = null
 var g_exodus_flow_queue = []
 // FUTURE: set to 1+ to allow deferred takeoffs while a flight is airborne.
 var g_exodus_flow_queue_max = 0
 var g_exodus_flight_n = 0
 
-function exodus_flight_log(msg) {
+function exo_flight_log(msg) {
 	// Quiet by default (stage 5). Enable: glogflights=true or ?logflights=1
 	if (glogflights && typeof console != 'undefined' && console.log)
 		console.log('[exodus flight] ' + msg)
@@ -7075,25 +7075,25 @@ function exodus_flight_log(msg) {
 }
 
 // Visible failure when required work cannot start (prefer this over silent no-op).
-function exodus_flight_skip_error(location, reason) {
+function exo_flight_skip_error(location, reason) {
 	var msg = 'Action not started: "' + (location || 'unknown') + '". ' + reason
 		+ '\n\nThis is a Gate A conflict (exclusive async). Fix: await inside the'
-		+ ' current flight, or schedule with exodus_begin_when_idle after land.'
-	exodus_flight_log('SKIP ERROR "' + location + '": ' + reason)
+		+ ' current flight, or schedule with exo_begin_when_idle after land.'
+	exo_flight_log('SKIP ERROR "' + location + '": ' + reason)
 	if (typeof console != 'undefined' && console.error)
 		console.error('[exodus flight] ' + msg)
-	systemerror('exodus_begin', msg)
+	systemerror('exo_begin', msg)
 }
 
 // Public API #1 of 3 — exclusive Gate A business async.
 // Returns Promise of { value, done: true }, or null if skipped (busy + full wait list).
 // Skip is a hard visible error — required work must not vanish.
-function exodus_begin(asyncHandler, location, event) {
+function exo_begin(asyncHandler, location, event) {
 	location = location || 'unknown'
 	if (g_exodus_flow) {
 		// Only the wait list is size-limited; airborne is tracked in g_exodus_flow.
 		if (g_exodus_flow_queue.length >= g_exodus_flow_queue_max) {
-			exodus_flight_skip_error(
+			exo_flight_skip_error(
 				location,
 				'Already busy with flight #' + g_exodus_flow.n
 				+ ' "' + g_exodus_flow.location + '" (queue_max='
@@ -7101,7 +7101,7 @@ function exodus_begin(asyncHandler, location, event) {
 			)
 			return Promise.resolve(null)
 		}
-		exodus_flight_log(
+		exo_flight_log(
 			'QUEUED "' + location + '" (airborne #' + g_exodus_flow.n
 			+ ' "' + g_exodus_flow.location + '", queue='
 			+ (g_exodus_flow_queue.length + 1) + '/' + g_exodus_flow_queue_max + ')'
@@ -7116,13 +7116,13 @@ function exodus_begin(asyncHandler, location, event) {
 			})
 		})
 	}
-	return exodus_begin_run(asyncHandler, location, event)
+	return exo_begin_run(asyncHandler, location, event)
 }
 
 // Schedule required work after the current flight lands. Not a fourth gate —
-// only retries until exodus_begin can take off. systemerror if still busy after
-// max_wait_ms (default 30s). Prefer over one-shot setTimeout→exodus_begin.
-function exodus_begin_when_idle(asyncHandler, location, options) {
+// only retries until exo_begin can take off. systemerror if still busy after
+// max_wait_ms (default 30s). Prefer over one-shot setTimeout→exo_begin.
+function exo_begin_when_idle(asyncHandler, location, options) {
 	options = options || {}
 	var delay_ms = typeof options.delay_ms == 'number' ? options.delay_ms : 1
 	var max_wait_ms = typeof options.max_wait_ms == 'number' ? options.max_wait_ms : 30000
@@ -7133,7 +7133,7 @@ function exodus_begin_when_idle(asyncHandler, location, options) {
 	function try_start() {
 		if (g_exodus_flow) {
 			if (Date.now() - t0 > max_wait_ms) {
-				exodus_flight_skip_error(
+				exo_flight_skip_error(
 					location,
 					'Still busy after ' + max_wait_ms + 'ms with flight #'
 					+ g_exodus_flow.n + ' "' + g_exodus_flow.location + '".'
@@ -7144,22 +7144,22 @@ function exodus_begin_when_idle(asyncHandler, location, options) {
 			return
 		}
 		// Race: another takeoff between check and begin — begin will systemerror.
-		void exodus_begin(asyncHandler, location)
+		void exo_begin(asyncHandler, location)
 	}
 
 	window.setTimeout(try_start, delay_ms)
 }
 
-async function exodus_begin_run(asyncHandler, location, event) {
+async function exo_begin_run(asyncHandler, location, event) {
 	var n = ++g_exodus_flight_n
 	g_exodus_flow = { n: n, location: location }
-	exodus_flight_log('TAKEOFF #' + n + ' "' + location + '"')
+	exo_flight_log('TAKEOFF #' + n + ' "' + location + '"')
 
 	form_blockevents(true, location)
 	// Keep form_blockevents for re-entry (strict one plane), but skip #uiblockerdiv +
 	// overflow:hidden for high-frequency chrome that must not thrash page scroll:
 	//   focus/activate — full-viewport overlay mid-click closes native <select>
-	//   background     — exodus_begin_if_idle (expression2 every 250ms, keepalive, relock)
+	//   background     — exo_begin_if_idle (expression2 every 250ms, keepalive, relock)
 	//   keydown/keypress/keyup — arrow/caret; key-repeat must not lock overflow
 	//   input/change — every keystroke / SELECT change is not a user-wait dialog
 	// Real dialogs/db waits still call blockmodalui themselves.
@@ -7174,10 +7174,10 @@ async function exodus_begin_run(asyncHandler, location, event) {
 
 	try {
 		var result = await asyncHandler(event)
-		exodus_flight_log('LANDING #' + n + ' "' + location + '" ok')
+		exo_flight_log('LANDING #' + n + ' "' + location + '" ok')
 		return { value: result, done: true }
 	} catch (e) {
-		exodus_flight_log(
+		exo_flight_log(
 			'LANDING #' + n + ' "' + location + '" error: '
 			+ (e && (e.message || e.description || e))
 		)
@@ -7187,53 +7187,53 @@ async function exodus_begin_run(asyncHandler, location, event) {
 		if (modalblock)
 			unblockmodalui_sync()
 		g_exodus_flow = null
-		exodus_begin_drain()
+		exo_begin_drain()
 	}
 }
 
-function exodus_begin_drain() {
+function exo_begin_drain() {
 	if (g_exodus_flow || !g_exodus_flow_queue.length)
 		return
 	var job = g_exodus_flow_queue.shift()
-	exodus_flight_log(
+	exo_flight_log(
 		'DEQUEUE "' + job.location + '" (remaining queue='
 		+ g_exodus_flow_queue.length + '/' + g_exodus_flow_queue_max + ')'
 	)
-	exodus_begin_run(job.asyncHandler, job.location, job.event).then(job.resolve, job.reject)
+	exo_begin_run(job.asyncHandler, job.location, job.event).then(job.resolve, job.reject)
 }
 
-// Deprecated alias for exodus_begin (pre-gate name). Prefer exodus_begin.
+// Deprecated alias for exo_begin (pre-gate name). Prefer exo_begin.
 function startAsyncFlow(asyncHandler, location, event) {
-	return exodus_begin(asyncHandler, location, event)
+	return exo_begin(asyncHandler, location, event)
 }
 
 // Optional background work (expression2, keepalive, relock): Gate A only when idle.
 // Skip if busy — form/lock state may be wrong later; missing a tick is fine.
-// Public API #2 of 3 (see block above exodus_begin_waitcancel).
-// Passes type 'background' so exodus_begin_run does not mount #uiblockerdiv /
+// Public API #2 of 3 (see block above exo_begin_waitcancel).
+// Passes type 'background' so exo_begin_run does not mount #uiblockerdiv /
 // overflow:hidden (expression2 ticks every 250ms were thrashing page scrollbars).
-function exodus_begin_if_idle(asyncHandler, location) {
+function exo_begin_if_idle(asyncHandler, location) {
 	location = location || 'background'
 	if (g_exodus_flow) {
-		exodus_flight_log(
+		exo_flight_log(
 			'SKIP "' + location + '" (A#' + g_exodus_flow.n
 			+ ' "' + g_exodus_flow.location + '" airborne)'
 		)
 		return Promise.resolve(null)
 	}
 	if (typeof db != 'undefined' && db.requesting) {
-		exodus_flight_log('SKIP "' + location + '" (db.requesting)')
+		exo_flight_log('SKIP "' + location + '" (db.requesting)')
 		return Promise.resolve(null)
 	}
-	return exodus_begin(asyncHandler, location, { type: 'background' })
+	return exo_begin(asyncHandler, location, { type: 'background' })
 }
 
 // Internal bridge from *_sync / HTML attribute handlers — not a fourth gate.
-// Async → exodus_begin; else sync (generators rejected stage 6).
+// Async → exo_begin; else sync (generators rejected stage 6).
 function exoinvokesynctarget(target, args, location) {
 	args = args || []
 	if (exoisasyncfunction(target)) {
-		void exodus_begin(function () { return target.apply(null, args) }, location)
+		void exo_begin(function () { return target.apply(null, args) }, location)
 		return
 	}
 	var result = target.apply(null, args)
@@ -7242,7 +7242,7 @@ function exoinvokesynctarget(target, args, location) {
 		return
 	}
 	if (exoispromise(result)) {
-		void exodus_begin(function () { return result }, location)
+		void exo_begin(function () { return result }, location)
 		return result
 	}
 	return result
@@ -7252,14 +7252,14 @@ function exoinvokesynctarget(target, args, location) {
 function exoinvokesynctargetreturn(target, args, location) {
 	args = args || []
 	if (exoisasyncfunction(target))
-		return exodus_begin(function () { return target.apply(null, args) }, location)
+		return exo_begin(function () { return target.apply(null, args) }, location)
 	var result = target.apply(null, args)
 	if (exoisgeneratoriterator(result)) {
 		systemerror('exoinvokesynctargetreturn', 'function* removed (stage 6) at ' + location)
 		return false
 	}
 	if (exoispromise(result))
-		return exodus_begin(function () { return result }, location)
+		return exo_begin(function () { return result }, location)
 	return result
 }
 
@@ -7294,7 +7294,7 @@ function exoneweventhandler(eventhandler, location) {
 	logevent(' ')
 	logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
 	if (exoisasyncfunction(eventhandler))
-		return exodus_begin(eventhandler, location)
+		return exo_begin(eventhandler, location)
 	if (exoisgeneratoriterator(eventhandler)) {
 		systemerror(
 			'exoneweventhandler',
@@ -7427,7 +7427,7 @@ function exoint2date(exodate) {
 
 // Thin timeout wrapper. Prefer await inside the current Gate A flight.
 // Preferred deferral of async work (stage 3):
-//   exodus_begin_when_idle(myfunc, 'label', { delay_ms: ms })
+//   exo_begin_when_idle(myfunc, 'label', { delay_ms: ms })
 //   or exosettimeout(myAsyncFn, ms)  — AsyncFunction → when_idle then begin
 // String 'await …' / 'yield* …' is legacy (eval via new Function); do not add more.
 function exosettimeout(command, milliseconds) {
@@ -7438,16 +7438,16 @@ function exosettimeout(command, milliseconds) {
 			var label = 'timeout ' + (command.name || 'fn')
 			// Must not one-shot begin while still airborne (silent miss → when_idle).
 			return window.setTimeout(function () {
-				exodus_begin_when_idle(command, label, { delay_ms: 0 })
+				exo_begin_when_idle(command, label, { delay_ms: 0 })
 			}, milliseconds)
 		}
 		return window.setTimeout(command, milliseconds)
 	}
 	if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
-		exodus_flight_log('LEGACY STRING TIMEOUT "' + command + '"')
+		exo_flight_log('LEGACY STRING TIMEOUT "' + command + '"')
 		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
 		return window.setTimeout(function () {
-			exodus_begin_when_idle(function () {
+			exo_begin_when_idle(function () {
 				return exotimeout_async_run(command)
 			}, 'timeout ' + command, { delay_ms: 0 })
 		}, milliseconds)
@@ -7461,19 +7461,19 @@ async function exotimeout_async_run(command) {
 	return await fn()
 }
 
-// Interval wrapper. Prefer function callbacks; AsyncFunction → exodus_begin_if_idle each tick.
+// Interval wrapper. Prefer function callbacks; AsyncFunction → exo_begin_if_idle each tick.
 function exosetinterval(command, milliseconds) {
 	if (typeof command == 'function') {
 		if (exoisasyncfunction(command)) {
 			var label = 'interval ' + (command.name || 'fn')
 			return window.setInterval(function () {
-				void exodus_begin_if_idle(command, label)
+				void exo_begin_if_idle(command, label)
 			}, milliseconds)
 		}
 		return window.setInterval(command, milliseconds)
 	}
 	if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
-		exodus_flight_log('LEGACY STRING INTERVAL "' + command + '"')
+		exo_flight_log('LEGACY STRING INTERVAL "' + command + '"')
 		command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
 		return window.setInterval(function () {
 			void exointerval_async_sync(command)
@@ -7485,14 +7485,14 @@ function exosetinterval(command, milliseconds) {
 // LEGACY: string expression under Gate A when idle (relock/keepalive style).
 async function exointerval_async_sync(command) {
 	if (g_exodus_flow || gblockevents) {
-		exodus_flight_log('SKIP interval "' + command + '" (busy)')
+		exo_flight_log('SKIP interval "' + command + '" (busy)')
 		return
 	}
 	if (typeof db != 'undefined' && db.requesting) {
-		exodus_flight_log('SKIP interval "' + command + '" (db.requesting)')
+		exo_flight_log('SKIP interval "' + command + '" (db.requesting)')
 		return
 	}
-	await exodus_begin(async function () {
+	await exo_begin(async function () {
 		var fn = new Function('return ' + command)
 		return await fn()
 	}, 'interval ' + command)
@@ -7639,7 +7639,7 @@ async function getcurrentstyle(element) {
 
 // Firefox innerText historically differed from WebKit (BR → newline); use walk when needed
 //need BR to show as \n
-function exodus_getinnertext(element) {
+function exo_getinnertext(element) {
 	if (element.tagName == 'BR')
 		return '\n'
 	if (typeof element.nodeValue == 'string')
@@ -7651,7 +7651,7 @@ function exodus_getinnertext(element) {
 	for (var noden = 0; noden < nodes.length; ++noden) {
 		//for (var noden=0;noden<nodes.length;++noden) {
 		//alert(nodes[node].tagName+' '+nodes[node].textContent)
-		text += exodus_getinnertext(nodes[noden])//recursive
+		text += exo_getinnertext(nodes[noden])//recursive
 		//alert(text)
 	}
 	return text
@@ -7665,7 +7665,7 @@ function exoconfirm_scrollpane() {
 // Scroll a table row into view below a sticky thead (scrollIntoView nearest
 // can leave the focused radio/row under sticky colheads on wheel/Up/Home).
 // +4px: radio/checkbox focus ring is 3px box-shadow; flush under thead clips it.
-function exodus_scroll_row_below_sticky_thead(tr, scrollpane, thead) {
+function exo_scroll_row_below_sticky_thead(tr, scrollpane, thead) {
 	if (!tr || !scrollpane)
 		return
 	if (!thead) {
@@ -7695,7 +7695,7 @@ function exoconfirm_footerwrap(content) {
  * url() inside a custom property used from global.css is resolved against the CSS
  * file path and often 404s → solid coloured square.
  */
-function exodus_icon_abs_url(maskFile) {
+function exo_icon_abs_url(maskFile) {
 	var rel = (typeof gimagetheme != 'undefined' ? gimagetheme : '') + maskFile
 	try {
 		// Resolve like <img src> — against the document URL
@@ -7707,22 +7707,22 @@ function exodus_icon_abs_url(maskFile) {
 	}
 }
 
-function exodus_icon_mask_style(maskFile) {
-	var abs = exodus_icon_abs_url(maskFile)
+function exo_icon_mask_style(maskFile) {
+	var abs = exo_icon_abs_url(maskFile)
 	// Set mask on the element style so the URL resolves against the document
 	return '-webkit-mask-image:url(\'' + abs + '\');mask-image:url(\'' + abs + '\')'
 }
 
-function exodus_icon_html(maskFileOrSpec, colorName, extraAttrs) {
+function exo_icon_html(maskFileOrSpec, colorName, extraAttrs) {
 	var mask = maskFileOrSpec
 	var color = colorName || 'darkgrey'
-	if (exodus_is_icon_spec(maskFileOrSpec)) {
+	if (exo_is_icon_spec(maskFileOrSpec)) {
 		mask = maskFileOrSpec.mask
 		color = maskFileOrSpec.color || 'darkgrey'
 	}
 	var attrs = extraAttrs || ''
 	// extraAttrs may include style=; merge mask into style if present
-	var style = exodus_icon_mask_style(mask)
+	var style = exo_icon_mask_style(mask)
 	var m = attrs.match(/\bstyle="([^"]*)"/)
 	if (m) {
 		attrs = attrs.replace(/\bstyle="([^"]*)"/, 'style="' + m[1] + ';' + style + '"')
@@ -7734,8 +7734,8 @@ function exodus_icon_html(maskFileOrSpec, colorName, extraAttrs) {
 		+ ' aria-hidden="true"></span>'
 }
 
-function exodus_icon_apply(el, spec) {
-	if (!el || !exodus_is_icon_spec(spec))
+function exo_icon_apply(el, spec) {
+	if (!el || !exo_is_icon_spec(spec))
 		return
 	var id = el.id
 	// Keep framework id→class map (exodusid_*) so $$() still finds multi-id groups
@@ -7751,7 +7751,7 @@ function exodus_icon_apply(el, spec) {
 	el.className = (keep ? keep + ' ' : '') + 'exodus-icon exodus-icon-' + (spec.color || 'darkgrey')
 	if (id)
 		el.id = id
-	var abs = exodus_icon_abs_url(spec.mask)
+	var abs = exo_icon_abs_url(spec.mask)
 	el.style.webkitMaskImage = 'url(\'' + abs + '\')'
 	el.style.maskImage = 'url(\'' + abs + '\')'
 	// clear any old custom-prop approach
@@ -7759,10 +7759,10 @@ function exodus_icon_apply(el, spec) {
 }
 
 // Create or update an icon host: monochrome {mask,color} → .exodus-icon; string → <img>
-function exodus_create_icon_element(specOrUrl) {
-	if (exodus_is_icon_spec(specOrUrl)) {
+function exo_create_icon_element(specOrUrl) {
+	if (exo_is_icon_spec(specOrUrl)) {
 		var tmp = document.createElement('span')
-		tmp.innerHTML = exodus_icon_html(specOrUrl)
+		tmp.innerHTML = exo_icon_html(specOrUrl)
 		return tmp.firstChild
 	}
 	var img = document.createElement('img')
@@ -7770,15 +7770,15 @@ function exodus_create_icon_element(specOrUrl) {
 	return img
 }
 
-function exodus_set_icon_element(el, specOrUrl) {
+function exo_set_icon_element(el, specOrUrl) {
 	if (!el)
 		return null
-	if (exodus_is_icon_spec(specOrUrl)) {
+	if (exo_is_icon_spec(specOrUrl)) {
 		if (el.classList && el.classList.contains('exodus-icon')) {
-			exodus_icon_apply(el, specOrUrl)
+			exo_icon_apply(el, specOrUrl)
 			return el
 		}
-		var span = exodus_create_icon_element(specOrUrl)
+		var span = exo_create_icon_element(specOrUrl)
 		if (el.id)
 			span.id = el.id
 		// keep common attributes used on field chrome / static toolbar buttons
@@ -7818,27 +7818,27 @@ function exodus_set_icon_element(el, specOrUrl) {
 
 // Decide Select: green check (mask)
 function exoconfirm_ok_image() {
-	return exodus_icon_html(exodus_icon_spec('confirm-ok.svg', 'green'))
+	return exo_icon_html(exo_icon_spec('confirm-ok.svg', 'green'))
 }
 // Decide Cancel: red X mask
 function exoconfirm_cancel_image() {
-	return exodus_icon_html(exodus_icon_spec('record-close.svg', 'red'))
+	return exo_icon_html(exo_icon_spec('record-close.svg', 'red'))
 }
 // Confirm Yes/OK (positive) — Save label uses menubar tray icon (record-save.svg), else check
 function exoconfirm_yes_image(buttontext) {
 	var plain = String(buttontext == null ? '' : buttontext).replace(/<[^>]*>/g, '')
 	plain = plain.replace(/\s+/g, ' ').trim()
 	if (plain.toLowerCase() == 'save')
-		return exodus_icon_html(exodus_icon_spec('record-save.svg', 'green'))
+		return exo_icon_html(exo_icon_spec('record-save.svg', 'green'))
 	return exoconfirm_ok_image()
 }
 // Confirm No: orange X if Cancel also shown, else red X
 function exoconfirm_no_image(hasCancelButton) {
-	return exodus_icon_html(exodus_icon_spec('record-close.svg', hasCancelButton ? 'orange' : 'red'))
+	return exo_icon_html(exo_icon_spec('record-close.svg', hasCancelButton ? 'orange' : 'red'))
 }
 // Confirm Cancel (Esc) — red U-turn
 function exoconfirm_back_image() {
-	return exodus_icon_html(exodus_icon_spec('confirm-back.svg', 'red'))
+	return exo_icon_html(exo_icon_spec('confirm-back.svg', 'red'))
 }
 
 function exoconfirm_focusable_elements() {
@@ -8012,11 +8012,11 @@ function exoconfirm_keymap(event) {
 	if (istextinput && active && active.id == 'exodusconfirmdiv_textinput'
 		&& !event.altKey && !event.ctrlKey && !event.metaKey) {
 		if (keycode == 13 || keycode == 120) {
-			window.setTimeout(exodus_confirm_function1_sync, 1)
+			window.setTimeout(exo_confirm_function1_sync, 1)
 			return false
 		}
 		if (keycode == 27) {
-			window.setTimeout(exodus_confirm_function3_sync, 1)
+			window.setTimeout(exo_confirm_function3_sync, 1)
 			return false
 		}
 		// Tab already handled above
@@ -8034,11 +8034,11 @@ function exoconfirm_keymap(event) {
 			focusedConfirmBtn = document.getElementById('positivebutton')
 		if (focusedConfirmBtn) {
 			if (focusedConfirmBtn.id == 'negativebutton')
-				window.setTimeout(exodus_confirm_function2_sync, 1)
+				window.setTimeout(exo_confirm_function2_sync, 1)
 			else if (focusedConfirmBtn.id == 'cancelbutton')
-				window.setTimeout(exodus_confirm_function3_sync, 1)
+				window.setTimeout(exo_confirm_function3_sync, 1)
 			else
-				window.setTimeout(exodus_confirm_function1_sync, 1)
+				window.setTimeout(exo_confirm_function1_sync, 1)
 			return false
 		}
 	}
@@ -8057,7 +8057,7 @@ function exoconfirm_keymap(event) {
 	// F9 / first-button letter: always positive (OK/Yes) — not bare Enter
 	if (keycode == 120
 		|| (accessLetter && keyletter == gexodusconfirmletters[1])) {
-		window.setTimeout(exodus_confirm_function1_sync, 1)
+		window.setTimeout(exo_confirm_function1_sync, 1)
 		return false
 	}
 
@@ -8065,13 +8065,13 @@ function exoconfirm_keymap(event) {
 
 	// CANCEL: Esc always; letter per accessLetter rules above
 	if (keycode == 27 || (accessLetter && keyletter == gexodusconfirmletters[3])) {
-		window.setTimeout(exodus_confirm_function3_sync, 1)
+		window.setTimeout(exo_confirm_function3_sync, 1)
 		return false
 	}
 
 	// NEGATIVE: F8; letter per accessLetter rules above
 	if (keycode == 119 || (accessLetter && keyletter == gexodusconfirmletters[2])) {
-		window.setTimeout(exodus_confirm_function2_sync, 1)
+		window.setTimeout(exo_confirm_function2_sync, 1)
 		return false
 	}
 
@@ -8450,7 +8450,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 		html += '<span id="' + buttonid + 'button"'
 		html += ' tabindex="0"'
 		html += ' class="graphicbutton"'
-		html += ' onclick="exodus_confirm_function' + buttonn + '_sync()"'
+		html += ' onclick="exo_confirm_function' + buttonn + '_sync()"'
 
 		// Hotkey letter: pure button = bare letter; text-input confirm = Alt+letter only.
 		// (See exoconfirm_keymap accessLetter CHANGE LOG — do not flip-flop.)
@@ -8597,11 +8597,11 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 			event = getevent(event)
 			var keycode = event.keyCode ? event.keyCode : event.which
 			if (keycode == 13) {
-				window.setTimeout(exodus_confirm_function1_sync, 1)
+				window.setTimeout(exo_confirm_function1_sync, 1)
 				return exocancelevent(event)
 			}
 			if (keycode == 27) {
-				window.setTimeout(exodus_confirm_function3_sync, 1)
+				window.setTimeout(exo_confirm_function3_sync, 1)
 				return exocancelevent(event)
 			}
 			return true
@@ -8737,37 +8737,37 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 
 //return 1 - Positive Button i.e. 'Ok' with optional text input
 // DOM/HTML entry points — *_sync (resolve confirm leaf; not Gate A takeoff)
-function exodus_confirm_function1_sync(event) {
+function exo_confirm_function1_sync(event) {
 	var el = $$('exodusconfirmdiv_textinput')
 	if (el && !el.tagName && el.length)
 		el = el[0]
 	// Always pass a string when the text field is present so empty OK is '' not 1/0/false
 	if (el && el.tagName)
-		return exodus_confirm_function(String(el.value), event)
-	return exodus_confirm_function(1, event)
+		return exo_confirm_function(String(el.value), event)
+	return exo_confirm_function(1, event)
 }
 
 //return 2
-function exodus_confirm_function2_sync(event) {
-	return exodus_confirm_function(2, event)
+function exo_confirm_function2_sync(event) {
+	return exo_confirm_function(2, event)
 }
 
 //return 0
-function exodus_confirm_function3_sync(event) {
-	return exodus_confirm_function(0, event)
+function exo_confirm_function3_sync(event) {
+	return exo_confirm_function(0, event)
 }
 
 // Click on modal blocker outside confirm: last footer action (Cancel/No), not OK/Select.
 // Matches Esc-ish "leave" rather than affirming the default/first button.
-function exodus_confirm_outside_click_sync(event) {
+function exo_confirm_outside_click_sync(event) {
 	if ($$('decide_cancelbutton'))
-		return resolvePendingConfirm('', 'exodus_confirm_outside_click_sync')
+		return resolvePendingConfirm('', 'exo_confirm_outside_click_sync')
 	if ($$('cancelbutton'))
-		return exodus_confirm_function3_sync(event)
+		return exo_confirm_function3_sync(event)
 	if ($$('negativebutton'))
-		return exodus_confirm_function2_sync(event)
+		return exo_confirm_function2_sync(event)
 	// Only one action button (e.g. OK alone)
-	return exodus_confirm_function1_sync(event)
+	return exo_confirm_function1_sync(event)
 }
 
 // expectedOwner: optional 'A' | 'B' — when set, only resolve if gpendingConfirmOwner matches
@@ -8775,7 +8775,7 @@ function exodus_confirm_outside_click_sync(event) {
 function resolvePendingConfirm(value, source, expectedOwner) {
 	if (gpendingConfirmResolve) {
 		if (expectedOwner && gpendingConfirmOwner && gpendingConfirmOwner !== expectedOwner) {
-			exodus_flight_log(
+			exo_flight_log(
 				'CONFIRM resolve blocked (want ' + expectedOwner
 				+ ' have ' + gpendingConfirmOwner + ' from ' + source + ')'
 			)
@@ -8800,7 +8800,7 @@ function resolvePendingConfirm(value, source, expectedOwner) {
 function resolvePendingDialog(value, source, expectedOwner) {
 	if (gpendingDialogResolve) {
 		if (expectedOwner && gpendingDialogOwner && gpendingDialogOwner !== expectedOwner) {
-			exodus_flight_log(
+			exo_flight_log(
 				'DIALOG resolve blocked (want ' + expectedOwner
 				+ ' have ' + gpendingDialogOwner + ' from ' + source + ')'
 			)
@@ -8820,13 +8820,13 @@ function resolvePendingDialog(value, source, expectedOwner) {
 	return false
 }
 
-function exodus_confirm_function(buttonno, event) {
+function exo_confirm_function(buttonno, event) {
 
-	console.log('exodus_confirm_function buttonno:' + buttonno)
+	console.log('exo_confirm_function buttonno:' + buttonno)
 	event = getevent(event)
 	exocancelevent(event)
-	//exodus_resume(buttonno, 'exodus_confirm_function')
-	resolvePendingConfirm(buttonno, 'exodus_confirm_function')
+	//exo_resume(buttonno, 'exo_confirm_function')
+	resolvePendingConfirm(buttonno, 'exo_confirm_function')
 }
 
 //backpage when popup is up should remove the popup and NOT backpage
@@ -8845,7 +8845,7 @@ function cancel_backpage_event(event) {
 	//remove the popup and its controlling generator/coroutine
 	//exoremovenode(exodusconfirmdiv)
 	//geventhandler = false
-	//exodus_resume(false, 'cancel_backpage_event')
+	//exo_resume(false, 'cancel_backpage_event')
 	resolvePendingConfirm(false, 'cancel_backpage_event')
 
 	// History entry so Back/popstate dismisses the popup (not navigate away) — mobile has no Esc.
@@ -9152,12 +9152,12 @@ async function decide_onload(decide_args) {
 		oCell.className = 'decide_datacol'
 		// Sort only when the column has a visible title (untitled data cols: no icon, no sort)
 		if (String(title || '').replace(/^\s+|\s+$/g, '')
-			&& typeof exodus_create_icon_element == 'function'
-			&& typeof exodus_sortimage == 'function') {
-			var sorticon = exodus_create_icon_element(
-				(typeof gsortimage != 'undefined' && gsortimage) ? gsortimage : exodus_sortimage())
-			if (typeof exodus_apply_sort_icon == 'function')
-				sorticon = exodus_apply_sort_icon(sorticon, '') || sorticon
+			&& typeof exo_create_icon_element == 'function'
+			&& typeof exo_sortimage == 'function') {
+			var sorticon = exo_create_icon_element(
+				(typeof gsortimage != 'undefined' && gsortimage) ? gsortimage : exo_sortimage())
+			if (typeof exo_apply_sort_icon == 'function')
+				sorticon = exo_apply_sort_icon(sorticon, '') || sorticon
 			sorticon.id = 'sortbutton_decide_' + ii
 			sorticon.title = 'Sort by ' + String(title)
 			oCell.appendChild(sorticon)
@@ -9898,7 +9898,7 @@ async function decide_onload(decide_args) {
 				try {
 					var tr = getancestor(newelement, 'tr')
 					if (tr)
-						exodus_scroll_row_below_sticky_thead(tr, scrollpane)
+						exo_scroll_row_below_sticky_thead(tr, scrollpane)
 				} catch (e) { }
 			}
 		}
@@ -9976,7 +9976,7 @@ async function decide_onload(decide_args) {
 			else {
 				var trEnd = getancestor(newelement, 'tr')
 				if (trEnd)
-					exodus_scroll_row_below_sticky_thead(trEnd, scrollpane)
+					exo_scroll_row_below_sticky_thead(trEnd, scrollpane)
 			}
 		}
 		decide_last_option_element = newelement
@@ -10503,7 +10503,7 @@ function decide_sorttable2_sync(event) {
 
 	// Chevrons: active col down→up cycle; others unsorted (exotable sortbutton_*)
 	var headrow = th.parentElement
-	if (headrow && typeof exodus_apply_sort_icon == 'function') {
+	if (headrow && typeof exo_apply_sort_icon == 'function') {
 		var dths = headrow.querySelectorAll('th.decide_datacol')
 		for (var hi = 0; hi < dths.length; hi++) {
 			var icon = dths[hi].querySelector('[id^="sortbutton_"]')
@@ -10511,10 +10511,10 @@ function decide_sorttable2_sync(event) {
 				continue
 			if (dths[hi] === th) {
 				// reverse was previous state: was sorted → now up; was unset → down
-				exodus_apply_sort_icon(icon, reverse ? 'up' : 'down')
+				exo_apply_sort_icon(icon, reverse ? 'up' : 'down')
 			} else {
 				dths[hi].removeAttribute('sorttable2_issorted')
-				exodus_apply_sort_icon(icon, '')
+				exo_apply_sort_icon(icon, '')
 			}
 		}
 	}
@@ -10806,7 +10806,7 @@ function DATE(mode, value, params) {
 				// Sync DATE iconv cannot await. Peer setx after current flight lands.
 				// when_idle retries; systemerror if still busy (never silent drop).
 				;(function (id, recn, val) {
-					exodus_begin_when_idle(function () {
+					exo_begin_when_idle(function () {
 						return gds.setx(id, recn, val)
 					}, 'date-fromto setx ' + id, { delay_ms: 1 })
 				})(otherdateid, grecn, otherdate)
@@ -11173,12 +11173,12 @@ function logevent(msg) {
 
 // Dev dump: more than outerHTML — box + key computed styles + matched rules.
 // Usage (console):
-//   exodus_dump_styles()                    // $0 if set, else document.activeElement
-//   exodus_dump_styles('#INVOICE_TO')
-//   exodus_dump_styles(el, ['display','width','padding'])
-//   exodus_dump_styles('table[exogroupno="4"] tbody tr:first-child > *')
+//   exo_dump_styles()                    // $0 if set, else document.activeElement
+//   exo_dump_styles('#INVOICE_TO')
+//   exo_dump_styles(el, ['display','width','padding'])
+//   exo_dump_styles('table[exogroupno="4"] tbody tr:first-child > *')
 // Returns the object; console.logs JSON; copy() when available.
-function exodus_dump_styles(sel, props) {
+function exo_dump_styles(sel, props) {
 	var roots
 	if (sel == null || sel === '') {
 		// $0 = last selected node in DevTools (when present)

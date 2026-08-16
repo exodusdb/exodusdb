@@ -87,9 +87,9 @@
     <li><strong>Core file:</strong> <code>client.js</code> — Must be included <strong>first</strong>. Core globals, Gate A/B, <code>exodblink</code>, <code>exoui_showmodaldialog</code>, security, cookies, utilities, string/array prototypes.</li>
     <li><strong>Form automation:</strong> <code>dbform.js</code> + helpers in <code>db.js</code> — Dictionary-driven (<code>dict_*</code>) CRUD forms, MV groups, validation, buttons.</li>
     <li><strong>Communication bridge:</strong> <code>xhttp.php</code> (and .asp variants). Client sends XML (<code>&lt;token&gt;</code>, <code>&lt;request&gt;</code>, <code>&lt;data&gt;</code>); bridge writes temp files; backend processes and responds via <code>.1</code>/<code>.2</code>/<code>.3</code> files.</li>
-    <li><strong>Async model (Gate A):</strong> Event handlers and deferred async work enter via <code>exodus_begin</code> (exclusive owner; <code>g_exodus_flow_queue_max = 0</code> means <strong>no queuing</strong> — second start while airborne is <strong>skipped</strong>). Prefer <code>async function myfunc() { ... await someOperation() ... }</code> and <code>await</code> inside the same flight. Do <strong>not</strong> start free-floating async that does DB/UI work.</li>
+    <li><strong>Async model (Gate A):</strong> Event handlers and deferred async work enter via <code>exo_begin</code> (exclusive owner; <code>g_exodus_flow_queue_max = 0</code> means <strong>no queuing</strong> — second start while airborne is <strong>skipped</strong>). Prefer <code>async function myfunc() { ... await someOperation() ... }</code> and <code>await</code> inside the same flight. Do <strong>not</strong> start free-floating async that does DB/UI work.</li>
     <li><strong>Wait/Cancel (Gate B):</strong> Only intentional second stack — in-DOM Wait/Cancel on the modal blocker while Gate A is blocked on <code>db.send</code> XHR. No main-line form dbio from Gate B.</li>
-    <li><strong>Public commencement API (only three):</strong> <code>exodus_begin</code> (business), <code>exodus_begin_if_idle</code> (background), <code>exodus_begin_waitcancel</code> (Wait/Cancel). <code>startAsyncFlow</code> is a deprecated alias of <code>exodus_begin</code>.</li>
+    <li><strong>Public commencement API (only three):</strong> <code>exo_begin</code> (business), <code>exo_begin_if_idle</code> (background), <code>exo_begin_waitcancel</code> (Wait/Cancel). <code>startAsyncFlow</code> is a deprecated alias of <code>exo_begin</code>.</li>
     <li><strong>Flight log:</strong> Quiet by default. Enable with <code>?logflights=1</code> or <code>glogflights=true</code>.</li>
     <li><strong>No generators:</strong> <code>function*</code> / <code>yield*</code> are not supported — use <code>async</code>/<code>await</code> only (stage 6).</li>
     <li><strong>UI conventions:</strong> Modal dialogs, <code>class="exodusform"</code> tables, input <code>id</code>s matching dictionary codes, heavy use of <code>gparameters</code>.</li>
@@ -194,12 +194,12 @@
 <p>Two kinds of functions — do not mix their jobs:</p>
 <table>
 <tr><th>Kind</th><th>Naming</th><th>May do</th><th>Must not do</th></tr>
-<tr><td><strong>Sync shell</strong></td><td>Prefer <code>*_sync</code> for DOM attribute targets</td><td>Pure DOM paint, <code>exodus_begin…</code> kickoff, cancel event</td><td><code>await</code>, <code>db.send</code>, dialogs, <code>gds.setx</code></td></tr>
+<tr><td><strong>Sync shell</strong></td><td>Prefer <code>*_sync</code> for DOM attribute targets</td><td>Pure DOM paint, <code>exo_begin…</code> kickoff, cancel event</td><td><code>await</code>, <code>db.send</code>, dialogs, <code>gds.setx</code></td></tr>
 <tr><td><strong>Async flight</strong></td><td><code>async function …</code> (via Gate A only)</td><td><code>await</code> confirm / <code>db.send</code> / <code>gds.setx</code> / form hooks</td><td>Free-run outside Gate A</td></tr>
 </table>
 <pre><code>// Sync shell — HTML may call this; only kicks Gate A
 function save_onclick_sync() {
-  void exodus_begin(save_onclick, 'save_onclick')
+  void exo_begin(save_onclick, 'save_onclick')
 }
 
 // Async flight — all real work lives here
@@ -214,14 +214,14 @@ async function save_onclick() {
 <li>Bare call of an async function without <code>await</code> is a bug.</li>
 </ul>
 
-<p>DOM events, HTM <code>*_sync</code> bridges, and deferred work all enter <strong>Gate A</strong> (<code>exodus_begin</code>). Nested <code>await</code> stays on that one flight. <code>g_exodus_flow_queue_max</code> is wait-list capacity only: <strong>0 = no queuing</strong> (current).</p>
+<p>DOM events, HTM <code>*_sync</code> bridges, and deferred work all enter <strong>Gate A</strong> (<code>exo_begin</code>). Nested <code>await</code> stays on that one flight. <code>g_exodus_flow_queue_max</code> is wait-list capacity only: <strong>0 = no queuing</strong> (current).</p>
 
-<p>Optional background work (session keepalive, relock) uses <code>exodus_begin_if_idle</code> — <strong>skip</strong> if busy (never uses the queue).</p>
+<p>Optional background work (session keepalive, relock) uses <code>exo_begin_if_idle</code> — <strong>skip</strong> if busy (never uses the queue).</p>
 
 <p><strong>No <code>function*</code> / <code>yield*</code>:</strong> Generators are removed (stage 6). Use <code>async</code>/<code>await</code> only. Form hooks and dict <code>functioncode</code> must not be generators.</p>
 
 <div class="note">
-<strong>Do not</strong> use free-running <code>setTimeout(async () =&gt; …)</code> or rely on <code>exosettimeout('await myfunc()')</code> as a second event system. Prefer <code>await myfunc()</code> inside the current handler. Defer after the current flight with <code>exodus_begin_when_idle(myfunc, 'label', { delay_ms: 10 })</code> — retries until free, then <strong>systemerror</strong> if still busy (never silent skip). Required <code>exodus_begin</code> while busy also systemerrors; only <code>exodus_begin_if_idle</code> may skip quietly.
+<strong>Do not</strong> use free-running <code>setTimeout(async () =&gt; …)</code> or rely on <code>exosettimeout('await myfunc()')</code> as a second event system. Prefer <code>await myfunc()</code> inside the current handler. Defer after the current flight with <code>exo_begin_when_idle(myfunc, 'label', { delay_ms: 10 })</code> — retries until free, then <strong>systemerror</strong> if still busy (never silent skip). Required <code>exo_begin</code> while busy also systemerrors; only <code>exo_begin_if_idle</code> may skip quietly.
 <p><strong>form_postread vs form_postdisplay:</strong> <code>opendoc2</code> runs <code>form_postread</code> → <code>gds.load</code> → <code>form_postdisplay</code>. Anything that needs bound DOM rows (<code>form_filter</code>, per-row readonly, images) belongs in <code>form_postdisplay</code>, not same-flight <code>await</code> from <code>form_postread</code>. Module helpers named <code>*_postpostdisplay</code> are ordinary functions called from <code>form_postdisplay</code>, not framework hooks.
 </div>
 
@@ -247,7 +247,7 @@ exoui_windowclose(['multiple', 'values']);
 <ul>
     <li><code>exoui_showmodaldialog(url, arguments)</code></li>
     <li><code>exoui_windowclose(returnValue)</code></li>
-    <li><code>exodus_setchildwin_returnvalue(...)</code></li>
+    <li><code>exo_setchildwin_returnvalue(...)</code></li>
 </ul>
 
 <p>Dialogs are the primary navigation/composition mechanism.</p>
@@ -397,9 +397,9 @@ arr.exotrim()
     <li><code>await exoui_okcancel(msg, default)</code></li>
     <li><code>await exoui_decide(question, data, ...)</code></li>
     <li><code>exoui_windowclose(value)</code></li>
-    <li><code>exodus_begin(asyncFn, 'label')</code> — <strong>public #1</strong> Gate A business</li>
-    <li><code>exodus_begin_if_idle(asyncFn, 'label')</code> — <strong>public #2</strong> optional background; skip if busy</li>
-    <li><code>exodus_begin_waitcancel(source)</code> — <strong>public #3</strong> Gate B Wait/Cancel only</li>
+    <li><code>exo_begin(asyncFn, 'label')</code> — <strong>public #1</strong> Gate A business</li>
+    <li><code>exo_begin_if_idle(asyncFn, 'label')</code> — <strong>public #2</strong> optional background; skip if busy</li>
+    <li><code>exo_begin_waitcancel(source)</code> — <strong>public #3</strong> Gate B Wait/Cancel only</li>
     <li><code>$$('id')</code> or <code>$$('classname')</code> — element lookup</li>
 </ul>
 

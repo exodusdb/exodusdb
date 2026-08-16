@@ -11,7 +11,7 @@ This is a modernized version of the original `exodus/pygment` directory.
 
 ## Files
 
-- `exodus_cpp.py` - The custom Pygments lexer for Exodus C++
+- `exo_cpp.py` - The custom Pygments lexer for Exodus C++
 - `pyproject.toml` - Modern Python packaging configuration
 - `install.sh` - Updated installer script
 - `test.sh` / `test.cpp` / `test_exp.htm` - Basic test for the lexer
@@ -41,6 +41,6 @@ pip install -e . --break-system-packages
 
 ## Notes
 
-- The lexer is registered under the name `exoduscpp` (and alias `exodus_cpp`).
+- The lexer is registered under the name `exoduscpp` (and alias `exo_cpp`).
 - It extends the standard CppLexer with many Exodus-specific keywords and functions.
 - Tested on Ubuntu 24.04 with Python 3.12 and Pygments.

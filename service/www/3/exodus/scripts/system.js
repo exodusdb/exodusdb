@@ -161,7 +161,7 @@ async function system_getdepartments(deptoptions) {
     var security = []
     if (!(await security.exoread('DEFINITIONS', 'SECURITY*USERS')))
         return await exoui_invalid(security.exodusresponse)
-    security = exodus_splitarray(security, [[[1, 9]], [[10, 11]]])
+    security = exo_splitarray(security, [[[1, 9]], [[10, 11]]])
     gdepts = [[], [], []]
     var nusers = security[1].length
     var groupusers = []
@@ -226,7 +226,7 @@ async function system_pop_department(many, deptoptions) {
 }
 
 // Department/group typeahead: we already have the list (system_getdepartments → gdepts).
-// Hand rows to exodus_typeahead — same "have a list" path as general_typeahead_master after SELECT.
+// Hand rows to exo_typeahead — same "have a list" path as general_typeahead_master after SELECT.
 async function system_typeahead_department(deptoptions) {
     var cols = [
         ['DEPT', 'Department'],
@@ -234,11 +234,11 @@ async function system_typeahead_department(deptoptions) {
         ['USERS', 'Users with email']
     ]
     if (!(await system_getdepartments(deptoptions)))
-        return await exodus_typeahead(null, cols, 0, { rows: [] })
+        return await exo_typeahead(null, cols, 0, { rows: [] })
     var rows = []
     for (var i = 0; i < gdepts[0].length; i++)
         rows.push([gdepts[0][i], gdepts[1][i] || '', gdepts[2][i] || ''])
-    return await exodus_typeahead(null, cols, 0, { rows: rows, wordstart: true })
+    return await exo_typeahead(null, cols, 0, { rows: rows, wordstart: true })
 }
 
 async function system_val_department(deptoptions) {
