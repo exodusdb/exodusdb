@@ -123,7 +123,7 @@ So: **`1%` is the current back door that gives free-text its expand-then-fold bu
 
 | Alternative | Why it fails or is incomplete alone |
 |-------------|-------------------------------------|
-| Remove `1%` only | Nest hugs content → free-text cells stay skinny → **no** expand-under-ceiling on line grids. |
+| Remove `1%` only | Nest left-packs (not fill 100%) → free-text cells stay skinny → **no** expand-under-ceiling on line grids. |
 | Nest `width: max-content` | **Forbidden** — free-text loses fold budget; sprawl or false wide → 30ch. |
 | Nest CSS/HTML `width: 100%` as default | Honest fill, but skeleton measure can resolve % toward the **viewport** → false `.exodusform-wide` → free-text stuck at **30ch** unless skeleton **temporarily** ignores nest fill. |
 | Per-page HTM `width="100%"` on every line grid | Same fill idea; scales poorly; still needs skeleton care if used widely. |
@@ -132,9 +132,47 @@ So: **`1%` is the current back door that gives free-text its expand-then-fold bu
 
 Any real replacement must cover **both**: (1) nest host-width budget for free-text expand/fold, (2) col0 chrome min — and must not break **(a)** narrow detection / **(b)** 30ch only when truly wide.
 
-### Side effect (not the free-text goal)
+### Compact multivalue (no free-text) — two halves
 
-Compact multivalue strips (short codes/rates) also get host fill from the same `1%`, so columns can look **gappy**. That is a known cost of one mechanism serving line grids. Do not “fix” with nest `max-content` without re-reading this section and free-text fold.
+**Terms (do not use “hug” alone — ambiguous):**
+
+| Term | Meaning |
+|------|---------|
+| **Fill** | Nest stretches to the **host TD** (~100% of data cell). Driven by col0 `width="1%"`. Free-text can expand/fold. Values (esp. R-aligned) can sit far from ins/del. |
+| **Left-pack** (aka “hug content”) | Nest is only as wide as its columns need — **left-aligned pack, not fill 100%** of the host. Ins/del stay next to the values. Implemented as omit `1%` + `style.width = max-content`. |
+
+Compact strips (short codes / integers) must **left-pack**, not fill (e.g. R-aligned `JOURNAL_NO` stuck far from ins/del when filled).
+
+**Framework (`form_group_needs_nest_fill` in dbform) — simple rule:**
+
+- **Fill** only if the group has **free-text data entry** (`type F` + text host via `form_field_exostyle` / `exodus_dict_text`).  
+- **Not** display `S`, not code/number/checkbox.  
+- Otherwise **left-pack**: omit `1%` and set nest `style.width = max-content` (second half: without it, auto width under a wide host TD still takes available width ≈ fill).
+
+Sources: `dict.groups[g]`, else dict index walk.
+
+### Nest left-pack vs HTM hardcode
+
+**Default:** do **not** hardcode nest width. Framework auto left-packs when the group has no free-text entry; auto-fills when it does.
+
+**Last resort only** — if auto still fills wrongly and left-pack is required:
+
+```html
+<table class="exotable" style="width: max-content">
+```
+
+- Means **left-pack** (size-to-content / not fill 100% of host), not a vague “hug”.  
+- **Do not** use nest `max-content` on free-text line grids (fold regression).  
+- Opt-in **full width fill** remains HTML `width="100%"` on the nest.  
+- Comment on the table when you hardcode, and prefer removing the hardcode once auto is enough.
+
+**Does the algorithm honour hardcode?** Yes (`form_table_hardcoded_width` / `form_table_hardcode_is_hug` in dbform):
+
+| HTM hardcode | Effect |
+|--------------|--------|
+| `style="width: max-content"` (or fit/min-content) | Force **left-pack**: no col0 `1%`; do not rewrite `style.width` |
+| `width="100%"` or other `width=` | Leave `style.width` alone; **fill/`1%` still follows free-text entry** |
+| none | Auto: free-text entry → fill `1%`; else left-pack `style.width = max-content` |
 
 ---
 

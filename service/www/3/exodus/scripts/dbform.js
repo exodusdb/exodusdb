@@ -218,6 +218,64 @@ function form_apply_input_field_width(element) {
 }
 
 // F7 / F6 / pad-only: one chrome wrap around the field.
+// Multivalue nest layout (two halves) — FORM-UI-WIDE-NARROW.md:
+//  1) free-text DATA ENTRY → col0 width=1% → FILL host TD (~100%; fold budget)
+//  2) otherwise → style width max-content → LEFT-PACK (size to columns, not fill 100%)
+//     “hug content” = left-pack, not fill host. 1% alone is not enough under wide host TD.
+// Free-text ENTRY only (type F + text host) — not display S.
+// HTM hardcode (width= / style.width): max-content|fit|min → force left-pack (no 1%);
+// other hardcodes skip auto max-content so we do not clobber. Walk groups[] / index.
+function form_table_hardcoded_width(tablex) {
+	if (!tablex)
+		return ''
+	var attr = tablex.getAttribute && tablex.getAttribute('width')
+	if (attr != null && String(attr).replace(/\s/g, '') !== '')
+		return String(attr)
+	var sw = (tablex.style && tablex.style.width) ? String(tablex.style.width) : ''
+	return sw
+}
+
+function form_table_hardcode_is_hug(w) {
+	w = String(w || '').toLowerCase().replace(/\s/g, '')
+	return w === 'max-content' || w === 'fit-content' || w === 'min-content'
+}
+
+function form_field_is_freetext_entry(di, element) {
+	// Display fields never drive nest fill.
+	if (di && di.type == 'S')
+		return false
+	if (element && element.getAttribute && element.getAttribute('exodustype') == 'S')
+		return false
+	if (di && (di.radio || di.checkbox))
+		return false
+	if (element && element.type && (element.type == 'radio' || element.type == 'checkbox'))
+		return false
+	// Entry free-text: exostyle text, or align-T free-text fallback (form_field_exostyle).
+	return form_field_exostyle(di, element) === 'text'
+}
+
+function form_group_needs_nest_fill(groupno) {
+	if (typeof gds == 'undefined' || !gds || !gds.dict)
+		return false
+	var g = Number(groupno)
+	var list = gds.dict.groups && gds.dict.groups[g]
+	if (list && list.length) {
+		for (var i = 0; i < list.length; i++) {
+			if (list[i] && form_field_is_freetext_entry(list[i], null))
+				return true
+		}
+		return false
+	}
+	for (var dictn = 0; dictn < gds.dict.length; dictn++) {
+		var di = gds.dict[dictn]
+		if (!di || Number(di.groupno) != g)
+			continue
+		if (form_field_is_freetext_entry(di, null))
+			return true
+	}
+	return false
+}
+
 // Free-text F (exostyle text) fills the cell; codes / type S / INPUT hug.
 // Returns the field element (parent is the wrap). Call once per chrome install.
 function form_field_chrome_ensure_wrap(element, dictitem) {
@@ -1932,6 +1990,16 @@ async function formfunctions_onload() {
                     var hasDel = !(element.getAttribute('exodusnodeleterow'))
                     // Lead-in col 0: ins/del, Show All, filter. Shared class for CSS hide.
                     var col0class = 'exogroup_col0 exogroup' + groupno + '_col0'
+                    // Nest fill vs left-pack — form_group_needs_nest_fill; respect HTM width hardcode.
+                    // left-pack = size to content / not fill 100% of host (FORM-UI-WIDE-NARROW.md).
+                    var hardW = form_table_hardcoded_width(tablex)
+                    var nestfill = form_group_needs_nest_fill(groupno)
+                    // style width max-content|fit-content|min-content → force left-pack (no col0 1%)
+                    if (form_table_hardcode_is_hug(hardW))
+                        nestfill = false
+                    // Half 2: left-pack — only if author did not already set width
+                    if (!nestfill && !hardW)
+                        tablex.style.width = 'max-content'
                     var t = ''
                     t += '<span style="white-space: nowrap">'
                     //if (!(exodusgetattribute(element,'exodusnoinsertrow')))
@@ -1955,13 +2023,10 @@ async function formfunctions_onload() {
                     insertdeletebuttons.className = col0class
                     insertdeletebuttons.innerHTML = t
                     insertdeletebuttons.style.borderRightWidth = '0px'
-                    // HTML width=1% on col0: NOT “column looks 1% wide” only.
-                    // Column % forces nest used width ≈ host TD (free-text expand/fold budget
-                    // under soft ceiling; wide/narrow can stay narrow so 30ch stays off until
-                    // truly wide). Also keeps col0 from absorbing free space. Full theory:
-                    // service/www/exodus/doc/FORM-UI-WIDE-NARROW.md § Multivalue col0 width=1%.
-                    // Same on thead/tfoot col0 below. Residual hide: table.exogroup_col0_hide.
-                    insertdeletebuttons.width = '1%'
+                    // Half 1: col0 width=1% only when fill (free-text entry, not HTM left-pack hardcode).
+                    // Full theory: FORM-UI-WIDE-NARROW.md § Multivalue col0 / Nest left-pack override.
+                    if (nestfill)
+                        insertdeletebuttons.width = '1%'
                     if (hasIns || hasDel)
                         insertdeletebuttons.style.paddingRight = '3px'
 
@@ -1975,7 +2040,8 @@ async function formfunctions_onload() {
                     //add page up/down buttons at the first column in the thead and tfoot
                     var pgupdownbuttons = document.createElement('th')
                     pgupdownbuttons.className = col0class
-                    pgupdownbuttons.width = '1%'
+                    if (nestfill)
+                        pgupdownbuttons.width = '1%'
                     var t = ''
                     t += '<button id=exogroup' + groupno + 'showall class=exodusbutton'
                     t += ' style=display:none exodusonclick="await form_filter(\'unfilter\',' + groupno + ')"'
@@ -2025,7 +2091,8 @@ async function formfunctions_onload() {
                         if (tfxr) {
                             var footspacer = document.createElement('th')
                             footspacer.className = col0class
-                            footspacer.width = '1%'
+                            if (nestfill)
+                                footspacer.width = '1%'
                             footspacer.innerHTML = ''
                             tfxr.insertBefore(footspacer, tfxr.firstChild)
                             footspacer.rowSpan = tfx.rows.length
