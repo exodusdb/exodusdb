@@ -727,7 +727,7 @@ function exodusenabledandvisible(element0, allowreadonly) {
 			}
 		}
 	}
-	if (!allowreadonly && element.getAttribute('exodusreadonly'))
+	if (!allowreadonly && element.getAttribute('exoreadonly'))
 		return false
 
 	if (!element.offsetWidth || element.style.display == 'none')
@@ -3895,7 +3895,7 @@ async function exodus_typeahead(request, cols, coln, options) {
 	var now = (typeof getvalue == 'function') ? getvalue(el) : null
 	if (now != null) {
 		now = String(now).replace(/^\s+|\s+$/g, '')
-		if (!el.getAttribute || !el.getAttribute('exoduslowercase'))
+		if (!el.getAttribute || !el.getAttribute('exolowercase'))
 			now = now.toUpperCase()
 		if (now !== keyAtStart)
 			return true
@@ -4323,7 +4323,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 	}
 
 	//if not required make sure that the first dropdown option is ""
-	if (dropdowndata.length && !element.getAttribute('exodusrequired')) {
+	if (dropdowndata.length && !element.getAttribute('exorequired')) {
 		if (dropdowndata[0][0] != '' && dropdowndata[dropdowndata.length - 1][0] != '') {
 			//ripple up, then replace first element
 			for (var i = dropdowndata.length; i > 0; i--) dropdowndata[i] = dropdowndata[i - 1]
@@ -4419,7 +4419,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 	}
 
 	//force option 1 if no options
-	// if (element.getAttribute('exodusfieldno')!='0'&&element.selectedIndex==-1) element.selectedIndex=0
+	// if (element.getAttribute('exofieldno')!='0'&&element.selectedIndex==-1) element.selectedIndex=0
 
 	//logout('setdropdown3')
 
@@ -4488,7 +4488,7 @@ async function exodussetdropdown(element, request, colarray, selectedvalues, noa
 		////xmltemp.loadXML(db.data)
 		await setdropdown2(element, dataobj, colarray, selectedvalues, null, noautoselection)
 		if (db.data == '' || !dataobj.group1.length)
-			element.setAttribute('exodusdropdown', '')
+			element.setAttribute('exodropdown', '')
 	}
 	else {
 		await exodusinvalid(db.response)
@@ -6097,7 +6097,7 @@ function form_restore_span_boxes(saved) {
 function form_table_skeleton_wants_wide(table, ceiling) {
 	if (!table || !(ceiling > 0))
 		return false
-	var spans = table.querySelectorAll('SPAN[contenteditable], SPAN[exodusalign="T"]')
+	var spans = table.querySelectorAll('SPAN[contenteditable], SPAN[exoalign="T"]')
 	var saved = []
 	var sn
 	for (sn = 0; sn < spans.length; sn++) {
@@ -11262,7 +11262,7 @@ function exodus_dump_styles(sel, props) {
 		return {
 			tag: el.tagName,
 			id: el.id || '',
-			name: el.getAttribute('name') || el.getAttribute('exodusname') || '',
+			name: el.getAttribute('name') || el.getAttribute('exoname') || '',
 			className: el.className || '',
 			html: (el.outerHTML || '').slice(0, 500),
 			box: {

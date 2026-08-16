@@ -91,7 +91,7 @@ HTM starts as `<input datafld>` or `<span datafld>` or `<textarea>` / `<select>`
 Rough order in `formfunctions_onload`:
 
 1. **INPUT + align T → replace with SPAN** (before most styling)
-2. **copydictitem** → `exodus*` attributes (`false`/`null` → `''` except popup/link removed)
+2. **copydictitem** → `exo*` attributes (`validpropnames`; no dual) (`false`/`null` → `''` except popup/link removed)
 3. radio/checkbox expand
 4. **SPAN white-space** from `dictitem.lowercase === false` → nowrap vs pre-wrap
 5. **Free-text soft max** if SPAN + align T + lowercase ≠ false
@@ -114,11 +114,11 @@ Then wide layout (separate) — full AIM/method: **[FORM-UI-WIDE-NARROW.md](./FO
 | DOM / style | Meaning |
 |-------------|---------|
 | tag | INPUT / SPAN / TEXTAREA / SELECT / radio / checkbox |
-| `exodustype` | F / S / … |
-| `exodusalign` | L / R / T / … |
-| `exoduslowercase` | `true` / `false` / `''` |
-| `exoduslength` | empty or N |
-| `exodusreadonly` | present or not |
+| `exotype` | F / S / … |
+| `exoalign` | L / R / T / … |
+| `exolowercase` | `true` / `false` / `''` |
+| `exolength` | empty or N |
+| `exoreadonly` | present or not |
 | `contenteditable` | true only entry free-text (and similar) |
 | class | `clsRequired` / `clsNotRequired` / **`clsReadOnly`** |
 | `exomaxwidth` | `30ch` or absent |

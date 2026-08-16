@@ -89,7 +89,7 @@ async function gds_regetx(dictitemorid, recn) {
         }
     }
 
-    this.tempfunction = dictitem.functioncode ? dictitem.functioncode : (dictitem.getAttribute ? dictitem.getAttribute('exodusfunctioncode') : '')
+    this.tempfunction = dictitem.functioncode ? dictitem.functioncode : (dictitem.getAttribute ? dictitem.getAttribute('exofunctioncode') : '')
     //this should always be a function not source code
     if (!this.tempfunction) {
 
@@ -485,7 +485,7 @@ async function gds_setx2(cells, values, forced) {
 
                 //work out if conversion required and do any conversion
                 if (rown == 0)
-                    conversion = screenelement.getAttribute('exodusconversion')
+                    conversion = screenelement.getAttribute('exoconversion')
                 if (conversion) {
                     var ivalue = value
                     value = await oconvertvalue(value, conversion, screenelement)
@@ -880,7 +880,7 @@ async function gds_bind(datasource, elements, rownx) {
             //default immediately for radio/checkbox and dropdown
             //or if literal default (starts with " or ')
             //do not default immediately for lines to avoid problem described in await validateall()
-            if (!(Number(element.getAttribute('exogroupno'))) && element.getAttribute('exodusdefaultvalue')) {
+            if (!(Number(element.getAttribute('exogroupno'))) && element.getAttribute('exodefaultvalue')) {
                 var ischeckbox
                 if (dataitem.text == ''
                     &&
@@ -892,13 +892,13 @@ async function gds_bind(datasource, elements, rownx) {
                      element.tagName == 'SELECT'
                      ||
                      (
-                      typeof element.getAttribute('exodusdefaultvalue') == 'string'
+                      typeof element.getAttribute('exodefaultvalue') == 'string'
                       &&
-                      '\'\"'.indexOf(element.getAttribute('exodusdefaultvalue').slice(0, 1)) >= 0
+                      '\'\"'.indexOf(element.getAttribute('exodefaultvalue').slice(0, 1)) >= 0
                      )
                     )
                    ) {
-                    //if element.getAttribute('exodusdefaultvalue')
+                    //if element.getAttribute('exodefaultvalue')
                     dataitem.text = await getdefault(element)
 
                     //allow : as separators of checkbox multiple default values
@@ -935,7 +935,7 @@ async function gds_bind(datasource, elements, rownx) {
                 //log('value=')
 
                 //conversions (NUMBER OCONV defaults display=true — grouping on paint)
-                var conversion = element.getAttribute('exodusconversion')
+                var conversion = element.getAttribute('exoconversion')
                 if (value != '' && typeof (conversion) == 'string' && conversion.substr(0, 1) == '[') {
                     value2 = value.exodusoconv(conversion)
                     if (value2 == null) {
@@ -1075,7 +1075,7 @@ async function gds_bind(datasource, elements, rownx) {
             var oldcell = olddatasource[propname]
             if (forced || newvalue != oldcell.text) {
                 //alert(propname+' '+newvalue+' '+oldcell.text)
-                //if (oldcell.element&&oldcell.element.getAttribute('exodusfieldno'))
+                //if (oldcell.element&&oldcell.element.getAttribute('exofieldno'))
                 var cells = [oldcell]
                 cells.dictid = propname//needed to enable afterupdate function
                 await this.setx2(cells, [newvalue], forced)

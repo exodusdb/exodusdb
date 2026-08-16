@@ -195,7 +195,7 @@ async function audiovisual_delete(event) {
 
  event=getevent(event)
 
- var filename=event.target.getAttribute('exodusfilename')
+ var filename=event.target.getAttribute('exofilename')
 
  //confirm!
  if (!(await exodusyesno(filename+'\rWarning! Are you SURE that you want to irrevocably delete this file permanently?\r\rNote: This is irreversible!',2))) return await exodusinvalid()
@@ -494,7 +494,7 @@ async function adddeletebutton(filename) {
   button.className="exodusbutton"
   button.value='Delete'
   $images.insertBefore(button, null)
-  button.setAttribute('exodusfilename',filename)
+  button.setAttribute('exofilename',filename)
   addeventlistener(button,'click','audiovisual_delete')
  }
 }

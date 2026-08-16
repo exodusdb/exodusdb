@@ -11,7 +11,7 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 // Change this table first if behaviour must change; do not add one-off patches.
 //
 // Scope
-//   INCLUDE  INPUT type text/password (and blank type) with exoduslength, size!=1
+//   INCLUDE  INPUT type text/password (and blank type) with exolength, size!=1
 //            pure DATE: always (sample '11/11/1111'), length optional
 //   INCLUDE  SELECT — maxWidth 60ch only (trap stupid long option titles;
 //            does not paint a fixed width from length)
@@ -75,11 +75,11 @@ var gform_input_width_date_sample = '11/11/1111'
 var gform_input_width_period_sample = '11/1111'
 
 function form_input_is_pure_date(element) {
-    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    var conv = (element.getAttribute('exoconversion') || '').toUpperCase()
     if (gform_input_width_puredate.test(conv))
         return true
     // Calendar popup without DATE_TIME / TIME conversion
-    if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0
+    if ((element.getAttribute('exopopup') || '').indexOf('form_pop_calendar') >= 0
         && conv.indexOf('DATE_TIME') < 0
         && !/^\[TIME/.test(conv)
         && !gform_input_width_periodconv.test(conv))
@@ -88,7 +88,7 @@ function form_input_is_pure_date(element) {
 }
 
 function form_input_is_period(element) {
-    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    var conv = (element.getAttribute('exoconversion') || '').toUpperCase()
     return gform_input_width_periodconv.test(conv)
 }
 
@@ -117,12 +117,12 @@ function form_field_exostyle(dictitem, element) {
         if (al.indexOf('T') === 0)
             return (dictitem.lowercase === false) ? 'code' : 'text'
     } else if (element && element.getAttribute) {
-        var conv2 = String(element.getAttribute('exodusconversion') || '').toUpperCase()
+        var conv2 = String(element.getAttribute('exoconversion') || '').toUpperCase()
         if (conv2.indexOf('[NUMBER') === 0 || conv2.indexOf('[DECIMAL') === 0
             || conv2.indexOf('[INTEGER') === 0 || conv2.indexOf('[ROUND') === 0)
             return 'number'
-        if (String(element.getAttribute('exodusalign') || '').toUpperCase().indexOf('T') === 0) {
-            var lc = element.getAttribute('exoduslowercase')
+        if (String(element.getAttribute('exoalign') || '').toUpperCase().indexOf('T') === 0) {
+            var lc = element.getAttribute('exolowercase')
             // false stored as ""; truthy = free-text
             return (lc && lc !== 'false') ? 'text' : 'code'
         }
@@ -151,15 +151,15 @@ function form_dictitem_wants_text_span(dictitem) {
 }
 
 function form_input_width_char(element) {
-    var conv = (element.getAttribute('exodusconversion') || '').toUpperCase()
+    var conv = (element.getAttribute('exoconversion') || '').toUpperCase()
     // Pure DATE handled by form_apply via sample string — not length×glyph
     if (gform_input_width_digitconv.test(conv))
         return '8'
     if (gform_input_width_dateconv.test(conv))
         return '8'
-    if ((element.getAttribute('exoduspopup') || '').indexOf('form_pop_calendar') >= 0)
+    if ((element.getAttribute('exopopup') || '').indexOf('form_pop_calendar') >= 0)
         return '8'
-    var lc = element.getAttribute('exoduslowercase')
+    var lc = element.getAttribute('exolowercase')
     if (lc && lc !== 'false')
         return '0'
     return 'M'
@@ -183,7 +183,7 @@ function form_apply_input_field_width(element) {
         return
     var pureDate = form_input_is_pure_date(element)
     var isPeriod = form_input_is_period(element)
-    var n = parseInt(element.getAttribute('exoduslength'), 10)
+    var n = parseInt(element.getAttribute('exolength'), 10)
     if (!pureDate && !isPeriod && !(n > 0))
         return
     var sample
@@ -244,7 +244,7 @@ function form_field_is_freetext_entry(di, element) {
 	// Display fields never drive nest fill.
 	if (di && di.type == 'S')
 		return false
-	if (element && element.getAttribute && element.getAttribute('exodustype') == 'S')
+	if (element && element.getAttribute && element.getAttribute('exotype') == 'S')
 		return false
 	if (di && (di.radio || di.checkbox))
 		return false
@@ -280,7 +280,7 @@ function form_group_needs_nest_fill(groupno) {
 // Returns the field element (parent is the wrap). Call once per chrome install.
 function form_field_chrome_ensure_wrap(element, dictitem) {
     var wrapFill = element.tagName == 'SPAN'
-        && element.getAttribute('exodustype') == 'F'
+        && element.getAttribute('exotype') == 'F'
         && form_field_exostyle(dictitem, element) === 'text'
     var wrap = document.createElement('span')
     wrap.className = 'exodus-fieldchrome'
@@ -960,7 +960,7 @@ async function formfunctions_onload() {
         }
 
         //force cursor on exodustype B for button
-        if (element.getAttribute('exodustype') == 'B' && element.style)
+        if (element.getAttribute('exotype') == 'B' && element.style)
             element.style.cursor = 'pointer'
 
         //NB inserting elements within the loop means that the same element
@@ -1065,21 +1065,21 @@ async function formfunctions_onload() {
 
             //build radio and check boxes
             if (
-                (element.getAttribute('exodusradio') && element.type != 'radio')
+                (element.getAttribute('exoradio') && element.type != 'radio')
                 ||
-                (element.getAttribute('exoduscheckbox') && element.type != 'checkbox')
+                (element.getAttribute('exocheckbox') && element.type != 'checkbox')
             ) {
 
                 //radio has preference over checkbox
-                if (element.getAttribute('exodusradio'))
-                    element.setAttribute('exoduscheckbox', '')
+                if (element.getAttribute('exoradio'))
+                    element.setAttribute('exocheckbox', '')
 
                 //gdefault=await getdefault(element)
 
                 //build html for multiple inputs
-                var options = (element.getAttribute('exodusradio') ? element.getAttribute('exodusradio') : element.getAttribute('exoduscheckbox')).exodussplit(':;')
+                var options = (element.getAttribute('exoradio') ? element.getAttribute('exoradio') : element.getAttribute('exocheckbox')).exodussplit(':;')
                 var temp = ''
-                var elementtype = element.getAttribute('exodusradio') ? 'radio' : 'checkbox'
+                var elementtype = element.getAttribute('exoradio') ? 'radio' : 'checkbox'
                 for (var ii = 0; ii < options.length; ii++) {
 
                     // One nowrap unit: radio/checkbox + label (no break between control and title
@@ -1089,12 +1089,12 @@ async function formfunctions_onload() {
                     //build an input item
                     temp += '<input type=' + elementtype + ' id=' + fieldname
                     temp += ' style="vertical-align:middle"'
-                    if (element.getAttribute('exodusreadonly'))
+                    if (element.getAttribute('exoreadonly'))
                         temp += ' disabled=true'
                     //must be done to group radio boxes
                     temp += ' name=' + fieldname
                     // mark for mouseup-focus handler (expanded radios have no other marker)
-                    temp += ' exodustype=F'
+                    temp += ' exotype=F'
                     if (typeof (options[ii][0]) != 'undefined')
                         temp += ' value=' + options[ii][0].toString().exodusquote()
 
@@ -1112,7 +1112,7 @@ async function formfunctions_onload() {
                     //horizontal or vertical
                     //if vertical then add <br /> between options
                     //but not after last option (so that next input can appear inline with the last option.
-                    if (element.getAttribute('exodushorizontal'))
+                    if (element.getAttribute('exohorizontal'))
                         temp += '&nbsp;&nbsp;'
                     else if (ii < options.length - 1)
                         temp += '<br />'
@@ -1148,7 +1148,7 @@ async function formfunctions_onload() {
 
             }
 
-            var exodusdropdown = element.getAttribute('exodusdropdown')
+            var exodusdropdown = element.getAttribute('exodropdown')
             if (exodusdropdown) {
 
                 exodusassertobject(element, 'formfunctions_onload', 'element (exodusdropdown)')
@@ -1184,9 +1184,9 @@ async function formfunctions_onload() {
             }
 
             //convert by conversion attribute
-            if (element.getAttribute('exodusconversion')) {
+            if (element.getAttribute('exoconversion')) {
 
-                var exodusconversion = element.getAttribute('exodusconversion')
+                var exodusconversion = element.getAttribute('exoconversion')
 
                 //conversion is a routine eg [NUMBER] [DATE]
                 if (
@@ -1222,7 +1222,7 @@ async function formfunctions_onload() {
                     element = temp
                     element.id = origid
 
-                    setdropdown3(element, element.getAttribute('exodusconversion'))
+                    setdropdown3(element, element.getAttribute('exoconversion'))
 
                     element.tabIndex = elementtabindex
 
@@ -1232,7 +1232,7 @@ async function formfunctions_onload() {
 
             //onchange for readonly elements
             if (
-                element.getAttribute('exodusreadonly')
+                element.getAttribute('exoreadonly')
                 &&
                 !element.getAttribute('disabled')
                 &&
@@ -1280,18 +1280,18 @@ async function formfunctions_onload() {
 
             //the first element is considered to be the 'key' field
             //zzz should be field 0
-            if (element.getAttribute('exodusfieldno') == '0') {
+            if (element.getAttribute('exofieldno') == '0') {
                 if (!gKeyNodes)
                     gKeyNodes = []
                 //gKeyNodes[gKeyNodes.length] = element
                 gKeyNodes.push(element)
                 if (gKeyNodes.length == 1) {
-                    var tt = element.getAttribute('exodusprintfunction')
+                    var tt = element.getAttribute('exoprintfunction')
                     if (tt)
-                        gKeyNodes[0].setAttribute('exodusprintfunction', tt)
-                    var tt = element.getAttribute('exoduslistfunction')
+                        gKeyNodes[0].setAttribute('exoprintfunction', tt)
+                    var tt = element.getAttribute('exolistfunction')
                     if (tt)
-                        gKeyNodes[0].setAttribute('exoduslistfunction', tt)
+                        gKeyNodes[0].setAttribute('exolistfunction', tt)
                     element.accessKey = 'K'
                 }
 
@@ -1336,7 +1336,7 @@ async function formfunctions_onload() {
                 // Attribute exomaxwidth="30ch" is a WIDE-MODE soft max only — applied by
                 // form_table_apply_freetext_wide_max when .exodusform-wide. Do NOT set
                 // style.maxWidth to 30ch here (would lock typing to ~30 chars always).
-                var freeLen = parseInt(element.getAttribute('exoduslength'), 10)
+                var freeLen = parseInt(element.getAttribute('exolength'), 10)
                 if (!(freeLen > 0))
                     freeLen = 0
                 if (!freeLen) {
@@ -1345,8 +1345,8 @@ async function formfunctions_onload() {
                         element.setAttribute('exomaxwidth', '30ch')
                 } else
                     element.removeAttribute('exomaxwidth')
-                var entryF = (element.getAttribute('exodustype') == 'F'
-                    && !element.getAttribute('exodusreadonly'))
+                var entryF = (element.getAttribute('exotype') == 'F'
+                    && !element.getAttribute('exoreadonly'))
                 if (entryF) {
                     element.style.display = 'block'
                     element.style.width = '100%'
@@ -1363,8 +1363,8 @@ async function formfunctions_onload() {
             }
 
             //allow for data entry in SPAN elements (unless hidden)
-            if (element.getAttribute('exodustype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
-                if (!(element.getAttribute('exodusreadonly'))) {
+            if (element.getAttribute('exotype') == 'F' && element.tagName == 'SPAN' && element.style.display != 'none') {
+                if (!(element.getAttribute('exoreadonly'))) {
                     element.contentEditable = 'true'
                     //element.contentEditable = true
                     if (!(element.getAttribute('tabindex')))
@@ -1373,7 +1373,7 @@ async function formfunctions_onload() {
             }
 
             // Type S display SPANs: not tabbable (empty chrome is CSS :empty::before only)
-            if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S')
+            if (element.tagName == 'SPAN' && element.getAttribute('exotype') == 'S')
                 element.tabIndex = -1
 
             // F7/F6 chrome (dict di.popup / di.link → exoduspopup / exoduslink):
@@ -1383,11 +1383,11 @@ async function formfunctions_onload() {
             //   never create a clickable icon for empty string.
             //   conversion SELECT free F7 only when popup slot is not pad (empty di.popup);
             //   otherwise pad-only would nest a second wrap and detach pads from the SELECT.
-            var popupExpr = element.getAttribute('exoduspopup') || ''
-            var linkExpr = element.getAttribute('exoduslink') || ''
+            var popupExpr = element.getAttribute('exopopup') || ''
+            var linkExpr = element.getAttribute('exolink') || ''
             // pad only when dict set the property to empty (not when property omitted)
-            var padPopup = element.hasAttribute('exoduspopup') && !popupExpr
-            var padLink = element.hasAttribute('exoduslink') && !linkExpr
+            var padPopup = element.hasAttribute('exopopup') && !popupExpr
+            var padLink = element.hasAttribute('exolink') && !linkExpr
             // free F7 on SELECT (multivalue discoverability) — not when di.popup='' pad
             var freeSelectPopup = element.tagName == 'SELECT' && !padPopup
             var installedRealPopup = false
@@ -1401,7 +1401,7 @@ async function formfunctions_onload() {
                     popupExpr
                 )
                 &&
-                !element.getAttribute('exodusreadonly')
+                !element.getAttribute('exoreadonly')
                 &&
                 (
                     element.type == 'text'
@@ -1429,7 +1429,7 @@ async function formfunctions_onload() {
                     if (padLink)
                         form_field_chrome_pad(element, 'var(--exodus-ui-icon-size)')
 
-                    element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exodustitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exodustitle')
+                    element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exotitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exotitle')
                     element2.title += ' (F7)'
                     element2.style.cursor = 'pointer'
 
@@ -1441,7 +1441,7 @@ async function formfunctions_onload() {
 
             //add button before element for link (or after if right justified)
             if (linkExpr) {
-                if (typeof element.getAttribute('exoduslink') != 'string') {
+                if (typeof element.getAttribute('exolink') != 'string') {
                     systemerror('formfunction_onload', exodusquote(fieldname) + ' link must be a string')
                 }
                 else {
@@ -1457,7 +1457,7 @@ async function formfunctions_onload() {
                     if (padPopup)
                         form_field_chrome_pad(element2, 'var(--exodus-ui-icon-size)')
 
-                    element2.title = 'Open this ' + element.getAttribute('exodustitle') + ' (F6)'
+                    element2.title = 'Open this ' + element.getAttribute('exotitle') + ' (F6)'
                     element2.style.cursor = 'pointer'
 
                     //addeventlistener(element2,'click','exoduslink')
@@ -1479,7 +1479,7 @@ async function formfunctions_onload() {
             }
 
             //add image element and hide element
-            if (element.getAttribute('exodusimage')) {
+            if (element.getAttribute('exoimage')) {
                 var element2 = document.createElement('img')
                 element.parentNode.insertBefore(element2, element.nextSibling)
                 element.style.display = 'none'
@@ -1492,7 +1492,7 @@ async function formfunctions_onload() {
             // Type S display next to a code with F7/F6: glue into prior chrome wrap
             // unless a <br> (or other real content) deliberately separates them.
             // e.g. MARKET_CODE + MARKET_NAME; Brand uses <br> so stays stacked.
-            if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S')
+            if (element.tagName == 'SPAN' && element.getAttribute('exotype') == 'S')
                 form_glue_name_to_prev_code_chrome(element)
 
             // conversion "color": text + swatch after id is set (swatch id = field_swatch)
@@ -1514,11 +1514,11 @@ async function formfunctions_onload() {
             // right-align when dict left align empty and conversion is fixed-width numeric/date-ish
             // ([NUMBER…], [DATE…], [DATE_TIME…]). Not [TIME…] — helper keeps L for short times.
             if (
-                !element.getAttribute('exodusalign')
+                !element.getAttribute('exoalign')
                 &&
-                typeof (element.getAttribute('exodusconversion')) == 'string'
+                typeof (element.getAttribute('exoconversion')) == 'string'
             ) {
-                var convU = element.getAttribute('exodusconversion').toUpperCase()
+                var convU = element.getAttribute('exoconversion').toUpperCase()
                 // Prefix match (same as form_field_exostyle) — not substring anywhere
                 if (convU.indexOf('[NUMBER') === 0
                     || convU.indexOf('[DECIMAL') === 0
@@ -1526,12 +1526,12 @@ async function formfunctions_onload() {
                     || convU.indexOf('[ROUND') === 0
                     || convU.indexOf('[DATE_TIME') >= 0
                     || /^\[DATE([,\]]|$)/.test(convU))
-                    element.setAttribute('exodusalign', 'R')
+                    element.setAttribute('exoalign', 'R')
             }
-            //if (groupno>0&&element.getAttribute('exodusalign')=='R'&&'THTD'.indexOf(element.parentNode.tagName)>=0)
-            //if (element.getAttribute('exodusalign')=='R'&&'THTD'.indexOf(element.parentNode.tagName)>=0)
+            //if (groupno>0&&element.getAttribute('exoalign')=='R'&&'THTD'.indexOf(element.parentNode.tagName)>=0)
+            //if (element.getAttribute('exoalign')=='R'&&'THTD'.indexOf(element.parentNode.tagName)>=0)
             if (
-                element.getAttribute('exodusalign') == 'R'
+                element.getAttribute('exoalign') == 'R'
                 &&
                 (
                     groupno > 0
@@ -1550,7 +1550,7 @@ async function formfunctions_onload() {
 			// for Arabic text in E-invoicing enabled databases
 			// Safety measure, dont interfere with existing assignments
 			if (element.style.textAlign == '') {
-				let tt = element.getAttribute('exodusalign')
+				let tt = element.getAttribute('exoalign')
 
 				if (tt.toUpperCase().startsWith('R'))
 					element.style.textAlign = 'right'
@@ -1563,13 +1563,13 @@ async function formfunctions_onload() {
             // Keep size = length only as a weak table hint — not +2, not the painted width.
             // length 0 = deliberate "no length" (legacy); treat like empty, not systemerror→10.
             if (element.tagName.match(gtexttagnames)) {
-                if (element.size != 1 && element.getAttribute('exoduslength')) {
-                    var lenN = parseInt(element.getAttribute('exoduslength'), 10)
+                if (element.size != 1 && element.getAttribute('exolength')) {
+                    var lenN = parseInt(element.getAttribute('exolength'), 10)
                     if (lenN === 0) {
-                        element.setAttribute('exoduslength', '')
+                        element.setAttribute('exolength', '')
                     } else if (!(lenN > 0)) {
-                        systemerror('formfunctions_onload()', element.id + '.getAttribute("exoduslength")=' + element.getAttribute('exoduslength') + ' is invalid. 10 used.')
-                        element.setAttribute('exoduslength', 10)
+                        systemerror('formfunctions_onload()', element.id + '.getAttribute("exolength")=' + element.getAttribute('exolength') + ' is invalid. 10 used.')
+                        element.setAttribute('exolength', 10)
                         element.size = 10
                     } else {
                         element.size = lenN
@@ -1593,8 +1593,8 @@ async function formfunctions_onload() {
                         })
 
                         var verticalpercent = 100
-                        if (element.getAttribute('exodusrows'))
-                            verticalpercent *= element.getAttribute('exodusrows') / 10
+                        if (element.getAttribute('exorows'))
+                            verticalpercent *= element.getAttribute('exorows') / 10
 
                         //var ockeditor = new CKEDITOR(element.id,'100%',verticalpercent+'%','EXODUS')
 
@@ -1618,7 +1618,7 @@ async function formfunctions_onload() {
                         // length → min-width Nch floor (no length → 6ch anti-collapse).
                         // Do not drive width with cols (that fixed preferred width and
                         // held the form). cols=1 is a weak UA hint only.
-                        var taLen = parseInt(element.getAttribute('exoduslength'), 10)
+                        var taLen = parseInt(element.getAttribute('exolength'), 10)
                         if (!(taLen > 0))
                             taLen = 0
                         element.cols = 1
@@ -1627,31 +1627,31 @@ async function formfunctions_onload() {
                         element.style.maxWidth = '100%'
                         element.style.boxSizing = 'border-box'
                         element.style.minWidth = taLen > 0 ? (taLen + 'ch') : '6ch'
-                        var exodusrows = element.getAttribute('exodusrows')
+                        var exodusrows = element.getAttribute('exorows')
                         if (exodusrows && exodusrows > 1)
                             element.rows = exodusrows
                     }
                 }
-                if (element.getAttribute('exodusmaxlength'))
-                    element.maxLength = parseInt(element.getAttribute('exodusmaxlength'), 10)
+                if (element.getAttribute('exomaxlength'))
+                    element.maxLength = parseInt(element.getAttribute('exomaxlength'), 10)
             }
 
             //lower case
-            if (!(element.getAttribute('exoduslowercase'))) {
+            if (!(element.getAttribute('exolowercase'))) {
                 if (element.tagName == 'SELECT'
                     //exodus_dict_text(di) now sets lowercase true but can be removed
                     //to allow capitalised flowing text eg ratecard columns
-                    //|| element.getAttribute('exodusalign') == 'T'
-                    || element.getAttribute('exodustype') == 'S') {
-                    element.setAttribute('exoduslowercase', true)
+                    //|| element.getAttribute('exoalign') == 'T'
+                    || element.getAttribute('exotype') == 'S') {
+                    element.setAttribute('exolowercase', true)
                 }
                 else {
-                    element.setAttribute('exoduslowercase', '')// not 'false' as user properties must be strings not boolean for row bound elements
+                    element.setAttribute('exolowercase', '')// not 'false' as user properties must be strings not boolean for row bound elements
                 }
             }
             //force visual uppercase (actual conversion done in onbeforeupdate)
             if (
-                !element.getAttribute('exoduslowercase')
+                !element.getAttribute('exolowercase')
                 &&
                 element.type != 'radio'
                 &&
@@ -1660,15 +1660,15 @@ async function formfunctions_onload() {
                 element.style.textTransform = 'uppercase'
 
             //non calculated fields may be displayed as/converted to uppercase
-            //if (element.getAttribute('exodustype')=='F'&&element.tagName!='SPAN')
-            if (element.getAttribute('exodustype') == 'F') {
+            //if (element.getAttribute('exotype')=='F'&&element.tagName!='SPAN')
+            if (element.getAttribute('exotype') == 'F') {
 
                 // only focus elements that have tabindex
                 //make them all the same and tab will work nicely
                 //tabindex can also be hard coded in the form design
                 //use <999 to come before defaults and >999 to come after
                 if (!element.tabIndex) {
-                    if (element.getAttribute('exodusreadonly')) {
+                    if (element.getAttribute('exoreadonly')) {
                         element.tabIndex = -1
                     }
                     else {
@@ -1710,9 +1710,9 @@ async function formfunctions_onload() {
 
                 //spans are only input if .isContentEditable
                 if (
-                    element.getAttribute('exodustype') == 'F'
+                    element.getAttribute('exotype') == 'F'
                     &&
-                    !element.getAttribute('exodusreadonly')
+                    !element.getAttribute('exoreadonly')
                     &&
                     (
                         element.tagName != 'SPAN'
@@ -1728,12 +1728,12 @@ async function formfunctions_onload() {
 
                 if (
                     (
-                        element.getAttribute('exodusrequired')
+                        element.getAttribute('exorequired')
                         ||
-                        element.getAttribute('exodusfieldno') == '0'
+                        element.getAttribute('exofieldno') == '0'
                     )
                     //mark elements with default values as required even though probably no data entry if required
-                    //&&!element.getAttribute('exodusdefaultvalue')
+                    //&&!element.getAttribute('exodefaultvalue')
                     && element.type != 'radio'
                     && element.type != 'checkbox'
                 ) {
@@ -1830,7 +1830,7 @@ async function formfunctions_onload() {
                     titleelement.insertBefore(element2, null)
 
                     element2.id = 'sortbutton_' + Number(element.getAttribute('exogroupno'))
-                    element2.title = 'Sort by ' + element.getAttribute('exodustitle')
+                    element2.title = 'Sort by ' + element.getAttribute('exotitle')
                     //addeventlistener(element2, 'click', 'sorttable')
                     element2.setAttribute('exodusonclick', 'await sorttable(event)')
                     element2.sorttableelementid = element.id
@@ -1839,15 +1839,15 @@ async function formfunctions_onload() {
                 }
 
                 //any element can determine if emptyrows are allowed
-                if (temp = element.getAttribute('exodusallowemptyrows'))
-                    tablex.setAttribute('exodusallowemptyrows', temp)
+                if (temp = element.getAttribute('exoallowemptyrows'))
+                    tablex.setAttribute('exoallowemptyrows', temp)
 
                 //any element can determine if a row is required
-                if (temp = element.getAttribute('exodusrowrequired'))
-                    tablex.setAttribute('exodusrowrequired', temp)
+                if (temp = element.getAttribute('exorowrequired'))
+                    tablex.setAttribute('exorowrequired', temp)
 
                 //need to know the last data entry column
-                if (!element.getAttribute('exodusreadonly') && element.tagName.match(gdatatagnames)) {
+                if (!element.getAttribute('exoreadonly') && element.tagName.match(gdatatagnames)) {
                     //spans are only input if .isContentEditable
                     if (element.tagName != 'SPAN' || element.isContentEditable) {
                         tablex.setAttribute('exoduslastinputcolscreenfn', element.getAttribute('exodusscreenfn'))
@@ -1859,7 +1859,7 @@ async function formfunctions_onload() {
                 //need to know the first data entry column
                 if (
                     !tablex.getAttribute('exodusfirstinputcolscreenfn')
-                    && !element.getAttribute('exodusreadonly')
+                    && !element.getAttribute('exoreadonly')
                     && element.tagName.match(gdatatagnames)
                 ) {
                     //spans are only input if .isContentEditable
@@ -1874,12 +1874,12 @@ async function formfunctions_onload() {
 
                 //prevent use of separator characters unless multiword
                 if (element.tagName != 'SELECT') {
-                    var wordsep = element.getAttribute('exoduswordsep')
-                    if (wordsep && element.getAttribute('exodusnwords') <= 1) {
-                        var invalidchars = element.getAttribute('exodusinvalidcharacters')
+                    var wordsep = element.getAttribute('exowordsep')
+                    if (wordsep && element.getAttribute('exonwords') <= 1) {
+                        var invalidchars = element.getAttribute('exoinvalidcharacters')
                         if (!invalidchars)
                             invalidchars = ''
-                        element.setAttribute('exodusinvalidcharacters', invalidchars + wordsep)
+                        element.setAttribute('exoinvalidcharacters', invalidchars + wordsep)
                     }
                 }
 
@@ -1902,7 +1902,7 @@ async function formfunctions_onload() {
 
                     async function maybe_remove_rowbutton(insertdelete) {
                         if (
-                            element.getAttribute('exodusno' + insertdelete + 'row')
+                            element.getAttribute('exono' + insertdelete + 'row')
                             && !tablex.getAttribute('no' + insertdelete + 'row')
                         ) {
                             tablex.setAttribute('no' + insertdelete + 'row', true)
@@ -1911,8 +1911,8 @@ async function formfunctions_onload() {
                     }
 
                     //maybe remove insertrow/deleterow buttons (in case first group dictionary element does not have the flag)
-                    //if (element.getAttribute('exodusnoinsertrow') && !tablex.getAttribute('noinsertrow')) {
-                    //if (element.getAttribute('exodusnodeleterow')&& !tablex.getAttribute('nodeleterow')) {
+                    //if (element.getAttribute('exonoinsertrow') && !tablex.getAttribute('noinsertrow')) {
+                    //if (element.getAttribute('exonodeleterow')&& !tablex.getAttribute('nodeleterow')) {
                     await maybe_remove_rowbutton('insert')
                     await maybe_remove_rowbutton('delete')
                     // Both buttons gone: residual lead-in stays for clone/col align; hide via
@@ -1928,7 +1928,7 @@ async function formfunctions_onload() {
 
                     //first column is required
                     //this should perhaps not be set since we have rowrequired and allowemptyrows
-                    //element.setAttribute('exodusrequired',true)
+                    //element.setAttribute('exorequired',true)
 
                     //check this groupno not used on other tables
                     if (gtables[groupno]) {
@@ -1962,9 +1962,9 @@ async function formfunctions_onload() {
                     //unfortunately this can only be set on the first element in the row at the moment
                     //TODO process tables after processing all fields
                     //add insert/delete buttons at the end instead of on the first table element discovered
-                    if (element.getAttribute('exodusnoinsertrow'))
+                    if (element.getAttribute('exonoinsertrow'))
                         tablex.setAttribute('noinsertrow', 'noinsertrow')
-                    if (element.getAttribute('exodusnodeleterow'))
+                    if (element.getAttribute('exonodeleterow'))
                         tablex.setAttribute('nodeleterow', 'nodeleterow')
 
                     //      if (!tablex.className) tablex.className='exodusform'
@@ -1986,8 +1986,8 @@ async function formfunctions_onload() {
                     // duplicate keycodes in 3 places
                     var t2 = '(Ctrl+I or Ctrl+Insert)'
                     var t3 = '(Ctrl+D or Ctrl+Delete)'
-                    var hasIns = !(element.getAttribute('exodusnoinsertrow'))
-                    var hasDel = !(element.getAttribute('exodusnodeleterow'))
+                    var hasIns = !(element.getAttribute('exonoinsertrow'))
+                    var hasDel = !(element.getAttribute('exonodeleterow'))
                     // Lead-in col 0: ins/del, Show All, filter. Shared class for CSS hide.
                     var col0class = 'exogroup_col0 exogroup' + groupno + '_col0'
                     // Nest fill vs left-pack — form_group_needs_nest_fill; respect HTM width hardcode.
@@ -2126,12 +2126,12 @@ async function formfunctions_onload() {
 
         var deplist = ''
         //   alert(gfields[fieldn].outerHTML)
-        if (field.getAttribute('exodustype') == 'S') {
-            var functioncode = field.getAttribute('exodusfunctioncode').toString()
+        if (field.getAttribute('exotype') == 'S') {
+            var functioncode = field.getAttribute('exofunctioncode').toString()
             for (var fieldn2 = 0; fieldn2 < gfields.length; fieldn2++) {
                 var field2 = gfields[fieldn2]
-                if (functioncode.indexOf('"' + field2.getAttribute('exodusname') + '"', 0) >= 0
-                    || functioncode.indexOf("'" + field2.getAttribute('exodusname') + "'", 0) >= 0) {
+                if (functioncode.indexOf('"' + field2.getAttribute('exoname') + '"', 0) >= 0
+                    || functioncode.indexOf("'" + field2.getAttribute('exoname') + "'", 0) >= 0) {
                     var deps = field2.getAttribute('exodusdependents')
                     if (deps)
                         deps += ';'
@@ -2227,11 +2227,11 @@ async function formfunctions_onload() {
         }
 
         //PRINT
-        if (gKeyNodes[0].getAttribute('exodusprintfunction'))
+        if (gKeyNodes[0].getAttribute('exoprintfunction'))
             buttonhtml += menubuttonhtml2('printsendrecord', gprintsendimage, '<u>P</u>rint/Send', 'Print/Send this or these documents. ' + AltorCtrl + '+P', 'P')
 
         //LIST
-        var tt2 = gKeyNodes[0].getAttribute('exoduslistfunction')
+        var tt2 = gKeyNodes[0].getAttribute('exolistfunction')
         if (tt2)
             buttonhtml += menubuttonhtml2('listrecord', glistimage, '<u>L</u>ist', 'List the current file. ' + AltorCtrl + '+L', 'L')
 
@@ -2312,14 +2312,14 @@ async function formfunctions_onload() {
         var nvisiblekeys = 0
         for (var keyn = 0; keyn < gKeyNodes.length; keyn++) {
             //find the first openfunction (visible or not)
-            if (openfunction = gKeyNodes[keyn].getAttribute('exodusopenfunction'))
+            if (openfunction = gKeyNodes[keyn].getAttribute('exoopenfunction'))
                 break
             if (exodusenabledandvisible(gKeyNodes[keyn])) {
                 //count the number of visible keys
                 nvisiblekeys++
                 //remember the first visible non-empty popupfunction ("" is pad-only)
                 if (!popupfunction) {
-                    var keypop = gKeyNodes[keyn].getAttribute('exoduspopup') || ''
+                    var keypop = gKeyNodes[keyn].getAttribute('exopopup') || ''
                     if (keypop)
                         popupfunction = keypop
                 }
@@ -2336,7 +2336,7 @@ async function formfunctions_onload() {
     }
     //hide the open button if no openfunction
     if (openfunction) {
-        openrecord.setAttribute('exoduspopup', openfunction)
+        openrecord.setAttribute('exopopup', openfunction)
         openrecord.style.display = ''
     }
     else if (openrecord)
@@ -2844,7 +2844,7 @@ async function form_activate_accesskey_control(event, element) {
 async function setfirstlastelement(element) {
 
     //discover first non key input element
-    if (element.getAttribute('exodusfieldno') > 0 && !element.getAttribute('exodusreadonly')) {
+    if (element.getAttribute('exofieldno') > 0 && !element.getAttribute('exoreadonly')) {
         if (!gfirstnonkeyelement)
             gfirstnonkeyelement = element
         if (element.tabIndex < gfirstnonkeyelement.tabIndex)
@@ -2852,7 +2852,7 @@ async function setfirstlastelement(element) {
     }
 
     //discover last input element
-    if (element.getAttribute('exodusfieldno') > 0 && !element.getAttribute('exodusreadonly')) {
+    if (element.getAttribute('exofieldno') > 0 && !element.getAttribute('exoreadonly')) {
         if (!gfinalinputelement)
             gfinalinputelement = element
         if (element.tabIndex >= gfinalinputelement.tabIndex)
@@ -2872,7 +2872,7 @@ async function setfirstlastcolumn(groupno) {
         var screenfn = gtables[groupno][ii]
         //shouldnt this also be restricted to elements with exodusfieldno?
         if (
-            !gfields[screenfn].getAttribute('exodusreadonly')
+            !gfields[screenfn].getAttribute('exoreadonly')
             && exodusenabledandvisible(gfields[screenfn].id)
         )
             tablex.setAttribute('exoduslastinputcolscreenfn', screenfn)
@@ -2900,13 +2900,13 @@ async function updatedisplay(elements) {
     var element = elements
 
     //only do elements with a conditional display expression
-    if (!(element.getAttribute('exodusdisplay')))
+    if (!(element.getAttribute('exodisplay')))
         return
 
     //login('updatedisplay ' + element.id)
 
     //determine required display
-    var display = await gds.evaluate(element.getAttribute('exodusdisplay'))
+    var display = await gds.evaluate(element.getAttribute('exodisplay'))
     if (typeof display == 'undefined') {
         systemerror('await updatedisplay(' + element.id + ')', '.display() returned undefined')
     }
@@ -2961,12 +2961,12 @@ async function element_exodussetdropdown(element, request, noautoselection) {
 
     assertelement(element, 'element_setdropdown', 'element')
 
-    if (!(element.getAttribute('exodusdropdown'))) {
+    if (!(element.getAttribute('exodropdown'))) {
         systemerror('await element_exodussetdropdown()', element.id + ' has no dropdown')
         return
     }
 
-    var dropdown = element.getAttribute('exodusdropdown').split(fm)
+    var dropdown = element.getAttribute('exodropdown').split(fm)
     var request = 'CACHE\r' + dropdown[0]
     var colarray = dropdown[1].split('\r')
 
@@ -3141,7 +3141,7 @@ function form_restore_field_caret(el, snap) {
 // target must not overwrite the real caret snap.
 function form_onfocusout_capture(event) {
     var el = event && event.target
-    if (!el || !el.getAttribute || !el.getAttribute('exodustype'))
+    if (!el || !el.getAttribute || !el.getAttribute('exotype'))
         return
     if (!el.tagName || !el.tagName.match(gtexttagnames))
         return
@@ -3169,7 +3169,7 @@ async function newrecordfocus() {
             //element=document.activeElement
             if (gevent)
                 element = gevent.target
-            if (!element || !element.getAttribute || !Number(element.getAttribute('exodusfieldno'))) {
+            if (!element || !element.getAttribute || !Number(element.getAttribute('exofieldno'))) {
                 if (typeof gfirstnonkeyelement == 'string') {
                     gfirstnonkeyelement = $$(gfirstnonkeyelement)
                     if (gfirstnonkeyelement[0])
@@ -3300,7 +3300,7 @@ async function printsendrecord_onclick(event) {
     exoduscancelevent(event)
 
     //work out the print function else return
-    var printfunction = gKeyNodes && gKeyNodes[0].getAttribute('exodusprintfunction')
+    var printfunction = gKeyNodes && gKeyNodes[0].getAttribute('exoprintfunction')
     if (!printfunction)
         return
     //printfunction=printfunction.replace(/%KEY%/g,gkeyexternal)
@@ -3324,7 +3324,7 @@ async function listrecord_onclick(event) {
     exoduscancelevent(event)
 
     //work out the print function else return
-    var listfunction = gKeyNodes && gKeyNodes[0].getAttribute('exoduslistfunction')
+    var listfunction = gKeyNodes && gKeyNodes[0].getAttribute('exolistfunction')
     if (!listfunction)
         return
 
@@ -4337,7 +4337,7 @@ async function document_onkeydown2(event) {
                 direction = 1
                 //enter on first column if required and no default skips (TODO and not rowrequired) first field after the table)
                 if (ggroupno
-                    && element.getAttribute('exodusrequired')
+                    && element.getAttribute('exorequired')
                     && element.getAttribute('exodusscreenfn') == tablex_firstinputcolscreenfn
                     && !getvalue(element)
                 ) {
@@ -4365,7 +4365,7 @@ async function document_onkeydown2(event) {
     // Horizontal radio: Up/Down = field leave (same focusdirection as Enter/Tab).
     // Same-group skip still applies so any option leaves the group as one stop.
     // Left/Right stay browser option change.
-    if (element.type == 'radio' && element.getAttribute('exodushorizontal')
+    if (element.type == 'radio' && element.getAttribute('exohorizontal')
         && (keycode == 38 || keycode == 40)
         && !event.ctrlKey && !event.shiftKey && !event.altKey) {
         // keep gkeycode 38/40 so readonly-skip knows back vs forward
@@ -4425,7 +4425,7 @@ async function document_onkeydown2(event) {
     if ((keycode == 38 || keycode == 40) && ggroupno == 0 && !event.ctrlKey && !event.shiftKey && !event.altKey) {
 
         //option to revert to windows standard (eg to show rapid effect of different values)
-        if (element.tagName == 'SELECT' && element.getAttribute('exodusallowcursor'))
+        if (element.tagName == 'SELECT' && element.getAttribute('exoallowcursor'))
             return true
 
         if (keycode == 38)
@@ -4605,20 +4605,20 @@ async function document_onkeydown2(event) {
 
     //protect readonly fields
     if (!(event.altKey || event.ctrlKey)
-        && (element.getAttribute('exodusreadonly')
+        && (element.getAttribute('exoreadonly')
             || (gKeyNodes
                 && !glocked
                 && element
-                && element.getAttribute('exodusfieldno')
-                && element.getAttribute('exodusfieldno') != 0
+                && element.getAttribute('exofieldno')
+                && element.getAttribute('exofieldno') != 0
             ))) {
         if (![9, 16, 17, 18, 20, 35, 36, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123].exoduslocate(keycode)) {
             exoduscancelevent(event)
             if (gKeyNodes && !glocked) {
                 return await readonlydocmsg()
             }
-            else if (element.getAttribute('exodusreadonly') != 'true') {
-                await exodusinvalid(element.getAttribute('exodusreadonly'))
+            else if (element.getAttribute('exoreadonly') != 'true') {
+                await exodusinvalid(element.getAttribute('exoreadonly'))
             }
             return false
         }
@@ -4639,7 +4639,7 @@ function form_getfirstinputcolscreenfn(tablex, last) {
         var element = gfields[sfns[ii]]
 
         //skip non-input elements
-        if (!element.getAttribute('exodusfieldno') || element.getAttribute('exodusreadonly') || !element.tagName.match(gdatatagnames))
+        if (!element.getAttribute('exofieldno') || element.getAttribute('exoreadonly') || !element.tagName.match(gdatatagnames))
             continue
 
         //capture only enabled and visible elements
@@ -4851,7 +4851,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
         }
 
         //skip readonly
-        if (nextelement.getAttribute('exodusreadonly')) {
+        if (nextelement.getAttribute('exoreadonly')) {
             //console.log('SKIP '+nextid+' is readonly')
             continue
         }
@@ -4899,7 +4899,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
         if ((gkeycode == 37 || gkeycode == 39 || gkeycode == 38 || gkeycode == 40)
             && (nextelement.tagName == 'SELECT' || nextelement.type == 'radio')) {
             if (!(nextelement.type == 'radio'
-                && nextelement.getAttribute('exodushorizontal')
+                && nextelement.getAttribute('exohorizontal')
                 && (gkeycode == 38 || gkeycode == 40))) {
                 //console.log('SKIP '+nextid+' cursor keys skip over SELECT or radio items')
                 continue
@@ -4988,7 +4988,7 @@ function form_ensure_radio_mouseup_focus() {
 function form_radio_is_exodus_toggle(el) {
     if (!el || (el.type != 'radio' && el.type != 'checkbox') || el.disabled)
         return false
-    if (el.getAttribute && el.getAttribute('exodustype'))
+    if (el.getAttribute && el.getAttribute('exotype'))
         return true
     var oc = el.getAttribute && el.getAttribute('exodusonclick')
     return !!(oc && oc.indexOf('onclickradiocheckbox') >= 0)
@@ -5346,11 +5346,11 @@ async function newrecord_onclick() {
     //only look at single part keys
     if (gKeyNodes.length == 1) {
         var keyelement = gKeyNodes[0]
-        var defaultvalue = keyelement.getAttribute('exodusdefaultvalue')
+        var defaultvalue = keyelement.getAttribute('exodefaultvalue')
         //if no default and key field not required, that means that key will be generated by server on request
         //if default and default starts with " character then considered to be a fixed default and not required if user clicks "New" button
         if (
-            (!defaultvalue && keyelement.getAttribute('exodusrequired'))
+            (!defaultvalue && keyelement.getAttribute('exorequired'))
             ||
             (defaultvalue && defaultvalue.slice(0, 1) == '"')
         ) {
@@ -5665,7 +5665,7 @@ async function opendoc_body(newkey) {
         else
             newkey1 = newkey[0]
         // dict attrs via Attribute API (not expandos — cloneNode keeps attributes only)
-        var sepchar = gKeyNodes[0].getAttribute('exoduskeypart') ? '*' : gKeyNodes[0].getAttribute('exoduswordsep')
+        var sepchar = gKeyNodes[0].getAttribute('exokeypart') ? '*' : gKeyNodes[0].getAttribute('exowordsep')
         if (sepchar && newkey1.split(sepchar).length != gKeyNodes.length) {
             systemerror('opendoc', newkey1.exodusquote() + ' does not have the correct number of key parts (' + gKeyNodes.length + ')')
             return false
@@ -5824,7 +5824,7 @@ async function opendoc2(newkey0) {
 
             //cannot create a record without a lock
             //if possible get another default key
-            if (gKeyNodes.length == 1 && gKeyNodes[0].getAttribute('exodusdefaultvalue')) {
+            if (gKeyNodes.length == 1 && gKeyNodes[0].getAttribute('exodefaultvalue')) {
                 var newkey = await getdefault(gKeyNodes[0])
                 if (newkey && newkey != gkey) {
                     //logout('opendoc2 - cannot create new record because ' + lockholder + ' is creating it.')
@@ -6135,7 +6135,7 @@ async function saveandorcleardoc_body(mode) {
                 && !clear && mode != 'OPEN' && mode != 'RELEASE'
             )
             || (gpreviouselement
-                && gpreviouselement.getAttribute('exodusfieldno') > 0
+                && gpreviouselement.getAttribute('exofieldno') > 0
                 && getvalue(gpreviouselement) != gpreviousvalue
             )
         )
@@ -6543,13 +6543,13 @@ async function form_oninput(event) {
     if (!element || !element.getAttribute)
         return true
     // Document-delegated: only bound form fields (attrs survive row cloneNode)
-    if (element.getAttribute('exodusfieldno') == null && !element.getAttribute('exodusonchange'))
+    if (element.getAttribute('exofieldno') == null && !element.getAttribute('exoonchange'))
         return true
     if (element.tagName == 'SELECT')
         return true
 
     //changing key fields does not cause gtouched
-    var fn = Number(element.getAttribute('exodusfieldno'))
+    var fn = Number(element.getAttribute('exofieldno'))
     if (fn && !gtouched) {
         //remember this element so pressing escape can cancel gtouched
         //removed in onfocus
@@ -6558,7 +6558,7 @@ async function form_oninput(event) {
     }
 
     // optional live onchange (e.g. brand_code_onchange) — debounced typeahead
-    var onchangexpr = element.getAttribute('exodusonchange')
+    var onchangexpr = element.getAttribute('exoonchange')
     if (onchangexpr) {
         gform_onchange_element = element
         // Supersede in-flight typeahead for older text. Without this, a late
@@ -6595,7 +6595,7 @@ async function form_run_onchange(element, onchangexpr) {
     if (text == null)
         text = ''
     text = text.toString()
-    if (!element.getAttribute('exoduslowercase'))
+    if (!element.getAttribute('exolowercase'))
         text = text.toUpperCase()
     // keep field display in sync for search (matches validate uppercase)
     if (getvalue(element) != text)
@@ -6715,10 +6715,10 @@ function form_field_is_allownew(el) {
         || (typeof gpreventcreation != 'undefined' && gpreventcreation)
         || (typeof greadonlymode != 'undefined' && greadonlymode))
         return false
-    var id = el.id || el.getAttribute('exodusname') || ''
+    var id = el.id || el.getAttribute('exoname') || ''
     if (id == 'EXECUTIVE_CODE' || id == 'BRAND_EXECUTIVE_CODE')
         return true
-    if (String(el.getAttribute('exodusfieldno')) !== '0')
+    if (String(el.getAttribute('exofieldno')) !== '0')
         return false
     // multipart key (e.g. ratecards vehicle+date): not allownew for key parts alone
     if (typeof gKeyNodes == 'undefined' || !gKeyNodes || gKeyNodes.length !== 1)
@@ -6988,7 +6988,7 @@ function form_typeahead_auto_focusn(element, rows, returncoln) {
             && typed.indexOf(gform_typeahead_prefix) === 0)
             typed = typed.slice(gform_typeahead_prefix.length)
         typed = typed.replace(/^\s+|\s+$/g, '')
-        if (!(element.getAttribute && element.getAttribute('exoduslowercase')))
+        if (!(element.getAttribute && element.getAttribute('exolowercase')))
             typed = typed.toUpperCase()
     }
     if (typed) {
@@ -6997,7 +6997,7 @@ function form_typeahead_auto_focusn(element, rows, returncoln) {
             if (cell == null)
                 cell = ''
             cell = String(cell).replace(/^\s+|\s+$/g, '')
-            if (!(element && element.getAttribute && element.getAttribute('exoduslowercase')))
+            if (!(element && element.getAttribute && element.getAttribute('exolowercase')))
                 cell = cell.toUpperCase()
             if (cell === typed)
                 return r
@@ -7446,7 +7446,7 @@ async function form_onchangeselect(event) {
         return await exodusinvalid()
 
     //encourage changing key or key part in a SELECT to change record
-    if (gpreviouselement.getAttribute('exodusfieldno') == '0')
+    if (gpreviouselement.getAttribute('exofieldno') == '0')
         focusnext()
 
     return true
@@ -7473,8 +7473,8 @@ async function validateall(mode) {
         var rows = (groupno == 0) ? [gds.data] : gds.data['group' + groupno]
 
         var tablex = gtables[groupno]
-        var allowemptyrows = (groupno == 0) ? false : tablex.tableelement.getAttribute('exodusallowemptyrows')
-        var rowrequired = (groupno == 0) ? false : tablex.tableelement.getAttribute('exodusrowrequired')
+        var allowemptyrows = (groupno == 0) ? false : tablex.tableelement.getAttribute('exoallowemptyrows')
+        var rowrequired = (groupno == 0) ? false : tablex.tableelement.getAttribute('exorowrequired')
         var nrowsfound = 0
 
         for (var rown = 0; rown < rows.length; rown++) {
@@ -7492,7 +7492,7 @@ async function validateall(mode) {
 
                 //skip unbound, calculated and not required cells
                 var element = cell.element
-                if (!element || element.getAttribute('exodustype') != 'F')
+                if (!element || element.getAttribute('exotype') != 'F')
                     continue
 
                 //skip cells with data
@@ -7506,7 +7506,7 @@ async function validateall(mode) {
                 }
 
                 //only interested in required fields from here on
-                if (!(element.getAttribute('exodusrequired')))
+                if (!(element.getAttribute('exorequired')))
                     continue
 
                 //skip cells that can be defaulted
@@ -7555,7 +7555,7 @@ async function validateall(mode) {
 
             //fail if any missing data
             if (missingelement && (!allowemptyrows || anydata)) {
-                await exodusinvalid(missingelement.getAttribute('exodustitle') + ' is required.')
+                await exodusinvalid(missingelement.getAttribute('exotitle') + ' is required.')
                 focuson(missingelement)
                 return false //logout('validateall ' + mode)
             }
@@ -7567,7 +7567,7 @@ async function validateall(mode) {
                 && rown < (rows.length - 1)) {
                 if (!allowemptyrows) {
                     var missingelement = rows[0][firstcolumnname].element
-                    await exodusinvalid('Empty rows are not allowed for ' + missingelement.getAttribute('exodustitle'))
+                    await exodusinvalid('Empty rows are not allowed for ' + missingelement.getAttribute('exotitle'))
                     focuson(missingelement)
                     return false //logout('validateall ' + mode + ' empty row')
                 }
@@ -7588,7 +7588,7 @@ async function validateall(mode) {
             && exodusenabledandvisible($$('exogroup' + groupno))
         ) {
             var missingelement = rows[0][firstcolumnname].element
-            await exodusinvalid('At least one ' + missingelement.getAttribute('exodustitle') + ' is required.')
+            await exodusinvalid('At least one ' + missingelement.getAttribute('exotitle') + ' is required.')
             focuson(missingelement)
             return false //logout('validateall ' + mode + ' no rows')
         }
@@ -7878,9 +7878,9 @@ function focuson2() {
         if (focusonelement.tagName
             && focusonelement.tagName.match(gdatatagnames)
             && focusonelement.getAttribute
-            && focusonelement.getAttribute('exodustype')) {
+            && focusonelement.getAttribute('exotype')) {
             if (focusonelement == gstartelement
-                || focusonelement.getAttribute('exodusfieldno') === '0') {
+                || focusonelement.getAttribute('exofieldno') === '0') {
                 form_scroll_log_msg('focuson2 scroll home key field',
                     form_scroll_el_label(focusonelement))
                 window.scrollTo(0, 0)
@@ -7981,12 +7981,12 @@ async function document_onfocus(event) {
     // //element.onclick=onclickradiocheckbox
     // addeventlistener(element,'click','onclickradiocheckbox')
 
-    ///log('no validation/update except changing exodus elements:' + element.getAttribute('exodustype'))
+    ///log('no validation/update except changing exodus elements:' + element.getAttribute('exotype'))
     form_scroll_log_msg('document_onfocus enter', form_scroll_el_label(element),
-        'exodustype=', element.getAttribute('exodustype'),
+        'exotype=', element.getAttribute('exotype'),
         'gkeycode=', gkeycode,
         'prev=', form_scroll_el_label(gpreviouselement))
-    if (!(element.getAttribute('exodustype'))) {
+    if (!(element.getAttribute('exotype'))) {
         form_scroll_log_msg('document_onfocus EXIT no exodustype', form_scroll_el_label(element))
         //logout('document_onfocus')
         return
@@ -8087,13 +8087,13 @@ async function document_onfocus(event) {
     //triggered by timeout from validateupdate now
     //but do it ALSO here in case triggered by defaulted key field
     ///log('if the key is complete and not on a key field, get the record')
-    //if (!gloaded&&gKeyNodes&&element.getAttribute('exodusfieldno')!=0)
+    //if (!gloaded&&gKeyNodes&&element.getAttribute('exofieldno')!=0)
     //dont check if element not changed to avoid endless loop if opendoc errors
     if (gKeyNodes && element != gpreviouselement) {
         var nextkey = await getkey()
         //if (nextkey.toUpperCase() != nextkey)
         //    xxx = 1
-        if (nextkey && (gloaded && nextkey != gkey) || (!gloaded && element.getAttribute('exodusfieldno') != 0))
+        if (nextkey && (gloaded && nextkey != gkey) || (!gloaded && element.getAttribute('exofieldno') != 0))
         //if (key&&(gloaded&&key!=gkey)||(!gloaded))
         {
             //exodussettimeout('await opendoc()',100)
@@ -8107,7 +8107,7 @@ async function document_onfocus(event) {
     // Must not run before prior-required + new-record checks above.
     // Horizontal radio Up keeps gkeycode 38 so back-nav works without a dir flag.
     if (gkeycode == 9 || gkeycode == 13 || gkeycode == 38 || gkeycode == 40) {
-        if (element.getAttribute('exodusreadonly')
+        if (element.getAttribute('exoreadonly')
             && (element.tabIndex == 999 || element.tabIndex == -1
                 || element.getAttribute('oldtabindex'))) {
             form_scroll_log_msg('document_onfocus EXIT readonly skip to next',
@@ -8126,7 +8126,7 @@ async function document_onfocus(event) {
     // modalblock_note_scroll_home: unpin must not restore pre-home scroll.
     // focuson2 applies the same key-home / scrollintoview split for programmatic
     // focus when this handler early-exits; still run here for click/tab.
-    if (element == gstartelement || element.getAttribute('exodusfieldno') === '0') {
+    if (element == gstartelement || element.getAttribute('exofieldno') === '0') {
         form_scroll_log_msg('document_onfocus scroll home key field', form_scroll_el_label(element))
         window.scrollTo(0, 0)
         if (typeof modalblock_note_scroll_home == 'function')
@@ -8334,7 +8334,7 @@ async function validateupdate() {
     //return if no changes (ignoring case if lowercase not allowed)
     var newvalue = getvalue(gpreviouselement)
     //done in getvalue now
-    //if (!gpreviouselement.getAttribute('exoduslowercase') && gpreviouselement != 'radio' && gpreviouselement.type != 'checkbox')
+    //if (!gpreviouselement.getAttribute('exolowercase') && gpreviouselement != 'radio' && gpreviouselement.type != 'checkbox')
     //    newvalue = newvalue.toUpperCase()
     if (newvalue == gpreviousvalue) {
         //logout('validateupdate - gpreviousvalue:' + gpreviousvalue + ' same as newvalue:' + newvalue)
@@ -8433,7 +8433,7 @@ async function validateupdate() {
         //switch to new key if new and user accepts to close the current one
         var nextkey
         if (gKeyNodes
-         && gpreviouselement.getAttribute('exodusfieldno') == 0
+         && gpreviouselement.getAttribute('exofieldno') == 0
          && (nextkey = await getkey())
          && nextkey != gkey) {
             //do not change key if user chooses not to unload an existing document
@@ -8465,8 +8465,8 @@ async function validateupdate() {
     /////////////
 
     //flag record edited
-    if (gpreviouselement.getAttribute('exodusfieldno') != 0
-        && !gpreviouselement.getAttribute('exodusnochangeswarning')) {
+    if (gpreviouselement.getAttribute('exofieldno') != 0
+        && !gpreviouselement.getAttribute('exonochangeswarning')) {
         settouched(true)
     }
 
@@ -8520,9 +8520,9 @@ function focusongpreviouselement2() {
     if (gpreviouselement.tagName
         && gpreviouselement.tagName.match(gdatatagnames)
         && gpreviouselement.getAttribute
-        && gpreviouselement.getAttribute('exodustype')) {
+        && gpreviouselement.getAttribute('exotype')) {
         if (gpreviouselement == gstartelement
-            || gpreviouselement.getAttribute('exodusfieldno') === '0') {
+            || gpreviouselement.getAttribute('exofieldno') === '0') {
             window.scrollTo(0, 0)
             if (typeof modalblock_note_scroll_home == 'function')
                 modalblock_note_scroll_home()
@@ -8631,7 +8631,7 @@ async function checkrequired(elements, element, groupno) {
             continue
 
         // Pre-open: only key parts (not JOB_NO etc.)
-        if (!gloaded && element2.getAttribute('exodusfieldno') !== '0')
+        if (!gloaded && element2.getAttribute('exofieldno') !== '0')
             continue
 
         //don't check current but continue looking for lower tabindexed fields
@@ -8653,19 +8653,19 @@ async function checkrequired(elements, element, groupno) {
             var element2_tab = form_effective_tabindex(element2)
             // form_effective_tabindex never returns -1 (maps to oldtabindex or 999)
             if ((!foundelement && element2_tab <= element_tab) || (element2_tab < element_tab)) {
-                //if (element&&element2.getAttribute('exodusrequired')&&gds.getcells(element2,grecn)[0].text=='')
-                //if (element&&element2.getAttribute('exodusrequired')&&getvalue(element2)=='')
-                //if (element&&(!Number(element.getAttribute('exogroupno'))||element2.getAttribute('exodusrequired'))&&getvalue(element2)=='')
+                //if (element&&element2.getAttribute('exorequired')&&gds.getcells(element2,grecn)[0].text=='')
+                //if (element&&element2.getAttribute('exorequired')&&getvalue(element2)=='')
+                //if (element&&(!Number(element.getAttribute('exogroupno'))||element2.getAttribute('exorequired'))&&getvalue(element2)=='')
                 if (element
                     && ((gds.isnewrecord && !Number(element2.getAttribute('exogroupno')))
-                        || element2.getAttribute('exodusrequired'))
+                        || element2.getAttribute('exorequired'))
                     && getvalue(element2) == '') {
 
                     //try to set the default
                     // Pre-open key parts (fieldno 0, !gloaded): DOM/getkey path only —
                     // setdefault donotupdate, still-empty via getvalue not gds.
                     var keyEntry = gKeyNodes && !gloaded
-                        && element2.getAttribute('exodusfieldno') === '0'
+                        && element2.getAttribute('exofieldno') === '0'
                     if (!(await setdefault(element2, keyEntry)) && exodusenabledandvisible(element2)) {
                         focuson(element2)
                         return false
@@ -8676,7 +8676,7 @@ async function checkrequired(elements, element, groupno) {
                     var stillEmpty = keyEntry
                         ? (getvalue(element2) == '')
                         : (gds.getcells(element2, grecn)[0].text == '')
-                    if (element2.getAttribute('exodusrequired') && !element2.getAttribute('exodusreadonly') && stillEmpty) {
+                    if (element2.getAttribute('exorequired') && !element2.getAttribute('exoreadonly') && stillEmpty) {
 
                         //disabled or invisible elements may be blank and required (even after setdefault)
                         if (element2.disabled || element2.getAttribute('disabled') || !exodusenabledandvisible(element2))
@@ -8690,7 +8690,7 @@ async function checkrequired(elements, element, groupno) {
                             // (incl. default-painted key) and runs opendoc when
                             // appropriate. Stealing previous to "suppress re-entry"
                             // early-exits that path.
-                            await exodusinvalid(element2.getAttribute('exodustitle') + ' is required..')
+                            await exodusinvalid(element2.getAttribute('exotitle') + ' is required..')
                         }
 
                         focuson(element2)
@@ -8733,7 +8733,7 @@ function getvalue_internal(element, recn) {
     var value = getvalue(element, recn)
     if (value === '' || value == null || !element || !element.getAttribute)
         return value
-    var conversion = element.getAttribute('exodusconversion')
+    var conversion = element.getAttribute('exoconversion')
     if (typeof conversion != 'string' || conversion.slice(0, 1) != '[')
         return value
     try {
@@ -8828,7 +8828,7 @@ function getvalue(element, recn) {
                     //similar code in INPUT and SPAN
 					//always trim trailing white space
                     var tx = element.value.replace(/\s+$/, '')
-                    if (!element.getAttribute('exoduslowercase')) {
+                    if (!element.getAttribute('exolowercase')) {
                         //may be visibly uppercase due to style but internally lowercase so change it here
                         tx = tx.toUpperCase()
 						//trim leading white space if lower case not allowed
@@ -8914,7 +8914,7 @@ function getvalue(element, recn) {
 			//similar code in INPUT and SPAN
             //remove trailing white space
             value = value.replace(/\s+$/, '')
-            if (!element.getAttribute('exoduslowercase')) {
+            if (!element.getAttribute('exolowercase')) {
                 //may be visibly uppercase due to style but internally lowercase so change it here
                 value = value.toUpperCase()
                 //trim leading white space if lower case not allowed
@@ -8960,7 +8960,7 @@ function exodussetreadonly(elements, msg, options, recn) {
         var elements = []
         for (var ii = 0; ii < gfields.length; ii++) {
             if (Number(gfields[ii].getAttribute('exogroupno')) == elementx
-                && Number(gfields[ii].getAttribute('exodusfieldno'))
+                && Number(gfields[ii].getAttribute('exofieldno'))
                 && (!(exodussetreadonly(gfields[ii].id, msg, options, recn))))
                 return false
         }
@@ -9036,7 +9036,7 @@ function exodussetreadonly(elements, msg, options, recn) {
     }
 
     if (msg) {
-        elementx.setAttribute('exodusreadonly', msg)
+        elementx.setAttribute('exoreadonly', msg)
 
         //activeElement not available everywhere
         //if (elementx.id!=document.activeElement.id)
@@ -9109,7 +9109,7 @@ function exodussetreadonly(elements, msg, options, recn) {
     }
     else {
 
-        elementx.removeAttribute('exodusreadonly')
+        elementx.removeAttribute('exoreadonly')
         //if (elementx.oldonchange)
         // elementx.onchange=elementx.oldonchange
         //addeventlistener(elementx,'change',elementx.oldonchange)
@@ -9143,8 +9143,8 @@ function exodussetreadonly(elements, msg, options, recn) {
     //move onto next field if setting current focus field to readonly
     //but only if default tabindex since focusnext cant find the next tabindex properly
     //activeElement not available everywhere
-    //if (document.activeElement.getAttribute('exodusreadonly')&&gpreviouselement&&document.activeElement.tabIndex==999)
-    if (gevent && typeof gevent.target != 'undefined' && gevent.target.getAttribute && gevent.target.getAttribute('exodusreadonly') && gpreviouselement && document.activeElement.tabIndex == 999)
+    //if (document.activeElement.getAttribute('exoreadonly')&&gpreviouselement&&document.activeElement.tabIndex==999)
+    if (gevent && typeof gevent.target != 'undefined' && gevent.target.getAttribute && gevent.target.getAttribute('exoreadonly') && gpreviouselement && document.activeElement.tabIndex == 999)
         focusnext(gpreviouselement)
 
     return true
@@ -9162,7 +9162,7 @@ async function readonly_onchange(event) {
     }
 
     var element = event.target
-    var readonlymsg = element.getAttribute('exodusreadonly')
+    var readonlymsg = element.getAttribute('exoreadonly')
     if (!readonlymsg || readonlymsg == 'true')
         return
 
@@ -9298,7 +9298,7 @@ function setvalue2(element, value) {
 
             setexoduslink(element, value)
 
-            if (element.getAttribute('exodusimage')) {
+            if (element.getAttribute('exoimage')) {
                 var img = element.nextSibling
                 if (!img)
                     img = element.parentNode.nextSibling
@@ -9380,11 +9380,11 @@ function getradiocheckboxelements(element) {
 
 function setexoduslink(element, value) {
     return//always display now
-    /*    if (element.getAttribute('exoduslink')) {
-            if (element.previousSibling && element.previousSibling.getAttribute('exoduslink')) {
+    /*    if (element.getAttribute('exolink')) {
+            if (element.previousSibling && element.previousSibling.getAttribute('exolink')) {
                 element.previousSibling.style.display = value ? '' : 'none'
             }
-            else if (element.nextSibling && element.nextSibling.getAttribute('exoduslink')) {
+            else if (element.nextSibling && element.nextSibling.getAttribute('exolink')) {
                 element.nextSibling.style.display = value ? '' : 'none'
             }
         }
@@ -9405,7 +9405,7 @@ async function getdefault(element) {
 
     //default value of a select item is the selected item if not already defaulted
     //suppress otherwise cannot have "" value except as first item eg (X;XXXX:;YYYY)
-    //if (!element.getAttribute('exodusdefaultvalue')&&element.tagName=='SELECT')
+    //if (!element.getAttribute('exodefaultvalue')&&element.tagName=='SELECT')
     //{
     // //login('getdefault '+element.id)
     // var defaultvalue=getvalue(element)
@@ -9414,7 +9414,7 @@ async function getdefault(element) {
     //}
 
     //return '' if no default
-    defaultvalueexpression = element.getAttribute('exodusdefaultvalue')
+    defaultvalueexpression = element.getAttribute('exodefaultvalue')
     if (!defaultvalueexpression || defaultvalueexpression == '""')
         return ''
 
@@ -9430,7 +9430,7 @@ async function getdefault(element) {
     }
 
     //don't default if unique and already present
-    if (defaultvalue && element.getAttribute('exodusunique')) {
+    if (defaultvalue && element.getAttribute('exounique')) {
         var othervalues = getvalues(element.id)
         if (othervalues.exoduslocate(defaultvalue))
             defaultvalue = ''
@@ -9499,13 +9499,13 @@ function form_field_all_selected(element) {
 function form_try_insert_tab_char(element) {
     if (!element)
         return false
-    var conv = element.getAttribute('exodusconversion') || ''
+    var conv = element.getAttribute('exoconversion') || ''
     if (conv.slice(0, 1) != '[')
         return false
     var convname = conv.slice(1, -1).split(',')[0].toUpperCase()
     if (convname != 'INDENTED')
         return false
-    if (element.getAttribute('exodusreadonly') || element.disabled
+    if (element.getAttribute('exoreadonly') || element.disabled
         || element.getAttribute('disabled') != null)
         return false
     // Non-empty whole-field select → navigate (Tab); caret/partial → insert
@@ -9611,7 +9611,7 @@ async function setdefault(element, donotupdate) {
         return true
 
     //cannot update anything but key field if not locked or save button not enabled
-    if (element.getAttribute('exodusfieldno') != 0 && gKeyNodes && (!glocked || saverecord.getAttribute('disabled'))) {
+    if (element.getAttribute('exofieldno') != 0 && gKeyNodes && (!glocked || saverecord.getAttribute('disabled'))) {
         //  return true
     }
 
@@ -9665,7 +9665,7 @@ async function setdefault(element, donotupdate) {
     //set the value (externally only)
     //await gds.setx(element,grecn,gdefault)
 
-    setvalue(element, await oconvertvalue(gdefault, element.getAttribute('exodusconversion')))
+    setvalue(element, await oconvertvalue(gdefault, element.getAttribute('exoconversion')))
 
     //call the validate/update routine
     if (!donotupdate) {
@@ -9724,8 +9724,8 @@ async function onbeforeupdate(element) {
     }
 
     //cannot update anything but key field if not locked or save button not enabled
-    //if (element.getAttribute('exodusfieldno')!=0&&gKeyNodes&&(!glocked||saverecord.getAttribute('disabled')))
-    if (element.getAttribute('exodusfieldno') != 0 && gKeyNodes && !glocked) {
+    //if (element.getAttribute('exofieldno')!=0&&gKeyNodes&&(!glocked||saverecord.getAttribute('disabled')))
+    if (element.getAttribute('exofieldno') != 0 && gKeyNodes && !glocked) {
         setvalue(gpreviouselement, gpreviousvalue)
         await readonlydocmsg()
         //logout('onbeforeupdate')
@@ -9771,7 +9771,7 @@ async function validate(element) {
         goldvalue = goldvalue[0].text
 
     //convert to uppercase
-    if (!element.getAttribute('exoduslowercase') && element.type != 'radio' && element.type != 'checkbox') {
+    if (!element.getAttribute('exolowercase') && element.type != 'radio' && element.type != 'checkbox') {
         var tt = gvalue.toUpperCase()
         if (tt != gvalue) {
             gvalue = tt
@@ -9781,7 +9781,7 @@ async function validate(element) {
     }
 
     //get something to show in error messages
-    var elementtitle = element.getAttribute('exodustitle')
+    var elementtitle = element.getAttribute('exotitle')
     if (!elementtitle)
         elementtitle = element.id
 
@@ -9789,12 +9789,12 @@ async function validate(element) {
 
         /*
         //invalid character check (nearly all punctuation except - / and #)
-        if (element.getAttribute('exodusinvalidcharacters')) {
+        if (element.getAttribute('exoinvalidcharacters')) {
 
-        var invalidcharacters=element.getAttribute('exodusinvalidcharacters')+'\xF8\xF9\xFA\xFB'//\xFC\xFD\xFE\xFF'
+        var invalidcharacters=element.getAttribute('exoinvalidcharacters')+'\xF8\xF9\xFA\xFB'//\xFC\xFD\xFE\xFF'
 
         //ignore any valid characters
-        if (element.getAttribute('exodusvalidcharacters')) invalidcharacters=invalidcharacters.exodusconvert(element.getAttribute('exodusvalidcharacters'),'')
+        if (element.getAttribute('exovalidcharacters')) invalidcharacters=invalidcharacters.exodusconvert(element.getAttribute('exovalidcharacters'),'')
 
         }
         else {
@@ -9804,7 +9804,7 @@ async function validate(element) {
         */
 
         //special key field validation and conversion
-        if (Number(element.getAttribute('exodusfieldno')) == 0) {
+        if (Number(element.getAttribute('exofieldno')) == 0) {
 
             //remove all non-printing ASCII characters (eg tab) from key fields
             gvalue = gvalue.replace(/[\x00-\x1F]/g, '')
@@ -9821,12 +9821,12 @@ async function validate(element) {
         var invalidcharacters = FMs
         if (element.type == 'checkbox')
             invalidcharacters = invalidcharacters.exodusconvert(sm, '')
-        if (element.getAttribute('exodusinvalidcharacters')) {
-            invalidcharacters += element.getAttribute('exodusinvalidcharacters')
+        if (element.getAttribute('exoinvalidcharacters')) {
+            invalidcharacters += element.getAttribute('exoinvalidcharacters')
 
             //valid characters override invalid characters (but be careful not to allow field marks
-            if (element.getAttribute('exodusvalidcharacters'))
-                invalidcharacters = invalidcharacters.exodusconvert(element.getAttribute('exodusvalidcharacters'), '')
+            if (element.getAttribute('exovalidcharacters'))
+                invalidcharacters = invalidcharacters.exodusconvert(element.getAttribute('exovalidcharacters'), '')
 
         }
 
@@ -9844,11 +9844,11 @@ async function validate(element) {
         }
 
         //valid character check
-        if (element.getAttribute('exodusvalidcharacters')) {
+        if (element.getAttribute('exovalidcharacters')) {
 
-            var temp = gvalue.exodusconvert(element.getAttribute('exodusvalidcharacters'), '')
+            var temp = gvalue.exodusconvert(element.getAttribute('exovalidcharacters'), '')
             if (temp != '') {
-                await exodusinvalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exodusvalidcharacters').exodusswap('|', '&#124;') + '\"')
+                await exodusinvalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exovalidcharacters').exodusswap('|', '&#124;') + '\"')
                 return false //logout('validate')
             }
         }
@@ -9858,7 +9858,7 @@ async function validate(element) {
     //required check
     //log('required check')
     if (gvalue == ''
-        && element.getAttribute('exodusrequired')
+        && element.getAttribute('exorequired')
         && exodusenabledandvisible(element)) {
         await exodusinvalid(elementtitle + ' is required...')
         return false //logout('validate')
@@ -9866,11 +9866,11 @@ async function validate(element) {
 
     //log('before file check')
     //file check (skip if has dropdown)
-    if (element.getAttribute('exodusfilename')
+    if (element.getAttribute('exofilename')
         && gvalue != ''
-        && !element.getAttribute('exodusdropdown')) {
+        && !element.getAttribute('exodropdown')) {
 
-        var filename = element.getAttribute('exodusfilename')
+        var filename = element.getAttribute('exofilename')
         var key = gvalue
 
         //exodus hack (possibly not used anymore as .filename='ACCOUNTS' not used?
@@ -9879,7 +9879,7 @@ async function validate(element) {
         db.request = 'CACHE\rREAD\r' + filename + '\r' + key
         if (!(await db.send())) {
 
-            if (db.response.indexOf('NO RECORD') >= 0) db.response = exodusquote(gvalue) + ' ' + element.getAttribute('exodustitle') + ' is not on file.'
+            if (db.response.indexOf('NO RECORD') >= 0) db.response = exodusquote(gvalue) + ' ' + element.getAttribute('exotitle') + ' is not on file.'
 
             await exodusinvalid(db.response)
 
@@ -9894,7 +9894,7 @@ async function validate(element) {
     gvaluebeforeiconv = gvalue
 
     //if conversion is a routine. eg [NUMBER] [DATE] are standard
-    var conversion = element.getAttribute('exodusconversion')
+    var conversion = element.getAttribute('exoconversion')
     if (typeof (conversion) != 'string' || conversion.slice(0, 1) != '[')
         conversion = false
 
@@ -9941,7 +9941,7 @@ async function validate(element) {
     //custom validation - data in internal format
     //log('before custom validation')
     var storegrecn = grecn
-    var elementvalidation = element.getAttribute('exodusvalidation')
+    var elementvalidation = element.getAttribute('exovalidation')
     if (elementvalidation) {
 
         var ok
@@ -9967,14 +9967,14 @@ async function validate(element) {
 
     //check for uniqueness for multivalues
     //log('before unique check')
-    if (gvalue && ggroupno > 0 && element.getAttribute('exodusunique')) {
+    if (gvalue && ggroupno > 0 && element.getAttribute('exounique')) {
         var othervalues = await gds.getall(element.id)
         var ln
         //othervalues[grecn]='' //not needed because only validate if changed
         othervalues[grecn] = '' //put back because of a validation after a multiple choice popup fails
         if (ln = othervalues.exoduslocate(gvalue)) {
             gmsg = exodusquote(gvaluebeforeiconv) + ' is already used in line ' + ln + '.'
-            if (element.getAttribute('exodusnonuniquewarning')) {
+            if (element.getAttribute('exononuniquewarning')) {
                 if (!(confirm('Warning:\n\n' + gmsg, 1))) {
                     //logout('validate - not unique warning')
                     return await exodusinvalid()
@@ -9989,11 +9989,11 @@ async function validate(element) {
 
     //check for sequential multivalues
     //assumes that numbers will be in number format
-    var elementsequence = element.getAttribute('exodussequence')
+    var elementsequence = element.getAttribute('exosequence')
     if (gvalue
         && ggroupno > 0
         && elementsequence) {
-        var title = element.getAttribute('exodustitle')
+        var title = element.getAttribute('exotitle')
         if (elementsequence == 'A') {
             var temp
             if ((temp = await getpreviousrow('', { skipblanks: true, internal: true }))
@@ -10034,7 +10034,7 @@ async function validate(element) {
 
 // OCONV ivalue (internal) onto the element if DOM still shows pre-canonical external.
 async function form_paint_oconv_if_needed(element, ivalue) {
-    var conversion = element && element.getAttribute && element.getAttribute('exodusconversion')
+    var conversion = element && element.getAttribute && element.getAttribute('exoconversion')
     if (typeof conversion != 'string' || conversion.slice(0, 1) != '[')
         return true
     var ovalue = await validateoconv(element, ivalue == null ? '' : ivalue)
@@ -10057,7 +10057,7 @@ async function validateoconv(element, ivalue) {
         return ovalue
 
     //if conversion is a routine. eg [NUMBER] [DATE] are standard
-    var conversion = element.getAttribute('exodusconversion')
+    var conversion = element.getAttribute('exoconversion')
     if (typeof conversion != 'string' || conversion.slice(0, 1) != '[')
         conversion = false
     if (!conversion)
@@ -10174,7 +10174,7 @@ async function calcfields(fieldns) {
                 systemerror('await calcfields()', 'gfields[' + fn + '] is undefined.')
             }
             else {
-                if (field.getAttribute('exodusfunctioncode') && field.getAttribute('exodustype') != 'F') {
+                if (field.getAttribute('exofunctioncode') && field.getAttribute('exotype') != 'F') {
                     fieldns[fieldns.length] = fn
                 }
             }
@@ -10191,7 +10191,7 @@ async function calcfields(fieldns) {
             var field = gfields[fieldns[fn]]
 
             //only do calculated fields
-            if (field.getAttribute('exodusfunctioncode')) {
+            if (field.getAttribute('exofunctioncode')) {
 
                 //add dependents of dependents to the list to recalc
                 var deps = field.getAttribute('exodusdependents')
@@ -10639,7 +10639,7 @@ async function insertallrows2(elements, values, fromrecn) {
                 // validateoconv returns false on fail (not only null/undefined)
                 if (ovalue === false || ovalue == null || typeof ovalue == 'undefined')
                     return false
-                //const conversion = gpreviouselement.getAttribute('exodusconversion')
+                //const conversion = gpreviouselement.getAttribute('exoconversion')
                 //if (conversion && conversion.substr(0,1) == '[')
                 //    newvalue = newvalue.exodusoconv(conversion)
                 setvalue(gpreviouselement,ovalue)
@@ -10702,7 +10702,7 @@ function form_group_row_has_data(datarow) {
 	for (var propname in datarow) {
 		var cell = datarow[propname]
 		var element = cell && cell.element
-		if (!element || element.getAttribute('exodustype') != 'F')
+		if (!element || element.getAttribute('exotype') != 'F')
 			continue
 		if (cell.text && (typeof cell.text != 'string' || cell.text.replace(/ *$/, '')))
 			return true
@@ -11047,22 +11047,22 @@ async function exoduslink(event, element) {
     //if (element.type!='text') element=element.previousSibling
     if (!element)
         element = event.target
-    while (element && element.getAttribute && !element.getAttribute('exoduslink')) {
+    while (element && element.getAttribute && !element.getAttribute('exolink')) {
         element = element.nextSibling
     }
-    if (!element || !element.getAttribute || !element.getAttribute('exoduslink')) {
+    if (!element || !element.getAttribute || !element.getAttribute('exolink')) {
         var element = event.target
-        while (element && (!element.getAttribute || !element.getAttribute('exoduslink'))) {
+        while (element && (!element.getAttribute || !element.getAttribute('exolink'))) {
             element = element.previousSibling
         }
     }
 
     //quit if no link defined
-    if (!element || !element.getAttribute('exoduslink'))
+    if (!element || !element.getAttribute('exolink'))
         return false //logout('exoduslink - no link')
 
     //prevent popups except on the key field unless a record is present
-    if (gKeyNodes && !gloaded && element.getAttribute('exodusfieldno') != 0) {
+    if (gKeyNodes && !gloaded && element.getAttribute('exofieldno') != 0) {
         focuson(gKeyNodes[0])
         return false //logout('exoduslink - no record')
     }
@@ -11070,10 +11070,10 @@ async function exoduslink(event, element) {
     grecn = getrecn(element)
 
     gvalue = getvalue(element, grecn)
-    if (!(element.getAttribute('exoduslowercase')))
+    if (!(element.getAttribute('exolowercase')))
         gvalue = gvalue.toUpperCase()
 
-    var reply = await exodusevaluate(element.getAttribute('exoduslink'), 'await exoduslink()');
+    var reply = await exodusevaluate(element.getAttribute('exolink'), 'await exoduslink()');
 
     //logout('exoduslink')
 
@@ -11086,7 +11086,7 @@ function exodusfieldpopupallowed(element) {
     if (!element || !element.getAttribute)
         return false
 
-    if (element.getAttribute('exodusreadonly'))
+    if (element.getAttribute('exoreadonly'))
         return false
 
     if (element.disabled || element.getAttribute('disabled'))
@@ -11113,7 +11113,7 @@ async function exoduspopup(event, element) {
     if (!element) {
         element = event.target
         while (element
-            && (!element.getAttribute || !element.getAttribute('exoduspopup'))
+            && (!element.getAttribute || !element.getAttribute('exopopup'))
             && element.tagName != 'SELECT') {
             element = element.nextSibling
         }
@@ -11121,7 +11121,7 @@ async function exoduspopup(event, element) {
             var elements = event.target.parentNode.getElementsByTagName('*')
             for (var elementn = 0; elementn < elements.length; ++elementn) {
                 element = elements[elementn]
-                if (element.getAttribute && element.getAttribute('exoduspopup'))
+                if (element.getAttribute && element.getAttribute('exopopup'))
                     break
             }
         }
@@ -11143,25 +11143,25 @@ async function exoduspopup(event, element) {
     }
 
     //cannot update anything but key field if not locked or save button not enabled
-    if (element.getAttribute('exodusfieldno') != 0 && gKeyNodes && (!glocked || saverecord.getAttribute('disabled'))) {
+    if (element.getAttribute('exofieldno') != 0 && gKeyNodes && (!glocked || saverecord.getAttribute('disabled'))) {
         await readonlydocmsg()
         return false //logout('exoduspopup - read only document')
     }
 
     // quit if field is not editable (readonly, disabled, or non-tabbable)
     if (!exodusfieldpopupallowed(element)) {
-        var readonly = element.getAttribute('exodusreadonly')
+        var readonly = element.getAttribute('exoreadonly')
         if (readonly && readonly != 'true')
             await exodusinvalid(readonly)
         return false //logout('exoduspopup - read only')
     }
 
     //quit if no popup defined
-    if (!element.getAttribute('exoduspopup') && element.tagName != 'SELECT')
+    if (!element.getAttribute('exopopup') && element.tagName != 'SELECT')
         return false //logout('exoduspopup - no popup')
 
     //prevent popups except on the key field unless a record is present
-    if (gKeyNodes && !gloaded && element.getAttribute('exodusfieldno') != 0) {
+    if (gKeyNodes && !gloaded && element.getAttribute('exofieldno') != 0) {
         focuson(gKeyNodes[0])
         return false //logout('exoduspopup - no record')
     }
@@ -11227,11 +11227,11 @@ async function exoduspopup(event, element) {
     }
 
     //do not change key if user chooses not to unload an existing document
-    if (element.getAttribute('exodusfieldno') == 0 && gloaded && !(await closedoc('OPEN')))
+    if (element.getAttribute('exofieldno') == 0 && gloaded && !(await closedoc('OPEN')))
         return false //logout('exoduspopup - user cancelled unloaddoc')
 
     //output convert it
-    if (element.getAttribute('exodusconversion')) {
+    if (element.getAttribute('exoconversion')) {
         reply = await validateoconv(element, reply)
         // validateoconv returns false on fail (not only null/undefined)
         if (reply === false || reply == null || typeof reply == 'undefined')
@@ -11265,7 +11265,7 @@ async function exoduspopup2(element) {
     //given a SELECT item or element with a popupfunction to evaluate, returns a reply or null
 
     //quit if no popup defined and not SELECT
-    var expression = element.getAttribute('exoduspopup')
+    var expression = element.getAttribute('exopopup')
     if (!expression && element.tagName != 'SELECT')
         return false
 
@@ -11336,7 +11336,7 @@ async function exoduspopup2(element) {
     }
 
     //if sole key field or the open function, setup a list of keys
-    if (reply && ((openrecord && element == openrecord) || (element.getAttribute('exodusfieldno') == 0 && gKeyNodes.length == 1))) {
+    if (reply && ((openrecord && element == openrecord) || (element.getAttribute('exofieldno') == 0 && gKeyNodes.length == 1))) {
         if (typeof reply == 'object') {
 
             if (reply.length > 1 && reply.length <= 50) {
@@ -11429,15 +11429,15 @@ async function getkey(mode) {
     var key = new Array(gKeyNodes.length)
     for (var ii = 0; ii < gKeyNodes.length; ii++) {
         var temp = getvalue(gKeyNodes[ii])
-        if (temp == '' && gKeyNodes[ii].getAttribute('exodusrequired') != false) {
+        if (temp == '' && gKeyNodes[ii].getAttribute('exorequired') != false) {
             //logout('getkey ""')
             return ''
         }
         if (mode != 'oconv') {
-            var conversion = gKeyNodes[ii].getAttribute('exodusconversion')
+            var conversion = gKeyNodes[ii].getAttribute('exoconversion')
             if (conversion.slice(0, 1) == '[') temp = exodusiconv(temp, conversion)
         }
-        key[gKeyNodes[ii].getAttribute('exoduskeypart') - 1] = temp
+        key[gKeyNodes[ii].getAttribute('exokeypart') - 1] = temp
     }
 
     var key
@@ -11466,8 +11466,8 @@ async function setkeyvalues(key) {
             key = String(key)
     }
     for (var ii = 0; ii < gKeyNodes.length; ii++) {
-        var temp = key.exodusfield('*', Number(gKeyNodes[ii].getAttribute('exoduskeypart')))
-        //var conversion=gKeyNodes[ii].getAttribute('exodusconversion')
+        var temp = key.exodusfield('*', Number(gKeyNodes[ii].getAttribute('exokeypart')))
+        //var conversion=gKeyNodes[ii].getAttribute('exoconversion')
         //if (conversion.slice(0,1)=='[') temp=temp.exodusoconv(conversion)
         //setvalue(gKeyNodes[ii],temp)
         await gds.setx(gKeyNodes[ii].id, '', temp)
@@ -11650,7 +11650,7 @@ function form_group_tag_col0(tablex, groupno) {
         return
     var col0class = form_group_col0_class(groupno)
     function tag(cell) {
-        if (!cell || cell.querySelector('[exodusname], [exodustype], input[name]'))
+        if (!cell || cell.querySelector('[exoname], [exotype], input[name]'))
             return
         if ((' ' + (cell.className || '') + ' ').indexOf(' exogroup_col0 ') >= 0)
             return
@@ -12172,28 +12172,38 @@ async function copyrecord_onclick() {
 
 function copydictitem(dictitem, element) {
 
+    // Dict attrs (validpropnames in db.js): write exo* only (no dual).
+    // groupno → exogroupno; exostyle → exostyle. Drop legacy name if HTM seed had it.
     for (var propertyname in dictitem) {
-        // Usual attr = "exodus"+property.
-        // Exceptions: groupno → exogroupno (table id exogroupN); exostyle → exostyle (not exodusexostyle).
-        var attr = propertyname == 'groupno' ? 'exogroupno'
+        if (typeof dictitem[propertyname] == 'undefined')
+            continue
+        var shortn = propertyname == 'groupno' ? 'exogroupno'
+            : (propertyname == 'exostyle' ? 'exostyle' : ('exo' + propertyname))
+        var legacyn = propertyname == 'groupno' ? 'exogroupno'
             : (propertyname == 'exostyle' ? 'exostyle' : ('exodus' + propertyname))
-        if (typeof element[attr] == 'undefined' && typeof dictitem[propertyname] != 'undefined') {
-            //element[attr]=dictitem[propertyname]
-            // setAttribute so row cloneNode keeps dict attrs (expandos are not cloned)
-            //store false as "" otherwise since attributes are stored as strings it becomes "false"
-            //which does not evaluate to false — still must setAttribute (was only in else).
-            var value = dictitem[propertyname]
-            // popup/link: false/null = suppress (no icon, no pad) — attribute must be absent.
-            // '' = pad request (hasAttribute + empty). non-empty = real F7/F6.
-            if ((propertyname == 'popup' || propertyname == 'link')
-                && (value === false || value === null)) {
-                element.removeAttribute(attr)
-                continue
-            }
-            if (value === false || value === null)
-                value = ''
-            element.setAttribute(attr, value)
+        // Skip if attr already an expando (HTML property collision).
+        if (typeof element[shortn] != 'undefined')
+            continue
+        if (legacyn != shortn && typeof element[legacyn] != 'undefined')
+            continue
+        // setAttribute so row cloneNode keeps dict attrs (expandos are not cloned)
+        // false → '' so attributes are not the string "false"
+        var value = dictitem[propertyname]
+        // popup/link: false/null = suppress (no icon, no pad) — attribute must be absent.
+        // '' = pad request (hasAttribute + empty). non-empty = real F7/F6.
+        if ((propertyname == 'popup' || propertyname == 'link')
+            && (value === false || value === null)) {
+            element.removeAttribute(shortn)
+            if (legacyn != shortn)
+                element.removeAttribute(legacyn)
+            continue
         }
+        if (value === false || value === null)
+            value = ''
+        element.setAttribute(shortn, value)
+        // no dual: drop legacy so DOM is not hybrid
+        if (legacyn != shortn)
+            element.removeAttribute(legacyn)
     }
 
     element.name = dictitem.name
@@ -12204,14 +12214,16 @@ function copydictitem(dictitem, element) {
 
     //key elements default to required
     //(no longer as the next seq key can be provided by the database)
-    //if (element.getAttribute('exodusfieldno')=='0'&&(typeof(element.getAttribute('exodusrequired'))=='undefined'||element.getAttribute('exodusrequired')=='false'))
+    //if (element.getAttribute('exofieldno')=='0'&&(typeof(element.getAttribute('exorequired'))=='undefined'||element.getAttribute('exorequired')=='false'))
     //{
-    // //element.setAttribute('exodusrequired','true')
-    // element.setAttribute('exodusrequired',true)
+    // //element.setAttribute('exorequired','true')
+    // element.setAttribute('exorequired',true)
     //}
 
-    if (!element.getAttribute('exodusrequired') || element.getAttribute('exodusrequired') == 'false')
-        element.setAttribute('exodusrequired', '')
+    if (!element.getAttribute('exorequired') || element.getAttribute('exorequired') == 'false') {
+        element.setAttribute('exorequired', '')
+        element.removeAttribute('exodusrequired') // HTM seed cleanup only
+    }
 
 }
 
@@ -12429,7 +12441,7 @@ async function document_onpaste(event) {
     }
 
     //prevent paste into readonly
-    var msg = element.getAttribute('exodusreadonly')
+    var msg = element.getAttribute('exoreadonly')
     if (msg) {
 		//Generic message for read-only fields
 		if (msg == 'true') {
@@ -12543,10 +12555,10 @@ function form_copypaste_getcols(event, pasting) {
     for (var fn = 0; fn < tablefieldns.length; ++fn) {
         var element = gfields[tablefieldns[fn]]
 	    //skip pasting values of non field type columns like symbolics
-        	if (pasting && Number(element.getAttribute('exodusfieldno')) == 0)
+        	if (pasting && Number(element.getAttribute('exofieldno')) == 0)
             	continue
         var elementtitle = element.id.exodusconvert('_', ' ')
-        var conversion = element.getAttribute('exodusconversion')
+        var conversion = element.getAttribute('exoconversion')
         var col = [element.id, elementtitle, conversion]
         cols.push(col)
     }
@@ -12740,14 +12752,14 @@ async function form_onpaste_generic_validatedata(data) {
         if (element0[0])
             element0 = element0[0]
 
-        col.conversion = element0.getAttribute('exodusconversion')
+        col.conversion = element0.getAttribute('exoconversion')
         if (!col.conversion)
-            col.conversion = element0.getAttribute('exoduscheckbox')
+            col.conversion = element0.getAttribute('exocheckbox')
         if (col.conversion && col.conversion.slice(0, 1) != '[')
             col.conversion = col.conversion.exodussplit(':;')
 
-        col.filename = element0.getAttribute('exodusfilename')
-        col.validation = element0.getAttribute('exodusvalidation')
+        col.filename = element0.getAttribute('exofilename')
+        col.validation = element0.getAttribute('exovalidation')
     }
 
     //parse line1 for column headings and find the datacoln for each screencoln

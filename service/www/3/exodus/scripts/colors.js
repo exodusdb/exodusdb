@@ -2183,7 +2183,7 @@ function colors_install_swatch(field) {
 	swatch.type = 'button'
 	swatch.id = field.id + '_swatch'
 	swatch.className = 'exodus-native-color'
-	swatch.title = (field.getAttribute('exodustitle') || field.id || 'Colour') + ' (F7)'
+	swatch.title = (field.getAttribute('exotitle') || field.id || 'Colour') + ' (F7)'
 	swatch.tabIndex = -1
 	swatch.setAttribute('tabindex', '-1')
 	swatch.setAttribute('aria-label', 'Colour swatch')
@@ -2221,7 +2221,7 @@ function colors_install_swatch(field) {
 				setgpreviouselement(field)
 			// Same entry as F7 when panel already open = toggle close
 			if (typeof exodus_pop_color == 'function')
-				await exodus_pop_color(!!field.getAttribute('exodusrequired'))
+				await exodus_pop_color(!!field.getAttribute('exorequired'))
 			else
 				colors_popup_show(field)
 		}, 'color swatch open')

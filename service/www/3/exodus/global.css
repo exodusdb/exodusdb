@@ -514,7 +514,7 @@ TABLE.exodusform TABLE.exotable th {
 }
 TABLE.exodusform.exodusform-wide td:has(> span[contenteditable]),
 TABLE.exodusform.exodusform-wide td:has(> span.clsReadOnly),
-TABLE.exodusform.exodusform-wide td:has(> span[exodusalign="T"]) {
+TABLE.exodusform.exodusform-wide td:has(> span[exoalign="T"]) {
     min-width: max-content;
 }
 
@@ -1210,7 +1210,7 @@ TABLE.exodusform SPAN.clsReadOnly:empty::before {
 .menubutton img,
 img[isexoduspopup="1"],
 img[isexoduslink="1"],
-img[exodustype="B"],
+img[exotype="B"],
 img[exodusonclick],
 img[id^="insertrowbutton"],
 img[id^="deleterowbutton"] {

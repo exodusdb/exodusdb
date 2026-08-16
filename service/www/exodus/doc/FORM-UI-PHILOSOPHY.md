@@ -139,7 +139,7 @@ element.style.overflowWrap = 'break-word';
 - Global overrides to “fix” one page’s width or borders
 - `width: 50%` on HTM expecting it to beat span `min-width` or `max-content` panes
 - `!important` on `min-width` without a column/`td` strategy
-- Assuming overflow/centering bugs before checking **`exoduslength × 7`** on flowing spans
+- Assuming overflow/centering bugs before checking **`exolength`** on flowing spans
 - Suppressing embedded-group `tr` borders globally instead of fixing the outer row / page CSS
 
 ---
