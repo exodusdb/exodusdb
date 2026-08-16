@@ -124,7 +124,7 @@ Then wide layout (separate) — full AIM/method: **[FORM-UI-WIDE-NARROW.md](./FO
 | `exomaxwidth` | `30ch` or absent |
 | display / width | block+100% (entry free-text) vs inline-block (display free-text) vs INPUT fixed px |
 | white-space | pre-wrap (fold) vs nowrap (code) |
-| chrome wrap | flex / inline-flex + F7/F6/pad |
+| field row | `.exofieldrow` = `.exofieldchrome` (F7/F6/pad only) + host |
 | wide host | cell may get `min-width: max-content` |
 
 **Important mismatch:** “display” is not one flag. It is roughly  
@@ -199,12 +199,20 @@ Grouped by **intent**; sub-rows = combinations that still behave differently.
 
 | Dict popup/link | DOM |
 |-----------------|-----|
-| non-empty | icon + wrap (flex if entry free-text F, else inline-flex) |
-| `''` | pad slot |
+| non-empty | `.exofieldrow` (`.exofieldrow-fill` if entry free-text F) = `.exofieldchrome` (icon) + host |
+| `''` | pad slot in the chrome strip |
 | false/null | attribute removed — no icon, no pad |
 | omit | nothing |
 
-Glue: type **S** after F7/F6 wrap moves into wrap unless `<br>`.
+Glue: type **S** after code row moves into `.exofieldrow` unless `<br>`.
+
+**Icon ↔ host is not field navigation.** Localised to F6/F7 **click** only:
+
+| Direction | What happens |
+|-----------|----------------|
+| **Click icon → host** | `form_field_from_chrome_icon`: `data-exo-host` = logical field name → same TR `exoid_*` or `$$`. Callers: `exoui_popup`, `exoui_link`. |
+| **Host → icon** | None. Icons are not focus stops. |
+| **Keyboard F6 / F7** | Focused **host** only. Icon DOM is not read. |
 
 ## 5. Combination matrix that actually drives **width**
 

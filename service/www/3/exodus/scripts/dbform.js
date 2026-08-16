@@ -276,24 +276,32 @@ function form_group_needs_nest_fill(groupno) {
 	return false
 }
 
-// Free-text F (exostyle text) fills the cell; codes / type S / INPUT hug.
-// Returns the field element (parent is the wrap). Call once per chrome install.
+// Field + F6/F7 layout:
+//   span.exofieldrow
+//     span.exofieldchrome   ← popup / link / pad ONLY
+//     host
+//     (optional glued type-S name)
+// Returns the host (parent is the row). Idempotent.
 function form_field_chrome_ensure_wrap(element, dictitem) {
+    if (element.parentNode && element.parentNode.classList
+        && element.parentNode.classList.contains('exofieldrow'))
+        return element
+
     var wrapFill = element.tagName == 'SPAN'
         && element.getAttribute('exotype') == 'F'
         && form_field_exostyle(dictitem, element) === 'text'
-    var wrap = document.createElement('span')
-    wrap.className = 'exofieldchrome'
-    wrap.style.display = wrapFill ? 'flex' : 'inline-flex'
-    if (wrapFill) {
-        wrap.style.width = '100%'
-        wrap.style.maxWidth = '100%'
-    }
-    wrap.style.alignItems = 'flex-start'
-    // valign: CSS .exodata > * (wrap is direct child of leaf data cell)
-    // replaceChild returns the field; re-parent into wrap
-    element = element.parentNode.replaceChild(wrap, element)
-    wrap.insertBefore(element, null)
+
+    var row = document.createElement('span')
+    row.className = wrapFill ? 'exofieldrow exofieldrow-fill' : 'exofieldrow'
+
+    var chrome = document.createElement('span')
+    chrome.className = 'exofieldchrome'
+
+    // replaceChild returns the field; re-parent into row after chrome strip
+    element = element.parentNode.replaceChild(row, element)
+    row.appendChild(chrome)
+    row.appendChild(element)
+
     if (wrapFill) {
         element.style.flex = '1 1 auto'
         element.style.width = 'auto'
@@ -304,9 +312,22 @@ function form_field_chrome_ensure_wrap(element, dictitem) {
     return element
 }
 
-// Empty F7/F6 slot. Inserted immediately before insertBeforeEl (icon or field).
-// Vertical align: chrome is flex (align-items: flex-start); no per-pad valign.
-function form_field_chrome_pad(insertBeforeEl, widthCss) {
+// Icon strip for a host already in .exofieldrow (first child .exofieldchrome).
+function form_field_chrome_strip(element) {
+    var row = element && element.parentNode
+    if (!row || !row.classList || !row.classList.contains('exofieldrow'))
+        return null
+    var chrome = row.firstChild
+    if (chrome && chrome.classList && chrome.classList.contains('exofieldchrome'))
+        return chrome
+    return null
+}
+
+// Empty F7/F6 slot: append to host's chrome strip (after form_field_chrome_ensure_wrap).
+function form_field_chrome_pad(hostEl, widthCss) {
+    var strip = form_field_chrome_strip(hostEl)
+    if (!strip)
+        return null
     var pad = document.createElement('span')
     pad.className = 'exofieldchrome-pad'
     pad.setAttribute('aria-hidden', 'true')
@@ -314,14 +335,33 @@ function form_field_chrome_pad(insertBeforeEl, widthCss) {
     pad.style.flexShrink = '0'
     pad.style.width = widthCss
     pad.style.height = 'var(--exoui-icon-size)'
-    insertBeforeEl.parentNode.insertBefore(pad, insertBeforeEl)
+    strip.appendChild(pad)
     return pad
 }
 
-// Type S name after a code with F7/F6: move into the prior chrome wrap so they
-// stay on one line (narrow columns / normal fold). Skip if a <br> or other
-// real content is between them (deliberate stack, e.g. Brand + <br> + name).
-// Does not invent pads or change free-text fill wraps.
+// Icons sit in .exofieldchrome, not beside the host — resolve by field name + same TR (clone-safe).
+function form_field_from_chrome_icon(iconEl) {
+    if (!iconEl || !iconEl.getAttribute)
+        return null
+    var hostId = iconEl.getAttribute('data-exo-host')
+    if (!hostId)
+        return null
+    var tr = getancestor(iconEl, 'TR')
+    if (tr) {
+        var inRow = tr.getElementsByClassName('exoid_' + hostId)
+        if (inRow && inRow.length)
+            return inRow[0]
+    }
+    var host = $$(hostId)
+    if (!host)
+        return null
+    if (host.tagName)
+        return host
+    return host[0] || null
+}
+
+// Type S name after a code with F7/F6: append to prior .exofieldrow (host line).
+// Skip if a <br> or other real content is between them (e.g. Brand + <br> + name).
 function form_glue_name_to_prev_code_chrome(nameEl) {
     if (!nameEl || !nameEl.parentNode)
         return
@@ -339,11 +379,12 @@ function form_glue_name_to_prev_code_chrome(nameEl) {
         return
     if (nameEl.parentNode === prev)
         return
-    // Prior sibling is F7/F6 chrome wrap (icons and/or pad slots)
-    if (!prev.querySelector
-        || !prev.querySelector('[isexopopup="1"], [isexolink="1"], .exofieldchrome-pad'))
+    // Prior sibling is field row (chrome strip + host)
+    if (!prev.classList || !prev.classList.contains('exofieldrow'))
         return
-    // Keep name on the flex line; allow shrink when the cell is tight
+    if (!prev.querySelector
+        || !prev.querySelector('.exofieldchrome [isexopopup], .exofieldchrome [isexolink], .exofieldchrome-pad'))
+        return
     if (nameEl.style.display === 'block')
         nameEl.style.display = ''
     nameEl.style.flexShrink = '1'
@@ -1415,60 +1456,57 @@ async function formfunctions_onload() {
             ) {
                 if (popupExpr || freeSelectPopup) {
                     //conversion is a routine eg [await exofilepopup(filename,cols,coln,sortselect] [popup.clients]
-                    // valign: wrap under .exodata → CSS .exodata > *; chrome flex-start for icon+host.
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealPopup = true
 
                     var element2 = exo_create_icon_element(
                         fieldname.indexOf('DATE') >= 0 ? gcalendarimage : gfindimage
                     )
-                    element2.id = element.id + '_popup'
-                    element.parentNode.insertBefore(element2, element)
+                    element2.id = fieldname + '_popup'
+                    element2.setAttribute('data-exo-host', fieldname)
                     element2.style.flexShrink = '0'
-                    // di.link='' → pad F6 slot (icon width only; no fake cell-pad gap)
+                    var strip = form_field_chrome_strip(element)
+                    if (strip)
+                        strip.appendChild(element2)
+                    // di.link='' → pad F6 slot (icon width only)
                     if (padLink)
                         form_field_chrome_pad(element, 'var(--exoui-icon-size)')
 
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exotitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exotitle')
                     element2.title += ' (F7)'
                     element2.style.cursor = 'pointer'
-
-                    //addeventlistener(element2,'click','exoui_popup')
                     element2.setAttribute('isexopopup', '1')
-
                 }
             }
 
-            //add button before element for link (or after if right justified)
+            // F6 link icon in chrome strip (before host)
             if (linkExpr) {
                 if (typeof element.getAttribute('exolink') != 'string') {
                     systemerror('formfunction_onload', exoquote(fieldname) + ' link must be a string')
                 }
                 else {
                     //conversion is a routine eg [await exofilepopup(filename,cols,coln,sortselect] [popup.clients]
-                    // valign: .exodata > * + chrome flex-start (same as F7 block above).
                     element = form_field_chrome_ensure_wrap(element, dictitem)
                     installedRealLink = true
 
                     var element2 = exo_create_icon_element(glinkimage)
-                    element.parentNode.insertBefore(element2, element)
+                    element2.setAttribute('data-exo-host', fieldname)
                     element2.style.flexShrink = '0'
                     // di.popup='' → pad F7 slot before link (e.g. DATELIST)
                     if (padPopup)
-                        form_field_chrome_pad(element2, 'var(--exoui-icon-size)')
+                        form_field_chrome_pad(element, 'var(--exoui-icon-size)')
+                    var strip = form_field_chrome_strip(element)
+                    if (strip)
+                        strip.appendChild(element2)
 
                     element2.title = 'Open this ' + element.getAttribute('exotitle') + ' (F6)'
                     element2.style.cursor = 'pointer'
-
-                    //addeventlistener(element2,'click','exoui_link')
                     element2.setAttribute('isexolink', '1')
-
                 }
             }
 
             // Pad-only (di.popup='' and/or di.link='' with no real F7/F6):
-            //   Empty slots = icon width only (no cell-pad gap; icons look after themselves).
-            //   Skip if real F7/F6 already installed (e.g. free SELECT F7 + padLink).
+            //   Empty slots = icon width only. Skip if real F7/F6 already installed.
             if ((padPopup || padLink) && !installedRealPopup && !installedRealLink) {
                 element = form_field_chrome_ensure_wrap(element, dictitem)
                 var iconW = 'var(--exoui-icon-size)'
@@ -1489,7 +1527,7 @@ async function formfunctions_onload() {
             //NB the name appears to be lost on databinding table rows
             element.id = fieldname
 
-            // Type S display next to a code with F7/F6: glue into prior chrome wrap
+            // Type S name after code with F7/F6: glue into prior .exofieldrow
             // unless a <br> (or other real content) deliberately separates them.
             // e.g. MARKET_CODE + MARKET_NAME; Brand uses <br> so stays stacked.
             if (element.tagName == 'SPAN' && element.getAttribute('exotype') == 'S')
@@ -11047,20 +11085,11 @@ async function exoui_link(event, element) {
 
     exocancelevent(event)
 
-    //search next then previous siblings for popup
-    //if (element.type!='text') element=element.previousSibling
-    //if (element.type!='text') element=element.previousSibling
+    // Keyboard: focused host. Click: icon has data-exo-host.
     if (!element)
         element = event.target
-    while (element && element.getAttribute && !element.getAttribute('exolink')) {
-        element = element.nextSibling
-    }
-    if (!element || !element.getAttribute || !element.getAttribute('exolink')) {
-        var element = event.target
-        while (element && (!element.getAttribute || !element.getAttribute('exolink'))) {
-            element = element.previousSibling
-        }
-    }
+    if (!element.getAttribute || !element.getAttribute('exolink'))
+        element = form_field_from_chrome_icon(element)
 
     //quit if no link defined
     if (!element || !element.getAttribute('exolink'))
@@ -11114,22 +11143,12 @@ async function exoui_popup(event, element) {
 
     exocancelevent(event)
 
-    //search current and following siblings for popup
+    // Keyboard: focused host/SELECT. Click: icon has data-exo-host.
     if (!element) {
         element = event.target
-        while (element
-            && (!element.getAttribute || !element.getAttribute('exopopup'))
-            && element.tagName != 'SELECT') {
-            element = element.nextSibling
-        }
-        if (!element) {
-            var elements = event.target.parentNode.getElementsByTagName('*')
-            for (var elementn = 0; elementn < elements.length; ++elementn) {
-                element = elements[elementn]
-                if (element.getAttribute && element.getAttribute('exopopup'))
-                    break
-            }
-        }
+        if ((!element.getAttribute || !element.getAttribute('exopopup'))
+            && element.tagName != 'SELECT')
+            element = form_field_from_chrome_icon(element)
     }
 
     //quit if no element

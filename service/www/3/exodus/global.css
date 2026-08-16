@@ -988,7 +988,7 @@ TABLE.exoform .clsReadOnly {
 /*
  * Leaf data cell (.exodata — same mark as body bg): all element children share top.
  * td/th vertical-align only places the cell in the row, not siblings inside it.
- * Text nodes are not elements; .exofieldchrome uses flex-start for icons+hosts.
+ * Text nodes are not elements; .exofieldrow uses flex-start for chrome+host.
  * Nested tables count as one child unit. Radio option labels keep inline middle.
  */
 TABLE.exoform td.exodata > *,
@@ -1230,7 +1230,23 @@ img[id^="deleterowbutton"] {
     width: var(--exoui-icon-size);
     cursor: pointer;
 }
-/* F7/F6 icons: no extra margin on the field — cell pad is enough; icons sit flush. */
+/* Field row: chrome strip (popup|link|pad only) + host (+ optional glued name) */
+.exofieldrow {
+    display: inline-flex;
+    align-items: flex-start;
+}
+.exofieldrow-fill {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+}
+/* Icons only — trailing air = cell left pad (icon took the border pad) */
+.exofieldchrome {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: flex-start;
+    margin-inline-end: var(--exoform-cell-padding-x);
+}
 /* Column sort chevrons after title text — tight to label (margin, not glyph pad). */
 :is(.exoicon, img)[id^="sortbutton_"] {
     margin-left: 0.15em;
