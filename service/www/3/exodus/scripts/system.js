@@ -160,7 +160,7 @@ async function system_getdepartments(deptoptions) {
 
     var security = []
     if (!(await security.exoread('DEFINITIONS', 'SECURITY*USERS')))
-        return await exoui_invalid(security.exodusresponse)
+        return await exoui_invalid(security.exoresponse)
     security = exo_splitarray(security, [[[1, 9]], [[10, 11]]])
     gdepts = [[], [], []]
     var nusers = security[1].length

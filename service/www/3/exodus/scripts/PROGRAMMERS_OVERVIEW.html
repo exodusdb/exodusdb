@@ -92,7 +92,7 @@
     <li><strong>Public commencement API (only three):</strong> <code>exo_begin</code> (business), <code>exo_begin_if_idle</code> (background), <code>exo_begin_waitcancel</code> (Wait/Cancel). <code>startAsyncFlow</code> is a deprecated alias of <code>exo_begin</code>.</li>
     <li><strong>Flight log:</strong> Quiet by default. Enable with <code>?logflights=1</code> or <code>glogflights=true</code>.</li>
     <li><strong>No generators:</strong> <code>function*</code> / <code>yield*</code> are not supported — use <code>async</code>/<code>await</code> only (stage 6).</li>
-    <li><strong>UI conventions:</strong> Modal dialogs, <code>class="exodusform"</code> tables, input <code>id</code>s matching dictionary codes, heavy use of <code>gparameters</code>.</li>
+    <li><strong>UI conventions:</strong> Modal dialogs, <code>class="exoform"</code> tables, input <code>id</code>s matching dictionary codes, heavy use of <code>gparameters</code>.</li>
     <li><strong>Data delimiters:</strong> <code>rm</code>, <code>fm</code>, <code>vm</code>, <code>sm</code>, <code>tm</code>, <code>stm</code> (and their regex versions).</li>
     <li><strong>Security model:</strong> PHP sessions (the real auth) + namespaced tokens. <code>exoui_security('TASK')</code>. Once a valid session exists, the web layer trusts it.</li>
     <li><strong>Globals:</strong> <code>gusername</code>, <code>gdataset</code>, <code>gparameters</code>, <code>greadonlymode</code>, many others set from cookies or passed in.</li>

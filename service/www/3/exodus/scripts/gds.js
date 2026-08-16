@@ -666,12 +666,12 @@ function gds_addrow(groupno, newdatarow) {
 function setupnewrow(newrow) {
 
     //faster than using the .all collection? TR.all is not available in ff3
-    newrow.exodusfields = []
+    newrow.exofields = []
     var elements = newrow.getElementsByTagName('*')
     for (var ii = 0; ii < elements.length; ii++) {
         var id = elements[ii].id
         if (id)
-            newrow.exodusfields[id] = elements[ii]
+            newrow.exofields[id] = elements[ii]
     }
 
 }
@@ -740,7 +740,7 @@ function gds_blankrowx(datarow, formrow, initdata) {
     if (!formrow)
         return
 
-    if (!formrow.exodusfields)
+    if (!formrow.exofields)
         setupnewrow(formrow)
 
     //blank all the columns found in the data and form rows
@@ -758,7 +758,7 @@ function gds_blankrowx(datarow, formrow, initdata) {
         try {
             var element = null
             //element=formrow.all[propname]
-            element = formrow.exodusfields[propname]
+            element = formrow.exofields[propname]
 
             if (initdata) {
                 datarow[propname].element = element
@@ -1019,10 +1019,10 @@ async function gds_bind(datasource, elements, rownx) {
             //alert('rows:'+rows)
             //alert('rown:'+rown)
             //alert('rownx:'+rowx)
-            //alert('rowx.exodusfields:'+rowx.exodusfields)
+            //alert('rowx.exofields:'+rowx.exofields)
             //call bind data recursively to the new row
             //async function gds_bind(datasource,elements,rownx)
-            /**/ await this.bind(rows[rown], rowx.exodusfields, rown)
+            /**/ await this.bind(rows[rown], rowx.exofields, rown)
             //alert('bound:'+rown)
             //gtimers.stop(3)
 

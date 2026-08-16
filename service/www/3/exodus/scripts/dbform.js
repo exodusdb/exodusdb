@@ -48,7 +48,7 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // di.length for SPAN paint:
 //   text   — wide mode ONLY: empty → attribute exomaxwidth="30ch" (client applies
-//            style.maxWidth when .exodusform-wide) unless HTM already set exomaxwidth.
+//            style.maxWidth when .exoform-wide) unless HTM already set exomaxwidth.
 //            length set → no soft max. NOT a min-width. Narrow forms: style.maxWidth
 //            must stay 100% so free-text folds under form soft ceiling — NEVER lock to 30ch.
 //   code / number — unused (floor 6ch either way).
@@ -283,7 +283,7 @@ function form_field_chrome_ensure_wrap(element, dictitem) {
         && element.getAttribute('exotype') == 'F'
         && form_field_exostyle(dictitem, element) === 'text'
     var wrap = document.createElement('span')
-    wrap.className = 'exodus-fieldchrome'
+    wrap.className = 'exofieldchrome'
     wrap.style.display = wrapFill ? 'flex' : 'inline-flex'
     if (wrapFill) {
         wrap.style.width = '100%'
@@ -308,12 +308,12 @@ function form_field_chrome_ensure_wrap(element, dictitem) {
 // Vertical align: chrome is flex (align-items: flex-start); no per-pad valign.
 function form_field_chrome_pad(insertBeforeEl, widthCss) {
     var pad = document.createElement('span')
-    pad.className = 'exodus-fieldchrome-pad'
+    pad.className = 'exofieldchrome-pad'
     pad.setAttribute('aria-hidden', 'true')
     pad.style.display = 'inline-block'
     pad.style.flexShrink = '0'
     pad.style.width = widthCss
-    pad.style.height = 'var(--exodus-ui-icon-size)'
+    pad.style.height = 'var(--exoui-icon-size)'
     insertBeforeEl.parentNode.insertBefore(pad, insertBeforeEl)
     return pad
 }
@@ -341,7 +341,7 @@ function form_glue_name_to_prev_code_chrome(nameEl) {
         return
     // Prior sibling is F7/F6 chrome wrap (icons and/or pad slots)
     if (!prev.querySelector
-        || !prev.querySelector('[isexoduspopup="1"], [isexoduslink="1"], .exodus-fieldchrome-pad'))
+        || !prev.querySelector('[isexoduspopup="1"], [isexoduslink="1"], .exofieldchrome-pad'))
         return
     // Keep name on the flex line; allow shrink when the cell is tight
     if (nameEl.style.display === 'block')
@@ -352,10 +352,10 @@ function form_glue_name_to_prev_code_chrome(nameEl) {
 }
 
 // Global icons: monochrome {mask,color} via CSS tokens, or painted URL for New/Open/Edit/Delete.
-// (exo_icon_spec / colours: client.js + --exodus-icon-* in global.css)
+// (exo_icon_spec / colours: client.js + --exoicon-* in global.css)
 gnewimage = gimagetheme + 'record-new_lm.svg' // painted multicolour — excluded from mask tint
 gopenimage = gimagetheme + 'record-open_lm.svg' // painted page + magnifier
-// F7/F6 field chrome: same grey as body text (--exodus-icon-neutral)
+// F7/F6 field chrome: same grey as body text (--exoicon-neutral)
 gfindimage = exo_icon_spec('field-find.svg', 'neutral')
 gcalendarimage = exo_icon_spec('field-date.svg', 'neutral')
 gsaveimage = exo_icon_spec('record-save.svg', 'green')
@@ -716,7 +716,7 @@ function render_formbuttons() {
     while (clone.firstChild)
         face.appendChild(clone.firstChild)
 
-    face.classList.toggle('exodusformactions', source.classList.contains('exodusformactions'))
+    face.classList.toggle('exoformactions', source.classList.contains('exoformactions'))
     face.classList.toggle('exo_formbuttons_relocated', source.classList.contains('exo_formbuttons_relocated'))
 }
 
@@ -1148,15 +1148,15 @@ async function formfunctions_onload() {
 
             }
 
-            var exodusdropdown = element.getAttribute('exodropdown')
-            if (exodusdropdown) {
+            var exodropdown = element.getAttribute('exodropdown')
+            if (exodropdown) {
 
-                exoassertobject(element, 'formfunctions_onload', 'element (exodusdropdown)')
-                if (typeof exodusdropdown == 'string')
-                    exodusdropdown = exodusdropdown.split(fm)
-                var request = exodusdropdown[0]
-                var colarray = exodusdropdown[1]
-                var noautoselection = exodusdropdown[2]
+                exoassertobject(element, 'formfunctions_onload', 'element (exodropdown)')
+                if (typeof exodropdown == 'string')
+                    exodropdown = exodropdown.split(fm)
+                var request = exodropdown[0]
+                var colarray = exodropdown[1]
+                var noautoselection = exodropdown[2]
 
                 //convert element to a SELECT
                 //var temp=document.createElement('select '+element.outerHTML.slice(7)
@@ -1186,25 +1186,25 @@ async function formfunctions_onload() {
             //convert by conversion attribute
             if (element.getAttribute('exoconversion')) {
 
-                var exodusconversion = element.getAttribute('exoconversion')
+                var exoconversion = element.getAttribute('exoconversion')
 
                 //conversion is a routine eg [NUMBER] [DATE]
                 if (
-                    typeof exodusconversion == 'string'
+                    typeof exoconversion == 'string'
                     &&
-                    exodusconversion.slice(0, 1) == '['
+                    exoconversion.slice(0, 1) == '['
                 ) {
                     //do nothing
                 }
 
                 // magic "color": keep bound text INPUT; swatch chrome installed later
                 else if (
-                    typeof exodusconversion == 'string'
+                    typeof exoconversion == 'string'
                     &&
-                    exodusconversion.toLowerCase() == 'color'
+                    exoconversion.toLowerCase() == 'color'
                 ) {
                     // mark only — colors_install_swatch after popup icon so wrap order is sane
-                    element.setAttribute('data-exodus-color-pending', '1')
+                    element.setAttribute('data-exo-color-pending', '1')
                 }
 
                 //conversion is an array of options → SELECT
@@ -1334,7 +1334,7 @@ async function formfunctions_onload() {
                 && fieldStyle === 'text') {
                 // Free-text fold (narrow default): fill cell, pre-wrap, maxWidth 100%.
                 // Attribute exomaxwidth="30ch" is a WIDE-MODE soft max only — applied by
-                // form_table_apply_freetext_wide_max when .exodusform-wide. Do NOT set
+                // form_table_apply_freetext_wide_max when .exoform-wide. Do NOT set
                 // style.maxWidth to 30ch here (would lock typing to ~30 chars always).
                 var freeLen = parseInt(element.getAttribute('exolength'), 10)
                 if (!(freeLen > 0))
@@ -1427,7 +1427,7 @@ async function formfunctions_onload() {
                     element2.style.flexShrink = '0'
                     // di.link='' → pad F6 slot (icon width only; no fake cell-pad gap)
                     if (padLink)
-                        form_field_chrome_pad(element, 'var(--exodus-ui-icon-size)')
+                        form_field_chrome_pad(element, 'var(--exoui-icon-size)')
 
                     element2.title = 'Find a' + ('aeioAEIO'.indexOf(element.getAttribute('exotitle').slice(0, 1)) != -1 ? 'n' : '') + ' ' + element.getAttribute('exotitle')
                     element2.title += ' (F7)'
@@ -1455,7 +1455,7 @@ async function formfunctions_onload() {
                     element2.style.flexShrink = '0'
                     // di.popup='' → pad F7 slot before link (e.g. DATELIST)
                     if (padPopup)
-                        form_field_chrome_pad(element2, 'var(--exodus-ui-icon-size)')
+                        form_field_chrome_pad(element2, 'var(--exoui-icon-size)')
 
                     element2.title = 'Open this ' + element.getAttribute('exotitle') + ' (F6)'
                     element2.style.cursor = 'pointer'
@@ -1471,7 +1471,7 @@ async function formfunctions_onload() {
             //   Skip if real F7/F6 already installed (e.g. free SELECT F7 + padLink).
             if ((padPopup || padLink) && !installedRealPopup && !installedRealLink) {
                 element = form_field_chrome_ensure_wrap(element, dictitem)
-                var iconW = 'var(--exodus-ui-icon-size)'
+                var iconW = 'var(--exoui-icon-size)'
                 if (padPopup)
                     form_field_chrome_pad(element, iconW)
                 if (padLink)
@@ -1496,8 +1496,8 @@ async function formfunctions_onload() {
                 form_glue_name_to_prev_code_chrome(element)
 
             // conversion "color": text + swatch after id is set (swatch id = field_swatch)
-            if (element.getAttribute('data-exodus-color-pending') == '1') {
-                element.removeAttribute('data-exodus-color-pending')
+            if (element.getAttribute('data-exo-color-pending') == '1') {
+                element.removeAttribute('data-exo-color-pending')
                 if (typeof colors_install_swatch == 'function')
                     colors_install_swatch(element)
             }
@@ -1627,9 +1627,9 @@ async function formfunctions_onload() {
                         element.style.maxWidth = '100%'
                         element.style.boxSizing = 'border-box'
                         element.style.minWidth = taLen > 0 ? (taLen + 'ch') : '6ch'
-                        var exodusrows = element.getAttribute('exorows')
-                        if (exodusrows && exodusrows > 1)
-                            element.rows = exodusrows
+                        var exorows = element.getAttribute('exorows')
+                        if (exorows && exorows > 1)
+                            element.rows = exorows
                     }
                 }
                 if (element.getAttribute('exomaxlength'))
@@ -1781,7 +1781,7 @@ async function formfunctions_onload() {
             var datacell = getancestor(element, ' TD TH ')
             if (datacell) {
                 var dcn = ' ' + (datacell.className || '') + ' '
-                if (dcn.indexOf(' exodusembeddedtable ') < 0 && dcn.indexOf(' exodata ') < 0)
+                if (dcn.indexOf(' exoembeddedtable ') < 0 && dcn.indexOf(' exodata ') < 0)
                     datacell.className += (datacell.className ? ' ' : '') + 'exodata'
             }
 
@@ -1946,10 +1946,10 @@ async function formfunctions_onload() {
                     datasrcelements[datasrcelements.length] = tablex
                     tablex.setAttribute('exo_dependents', '')
 
-                    // Embedded group table inside an outer exodusform cell — drop host row/cell inline borders
+                    // Embedded group table inside an outer exoform cell — drop host row/cell inline borders
                     var hostcell = tablex.parentNode
                     if (hostcell && hostcell.tagName == 'TD') {
-                        hostcell.className += (hostcell.className ? ' ' : '') + 'exodusembeddedtable'
+                        hostcell.className += (hostcell.className ? ' ' : '') + 'exoembeddedtable'
                         hostcell.style.removeProperty('border')
                         var hostrow = hostcell.parentNode
                         if (hostrow && hostrow.tagName == 'TR') {
@@ -1967,7 +1967,7 @@ async function formfunctions_onload() {
                     if (element.getAttribute('exonodeleterow'))
                         tablex.setAttribute('nodeleterow', 'nodeleterow')
 
-                    //      if (!tablex.className) tablex.className='exodusform'
+                    //      if (!tablex.className) tablex.className='exoform'
                     //      tablex.border=1
 
                     //capture all double clicks for potential filtering
@@ -2043,7 +2043,7 @@ async function formfunctions_onload() {
                     if (nestfill)
                         pgupdownbuttons.width = '1%'
                     var t = ''
-                    t += '<button id=exogroup' + groupno + 'showall class=exodusbutton'
+                    t += '<button id=exogroup' + groupno + 'showall class=exobutton'
                     t += ' style=display:none exo_onclick="await form_filter(\'unfilter\',' + groupno + ')"'
                     t += '>Show All</button>'
 
@@ -2259,7 +2259,7 @@ async function formfunctions_onload() {
         if (typeof adjust_bodymargin == 'function')
             adjust_bodymargin()
     } else {
-        formbuttons.className = 'exodusformactions'
+        formbuttons.className = 'exoformactions'
         document.body.insertBefore(formbuttons, null)
     }
 
@@ -2555,7 +2555,7 @@ async function formfunctions_onload() {
 // activate and the UA may still run accesskey / focus chrome.
 //
 // Fix: (1) register into gformdigitaccesskeys, (2) move accesskey →
-// data-exodus-accesskey so the UA no longer owns the key, (3) native capture
+// data-exo-accesskey so the UA no longer owns the key, (3) native capture
 // keydown (outside Gate A) preventDefaults and activates via Gate A.
 // Tooltips are not parsed. Letter shortcuts stay on the Alt+letter handlers.
 
@@ -2613,12 +2613,12 @@ function form_accesskey_prefer(existing, candidate) {
     return false
 }
 
-// Read digit from accesskey or from data-exodus-accesskey after we disarm the UA.
+// Read digit from accesskey or from data-exo-accesskey after we disarm the UA.
 function form_accesskey_digit_attr(element) {
 
     if (!element || !element.getAttribute)
         return ''
-    var raw = element.getAttribute('data-exodus-accesskey')
+    var raw = element.getAttribute('data-exo-accesskey')
     if (raw == null || raw === '')
         raw = element.getAttribute('accesskey')
     if (raw == null)
@@ -2630,13 +2630,13 @@ function form_accesskey_digit_attr(element) {
 }
 
 // Build gformdigitaccesskeys from digit accesskeys in the document.
-// Disarm native accesskey (→ data-exodus-accesskey) so only our handler fires.
+// Disarm native accesskey (→ data-exo-accesskey) so only our handler fires.
 // Call after form DOM is ready and after form_add_action_button.
 function form_register_accesskeys() {
 
     var map = Object.create(null)
     // Include already-disarmed controls from a prior register pass
-    var nodes = document.querySelectorAll('[accesskey], [data-exodus-accesskey]')
+    var nodes = document.querySelectorAll('[accesskey], [data-exo-accesskey]')
 
     for (var i = 0; i < nodes.length; i++) {
         var el = nodes[i]
@@ -2662,7 +2662,7 @@ function form_register_accesskeys() {
             continue
         // Always store canonical digit; remove HTML accesskey so browser native
         // accesskey path cannot also run when content handles the key.
-        el2.setAttribute('data-exodus-accesskey', dig)
+        el2.setAttribute('data-exo-accesskey', dig)
         if (el2.getAttribute('accesskey') != null)
             el2.removeAttribute('accesskey')
     }
@@ -2728,9 +2728,9 @@ function form_lookup_digit_accesskey_element(event) {
         && form_accesskey_action_target(preferred))
         return preferred
 
-    // Scan all controls sharing this digit (data-exodus-accesskey after disarm)
+    // Scan all controls sharing this digit (data-exo-accesskey after disarm)
     var nodes = document.querySelectorAll(
-        '[data-exodus-accesskey="' + digit + '"], [accesskey="' + digit + '"]'
+        '[data-exo-accesskey="' + digit + '"], [accesskey="' + digit + '"]'
     )
     for (var i = 0; i < nodes.length; i++) {
         var el = nodes[i]
@@ -3707,7 +3707,7 @@ async function document_onkeydown2(event) {
         return exocancelevent(event)
     }
 
-    // Alt+Up/Down pan always; Alt+Left/Right only when .exodusform-wide (else history).
+    // Alt+Up/Down pan always; Alt+Left/Right only when .exoform-wide (else history).
 
     //close (F8)
     if (keycode == 119) {
@@ -4193,7 +4193,7 @@ async function document_onkeydown2(event) {
         }
         // forwards from first / backwards from last — same col if enabled+visible
         for (var ii = startrown; ii >= 0 && ii < grows.length; ii += increment) {
-            var cellelement = grows[ii].exodusfields && grows[ii].exodusfields[id]
+            var cellelement = grows[ii].exofields && grows[ii].exofields[id]
             if (cellelement && exoenabledandvisible(cellelement)) {
                 focuson(cellelement)
                 break
@@ -4247,7 +4247,7 @@ async function document_onkeydown2(event) {
 
             //on last column - add a row
             //exo_firstinputcolscreenfn
-            var firstcolelement = rowx.exodusfields[gfields[gtables[ggroupno][0]].id]
+            var firstcolelement = rowx.exofields[gfields[gtables[ggroupno][0]].id]
             if ((glocked || !gKeyNodes)
                 //&& element.getAttribute('exo_screenfn') == tablex.getAttribute('exo_lastinputcolscreenfn')
                 && element.getAttribute('exo_screenfn') == tablex_lastinputcolscreenfn
@@ -4497,17 +4497,17 @@ async function document_onkeydown2(event) {
             //ctrl+pgdn sadly not supported since reserved by firefox to change tabs
             if (rown < nrows - 1) {
                 if (keycode == 40) {
-                    if (!grows[rown + 1].exodusfields[id]) {
-                        systemerror('await document_onkeydown()', 'Cannot locate id ' + id + ' in rown: ' + rown + ' nrows:' + grows.length + ' tagname:' + grows[rown + 1].exodusfields[id])
+                    if (!grows[rown + 1].exofields[id]) {
+                        systemerror('await document_onkeydown()', 'Cannot locate id ' + id + ' in rown: ' + rown + ' nrows:' + grows.length + ' tagname:' + grows[rown + 1].exofields[id])
                         return false
                     }
-                    focuson(grows[rown + 1].exodusfields[id])
+                    focuson(grows[rown + 1].exofields[id])
                 }
                 else {
                     var newrown = grecn + gpagenrows
                     if (newrown > (nrows - 1))
                         newrown = nrows - 1
-                    focuson(grows[newrown].exodusfields[id])
+                    focuson(grows[newrown].exofields[id])
                 }
             }
 
@@ -4516,7 +4516,7 @@ async function document_onkeydown2(event) {
 
                 if (pagen < npages - 1) {
                     //tablex.nextPage()
-                    focuson(grows[0].exodusfields[id])
+                    focuson(grows[0].exofields[id])
                 }
             }
 
@@ -4529,7 +4529,7 @@ async function document_onkeydown2(event) {
             //goes to first line of first page
             if (event.ctrlKey) {
                 //tablex.firstPage()
-                focuson(grows[0].exodusfields[id])
+                focuson(grows[0].exofields[id])
             }
             else {
 
@@ -4541,16 +4541,16 @@ async function document_onkeydown2(event) {
                         while (newrown > 0 && !exoenabledandvisible(grows[newrown])) {
                             newrown--
                         }
-                        focuson(grows[newrown].exodusfields[id])
+                        focuson(grows[newrown].exofields[id])
                     }
                     //page up
                     else {
                         var newrown = grecn - gpagenrows
                         if (newrown < 0)
                             newrown = 0
-                        //focuson(grows[newrown].exodusfields[id])
+                        //focuson(grows[newrown].exofields[id])
                         if (document.getElementsByClassName)
-                            focuson(grows[newrown].exodusfields[id])
+                            focuson(grows[newrown].exofields[id])
                         else
                             focuson(grows[newrown].all[id])
                     }
@@ -4564,7 +4564,7 @@ async function document_onkeydown2(event) {
                     }
                     else {
                         //tablex.previousPage()
-                        focuson(grows[nrows - 1].exodusfields[id])
+                        focuson(grows[nrows - 1].exofields[id])
                     }
                 }
             }
@@ -4584,7 +4584,7 @@ async function document_onkeydown2(event) {
     //Ctrl+I or Ctrl+Insert is insert row, but only in rows.
     //with or without shift
     if (event.ctrlKey && (keycode == 73 || keycode == 45) && rowx) {
-        var button = rowx.exodusfields['insertrowbutton' + ggroupno]
+        var button = rowx.exofields['insertrowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
             exocancelevent(event)
             await form_insertrow(event)
@@ -4595,7 +4595,7 @@ async function document_onkeydown2(event) {
     //Ctrl+D or Ctrl+Delete is delete row, but only in rows.
     //with or without shift
     if (event.ctrlKey && (keycode == 68 || keycode == 46) && rowx) {
-        var button = rowx.exodusfields['deleterowbutton' + ggroupno]
+        var button = rowx.exofields['deleterowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
             exocancelevent(event)
             await form_deleterow(event, event.target)
@@ -4937,8 +4937,8 @@ function focusdirection(direction, element, notgroupno, scopex) {
                         var tablex_firstinputcolscreenfn = form_getfirstinputcolscreenfn(tablex)
                         var firstinputcolid = gfields[tablex_firstinputcolscreenfn].id
                         var row = tablex.tBodies[0].getElementsByTagName('tr')[getrecn(nextelement)]
-                        setupnewrow(row)//create .exodusfields
-                        var firstcolelement = row.exodusfields[firstinputcolid]
+                        setupnewrow(row)//create .exofields
+                        var firstcolelement = row.exofields[firstinputcolid]
                         if (firstcolelement)
                             nextelement = firstcolelement
                     }
@@ -5019,16 +5019,16 @@ function form_radio_mouseup_focus(event) {
         form_focus_noscroll(t)
 }
 
-// True if any main form is extreme-wide (.exodusform-wide) — horizontal pan useful.
+// True if any main form is extreme-wide (.exoform-wide) — horizontal pan useful.
 function form_any_wide_layout() {
     var tables = document.querySelectorAll
-        ? document.querySelectorAll('TABLE.exodusform')
+        ? document.querySelectorAll('TABLE.exoform')
         : []
     for (var i = 0; i < tables.length; i++) {
         if (typeof form_table_is_wide == 'function') {
             if (form_table_is_wide(tables[i]))
                 return true
-        } else if (tables[i].classList && tables[i].classList.contains('exodusform-wide'))
+        } else if (tables[i].classList && tables[i].classList.contains('exoform-wide'))
             return true
     }
     return false
@@ -5051,7 +5051,7 @@ function form_scroll_viewport(keycode) {
     try {
         topCover = parseFloat(
             window.getComputedStyle(document.documentElement)
-                .getPropertyValue('--exodus-sticky-top')
+                .getPropertyValue('--exosticky-top')
         ) || 0
     } catch (e) { }
 
@@ -5106,7 +5106,7 @@ function form_scroll_viewport_capture_keydown(event) {
         return
 
     // Confirm / colour popup own the keyboard
-    if (typeof $$ == 'function' && $$('exodusconfirmdiv'))
+    if (typeof $$ == 'function' && $$('exoconfirmdiv'))
         return
     if (typeof colors_popup_is_open == 'function' && colors_popup_is_open())
         return
@@ -5125,7 +5125,7 @@ function form_scroll_viewport_capture_keydown(event) {
 
 /*
  * Safe viewport band — geometry only (no elementFromPoint).
- * top = menubar (--exodus-sticky-top) + pad, then raised by any stuck
+ * top = menubar (--exosticky-top) + pad, then raised by any stuck
  * multirow thead that contains the field (clients brands, journals lines, …).
  */
 function scrollintoview_viewport(element) {
@@ -5140,7 +5140,7 @@ function scrollintoview_viewport(element) {
     try {
         stickyTop = parseFloat(
             window.getComputedStyle(document.documentElement)
-                .getPropertyValue('--exodus-sticky-top')
+                .getPropertyValue('--exosticky-top')
         ) || 0
     } catch (e) { }
     var top = stickyTop + pad
@@ -6386,7 +6386,7 @@ async function cleardoc() {
     }
 
     // Wide decide for bound and unbound (skeleton on empty). Journals can be
-    // .exodusform-wide before first record paints — avoids crushed→wide flash.
+    // .exoform-wide before first record paints — avoids crushed→wide flash.
     if (typeof form_update_wide_layout == 'function')
         form_update_wide_layout()
 
@@ -6836,7 +6836,7 @@ function form_typeahead_free_band() {
     try {
         stickyTop = parseFloat(
             window.getComputedStyle(document.documentElement)
-                .getPropertyValue('--exodus-sticky-top')
+                .getPropertyValue('--exosticky-top')
         ) || 0
     } catch (e) { }
     var pad = 4
@@ -9085,7 +9085,7 @@ function exosetreadonly(elements, msg, options, recn) {
                 try {
                     if (typeof getComputedStyle != 'undefined')
                         bcol = getComputedStyle(document.documentElement)
-                            .getPropertyValue('--exodus-form-border-color').trim()
+                            .getPropertyValue('--exoform-border-color').trim()
                 } catch (e2) { }
                 elementx.style.borderColor = bcol || 'currentColor'
             }
@@ -9221,7 +9221,7 @@ function setvalue2(element, value) {
                     setexoduslink(element, value)
                     element.value = value
                     // colour fields: keep swatch in step with bound text
-                    if (element.getAttribute('data-exodus-color-field') == '1'
+                    if (element.getAttribute('data-exo-color-field') == '1'
                         && typeof colors_sync_swatch == 'function')
                         colors_sync_swatch(element)
                     break
@@ -9364,7 +9364,7 @@ function getradiocheckboxelements(element) {
         scope = document
     }
     if (document.getElementsByClassName)
-        elements = scope.getElementsByClassName('exodusid_' + (element.id ? element.id : element))
+        elements = scope.getElementsByClassName('exoid_' + (element.id ? element.id : element))
     else {
         elements = scope.all[element.id ? element.id : element]
         if (elements && elements.tagName)
@@ -10438,9 +10438,9 @@ async function form_deleterow(event, element) {
     if (rown > 0 && rown == (nrows - 1)) rown--//if deleting last row then focus on previous row
     grows = tablex.tBodies[0].getElementsByTagName('tr')
     var element
-    //rows[rown].getElementsByClassName('exodusid_'+id)
+    //rows[rown].getElementsByClassName('exoid_'+id)
     if (document.getElementsByClassName)
-        element = grows[rown].getElementsByClassName('exodusid_' + id)[0]
+        element = grows[rown].getElementsByClassName('exoid_' + id)[0]
     else
         //using (id) instead of [id] because will return only one?
         element = grows[rown].all(id)
@@ -10780,8 +10780,8 @@ async function form_insertrow(event, append) {
     //   • fold-on-open [+] (exo_expand) while Show All up: expand those
     //   • not filtered: expand (indent/legacy hide)
     var valueFilter = !!(tablex && tablex.exo_filter_colid)
-    var insertbtn = grows[grecn] && grows[grecn].exodusfields
-        && grows[grecn].exodusfields['insertrowbutton' + groupno]
+    var insertbtn = grows[grecn] && grows[grecn].exofields
+        && grows[grecn].exofields['insertrowbutton' + groupno]
     var expandAffordance = insertbtn && insertbtn.getAttribute('exo_expand')
     if (grecn < (nrows - 1) && grows[grecn + 1].style.display == 'none'
         && !valueFilter
@@ -10859,10 +10859,10 @@ async function form_insertrow(event, append) {
             id = gfields[firstsfn].id
         var focusel = null
         if (row) {
-            if (row.exodusfields && row.exodusfields[id])
-                focusel = row.exodusfields[id]
+            if (row.exofields && row.exofields[id])
+                focusel = row.exofields[id]
             else if (document.getElementsByClassName)
-                focusel = row.getElementsByClassName('exodusid_' + id)[0]
+                focusel = row.getElementsByClassName('exoid_' + id)[0]
             else if (row.all)
                 focusel = row.all[id]
         }
@@ -10880,8 +10880,8 @@ function setinsertimage(mode, row, groupno) {
 
     //return to insertrow graphic zzz hardcoded should be located
     //var insertimage=row.childNodes[0].childNodes[0].childNodes[0]
-    //var insertimage=row.childNodes[0].exodusfields['insertrowbutton'+groupno]
-    var insertimage = row.exodusfields
+    //var insertimage=row.childNodes[0].exofields['insertrowbutton'+groupno]
+    var insertimage = row.exofields
     if (!insertimage)
         return
     insertimage = insertimage['insertrowbutton' + groupno]
@@ -12148,7 +12148,7 @@ async function copyrecord_onclick() {
     //read the record to be copied
     var copyrecord = []
     if (!(await copyrecord.exoread(gdatafilename, glastkey)))
-        return await exoui_invalid(copyrecord.exodusresponse)
+        return await exoui_invalid(copyrecord.exoresponse)
 
     //remove any uncopyable data
     for (var dictname in gds.dict) {
@@ -12362,7 +12362,7 @@ async function form_oncopy_generic(event) {
     var selection = window.getSelection()
     //var elements=document.getElementsByName('ITEM_DESCRIPTION')
     //getElementByName doesnt work on span tags
-    var elements = document.getElementsByClassName('exodusid_' + elementid)
+    var elements = document.getElementsByClassName('exoid_' + elementid)
     var lns = []
     if (!selection.containsNode)
         return false // no containsNode — fall through to normal copy

@@ -26,7 +26,7 @@ The framework originated in an era of older browsers and cooperative generators;
 - **Public commencement API (only three):** `exo_begin` (business), `exo_begin_if_idle` (background), `exo_begin_waitcancel` (Wait/Cancel). No fourth entry path. `startAsyncFlow` is a deprecated alias of `exo_begin`.
 - **Flight log:** Quiet by default. Enable with `?logflights=1` or `glogflights=true` in the console (`[exodus flight] TAKEOFF|LANDING|SKIP|…`).
 - **No generators:** `function*` / `yield*` are not supported. Use `async`/`await` only. Accidental generators fail with `systemerror` (stage 6).
-- **UI conventions:** Modal dialogs, `class="exodusform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
+- **UI conventions:** Modal dialogs, `class="exoform"` tables, input `id`s matching dictionary codes, heavy use of `gparameters`.
 - **Data delimiters:** `rm`, `fm`, `vm`, `sm`, `tm`, `stm` (and their regex versions).
 - **Security model:** PHP sessions (the real auth) + namespaced tokens. `exoui_security('TASK')`. Once a valid session exists, the web layer trusts it.
 - **Globals:** `gusername`, `gdataset`, `gparameters`, `greadonlymode`, many others set from cookies or passed in.

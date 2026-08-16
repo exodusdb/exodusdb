@@ -248,7 +248,7 @@ Indent helper calls at the **same** level as the matching `di = dict[++din] = �
 
 `getvalue` is always **external** from the DOM (including NUMBER with thousands/unit).
 
-For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when `exodusconversion` is `[…]`. Do not hide ICONV inside `getvalue` (that broke “did the field change?” for grouping-only edits).
+For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when `exoconversion` is `[…]`. Do not hide ICONV inside `getvalue` (that broke “did the field change?” for grouping-only edits).
 
 ---
 

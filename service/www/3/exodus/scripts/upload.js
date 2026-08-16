@@ -449,7 +449,7 @@ async function loadimages() {
   //and an Open button
   var button=document.createElement('input')
   button.type="button"
-  button.className="exodusbutton"
+  button.className="exobutton"
   $images.insertBefore(button, null)
   button.value='Open'
   addeventlistener(button,'click','audiovisual_open')
@@ -491,7 +491,7 @@ async function adddeletebutton(filename) {
 
   var button=document.createElement('input')
   button.type="button"
-  button.className="exodusbutton"
+  button.className="exobutton"
   button.value='Delete'
   $images.insertBefore(button, null)
   button.setAttribute('exofilename',filename)

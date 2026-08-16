@@ -44,7 +44,7 @@ function exodblink() {
  
  gfso = new ActiveXObject('Scripting.FileSystemObject')
  
- this.exodusrootpath=getexodusrootpath(Server.MapPath(Request.ServerVariables("PATH_INFO")))
+ this.exorootpath=getexorootpath(Server.MapPath(Request.ServerVariables("PATH_INFO")))
  
  //localhostname
  //this.localhostname=new ActiveXObject('WScript.Network').ComputerName.slice(0,8)

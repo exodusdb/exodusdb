@@ -46,10 +46,10 @@ async function formfunctions_onload() {
     gwaitdiv = $$('waitdivelement')
 
     // needjs display:inline / login-ui display:none in HTML; swap when script runs
-    var needjs = document.getElementById('exodus-needjs')
+    var needjs = document.getElementById('exo-needjs')
     if (needjs)
         needjs.style.display = 'none'
-    var loginui = document.getElementById('exodus-login-ui')
+    var loginui = document.getElementById('exo-login-ui')
     if (loginui)
         loginui.style.display = ''
 

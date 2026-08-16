@@ -500,7 +500,7 @@ function exo_dict_number(dicti, opts) {
 
 // Align T free text: contenteditable SPAN, fold at spaces (lowercase true).
 // di.length: used for free-text in wide mode only (empty → soft max 30ch when
-// .exodusform-wide; length set → no soft max). Not a min-width. Omitted → clear.
+// .exoform-wide; length set → no soft max). Not a min-width. Omitted → clear.
 // Codes: exo_dict_code. Multi-line: exo_dict_textarea (separate).
 // exostyle "text".
 function exo_dict_text(dicti, length, rows) {

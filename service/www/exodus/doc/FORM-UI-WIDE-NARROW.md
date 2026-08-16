@@ -8,7 +8,7 @@ Related:
 
 - [FORM-UI-PHILOSOPHY.md](./FORM-UI-PHILOSOPHY.md) — pane/frame model, no flash
 - [FORM-UI-TYPES.md](./FORM-UI-TYPES.md) — field categories (code vs free-text) and soft max
-- Code: `../3/exodus/global.css` (soft ceiling, nest hosts, `.exodusform-wide`)
+- Code: `../3/exodus/global.css` (soft ceiling, nest hosts, `.exoform-wide`)
 - Code: `../3/exodus/scripts/client.js` (`form_update_wide_layout`, `form_table_set_wide`)
 - Code: `../3/exodus/scripts/dbform.js` (free-text paint, `exomaxwidth` attribute only)
 
@@ -42,14 +42,14 @@ The two strategies give the **best UI depending on form and screen size**.
 
 | Piece | Behaviour |
 |--------|-----------|
-| Form table | `.exodusformpane > TABLE.exodusform` has **`max-width: calc(100vw - 2rem)`** — soft ceiling |
+| Form table | `.exoformpane > TABLE.exoform` has **`max-width: calc(100vw - 2rem)`** — soft ceiling |
 | Form table width | **Not** forced `max-content` on non-wide forms (auto under the ceiling) |
 | Nested hosts (no HTM `width=`) | **`max-width: 100%` only** — no `width: max-content` |
 | Nested hosts opt-in | HTML **`width="100%"`** for line grids that must fill the data column |
 | Free-text SPAN | Paint: **`width/max 100%`**, **`pre-wrap`**, fold under cell; **`style.maxWidth` stays `100%`** |
 | Attribute `exomaxwidth="30ch"` | Stored as **wide soft-max candidate only** — not applied as style until wide |
 
-### Wide (`.exodusform-wide` only)
+### Wide (`.exoform-wide` only)
 
 | Piece | Behaviour |
 |--------|-----------|
@@ -76,10 +76,10 @@ wantWide =
      AND free-text column is crushed below its preferred width)
 
 if wantWide:
-    add .exodusform-wide
+    add .exoform-wide
     apply free-text soft max (30ch when exomaxwidth set)
 else:
-    remove .exodusform-wide
+    remove .exoform-wide
     free-text style.maxWidth = 100%   // fold under cell / ceiling
 ```
 
@@ -105,7 +105,7 @@ Think of two stages:
 
 **(a) Wide / narrow detection can still treat the form as narrow** when fixed columns fit the soft ceiling.
 
-Skeleton measure floors free-text at **6ch** and prefers content width. The col0 `1%` is a **column** percentage, not nest `width: 100%` on the table element. Live layout and skeleton are not the same as “always force viewport-wide nests,” so the form is **not** forced into `.exodusform-wide` merely because free-text should grow. Narrow forms keep free-text **`style.maxWidth = 100%`** (of cell), not the wide **30ch** soft max.
+Skeleton measure floors free-text at **6ch** and prefers content width. The col0 `1%` is a **column** percentage, not nest `width: 100%` on the table element. Live layout and skeleton are not the same as “always force viewport-wide nests,” so the form is **not** forced into `.exoform-wide` merely because free-text should grow. Narrow forms keep free-text **`style.maxWidth = 100%`** (of cell), not the wide **30ch** soft max.
 
 **(b) After that, free-text has a real capability to grow under the screen, then fold.**
 
@@ -115,7 +115,7 @@ HTML **`width="1%"` on a column** makes the browser give the multivalue / nest t
 
 1. Free-text cells get that budget → spans **expand** with available width under the form **soft ceiling**.  
 2. Long text **starts folding** (`pre-wrap` + `max-width: 100%` of cell + form `max-width: calc(100vw − 2rem)`) so typing prefers to stay **on screen**.  
-3. If folding is **not** enough (many fixed columns, true extreme-wide), the form is allowed **past** the right edge (`.exodusform-wide`, pan / Alt+←→) and free-text may take the **30ch** soft max instead of monopolising the grid.
+3. If folding is **not** enough (many fixed columns, true extreme-wide), the form is allowed **past** the right edge (`.exoform-wide`, pan / Alt+←→) and free-text may take the **30ch** soft max instead of monopolising the grid.
 
 So: **`1%` is the current back door that gives free-text its expand-then-fold budget on multivalue nests**, while still allowing narrow detection to keep **30ch off** until the form is truly wide. Secondary effect: col0 stays narrow when the nest is host-wide (without `1%`, that lead-in column often absorbs free space).
 
@@ -125,7 +125,7 @@ So: **`1%` is the current back door that gives free-text its expand-then-fold bu
 |-------------|-------------------------------------|
 | Remove `1%` only | Nest left-packs (not fill 100%) → free-text cells stay skinny → **no** expand-under-ceiling on line grids. |
 | Nest `width: max-content` | **Forbidden** — free-text loses fold budget; sprawl or false wide → 30ch. |
-| Nest CSS/HTML `width: 100%` as default | Honest fill, but skeleton measure can resolve % toward the **viewport** → false `.exodusform-wide` → free-text stuck at **30ch** unless skeleton **temporarily** ignores nest fill. |
+| Nest CSS/HTML `width: 100%` as default | Honest fill, but skeleton measure can resolve % toward the **viewport** → false `.exoform-wide` → free-text stuck at **30ch** unless skeleton **temporarily** ignores nest fill. |
 | Per-page HTM `width="100%"` on every line grid | Same fill idea; scales poorly; still needs skeleton care if used widely. |
 | Style col0 with nowrap/valign only (no width) | Does **not** stop col0 exploding when the table is host-wide; only a **width** rule (`1%` today) does. |
 | CSS `width: 0` on `.exogroup_col0` while keeping HTML `1%` for fill | Can **fight** the percentage contribution and kill host fill. |
@@ -179,11 +179,11 @@ Sources: `dict.groups[g]`, else dict index walk.
 ## Forbidden regressions (checklist before any width CSS/JS change)
 
 1. **Do not** set `width: max-content` or `min-width: max-content` on  
-   `TABLE.exodusform TABLE.exotable|TABLE[exogroupno]|TABLE.exodus-fieldstrip`  
+   `TABLE.exoform TABLE.exotable|TABLE[exogroupno]|TABLE.exofieldstrip`  
    without `[width]` — kills free-text fold budget.
-2. **Do not** set free-text `style.maxWidth = 30ch` at dbform paint — only the wide applier may do that, and only when `.exodusform-wide` is present.
+2. **Do not** set free-text `style.maxWidth = 30ch` at dbform paint — only the wide applier may do that, and only when `.exoform-wide` is present.
 3. **Do not** “fix” a stretched nest by max-content on all nests; prefer remove spurious HTM `width=100%`, or opt-in `width=100%` only where a line grid needs fill.
-4. Before changing form `width:` on non-wide tables, re-read competing bugs **A** (sibling stretch) and **B** (free-text fold) in `global.css` comments on `.exodusformpane > TABLE.exodusform`.
+4. Before changing form `width:` on non-wide tables, re-read competing bugs **A** (sibling stretch) and **B** (free-text fold) in `global.css` comments on `.exoformpane > TABLE.exoform`.
 5. **Do not** remove multivalue col0 `width="1%"` without an explicit replacement for nest host-fill **and** a plan for wide/narrow (see section above). Col0-only “polish” without a width rule does not replace it.
 
 ---
@@ -192,9 +192,9 @@ Sources: `dict.groups[g]`, else dict index walk.
 
 | Concern | File / symbol |
 |---------|----------------|
-| Soft ceiling | `global.css` → `.exodusformpane > TABLE.exodusform { max-width: calc(100vw - 2rem) }` |
-| Nest hosts (no max-content) | `global.css` → nested `TABLE.exotable` / `[exogroupno]` / `.exodus-fieldstrip` |
-| Wide class + free-text min-width | `global.css` → `.exodusform-wide` |
+| Soft ceiling | `global.css` → `.exoformpane > TABLE.exoform { max-width: calc(100vw - 2rem) }` |
+| Nest hosts (no max-content) | `global.css` → nested `TABLE.exotable` / `[exogroupno]` / `.exofieldstrip` |
+| Wide class + free-text min-width | `global.css` → `.exoform-wide` |
 | Decide wide / apply 30ch | `client.js` → `form_update_wide_layout`, `form_table_set_wide`, `form_table_apply_freetext_wide_max` |
 | Free-text paint + `exomaxwidth` attr | `dbform.js` → SPAN `fieldStyle === 'text'` |
 | Field style axis | `dbform.js` / `db.js` → `exostyle` code \| text \| number |

@@ -112,7 +112,7 @@ async function users_postdisplay() {
         var passwordexpires = await gds.getx('PASSWORD_EXPIRY_DATE')
         //if (passwordexpires) {
         if (!passwordexpires) {
-            $expiryelement.innerHTML = '<strong style="color:var(--exodus-icon-green,#22b014)">ACTIVE</strong>'
+            $expiryelement.innerHTML = '<strong style="color:var(--exoicon-green,#22b014)">ACTIVE</strong>'
         } else {
             var text=''
             var expirydays = (exoint(passwordexpires) - exodate())

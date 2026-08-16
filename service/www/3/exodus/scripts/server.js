@@ -9,7 +9,7 @@ var gautostartdatabase = true//unless ..\exodus\NET.CFG first line is AUTOSTART=
 var gsecondstowaitforreceipt = 10
 var gmillisecondstowaitforstart = 30 * 1000
 
-function getexodusrootpath(documentlocation) {
+function getexorootpath(documentlocation) {
 
     //scan the parent folders for exodus and data folders
     //otherwise null
@@ -40,11 +40,11 @@ function getexodusrootpath(documentlocation) {
 
                 //check that exodus is also available in the same folder
                 if (gfso.GetFolder(folder.Path + '\\exodus')) {
-                    exodusrootpath = folder.Path
+                    exorootpath = folder.Path
                     //append a trailing backslash if necessary
-                    if (exodusrootpath.slice(exodusrootpath.length - 1) != ":" && exodusrootpath.slice(exodusrootpath.length - 1) != "\\")
-                        exodusrootpath = exodusrootpath + "\\"
-                    return exodusrootpath
+                    if (exorootpath.slice(exorootpath.length - 1) != ":" && exorootpath.slice(exorootpath.length - 1) != "\\")
+                        exorootpath = exorootpath + "\\"
+                    return exorootpath
                 }
             }
         } catch (e) { }
@@ -55,11 +55,11 @@ function getexodusrootpath(documentlocation) {
 
                 //check that exodus is also available in the same folder
                 if (gfso.GetFolder(folder.Path + '\\exodus\\exodus')) {
-                    exodusrootpath = folder.Path
+                    exorootpath = folder.Path
                     //append a trailing backslash if necessary
-                    if (exodusrootpath.slice(exodusrootpath.length - 1) != ":" && exodusrootpath.slice(exodusrootpath.length - 1) != "\\")
-                        exodusrootpath = exodusrootpath + "\\"
-                    return exodusrootpath + 'exodus\\'
+                    if (exorootpath.slice(exorootpath.length - 1) != ":" && exorootpath.slice(exorootpath.length - 1) != "\\")
+                        exorootpath = exorootpath + "\\"
+                    return exorootpath + 'exodus\\'
                 }
             }
         } catch (e) { }
@@ -107,7 +107,7 @@ function exodblink_send_byfile(data) {
     var invaliddatapathresponse = 'ERROR: INVALID DATA PATH'.toUpperCase()
 
     //fail if could not locate the database
-    if (this.exodusrootpath == null) {
+    if (this.exorootpath == null) {
         this.response = cannotfinddatabaseresponse
         dbready(dbwaitingwindow)
         this.request = ''
@@ -141,7 +141,7 @@ function exodblink_send_byfile(data) {
         if (this.request.split('\r')[0] == 'GETDATASETS') {
             //  Response.Write(this.request)
             //  Response.End()
-            var datasets = getdatasets(this.exodusrootpath, this.request.split('\r')[1])
+            var datasets = getdatasets(this.exorootpath, this.request.split('\r')[1])
 
             //error if no datasets
             if (datasets.length == 0) {
@@ -177,7 +177,7 @@ function exodblink_send_byfile(data) {
         //get a database not available message or depending on config the system will try to start another db process
         //TODO probably starting a db process should respect the higher global.end too
         try {
-            proglocation = this.exodusrootpath + 'exodus\\'
+            proglocation = this.exorootpath + 'exodus\\'
             tf = gfso.GetFile(proglocation + 'GLOBAL.END')
             this.response = databasestoppedresponse
             dbready(dbwaitingwindow)
@@ -242,7 +242,7 @@ function exodblink_send_byfile(data) {
             datasetdir = datasetdir + '\\'
         }
 
-        datalocation = (this.exodusrootpath + 'data\\').toUpperCase()
+        datalocation = (this.exorootpath + 'data\\').toUpperCase()
         //var flag_filename = datalocation + datasetdir + 'GLOBAL.SVR'
         var flag_filename = datalocation + datasetdir + this.dataset + '.SVR'
 
@@ -447,7 +447,7 @@ function exodblink_send_byfile(data) {
 
                 //Sleep while the request file still exists every 10 ms for x seconds
                 try {
-                    var cmd = this.exodusrootpath + 'exodus\\waiting2.exe ' + linkfilename + '.1 ' + gsecondstowaitforreceipt + ' 10'
+                    var cmd = this.exorootpath + 'exodus\\waiting2.exe ' + linkfilename + '.1 ' + gsecondstowaitforreceipt + ' 10'
                     this.wscriptshell.Run(cmd, 0, true)
                 }
                 catch (e) {
@@ -497,7 +497,7 @@ function exodblink_send_byfile(data) {
 
                 //looking for the response file every 10 ms for 5 seconds (uses sleep to save processor cycles)
                 try {
-                    var cmd = this.exodusrootpath + 'exodus\\waiting.exe ' + linkfilename + '.3' + ' 5 10'
+                    var cmd = this.exorootpath + 'exodus\\waiting.exe ' + linkfilename + '.3' + ' 5 10'
                     this.wscriptshell.Run(cmd, 0, true)
                 }
                 catch (e) {
@@ -587,7 +587,7 @@ function exodblink_send_byfile(data) {
     //if direct access then convert relative reference to fullpath
     if (this.documentprotocolcode == 'file') {
         if (this.request.slice(0, 7) == 'EXECUTE' && this.data.slice(0, 3).toUpperCase() == '..\\') {
-            this.data = this.exodusrootpath + this.data.slice(3)
+            this.data = this.exorootpath + this.data.slice(3)
         }
     }
 
@@ -620,15 +620,15 @@ function exodblink_send_byfile(data) {
 function exodblink_startdb() {
 
     var cannotfinddatabaseresponse = 'ERROR: SERVER CONFIGURATION ERROR - CANNOT FIND DATABASE ON SERVER'.toUpperCase()
-    if (this.exodusrootpath == null) {
+    if (this.exorootpath == null) {
         this.response = cannotfinddatabaseresponse
         return false
     }
 
-    // var proglocation=getexodusrootpath()+'exodus'
+    // var proglocation=getexorootpath()+'exodus'
     //proglocation='C:\\exodus\\'
-    //var exodusrootpath=getexodusrootpath()
-    proglocation = this.exodusrootpath + 'exodus\\'
+    //var exorootpath=getexorootpath()
+    proglocation = this.exorootpath + 'exodus\\'
 
     // var x=Session.CodePage
     // Session.CodePage=1252
@@ -747,9 +747,9 @@ function exodblink_startdb() {
         }
 
         //Sleep while looking for the response file every 500 ms for 10 seconds
-        //var cmd=this.exodusrootpath+'exodus\\waiting.exe '+responsefilename + '.3'+' 10 100'
+        //var cmd=this.exorootpath+'exodus\\waiting.exe '+responsefilename + '.3'+' 10 100'
         try {
-            var cmd = this.exodusrootpath + 'exodus\\waiting.exe ' + responsefilename + ' 10 500'
+            var cmd = this.exorootpath + 'exodus\\waiting.exe ' + responsefilename + ' 10 500'
             this.wscriptshell.Run(cmd, 0, true)
         }
         catch (e) {
@@ -829,7 +829,7 @@ function osdelete(filename, caller) {
     return true
 }
 
-function getdatasets(exodusrootpath, systemcode) {
+function getdatasets(exorootpath, systemcode) {
 
     //return an array of available dataset codes and names
     //or an empty array
@@ -838,7 +838,7 @@ function getdatasets(exodusrootpath, systemcode) {
 
     //get an array of datasets
     //location of \exodus folder
-    var proglocation = (exodusrootpath + 'exodus\\').toUpperCase()
+    var proglocation = (exorootpath + 'exodus\\').toUpperCase()
     var datasets = exoosread(proglocation + systemcode + '.vol')
     //.split('\r')[0]
     //backward compatible with old text format
@@ -864,7 +864,7 @@ function getdatasets(exodusrootpath, systemcode) {
     }
 
     //strip out the datasets with no data
-    var datalocation = (exodusrootpath + 'data\\').toUpperCase()
+    var datalocation = (exorootpath + 'data\\').toUpperCase()
     var existingdatasets = []
     for (var i = 0; i < datasets.length; i++) {
         if (gfso.FileExists(datalocation + datasets[i][1] + '\\general\\revmedia.lk')) {

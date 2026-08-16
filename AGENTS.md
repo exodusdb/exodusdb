@@ -72,7 +72,7 @@ Plain **`review`** / **squash** must not wait for the user to also say “KISS�
 ## Principles (short)
 
 - HTM is a **seed**; dbform rewrites the DOM (e.g. `align='T'` → contenteditable `<span>`). Dict attrs (`validpropnames`): `exo*` only (no dual).
-- **Pane** owns the outer edge; **grid borders** belong on **`td`**, not `tr`. Do not use page `tr { border-bottom }` on `exodusform` pages.
+- **Pane** owns the outer edge; **grid borders** belong on **`td`**, not `tr`. Do not use page `tr { border-bottom }` on `exoform` pages.
 - **Embedded groups** live in host cells (`:has(> TABLE[exogroupno])`); a line “under” a group is often the **outer** row, not the inner table.
 - **Multivalue rows (`groupno > 0`):** `cloneNode` copies **attributes**, not **listeners**. Do not attach `input`/`change` only on the template row — use **document/table delegation** or attributes the form already re-reads. See FORM-UI-PHILOSOPHY § “Multivalue rows”.
 - **Touched leave (Cancel / Esc / F8-clear):** default **Discard / Cancel** when `gtouched` for unbound forms too (no modal exception). Bound locked leave still uses Save/Discard/Cancel on the record. Later: per-form opt-out for light dialogs (e.g. settings) if needed.
@@ -269,14 +269,14 @@ Invariants when touching focus, click, `gblockevents`, or `#uiblockerdiv`:
 
 ### DOMUI events while a popup is open (strategy)
 
-`#exodusconfirmdiv` and other exclusive UI are **product-owned** for the shell lifetime. Do not re-grow a three-path maze (startevent + document_onkeydown “belt” + div handler all half-implementing Enter).
+`#exoconfirmdiv` and other exclusive UI are **product-owned** for the shell lifetime. Do not re-grow a three-path maze (startevent + document_onkeydown “belt” + div handler all half-implementing Enter).
 
 **Ownership (code in `client.js`):**
 
 | Product | Open signal | Key owner | Form path role |
 |--------|-------------|-----------|----------------|
-| **Plain confirm** (OK, Yes/No, text, invalid, Wait) | `#exodusconfirmdiv` without `.exodusconfirm_decide` | **Document capture** while open: `exoconfirm_install_plain_keydown` → `exoconfirm_keymap` (install in `exoconfirm2`, uninstall in `finally`) | **Swallow only** (`exoconfirm_startevent` does not reimplement OK/Cancel) |
-| **Decide list** | `.exodusconfirm_decide` / `#decide_table1` | **Handlers on the confirm div** (`decide_document_on*`) | Swallow; **Esc** if focus is outside (bubble never reaches the div) |
+| **Plain confirm** (OK, Yes/No, text, invalid, Wait) | `#exoconfirmdiv` without `.exoconfirm_decide` | **Document capture** while open: `exoconfirm_install_plain_keydown` → `exoconfirm_keymap` (install in `exoconfirm2`, uninstall in `finally`) | **Swallow only** (`exoconfirm_startevent` does not reimplement OK/Cancel) |
+| **Decide list** | `.exoconfirm_decide` / `#decide_table1` | **Handlers on the confirm div** (`decide_document_on*`) | Swallow; **Esc** if focus is outside (bubble never reaches the div) |
 | **Colour / calendar** | product open flags | Product helpers / handlers on their DOM | Form isolates; do not invent a second key map in `starteventhandler` |
 
 **Rules:**
@@ -297,7 +297,7 @@ These were broken and fixed together. Treat as **one contract**. If you change o
 
 | Rule | Wrong (do not restore) | Right |
 |------|------------------------|--------|
-| **Typing while `gblockevents`** | Capture allows key (`keymap` true) but bubble `startevent` always `false` → `preventDefault` kills characters | Capture: no `preventDefault` when typing. Bubble: `startevent` **true** if focus is `#exodusconfirmdiv_textinput` |
+| **Typing while `gblockevents`** | Capture allows key (`keymap` true) but bubble `startevent` always `false` → `preventDefault` kills characters | Capture: no `preventDefault` when typing. Bubble: `startevent` **true** if focus is `#exoconfirmdiv_textinput` |
 | **Access letters** | (1) Bare O/C always → kills typing. (2) Alt+ only always → pure button needs Alt+C | **Split:** pure button confirm (no text field) → **bare letter** (Alt+ also ok). Text-input confirm → **Alt+letter only**; bare letters type when focus is the field |
 | **Enter** | Bare Enter always OK | Enter OK only: focused footer button, or text field Enter/F9; no silent target |
 | **`exoui_input` return** | Cancel and empty OK both “falsy” | OK → `string` (may `''`); Cancel → `false`. Empty-OK paths: `typeof x == 'string'` / `x === false` — **never** `if (!x)` when empty means continue |
@@ -310,12 +310,12 @@ These were broken and fixed together. Treat as **one contract**. If you change o
 
 ### Menubar / form icons (theme2)
 
-- **One scale for all:** `--exodus-ui-icon-size` in `global.css` is the **only** size knob (outer box; scales with text). Retune once → all menubar/form icons.
+- **One scale for all:** `--exoui-icon-size` in `global.css` is the **only** size knob (outer box; scales with text). Retune once → all menubar/form icons.
 - **SVG assets are full-bleed 16×16** (art to the edges of the viewBox). Default: no empty border in the file. Do **not** add per-file `scale(…)` wrappers or per-control CSS padding/mask hacks for mass.
 - **Exception — perceptually large glyphs** (dense shapes that read oversized next to siblings, e.g. solid X / Close): may include **padding in the SVG** (e.g. 2 units inset on a 16 canvas). That is the only place for that inset — not CSS.
-- **`--exodus-ui-icon-glyph` stays `1`** (fill the outer box). Painted `<img>` padding and mono `mask-size` both follow it; do not use glyph as a per-icon mass control.
+- **`--exoui-icon-glyph` stays `1`** (fill the outer box). Painted `<img>` padding and mono `mask-size` both follow it; do not use glyph as a per-icon mass control.
 - **Naming:** `role[-variant].svg` (kebab-case). Families: `shell-*`, `record-*`, `file-*`, `nav-*`, `row-*`, `field-*`, `confirm-*`, `media-*`, `sort` / `sort-up` / `sort-down`, `dialog-*`, `login-*`, `theme-*`. Mono masks = one file + CSS tint (no `_lm`/`_dm`); **standard 16×16** like other toolbar icons (glyph inset in the SVG if needed). Painted multi = pair `name_lm.svg` + `name_dm.svg`.
-- Colours for mono stay in CSS (`--exodus-icon-*`); painted multi keep fill in the SVG.
+- Colours for mono stay in CSS (`--exoicon-*`); painted multi keep fill in the SVG.
 
 ### Still raster / webp (page chrome, not toolbar icons)
 

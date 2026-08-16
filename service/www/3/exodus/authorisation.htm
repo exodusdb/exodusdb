@@ -14,27 +14,27 @@
     <script type="text/javascript" src="../exodus/scripts/authorisation.js"></script>
     <script type="text/javascript" src="../exodus/scripts/authorisation2.js"></script>
     <style type="text/css">
-        .exodustabs {
+        .exotabs {
             display: inline-block;
             text-align: left;
             vertical-align: top;
         }
-        .exodustabs_bar {
+        .exotabs_bar {
             display: flex;
             gap: 4px;
             margin-bottom: 6px;
         }
-        .exodustab.exodustab_active {
+        .exotab.exotab_active {
             font-weight: bold;
             border-style: inset;
         }
-        .exodustab_panel {
+        .exotab_panel {
             display: none;
         }
-        .exodustab_panel.exodustab_active {
+        .exotab_panel.exotab_active {
             display: block;
         }
-        .exodustab_panel > .exodusformpane {
+        .exotab_panel > .exoformpane {
             display: block;
             width: max-content;
             margin-left: auto;
@@ -49,8 +49,8 @@
             max-width: 12rem;
             overflow-wrap: anywhere;
         }
-        .authorisation_users_table .exodusid_KEYS,
-        .authorisation_users_table .exodusid_IP_NUMBERS {
+        .authorisation_users_table .exoid_KEYS,
+        .authorisation_users_table .exoid_IP_NUMBERS {
             min-width: 0 !important;
             max-width: 100%;
             box-sizing: border-box;
@@ -61,16 +61,16 @@
     <div align="center">
         <h1>
             Authorisation File</h1>
-        <div class="exodustabs" id="authorisation_tabs">
-            <div class="exodustabs_bar" role="tablist">
-                <button type="button" role="tab" class="exodustab exodustab_active"
+        <div class="exotabs" id="authorisation_tabs">
+            <div class="exotabs_bar" role="tablist">
+                <button type="button" role="tab" class="exotab exotab_active"
                     id="authorisation_tabbtn_users" exo_onclick="authorisation_tabs_show_sync('users')">Users</button>
-                <button type="button" role="tab" class="exodustab"
+                <button type="button" role="tab" class="exotab"
                     id="authorisation_tabbtn_tasks" exo_onclick="authorisation_tabs_show_sync('tasks')">Tasks</button>
             </div>
-            <div class="exodustab_panel exodustab_active" id="authorisation_tabpanel_users" role="tabpanel">
+            <div class="exotab_panel exotab_active" id="authorisation_tabpanel_users" role="tabpanel">
         <input style="display: none" id="KEY" />
-        <table class="exodusform authorisation_users_table">
+        <table class="exoform authorisation_users_table">
             <thead>
                 <tr>
                     <th>
@@ -85,7 +85,7 @@
                     <td>
                         User Name:<br />
                         Email Address:<br />
-                        <input id="button_changeemaildomain" title="Change email domain name" class="exodusbutton"
+                        <input id="button_changeemaildomain" title="Change email domain name" class="exobutton"
                             type="button" exotype="B" value="Change domain" exo_onclick="await authorisation_changeallemaildomains()">
                     </td>
                     <th>
@@ -105,9 +105,9 @@
                     </td>
                     <td>
                         <input id="button_password" exogroupno="1" title="Set the password for the user"
-                            exo_onclick="await user_setpassword(false,this)" class="exodusbutton" type="button"
+                            exo_onclick="await user_setpassword(false,this)" class="exobutton" type="button"
                             exotype="B" value="Password" />
-                        <input id="button_tasks" exogroupno="1" title="See user's authorised tasks" class="exodusbutton"
+                        <input id="button_tasks" exogroupno="1" title="See user's authorised tasks" class="exobutton"
                             type="button" exotype="B" value="Tasks" exo_onclick="await user_showtasks()" />
                     </td>
                     <td>
@@ -126,8 +126,8 @@
             </tbody>
         </table>
             </div>
-            <div class="exodustab_panel" id="authorisation_tabpanel_tasks" role="tabpanel">
-        <table class="exodusform">
+            <div class="exotab_panel" id="authorisation_tabpanel_tasks" role="tabpanel">
+        <table class="exoform">
             <thead>
                 <tr>
                     <th id="TASK_ID_title">

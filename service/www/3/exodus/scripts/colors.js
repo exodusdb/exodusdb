@@ -490,7 +490,7 @@ function colors_popup_sync_chrome(hexOverride) {
 	var headDir = colors_popup_monitor_head_direction(hex)
 	// Sample block — own fill; beat theme INPUT rules
 	if (mon)
-		mon.style.setProperty('--exodus-color-monitor-bg-color', hex)
+		mon.style.setProperty('--exocolor-monitor-bg-color', hex)
 	inp.style.setProperty('background-color', hex, 'important')
 	inp.style.setProperty('background-image', 'none', 'important')
 	inp.style.setProperty('color', textCol, 'important')
@@ -535,9 +535,9 @@ function colors_popup_paint_grid() {
 			cell.setAttribute('data-si', String(si))
 			var sel = (hi === colors_popup._hi && si === colors_popup._si)
 			if (sel)
-				cell.classList.add('exodus-color-cell-selected')
+				cell.classList.add('exocolor-cell-selected')
 			else
-				cell.classList.remove('exodus-color-cell-selected')
+				cell.classList.remove('exocolor-cell-selected')
 		}
 	}
 }
@@ -556,9 +556,9 @@ function colors_popup_paint_bright() {
 		cell.style.backgroundColor = colors_popup_cell_hex(colors_popup._hi, colors_popup._si, vi)
 		cell.setAttribute('data-vi', String(vi))
 		if (vi === colors_popup._vi)
-			cell.classList.add('exodus-color-cell-selected')
+			cell.classList.add('exocolor-cell-selected')
 		else
-			cell.classList.remove('exodus-color-cell-selected')
+			cell.classList.remove('exocolor-cell-selected')
 	}
 }
 
@@ -578,7 +578,7 @@ function colors_popup_select_v(vi) {
 }
 
 function colors_popup_cycle_buttons(backwards) {
-	var row = colors_popup._div && colors_popup._div.querySelector('.exodus-color-popup-actions')
+	var row = colors_popup._div && colors_popup._div.querySelector('.exocolor-popup-actions')
 	if (!row)
 		return
 	var buttons = row.querySelectorAll('button')
@@ -611,7 +611,7 @@ function colors_popup_focusables() {
 		list.push(colors_popup._bright)
 	if (colors_popup._grid)
 		list.push(colors_popup._grid)
-	var row = colors_popup._div && colors_popup._div.querySelector('.exodus-color-popup-actions')
+	var row = colors_popup._div && colors_popup._div.querySelector('.exocolor-popup-actions')
 	if (row) {
 		var buttons = row.querySelectorAll('button')
 		for (var i = 0; i < buttons.length; i++)
@@ -742,7 +742,7 @@ function colors_popup_startevent(event) {
 		}
 
 		var actions = colors_popup._div
-			&& colors_popup._div.querySelector('.exodus-color-popup-actions')
+			&& colors_popup._div.querySelector('.exocolor-popup-actions')
 		// Enter / Ctrl+Enter: focused action button, else OK (confirm: Enter = positive)
 		if (keycode == 13) {
 			if (!event.ctrlKey && tgt && actions && actions.contains(tgt) && tgt.tagName == 'BUTTON') {
@@ -972,7 +972,7 @@ function colors_popup_pick_v(cell, isClick) {
 function colors_popup_cell_from_event(ev, pane) {
 	var t = ev.target
 	while (t && t !== pane) {
-		if (t.classList && t.classList.contains('exodus-color-cell'))
+		if (t.classList && t.classList.contains('exocolor-cell'))
 			return t
 		t = t.parentNode
 	}
@@ -1008,7 +1008,7 @@ function colors_popup_fill_grid_cells(grid, n) {
 		for (var hi = 0; hi < n; hi++) {
 			var cell = document.createElement('button')
 			cell.type = 'button'
-			cell.className = 'exodus-color-cell'
+			cell.className = 'exocolor-cell'
 			cell.tabIndex = -1
 			cell.setAttribute('data-hi', String(hi))
 			cell.setAttribute('data-si', String(si))
@@ -1023,7 +1023,7 @@ function colors_popup_fill_bright_cells(strip, n) {
 	for (var vi = n - 1; vi >= 0; vi--) {
 		var cell = document.createElement('button')
 		cell.type = 'button'
-		cell.className = 'exodus-color-cell exodus-color-bright-cell'
+		cell.className = 'exocolor-cell exocolor-bright-cell'
 		cell.tabIndex = -1
 		cell.setAttribute('data-vi', String(vi))
 		frag.appendChild(cell)
@@ -1033,7 +1033,7 @@ function colors_popup_fill_bright_cells(strip, n) {
 
 function colors_popup_build_grid() {
 	var grid = document.createElement('div')
-	grid.className = 'exodus-color-popup-grid'
+	grid.className = 'exocolor-popup-grid'
 	grid.setAttribute('role', 'grid')
 	grid.tabIndex = 0
 	grid.title = 'Hue × saturation — click to lock/unlock; Ctrl+scroll changes resolution'
@@ -1043,7 +1043,7 @@ function colors_popup_build_grid() {
 
 function colors_popup_build_bright() {
 	var strip = document.createElement('div')
-	strip.className = 'exodus-color-popup-bright'
+	strip.className = 'exocolor-popup-bright'
 	strip.tabIndex = 0
 	strip.title = 'Brightness — click to lock/unlock; Ctrl+scroll changes resolution'
 	colors_popup_bind_pane(strip, 'bright')
@@ -1069,8 +1069,8 @@ function colors_popup_set_n(n) {
 	// Keep overall continuum size ~constant (scale cells with N)
 	var cellEm = (COLORS_POPUP_REF_N * COLORS_POPUP_REF_CELL_EM) / n
 	if (continuum) {
-		continuum.style.setProperty('--exodus-color-n', String(n))
-		continuum.style.setProperty('--exodus-color-cell', cellEm.toFixed(3) + 'em')
+		continuum.style.setProperty('--exocolor-n', String(n))
+		continuum.style.setProperty('--exocolor-cell', cellEm.toFixed(3) + 'em')
 	}
 	if (colors_popup._nLabel)
 		colors_popup._nLabel.textContent = n + '×' + n
@@ -1115,17 +1115,17 @@ function colors_popup_create() {
 		return
 	var div = document.createElement('div')
 	div.id = 'exo_color_popup'
-	div.className = 'exodus-color-popup calendar'
+	div.className = 'exocolor-popup calendar'
 	div.tabIndex = 1
 	div.setAttribute('role', 'dialog')
 	div.setAttribute('aria-label', 'Colour')
 
 	// Face + sticky-thead monitor (continuum pick only — no typing)
 	var monitor = document.createElement('div')
-	monitor.className = 'exodus-color-popup-monitor'
+	monitor.className = 'exocolor-popup-monitor'
 	var hexInput = document.createElement('input')
 	hexInput.type = 'text'
-	hexInput.className = 'exodus-color-popup-hex'
+	hexInput.className = 'exocolor-popup-hex'
 	hexInput.readOnly = true
 	hexInput.tabIndex = -1
 	hexInput.spellcheck = false
@@ -1133,16 +1133,16 @@ function colors_popup_create() {
 	hexInput.setAttribute('aria-label', 'Form body colour')
 	hexInput.setAttribute('aria-readonly', 'true')
 	var hexThead = document.createElement('div')
-	hexThead.className = 'exodus-color-popup-hex-thead'
+	hexThead.className = 'exocolor-popup-hex-thead'
 	hexThead.setAttribute('aria-label', 'Sticky thead tint of this form body colour')
 	hexThead.textContent = 'thead'
 	monitor.appendChild(hexInput)
 	monitor.appendChild(hexThead)
 
 	var continuum = document.createElement('div')
-	continuum.className = 'exodus-color-popup-continuum'
+	continuum.className = 'exocolor-popup-continuum'
 	var nLabel = document.createElement('div')
-	nLabel.className = 'exodus-color-popup-nlabel'
+	nLabel.className = 'exocolor-popup-nlabel'
 	nLabel.title = 'Continuum resolution (Ctrl+scroll: 8, 16, 24, 32)'
 	var grid = colors_popup_build_grid()
 	var bright = colors_popup_build_bright()
@@ -1151,7 +1151,7 @@ function colors_popup_create() {
 	continuum.appendChild(grid)
 
 	var row = document.createElement('div')
-	row.className = 'exodus-color-popup-actions'
+	row.className = 'exocolor-popup-actions'
 	// Confirm-style: underline hotkey letter, title "Press X or Fkey" (exoui_confirm)
 	function mkBtn(label, cls, letter, funckey) {
 		var b = document.createElement('button')
@@ -1165,7 +1165,7 @@ function colors_popup_create() {
 		else
 			b.textContent = plain
 		b.title = 'Press ' + letter + (funckey ? ' or ' + funckey : '')
-		b.setAttribute('data-exodus-letter', letter)
+		b.setAttribute('data-exo-letter', letter)
 		return b
 	}
 	// Order: OK (positive/F9/Ctrl+Enter) · Default (F8) · Cancel (Esc) — like exoui_confirm
@@ -1304,7 +1304,7 @@ function colors_popup_base_rect(field) {
 		return null
 	var els = []
 	var p = field.parentNode
-	if (p && p.classList && p.classList.contains('exodus-color-field-wrap'))
+	if (p && p.classList && p.classList.contains('exocolor-field-wrap'))
 		els.push(p)
 	else {
 		els.push(field)
@@ -1532,12 +1532,12 @@ function colors_popup_place(field) {
 	div.style.top = Math.round(topPos) + 'px'
 }
 
-// Snapshot live form body (--exodus-form-bg-color / cookie) for cancel restore.
+// Snapshot live form body (--exoform-bg-color / cookie) for cancel restore.
 // The popup must not leave the form body changed unless the user OK/Defaults.
 function colors_popup_capture_form_body() {
 	try {
 		var formBody = getComputedStyle(document.documentElement)
-			.getPropertyValue('--exodus-form-bg-color').trim()
+			.getPropertyValue('--exoform-bg-color').trim()
 		if (formBody)
 			return formBody
 	} catch (e) { }
@@ -1628,7 +1628,7 @@ async function colors_popup_ok() {
 		}
 		// Prefer chrome hex (exact field seed until user picks a continuum cell)
 		var hex = colors_popup._hex || colors_popup_current_hex()
-		// Empty store only for the fixed system form body — not live --exodus-form-bg-color
+		// Empty store only for the fixed system form body — not live --exoform-bg-color
 		// (live form body follows preview, so hex===formBody would always store "").
 		var sys = colors_system_default_body_hex()
 		var store = (hex && hex === sys) ? '' : hex
@@ -1717,12 +1717,12 @@ async function colors_pop_color_open(gen) {
 	if (colors_popup._closedAt && (Date.now() - colors_popup._closedAt) < 450)
 		return false
 	var field = (typeof gpreviouselement != 'undefined') ? gpreviouselement : null
-	if (field && field.getAttribute && field.getAttribute('data-exodus-color-swatch-for'))
-		field = document.getElementById(field.getAttribute('data-exodus-color-swatch-for')) || field
+	if (field && field.getAttribute && field.getAttribute('data-exo-color-swatch-for'))
+		field = document.getElementById(field.getAttribute('data-exo-color-swatch-for')) || field
 	if (!field)
 		return false
 	if (typeof exofieldpopupallowed == 'function' && !exofieldpopupallowed(field)
-		&& field.getAttribute('data-exodus-color-field') != '1')
+		&& field.getAttribute('data-exo-color-field') != '1')
 		return false
 	colors_popup_show(field)
 	return false
@@ -1978,14 +1978,14 @@ function exo_dict_colorfontsize(dict, fn) {
     // SCREEN_HEAD_COLOR — UNUSED in the live UI (no cookie, no set_style, no HTM
     // input on Screens row). Kept as word 4 so SYSTEM 46,* field layout stays stable
     // (see initgeneral formheadcolor). Sticky thead tint is CSS: slightly darker
-    // mix of --exodus-form-bg-color (body colour), not this field.
+    // mix of --exoform-bg-color (body colour), not this field.
     di = dict[++din] = dictrec('SCREEN_HEAD_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 4
     di.nwords = 1
     exo_dict_color(di)
 
-    // SCREEN_BODY_COLOR — users preview → --exodus-form-bg-color; cookie fc on Save.
+    // SCREEN_BODY_COLOR — users preview → --exoform-bg-color; cookie fc on Save.
     di = dict[++din] = dictrec('SCREEN_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 5
@@ -2058,12 +2058,12 @@ function colors_system_default_body_hex() {
 	return '#fdf5e6'
 }
 
-// Empty field swatch paint = live form body colour (cookie fc / --exodus-form-bg-color).
+// Empty field swatch paint = live form body colour (cookie fc / --exoform-bg-color).
 // After live preview this follows the popup selection — do not use for "is default?".
 function colors_default_swatch_hex() {
 	try {
 		var formBody = getComputedStyle(document.documentElement)
-			.getPropertyValue('--exodus-form-bg-color').trim()
+			.getPropertyValue('--exoform-bg-color').trim()
 		var hex = colors_css_to_hex6(formBody)
 		if (hex)
 			return hex
@@ -2168,13 +2168,13 @@ function colors_install_swatch(field) {
 	// Need a stable id for field_swatch (dbform must set id before install)
 	if (!field.id)
 		return false
-	if (field.getAttribute('data-exodus-color-field') == '1') {
+	if (field.getAttribute('data-exo-color-field') == '1') {
 		colors_sync_swatch(field)
 		return true
 	}
 
-	field.setAttribute('data-exodus-color-field', '1')
-	field.className = (field.className ? field.className + ' ' : '') + 'exodus-color-text'
+	field.setAttribute('data-exo-color-field', '1')
+	field.className = (field.className ? field.className + ' ' : '') + 'exocolor-text'
 
 	// Swatch is chrome only — not tabbable; sits after the text; click = F7.
 	// Inline size so the chip is visible even if colors.css fails to load
@@ -2182,19 +2182,19 @@ function colors_install_swatch(field) {
 	var swatch = document.createElement('button')
 	swatch.type = 'button'
 	swatch.id = field.id + '_swatch'
-	swatch.className = 'exodus-native-color'
+	swatch.className = 'exonative-color'
 	swatch.title = (field.getAttribute('exotitle') || field.id || 'Colour') + ' (F7)'
 	swatch.tabIndex = -1
 	swatch.setAttribute('tabindex', '-1')
 	swatch.setAttribute('aria-label', 'Colour swatch')
-	swatch.setAttribute('data-exodus-color-swatch-for', field.id)
+	swatch.setAttribute('data-exo-color-swatch-for', field.id)
 	swatch.style.cssText = 'display:inline-block;width:2.7rem;height:1.35rem;'
 		+ 'min-width:2.7rem;min-height:1.35rem;padding:0;margin:0 0 0 0.35em;'
 		+ 'border:2px solid #888;border-radius:0.3rem;vertical-align:middle;'
 		+ 'cursor:pointer;box-sizing:border-box;overflow:hidden;'
 
 	var wrap = document.createElement('span')
-	wrap.className = 'exodus-color-field-wrap'
+	wrap.className = 'exocolor-field-wrap'
 	if (!field.parentNode)
 		return false
 	field.parentNode.insertBefore(wrap, field)

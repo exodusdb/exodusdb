@@ -69,13 +69,13 @@
 		<h2>
 			Upload Image, Audio, Video, Documents
 		</h2>
-		<button class="exodusbutton" style="display: none" id="button_showupload">
+		<button class="exobutton" style="display: none" id="button_showupload">
 			Upload
 		</button>
 
 		<form enctype="multipart/form-data" target="_parent" action="../exodus/upload.php" method="post" id="form1">
 
-			<table class="exodusform" id="table_upload" style="padding: 5px; display: none">
+			<table class="exoform" id="table_upload" style="padding: 5px; display: none">
 
 				<tr>
 					<td rowspan="2" style="text-align:center; vertical-align:middle; padding:30px;">
@@ -98,8 +98,8 @@
 
 				<tr>
 					<td style="text-align:center; vertical-align:middle; padding:10px;">
-						<input id="button_submit" class="exodusbutton" type="button" value="Upload" accesskey="2" title="Upload (Alt+2)" />
-						<button class="exodusbutton" onclick="window.close()" title="Close window (Esc)">Close</button>
+						<input id="button_submit" class="exobutton" type="button" value="Upload" accesskey="2" title="Upload (Alt+2)" />
+						<button class="exobutton" onclick="window.close()" title="Close window (Esc)">Close</button>
 					</td>
 					<span style="margin-left: 2.5px; display:none;" id="uploadpathtext"></span>
 				</tr>
@@ -119,7 +119,7 @@
 					<td>
 					</td>
 					<td>
-						<button exo_onclick="await loadimages()" class="exodusbutton">
+						<button exo_onclick="await loadimages()" class="exobutton">
 							Refresh
 						</button>
 					</td>

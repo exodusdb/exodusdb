@@ -60,12 +60,12 @@ function authorisation_tabs_show_sync(which) {
         return
 
     var showusers = which == 'users'
-    userspanel.className = showusers ? 'exodustab_panel exodustab_active' : 'exodustab_panel'
-    taskspanel.className = showusers ? 'exodustab_panel' : 'exodustab_panel exodustab_active'
+    userspanel.className = showusers ? 'exotab_panel exotab_active' : 'exotab_panel'
+    taskspanel.className = showusers ? 'exotab_panel' : 'exotab_panel exotab_active'
     if (usersbtn)
-        usersbtn.className = showusers ? 'exodustab exodustab_active' : 'exodustab'
+        usersbtn.className = showusers ? 'exotab exotab_active' : 'exotab'
     if (tasksbtn)
-        tasksbtn.className = showusers ? 'exodustab' : 'exodustab exodustab_active'
+        tasksbtn.className = showusers ? 'exotab' : 'exotab exotab_active'
 }
 
 async function user_showtasks(event) {

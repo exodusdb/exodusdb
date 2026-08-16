@@ -49,7 +49,7 @@ var gimagetheme = '../../exodus/images/theme2/'
 /*
  * Icon values are either:
  *   string URL  — painted multicolour SVG (New/Edit/Delete, theme, …)
- *   { mask, color } — black monochrome SVG, tinted via CSS --exodus-icon-*
+ *   { mask, color } — black monochrome SVG, tinted via CSS --exoicon-*
  * Colour names: green, red, orange, blue, darkgrey, lightgrey, neutral
  */
 function exo_icon_spec(mask, color) {
@@ -152,7 +152,7 @@ function exo_apply_sort_icon(el, order) {
 
 function exo_refresh_sortimages() {
 
-	document.querySelectorAll('.exodus-icon[id^="sortbutton_"], img[id^="sortbutton_"]').forEach(function (el) {
+	document.querySelectorAll('.exoicon[id^="sortbutton_"], img[id^="sortbutton_"]').forEach(function (el) {
 		exo_apply_sort_icon(el, exo_sort_order_of(el))
 	})
 }
@@ -257,7 +257,7 @@ function exo_client_init() {
 	}
 
 	// $$ is an Exodus DOM helper (not a browser polyfill).
-	// Primary lookup: class exodusid_<id> (so multi-row/multi-instance fields share one logical id).
+	// Primary lookup: class exoid_<id> (so multi-row/multi-instance fields share one logical id).
 	// Return shape (legacy document.all-like): one match → element; many → collection; none → getElementById then undefined.
 	// getElementById alone does not match this: it always returns at most one node even when duplicate ids exist.
 	// Required by login/dbform/etc. — do not drop or replace with plain getElementById.
@@ -396,7 +396,7 @@ function exo_client_init() {
 		document.writeln('<style id="exo_dm_flashguard">'
 			+ '@media screen{'
 			+ ':root[data-theme=dark_mode],:root[data-theme=dark_mode] BODY{background:#000!important;color:#fff}'
-			// No TABLE.exodusform body fill — pane chrome + .exodata only (global.css)
+			// No TABLE.exoform body fill — pane chrome + .exodata only (global.css)
 			+ '}'
 			+ '</style>')
 	}
@@ -854,7 +854,7 @@ function dbsend_release_modal(xhttp, dbmodalblocked) {
 
 	// Close Wait/Cancel confirm only if it owns the pending resolver (Gate B).
 	// Never resolve a Gate A business confirm from db.send completion.
-	if ($$('exodusconfirmdiv') && gpendingConfirmResolve)
+	if ($$('exoconfirmdiv') && gpendingConfirmResolve)
 		resolvePendingConfirm(1, 'db.send complete', 'B')
 
 	unblockmodalui_sync()
@@ -896,7 +896,7 @@ function exo_begin_waitcancel(source) {
 		return
 	}
 
-	if ($$('exodusconfirmdiv')) {
+	if ($$('exoconfirmdiv')) {
 		exo_flight_log('WAITCANCEL ignored (other confirm up)')
 		return
 	}
@@ -976,11 +976,11 @@ var gdecide_ctx_timer = null
 
 function modalblock_scrollpane_under(event) {
 
-	var confirm = $$('exodusconfirmdiv')
+	var confirm = $$('exoconfirmdiv')
 	if (!confirm || !confirm.contains(event.target))
 		return null
 
-	var scrollpane = confirm.querySelector('.exodusconfirm_body')
+	var scrollpane = confirm.querySelector('.exoconfirm_body')
 	if (!scrollpane || !(scrollpane === event.target || scrollpane.contains(event.target)))
 		return null
 
@@ -1067,12 +1067,12 @@ function modalblock_create() {
 	blocker.style.width = '100vw'
 	blocker.style.height = '100vh'
 	blocker.style.background = gisdarktheme
-		? 'rgba(0, 0, 0, 0.08)'//near-transparent tint, matches --exodus-page-bg-color
+		? 'rgba(0, 0, 0, 0.08)'//near-transparent tint, matches --exopage-bg-color
 		: 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
 	blocker.style.position = 'fixed'
 	blocker.style.top = '0'
 	blocker.style.left = '0'
-	blocker.style.zIndex = '1000'//above #exo_menu (999), below .exodusconfirmdiv (1001)
+	blocker.style.zIndex = '1000'//above #exo_menu (999), below .exoconfirmdiv (1001)
 	blocker.style.pointerEvents = 'auto'
 	blocker.id = 'uiblockerdiv'
 
@@ -1093,7 +1093,7 @@ function modalblock_create() {
 	}
 	blocker.onclick = function uiblockerdiv_onclick_sync(event) {
 
-		if ($$('exodusconfirmdiv')) {
+		if ($$('exoconfirmdiv')) {
 			window.setTimeout(exo_confirm_outside_click_sync, 10)
 		}
 		// Date picker: click outside (on modal shield) dismisses without commit
@@ -1137,7 +1137,7 @@ function modalblock_destroy() {
 
 	// Orphaned confirm while last modal layer tears down — resolve by owner only.
 	// Gate B Wait/Cancel → Wait/complete (1). Gate A business → Cancel (0), never auto-OK.
-	if ($$('exodusconfirmdiv') && gpendingConfirmResolve) {
+	if ($$('exoconfirmdiv') && gpendingConfirmResolve) {
 		if (gpendingConfirmOwner === 'B')
 			resolvePendingConfirm(1, 'modalblock_destroy', 'B')
 		else if (gpendingConfirmOwner === 'A') {
@@ -1418,7 +1418,7 @@ function exoui_windowclose(returnvalues) {
 		if (window.opener.exo_setchildwin_returnvalue) {
 			if (typeof returnvalues == 'undefined')
 				returnvalues = ''
-			returnvalues.exodusisarray = true
+			returnvalues.exoisarray = true
 			window.opener.exo_setchildwin_returnvalue(returnvalues)
 		}
 	}
@@ -1431,7 +1431,7 @@ var gchildwin_returnvalue
 function exo_setchildwin_returnvalue(returnvalue) {
 	//gchildwin_returnvalue=returnvalue
 	//shallow copy array to avoid permissions issue when child windows closes in edge
-	if (returnvalue.exodusisarray) {
+	if (returnvalue.exoisarray) {
 		gchildwin_returnvalue = []
 		for (var ii = 0; ii < returnvalue.length; ++ii) {
 			//gchildwin_returnvalue[ii]=returnvalue[ii].toString()
@@ -1789,7 +1789,7 @@ function exo_sync_theme_btn_icon(img, btn) {
 
 function exo_swap_tool_icons() {
 
-	// Static toolbar icons (e.g. reports.htm). Mono masks → tinted .exodus-icon spans.
+	// Static toolbar icons (e.g. reports.htm). Mono masks → tinted .exoicon spans.
 	var tools = [
 		{ file: 'row-insert.svg', color: 'green' },
 		{ file: 'row-delete.svg', color: 'red' },
@@ -1862,7 +1862,7 @@ function exo_set_theme_icons() {
 				img.src = gdeleteimage
 			else if (id == 'copyrecord' && typeof gcopyimage == 'string')
 				img.src = gcopyimage
-			else if (id.indexOf('edit') >= 0 && b.querySelector && !b.querySelector('.exodus-icon'))
+			else if (id.indexOf('edit') >= 0 && b.querySelector && !b.querySelector('.exoicon'))
 				img.src = geditimage // Edit mode; Release uses lock mono
 		})
 	}
@@ -1935,7 +1935,7 @@ function exo_clear_form_inline_theme() {
 
 	var tables = document.getElementsByTagName('TABLE')
 	for (var ii = 0; ii < tables.length; ii++) {
-		if ((' ' + tables[ii].className + ' ').indexOf(' exodusform ') >= 0) {
+		if ((' ' + tables[ii].className + ' ').indexOf(' exoform ') >= 0) {
 			tables[ii].style.removeProperty('color')
 			tables[ii].style.removeProperty('background-color')
 		}
@@ -1951,7 +1951,7 @@ function theme_toggle(theme = 'default') {
 	if (theme == 'default') {
 		gisdarktheme = false
 		html.removeAttribute('data-theme')
-		html.style.removeProperty('--exodus-cardcolor')
+		html.style.removeProperty('--exocardcolor')
 		// Drop firstpaint DM inline (color-scheme / black bg) so LM is not stuck dark
 		html.style.removeProperty('color-scheme')
 		html.style.removeProperty('background')
@@ -1967,10 +1967,10 @@ function theme_toggle(theme = 'default') {
 	} else {
 		gisdarktheme = true
 		html.setAttribute('data-theme', theme)
-		html.style.removeProperty('--exodus-cardcolor')
+		html.style.removeProperty('--exocardcolor')
 		// Inline LM colour on <html> would override DM :root tokens
-		html.style.removeProperty('--exodus-form-bg-color')
-		html.style.removeProperty('--exodus-form-border-color')
+		html.style.removeProperty('--exoform-bg-color')
+		html.style.removeProperty('--exoform-border-color')
 		html.removeAttribute('data-form-head')
 	}
 
@@ -1990,7 +1990,7 @@ function theme_toggle(theme = 'default') {
 
 // Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
 // Deeper vs lighter from body luma; CSS owns the two formulas.
-// Call when setting a non-empty --exodus-form-bg-color.
+// Call when setting a non-empty --exoform-bg-color.
 function exo_set_form_head_direction(cssColor) {
 	var s = String(cssColor == null ? '' : cssColor).replace(/\s+/g, '')
 	if (/^[0-9a-fA-F]{3}$/.test(s) || /^[0-9a-fA-F]{6}$/.test(s))
@@ -2040,26 +2040,26 @@ function exo_chrome_apply_color(value) {
 		return
 	var html = document.documentElement
 	if (exo_chrome_is_empty(value)) {
-		html.style.removeProperty('--exodus-form-bg-color')
-		html.style.removeProperty('--exodus-form-border-color')
+		html.style.removeProperty('--exoform-bg-color')
+		html.style.removeProperty('--exoform-border-color')
 		html.removeAttribute('data-form-head')
-		html.style.removeProperty('--exodus-cardcolor')
+		html.style.removeProperty('--exocardcolor')
 		return
 	}
 	value = String(value).trim()
-	html.style.setProperty('--exodus-form-bg-color', value)
-	html.style.setProperty('--exodus-form-border-color', '#d0d0d0')
+	html.style.setProperty('--exoform-bg-color', value)
+	html.style.setProperty('--exoform-border-color', '#d0d0d0')
 	exo_set_form_head_direction(value)
-	html.style.removeProperty('--exodus-cardcolor')
+	html.style.removeProperty('--exocardcolor')
 }
 
 // Font family + size %. Empty family/size → CSS / browser default (remove override).
 function exo_chrome_apply_font(family, size) {
 	var html = document.documentElement
 	if (exo_chrome_is_empty(family))
-		html.style.removeProperty('--exodus-screen-font-family')
+		html.style.removeProperty('--exoscreen-font-family')
 	else
-		html.style.setProperty('--exodus-screen-font-family', String(family).trim())
+		html.style.setProperty('--exoscreen-font-family', String(family).trim())
 
 	if (exo_chrome_is_empty(size)) {
 		html.style.removeProperty('font-size')
@@ -2193,7 +2193,7 @@ function adjust_bodymargin() {
 	}
 	document.body.style.marginTop = (menuheight + 10) + 'px'
 	// stick flush under fixed menubar (body margin +10 is page spacing, not sticky offset)
-	document.documentElement.style.setProperty('--exodus-sticky-top', (barTop + menuheight) + 'px')
+	document.documentElement.style.setProperty('--exosticky-top', (barTop + menuheight) + 'px')
 }
 
 // Once per window: resize + MutationObserver so late-built bars (modals) keep body clear.
@@ -2271,7 +2271,7 @@ async function clientfunctions_windowonload() {
 	wire_exodus_bodymargin()
 
 	//trigger formfunctions_onload; wrap panes; only then reveal forms
-	// (html:not(.exodus-panes-ready) keeps bare/unmerged layout invisible — global.css).
+	// (html:not(.exopanes-ready) keeps bare/unmerged layout invisible — global.css).
 	// Wide: cleardoc skeleton (bound+unbound) before first record; re-decide after wrap.
 	try {
 		if (typeof formfunctions_onload == 'function')
@@ -2387,7 +2387,7 @@ function menuonload() {
 
 		//enable exodus support menu items
 		if (gusername=='EXODUS') {
-			var elements = idocument.getElementsByClassName('exodussupportmenuitem')
+			var elements = idocument.getElementsByClassName('exosupportmenuitem')
 			for (var ii=0;ii<elements.length;++ii)
 				elements[ii].style.display = ''
 		}
@@ -2455,7 +2455,7 @@ Array.prototype.exoread = async function array_exodusread(filename, key, fieldno
 	//so that accessing fields that do not exist by [] returns ''
 	var minnfields = 100
 
-	this.exodusresponse = exoquote(key) + ' does not exist in the ' + filename.toLowerCase() + ' file.'
+	this.exoresponse = exoquote(key) + ' does not exist in the ' + filename.toLowerCase() + ' file.'
 	if (key == '')
 		return false
 
@@ -2471,7 +2471,7 @@ Array.prototype.exoread = async function array_exodusread(filename, key, fieldno
 		}
 		else {
 			if (db.response.indexOf('file is not available') >= 0) systemerror('exoread', db.response)
-			this.exodusresponse = db.response
+			this.exoresponse = db.response
 		}
 		return false
 	}
@@ -2541,7 +2541,7 @@ Array.prototype.exoxlate = async function arrayxlate(filename, fieldno, mode) {
 		if (!(await db.send(uncachedkeys.join(fm)))) {
 			// Client abort/cancel (typeahead supersede, unload) — not a system failure.
 			// Keep any cached partials already filled above.
-			this.exodusresponse = db.response
+			this.exoresponse = db.response
 			var r = String(db.response || '')
 			if (r == 'Cancelled' || r.indexOf('Client cancelled') >= 0)
 				return results
@@ -2772,7 +2772,7 @@ function exodblink() {
 		return
 	}
 
-	this.exodusrootpath = getexodusrootpath(document.location.toString())
+	this.exorootpath = getexorootpath(document.location.toString())
 
 	//localhostname
 	//remove space . " ' characters
@@ -5078,8 +5078,8 @@ function menuhide(element) {
 		okmenus = okmenus.split(',')
 	}
 
-	if (!element.exodusmenuaccesskeys)
-		element.exodusmenuaccesskeys = []
+	if (!element.exomenuaccesskeys)
+		element.exomenuaccesskeys = []
 
 	var childnodes = element.childNodes
 
@@ -5119,25 +5119,25 @@ function menuhide(element) {
 				//child.style.paddingLeft = '0px'
 				child.style.paddingLeft = '5px'
 
-				if (typeof child.exodussubmenuoption == 'undefined') {
+				if (typeof child.exosubmenuoption == 'undefined') {
 
 					//save an array of elements by accesskey in the menu
 					var underlineelement
 					if ((underlineelement = child.getElementsByTagName('U')).length) {
 						var menuaccesskey = underlineelement[0].innerText.exotrim().slice(0, 1).toUpperCase()
-						var temp = element.exodusmenuaccesskeys[menuaccesskey]
+						var temp = element.exomenuaccesskeys[menuaccesskey]
 						if (gusername == 'EXODUS' && temp)
 							void exo_begin(function () {
 								return exoui_note('Duplicate menu access key ' + menuaccesskey.exoquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
 							}, 'duplicate menu access key')
 							// alert('Duplicate menu access key ' + menuaccesskey.exoquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
-						element.exodusmenuaccesskeys[menuaccesskey] = child
+						element.exomenuaccesskeys[menuaccesskey] = child
 					}
 				}
 
 				//add submenu indicators
-				if (!child.href && !child.onclick && typeof child.exodussubmenuoption == 'undefined') {
-					child.exodussubmenuoption = true
+				if (!child.href && !child.onclick && typeof child.exosubmenuoption == 'undefined') {
+					child.exosubmenuoption = true
 					//child.style.width=child.parentNode.runtimeStyle.width
 					//child.style.border='1px solid'
 					if (element.id != 'menudiv')
@@ -5145,7 +5145,7 @@ function menuhide(element) {
 
 				}
 				else {
-					child.exodussubmenuoption = false
+					child.exosubmenuoption = false
 				}
 
 			}
@@ -5395,8 +5395,8 @@ function menuonkeydown(event, menu, key) {
 	}
 
 	//menu access key?
-	if (alphakey && menu.exodusmenuaccesskeys) {
-		var newmenuoption = menu.exodusmenuaccesskeys[String.fromCharCode(key)]
+	if (alphakey && menu.exomenuaccesskeys) {
+		var newmenuoption = menu.exomenuaccesskeys[String.fromCharCode(key)]
 		if (newmenuoption) {
 			menuoption = newmenuoption
 			//will be done below menuchangeoption(menu,menuoption)
@@ -5510,7 +5510,7 @@ function menuchangeoption(menu, newmenuoption) {
 
 	//highlight new menu item
 	//newmenuoption.style.backgroundColor='#d0d0d0'
-	newmenuoption.style.background = 'var(--exodus-menu-hover-bg-color)'
+	newmenuoption.style.background = 'var(--exomenu-hover-bg-color)'
 	newmenuoption.style.borderRadius = '8px'
 	//newmenuoption.style.backgroundColor = 'highlight'
 	//newmenuoption.style.color = 'highlighttext'
@@ -5712,7 +5712,7 @@ function setgraphicbutton(button, labeltext, src) {
 	if (src == null || typeof src == 'undefined')
 		return
 
-	var icon = button.querySelector('.exodus-icon')
+	var icon = button.querySelector('.exoicon')
 	var img = button.getElementsByTagName('IMG')[0]
 
 	if (exo_is_icon_spec(src)) {
@@ -5822,16 +5822,16 @@ function exoformpaneof(tablex) {
 	var parent = tablex && tablex.parentNode
 	if (!parent || !parent.className)
 		return tablex
-	if ((' ' + parent.className + ' ').indexOf(' exodusformpane ') >= 0)
+	if ((' ' + parent.className + ' ').indexOf(' exoformpane ') >= 0)
 		return parent
 	return tablex
 }
 
-function exoform_is_inside_exodusform(tablex) {
+function exoform_is_inside_exoform(tablex) {
 
 	var el = tablex && tablex.parentNode
 	while (el) {
-		if (el.tagName == 'TABLE' && el.className && (' ' + el.className + ' ').indexOf(' exodusform ') >= 0)
+		if (el.tagName == 'TABLE' && el.className && (' ' + el.className + ' ').indexOf(' exoform ') >= 0)
 			return true
 		el = el.parentNode
 	}
@@ -5854,9 +5854,9 @@ function exo_is_formpane_run_sep(node) {
 
 function exocoalesceformpanes() {
 
-	// Merge sibling .exodusformpane shells (only br/ws/comment between) into one rounded frame.
+	// Merge sibling .exoformpane shells (only br/ws/comment between) into one rounded frame.
 	// A plain <span></span> between panes keeps separate shells (schedules.htm).
-	var panes = document.getElementsByClassName('exodusformpane')
+	var panes = document.getElementsByClassName('exoformpane')
 	var parents = []
 	for (var panen = 0; panen < panes.length; panen++) {
 		var parentx = panes[panen].parentNode
@@ -5890,7 +5890,7 @@ function exocoalesceformpanes() {
 
 		while (node) {
 			var next = node.nextSibling
-			if (node.nodeType == 1 && node.className && (' ' + node.className + ' ').indexOf(' exodusformpane ') >= 0) {
+			if (node.nodeType == 1 && node.className && (' ' + node.className + ' ').indexOf(' exoformpane ') >= 0) {
 				runpanes.push(node)
 				runseps.push(seps)
 				seps = []
@@ -5909,26 +5909,26 @@ function exocoalesceformpanes() {
 	}
 }
 
-function exo_is_wrappable_exodusform(tablex) {
+function exo_is_wrappable_exoform(tablex) {
 
-	// Top-level TABLE.exodusform not already inside a pane (or nested in another form).
-	if (!tablex || !tablex.className || (' ' + tablex.className + ' ').indexOf(' exodusform ') < 0)
+	// Top-level TABLE.exoform not already inside a pane (or nested in another form).
+	if (!tablex || !tablex.className || (' ' + tablex.className + ' ').indexOf(' exoform ') < 0)
 		return false
-	if (exoform_is_inside_exodusform(tablex))
+	if (exoform_is_inside_exoform(tablex))
 		return false
 	var parent = tablex.parentNode
 	if (!parent)
 		return false
-	if (parent.className && (' ' + parent.className + ' ').indexOf(' exodusformpane ') >= 0)
+	if (parent.className && (' ' + parent.className + ' ').indexOf(' exoformpane ') >= 0)
 		return false
 	return true
 }
 
 function exo_reveal_form_panes() {
 
-	// Allow painting after wrap+coalesce (pairs with global.css html:not(.exodus-panes-ready)).
+	// Allow painting after wrap+coalesce (pairs with global.css html:not(.exopanes-ready)).
 	try {
-		document.documentElement.classList.add('exodus-panes-ready')
+		document.documentElement.classList.add('exopanes-ready')
 	} catch (e) { }
 }
 
@@ -5943,7 +5943,7 @@ function exo_reveal_form_panes() {
  * Skeleton: free-text at empty floor 6ch, table unlimited max-content width.
  * Soft ceiling = current zoom (100vw − 2rem). Remeasure each decide (KISS).
  *
- * Free-text soft max 30ch ONLY when .exodusform-wide (form_table_set_wide).
+ * Free-text soft max 30ch ONLY when .exoform-wide (form_table_set_wide).
  * REGRESSION GUARD: never leave style.maxWidth=30ch on narrow forms — that
  * looks like “all text locked to 30 characters”. Always apply 100% when !wide.
  * Nested host tables must NOT use width:max-content (global.css) or free-text
@@ -5958,8 +5958,8 @@ function form_table_is_wide(table) {
 	if (!table)
 		return false
 	if (table.classList)
-		return table.classList.contains('exodusform-wide')
-	return (' ' + (table.className || '') + ' ').indexOf(' exodusform-wide ') >= 0
+		return table.classList.contains('exoform-wide')
+	return (' ' + (table.className || '') + ' ').indexOf(' exoform-wide ') >= 0
 }
 
 function form_table_set_wide_class(table, wide) {
@@ -5967,16 +5967,16 @@ function form_table_set_wide_class(table, wide) {
 		return
 	if (table.classList) {
 		if (wide)
-			table.classList.add('exodusform-wide')
+			table.classList.add('exoform-wide')
 		else
-			table.classList.remove('exodusform-wide')
+			table.classList.remove('exoform-wide')
 		return
 	}
 	var has = form_table_is_wide(table)
 	if (wide && !has)
-		table.className = (table.className ? table.className + ' ' : '') + 'exodusform-wide'
+		table.className = (table.className ? table.className + ' ' : '') + 'exoform-wide'
 	else if (!wide && has)
-		table.className = (' ' + table.className + ' ').replace(/ exodusform-wide /g, ' ').replace(/^\s+|\s+$/g, '')
+		table.className = (' ' + table.className + ' ').replace(/ exoform-wide /g, ' ').replace(/^\s+|\s+$/g, '')
 }
 
 function form_table_apply_freetext_wide_max(table, wide) {
@@ -6051,10 +6051,10 @@ function form_table_wants_wide(table, ceiling) {
 }
 
 function form_wide_layout_tables() {
-	var forms = document.querySelectorAll('.exodusformpane > TABLE.exodusform')
+	var forms = document.querySelectorAll('.exoformpane > TABLE.exoform')
 	if (forms.length)
 		return forms
-	return document.querySelectorAll('TABLE.exodusform')
+	return document.querySelectorAll('TABLE.exoform')
 }
 
 function form_wide_layout_geom_snap(forms, ceiling) {
@@ -6260,14 +6260,14 @@ function exowrapformpanes() {
 
 	// One pane per sibling *run* of top-level forms (same rules as coalesce:
 	// only br/ws/comment between). Build each shell in a single step.
-	// Pre-authored .exodusformpane shells are left alone; coalesce still merges
+	// Pre-authored .exoformpane shells are left alone; coalesce still merges
 	// those if they sit with only br/ws/comment between them.
 	// Caller reveals via exo_reveal_form_panes() after this returns.
 	var tables = document.getElementsByTagName('TABLE')
 	var candidates = []
 	var tablen
 	for (tablen = 0; tablen < tables.length; tablen++) {
-		if (exo_is_wrappable_exodusform(tables[tablen]))
+		if (exo_is_wrappable_exoform(tables[tablen]))
 			candidates.push(tables[tablen])
 	}
 
@@ -6290,7 +6290,7 @@ function exowrapformpanes() {
 			if (!runforms.length)
 				return
 			var pane = document.createElement('div')
-			pane.className = 'exodusformpane'
+			pane.className = 'exoformpane'
 			var first = runforms[0]
 			if (first.style && first.style.display) {
 				pane.style.display = first.style.display
@@ -6336,7 +6336,7 @@ function exowrapformpanes() {
 /*
  * Pane owns outer edges: mark first/last *visible* content (display != none).
  * Runs after formfunctions_onload (postinit showhide already applied). Only
- * direct child forms of .exodusformpane.
+ * direct child forms of .exoformpane.
  *
  * T/B: first/last non-spacer row. Multi-form pane: only the last form gets
  * edge-bottom so the rule between forms stays.
@@ -6350,14 +6350,14 @@ function exowrapformpanes() {
  */
 function exo_mark_form_edge_rows() {
 
-	var panes = document.getElementsByClassName('exodusformpane')
+	var panes = document.getElementsByClassName('exoformpane')
 	for (var panen = 0; panen < panes.length; panen++) {
 		var forms = []
 		var kids = panes[panen].children
 		for (var kidn = 0; kidn < kids.length; kidn++) {
 			var kid = kids[kidn]
 			if (kid.tagName == 'TABLE' && kid.className
-				&& (' ' + kid.className + ' ').indexOf(' exodusform ') >= 0)
+				&& (' ' + kid.className + ' ').indexOf(' exoform ') >= 0)
 				forms.push(kid)
 		}
 		for (var fi = 0; fi < forms.length; fi++) {
@@ -6366,13 +6366,13 @@ function exo_mark_form_edge_rows() {
 			var lastRow = null
 			for (var rown = 0; rows && rown < rows.length; rown++) {
 				var tr = rows[rown]
-				tr.classList.remove('exodus-form-edge-top')
-				tr.classList.remove('exodus-form-edge-bottom')
+				tr.classList.remove('exoform-edge-top')
+				tr.classList.remove('exoform-edge-bottom')
 				// L/R classes on cells every pass (row may be re-shown later)
 				if (tr.cells) {
 					for (var cci = 0; cci < tr.cells.length; cci++) {
-						tr.cells[cci].classList.remove('exodus-form-edge-left')
-						tr.cells[cci].classList.remove('exodus-form-edge-right')
+						tr.cells[cci].classList.remove('exoform-edge-left')
+						tr.cells[cci].classList.remove('exoform-edge-right')
 					}
 				}
 				if (tr.style.display == 'none')
@@ -6420,15 +6420,15 @@ function exo_mark_form_edge_rows() {
 					lastCell = c
 				}
 				if (firstCell)
-					firstCell.classList.add('exodus-form-edge-left')
+					firstCell.classList.add('exoform-edge-left')
 				if (lastCell)
-					lastCell.classList.add('exodus-form-edge-right')
+					lastCell.classList.add('exoform-edge-right')
 			}
 			if (firstRow)
-				firstRow.classList.add('exodus-form-edge-top')
+				firstRow.classList.add('exoform-edge-top')
 			// last form in pane only — intermediate forms keep bottom as separator
 			if (fi == forms.length - 1 && lastRow)
-				lastRow.classList.add('exodus-form-edge-bottom')
+				lastRow.classList.add('exoform-edge-bottom')
 		}
 	}
 }
@@ -6447,8 +6447,8 @@ function exoclear_embeddedtable_hostborders() {
 		// Outer grid prompt cells may be th; data cells are td
 		if (!hostcell || (hostcell.tagName != 'TD' && hostcell.tagName != 'TH'))
 			continue
-		if ((' ' + hostcell.className + ' ').indexOf(' exodusembeddedtable ') < 0)
-			hostcell.className += (hostcell.className ? ' ' : '') + 'exodusembeddedtable'
+		if ((' ' + hostcell.className + ' ').indexOf(' exoembeddedtable ') < 0)
+			hostcell.className += (hostcell.className ? ' ' : '') + 'exoembeddedtable'
 		hostcell.style.removeProperty('border')
 		var hostrow = hostcell.parentNode
 		if (hostrow && hostrow.tagName == 'TR') {
@@ -6489,12 +6489,12 @@ function id2classname(element) {
 	while (element = nextelement(element)) {
 		if (element.id) {
 			if (element.className) {
-				if (element.className.indexOf('exodusid_') < 0) {
-					element.className += ' exodusid_' + element.id
+				if (element.className.indexOf('exoid_') < 0) {
+					element.className += ' exoid_' + element.id
 				}
 			}
 			else
-				element.className = 'exodusid_' + element.id
+				element.className = 'exoid_' + element.id
 		}
 	}
 
@@ -6592,7 +6592,7 @@ var gblockevents_flight_warn_ms = 120000
 // PRODUCT-SPECIFIC (popup owns the gesture):
 //   • colours Ctrl+wheel          continuum resolution N (colors.js — blocks zoom
 //                                 over that popup by design)
-//   • decide type-to-filter etc.  on #exodusconfirmdiv only
+//   • decide type-to-filter etc.  on #exoconfirmdiv only
 //   • decide plain wheel          radio: check+focus next/prev; multi: focus only
 //
 // Browser zoom keys: early *sync capture* keydown — not Gate A, not
@@ -6629,8 +6629,8 @@ function exo_browser_chrome_keydown_capture(event) {
 	if (event.stopImmediatePropagation)
 		event.stopImmediatePropagation()
 	// Decide locks px width; reflow after zoom (resize/visualViewport also refit)
-	var conf = $$('exodusconfirmdiv')
-	if (conf && conf.classList && conf.classList.contains('exodusconfirm_decide'))
+	var conf = $$('exoconfirmdiv')
+	if (conf && conf.classList && conf.classList.contains('exoconfirm_decide'))
 		window.setTimeout(function () { exoconfirm_fit_decide_popup(true) }, 0)
 }
 
@@ -6709,8 +6709,8 @@ function exo_gblockevents_holder() {
 	} catch (e1b) { }
 	// In-DOM confirm / decide while Gate A awaits resolvePendingConfirm
 	try {
-		if (document.getElementById('exodusconfirmdiv'))
-			return 'exodusconfirmdiv'
+		if (document.getElementById('exoconfirmdiv'))
+			return 'exoconfirmdiv'
 	} catch (e) { }
 	try {
 		if (typeof colors_popup != 'undefined' && colors_popup && colors_popup._showing)
@@ -6972,7 +6972,7 @@ function starteventhandler(eventfunctionname, functionx) {
 			}
 
 			++gblockevents_skipped_n
-			logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
+			logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exoconfirmdiv')
 
 			return exocancelevent(event)
 
@@ -7589,14 +7589,14 @@ function systemerror(functionname, e) {
 	})()
 }
 
-// Implementation of $$. Class-based (exodusid_*) so one logical name can have many nodes
+// Implementation of $$. Class-based (exoid_*) so one logical name can have many nodes
 // (rows/repeats). single → element, multi → HTMLCollection, miss → getElementById (one only).
 function $class(elementid, element) {
 	var temp
 	if (element)
-		temp = element.getElementsByClassName('exodusid_' + elementid)
+		temp = element.getElementsByClassName('exoid_' + elementid)
 	else
-		temp = document.getElementsByClassName('exodusid_' + elementid)
+		temp = document.getElementsByClassName('exoid_' + elementid)
 	// one → bare element (callers use .value / .focus etc. without [0])
 	if (temp.length == 1)
 		return temp[0]
@@ -7658,8 +7658,8 @@ function exo_getinnertext(element) {
 }
 
 function exoconfirm_scrollpane() {
-	var div = $$('exodusconfirmdiv')
-	return div && (div.querySelector('.exodusconfirm_body') || div)
+	var div = $$('exoconfirmdiv')
+	return div && (div.querySelector('.exoconfirm_body') || div)
 }
 
 // Scroll a table row into view below a sticky thead (scrollIntoView nearest
@@ -7688,8 +7688,8 @@ function exoconfirm_footerwrap(content) {
 }
 
 /*
- * Monochrome icons: black SVG + CSS mask tint (--exodus-icon-green/red/orange/…).
- * Multicolour icons (New/Edit/Delete) stay as normal <img src>. See global.css .exodus-icon.
+ * Monochrome icons: black SVG + CSS mask tint (--exoicon-green/red/orange/…).
+ * Multicolour icons (New/Edit/Delete) stay as normal <img src>. See global.css .exoicon.
  *
  * IMPORTANT: mask-image URLs must be applied on the element (or resolved absolute).
  * url() inside a custom property used from global.css is resolved against the CSS
@@ -7729,7 +7729,7 @@ function exo_icon_html(maskFileOrSpec, colorName, extraAttrs) {
 	} else {
 		attrs += ' style="' + style + '"'
 	}
-	return '<span class="exodus-icon exodus-icon-' + color + '"'
+	return '<span class="exoicon exoicon-' + color + '"'
 		+ attrs
 		+ ' aria-hidden="true"></span>'
 }
@@ -7738,27 +7738,27 @@ function exo_icon_apply(el, spec) {
 	if (!el || !exo_is_icon_spec(spec))
 		return
 	var id = el.id
-	// Keep framework id→class map (exodusid_*) so $$() still finds multi-id groups
+	// Keep framework id→class map (exoid_*) so $$() still finds multi-id groups
 	// (e.g. all sortbutton_N). Do not wipe className wholesale.
 	var keep = ''
 	if (el.className) {
 		var parts = String(el.className).split(/\s+/)
 		for (var pi = 0; pi < parts.length; pi++) {
-			if (parts[pi].indexOf('exodusid_') === 0)
+			if (parts[pi].indexOf('exoid_') === 0)
 				keep += (keep ? ' ' : '') + parts[pi]
 		}
 	}
-	el.className = (keep ? keep + ' ' : '') + 'exodus-icon exodus-icon-' + (spec.color || 'darkgrey')
+	el.className = (keep ? keep + ' ' : '') + 'exoicon exoicon-' + (spec.color || 'darkgrey')
 	if (id)
 		el.id = id
 	var abs = exo_icon_abs_url(spec.mask)
 	el.style.webkitMaskImage = 'url(\'' + abs + '\')'
 	el.style.maskImage = 'url(\'' + abs + '\')'
 	// clear any old custom-prop approach
-	el.style.removeProperty('--exodus-icon-mask')
+	el.style.removeProperty('--exoicon-mask')
 }
 
-// Create or update an icon host: monochrome {mask,color} → .exodus-icon; string → <img>
+// Create or update an icon host: monochrome {mask,color} → .exoicon; string → <img>
 function exo_create_icon_element(specOrUrl) {
 	if (exo_is_icon_spec(specOrUrl)) {
 		var tmp = document.createElement('span')
@@ -7774,7 +7774,7 @@ function exo_set_icon_element(el, specOrUrl) {
 	if (!el)
 		return null
 	if (exo_is_icon_spec(specOrUrl)) {
-		if (el.classList && el.classList.contains('exodus-icon')) {
+		if (el.classList && el.classList.contains('exoicon')) {
 			exo_icon_apply(el, specOrUrl)
 			return el
 		}
@@ -7843,13 +7843,13 @@ function exoconfirm_back_image() {
 
 function exoconfirm_focusable_elements() {
 
-	var confirm=$$('exodusconfirmdiv')
+	var confirm=$$('exoconfirmdiv')
 	if (!confirm)
 		return []
 	// Document order: text input (if any), then footer action controls
 	var nodes=confirm.querySelectorAll(
-		'#exodusconfirmdiv_textinput,'
-		+ ' .exodusconfirm_footer .graphicbutton[tabindex]'
+		'#exoconfirmdiv_textinput,'
+		+ ' .exoconfirm_footer .graphicbutton[tabindex]'
 	)
 	var list=[]
 	for (var i=0;i<nodes.length;++i) {
@@ -7900,8 +7900,8 @@ function exoconfirm_uninstall_plain_keydown() {
 // AGENTS.md HIGH PRIORITY: typing needs capture true AND startevent true (both).
 function exoconfirm_plain_keydown(event) {
 
-	var conf = document.getElementById('exodusconfirmdiv')
-	if (!conf || (conf.classList && conf.classList.contains('exodusconfirm_decide')))
+	var conf = document.getElementById('exoconfirmdiv')
+	if (!conf || (conf.classList && conf.classList.contains('exoconfirm_decide')))
 		return
 
 	var r = exoconfirm_keymap(event)
@@ -7926,7 +7926,7 @@ function exoconfirm_plain_keydown(event) {
 // Return null = no confirm; true = allow browser; false = swallow form path.
 function exoconfirm_startevent(event) {
 
-	var confirmdiv = document.getElementById('exodusconfirmdiv')
+	var confirmdiv = document.getElementById('exoconfirmdiv')
 	if (!confirmdiv)
 		return null
 
@@ -7935,7 +7935,7 @@ function exoconfirm_startevent(event) {
 
 	// Decide: keys on the popup div; form path only swallows (Esc if focus outside).
 	if (document.getElementById('decide_table1')
-		|| (confirmdiv.classList && confirmdiv.classList.contains('exodusconfirm_decide'))) {
+		|| (confirmdiv.classList && confirmdiv.classList.contains('exoconfirm_decide'))) {
 		if (event.type != 'keydown')
 			return false
 		if (event.ctrlKey && (event.which == 67 || event.keyCode == 67))
@@ -7958,7 +7958,7 @@ function exoconfirm_startevent(event) {
 	// WRONG (broke all typing in exoui_input — material code prompt etc.):
 	// return false
 	// RIGHT: when focus is the text field, allow browser (capture already left key un-cancelled).
-	var textel = document.getElementById('exodusconfirmdiv_textinput')
+	var textel = document.getElementById('exoconfirmdiv_textinput')
 	if (textel && document.activeElement === textel)
 		return true
 	return false
@@ -7969,7 +7969,7 @@ function exoconfirm_startevent(event) {
 // false = action taken or swallow.
 function exoconfirm_keymap(event) {
 
-	if (!document.getElementById('exodusconfirmdiv'))
+	if (!document.getElementById('exoconfirmdiv'))
 		return null
 	if (event.type != 'keydown')
 		return false
@@ -7980,7 +7980,7 @@ function exoconfirm_keymap(event) {
 
 	var keycode = event.keyCode ? event.keyCode : event.which
 	var keyletter = String.fromCharCode(keycode).toUpperCase()
-	var textel = document.getElementById('exodusconfirmdiv_textinput')
+	var textel = document.getElementById('exoconfirmdiv_textinput')
 	var istextinput = !!textel
 	var active = document.activeElement
 	var focusedConfirmBtn = null
@@ -8002,14 +8002,14 @@ function exoconfirm_keymap(event) {
 
 	// Arrows: same cycle as Tab, unless caret is in the confirm text field
 	if ((keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40)
-		&& !(istextinput && active && active.id == 'exodusconfirmdiv_textinput')) {
+		&& !(istextinput && active && active.id == 'exoconfirmdiv_textinput')) {
 		exoconfirm_focus_cycle(keycode == 37 || keycode == 38)
 		return false
 	}
 
 	// Text field focused (no modifiers): type freely. Enter/F9=OK, Esc=Cancel.
 	// Pair with startevent text-field return true (both required for typing).
-	if (istextinput && active && active.id == 'exodusconfirmdiv_textinput'
+	if (istextinput && active && active.id == 'exoconfirmdiv_textinput'
 		&& !event.altKey && !event.ctrlKey && !event.metaKey) {
 		if (keycode == 13 || keycode == 120) {
 			window.setTimeout(exo_confirm_function1_sync, 1)
@@ -8145,7 +8145,7 @@ var gexodusconfirm_scrollhint_resize
 
 function exoconfirm_update_scroll_hints() {
 	var scrollpane = exoconfirm_scrollpane()
-	var wrap = $$('exodusconfirm_scrollhint_wrap')
+	var wrap = $$('exoconfirm_scrollhint_wrap')
 	if (!scrollpane || !wrap)
 		return
 
@@ -8173,9 +8173,9 @@ function exoconfirm_update_scroll_hints() {
 
 function exoconfirm_fit_decide_popup(force) {
 
-	var div=$$('exodusconfirmdiv')
+	var div=$$('exoconfirmdiv')
 	var table=$$('decide_table1')
-	if (!div||!table||!div.classList.contains('exodusconfirm_decide'))
+	if (!div||!table||!div.classList.contains('exoconfirm_decide'))
 		return
 	if (div.getAttribute('exo_confirm_fitted')&&!force)
 		return
@@ -8198,11 +8198,11 @@ function exoconfirm_fit_decide_popup(force) {
 
 	var maxw=Math.max(vw-40, 120)
 	var maxh=Math.max(vh-40, 120)
-	var iconcol=div.querySelector('.exodusconfirm_iconcol')
+	var iconcol=div.querySelector('.exoconfirm_iconcol')
 	var iconw=iconcol ? iconcol.offsetWidth : 0
 	// scrollWidth after clearing width = natural content width
 	var want=Math.max(table.scrollWidth, table.offsetWidth)+iconw+24
-	var footer=div.querySelector('.exodusconfirm_footer')
+	var footer=div.querySelector('.exoconfirm_footer')
 	if (footer)
 		want=Math.max(want, footer.scrollWidth+iconw+24)
 	div.style.width=Math.min(want, maxw)+'px'
@@ -8215,7 +8215,7 @@ function exoconfirm_bind_scroll_hints() {
 	exoconfirm_unbind_scroll_hints()
 
 	var scrollpane = exoconfirm_scrollpane()
-	if (!scrollpane || !$$('exodusconfirm_scrollhint_wrap'))
+	if (!scrollpane || !$$('exoconfirm_scrollhint_wrap'))
 		return
 
 	// fit_decide_popup already refreshes the ▼ hint
@@ -8252,7 +8252,7 @@ function exoconfirm_capture_invoker() {
 		return null
 	// already inside a confirm (nested / re-entry) — leave alone
 	try {
-		if (ae.closest && ae.closest('#exodusconfirmdiv'))
+		if (ae.closest && ae.closest('#exoconfirmdiv'))
 			return null
 	} catch (e) { }
 	var saved = { el: ae, start: null, end: null }
@@ -8274,7 +8274,7 @@ function exoconfirm_release_invoker(saved) {
 		try {
 			if (!document.body.contains(gclient_focuson_element)
 				|| (gclient_focuson_element.closest
-					&& gclient_focuson_element.closest('#exodusconfirmdiv')))
+					&& gclient_focuson_element.closest('#exoconfirmdiv')))
 				gclient_focuson_element = undefined
 		} catch (e) {
 			gclient_focuson_element = undefined
@@ -8288,7 +8288,7 @@ function exoconfirm_release_invoker(saved) {
 		try {
 			if (!el || !el.focus || !document.body.contains(el) || el.disabled)
 				return
-			if (el.closest && el.closest('#exodusconfirmdiv'))
+			if (el.closest && el.closest('#exoconfirmdiv'))
 				return
 			try {
 				el.focus({ preventScroll: true })
@@ -8361,12 +8361,12 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 	//create a centralised div with the appropriate buttons or input box
 	var div = document.createElement('div')
 	// id name determines style, see global.css
-	div.id = 'exodusconfirmdiv'
-	div.classList.add('exodusconfirmdiv')
+	div.id = 'exoconfirmdiv'
+	div.classList.add('exoconfirmdiv')
 	if (istextinput)
-		div.classList.add('exodusconfirm_textinput')
+		div.classList.add('exoconfirm_textinput')
 	if (decide_args)
-		div.classList.add('exodusconfirm_decide')
+		div.classList.add('exoconfirm_decide')
 	div.style.maxHeight = (window.innerHeight - 120) + 'px'
 
 	//image
@@ -8385,19 +8385,19 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 		var xpdm = (typeof gisdarktheme != 'undefined' && gisdarktheme) ? '_dm' : '_lm'
 		if (imagesrc == 'critical') {
 			imagesrc = 'dialog-critical' + xpdm + '.svg'
-			div.classList.add('exodusconfirm_critical')
+			div.classList.add('exoconfirm_critical')
 		}
 		if (imagesrc == 'warning') {
 			imagesrc = 'dialog-warning' + xpdm + '.svg'
-			div.classList.add('exodusconfirm_warning')
+			div.classList.add('exoconfirm_warning')
 		}
 		if (imagesrc == 'info') {
 			imagesrc = 'dialog-info' + xpdm + '.svg'
-			div.classList.add('exodusconfirm_info')
+			div.classList.add('exoconfirm_info')
 		}
 		if (imagesrc == 'question1') {
 			imagesrc = 'dialog-question' + xpdm + '.svg'
-			div.classList.add('exodusconfirm_question1')
+			div.classList.add('exoconfirm_question1')
 		}
 		if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
 			imagesrc = gimagetheme + imagesrc
@@ -8488,7 +8488,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 		html += '"'
 
 		//set the button number
-		html += ' exodusbuttonnumber="' + nbuttons + '"'
+		html += ' exobuttonnumber="' + nbuttons + '"'
 		html += ' exodusyesnocancel="' + (buttonn % 3) + '"'
 
 		var iconhtml = ''
@@ -8520,9 +8520,9 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 
 	if (decide_args) {
 		bodyinner += '\
-			<div class="exodusconfirm_decideblock">\
+			<div class="exoconfirm_decideblock">\
 			<div id="decide_filter_status" class="decide_filter_status" style="display:none"></div>\
-			<table id="decide_table1" xwidth=100% xclass="exodusform">\
+			<table id="decide_table1" xwidth=100% xclass="exoform">\
 				<thead onclick="decide_sorttable2_sync(event)" style="cursor: pointer">\
 					<tr id="decide_table1head1row1">\
 					</tr>\
@@ -8546,9 +8546,9 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 			+ '<span id="decide_cancelbutton_label"><u>C</u>ancel</span>'
 			+ '</span>')
 	} else if (istextinput) {
-		// NB id 'exodusconfirmdiv_textinput' used in starteventhandler()
+		// NB id 'exoconfirmdiv_textinput' used in starteventhandler()
 		bodyinner += '\
-						<input id="exodusconfirmdiv_textinput" size="60" style="display: block;">'
+						<input id="exoconfirmdiv_textinput" size="60" style="display: block;">'
 		footerhtml = exoconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
 	} else {
 		footerhtml = exoconfirm_footerwrap('<span id="yesnocancelbuttons">'+ buttonshtml + '</span>')
@@ -8557,19 +8557,19 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 	var scrollhinthtml = ''
 	if (decide_args)
 		scrollhinthtml = '\
-			<div class="exodusconfirm_scrollhint_wrap" id="exodusconfirm_scrollhint_wrap" aria-hidden="true">\
-				<div class="exodusconfirm_scrollhint" id="exodusconfirm_scrollhint">&#9660;</div>\
+			<div class="exoconfirm_scrollhint_wrap" id="exoconfirm_scrollhint_wrap" aria-hidden="true">\
+				<div class="exoconfirm_scrollhint" id="exoconfirm_scrollhint">&#9660;</div>\
 			</div>'
 
 	// Div shell (not table): option rows are the only <tr>s, so click hit-testing is local.
 	var html = '\
-		<div class="exodusconfirm_layout">\
-			<div class="exodusconfirm_iconcol">'+ imagehtml + '</div>\
-			<div class="exodusconfirm_promptcol">\
-				<div class="exodusconfirm_promptstack">\
-					<div class="exodusconfirm_body">'+ bodyinner + '</div>\
+		<div class="exoconfirm_layout">\
+			<div class="exoconfirm_iconcol">'+ imagehtml + '</div>\
+			<div class="exoconfirm_promptcol">\
+				<div class="exoconfirm_promptstack">\
+					<div class="exoconfirm_body">'+ bodyinner + '</div>\
 					'+ scrollhinthtml + '\
-					<div class="exodusconfirm_footer">'+ footerhtml + '</div>\
+					<div class="exoconfirm_footer">'+ footerhtml + '</div>\
 				</div>\
 			</div>\
 		</div>'
@@ -8581,7 +8581,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 	document.body.insertBefore(div, null)
 
 	if (istextinput) {
-		var textinput = $$('exodusconfirmdiv_textinput')
+		var textinput = $$('exoconfirmdiv_textinput')
 		// $$ may return a NodeList if multiple matches — use the real input element
 		if (textinput && !textinput.tagName && textinput.length)
 			textinput = textinput[0]
@@ -8630,7 +8630,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 
 	}
 
-	// centers exodusconfirmdiv popups via global.css (dynamic centering on resize)
+	// centers exoconfirmdiv popups via global.css (dynamic centering on resize)
 
 	//if case too much to fit vertically on the screen, use scrollbars on the body only
 	//for messages show the bottom of the message; footer buttons stay visible
@@ -8672,10 +8672,10 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 	if (istextinput) {
 		if (typeof gclient_focuson_element != 'undefined')
 			gclient_focuson_element = undefined
-		var exodusconfirm_park_text_focus = function () {
+		var exoconfirm_park_text_focus = function () {
 			try {
-				var el = document.getElementById('exodusconfirmdiv_textinput')
-				if (!el || !document.getElementById('exodusconfirmdiv'))
+				var el = document.getElementById('exoconfirmdiv_textinput')
+				if (!el || !document.getElementById('exoconfirmdiv'))
 					return
 				if (document.activeElement === el)
 					return
@@ -8688,9 +8688,9 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 					el.select()
 			} catch (e) { }
 		}
-		exodusconfirm_park_text_focus()
-		window.setTimeout(exodusconfirm_park_text_focus, 1)
-		window.setTimeout(exodusconfirm_park_text_focus, 50)
+		exoconfirm_park_text_focus()
+		window.setTimeout(exoconfirm_park_text_focus, 1)
+		window.setTimeout(exoconfirm_park_text_focus, 50)
 	} else if (!decide_args) {
 		// Default button, or sole OK (note/invalid) so focus matches Enter behaviour
 		var defbtn = exoconfirm_default_button_element(defaultbuttonn)
@@ -8738,7 +8738,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 //return 1 - Positive Button i.e. 'Ok' with optional text input
 // DOM/HTML entry points — *_sync (resolve confirm leaf; not Gate A takeoff)
 function exo_confirm_function1_sync(event) {
-	var el = $$('exodusconfirmdiv_textinput')
+	var el = $$('exoconfirmdiv_textinput')
 	if (el && !el.tagName && el.length)
 		el = el[0]
 	// Always pass a string when the text field is present so empty OK is '' not 1/0/false
@@ -8837,13 +8837,13 @@ function cancel_backpage_event(event) {
 	// there must be some history present (see pushState below)
 
 	//execute the normal action if no popup is present
-	if (!document.getElementById('exodusconfirmdiv')) {
+	if (!document.getElementById('exoconfirmdiv')) {
 		history.back()
 		return
 	}
 
 	//remove the popup and its controlling generator/coroutine
-	//exoremovenode(exodusconfirmdiv)
+	//exoremovenode(exoconfirmdiv)
 	//geventhandler = false
 	//exo_resume(false, 'cancel_backpage_event')
 	resolvePendingConfirm(false, 'cancel_backpage_event')
@@ -8865,7 +8865,7 @@ async function decide_fail_no_options() {
 		window.clearTimeout(gdecide_ctx_timer)
 		gdecide_ctx_timer = null
 	}
-	var shell = $$('exodusconfirmdiv')
+	var shell = $$('exoconfirmdiv')
 	if (shell)
 		exoremovenode(shell)
 	return await exoui_invalid('No records found.')
@@ -8975,7 +8975,7 @@ function decide_contextmenu_watch(event) {
 		return
 	event = getevent(event)
 	var t = event.target
-	var conf = document.getElementById('exodusconfirmdiv')
+	var conf = document.getElementById('exoconfirmdiv')
 	if (!conf || !t || !(conf.contains(t)))
 		return
 	gdecide_ctx_menu = true
@@ -9117,7 +9117,7 @@ async function decide_onload(decide_args) {
 		var tt = '<button'
 			+ ' title="Alt+A: select/deselect all visible (filtered) rows"'
 			//+ ' onclick="decide_all_onclick_sync()"'
-			+ ' style="font-size:80%" class="exodusbutton"'
+			+ ' style="font-size:80%" class="exobutton"'
 			+ '><u>A</u>ll</button>'
 	else
 		var tt = '&nbsp;'
@@ -9425,14 +9425,14 @@ async function decide_onload(decide_args) {
 		history.pushState(null, null, window.location.pathname + window.location.search + window.location.hash);
 	}
 
-	addeventlistener(exodusconfirmdiv, 'keydown', decide_document_onkeydown)
-	addeventlistener(exodusconfirmdiv, 'keyup', decide_document_onkeyup)
-	addeventlistener(exodusconfirmdiv, 'click', decide_document_onclick)
-	addeventlistener(exodusconfirmdiv, 'dblclick', decide_document_ondblclick)
-	addeventlistener(exodusconfirmdiv, 'mouseover', decide_document_onmouseover)
-	addeventlistener(exodusconfirmdiv, 'mouseout', decide_document_onmouseout)
+	addeventlistener(exoconfirmdiv, 'keydown', decide_document_onkeydown)
+	addeventlistener(exoconfirmdiv, 'keyup', decide_document_onkeyup)
+	addeventlistener(exoconfirmdiv, 'click', decide_document_onclick)
+	addeventlistener(exoconfirmdiv, 'dblclick', decide_document_ondblclick)
+	addeventlistener(exoconfirmdiv, 'mouseover', decide_document_onmouseover)
+	addeventlistener(exoconfirmdiv, 'mouseout', decide_document_onmouseout)
 	// Real pointer move only — not scroll-under-cursor (see decide_hover_locked)
-	addeventlistener(exodusconfirmdiv, 'mousemove', decide_document_onmousemove)
+	addeventlistener(exoconfirmdiv, 'mousemove', decide_document_onmousemove)
 
 	// Wheel over the option table: step like Up/Down (modalblock_onwheel calls this).
 	gdecide_onwheel = function decide_onwheel(event) {
