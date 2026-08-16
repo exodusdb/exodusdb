@@ -24,7 +24,7 @@ async function dict_CHANGELOG() {
  
  di=dict[++din]=dictrec('CHANGELOG_NUMBER','F',0)
  //di.required=true
- exodus_dict_number(di, { decimals: 2 })
+ exo_dict_number(di, { decimals: 2 })
  di.validcharacters='1234567890.'
  di.defaultvalue=exodusdate().exodusquote()
  di.popup='await changelog_pop_number(true)'
@@ -32,28 +32,28 @@ async function dict_CHANGELOG() {
  
  di=dict[++din]=dictrec('CHANGELOG_DATE','F',1)
  di.required=true
- exodus_dict_date(di)
+ exo_dict_date(di)
  di.defaultvalue='TODAY'
  
  di=dict[++din]=dictrec('KEYWORD','F',2,'',1)
  //causes popup of/validation versus previous entries
- exodus_dict_index(di)
+ exo_dict_index(di)
  di.rowrequired=true
  di.lowercase=true
  
  di=dict[++din]=dictrec('CHANGELOG_TEXT','F',3)
  di.required=true
- exodus_dict_textarea(di, 20, 100)
+ exo_dict_textarea(di, 20, 100)
  
  di=dict[++din]=dictrec('DATE_TIME','F',4)
- exodus_dict_datetimeupdated(di)
+ exo_dict_datetimeupdated(di)
  
  di=dict[++din]=dictrec('DISTRIBUTION','F',5)
  di.checkbox='User;User:Support;Support:Developer;Developer'
  di.defaultvalue='"User:Support:Developer"'
  di.horizontal=true
  //causes popup of/validation versus previous entries
- //exodus_dict_index(di)
+ //exo_dict_index(di)
  //di.rowrequired=true
  //di.lowercase=true
  

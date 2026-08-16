@@ -29,10 +29,10 @@ async function dict_VIEWLOG(parameters) {
  //single valued fields
  
  di=dict[++din]=dictrec('FROM_DATE', 'F',5)
- exodus_dict_date(di,'TO=UPTO_DATE')
+ exo_dict_date(di,'TO=UPTO_DATE')
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',6)
- exodus_dict_date(di,'FROM=FROM_DATE')
+ exo_dict_date(di,'FROM=FROM_DATE')
  di.defaultvalue='await  gds.getx("FROM_DATE")'
 
  di=dict[++din]=dictrec('CONTAINING','F',7)

@@ -30,7 +30,7 @@ async function dict_AUTHORISATION(parameters) {
 
     di = dict[++din] = dictrec('KEYS', 'F', 2, '', usersgroupn)
     if (!(await exoui_security('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
-    exodus_dict_code(di)
+    exo_dict_code(di)
     di.validation = 'await user_val_keys()'
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
     di.validcharacters='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ '
@@ -39,7 +39,7 @@ async function dict_AUTHORISATION(parameters) {
     //di=dict[++din]=dictrec('MENU','F',3,'',1)
 
     di = dict[++din] = dictrec('EXPIRY_DATE', 'F', 3, '', usersgroupn)
-    exodus_dict_date(di)
+    exo_dict_date(di)
     di.align = 'L'
 
     di = dict[++din] = dictrec('PASSWORD', 'F', 4, '', usersgroupn)
@@ -49,14 +49,14 @@ async function dict_AUTHORISATION(parameters) {
 
     di = dict[++din] = dictrec('IP_NUMBERS', 'F', 6, '', usersgroupn)
     if (!(await exoui_security('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
-    exodus_dict_ipno(di, true, true, true)
+    exo_dict_ipno(di, true, true, true)
     di.length = 40
 
     di = dict[++din] = dictrec('EMAIL_ADDRESS', 'F', 7, '', usersgroupn)
-    exodus_dict_emailaddress(di, ';')
+    exo_dict_emailaddress(di, ';')
 
     di = dict[++din] = dictrec('USER_NAME', 'F', 8, '', usersgroupn)
-    exodus_dict_text(di)
+    exo_dict_text(di)
 
     //was used to buffer valid companies by user for validcode()
     //di=dict[++din]=dictrec('FIELD9','F',9)
@@ -106,14 +106,14 @@ async function dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('TEMP_OTHER_KEYS', 'F', 24)
 
     di = dict[++din] = dictrec('PASSWORD_AUTOEXPIRY_DAYS', 'F', 25)
-    exodus_dict_integer(di)
+    exo_dict_integer(di)
     if (!(await exoui_security('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
 
     di = dict[++din] = dictrec('EMAIL_NEW_USERS', 'F', 26)
     di.conversion = ';Ask:1;Yes:0;No'
 
     di = dict[++din] = dictrec('LAST_LOGIN_DATE_TIME', 'S', '', '', usersgroupn)
-    exodus_dict_datetime(di)
+    exo_dict_datetime(di)
     di.functioncode = 'return await gds.xlate("USER_ID", "USERS",13)'
 
     di = dict[++din] = dictrec('LAST_LOGIN_LOCATION', 'S', '', '', usersgroupn)

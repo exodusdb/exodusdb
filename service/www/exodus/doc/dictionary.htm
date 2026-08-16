@@ -2,7 +2,7 @@
 <P>Dictionary function are designed to quickly setup repetitive data types. 
 	Additional properties can be added and overridden after the dictionary item is 
 	setup.</P>
-<H4>exodus_dict_index(di,filename,fieldname,many,allownew,warnnew)</H4>
+<H4>exo_dict_index(di,filename,fieldname,many,allownew,warnnew)</H4>
 <P>Sets up a data field to popup/validate against indexed values</P>
 <P><EM>filename </EM>defaults to the current data entry file</P>
 <P><EM>fieldname </EM>defaults to the current dictionary fieldname</P>
@@ -11,37 +11,37 @@
 <P><EM>allownew</EM> defaults to true. if false then user cannot enter new values</P>
 <P><EM>warnnew </EM>defaults to true. if false then the user is warned if entering 
 	new values</P>
-<H4>exodus_dict_year(dictitem,from,to,defaultyear)</H4>
+<H4>exo_dict_year(dictitem,from,to,defaultyear)</H4>
 <P>Sets up a dictionary item to allow four digit years in a dropdown box.</P>
 <P><EM>dictitem</EM> is a dictionary item to be converted</P>
 <P><EM>from </EM>is an optional offset from the current year to start from</P>
 <P><EM>to&nbsp;</EM>is an optional offset from the current year to stop at</P>
 <P><EM>defaultyear </EM>is an optional offset from the current year otherwise there 
 	is no default</P>
-<H4>exodus_dict_datetimeupdated(dictitem)</H4>
+<H4>exo_dict_datetimeupdated(dictitem)</H4>
 <P>Sets up a dictionary item to&nbsp;show time and date and makes it read only and 
 	not copyable</P>
-<H4>exodus_dict_datetime(dictitem)</H4>
+<H4>exo_dict_datetime(dictitem)</H4>
 <P>Sets up a dictionary item to&nbsp;handle time and date in one field eg. 
 	"1/1/2004 12:59"</P>
-<H4>exodus_dict_date(dictitem,params)</H4>
+<H4>exo_dict_date(dictitem,params)</H4>
 <P>Sets up a dictionary item to handle date eg "1/1/2004"</P>
 <P>The conversion is set as "[DATE,params]"</P>
-<H4>exodus_dict_time(dictitem,mode,otherid,params)</H4>
+<H4>exo_dict_time(dictitem,mode,otherid,params)</H4>
 <P>Sets up a dictionary item to handle time eg "12:59"</P>
 <P><EM>mode "</EM>FROM" or "UPTO" indicates that this is one of a pair of time 
 	fields indicating a period of time</P>
 <P><EM>otherid </EM>the dictionary id of the "other" time field</P>
 <P><EM>conversion </EM>The conversion is set as "[TIME,params]" Will not overide an 
 	existing conversion on the dictitem.</P>
-<H4>exodus_dict_period(dictitem)</H4>
+<H4>exo_dict_period(dictitem)</H4>
 <P>Sets up a dictionary item to handle a PERIOD_OF_YEAR eg 1/2004</P>
-<H4>exodus_dict_yesno(dictitem,defaultvalue,type)</H4>
+<H4>exo_dict_yesno(dictitem,defaultvalue,type)</H4>
 <P>Sets up a dictionary to handle a Yes/No field (internally "Y" or "N")</P>
 <P><EM>defaultvalue </EM>"Y" or "N" or defaults to "Y"</P>
 <P><EM>type</EM> "dropdown"=a drop down box, "radio"=vertical aligned, 
 	"hradio"=horizontal aligned</P>
-<H4>exodus_dict_number(dictitem, opts)</H4>
+<H4>exo_dict_number(dictitem, opts)</H4>
 <P>Sets up a dictionary to handle numbers. <EM>opts</EM> is an object bag
 	(optional; omit or <code>{}</code> for defaults). <strong>Omit keys that are
 	at default</strong> — do not pass empty placeholders.</P>
@@ -60,36 +60,36 @@
 	so min/max stay in the right places); omit → <code>[NUMBER,…]</code>
 	(amounts, grouping when BASEFMT groups)
 </UL>
-<P>Examples: <code>exodus_dict_number(di, { decimals: 'CURRENCY' })</code>;
-	<code>exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })</code>;
-	<code>exodus_dict_number(di, { signed: true, max: 100 })</code>
+<P>Examples: <code>exo_dict_number(di, { decimals: 'CURRENCY' })</code>;
+	<code>exo_dict_number(di, { decimals: 'CURRENCY', signed: true })</code>;
+	<code>exo_dict_number(di, { signed: true, max: 100 })</code>
 	(→ min −100, max 100);
-	<code>exodus_dict_integer(di, { max: 100 })</code>;
-	<code>exodus_dict_decimal(di, { decimals: 2 })</code>;
-	<code>exodus_dict_number(di, { max: 100 })</code>
+	<code>exo_dict_integer(di, { max: 100 })</code>;
+	<code>exo_dict_decimal(di, { decimals: 2 })</code>;
+	<code>exo_dict_number(di, { max: 100 })</code>
 	(not <code>decimals: ''</code>).</P>
-<H4>exodus_dict_integer(dictitem, opts)</H4>
-<P>Counts, days, sequences — bag-only shim to <code>exodus_dict_number</code>.
+<H4>exo_dict_integer(dictitem, opts)</H4>
+<P>Counts, days, sequences — bag-only shim to <code>exo_dict_number</code>.
 	Copies <EM>opts</EM>; sets <EM>decimals</EM> 0 and <EM>plain</EM> true only if
-	not already set. Typical: <code>exodus_dict_integer(di)</code> or
+	not already set. Typical: <code>exo_dict_integer(di)</code> or
 	<code>{ max: 100 }</code>. Do not pass string/positional args (e.g. <code>"0Z"</code>).</P>
-<H4>exodus_dict_decimal(dictitem, opts)</H4>
-<P>Plain fractional (no thousands) — bag-only shim to <code>exodus_dict_number</code>.
+<H4>exo_dict_decimal(dictitem, opts)</H4>
+<P>Plain fractional (no thousands) — bag-only shim to <code>exo_dict_number</code>.
 	Copies <EM>opts</EM>; sets <EM>plain</EM> true only if not already set.
-	Typical: <code>exodus_dict_decimal(di, { decimals: 2 })</code>.</P>
-<H4>exodus_dict_text(dictitem,length,rows)</H4>
+	Typical: <code>exo_dict_decimal(di, { decimals: 2 })</code>.</P>
+<H4>exo_dict_text(dictitem,length,rows)</H4>
 <P>Free text field (align T, lowercase true). The field expands to the available
 	cell width; that is the normal layout.</P>
 <P><EM>di.length</EM> is an optional hint. Free-text paint does <strong>not</strong>
 	use length today (no min/max from Nch). Length is still stored on the dictitem
 	when you set it deliberately:</P>
 <ul>
-<li>Pass <em>length</em> into <code>exodus_dict_text(di, length)</code> — sets
+<li>Pass <em>length</em> into <code>exo_dict_text(di, length)</code> — sets
 	<code>di.length</code>, or</li>
 <li>Set <code>di.length = N</code> <strong>after</strong> calling
-	<code>exodus_dict_text(di)</code></li>
+	<code>exo_dict_text(di)</code></li>
 </ul>
-<P>If <em>length</em> is omitted, <code>exodus_dict_text</code> clears
+<P>If <em>length</em> is omitted, <code>exo_dict_text</code> clears
 	<code>di.length</code> (no inherit from dictrec or a prior assignment). There is
 	no default length. A bare <code>di.length = N</code> before the call is therefore
 	cleared unless you also pass <em>length</em> or set length after.</P>
@@ -98,18 +98,18 @@
 	left over from dictrec.</P>
 <p>
     <em>rows</em> is the depth (number of lines) of the data entry field. Default is 1.
-	Prefer <code>exodus_dict_textarea</code> for multi-line fields.</p>
+	Prefer <code>exo_dict_textarea</code> for multi-line fields.</p>
 <P>Lower case will be allowed</P>
-<H4>exodus_dict_textarea(dictitem,nrows,length)</H4>
+<H4>exo_dict_textarea(dictitem,nrows,length)</H4>
 <P>Multi-line free text (HTML textarea). Does <strong>not</strong> call
-	<code>exodus_dict_text</code>. Default <em>nrows</em> is 3.
+	<code>exo_dict_text</code>. Default <em>nrows</em> is 3.
 	<em>length</em> if passed sets <code>di.length</code>; if omitted, any
 	<strong>preexisting</strong> <code>di.length</code> is kept (no clear, no
 	default 80). Typical: <code>di.length = 60</code> then
-	<code>exodus_dict_textarea(di, 5)</code>, or pass length as the third arg.</P>
-<H4>exodus_dict_code(dictitem)</H4>
+	<code>exo_dict_textarea(di, 5)</code>, or pass length as the third arg.</P>
+<H4>exo_dict_code(dictitem)</H4>
 <P>Uppercase code fields (align T, lowercase false, exostyle code). Style only —
-	same length contract as <code>exodus_dict_number</code> (no length arg; does not
+	same length contract as <code>exo_dict_number</code> (no length arg; does not
 	set or clear <code>di.length</code>). Paint floor matches numbers (6ch).</P>
 
 <p>

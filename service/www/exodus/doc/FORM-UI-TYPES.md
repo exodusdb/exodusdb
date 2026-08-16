@@ -4,7 +4,7 @@
 
 Exodus bound form fields: **theory** (clean categories) and **practice** (dictitem × paint × DOM as implemented).
 
-Primary code: `../3/exodus/scripts/db.js` (`dictrec`, `exodus_dict_*`), `dbform.js` (paint, `copydictitem`), wide soft max in `client.js` + `global.css`.
+Primary code: `../3/exodus/scripts/db.js` (`dictrec`, `exo_dict_*`), `dbform.js` (paint, `copydictitem`), wide soft max in `client.js` + `global.css`.
 
 Related:
 
@@ -77,12 +77,12 @@ Helpers that matter for layout:
 
 | Helper | align | lowercase | length | Notes |
 |--------|-------|-----------|--------|-------|
-| `exodus_dict_text` | **T** | true if unset | clear unless arg | free-text intent |
-| `exodus_dict_code` | T via text | **false** | default 30 | code intent |
-| `exodus_dict_textarea` | T | true if unset | keep or set | stays TEXTAREA |
-| `exodus_dict_date` | L | optional | 10 | calendar popup |
-| `exodus_dict_number` | L or R (group) | — | — | conversion |
-| `exodus_dict_time` | L | — | 5 | |
+| `exo_dict_text` | **T** | true if unset | clear unless arg | free-text intent |
+| `exo_dict_code` | T via text | **false** | default 30 | code intent |
+| `exo_dict_textarea` | T | true if unset | keep or set | stays TEXTAREA |
+| `exo_dict_date` | L | optional | 10 | calendar popup |
+| `exo_dict_number` | L or R (group) | — | — | conversion |
+| `exo_dict_time` | L | — | 5 | |
 
 HTM starts as `<input datafld>` or `<span datafld>` or `<textarea>` / `<select>`.
 

@@ -30,12 +30,12 @@
 			await system_dict_datasetcode(di, false, false,'')
 			di.validation = 'await  database_val_olddatabasecode()'
 			di.length = 20
-			exodus_dict_text(di)
+			exo_dict_text(di)
             di.required = true
 
             di = dict[++din] = dictrec('NEW_DATABASE_CODE', 'F', 2)
 			di.length = '25'
-			exodus_dict_text(di);
+			exo_dict_text(di);
             di.required = true
 			di.validation = 'await  database_val_newdatabasecode()'
 

@@ -20,14 +20,14 @@ function colors_restore_saved_screencolor() {
 
 // Custom validators: always call base val first (di.validation replaces base).
 async function colors_val_screencolor() {
-	if (!(await exodus_val_color())) return await exoui_invalid()
+	if (!(await exo_val_color())) return await exoui_invalid()
 	// Preview only. Empty after Default → system body via CSS fallback.
 	colors_apply_screencolor(gvalue)
 	return true
 }
 
 async function colors_val_screenfont() {
-	if (!(await exodus_val_font())) return await exoui_invalid()
+	if (!(await exo_val_font())) return await exoui_invalid()
 	if (typeof exodus_chrome_apply_font == 'function')
 		exodus_chrome_apply_font(gvalue, await gds.getx('SCREEN_FONT_SIZE'))
 	else if (typeof exodus_set_style == 'function')
@@ -43,7 +43,7 @@ async function colors_val_screenfontsize() {
 	return true
 }
 
-async function exodus_val_font() {
+async function exo_val_font() {
 	if (gvalue == null)
 		gvalue = ''
 	gvalue = String(gvalue)
@@ -70,12 +70,12 @@ function colors_is_valid_css_color(v) {
 	}
 }
 
-// Base colour field validation. Wired by exodus_dict_color when di.validation is
+// Base colour field validation. Wired by exo_dict_color when di.validation is
 // unset. Custom di.validation must call this first.
 // Empty / "Default" → "". Named colours and other valid CSS colours stay as-is
 // (framework / exodus_set_style have long accepted them). Invalid rejected.
 // Length capped to the longest name in the allowed colour list.
-async function exodus_val_color() {
+async function exo_val_color() {
 	if (gvalue == null)
 		gvalue = ''
 	gvalue = String(gvalue)
@@ -91,7 +91,7 @@ async function exodus_val_color() {
 	return await exoui_invalid(gvalue + ' is not a recognised color')
 }
 
-function exodus_dict_font(di) {
+function exo_dict_font(di) {
 
 	di.lowercase = true
 	di.allowcursor = true
@@ -103,19 +103,19 @@ function exodus_dict_font(di) {
 
 	di.conversion = tt
 
-	di.popup = 'await exodus_pop_font('
+	di.popup = 'await exo_pop_font('
 	if (di.required) di.popup += 'true'
 	di.popup += ')'
 
 	// Base validation unless a custom di.validation is already set (or set after).
 	if (!di.validation)
-		di.validation = 'await exodus_val_font()'
+		di.validation = 'await exo_val_font()'
 
 	return
 
 }
 
-async function exodus_pop_font(required, many) {
+async function exo_pop_font(required, many) {
 
     //get colors
     var tt = ''
@@ -157,7 +157,7 @@ function colors_max_name_length() {
 	return max
 }
 
-function exodus_dict_color(di) {
+function exo_dict_color(di) {
 
 	di.lowercase = true
 	di.allowcursor = true
@@ -168,7 +168,7 @@ function exodus_dict_color(di) {
 	// Empty paints current form body — not di.defaultvalue.
 	di.conversion = 'color'
 
-	di.popup = 'await exodus_pop_color('
+	di.popup = 'await exo_pop_color('
 	if (di.required) di.popup += 'true'
 	di.popup += ')'
 
@@ -178,9 +178,9 @@ function exodus_dict_color(di) {
 
 	// Base validation for every conversion="color" field from this helper.
 	// If a custom di.validation is set after (or already set), that custom
-	// routine must call await exodus_val_color() first (see colors_val_screencolor).
+	// routine must call await exo_val_color() first (see colors_val_screencolor).
 	if (!di.validation)
-		di.validation = 'await exodus_val_color()'
+		di.validation = 'await exo_val_color()'
 
 	return
 
@@ -1650,7 +1650,7 @@ async function colors_popup_clear() {
 			return
 		}
 		// Return "Default"; field validation turns it into "" and applies system
-		// form-body (colors_val_screencolor / exodus_val_color).
+		// form-body (colors_val_screencolor / exo_val_color).
 		var prev = colors_field_text(field)
 		colors_popup_hide()
 		await colors_field_store(field, 'Default')
@@ -1685,7 +1685,7 @@ async function colors_popup_cancel() {
 }
 
 // F7 / find — calendar contract: return null, open when idle. Toggle closes.
-async function exodus_pop_color(required, many) {
+async function exo_pop_color(required, many) {
 
 	if (many)
 		return await colors_pop_color_decide(required, many)
@@ -1950,7 +1950,7 @@ function exodus_get_fonts(tt) {
 
 }
 
-function exodus_dict_colorfontsize(dict, fn) {
+function exo_dict_colorfontsize(dict, fn) {
 
     var din = dict.length - 1
 
@@ -1960,19 +1960,19 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.wordsep = vm
     di.wordno = 1
     di.nwords = 1
-    exodus_dict_color(di)
+    exo_dict_color(di)
 
     di = dict[++din] = dictrec('REPORT_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 2
     di.nwords = 1
-    exodus_dict_color(di)
+    exo_dict_color(di)
 
     di = dict[++din] = dictrec('REPORT_FONT_NAME', 'F', fn)
     di.wordsep = vm
     di.wordno = 3
     di.nwords = 1
-    exodus_dict_font(di)
+    exo_dict_font(di)
     //di.required=true
 
     // SCREEN_HEAD_COLOR — UNUSED in the live UI (no cookie, no set_style, no HTM
@@ -1983,21 +1983,21 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.wordsep = vm
     di.wordno = 4
     di.nwords = 1
-    exodus_dict_color(di)
+    exo_dict_color(di)
 
     // SCREEN_BODY_COLOR — users preview → --exodus-form-bg-color; cookie fc on Save.
     di = dict[++din] = dictrec('SCREEN_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 5
     di.nwords = 1
-    exodus_dict_color(di)
+    exo_dict_color(di)
     di.validation = 'await colors_val_screencolor()'
 
     di = dict[++din] = dictrec('SCREEN_FONT', 'F', fn)
     di.wordsep = vm
     di.wordno = 6
     di.nwords = 1
-    exodus_dict_font(di)
+    exo_dict_font(di)
     di.validation = 'await colors_val_screenfont()'
 
     di = dict[++din] = dictrec('SCREEN_FONT_SIZE', 'F', fn)
@@ -2006,7 +2006,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.nwords = 1
     di.validation = 'await colors_val_screenfontsize()'
     //di.defaultvalue='100'
-    exodus_dict_integer(di, { min: 50, max: 200 })
+    exo_dict_integer(di, { min: 50, max: 200 })
     di.allowcursor = true
 
     di = dict[++din] = dictrec('REPORT_FONT_SIZE', 'F', fn)
@@ -2014,7 +2014,7 @@ function exodus_dict_colorfontsize(dict, fn) {
     di.wordno = 8
     di.nwords = 1
     //di.defaultvalue='100'
-    exodus_dict_integer(di, { min: 50, max: 200 })
+    exo_dict_integer(di, { min: 50, max: 200 })
     di.allowcursor = true
 
     //report styles need to be ignored in LISTEN2 see task USER UPDATE "REPORT"
@@ -2212,7 +2212,7 @@ function colors_install_swatch(field) {
 		colors_sync_swatch(field)
 	})
 
-	// Click swatch → same as F7 find icon (exodus_pop_color / HSL panel)
+	// Click swatch → same as F7 find icon (exo_pop_color / HSL panel)
 	swatch.addEventListener('click', function (ev) {
 		ev.preventDefault()
 		ev.stopPropagation()
@@ -2220,8 +2220,8 @@ function colors_install_swatch(field) {
 			if (typeof setgpreviouselement == 'function')
 				setgpreviouselement(field)
 			// Same entry as F7 when panel already open = toggle close
-			if (typeof exodus_pop_color == 'function')
-				await exodus_pop_color(!!field.getAttribute('exorequired'))
+			if (typeof exo_pop_color == 'function')
+				await exo_pop_color(!!field.getAttribute('exorequired'))
 			else
 				colors_popup_show(field)
 		}, 'color swatch open')

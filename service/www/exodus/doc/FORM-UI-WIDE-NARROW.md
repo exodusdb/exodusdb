@@ -145,7 +145,7 @@ Compact strips (short codes / integers) must **left-pack**, not fill (e.g. R-ali
 
 **Framework (`form_group_needs_nest_fill` in dbform) — simple rule:**
 
-- **Fill** only if the group has **free-text data entry** (`type F` + text host via `form_field_exostyle` / `exodus_dict_text`).  
+- **Fill** only if the group has **free-text data entry** (`type F` + text host via `form_field_exostyle` / `exo_dict_text`).  
 - **Not** display `S`, not code/number/checkbox.  
 - Otherwise **left-pack**: omit `1%` and set nest `style.width = max-content` (second half: without it, auto width under a wide host TD still takes available width ≈ fill).
 

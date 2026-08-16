@@ -29,17 +29,17 @@ async function dict_LISTREQUESTLOG(parameters) {
  //single valued fields
  
  di=dict[++din]=dictrec('FROM_DATE', 'F',5)
- exodus_dict_date(di,'TO=UPTO_DATE')
+ exo_dict_date(di,'TO=UPTO_DATE')
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',6)
- exodus_dict_date(di,'FROM=FROM_DATE')
+ exo_dict_date(di,'FROM=FROM_DATE')
  di.defaultvalue='await  gds.getx("FROM_DATE")'
 
  di=dict[++din]=dictrec('FROM_TIME', 'F',7)
- exodus_dict_time(di,'TO=UPTO_TIME')
+ exo_dict_time(di,'TO=UPTO_TIME')
  
  di=dict[++din]=dictrec('UPTO_TIME', 'F',8)
- exodus_dict_time(di,'FROM=FROM_TIME')
+ exo_dict_time(di,'FROM=FROM_TIME')
  di.defaultvalue='await  gds.getx("FROM_TIME")'
 
  di=dict[++din]=dictrec('CONTAINING','F',9)
@@ -47,7 +47,7 @@ async function dict_LISTREQUESTLOG(parameters) {
  di.lowercase=true
    
  di=dict[++din]=dictrec('DURATION_SECS','F',10)
- exodus_dict_number(di, { decimals: 0 })
+ exo_dict_number(di, { decimals: 0 })
     
  groupn=1
 

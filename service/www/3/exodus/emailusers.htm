@@ -58,11 +58,11 @@
 
             di = dict[++din] = dictrec('EMAIL_SUBJECT', 'F', 4)
             di.length = 73
-            exodus_dict_text(di)
+            exo_dict_text(di)
             di.required = true
 
             di = dict[++din] = dictrec('EMAIL_MESSAGE', 'F', 5)
-            exodus_dict_textarea(di, 20, 80)
+            exo_dict_textarea(di, 20, 80)
             di.required = true
 
             return dict

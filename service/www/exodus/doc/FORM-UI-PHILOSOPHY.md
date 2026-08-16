@@ -87,7 +87,7 @@ Same trap applies to any experimental live-typing / typeahead work on multivalue
 
 ## 3. Flowing text fields (`align='T'`)
 
-Set by `exodus_dict_text()` in `db.js`. `dbform.js` converts `INPUT` → `SPAN` and applies:
+Set by `exo_dict_text()` in `db.js`. `dbform.js` converts `INPUT` → `SPAN` and applies:
 
 ```javascript
 element.style.minWidth = spanlen + 'ch';  // length floor (ch)
@@ -106,7 +106,7 @@ element.style.overflowWrap = 'break-word';
 2. **HTM** — `class` on the column `td` (thead + template tbody row; cloned rows inherit).
 3. **Page-local CSS** — only if a page needs a tighter cap: `table-layout: fixed` + column width + `min-width: 0 !important` on `.exodusid_FIELD` (must override dbform inline `min-width`).
 
-**Avoid:** `max-width` on HTM `<input>` only; commenting out `exodus_dict_text()` to “shrink” a field; page `!important` that fights the global 100% pane cap without a reason.
+**Avoid:** `max-width` on HTM `<input>` only; commenting out `exo_dict_text()` to “shrink” a field; page `!important` that fights the global 100% pane cap without a reason.
 
 ---
 
@@ -127,7 +127,7 @@ element.style.overflowWrap = 'break-word';
 1. **Inspect the element that owns the line or width** — Styles panel → winning `border-bottom` / `min-width` rule and **which stylesheet**.
 2. **Read page-local `<style>` in the `.htm`** — bare `tr` / `table` selectors are a frequent root cause.
 3. **Compare source HTM vs Elements panel** — ids, tag names (`input` vs `span`), `exogroupno`, pane wrapper.
-4. **Check dict** — `align`, `length`, `groupno`, `exodus_dict_text()` vs plain input.
+4. **Check dict** — `align`, `length`, `groupno`, `exo_dict_text()` vs plain input.
 5. **Pane coalescence** — two tables with only `<br>` between them become **one** pane; tabs/panels prevent that.
 6. **Prefer root cause** — remove conflicting page CSS or use the dict/HTM knob; do not stack global suppressions.
 
@@ -150,7 +150,7 @@ element.style.overflowWrap = 'break-word';
 |------|------|
 | `global.css` | Form face, pane shell, td/th grid, embedded host-cell rules, pane edge stripping |
 | `scripts/dbform.js` | Dict bind, group tables, span min-width, insert/delete row, `form_filter` |
-| `scripts/db.js` | `exodus_dict_text`, `dictrec`, dict helpers |
+| `scripts/db.js` | `exo_dict_text`, `dictrec`, dict helpers |
 | `scripts/client.js` | `exoduswrapformpanes`, `exoduscoalesceformpanes`, `exodusclear_embeddedtable_hostborders` |
 | `template.htm` | Minimal form page pattern |
 

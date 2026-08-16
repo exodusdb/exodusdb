@@ -9,7 +9,7 @@ async function system_dict_datasetcode(di, many, orcurrent, test) {
     //"" means no restriction, true=only TEST databases, false=not TEST databases
     if (typeof test == 'undefined')
         test = '""'
-    exodus_dict_code(di)
+    exo_dict_code(di)
     // dataset codes keep natural case (not forced uppercase like most codes)
     di.lowercase = true
     di.popup = 'await system_pop_datasetcode(' + many + ',' + orcurrent + ')'
@@ -204,7 +204,7 @@ async function system_getdepartments(deptoptions) {
 
 async function system_dict_departmentcode(di, many, deptoptions) {
     // Style: uppercase code host (dept ids); preferred length 10
-    exodus_dict_code(di)
+    exo_dict_code(di)
     if (!many)
         many = false
     if (!deptoptions)

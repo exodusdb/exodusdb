@@ -279,12 +279,12 @@ function dict_MYFILE() {
 `dictrec(code, type, fieldno, title, group, keypart, x, conversion, functioncode, align, length)`
 
 Many helpers exist in `db.js`:
-- `exodus_dict_text(di, length)`
-- `exodus_dict_date(di)`
-- `exodus_dict_amount(di)`
-- `exodus_dict_emailaddress(di)`
-- `exodus_dict_url(di, protocol)`
-- Validation functions (`exodus_val_*`) that you can assign to `di.validation = 'await myfunc()'`
+- `exo_dict_text(di, length)`
+- `exo_dict_date(di)`
+- `exo_dict_amount(di)`
+- `exo_dict_emailaddress(di)`
+- `exo_dict_url(di, protocol)`
+- Validation functions (`exo_val_*`) that you can assign to `di.validation = 'await myfunc()'`
 
 You can attach:
 - `di.validation`

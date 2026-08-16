@@ -33,18 +33,18 @@ async function dict_USERS() {
  }
 
  di=dict[++din]=dictrec('USER_NAME','F',1)
- exodus_dict_text(di)
+ exo_dict_text(di)
  di.readonly=!updateallowed
  di.required=true
  
  di=dict[++din]=dictrec('PASSWORD','F',4)
 
  di=dict[++din]=dictrec('DEPARTMENT','F',5)
- exodus_dict_text(di)
+ exo_dict_text(di)
  di.readonly=true
 
  di=dict[++din]=dictrec('EMAIL_ADDRESS','F',7)
- exodus_dict_emailaddress(di,';')
+ exo_dict_emailaddress(di,';')
  di.readonly=!updateallowed
 
  groupn=1
@@ -54,7 +54,7 @@ async function dict_USERS() {
  di.wordsep='.'
  di.wordno=1
  di.nwords=1
- exodus_dict_date(di,'MINIMAL')
+ exo_dict_date(di,'MINIMAL')
  di.readonly=true
  di.noinsertrow=true
  di.nodeleterow=true
@@ -64,45 +64,45 @@ async function dict_USERS() {
  di.wordsep='.'
  di.wordno=2
  di.nwords=1
- exodus_dict_time(di)
+ exo_dict_time(di)
  di.readonly=true
  */
  
  di=dict[++din]=dictrec('LOGIN_DATETIME','F',15,'',1)
- exodus_dict_datetime(di)
+ exo_dict_datetime(di)
  // Display-only: code SPAN hugs content (INPUT default size wasted fixed space)
- exodus_dict_code(di)
+ exo_dict_code(di)
  di.align='R'
  di.readonly=true
  di.noinsertrow=true
  di.nodeleterow=true
    
  di=dict[++din]=dictrec('LOGIN_LOCATION','F',16,'',groupn)
- exodus_dict_code(di)
+ exo_dict_code(di)
  di.readonly=true
 
  di=dict[++din]=dictrec('LOGIN_RESULT','F',18,'',groupn)
  di.readonly=true
- exodus_dict_text(di)
+ exo_dict_text(di)
 
- exodus_dict_colorfontsize(dict,19)
+ exo_dict_colorfontsize(dict,19)
  din=dict.length-1
 
  groupn=2
  
  di=dict[++din]=dictrec('HOLIDAY_FROM_DATE','F',22,'',groupn)
  di.readonly=timesheetadminreadonlymsg
- exodus_dict_date(di,'TO=HOLIDAY_UPTO_DATE')
+ exo_dict_date(di,'TO=HOLIDAY_UPTO_DATE')
  di.nodeleterow=!!timesheetadminreadonlymsg
  di.noinsertrow=!!timesheetadminreadonlymsg
 
  di=dict[++din]=dictrec('HOLIDAY_UPTO_DATE','F',23,'',groupn)
  di.readonly=timesheetadminreadonlymsg
- exodus_dict_date(di,'FROM=HOLIDAY_FROM_DATE')
+ exo_dict_date(di,'FROM=HOLIDAY_FROM_DATE')
 
  di = dict[++din] = dictrec('HOLIDAY_REASON', 'F', 38, '', groupn)
  di.readonly = timesheetadminreadonlymsg
- exodus_dict_text(di)
+ exo_dict_text(di)
 
  di = dict[++din] = dictrec('WEEKDAYS_OFF', 'F', 24)
  di.checkbox='1;Mon:2;Tue:3;Wed:4;Thu:5;Fri:6;Sat:7;Sun'

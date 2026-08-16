@@ -62,7 +62,7 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     // di.validation='configuration_val_scope()'
 
     di = dict[++din] = dictrec('IP_NUMBERS', 'F', 39)
-    exodus_dict_ipno(di, true, true, true)
+    exo_dict_ipno(di, true, true, true)
 
     //eg a hostname like unilever will get ddns like unilever.hosts.neosys.com on zoneedit
     di = dict[++din] = dictrec('HOST_NAME', 'F', 57)
@@ -80,7 +80,7 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.unique = true
 
     di = dict[++din] = dictrec('NUMBER_OF_PROCESSES', 'F', 59, '', groupn)
-    exodus_dict_integer(di, { min: 1, max: 9 })
+    exo_dict_integer(di, { min: 1, max: 9 })
     //di.required=true;
     if (gusername != 'EXODUS') di.readonly = true
 
@@ -94,12 +94,12 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     await system_dict_datasetcode(di, true, false, true)
 
     di = dict[++din] = dictrec('BACKUP_TIME_FROM', 'F', 73)
-    exodus_dict_time(di)
+    exo_dict_time(di)
     di.length = 3
     //di.defaultvalue='02:00'.exodusiconv('[TIME]').exodusquote()
 
     di = dict[++din] = dictrec('BACKUP_TIME_UPTO', 'F', 74)
-    exodus_dict_time(di)
+    exo_dict_time(di)
     di.length = 3
     //di.defaultvalue='02:05'.exodusiconv('[TIME]').exodusquote()
 
@@ -110,35 +110,35 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
 
     // Tech/alert emails (sysmsg To). ; separates addresses; after ;; is Cc (sendmail.cpp).
     di = dict[++din] = dictrec('BACKUP_EMAIL_ADDRESSES', 'F', 76)
-    exodus_dict_emailaddress(di, ';')
+    exo_dict_emailaddress(di, ';')
 
     di = dict[++din] = dictrec('BACKUP_DATABASE_TO', 'F', 77)
-    exodus_dict_diskdrive(di)
+    exo_dict_diskdrive(di)
 
     di = dict[++din] = dictrec('BACKUP_UPLOADS_TO', 'F', 82)
-    exodus_dict_diskdrive(di)
+    exo_dict_diskdrive(di)
     di.validcharacters += '0'
 
     di = dict[++din] = dictrec('LOG_EMAIL_ADDRESSES', 'F', 84)
-    exodus_dict_emailaddress(di, ';')
+    exo_dict_emailaddress(di, ';')
 
     di = dict[++din] = dictrec('SMTP_SENDER_EMAIL_ADDRESS', 'F', 101)
-    exodus_dict_emailaddress(di)
+    exo_dict_emailaddress(di)
 
     //di=dict[++din]=dictrec('RESERVED','F',100)
 
     di = dict[++din] = dictrec('SMTP_HOST', 'F', 102)
-    exodus_dict_text(di)
+    exo_dict_text(di)
     di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     di.validcharacters += di.validcharacters.toLowerCase()
     di.validcharacters += '0123456789-_.'
 
     di = dict[++din] = dictrec('SMTP_PORT', 'F', 103)
-    exodus_dict_integer(di, { min: 1, max: 65535 })
+    exo_dict_integer(di, { min: 1, max: 65535 })
     //di.defaultvalue='"25"'
 
     di = dict[++din] = dictrec('SMTP_TIMEOUT_SECONDS', 'F', 104)
-    exodus_dict_integer(di)
+    exo_dict_integer(di)
     //di.defaultvalue='"60"'
 
     di = dict[++din] = dictrec('SMTP_USE_SSL', 'F', 105)
@@ -148,26 +148,26 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.conversion = '0;Anonymous:1;Basic:2;NTLM'
 
     di = dict[++din] = dictrec('SMTP_USERNAME', 'F', 107)
-    exodus_dict_text(di)
+    exo_dict_text(di)
 
     di = dict[++din] = dictrec('SMTP_PASSWORD', 'F', 108)
-    exodus_dict_text(di)
+    exo_dict_text(di)
 
     di = dict[++din] = dictrec('NOTES', 'F', 110)
-    exodus_dict_text(di)
+    exo_dict_text(di)
 
     groupn=2
 
     di = dict[++din] = dictrec('WEB_ADDRESS', 'F', 114, '', groupn)
-    exodus_dict_url(di)
+    exo_dict_url(di)
     di.required = true
 
     di = dict[++din] = dictrec('WEB_ADDRESS_DESCRIPTION', 'F', 115, '', groupn)
-    exodus_dict_text(di)
+    exo_dict_text(di)
     di.required = true
 
     di = dict[++din] = dictrec('EMAIL_DOMAINS', 'F', 116)
-    exodus_dict_text(di)
+    exo_dict_text(di)
     di.validation = function sysconfig_val_EMAIL_DOMAINS() {
         var punctuation = "'" + '`!"$%^&*()_+=[]{};:@#~,<>/?\\|'
         //ie dont allow punctuation except space and -
@@ -181,9 +181,9 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.required=true;
     */
 
-    // if (typeof exodus_dict_colorfontsize!='undefined')
+    // if (typeof exo_dict_colorfontsize!='undefined')
     {
-        exodus_dict_colorfontsize(dict, 46)
+        exo_dict_colorfontsize(dict, 46)
         din = dict.length - 1
     }
 
@@ -216,12 +216,12 @@ async function dict_SYSTEMCONFIGURATION(parameters) {
     di.horizontal=true
 
     di = dict[++din] = dictrec('MAX_NOLOGIN_DAYS', 'F', 128)
-    exodus_dict_integer(di, { max: 9999 })
+    exo_dict_integer(di, { max: 9999 })
 
     //defaults to 4428 in GBP, CONTROL
     //could be set to 443 to pass outgoing fw
     di = dict[++din] = dictrec('MONITOR_PORT_NO', 'F', 131)
-    exodus_dict_integer(di, { max: 65535 })
+    exo_dict_integer(di, { max: 65535 })
 
     //see also INIT.GENERAL for system<*>
     

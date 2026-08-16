@@ -3,7 +3,7 @@
 var glocktimeoutinmins=5
 var trailingspaces=/\s*$/g
 
-function exodus_dict_dow(di,many) {
+function exo_dict_dow(di,many) {
 
  if (many) {
 
@@ -15,13 +15,13 @@ function exodus_dict_dow(di,many) {
  
 }
 
-function exodus_dict_url(di,protocol) {
+function exo_dict_url(di,protocol) {
 
- exodus_dict_text(di)
- di.validation='await exodus_val_url("'+protocol+'")'
+ exo_dict_text(di)
+ di.validation='await exo_val_url("'+protocol+'")'
 }
 
-async function exodus_val_url(protocol) {
+async function exo_val_url(protocol) {
 
  //protocol should be http or https
  if (protocol=='http'||protocol=='https') {
@@ -41,7 +41,7 @@ async function exodus_val_url(protocol) {
  return true
 }
 
-async function exodus_val_html() {
+async function exo_val_html() {
     var element=document.createElement('span')
     element.innerHTML=gvalue
     var normalisedhtml=element.innerHTML
@@ -53,9 +53,9 @@ async function exodus_val_html() {
     return true
 }
 
-function exodus_dict_ipno(di,many,wildcard,plus) {
+function exo_dict_ipno(di,many,wildcard,plus) {
 
- exodus_dict_text(di)
+ exo_dict_text(di)
  var tt='.0123456789'
  if (many) tt+=' ;,'
  if (wildcard) tt+='*'
@@ -64,7 +64,7 @@ function exodus_dict_ipno(di,many,wildcard,plus) {
  //TODO validate true ip number patterns
 }
 
-function exodus_dict_emailaddress(di,sepchar) {
+function exo_dict_emailaddress(di,sepchar) {
 
  var length=30
  if (!sepchar)
@@ -73,11 +73,11 @@ function exodus_dict_emailaddress(di,sepchar) {
   length=60
  if (!sepchar.slice(0,1).match(/[\'\"]/))
   sepchar='"'+sepchar+'"'
- exodus_dict_text(di,length)
- di.validation='await exodus_val_emailaddress('+sepchar+')'
+ exo_dict_text(di,length)
+ di.validation='await exo_val_emailaddress('+sepchar+')'
 }
 
-async function exodus_val_diskdrive() {
+async function exo_val_diskdrive() {
 
  if (!gvalue) return true
 
@@ -90,16 +90,16 @@ async function exodus_val_diskdrive() {
  return true
 }
 
-function exodus_dict_diskdrive(di) {
+function exo_dict_diskdrive(di) {
 
  //di.conversion+='C:D:E:F:G:H:I:J:K:L:M:N:O:P:Q:R:S:T:U:V:W:X:Y:Z'
  di.validcharacters='CDEFGHIJKLMNOPQRSTUVWXYZ:'
- di.validation='await exodus_val_diskdrive()'
+ di.validation='await exo_val_diskdrive()'
  di.length=1
  di.maxlength=1
 }
 
-async function exodus_val_emailaddress(sepchar) {
+async function exo_val_emailaddress(sepchar) {
 
  if (!gvalue) return true
  //Description: Most email validation regexps are outdated and ignore the fact that domain names can contain any foreign character these days,
@@ -136,7 +136,7 @@ async function exodus_val_emailaddress(sepchar) {
 //INDEX FUNCTIONS
 /////////////////
 
-function exodus_dict_index(di,filename,fieldname,many,allownew,warnnew) {
+function exo_dict_index(di,filename,fieldname,many,allownew,warnnew) {
 
  if (!filename) filename=''
  if (!fieldname) fieldname=''
@@ -154,11 +154,11 @@ function exodus_dict_index(di,filename,fieldname,many,allownew,warnnew) {
 //DATABASE FUNCTIONS
 ////////////////////
 
-function exodus_dict_year(dicti,from,to,defaultyear) {
+function exo_dict_year(dicti,from,to,defaultyear) {
 
  if (!from) from=0
  if (!to) to=0
- exodusassertobject(dicti,'exodus_dict_year','dicti')
+ exodusassertobject(dicti,'exo_dict_year','dicti')
  // Year dropdown: install value;title list as conversion (not a live [NUMBER…] field).
  // Brief [NUMBER,0] seed then replace — same “numeric then select” pattern as other
  // code that wants number-ish align/width defaults before the option list owns conversion.
@@ -177,16 +177,16 @@ function exodus_dict_year(dicti,from,to,defaultyear) {
  if (typeof defaultyear!='undefined') dicti.defaultvalue='"'+(curryear+defaultyear)+'"'
 }
 
-function exodus_dict_datetimeupdated(di) {
+function exo_dict_datetimeupdated(di) {
 
- exodus_dict_datetime(di)
+ exo_dict_datetime(di)
  di.readonly=true
  di.copyable=false
  di.align='R'
  di.lowercase=true
 }
 
-function exodus_dict_datetime(di,params) {
+function exo_dict_datetime(di,params) {
 
  if (!params) params=''
  di.conversion='[DATE_TIME,'+params+']'
@@ -194,7 +194,7 @@ function exodus_dict_datetime(di,params) {
  di.lowercase=true
 }
 
-function exodus_dict_time(di,mode,otherid,params) {
+function exo_dict_time(di,mode,otherid,params) {
  
  if (!di.conversion) {
 
@@ -209,13 +209,13 @@ function exodus_dict_time(di,mode,otherid,params) {
  di.length=5 
  if (mode&&otherid) {
 
-  di.defaultvalue='await exodus_def_time("'+mode+'","'+otherid+'")'
-  di.validation='await exodus_val_time("'+mode+'","'+otherid+'")'
+  di.defaultvalue='await exo_def_time("'+mode+'","'+otherid+'")'
+  di.validation='await exo_val_time("'+mode+'","'+otherid+'")'
  }
  
 }
 
-async function exodus_def_time(mode,othertimeid) {
+async function exo_def_time(mode,othertimeid) {
 
  if (!othertimeid) return ''
  
@@ -225,7 +225,7 @@ async function exodus_def_time(mode,othertimeid) {
  return othertime
 }
 
-async function exodus_val_time(mode,otherid) {
+async function exo_val_time(mode,otherid) {
  
  if (!gvalue||!mode||!otherid) return true
  
@@ -252,31 +252,31 @@ async function exodus_val_time(mode,otherid) {
  
 }
 
-// exodus_dict_period(di,'FROM','PERIOD_TO','[FINANCIAL_PERIOD]')
+// exo_dict_period(di,'FROM','PERIOD_TO','[FINANCIAL_PERIOD]')
 // Align: keep preset if already set; else R (amounts-style). Callers may set L before.
-function exodus_dict_period(di,mode,otherperiodid,conversion) {
+function exo_dict_period(di,mode,otherperiodid,conversion) {
 
  if (!mode) mode=''
  if (!otherperiodid) otherperiodid=''
  if (!conversion) conversion=''
- exodusassertobject(di,'exodus_dict_period','di')
+ exodusassertobject(di,'exo_dict_period','di')
  di.conversion='[PERIOD_OF_YEAR]'
  if (typeof di.align == 'undefined' || di.align === '' || di.align == null)
   di.align='R'
  di.length=7
- if (di.type=='F') di.validation='await exodus_val_period("'+mode+'","'+otherperiodid+'")'
+ if (di.type=='F') di.validation='await exo_val_period("'+mode+'","'+otherperiodid+'")'
 }
 
-function exodus_dict_year_period(di,mode) {
+function exo_dict_year_period(di,mode) {
 
  if (!mode) mode=''
- exodusassertobject(di,'exodus_dict_yearperiod','di')
+ exodusassertobject(di,'exo_dict_yearperiod','di')
  di.conversion='[YEAR_PERIOD,'+mode+']'
  di.align='R'
  di.length=7
 }
 
-async function exodus_val_period(mode,otherperiodid) {
+async function exo_val_period(mode,otherperiodid) {
 
  if (!gvalue) return true
  
@@ -335,9 +335,9 @@ async function exodus_val_period(mode,otherperiodid) {
  
 }
 
-function exodus_dict_yesno(dicti,defaultvalue,type) {
+function exo_dict_yesno(dicti,defaultvalue,type) {
 
- exodusassertobject(dicti,'exodus_dict_yesno','dicti')
+ exodusassertobject(dicti,'exo_dict_yesno','dicti')
  if (!type) type='dropdown' 
  if (typeof defaultvalue=='undefined') defaultvalue='"Y"'
  defaultvalue=defaultvalue.toString()
@@ -353,11 +353,11 @@ function exodus_dict_yesno(dicti,defaultvalue,type) {
  
 }
 
-function exodus_dict_date(dicti,params) {
+function exo_dict_date(dicti,params) {
 
  if (typeof params=='undefined') params=''
 
- exodusassertobject(dicti,'exodus_dict_date','dicti')
+ exodusassertobject(dicti,'exo_dict_date','dicti')
  dicti.conversion='[DATE,'+params+']'
  // Right like amounts/columns of fixed date strings. Callers may set di.align after.
  dicti.align = 'R'
@@ -380,21 +380,21 @@ function exodus_dict_date(dicti,params) {
 //                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
 //   INTEGER forces ndecs 0 at runtime; conversion string omits lone ,0 when no min/max
 //
-//   exodus_dict_number(di, { decimals: 'CURRENCY' })
-//   exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED
-//   exodus_dict_number(di, { signed: true, max: 100 })             // → min -100, max 100
-//   exodus_dict_integer(di, { max: 100 })         // counts: decimals 0 + plain
-//   exodus_dict_decimal(di, { decimals: 2 })      // plain fractional (via dict_number)
-//   exodus_dict_percent(di)                       // 0–100; max 100 if unset
-//   exodus_dict_percent(di, { decimals: 2 })      // e.g. COMMISSION_PERCENT
-//   exodus_dict_number(di, { max: 100 })
-//   exodus_dict_number(di)  // all defaults
+//   exo_dict_number(di, { decimals: 'CURRENCY' })
+//   exo_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED
+//   exo_dict_number(di, { signed: true, max: 100 })             // → min -100, max 100
+//   exo_dict_integer(di, { max: 100 })         // counts: decimals 0 + plain
+//   exo_dict_decimal(di, { decimals: 2 })      // plain fractional (via dict_number)
+//   exo_dict_percent(di)                       // 0–100; max 100 if unset
+//   exo_dict_percent(di, { decimals: 2 })      // e.g. COMMISSION_PERCENT
+//   exo_dict_number(di, { max: 100 })
+//   exo_dict_number(di)  // all defaults
 //
 // Counts / days / sequences. Bag only. Via dict_number (decimals 0 + plain if unset).
-function exodus_dict_integer(dicti, opts) {
+function exo_dict_integer(dicti, opts) {
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exodus_dict_integer', 'dicti')
+ exodusassertobject(dicti, 'exo_dict_integer', 'dicti')
  var bag = {}
  for (var k in opts) {
   if (Object.prototype.hasOwnProperty.call(opts, k))
@@ -404,14 +404,14 @@ function exodus_dict_integer(dicti, opts) {
   bag.decimals = 0
  if (typeof bag.plain == 'undefined')
   bag.plain = true
- return exodus_dict_number(dicti, bag)
+ return exo_dict_number(dicti, bag)
 }
 
 // Plain fractional (no thousands). Via dict_number (plain true if unset).
-function exodus_dict_decimal(dicti, opts) {
+function exo_dict_decimal(dicti, opts) {
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exodus_dict_decimal', 'dicti')
+ exodusassertobject(dicti, 'exo_dict_decimal', 'dicti')
  var bag = {}
  for (var k in opts) {
   if (Object.prototype.hasOwnProperty.call(opts, k))
@@ -419,19 +419,19 @@ function exodus_dict_decimal(dicti, opts) {
  }
  if (typeof bag.plain == 'undefined')
   bag.plain = true
- return exodus_dict_number(dicti, bag)
+ return exo_dict_number(dicti, bag)
 }
 
 // 0–100 scale (commission, tax %, discount %, ratings, share). Via dict_number.
 // Adds max:100 if bag does not already set max. decimals optional (e.g. 2 for
 // COMMISSION_PERCENT); omit to allow 0/1/2… places like bare NUMBER.
-//   exodus_dict_percent(di)
-//   exodus_dict_percent(di, { decimals: 2 })
-//   exodus_dict_percent(di, { decimals: 1, min: 1 })  // max still 100 unless set
-function exodus_dict_percent(dicti, opts) {
+//   exo_dict_percent(di)
+//   exo_dict_percent(di, { decimals: 2 })
+//   exo_dict_percent(di, { decimals: 1, min: 1 })  // max still 100 unless set
+function exo_dict_percent(dicti, opts) {
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exodus_dict_percent', 'dicti')
+ exodusassertobject(dicti, 'exo_dict_percent', 'dicti')
  var bag = {}
  for (var k in opts) {
   if (Object.prototype.hasOwnProperty.call(opts, k))
@@ -439,14 +439,14 @@ function exodus_dict_percent(dicti, opts) {
  }
  if (typeof bag.max == 'undefined' || bag.max == null || bag.max === '')
   bag.max = 100
- return exodus_dict_number(dicti, bag)
+ return exo_dict_number(dicti, bag)
 }
 
-function exodus_dict_number(dicti, opts) {
+function exo_dict_number(dicti, opts) {
 
  if (!opts)
   opts = {}
- exodusassertobject(dicti, 'exodus_dict_number', 'dicti')
+ exodusassertobject(dicti, 'exo_dict_number', 'dicti')
 
  // Same defaults as former positional (undefined → ''). Callers should omit keys,
  // not pass empty placeholders.
@@ -501,11 +501,11 @@ function exodus_dict_number(dicti, opts) {
 // Align T free text: contenteditable SPAN, fold at spaces (lowercase true).
 // di.length: used for free-text in wide mode only (empty → soft max 30ch when
 // .exodusform-wide; length set → no soft max). Not a min-width. Omitted → clear.
-// Codes: exodus_dict_code. Multi-line: exodus_dict_textarea (separate).
+// Codes: exo_dict_code. Multi-line: exo_dict_textarea (separate).
 // exostyle "text".
-function exodus_dict_text(dicti, length, rows) {
+function exo_dict_text(dicti, length, rows) {
 
- exodusassertobject(dicti, 'exodus_dict_text', 'dicti')
+ exodusassertobject(dicti, 'exo_dict_text', 'dicti')
  dicti.align = 'T'
  if (typeof length != 'undefined')
   dicti.length = length
@@ -525,9 +525,9 @@ function exodus_dict_text(dicti, length, rows) {
 //  - length omitted → keep preexisting di.length (do not clear, no default 80)
 // nrows default 3. align T, lowercase true if unset. exostyle "text".
 // Unlike free-text SPAN, length is a min-width floor (not only wide soft max).
-function exodus_dict_textarea(di, nrows, length) {
+function exo_dict_textarea(di, nrows, length) {
 
- exodusassertobject(di, 'exodus_dict_textarea', 'di')
+ exodusassertobject(di, 'exo_dict_textarea', 'di')
  if (typeof nrows == 'undefined')
   nrows = 3
  di.align = 'T'
@@ -544,9 +544,9 @@ function exodus_dict_textarea(di, nrows, length) {
 // Align T uppercase codes (nowrap, no fold). Style only — like dict_number:
 // no length arg, does not set or clear di.length. length unused by paint
 // (floor 6ch same as number). Free-text wide soft-max is text-only.
-function exodus_dict_code(di) {
+function exo_dict_code(di) {
 
- exodusassertobject(di, 'exodus_dict_code', 'di')
+ exodusassertobject(di, 'exo_dict_code', 'di')
  di.align = 'T'
  di.rows = 1
  di.lowercase = false

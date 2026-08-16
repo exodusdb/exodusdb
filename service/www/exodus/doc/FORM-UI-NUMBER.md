@@ -1,7 +1,7 @@
 # FORM-UI-NUMBER — `[NUMBER…]` / `[DECIMAL…]` / `[INTEGER]`
 
 **Location:** `service/www/exodus/doc/`  
-**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `INTEGER`, `exodusround`), `db.js` (`exodus_dict_number` / `_integer` / `_decimal`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
+**Runtime:** `service/www/3/exodus/scripts/exodus.js` (`NUMBER`, `DECIMAL`, `INTEGER`, `exodusround`), `db.js` (`exo_dict_number` / `_integer` / `_decimal`), `gds.js` / `dbform.js` (bind, `oconvertvalue`, `getvalue` / `getvalue_internal`)  
 **Tests:** `service/www/3/exodus/scripts/test_number.js`  
 **See also:** [FORM-UI-TYPES.md](./FORM-UI-TYPES.md), [PROGRAMMERS_OVERVIEW.md](./PROGRAMMERS_OVERVIEW.md)
 
@@ -31,17 +31,17 @@ There is **no** conversion name `AMOUNT`. Amount fields use NUMBER (often `CURRE
 
 ## 2. Dict helpers (bag only)
 
-All via `exodus_dict_number` in `db.js`. Prefer helpers over raw `dictrec(…, '[NUMBER…]')` or `di.conversion = '[NUMBER…]'`.
+All via `exo_dict_number` in `db.js`. Prefer helpers over raw `dictrec(…, '[NUMBER…]')` or `di.conversion = '[NUMBER…]'`.
 
 ```js
-exodus_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts (grouping)
-exodus_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED (any neg)
-exodus_dict_number(di, { signed: true, max: 100 })         // → min -100, max 100 (no SIGNED token)
-exodus_dict_number(di, { signed: true })                   // → min SIGNED
-exodus_dict_integer(di, { max: 100 })                      // plain 0-dp counts
-exodus_dict_integer(di)                                    // [INTEGER]
-exodus_dict_decimal(di, { decimals: 2 })                   // plain fractional [DECIMAL,…]
-exodus_dict_number(di)                                     // same as {}
+exo_dict_number(di, { decimals: 'CURRENCY' })           // [NUMBER,…] amounts (grouping)
+exo_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED (any neg)
+exo_dict_number(di, { signed: true, max: 100 })         // → min -100, max 100 (no SIGNED token)
+exo_dict_number(di, { signed: true })                   // → min SIGNED
+exo_dict_integer(di, { max: 100 })                      // plain 0-dp counts
+exo_dict_integer(di)                                    // [INTEGER]
+exo_dict_decimal(di, { decimals: 2 })                   // plain fractional [DECIMAL,…]
+exo_dict_number(di)                                     // same as {}
 ```
 
 | `opts` key | Default if omitted | Role |
@@ -55,17 +55,17 @@ exodus_dict_number(di)                                     // same as {}
 
 | Helper | Defaults if unset | Result kind |
 |--------|-------------------|-------------|
-| `exodus_dict_integer` | `decimals: 0`, `plain: true` | counts / days / sequences |
-| `exodus_dict_decimal` | `plain: true` | plain fractional (no thousands) |
-| `exodus_dict_number` | (none) | amounts unless `plain` |
+| `exo_dict_integer` | `decimals: 0`, `plain: true` | counts / days / sequences |
+| `exo_dict_decimal` | `plain: true` | plain fractional (no thousands) |
+| `exo_dict_number` | (none) | amounts unless `plain` |
 
 **Omit defaults** — do not write `decimals: ''`, `min: ''`, `plain: false`, or redundant `min: 0` (empty min already means ≥ 0).
 
 ```js
 // Prefer
-exodus_dict_number(di, { max: 100 })
+exo_dict_number(di, { max: 100 })
 // Not
-exodus_dict_number(di, { min: 0, max: 100 })
+exo_dict_number(di, { min: 0, max: 100 })
 ```
 
 **Empty / omitted `decimals` (rare — intentional only)**  
@@ -80,10 +80,10 @@ When the decimals slot is empty, NUMBER ICONV/OCONV sets ndecs from the **curren
 
 | Kind | Helper | Typical bag |
 |------|--------|-------------|
-| Counts, days, sequences, line nos | `exodus_dict_integer` | `{ max: n }` if needed |
-| Amounts (grouping when BASEFMT groups) | `exodus_dict_number` | `{ decimals: 'CURRENCY' }` / `'BASE'` / `'NDECS'` |
+| Counts, days, sequences, line nos | `exo_dict_integer` | `{ max: n }` if needed |
+| Amounts (grouping when BASEFMT groups) | `exo_dict_number` | `{ decimals: 'CURRENCY' }` / `'BASE'` / `'NDECS'` |
 | Allow negatives (credits, journals, some estimates) | same + | `signed: true` |
-| Plain fractional (no thousands) | `exodus_dict_decimal` | `{ decimals: 2 }` or `NDECS` |
+| Plain fractional (no thousands) | `exo_dict_decimal` | `{ decimals: 2 }` or `NDECS` |
 
 ---
 
@@ -100,7 +100,7 @@ Implemented in `NUMBER` (`exodus.js`). DECIMAL/INTEGER call into the same path.
 | **Numeric max** | Value must be ≤ max (same empty+numeric gate as min — so **`max: 0` works**) |
 | **`POSITIVE` keyword** | **Retired** — use numeric `min: 0` or rely on default ≥ 0 |
 
-Bag → conversion string (`exodus_dict_number`):
+Bag → conversion string (`exo_dict_number`):
 
 | Bag | Conversion min/max slots |
 |-----|--------------------------|
@@ -194,7 +194,7 @@ Use **NUMBER** only for:
 - **User-facing** strings (warnings, notes, invalid messages) where full formatting is wanted
 
 Amount fields: omit `plain` so conversion is `[NUMBER,…]` and paint gets full external formatting.  
-Non-amount integers: `exodus_dict_integer` (or `plain: true` + `decimals: 0`) → `[INTEGER]`.
+Non-amount integers: `exo_dict_integer` (or `plain: true` + `decimals: 0`) → `[INTEGER]`.
 
 ---
 
@@ -204,7 +204,7 @@ Primary axis: **`di.exostyle`** (set by helpers only).
 
 | Helper | `exostyle` | Host |
 |--------|------------|------|
-| `exodus_dict_number` / `_integer` / `_decimal` | `"number"` | content **SPAN** (not fixed INPUT) |
+| `exo_dict_number` / `_integer` / `_decimal` | `"number"` | content **SPAN** (not fixed INPUT) |
 
 | Axis | Number SPAN behaviour |
 |------|------------------------|
@@ -214,7 +214,7 @@ Primary axis: **`di.exostyle`** (set by helpers only).
 
 ### Align / length after the helper
 
-**After** `exodus_dict_integer` / `_number` / `_decimal`:
+**After** `exo_dict_integer` / `_number` / `_decimal`:
 
 - Do **not** set `di.align` or `di.exostyle` (helper owns them).
 - Do **not** set `di.length` for paint (ignored for number SPAN).
@@ -225,7 +225,7 @@ Primary axis: **`di.exostyle`** (set by helpers only).
 // Footer total (group blank) — want R like table money cells
 di = dict[++din] = dictrec('TOTAL_AMOUNT', 'S')
 di.align = 'R'
-exodus_dict_number(di, { decimals: 'NDECS' })
+exo_dict_number(di, { decimals: 'NDECS' })
 ```
 
 ### dictrec constructor args
@@ -237,7 +237,7 @@ Once a field uses a number helper, drop trailing conversion / align / length fro
 di = dict[++din] = dictrec('SEQUENCE', 'F', 3, '', '', '', '', '[INTEGER]', '', 'R', 5)
 // Good
 di = dict[++din] = dictrec('SEQUENCE', 'F', 3)
-exodus_dict_integer(di)
+exo_dict_integer(di)
 ```
 
 Indent helper calls at the **same** level as the matching `di = dict[++din] = …` line.
@@ -278,14 +278,14 @@ For storage/math use **`getvalue_internal(element)`** = `getvalue` + ICONV when 
 |------|--------|
 | ICONV default ≥ 0 / SIGNED / max gate | Done |
 | INTEGER / DECIMAL shims + ROUND alias | Done |
-| `exodus_dict_number` bag + integer/decimal helpers | Done |
+| `exo_dict_number` bag + integer/decimal helpers | Done |
 | `signed: true` → min SIGNED | Done |
 | Paint: `exostyle number`, length unused, align by groupno | Done |
 | Docs + `test_number.js` | Done |
 
 **Framework leftovers (small)**
 
-- Some **exodus product dicts** still call `exodus_dict_number({ decimals: 0, min: 0 })` instead of `exodus_dict_integer` and omitting `min: 0` (`systemconfiguration`, `parts`, `authorisation`, `colors`, …).
+- Some **exodus product dicts** still call `exo_dict_number({ decimals: 0, min: 0 })` instead of `exo_dict_integer` and omitting `min: 0` (`systemconfiguration`, `parts`, `authorisation`, `colors`, …).
 - Helpers under-used **inside** exodus’s own form scripts (API exists; call sites lag).
 - Patterns that seed a numeric conversion then **overwrite** with a select list (e.g. year dropdown) are not “number fields” — do not treat as NUMBER migration targets.
 
@@ -309,7 +309,7 @@ Typical mature state after the bag migration wave:
 | Topic | Notes |
 |--------|------|
 | Select list + leftover `[INTEGER]` / helper | If `di.conversion = cols` (or `'0:1:2:…'`) **overwrites** a prior numeric conversion, the field is a **select**, not a number. Do **not** add `dict_integer` (it would wipe the list). Drop dead `[INTEGER]` from dictrec; drop stray `exostyle = 'number'` unless paint truly needs it. |
-| Helper **after** select assign | `di.conversion = cols` then `exodus_dict_integer(di)` makes the helper win — confirm product intent; often a smell. |
+| Helper **after** select assign | `di.conversion = cols` then `exo_dict_integer(di)` makes the helper win — confirm product intent; often a smell. |
 | Special raw forms (e.g. `[NUMBER,*]`) | Decide per field: helper bag, keep raw with a comment, or replace. |
 | `dict_number({ decimals: 0 })` without plain | May be intentional 0-dp **amount** (grouping). Pure counts → `dict_integer`. Signed 0-dp amounts → often still **number** + `signed: true`, not integer. |
 | Legacy `dictrec(…, 'R', length)` next to a helper | Redundant; length unused for number SPAN; align usually already set by helper when `groupno > 0`. Strip when touching the line. |
@@ -337,7 +337,7 @@ Typical mature state after the bag migration wave:
 | Concern | Where |
 |---------|--------|
 | `NUMBER` / `DECIMAL` / `INTEGER` / `ROUND` | `exodus.js` |
-| Dict helpers | `db.js` → `exodus_dict_number` / `_integer` / `_decimal` |
+| Dict helpers | `db.js` → `exo_dict_number` / `_integer` / `_decimal` |
 | Pure numeric round | `exodus.js` → `exodusround` |
 | BASEFMT | `client.js` → `gbasefmt`, `gthousands_regex` |
 | DOM read | `dbform.js` → `getvalue` (external), `getvalue_internal` (ICONV) |

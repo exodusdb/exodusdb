@@ -41,10 +41,10 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 //
 // Primary axis: di.exostyle → DOM attribute "exostyle" (copydictitem; not exodusexostyle).
 //   set by style helpers only:
-//     exodus_dict_code     → "code"   (uppercase SPAN; floor 6ch)
-//     exodus_dict_text     → "text"   (free-text SPAN; fill + wide soft max)
-//     exodus_dict_textarea → "text"
-//     exodus_dict_number   → "number" (SPAN; floor 6ch)
+//     exo_dict_code     → "code"   (uppercase SPAN; floor 6ch)
+//     exo_dict_text     → "text"   (free-text SPAN; fill + wide soft max)
+//     exo_dict_textarea → "text"
+//     exo_dict_number   → "number" (SPAN; floor 6ch)
 //
 // di.length for SPAN paint:
 //   text   — wide mode ONLY: empty → attribute exomaxwidth="30ch" (client applies
@@ -62,7 +62,7 @@ var gradiocheckboxtypes = /(^radio$)|(^checkbox$)/
 // =============================================================================
 var gform_input_width_digitconv = /^\[(DATE_TIME|TIME)/
 var gform_input_width_puredate = /^\[DATE([,\]]|$)/
-// PERIOD_OF_YEAR, YEAR_PERIOD, FINANCIAL_PERIOD, YEARPERIOD (exodus_dict_period)
+// PERIOD_OF_YEAR, YEAR_PERIOD, FINANCIAL_PERIOD, YEARPERIOD (exo_dict_period)
 var gform_input_width_periodconv = /\[(PERIOD_OF_YEAR|YEAR_?PERIOD|FINANCIAL_PERIOD)/
 var gform_input_width_dateconv = /\[[^\]]*DATE[^\]]*\]/
 var gform_input_width_cache = {}
@@ -1639,7 +1639,7 @@ async function formfunctions_onload() {
             //lower case
             if (!(element.getAttribute('exolowercase'))) {
                 if (element.tagName == 'SELECT'
-                    //exodus_dict_text(di) now sets lowercase true but can be removed
+                    //exo_dict_text(di) now sets lowercase true but can be removed
                     //to allow capitalised flowing text eg ratecard columns
                     //|| element.getAttribute('exoalign') == 'T'
                     || element.getAttribute('exotype') == 'S') {

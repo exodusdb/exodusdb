@@ -41,11 +41,11 @@ async function dict_WHATSNEW() {
  di.noinsertrow=true
  
  di=dict[++din]=dictrec('FROM_DATE', 'F',2)
- exodus_dict_date(di,'TO=UPTO_DATE')
+ exo_dict_date(di,'TO=UPTO_DATE')
  di.popup='await  whatsnew_pop_dates()'
  
  di=dict[++din]=dictrec('UPTO_DATE', 'F',3)
- exodus_dict_date(di,'FROM=FROM_DATE')
+ exo_dict_date(di,'FROM=FROM_DATE')
  di.defaultvalue=exodusdate().exodusoconv('[DATE]')
   
  di=dict[++din]=dictrec('COMPANY_CODE', 'F',4)
