@@ -364,10 +364,10 @@ nextuser:
 
 		item = "Re_questLog";
 		// style="display: none"
-		// id="exodussupportmenuitem1"
+		// id="exosupportmenuitem1"
 		href = "../exodus/requestlog.htm";
 		call menusubs("ADDITEM", menutx, item, href);
-		// <br style="display: none" id="exodussupportmenuitem2" />
+		// <br style="display: none" id="exosupportmenuitem2" />
 
 		item = "_Usage Statistics";
 		href = "../exodus/usagestatistics.htm";

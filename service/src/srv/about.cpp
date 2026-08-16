@@ -67,7 +67,7 @@ func main() {
 	}
 
 	// Prefer data_ so client displayresponsedata shows the body cleanly
-	// (exodusnote converts FM to newlines on the browser)
+	// (exoui_note converts FM to newlines on the browser)
 	data_ = text;
 	call note(text);
 
