@@ -2047,17 +2047,6 @@ async function formfunctions_onload() {
                     t += ' style=display:none exo_onclick="await form_filter(\'unfilter\',' + groupno + ')"'
                     t += '>Show All</button>'
 
-                    if (groupno == 1 && typeof gallowfilter != 'undefined' && gallowfilter) {
-                        t += '<input id="exogroup' + groupno + 'filter"'
-                        t += ' class="clsNotRequired"'
-                        t += ' onblur="form_filter_onblur_sync(' + groupno + ',this)"'
-                        t += ' onfocus="form_filter_onfocus_sync(' + groupno + ',this)"'
-                        t += ' contenteditable="true"'
-                        t += ' size="3"'
-                        t += ' tabIndex="-1"'
-                        t += ' />'
-                    }
-
                     pgupdownbuttons.innerHTML = t
 
                     //locate the THEAD element in the parents
@@ -11695,21 +11684,9 @@ function form_group_leadin_display(tablex, show) {
         tablex.classList.add('exogroup_col0_hide')
 }
 
-// Raw onblur/onfocus from DOM filter input — enter Gate A (form_filter is async).
-// when_idle: these handlers bypass starteventhandler/gblockevents, so a one-shot
-// begin during an open flight would systemerror; wait for land instead.
-function form_filter_onblur_sync(groupno, elem) {
-    exo_begin_when_idle(function () {
-        return form_filter('filterall', groupno, null, null, elem)
-    }, 'form_filter filterall', { delay_ms: 0 })
-}
-
-function form_filter_onfocus_sync(groupno, elem) {
-    exo_begin_when_idle(function () {
-        return form_filter('filterfocus', groupno, null, null, elem)
-    }, 'form_filter filterfocus', { delay_ms: 0 })
-}
-
+// form_filter: hide multivalue rows (dblclick value, regexp, maxrecn) + Show All.
+// No type-in filter box — that was schedules-only (gallowfilter), incomplete, and
+// carried ad-hoc onfocus/onblur + VEHICLE_CODE hardcode.
 async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     //NB regexp to be filtered OUT not IN
@@ -11718,18 +11695,6 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         colidorgroupno2 = colidorgroupno
         await form_filter('unfilter', colidorgroupno2)
         mode = 'filter'
-    }
-
-    if (mode == 'filterfocus') {
-        //following only applies to schedules! convert to any form
-        if (!(await gds.get1('VEHICLE_CODE', 0))) {
-            focuson('VEHICLE_CODE')
-            return false
-        }
-        textrange = elem.select()
-        // room to type; filterall/unfilter restore size 3 (HTM default)
-        elem.size = 10
-        return true
     }
 
     //get colid
@@ -11798,7 +11763,6 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     //get the show all button
     var tablexshowall = $$('exogroup' + groupno + 'showall')
-    var tablexfilter = $$('exogroup' + groupno + 'filter')
     if (!tablexshowall) {
         //syserror('await form_filter()','Cannot find showall button, are you missing a thead?')
         return true
@@ -11818,8 +11782,6 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         showhide('exogroup' + groupno + 'showall', false)
         // residual lead-in (no ins/del): re-hide thead/tbody/tfoot together
         form_group_leadin_display(tablex, false)
-        if (typeof tablexfilter != 'undefined' && tablexfilter)
-            tablexfilter.size = 3
         // clear dblclick filter snapshot on the ruling table
         tablex.exo_filter_colid = ''
         tablex.exo_filter_value = ''
@@ -11833,30 +11795,15 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     //get the value and values to be filtered
     var value
     var values
-    var filterall = false
-    if (mode == 'filterall') {
-        filterall = true
-        values = gds.data['group' + groupno]
-
-        //turn filtervalues into a case insensitive regular expression
-        filtervalues = document.getElementById('exogroup' + groupno + 'filter').value.split(' ')
-        for (var ii = 0; ii < filtervalues.length; ++ii) {
-            filtervalues[ii] = filtervalues[ii].replace(/([\\,\^,\$,\*,\+,\?,\.,\(,\),\|,\{,\},\[,\]])/g, "\\$1")//convert metacharacters to real characters
-            filtervalues[ii] = new RegExp(filtervalues[ii], 'gi')
-        }
-
-    }
-    else {
-        values = await gds.regetx(colid, null)
-        if (!regexp && !maxrecn) {
-            grecn = getrecn()
-            var value = values[grecn]
-        }
+    values = await gds.regetx(colid, null)
+    if (!regexp && !maxrecn) {
+        grecn = getrecn()
+        var value = values[grecn]
     }
 
     // Dblclick same col + same value again → Show All (unfilter).
     // State lives on the multivalue TABLE (exogroupN).
-    if (mode == 'filter' && !regexp && !maxrecn && !filterall) {
+    if (mode == 'filter' && !regexp && !maxrecn) {
         var prevCol = tablex.exo_filter_colid
         var prevVal = tablex.exo_filter_value
         if (prevCol === colid && String(prevVal) === String(value))
@@ -11885,39 +11832,6 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         }
         else if (maxrecn) {
             hiderow = rown > maxrecn
-        }
-        else if (filterall) {
-            var row = values[rown]
-
-            //search all columns
-            for (var filtern = 0; filtern < filtervalues.length; ++filtern) {
-                hiderow = true
-                var filtervalue = filtervalues[filtern]
-                /* search in internal data format
-                for (var propname in row) {
-                //should skip propname 'dbordinal'
-                //first matching column indicates row should NOT be hidden
-                if (row[propname].text.toString().search(filtervalue) >= 0) {
-                hiderow = false
-                break
-                }
-                }
-                */
-                if (grows[rown].innerText.search(filtervalue) >= 0)
-                    hiderow = false
-                else {
-                    var inputs = grows[rown].getElementsByTagName('input')
-                    for (var ii = 0; ii < inputs.length; ++ii) {
-                        if (inputs[ii].value.search(filtervalue) >= 0) {
-                            hiderow = false
-                            break
-                        }
-                    }
-                }
-                if (hiderow)
-                    break
-            }
-
         }
         else if (values[rown] != value)
             hiderow = true
@@ -11951,7 +11865,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
             }
         }
         // Fold-on-open (regexp / maxrecn): expand [+] on last visible before a
-        // hidden run. Dblclick value filter / filterall: green insert only —
+        // hidden run. Dblclick value filter: green insert only —
         // clear any leftover fold expand marks so insert after filter works.
         if (regexp || maxrecn) {
             for (var ern = 0; ern < lastunhiddenrows.length; ++ern)
