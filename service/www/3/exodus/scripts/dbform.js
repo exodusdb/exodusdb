@@ -1577,8 +1577,67 @@ async function formfunctions_onload() {
                     getancestor(element, 'TFOOT')
                 )
             ) {
+                // Right-align field cell (tbody line or tfoot total).
+                // style.textAlign beats TABLE.exoform { text-align:left }.
                 var cellnode = getancestor(element, ' TD TH ')
-                if (cellnode && !cellnode.parentNode.align && !cellnode.align) cellnode.align = 'right'
+                if (cellnode) {
+                    if (!cellnode.parentNode.align && !cellnode.align)
+                        cellnode.align = 'right'
+                    cellnode.style.textAlign = 'right'
+                    // Col title: tfoot = value cell only. Prefer id_title (same as sort).
+                    // Else Nth *visible* thead th for Nth *visible* body td — not cellIndex
+                    // (tbody-only hidden cols e.g. LINE_TAX_* shift cellIndex vs thead).
+                    var inFoot = !!getancestor(element, 'TFOOT')
+                    var titleelement = null
+                    if (!inFoot)
+                        titleelement = $$(element.id + '_title')
+                    if (!titleelement && !inFoot) {
+                        var bodyRow = cellnode.parentNode
+                        var gtable = getancestor(cellnode, 'TABLE')
+                        var gthead = gtable && gtable.tHead
+                        var titleRow = gthead && gthead.rows && gthead.rows.length
+                            ? gthead.rows[gthead.rows.length - 1]
+                            : null
+                        if (bodyRow && bodyRow.cells && titleRow && titleRow.cells) {
+                            var visn = -1
+                            var found = false
+                            for (var bci = 0; bci < bodyRow.cells.length; bci++) {
+                                var bc = bodyRow.cells[bci]
+                                var bhid = bc.style.display == 'none'
+                                    || (bc.currentStyle && bc.currentStyle.display == 'none')
+                                    || (window.getComputedStyle && getComputedStyle(bc).display == 'none')
+                                if (bhid)
+                                    continue
+                                visn++
+                                if (bc == cellnode) {
+                                    found = true
+                                    break
+                                }
+                            }
+                            if (found && visn >= 0) {
+                                var tvis = -1
+                                for (var tci = 0; tci < titleRow.cells.length; tci++) {
+                                    var tc = titleRow.cells[tci]
+                                    var thid = tc.style.display == 'none'
+                                        || (tc.currentStyle && tc.currentStyle.display == 'none')
+                                        || (window.getComputedStyle && getComputedStyle(tc).display == 'none')
+                                    if (thid)
+                                        continue
+                                    tvis++
+                                    if (tvis == visn) {
+                                        titleelement = tc
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (titleelement) {
+                        if (!titleelement.align)
+                            titleelement.align = 'right'
+                        titleelement.style.textAlign = 'right'
+                    }
+                }
             }
 
 			// align
