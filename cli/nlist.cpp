@@ -1356,7 +1356,10 @@ x1exit:
 
 		htmlcode ^= "<table class=\"exotable\"";
 		htmlcode ^= " cellspacing=\"0\"";
-		htmlcode ^= " style=\"font-size:66%";
+		// Was 66%: ~8pt density when body was browser 100% (GUI used to be 8pt).
+		// GUI is 1rem (~16px ≈ 150% of 8pt). Table inherits GETCSS exodussize
+		// (default 100%) — no second shrink.
+		htmlcode ^= " style=\"font-size:100%";
 		htmlcode ^= ";page-break-after:avoid";
 		htmlcode ^= "\">";
 		htmlcode ^= _FM "<colgroup>" ^ coltags ^ "</colgroup>";

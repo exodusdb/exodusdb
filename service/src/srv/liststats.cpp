@@ -150,7 +150,8 @@ func main() {
 
 		tx = "<table border=1 class=exotable";
 		tx ^= " CELLSPACING=0 CELLPADDING=2 ALIGN=CENTER";
-		tx ^= " STYLE=\"font-size:66%\"";
+		// Was 66% (~old 8pt vs body 100%); release to 100% like nlist / GUI 1rem
+		tx ^= " STYLE=\"font-size:100%\"";
 		tx ^= ">";
 
 		tx ^= "<thead>";
