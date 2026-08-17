@@ -1,0 +1,104 @@
+#!/bin/bash
+set -euxo pipefail
+PS4='+ [./rename_db:$LINENO $* ${SECONDS}s] '
+
+: ─────────────────────────────────────────────────────────────────────────────────
+: Rename a postgres database
+: ─────────────────────────────────────────────────────────────────────────────────
+: 'Syntax:'
+:
+: '  ./rename_db FROM_DBCODE TO_DBCODE [OPTIONS]'
+:
+: 'OPTIONS: (D)elete target if it already exists'
+: '         Required when TO_DBCODE already exists — otherwise refuse.'
+:
+: 'Example:'
+:
+: '  ./rename_db mgg_old mgg'
+: '  ./rename_db mgg_tmp mgg D   # drop mgg first if present'
+:
+: Command line
+: ────────────────────────────────────────
+	SOURCE_EXO_DATA=${1:?FROM_DBCODE argument is required.}
+	TARGET_EXO_DATA=${2:?TO_DBCODE argument is required.}
+	OPTIONS=${3:-}
+:
+: Validate
+: ────────────────────────────────────────
+	if [ "$SOURCE_EXO_DATA" = "$TARGET_EXO_DATA" ]; then
+		echo "FROM and TO database names must differ" 1>&2
+		exit 1
+	fi
+:
+: Determine source service / type — strip trailing _test
+: ────────────────────────────────────────
+	SOURCE_SERVICE=${SOURCE_EXO_DATA%_test}
+	if [[ $SOURCE_EXO_DATA =~ _test$ ]]; then
+		SOURCE_TYPE=test
+	else
+		SOURCE_TYPE=live
+	fi
+:
+: Determine target service / type
+: ────────────────────────────────────────
+	TARGET_SERVICE=${TARGET_EXO_DATA%_test}
+	if [[ $TARGET_EXO_DATA =~ _test$ ]]; then
+		TARGET_TYPE=test
+	else
+		TARGET_TYPE=live
+	fi
+:
+: Detect if source / target services are running — restart after rename if needed
+: ────────────────────────────────────────
+	./service ${SOURCE_SERVICE} is-active $SOURCE_TYPE &> /dev/null && RESTART_SOURCE=Y || RESTART_SOURCE=N
+	./service ${TARGET_SERVICE} is-active $TARGET_TYPE &> /dev/null && RESTART_TARGET=Y || RESTART_TARGET=N
+:
+: Stop services that use either database name
+: ────────────────────────────────────────
+	[ $RESTART_SOURCE = Y ] && ./service ${SOURCE_SERVICE} stop ${SOURCE_TYPE}
+	[ $RESTART_TARGET = Y ] && ./service ${TARGET_SERVICE} stop ${TARGET_TYPE}
+:
+: Target exists?
+: ────────────────────────────────────────
+	if sudo -u postgres psql -Atc "SELECT 1 FROM pg_database WHERE datname = '$TARGET_EXO_DATA'" | grep -q 1; then
+		if [[ $OPTIONS =~ D ]]; then
+		:
+		: Delete existing target database — D required
+		: ────────────────────────────────────────
+			sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$TARGET_EXO_DATA';" || true
+			for TRY in 1 2 3; do
+				dbdelete $TARGET_EXO_DATA && break || true
+			done
+		else
+			echo "Target database $TARGET_EXO_DATA already exists. Pass OPTIONS with D to delete it first." 1>&2
+			exit 1
+		fi
+	fi
+:
+: Source must exist
+: ────────────────────────────────────────
+	if ! sudo -u postgres psql -Atc "SELECT 1 FROM pg_database WHERE datname = '$SOURCE_EXO_DATA'" | grep -q 1; then
+		echo "Source database $SOURCE_EXO_DATA does not exist" 1>&2
+		exit 1
+	fi
+:
+: Kill connections to source then rename
+: ────────────────────────────────────────
+	sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$SOURCE_EXO_DATA';" || true
+	sudo -u postgres psql -c "ALTER DATABASE $SOURCE_EXO_DATA RENAME TO $TARGET_EXO_DATA;"
+:
+: Fix foreign server dbname if any — suffix may need to match live/test
+: ────────────────────────────────────────
+	if [ -x ./fix.foreign.dbname.sh ]; then
+		./fix.foreign.dbname.sh $TARGET_EXO_DATA || true
+	fi
+:
+: Restart service under the new name if source or target was running
+: ────────────────────────────────────────
+	if [ $RESTART_SOURCE = Y ] || [ $RESTART_TARGET = Y ]; then
+		./service $TARGET_SERVICE start $TARGET_TYPE || true
+	fi
+:
+: ────────────────────────────────────────
+: Finished $0 $* in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: ────────────────────────────────────────
