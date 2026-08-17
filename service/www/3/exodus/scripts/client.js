@@ -7668,6 +7668,8 @@ function exoconfirm_install_drag(div) {
 	if (!div || div.getAttribute('exo_confirm_drag') == '1')
 		return
 	div.setAttribute('exo_confirm_drag', '1')
+	// Size pins use getBoundingClientRect (border-box metrics)
+	div.style.boxSizing = 'border-box'
 
 	// mode: '' | 'move' | 'n'|'s'|'e'|'w'|combos
 	var mode = ''
@@ -7679,37 +7681,20 @@ function exoconfirm_install_drag(div) {
 	var startH = 0
 	var minW = 200
 	var minH = 120
+	// After leaving inset/margin centering: left/top are explicit.
+	var positioned = false
+	// Width/height locked only for resize (move must not touch size — that grew the shell).
+	var sizeLocked = false
 
-	function pin_to_pixels() {
-		var r = div.getBoundingClientRect()
-		div.style.inset = 'auto'
-		div.style.margin = '0'
-		div.style.right = 'auto'
-		div.style.bottom = 'auto'
-		div.style.left = r.left + 'px'
-		div.style.top = r.top + 'px'
-		div.style.width = r.width + 'px'
-		div.style.height = r.height + 'px'
-		div.style.maxWidth = 'none'
-		div.style.maxHeight = 'none'
-		div.style.minWidth = minW + 'px'
-		div.style.minHeight = minH + 'px'
-	}
-
-	function viewport() {
-		return {
-			vw: window.innerWidth || document.documentElement.clientWidth || 0,
-			vh: window.innerHeight || document.documentElement.clientHeight || 0
-		}
-	}
-
+	// onmove / onup kept named only so removeEventListener can match addEventListener.
 	function onmove(event) {
 		if (!mode)
 			return
 		event = getevent(event)
 		var dx = event.clientX - originX
 		var dy = event.clientY - originY
-		var vp = viewport()
+		var vw = window.innerWidth || document.documentElement.clientWidth || 0
+		var vh = window.innerHeight || document.documentElement.clientHeight || 0
 		var left = startLeft
 		var top = startTop
 		var w = startW
@@ -7718,10 +7703,10 @@ function exoconfirm_install_drag(div) {
 		if (mode == 'move') {
 			left = startLeft + dx
 			top = startTop + dy
-			if (left > vp.vw - 40)
-				left = vp.vw - 40
-			if (top > vp.vh - 40)
-				top = vp.vh - 40
+			if (left > vw - 40)
+				left = vw - 40
+			if (top > vh - 40)
+				top = vh - 40
 			if (left + w < 40)
 				left = 40 - w
 			if (top < 0)
@@ -7754,10 +7739,10 @@ function exoconfirm_install_drag(div) {
 				top = startTop + (startH - minH)
 			h = minH
 		}
-		if (w > vp.vw - 20)
-			w = vp.vw - 20
-		if (h > vp.vh - 20)
-			h = vp.vh - 20
+		if (w > vw - 20)
+			w = vw - 20
+		if (h > vh - 20)
+			h = vh - 20
 		if (left < 0) {
 			if (mode.indexOf('w') >= 0)
 				w += left
@@ -7768,10 +7753,10 @@ function exoconfirm_install_drag(div) {
 				h += top
 			top = 0
 		}
-		if (left + w > vp.vw)
-			w = vp.vw - left
-		if (top + h > vp.vh)
-			h = vp.vh - top
+		if (left + w > vw)
+			w = vw - left
+		if (top + h > vh)
+			h = vh - top
 		if (w < minW)
 			w = minW
 		if (h < minH)
@@ -7792,45 +7777,57 @@ function exoconfirm_install_drag(div) {
 		document.removeEventListener('mouseup', onup, true)
 	}
 
-	function start_gesture(event, newMode) {
-		event = getevent(event)
-		if (event.button != null && event.button !== 0)
-			return
-		pin_to_pixels()
-		mode = newMode
-		originX = event.clientX
-		originY = event.clientY
-		startLeft = parseFloat(div.style.left) || 0
-		startTop = parseFloat(div.style.top) || 0
-		startW = div.offsetWidth
-		startH = div.offsetHeight
-		if (mode == 'move')
-			div.classList.add('exo_confirm_dragging')
-		else
-			div.classList.add('exo_confirm_resizing')
-		document.addEventListener('mousemove', onmove, true)
-		document.addEventListener('mouseup', onup, true)
-		return exocancelevent(event)
-	}
-
-	function ondown_move(event) {
-		return start_gesture(event, 'move')
-	}
-
-	function ondown_resize(event) {
-		var t = event.target || event.srcElement
-		var edges = t && t.getAttribute && t.getAttribute('data-exo-rsz')
-		if (!edges)
-			return
-		return start_gesture(event, edges)
-	}
-
 	var icon = div.querySelector('.exoconfirm_iconcol')
-	var question = div.querySelector('#question1')
 	if (icon)
-		addeventlistener(icon, 'mousedown', ondown_move)
-	if (question)
-		addeventlistener(question, 'mousedown', ondown_move)
+		addeventlistener(icon, 'mousedown', function (event) {
+			// Drag start (move): measure once, pin left/top only — never width/height.
+			event = getevent(event)
+			if (event.button != null && event.button !== 0)
+				return
+			var r = div.getBoundingClientRect()
+			var left = r.left
+			var top = r.top
+			var w = r.width
+			var h = r.height
+			// Position pin — similar: resize mousedown below
+			if (!positioned) {
+				// Drop inset:0 + margin:auto centering → fixed left/top only.
+				div.style.inset = 'auto'
+				div.style.margin = '0'
+				div.style.right = 'auto'
+				div.style.bottom = 'auto'
+				div.style.left = left + 'px'
+				div.style.top = top + 'px'
+				positioned = true
+			} else {
+				left = parseFloat(div.style.left)
+				top = parseFloat(div.style.top)
+				if (isNaN(left))
+					left = r.left
+				if (isNaN(top))
+					top = r.top
+			}
+			// Viewport clamp uses current box size (fit-content or prior resize lock)
+			if (sizeLocked) {
+				w = parseFloat(div.style.width)
+				h = parseFloat(div.style.height)
+				if (isNaN(w))
+					w = r.width
+				if (isNaN(h))
+					h = r.height
+			}
+			mode = 'move'
+			originX = event.clientX
+			originY = event.clientY
+			startLeft = left
+			startTop = top
+			startW = w
+			startH = h
+			div.classList.add('exo_confirm_dragging')
+			document.addEventListener('mousemove', onmove, true)
+			document.addEventListener('mouseup', onup, true)
+			return exocancelevent(event)
+		})
 
 	// Four borders + corners (corner = two letters)
 	var edges = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw']
@@ -7839,7 +7836,65 @@ function exoconfirm_install_drag(div) {
 		strip.className = 'exo_confirm_rsz exo_confirm_rsz_' + edges[i]
 		strip.setAttribute('data-exo-rsz', edges[i])
 		strip.setAttribute('aria-hidden', 'true')
-		addeventlistener(strip, 'mousedown', ondown_resize)
+		addeventlistener(strip, 'mousedown', function (event) {
+			// Resize start: same measure, then lock width/height from that rect once.
+			event = getevent(event)
+			if (event.button != null && event.button !== 0)
+				return
+			var t = event.target || event.srcElement
+			var newMode = t && t.getAttribute && t.getAttribute('data-exo-rsz')
+			if (!newMode)
+				return
+			var r = div.getBoundingClientRect()
+			var left = r.left
+			var top = r.top
+			var w = r.width
+			var h = r.height
+			// Position pin — similar: icon mousedown above
+			if (!positioned) {
+				div.style.inset = 'auto'
+				div.style.margin = '0'
+				div.style.right = 'auto'
+				div.style.bottom = 'auto'
+				div.style.left = left + 'px'
+				div.style.top = top + 'px'
+				positioned = true
+			} else {
+				left = parseFloat(div.style.left)
+				top = parseFloat(div.style.top)
+				if (isNaN(left))
+					left = r.left
+				if (isNaN(top))
+					top = r.top
+			}
+			if (!sizeLocked) {
+				div.style.width = w + 'px'
+				div.style.height = h + 'px'
+				div.style.maxWidth = 'none'
+				div.style.maxHeight = 'none'
+				div.style.minWidth = minW + 'px'
+				div.style.minHeight = minH + 'px'
+				sizeLocked = true
+			} else {
+				w = parseFloat(div.style.width)
+				h = parseFloat(div.style.height)
+				if (isNaN(w))
+					w = r.width
+				if (isNaN(h))
+					h = r.height
+			}
+			mode = newMode
+			originX = event.clientX
+			originY = event.clientY
+			startLeft = left
+			startTop = top
+			startW = w
+			startH = h
+			div.classList.add('exo_confirm_resizing')
+			document.addEventListener('mousemove', onmove, true)
+			document.addEventListener('mouseup', onup, true)
+			return exocancelevent(event)
+		})
 		div.appendChild(strip)
 	}
 }

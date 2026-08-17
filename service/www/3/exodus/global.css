@@ -1573,6 +1573,7 @@ input[type=checkbox]:focus-visible {
     --exoconfirm-iconcol-width: 4.3em;
     z-index: 1001;
     position: fixed;
+    box-sizing: border-box;
     width: fit-content;
     min-width: min-content;
     max-width: min(700px, calc(100vw - 40px));
@@ -1590,18 +1591,16 @@ input[type=checkbox]:focus-visible {
     align-items: stretch;
     overflow: hidden;
 }
-/* Drag handles: icon + question only (not body list / footer).
+/* Drag handle: icon only (not question / body list / footer).
  * grab/grabbing — not move (often a four-arrow “resize” glyph). */
-.exoconfirmdiv .exoconfirm_iconcol,
-.exoconfirmdiv #question1 {
+.exoconfirmdiv .exoconfirm_iconcol {
     cursor: grab;
     cursor: -webkit-grab;
     -webkit-user-select: none;
     user-select: none;
 }
 .exoconfirmdiv.exo_confirm_dragging,
-.exoconfirmdiv.exo_confirm_dragging .exoconfirm_iconcol,
-.exoconfirmdiv.exo_confirm_dragging #question1 {
+.exoconfirmdiv.exo_confirm_dragging .exoconfirm_iconcol {
     cursor: grabbing;
     cursor: -webkit-grabbing;
 }
