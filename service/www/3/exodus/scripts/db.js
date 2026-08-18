@@ -253,7 +253,7 @@ async function exo_val_time(mode,otherid) {
 }
 
 // exo_dict_period(di,'FROM','PERIOD_TO','[FINANCIAL_PERIOD]')
-// Align: keep preset if already set; else R (amounts-style). Callers may set L before.
+// Align: keep preset; else same as exo_dict_number/date — L scalar, R in mv group.
 function exo_dict_period(di,mode,otherperiodid,conversion) {
 
  if (!mode) mode=''
@@ -261,8 +261,12 @@ function exo_dict_period(di,mode,otherperiodid,conversion) {
  if (!conversion) conversion=''
  exoassertobject(di,'exo_dict_period','di')
  di.conversion='[PERIOD_OF_YEAR]'
- if (typeof di.align == 'undefined' || di.align === '' || di.align == null)
-  di.align='R'
+ if (typeof di.align == 'undefined' || di.align === '' || di.align == null) {
+  if (Number(di.groupno) > 0)
+   di.align = 'R'
+  else
+   di.align = 'L'
+ }
  di.length=7
  if (di.type=='F') di.validation='await exo_val_period("'+mode+'","'+otherperiodid+'")'
 }
@@ -272,7 +276,13 @@ function exo_dict_year_period(di,mode) {
  if (!mode) mode=''
  exoassertobject(di,'exo_dict_yearperiod','di')
  di.conversion='[YEAR_PERIOD,'+mode+']'
- di.align='R'
+ // Same align rule as exo_dict_period / number / date.
+ if (typeof di.align == 'undefined' || di.align === '' || di.align == null) {
+  if (Number(di.groupno) > 0)
+   di.align = 'R'
+  else
+   di.align = 'L'
+ }
  di.length=7
 }
 

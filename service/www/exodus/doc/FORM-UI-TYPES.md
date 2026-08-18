@@ -81,6 +81,7 @@ Helpers that matter for layout:
 | `exo_dict_code` | T via text | **false** | default 30 | code intent |
 | `exo_dict_textarea` | T | true if unset | keep or set | stays TEXTAREA |
 | `exo_dict_date` | L or R (group) | optional | 10 | calendar popup; same group rule as number |
+| `exo_dict_period` / `year_period` | L or R (group) | — | 7 | same group rule as number |
 | `exo_dict_number` | L or R (group) | — | — | conversion |
 | `exo_dict_time` | L | — | 5 | |
 
