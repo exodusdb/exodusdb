@@ -359,8 +359,14 @@ function exo_dict_date(dicti,params) {
 
  exoassertobject(dicti,'exo_dict_date','dicti')
  dicti.conversion='[DATE,'+params+']'
- // Right like amounts/columns of fixed date strings. Callers may set di.align after.
- dicti.align = 'R'
+ // Same align rule as exo_dict_number: keep preset; else line-grid R, header/single L.
+ // Call after dictrec so di.groupno is set when needed.
+ if (typeof dicti.align == 'undefined' || dicti.align === '' || dicti.align == null) {
+  if (Number(dicti.groupno) > 0)
+   dicti.align = 'R'
+  else
+   dicti.align = 'L'
+ }
  dicti.length=10
  dicti.popup='await form_pop_calendar()'
  if (!gcalendarscript) gcalendarscript=1

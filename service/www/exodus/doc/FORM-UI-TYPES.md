@@ -63,7 +63,7 @@ From `dictrec` + helpers + common overrides:
 | Axis | Values | Set by |
 |------|--------|--------|
 | **type** | `F` (file/data), `S` (symbolic/calc), also `B` buttons etc. | `dictrec(..., type, ...)` |
-| **align** | `''` / `L` / `R` / `T` | `dictrec` arg, or helper (`dict_text`→T, `dict_date`→L, `dict_number`→L/R by group) |
+| **align** | `''` / `L` / `R` / `T` | `dictrec` arg, or helper (`dict_text`→T, `dict_date`/`dict_number`→L/R by group) |
 | **lowercase** | unset / `true` / `false` | `dict_text`→true if unset; `dict_code`→false; date/time sometimes true; default paint for S/SELECT→true |
 | **length** | empty / N | `dictrec` arg, helper, or after-call `di.length=` |
 | **readonly** | unset / true / msg string | dict / security |
@@ -80,7 +80,7 @@ Helpers that matter for layout:
 | `exo_dict_text` | **T** | true if unset | clear unless arg | free-text intent |
 | `exo_dict_code` | T via text | **false** | default 30 | code intent |
 | `exo_dict_textarea` | T | true if unset | keep or set | stays TEXTAREA |
-| `exo_dict_date` | L | optional | 10 | calendar popup |
+| `exo_dict_date` | L or R (group) | optional | 10 | calendar popup; same group rule as number |
 | `exo_dict_number` | L or R (group) | — | — | conversion |
 | `exo_dict_time` | L | — | 5 | |
 
