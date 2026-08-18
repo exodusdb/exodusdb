@@ -5566,7 +5566,7 @@ async function saverecord_onclick() {
         //prune the cache to reselect any edited record
         prunecache('SELECT\r' + gdatafilename + '\r')
         prunecache('READ\r' + gdatafilename + '\r' + gkey)
-        prunecache('GETINDEXVALUES\r' + gdatafilename + '\r')
+        prunecache('GETINDEX\r' + gdatafilename + '\r')
 
         //custom postwrite function
         if (typeof form_postwrite == 'function') {
@@ -5732,7 +5732,7 @@ async function deleterecord_onclick(event) {
 
     //prune the cache to reselect any deleted record
     prunecache('SELECT\r' + gdatafilename + '\r')
-    prunecache('GETINDEXVALUES\r' + gdatafilename + '\r')
+    prunecache('GETINDEX\r' + gdatafilename + '\r')
 
     //custom postdelete function
     if (typeof form_postdelete == 'function') {
@@ -12145,7 +12145,7 @@ async function form_val_index(filename, fieldname, allownew) {
 
 async function form_get_index(filename, fieldname) {
 
-    db.request = 'CACHE\rGETINDEXVALUESXML\r' + filename + '\r' + fieldname
+    db.request = 'CACHE\rGETINDEX.XML\r' + filename + '\r' + fieldname
     if (!(await db.send())) {
         await exoui_invalid(db.response)
         return ''

@@ -109,7 +109,7 @@ func main(io filename, in mode, out filetitle, out triggers) {
 	} else if (mode == "RELOCK") {
 	} else if (mode == "UNLOCK") {
 	} else if (mode == "SELECT") {
-		// case mode='GETINDEXVALUES'
+		// case mode='GETINDEX'
 	} else {
 		call note(mode.quote() ^ " is invalid in LISTEN3");
 		return 0;

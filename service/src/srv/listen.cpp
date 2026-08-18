@@ -1575,8 +1575,8 @@ subr process2() {
 
 		call listen2(request1, datasetx, username, connection, request5);
 
-		// GETINDEXVALUES / GETINDEXVALUESXML → listen5 (collectixvals)
-	} else if (request1.starts("GETINDEXVALUES")) {
+		// GETINDEX / GETINDEX.XML → listen5 (collectixvals)
+	} else if (request1.starts("GETINDEX")) {
 
 		call listen5(request1, request2, request3, request4, request5, request6);
 

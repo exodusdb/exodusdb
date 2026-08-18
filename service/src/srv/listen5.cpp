@@ -235,8 +235,8 @@ func main(in request1, in request2in, in request3in, in request4in, in request5i
 		logx.replacer("%3C", "&lt;");
 		logx.replacer("%3E", "&gt;");
 
-	// GETINDEXVALUES and GETINDEXVALUESXML (XML via request_.contains("XML") below)
-	} else if (request1.starts("GETINDEXVALUES")) {
+	// GETINDEX and GETINDEX.XML (XML via request_.contains("XML") below)
+	} else if (request1.starts("GETINDEX")) {
 
 		data_		  = "";
 		var filename  = request2;
@@ -248,7 +248,7 @@ func main(in request1, in request2in, in request3in, in request4in, in request5i
 		}
 		if (sortby) {
 			if (not sortby.listed("AL,AR,DL,DR")) {
-				response_ = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEXVALUES";
+				response_ = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEX";
 				return 0;
 			}
 		}
