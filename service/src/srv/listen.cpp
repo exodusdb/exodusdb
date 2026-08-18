@@ -1575,11 +1575,9 @@ subr process2() {
 
 		call listen2(request1, datasetx, username, connection, request5);
 
-		// find index values
-		// case request1[1,14]='GETINDEXVALUES'
-	} else if (request1.starts("GETINDEX")) {
+		// GETINDEXVALUES / GETINDEXVALUESXML → listen5 (collectixvals)
+	} else if (request1.starts("GETINDEXVALUES")) {
 
-		// call listen3(request2,'GETINDEXVALUES')
 		call listen5(request1, request2, request3, request4, request5, request6);
 
 		// select some data

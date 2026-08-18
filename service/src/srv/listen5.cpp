@@ -235,7 +235,8 @@ func main(in request1, in request2in, in request3in, in request4in, in request5i
 		logx.replacer("%3C", "&lt;");
 		logx.replacer("%3E", "&gt;");
 
-	} else if (request1.starts("GETINDEX")) {
+	// GETINDEXVALUES and GETINDEXVALUESXML (XML via request_.contains("XML") below)
+	} else if (request1.starts("GETINDEXVALUES")) {
 
 		data_		  = "";
 		var filename  = request2;
