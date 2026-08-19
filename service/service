@@ -16,17 +16,42 @@ PS4='+ [./service:$LINENO ${DB_CODE:-${1-}} ${SECONDS}s] '
 	DB_CODE=${1:?DB_CODE argument is required}
 	CMD=${2:?Action [start|stop|etc.] argument is required}
 	LIVE_OR_TEST=${3:-}
-
+:
+: 'Skip stop/restart when unit is not active (missing, inactive, partial install)'
+: 'so we do not wait on systemd stop of a non-running service. When active, use'
+: 'normal systemctl stop/restart — do not override unit stop timeout or kill policy.'
+:
+	do_cmd() {
+		local unit=$1
+		case "$CMD" in
+		stop)
+			if systemctl is-active --quiet "$unit" 2>/dev/null; then
+				sudo systemctl stop "$unit"
+			fi
+			;;
+		restart)
+			if systemctl is-active --quiet "$unit" 2>/dev/null; then
+				sudo systemctl restart "$unit"
+			else
+				sudo systemctl start "$unit"
+			fi
+			;;
+		*)
+			sudo systemctl "$CMD" "$unit"
+			;;
+		esac
+	}
+:
 	if [ "$LIVE_OR_TEST" != "test" ]; then
 	:
 	: LIVE
 	: ────────────────────────────────────────
-		sudo systemctl $CMD ${APP_CODE}_live@$DB_CODE
+		do_cmd ${APP_CODE}_live@$DB_CODE
 	fi
 
 	if [ "$LIVE_OR_TEST" != "live" ]; then
 	:
 	: TEST
 	: ────────────────────────────────────────
-		sudo systemctl $CMD ${APP_CODE}_test@$DB_CODE
+		do_cmd ${APP_CODE}_test@$DB_CODE
 	fi
