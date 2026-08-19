@@ -24,6 +24,7 @@ async function formfunctions_onload() {
  }
 
  //prepare for login as much as possible but take existing username if possible
+ // gsystem: pre-login hint only; backend APPLICATION (ap=) is authoritative after LOGIN
  gsystem=unescape(request[0])
  gdataset=unescape(request[1])
 

@@ -7,6 +7,9 @@ var gpasswordreset_link
 var glogin_button
 var gisdialog
 
+// gsystem (ACCOUNTS|ADAGENCY): pre-login hint only (.VOL list / entry URL / cookie).
+// Authoritative APPLICATION is decided by the backend at serve start
+// (SCHEDULES open → ADAGENCY, else ACCOUNTS). After LOGIN, ap= overwrites EXODUSsystem.
 var gsystem
 var ghref
 var gportno=''
@@ -28,7 +31,7 @@ async function formfunctions_onload() {
     if (!gsystem || gsystem == 'UNDEFINED')
         gsystem = 'ADAGENCY'
     gsystem = gsystem.toUpperCase()
-    //save permanent default
+    //save permanent default (pre-login hint; corrected from ap= after LOGIN below)
     document.cookie = 'EXODUSsystem=' + gsystem
     
     //+'; path=/'
@@ -313,7 +316,7 @@ async function login_onclick() {
             //temporary cookie for menu, gcompany etc
             exosetcookie(glogincode, 'EXODUS2', db.data)
 
-            //mv.APPLICATION
+            // Backend APPLICATION (ap=) — authoritative; replaces any entry URL/cookie hint
             var tt = exogetcookie2('ap', '', glogincode)
             if (tt) {
                 gsystem = tt;

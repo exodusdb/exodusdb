@@ -195,6 +195,8 @@ var gDialogArguments//similar to window.dialogArguments
 
 var gusername
 var gdataset
+// gsystem (ACCOUNTS|ADAGENCY): UI hint only. Backend APPLICATION is authoritative
+// (serve sets it; LOGIN cookie ap= syncs EXODUSsystem). Not used by listen on requests.
 var gsystem
 
 var gcompanycode
@@ -465,6 +467,7 @@ async function exologout_onclick() {
 
 	//decide where to login again
 	var newwindowlocation = '../index.html'
+	// Return to entry system URL if cookie set (pre-login hint; backend APPLICATION wins after login)
 	var system = exogetcookie2('', 'EXODUSsystem', null)
 	if (system && system != 'ADAGENCY')
 		newwindowlocation += '??' + system
@@ -2714,6 +2717,7 @@ function exodblink() {
 	gusername = exogetcookie2('username') || gusername
 	//alert('xyz2 EXODUS2/username='+exogetcookie2('username'))
 	//alert(document.cookie)
+	// EXODUSsystem cookie = pre-login hint or post-login ap= from backend APPLICATION
 	gsystem = exogetcookie2('', 'EXODUSsystem', null) || gsystem
 
 	// alert(gdataset+'*'+gusername+'*'+gsystem)

@@ -193,6 +193,7 @@ function exodblink_send_byfile(data) {
             this.password = requests[2]
             this.dataset = requests[3]
             this.authno = requests[4]
+            // system (ACCOUNTS|ADAGENCY): pre-login hint; backend APPLICATION wins after LOGIN (ap=)
             this.system = requests[5]
             this.request = requests[0]//remove the password from the request string
 
