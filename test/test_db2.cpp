@@ -306,7 +306,10 @@ dict(AGE_IN_YEARS) {
 	//#endif
 
 	var myclients;
-	var clients_filename = "xo_clients";
+	var clients_filename = "xo_db2_clients";
+	// Private file (not shared testsort xo_clients). Create empty so open succeeds; generate rebuilds.
+	if (not var().open(clients_filename))
+		assert(createfile(clients_filename));
 	if (myclients.open(clients_filename)) {
 
 		generate_xo_clients_dict_data(clients_filename);
