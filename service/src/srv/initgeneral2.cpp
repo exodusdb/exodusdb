@@ -85,8 +85,8 @@ func main(in mode, io logtime, in menu) {
 			hosts(ln) = hosts.f(ln).field("#", 1);
 		}  // ln;
 
-		// remove blank lines and convert fm to sm
-		hosts.converter(FM, " ");
+		// remove blank lines; treat ;/, like spaces (hosts.allow / pasted lists)
+		hosts.converter(_FM ",;/", "    ");
 		hosts.trimmer();
 		hosts.converter(" ", SM);
 
@@ -116,6 +116,10 @@ func main(in mode, io logtime, in menu) {
 		if (configips == "") {
 			configips = "192.168 10 172";
 		}
+		// Same separators as listen2 user path — ";" must not stay inside one token
+		// (e.g. "10;127" would not match prefix "10").
+		configips.converter(",;/", "   ");
+		configips.trimmer();
 		configips.converter(" ", SM);
 		configips.replacer(".*", "");
 		nn = configips.fcount(SM);
