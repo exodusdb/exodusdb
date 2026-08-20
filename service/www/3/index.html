@@ -20,92 +20,10 @@
 	<link rel="preload" href="../exodus/images/theme2/login-eye-slash.svg" as="image">
 
 	<style>
-		/*entire form including left form side and right image side*/
-		.loginform {
-			display: flex;
-			flex-direction: row;
-			margin: auto;
-			width: 100%;
-			max-width: 800px;
+		:root {
 			--login-shell-radius: 0.5rem;
 			--login-image-margin: 5px;
-			border-radius: var(--login-shell-radius);
-			box-shadow: 0 0 30px rgba(0,0,0,0.1);
-			overflow: hidden;
-		}
-
-		/*usercode, password, database — same field chrome (incl. select bg in light mode)*/
-		#logindiv .loginfield {
-			width: 100%;
-			padding: 10px;
-			margin: auto;
-			box-sizing: border-box;
-			border: 1px solid #ccc;
-			border-radius: 0.5rem;
-			font-size: 0.875rem;
-			background-color: #fff;
-			color: #222;
-			/*text-transform: uppercase*/
-			/*should not transform database field*/
-		}
-
-		#logindiv select.loginfield {
-			-webkit-appearance: none;
-			appearance: none;
-			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23222222' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
-			background-repeat: no-repeat;
-			background-position: right 0.75em center;
-			padding-right: 2em;
-		}
-
-		.loginbutton {
-			/*applies only to login page*/
-			color: white;
-			background-color: #b28d4f;
-			padding: 0.5rem;
-			font-size: 12px;
-			width: 100%;
-			margin: auto;
-			border: none;
-			border-radius: 1.5rem;
-			box-sizing: border-box;
-		}
-
-		/* Slightly below main field text; asyncjs global.css body is 1rem */
-		.login-options-row {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			font-size: 9pt;
-		}
-
-		/* Keep square: global.css sets width/min/max with !important; a lone
-		   height:14px left Remember me wider than tall. Reassert full box. */
-		#logindiv .login-options-row input[type=checkbox] {
-			width: var(--exocheck-size) !important;
-			min-width: var(--exocheck-size) !important;
-			max-width: var(--exocheck-size) !important;
-			height: var(--exocheck-size) !important;
-			min-height: 0;
-		}
-
-		/* Keyboard focus: browser Highlight (system selection/focus colour), not app orange */
-		#logindiv .loginfield:focus,
-		#logindiv .loginbutton:focus,
-		#logindiv .toggle-password:focus,
-		#logindiv .login-options-row input[type=checkbox]:focus,
-		#logindiv .login-options-row input[type=checkbox]:focus-visible,
-		#logindiv .login-reset-link:focus {
-			outline: 2px solid Highlight;
-			outline-offset: 2px;
-			/* global.css paints orange box-shadow on checkbox:focus — cancel here */
-			box-shadow: none;
-		}
-		#logindiv .toggle-password:focus {
-			border-radius: 2px;
-		}
-		#logindiv .login-reset-link:focus {
-			border-radius: 2px;
+			--login-bg: #f1eee0;
 		}
 
 		body.login-page {
@@ -114,47 +32,130 @@
 
 		.login-shell {
 			display: flex;
-			justify-content: center;
+			justify-content: safe center;
 			align-items: center;
-			height: 100vh;
-		}
-
-		#logindiv.login-shell-form {
-			border-style: hidden;
-			width: 80%;
-			display: flex;
-			border: 1px solid #ccc;
-			box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-		}
-
-		.login-panel-left {
-			background-color: #f1eee0;
-			width: 30%;
-			padding: 1.5rem;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			border-radius: 8px 0 0 8px;
-		}
-
-		.login-image-panel {
-			width: 70%;
-			padding: var(--login-image-margin) var(--login-image-margin) var(--login-image-margin) 0;
-			background-color: #f1eee0;
-			display: flex;
-			align-items: stretch;
-			justify-content: center;
+			min-height: 100vh;
 			box-sizing: border-box;
+			padding: 1rem;
 		}
 
-		.login-image-panel-inner {
-			flex: 1;
+		/* Outer: one row, two columns — fields | image */
+		#logindiv.login-shell-table {
+			border-collapse: collapse;
+			border-spacing: 0;
+			margin: auto;
+			max-width: calc(100vw - 2rem);
+			border: 1px solid #ccc;
+			border-radius: var(--login-shell-radius);
+			box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+			overflow: hidden;
+			background: var(--login-bg);
+		}
+
+		#logindiv.login-shell-table > tbody > tr > td {
+			border: none;
+			vertical-align: middle;
+			background: var(--login-bg);
+		}
+
+		.login-left-cell {
+			padding: 1.5rem;
+		}
+
+		.login-image-cell {
+			padding: var(--login-image-margin) var(--login-image-margin) var(--login-image-margin) 0;
+			vertical-align: middle;
+		}
+		.login-image-cell img {
+			display: block;
+			/* 80% of the image itself (natural 500px) — not 80% of the td (td has no height) */
+			height: calc(500px * 0.8);
+			width: auto;
+		}
+
+		/* Inner: gutter (F7) | controls */
+		.login-fields-table {
+			border-collapse: collapse;
+			border-spacing: 0;
+			width: auto;
+		}
+		.login-fields-table td {
+			padding: 0;
+			vertical-align: middle;
+			border: none;
+		}
+		.login-fields-table tr + tr > td {
+			padding-top: 1rem;
+		}
+		.login-fields-table td.login-fields-popup-cell {
+			width: 1%;
+			padding-right: 0.35rem;
+			white-space: nowrap;
+		}
+
+		/* Field chrome */
+		#logindiv .loginfield {
+			width: 100%;
+			padding: 10px;
+			box-sizing: border-box;
+			border: 1px solid #ccc;
+			border-radius: 0.5rem;
+			font-size: 0.875rem;
+			background-color: #fff;
+			color: #222;
+		}
+
+		#logindiv select.loginfield {
+			-webkit-appearance: none;
+			appearance: none;
+			background-color: #fff;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23222222' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: right 0.75em center;
+			background-size: 10px 6px;
+			padding-right: 2.5em;
+		}
+
+		.loginbutton {
+			color: white;
+			background-color: #b28d4f;
+			padding: 0.5rem;
+			font-size: 12px;
+			width: 100%;
+			border: none;
+			border-radius: 1.5rem;
+			box-sizing: border-box;
+			cursor: pointer;
+		}
+
+		.login-options-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			font-size: 9pt;
+		}
+
+		#logindiv .login-options-row input[type=checkbox] {
+			width: var(--exocheck-size) !important;
+			min-width: var(--exocheck-size) !important;
+			max-width: var(--exocheck-size) !important;
+			height: var(--exocheck-size) !important;
 			min-height: 0;
-			background-image: url('../exodus/images/theme2/login.webp');
-			background-size: cover;
-			background-position: center;
-			border-radius: 0 calc(var(--login-shell-radius) - var(--login-image-margin))
-				calc(var(--login-shell-radius) - var(--login-image-margin)) 0;
+		}
+
+		#logindiv .loginfield:focus,
+		#logindiv .loginbutton:focus,
+		#logindiv .toggle-password:focus,
+		#logindiv .login-options-row input[type=checkbox]:focus,
+		#logindiv .login-options-row input[type=checkbox]:focus-visible,
+		#logindiv .login-reset-link:focus {
+			outline: 2px solid Highlight;
+			outline-offset: 2px;
+			box-shadow: none;
+		}
+		#logindiv .toggle-password:focus,
+		#logindiv .login-reset-link:focus {
+			border-radius: 2px;
 		}
 
 		.login-reset-link {
@@ -163,10 +164,15 @@
 			cursor: pointer;
 		}
 
-		/* Autofill: match normal field colours (override browser yellow wash) */
 		#logindiv input.loginfield:-webkit-autofill {
 			-webkit-box-shadow: 0 0 0 1000px #fff inset;
 			-webkit-text-fill-color: #222;
+		}
+
+		#logindiv .toggle-password img {
+			display: block;
+			height: 14px;
+			width: 21px;
 		}
 
 		.login-footer {
@@ -178,22 +184,18 @@
 			z-index: -1;
 		}
 
+		:root[data-theme="dark_mode"] {
+			--login-bg: #28304a;
+		}
 		:root[data-theme="dark_mode"] body.login-page {
 			background: #000;
 			color: #c5c8d4;
 		}
-
-		:root[data-theme="dark_mode"] #logindiv.login-shell-form {
+		:root[data-theme="dark_mode"] #logindiv.login-shell-table {
 			border-color: #7070e0;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 			color: #c5c8d4;
 		}
-
-		:root[data-theme="dark_mode"] .login-panel-left,
-		:root[data-theme="dark_mode"] .login-image-panel {
-			background-color: #28304a;
-		}
-
 		:root[data-theme="dark_mode"] #logindiv .loginfield {
 			-webkit-appearance: none;
 			appearance: none;
@@ -201,49 +203,35 @@
 			border-color: #7070e0;
 			color: #d0d3dc;
 		}
-
 		:root[data-theme="dark_mode"] #logindiv .loginfield::placeholder {
 			color: #9a9ea8;
 			opacity: 1;
 		}
-
 		:root[data-theme="dark_mode"] #logindiv select.loginfield {
+			background-color: #353b52;
 			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23c5c8d4' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
 			background-repeat: no-repeat;
 			background-position: right 0.75em center;
-			padding-right: 2em;
+			background-size: 10px 6px;
+			padding-right: 2.5em;
 		}
-
-		/* same idea as light: field bg + text, not browser autofill chrome */
 		:root[data-theme="dark_mode"] #logindiv input.loginfield:-webkit-autofill {
 			-webkit-box-shadow: 0 0 0 1000px #353b52 inset;
 			-webkit-text-fill-color: #d0d3dc;
 		}
-
-		#logindiv .toggle-password img {
-			display: block;
-			height: 14px;
-			width: 21px;
-		}
-
-		/* Same approach as legacy PNG: black art, invert for dark field (no JS theme swap) */
 		:root[data-theme="dark_mode"] #logindiv .toggle-password img {
 			filter: brightness(0) invert(0.85);
 		}
-
 		:root[data-theme="dark_mode"] #logindiv .loginbutton {
 			background-color: #b8944f;
 			color: #1f1a12;
 		}
-
 		:root[data-theme="dark_mode"] .login-reset-link {
 			color: #a8b4d0;
 		}
-
 		:root[data-theme="dark_mode"] .login-footer {
 			color: #8a8e9a;
 		}
-
 		:root[data-theme="dark_mode"] #logindiv .login-options-row label,
 		:root[data-theme="dark_mode"] #logindiv .login-options-row a#passwordresetlink {
 			color: #b0b4c0;
@@ -273,52 +261,69 @@
 	<p id="exo-needjs" style="display:inline;margin:2em;padding:0.5em 1em;font-family:sans-serif;font-size:1rem;line-height:1.4;color:#222;background:#fff">EXODUS needs JavaScript enabled.</p>
 	<div id="exo-login-ui" style="display:none">
 	<div class="login-shell">
-		<div id="logindiv" class="loginform login-shell-form">
-
-			<div class="login-panel-left">
-				<div style="text-align: center; padding-top: 1rem; padding-bottom: 2rem; margin: auto;">
-					<img alt="EXODUS" src="../exodus/images/theme2/exoduslogo.webp" style="height: 80px; width: 100px" />
-				</div>
-
-				<div style="margin-bottom: 1rem;">
-					<input id="usernameelement" class="loginfield" placeholder="USERCODE" style="text-transform: uppercase;" />
-				</div>
-
-				<!--button behavior set in login.js				-->
-				<div style="margin-bottom: 1rem; position: relative; display: flex; align-items: center;">
-					<input type="password" id="passwordelement" class="loginfield" placeholder="PASSWORD" style="padding-right: 40px; text-transform: uppercase;">
-					<button id="togglePassword" class="toggle-password" type="button" onclick="showpassword_sync()" title="Show/Hide password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0;">
-						<img src="../exodus/images/theme2/login-eye-slash.svg" alt="" width="21" height="14">
-					</button>
-				</div>
-
-				<div style="margin-bottom: 1rem;">
-					<select id="datasetelement" class="loginfield" title="Database">
-					</select>
-				</div>
-
-				<div style="margin-bottom: 1rem; text-align: right; padding-top: 1rem;">
-					<button id="loginbutton" type="submit" class="loginbutton">
-						<b>Login</b>
-					</button>
-				</div>
-
-				<div class="login-options-row">
-					<div>
-						<input type="checkbox" id="autologinelement" />
-						<label for="autologinelement">Remember me</label>
-					</div>
-					<a id="passwordresetlink" class="login-reset-link" href="#" role="button">
-						Reset Password
-					</a>
-				</div>
-			</div>
-
-			<div class="login-image-panel">
-				<div class="login-image-panel-inner"></div>
-			</div>
-
-		</div>
+		<table id="logindiv" class="login-shell-table" role="presentation">
+			<tr>
+				<td class="login-left-cell">
+					<table class="login-fields-table" role="presentation">
+						<tr>
+							<td class="login-fields-popup-cell"></td>
+							<td class="login-fields-input-cell" style="text-align: center; padding-top: 1rem; padding-bottom: 1rem;">
+								<img alt="EXODUS" src="../exodus/images/theme2/exoduslogo.webp" style="height: 80px; width: 100px" />
+							</td>
+						</tr>
+						<tr>
+							<td class="login-fields-popup-cell"></td>
+							<td class="login-fields-input-cell">
+								<input id="usernameelement" class="loginfield" placeholder="USERCODE" style="text-transform: uppercase;" />
+							</td>
+						</tr>
+						<tr>
+							<td class="login-fields-popup-cell"></td>
+							<td class="login-fields-input-cell">
+								<div style="position: relative;">
+									<input type="password" id="passwordelement" class="loginfield" placeholder="PASSWORD" style="padding-right: 40px; text-transform: uppercase;">
+									<button id="togglePassword" class="toggle-password" type="button" onclick="showpassword_sync()" title="Show/Hide password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0;">
+										<img src="../exodus/images/theme2/login-eye-slash.svg" alt="" width="21" height="14">
+									</button>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="login-fields-popup-cell" id="dataset_popup_slot"></td>
+							<td class="login-fields-input-cell">
+								<select id="datasetelement" class="loginfield" title="Database">
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="login-fields-popup-cell"></td>
+							<td class="login-fields-input-cell">
+								<button id="loginbutton" type="submit" class="loginbutton">
+									<b>Login</b>
+								</button>
+							</td>
+						</tr>
+						<tr>
+							<td class="login-fields-popup-cell"></td>
+							<td class="login-fields-input-cell">
+								<div class="login-options-row">
+									<div>
+										<input type="checkbox" id="autologinelement" />
+										<label for="autologinelement">Remember me</label>
+									</div>
+									<a id="passwordresetlink" class="login-reset-link" href="#" role="button">
+										Reset Password
+									</a>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td class="login-image-cell">
+					<img src="../exodus/images/theme2/login.webp" alt="" />
+				</td>
+			</tr>
+		</table>
 	</div>
 
 	<div style="display: none; text-align: center" id="waitdivelement" class="waiting">

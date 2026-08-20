@@ -15,6 +15,9 @@ var ghref
 var gportno=''
 var gwaitdiv
 
+// Local GETDATASETS rows [[code, name], …] for login dataset select + Alt+Down decide (no dbform).
+var glogin_dataset_rows = []
+
 gloggedon = false
 
 //autosize if a popup login
@@ -75,7 +78,8 @@ async function formfunctions_onload() {
         //gpassword_element.value=gDialogArguments[1]
         var datasetx = gDialogArguments[2]
         var datasetlist = gDialogArguments[4]
-        await setdropdown2(gdataset_element, datasetlist, Array("code", "name"), datasetx, null)
+        login_dataset_rows_from_obj(datasetlist)
+        login_dataset_init_field(datasetx)
 
         if (gDialogArguments[5] == 'true') {
             gusername_element.innerText = gDialogArguments[0]
@@ -103,7 +107,7 @@ async function formfunctions_onload() {
             if (typeof exogetcookie == 'undefined')
                 datasetcode = datasetcode.substr(0,8).toUpperCase()
         }
-        await exosetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
+        await login_dataset_load("GETDATASETS\r" + gsystem, datasetcode)
         if (startinglocation != 'login' && exogetcookie2('a', 'EXODUS', '') == 'true') {
             gusername_element.value = exogetcookie2('u', 'EXODUS', '')
             gpassword_element.value = exogetcookie2('p', 'EXODUS', '')
@@ -131,8 +135,9 @@ async function formfunctions_onload() {
         gusername_element.select()
     }
     
-    //gdataset_element.onkeydown=dataset_onkeydown
-    //document.onkeydown = document_onkeydown
+    // F7 icon + F7 / Alt+Down → exoui_decide (letters left to native <select>)
+    login_dataset_install_popup_icon()
+    addeventlistener(gdataset_element, 'keydown', 'login_dataset_onkeydown')
     addeventlistener(document,'keydown','document_onkeydown')
 
     // Auto-login when credentials are already present — e.g. browser password
@@ -176,7 +181,7 @@ async function passwordreset_onclick(event) {
         return await exoui_invalid('Username is required')
     }
     var oldpass = gpassword_element.value
-    var email = await exoui_input('Password reset for database "' + gdataset_element.value + '"\n\nWhat is your registered email address?')
+    var email = await exoui_input('Password reset for database "' + login_dataset_selected_code() + '"\n\nWhat is your registered email address?')
     if (!email)
         return
     if (email.indexOf('@') < 0)
@@ -227,7 +232,7 @@ async function login_onclick() {
     //event.returnValue=false
     //exocancelevent(event)
 
-    var datasetx = exogetdropdown(gdataset_element)
+    var datasetx = login_dataset_selected_code()
 
 	// Remember the last database logged into if not a test database
     if (datasetx.substr(-5) != '_test')
@@ -400,6 +405,149 @@ async function login_onclick() {
 
     } //while
 
+}
+
+/*
+ * Login database: <select> always shows current DB. Alt+Down opens ordinary
+ * exoui_decide (client.js; no dbform). Letters left to native select.
+ * Similar: system_pop_datasetcode (inverted Name/Code layout there).
+ */
+async function login_dataset_load(request, selectedcode) {
+    db.request = request
+    if (!(await db.send())) {
+        await exoui_invalid(db.response)
+        glogin_dataset_rows = []
+        return
+    }
+    login_dataset_rows_from_obj(exoxml2obj(db.data))
+    login_dataset_init_field(selectedcode)
+}
+
+function login_dataset_rows_from_obj(dataobj) {
+    glogin_dataset_rows = []
+    if (!dataobj || !dataobj.group1)
+        return
+    for (var i = 0; i < dataobj.group1.length; i++) {
+        var rec = dataobj.group1[i]
+        var code = (rec.code && rec.code.text != null) ? String(rec.code.text) : ''
+        var name = (rec.name && rec.name.text != null) ? String(rec.name.text) : code
+        if (code)
+            glogin_dataset_rows.push([code, name])
+    }
+}
+
+function login_dataset_option_label(code, name) {
+    code = String(code || '')
+    name = String(name || '')
+    if (name && name != code)
+        return code + ' — ' + name
+    return code
+}
+
+function login_dataset_init_field(selectedcode) {
+    // Rebuild <select> options from local rows (always show a selected value)
+    while (gdataset_element.options && gdataset_element.options.length)
+        gdataset_element.remove(0)
+    for (var i = 0; i < glogin_dataset_rows.length; i++) {
+        var code = glogin_dataset_rows[i][0]
+        var name = glogin_dataset_rows[i][1]
+        var opt = document.createElement('option')
+        opt.value = code
+        opt.text = login_dataset_option_label(code, name)
+        gdataset_element.appendChild(opt)
+    }
+    var code = selectedcode ? String(selectedcode) : ''
+    if (code) {
+        var found = false
+        for (var j = 0; j < glogin_dataset_rows.length; j++) {
+            if (String(glogin_dataset_rows[j][0]).toUpperCase() == code.toUpperCase()) {
+                gdataset_element.value = glogin_dataset_rows[j][0]
+                found = true
+                break
+            }
+        }
+        if (!found && glogin_dataset_rows.length)
+            gdataset_element.selectedIndex = 0
+    } else if (glogin_dataset_rows.length) {
+        gdataset_element.selectedIndex = 0
+    }
+    login_dataset_size_field()
+}
+
+function login_dataset_size_field() {
+    var longest = 8
+    for (var i = 0; i < glogin_dataset_rows.length; i++) {
+        var label = login_dataset_option_label(glogin_dataset_rows[i][0], glogin_dataset_rows[i][1])
+        if (label.length > longest)
+            longest = label.length
+    }
+    gdataset_element.style.width = Math.min(52, Math.max(12, longest + 5)) + 'ch'
+}
+
+function login_dataset_selected_code() {
+    return String(gdataset_element.value || '')
+}
+
+function login_dataset_install_popup_icon() {
+    if (!gdataset_element || $$('dataset_popup'))
+        return
+    // Same find mask as form F7 chrome (gfindimage is in dbform.js — not on login)
+    var icon = exo_create_icon_element(exo_icon_spec('field-find.svg', 'neutral'))
+    icon.id = 'dataset_popup'
+    icon.title = 'Find a Database (F7)'
+    icon.style.cursor = 'pointer'
+    icon.setAttribute('isexopopup', '1')
+    if (gdataset_element.disabled) {
+        icon.style.visibility = 'hidden'
+        icon.style.pointerEvents = 'none'
+    }
+    var slot = $$('dataset_popup_slot')
+    if (slot)
+        slot.appendChild(icon)
+    addeventlistener(icon, 'click', 'login_dataset_popup_onclick')
+}
+
+async function login_dataset_popup_onclick(event) {
+    event = getevent(event)
+    if (event && event.preventDefault)
+        event.preventDefault()
+    await login_dataset_decide()
+    return exocancelevent(event)
+}
+
+async function login_dataset_decide() {
+    if (gdataset_element.disabled)
+        return
+    var rows = glogin_dataset_rows || []
+    if (!rows.length)
+        return await exoui_invalid('No databases available')
+    var cols = [[0, 'Code'], [1, 'Name']]
+    var reply = await exoui_decide(
+        'Which database?',
+        rows,
+        cols,
+        0,
+        login_dataset_selected_code(),
+        false,
+        false)
+    if (!reply)
+        return
+    var code = (typeof reply == 'object' && reply.length) ? reply[0] : reply
+    if (code == null || code === '')
+        return
+    gdataset_element.value = code
+    gdataset_element.focus()
+}
+
+async function login_dataset_onkeydown(event) {
+    event = getevent(event)
+    var keycode = event.keyCode || event.which
+    // F7 or Alt+Down — ordinary decide list (form SELECT popup convention)
+    if (keycode == 118 || (keycode == 40 && event.altKey)) {
+        await login_dataset_decide()
+        return exocancelevent(event)
+    }
+    return true
 }
 
 //using timeout to ensure password is hidden before any sync windows appear and block ui
