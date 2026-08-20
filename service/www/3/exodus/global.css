@@ -846,19 +846,21 @@ TH
     /*deprecated in html5 - removed to fix alignment issue in schedules*/
     /*vertical-align: baseline;*/
 }
+/* Normal links: colour + underline (login Reset Password, docs, …).
+ * Menu anchors keep underline off — see .menu a / a.menuitem below. */
 A:link
 {
     color: #003399;
-    text-decoration: none;
+    text-decoration: underline;
 }
 A:visited
 {
     color: #6699cc;
-    text-decoration: none;
+    text-decoration: underline;
 }
 A:hover
 {
-    /*text-decoration: underline;*/
+    text-decoration: underline;
 }
 
 
@@ -1131,19 +1133,29 @@ TABLE.exoform SPAN.clsReadOnly:empty::before {
     cursor: pointer;
 }
 
+/* Menu links: no underline (access-key <u> already marks hotkeys) */
+.menu a,
+a.menuitem
+{
+    text-decoration: none;
+}
+
 .menuitem:link
 {
     color: black;
+    text-decoration: none;
 }
 .menuitem:visited
 {
     color: black;
+    text-decoration: none;
 }
 
 
 .menuitem:hover
 {
     cursor: pointer;
+    text-decoration: none;
 }
 
 .menu hr,

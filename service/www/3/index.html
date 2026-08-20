@@ -21,8 +21,9 @@
 
 	<style>
 		:root {
-			--login-shell-radius: 0.5rem;
+			--login-shell-radius: 0.75rem;
 			--login-image-margin: 5px;
+			--login-section-gap: 0.75rem;
 			--login-bg: #f1eee0;
 		}
 
@@ -36,15 +37,16 @@
 			align-items: center;
 			min-height: 100vh;
 			box-sizing: border-box;
-			padding: 1rem;
+			padding: 0.25rem;
 		}
 
 		/* Outer: one row, two columns — fields | image */
 		#logindiv.login-shell-table {
-			border-collapse: collapse;
+			/* separate so border-radius actually clips (collapse ignores radius) */
+			border-collapse: separate;
 			border-spacing: 0;
 			margin: auto;
-			max-width: calc(100vw - 2rem);
+			max-width: calc(100vw - 0.5rem);
 			border: 1px solid #ccc;
 			border-radius: var(--login-shell-radius);
 			box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -54,23 +56,28 @@
 
 		#logindiv.login-shell-table > tbody > tr > td {
 			border: none;
-			vertical-align: middle;
+			/* top — not middle: image is taller than fields; middle left empty beige bands */
+			vertical-align: top;
 			background: var(--login-bg);
 		}
 
 		.login-left-cell {
-			padding: 1.5rem;
+			padding: 0.75rem;
+			/* gap between fields column and image (image itself has no inset) */
+			padding-right: var(--login-section-gap);
 		}
 
 		.login-image-cell {
-			padding: var(--login-image-margin) var(--login-image-margin) var(--login-image-margin) 0;
-			vertical-align: middle;
+			/* image bleeds to card top/right/bottom — no inset frame */
+			padding: 0;
+			vertical-align: top;
 		}
 		.login-image-cell img {
 			display: block;
-			/* 80% of the image itself (natural 500px) — not 80% of the td (td has no height) */
-			height: calc(500px * 0.8);
+			/* 82% of the image itself (natural 500px) — not % of the td (td has no height) */
+			height: calc(500px * 0.82);
 			width: auto;
+			border-radius: 0 var(--login-shell-radius) var(--login-shell-radius) 0;
 		}
 
 		/* Inner: gutter (F7) | controls */
@@ -158,11 +165,7 @@
 			border-radius: 2px;
 		}
 
-		.login-reset-link {
-			text-decoration: underline;
-			color: black;
-			cursor: pointer;
-		}
+		/* Reset Password: normal A:link / A:visited from global.css — no local colour override */
 
 		#logindiv input.loginfield:-webkit-autofill {
 			-webkit-box-shadow: 0 0 0 1000px #fff inset;
@@ -226,14 +229,10 @@
 			background-color: #b8944f;
 			color: #1f1a12;
 		}
-		:root[data-theme="dark_mode"] .login-reset-link {
-			color: #a8b4d0;
-		}
 		:root[data-theme="dark_mode"] .login-footer {
 			color: #8a8e9a;
 		}
-		:root[data-theme="dark_mode"] #logindiv .login-options-row label,
-		:root[data-theme="dark_mode"] #logindiv .login-options-row a#passwordresetlink {
+		:root[data-theme="dark_mode"] #logindiv .login-options-row label {
 			color: #b0b4c0;
 		}
 
