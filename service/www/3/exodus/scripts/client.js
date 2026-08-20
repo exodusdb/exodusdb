@@ -3959,6 +3959,8 @@ async function exo_typeahead(request, cols, coln, options) {
 // Keep rows where any cell matches typed key as:
 //   • whole-cell prefix (account/ledger codes: G12 → G123), or
 //   • any whitespace-word prefix (names: "DUBAI" in "DUBAI FZ").
+// Multi-word key ("c2 test"): ordered word-starts across the row (\bword1.*?\bword2).
+// Word breaks for multi-word: non-alphanumeric (so _ - ( ) count), not only spaces.
 // Covers both code keys and name search in one filter.
 function exo_typeahead_wordstart(rows, key) {
 	if (!rows || !rows.length)
@@ -3968,31 +3970,50 @@ function exo_typeahead_wordstart(rows, key) {
 	var ku = String(key).replace(/^\s+|\s+$/g, '').toUpperCase()
 	if (!ku)
 		return rows
+	var tokens = ku.split(/\s+/)
+	var multi = tokens.length > 1
 	var kept = []
 	for (var i = 0; i < rows.length; i++) {
 		var row = rows[i]
 		if (!row)
 			continue
 		var hit = false
-		for (var c = 0; c < row.length; c++) {
-			var cell = String(row[c] == null ? '' : row[c]).toUpperCase()
-			cell = cell.replace(/^\s+|\s+$/g, '')
-			if (!cell)
-				continue
-			// whole cell prefix (codes without spaces)
-			if (cell.indexOf(ku) === 0) {
-				hit = true
-				break
+		if (multi) {
+			var hay = []
+			for (var c = 0; c < row.length; c++) {
+				var cell = String(row[c] == null ? '' : row[c]).toUpperCase()
+				cell = cell.replace(/^\s+|\s+$/g, '')
+				if (cell)
+					hay.push(cell)
 			}
-			var words = cell.split(/\s+/)
-			for (var w = 0; w < words.length; w++) {
-				if (words[w] && words[w].indexOf(ku) === 0) {
+			var words = hay.join(' ').split(/[^A-Z0-9]+/)
+			var ti = 0
+			for (var wi = 0; wi < words.length && ti < tokens.length; wi++) {
+				if (words[wi] && words[wi].indexOf(tokens[ti]) === 0)
+					ti++
+			}
+			hit = ti === tokens.length
+		} else {
+			for (var c = 0; c < row.length; c++) {
+				var cell = String(row[c] == null ? '' : row[c]).toUpperCase()
+				cell = cell.replace(/^\s+|\s+$/g, '')
+				if (!cell)
+					continue
+				// whole cell prefix (codes without spaces)
+				if (cell.indexOf(ku) === 0) {
 					hit = true
 					break
 				}
+				var words = cell.split(/\s+/)
+				for (var w = 0; w < words.length; w++) {
+					if (words[w] && words[w].indexOf(ku) === 0) {
+						hit = true
+						break
+					}
+				}
+				if (hit)
+					break
 			}
-			if (hit)
-				break
 		}
 		if (hit)
 			kept.push(row)
