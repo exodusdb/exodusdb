@@ -9629,6 +9629,9 @@ async function decide_onload(decide_args) {
 
 	}
 
+	// Original numbered option count (before type-filter) — digit 1-9 shortcuts only if <= 9
+	var decide_noptions_orig = optionno
+
 	// Footer actions: only close the popup (popup-local; form path is blocked).
 	var okbutton = $$('decide_okbutton')
 	okbutton.onclick = function (event) {
@@ -10324,6 +10327,8 @@ async function decide_onload(decide_args) {
 		var vis = 0
 		var firstVis = null
 		var i
+		var matchAt = []
+		// Count first — do not change on-screen rows until we know the filter is non-empty
 		for (i = 0; i < rows.length; ++i) {
 			var row = rows[i]
 			var sel = null
@@ -10334,26 +10339,46 @@ async function decide_onload(decide_args) {
 					break
 				}
 			}
-			// Permanently non-returnable rows (hidden radio) stay out of the list
 			if (sel && sel.style.visibility == 'hidden') {
-				row.style.display = filter ? 'none' : ''
+				matchAt[i] = false
 				continue
 			}
 			var match = !filter
 				|| (row.innerText || row.textContent || '').toLowerCase().indexOf(filter) >= 0
-			row.style.display = match ? '' : 'none'
+			matchAt[i] = match
 			if (!match || !sel)
 				continue
 			vis++
 			if (!firstVis)
 				firstVis = sel
 		}
+		// Apply hide only when clearing filter or when there is at least one match.
+		// Empty filter result: leave previous rows visible; status shows no matches.
+		if (!filter || vis) {
+			for (i = 0; i < rows.length; ++i) {
+				var row2 = rows[i]
+				var sel2 = null
+				var inputs2 = row2.getElementsByTagName('input')
+				for (var jj = 0; jj < inputs2.length; ++jj) {
+					if (inputs2[jj].name == 'decide_selection') {
+						sel2 = inputs2[jj]
+						break
+					}
+				}
+				if (sel2 && sel2.style.visibility == 'hidden') {
+					row2.style.display = filter ? 'none' : ''
+					continue
+				}
+				row2.style.display = matchAt[i] ? '' : 'none'
+			}
+		}
 		var st = $$('decide_filter_status')
 		if (st) {
 			if (filter) {
 				st.style.display = ''
-				st.textContent = 'Filter: ' + decide_filter_text
-					+ (vis ? ' — ' + vis + ' match' + (vis == 1 ? '' : 'es') : ' — no matches')
+				st.textContent = vis
+					? ('"' + decide_filter_text + '" - ' + vis + ' match' + (vis == 1 ? '' : 'es'))
+					: ('"' + decide_filter_text + '" - no matches')
 				st.className = 'decide_filter_status '
 					+ (vis ? 'decide_filter_ok' : 'decide_filter_empty')
 			} else {
@@ -10373,12 +10398,9 @@ async function decide_onload(decide_args) {
 				if (!decide_returnmany)
 					firstVis.checked = true
 			}
-		} else if (filter) {
-			// No matches: park on Select so keydown still reaches the dialog
-			var okb = $$('decide_okbutton')
-			if (okb)
-				try { client_focuson(okb) } catch (e) { }
 		}
+		// No matches: do not focus Select (Space would OK while still filtering).
+		// Prior rows stay visible; leave focus on the list.
 		// Refit + refresh ▼ (fit calls update_scroll_hints)
 		exoconfirm_fit_decide_popup(true)
 	}
@@ -10549,8 +10571,9 @@ async function decide_onload(decide_args) {
 			}
 		}
 
-		//ctrl+enter and f9 is ok ... so is space if not !returnmany
-		if (keycode == 120 || (keycode == 13 && event.ctrlKey) || (keycode == 32 && !decide_returnmany)) {
+		//ctrl+enter and f9 is ok ... space ok only when not type-filtering
+		if (keycode == 120 || (keycode == 13 && event.ctrlKey)
+			|| (keycode == 32 && !decide_returnmany && !decide_filter_text)) {
 			decide_ok_onclick_sync()
 			return exocancelevent(event)
 		}
@@ -10572,8 +10595,8 @@ async function decide_onload(decide_args) {
 			return exocancelevent(event)
 		}
 
-		// Type-to-filter: letters always; digits/space/- etc only once filter is active.
-		// First character cannot be 1-9 (those select option 1-9 when filter empty).
+		// Type-to-filter: letters always; digits/space/- etc once filter is active.
+		// Digits 1-9 as first char: filter when >9 original options; else row shortcut below.
 		// Once no matches (red filter title), block further insert keys —
 		// Backspace/Esc above still shorten or clear.
 		if (!event.ctrlKey && !event.altKey && !event.metaKey) {
@@ -10584,7 +10607,10 @@ async function decide_onload(decide_args) {
 				var isDigit = ch >= '0' && ch <= '9'
 				var isLetter = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
 				var isExtra = ch == ' ' || ch == '-' || ch == '.' || ch == '/' || ch == '_' || ch == '*' || ch == '#'
-				if (isLetter || (decide_filter_text && (isDigit || isExtra))) {
+				var digitRowShortcut = decide_noptions_orig <= 9
+				if (isLetter
+					|| (decide_filter_text && (isDigit || isExtra))
+					|| (isDigit && ch >= '1' && ch <= '9' && !digitRowShortcut)) {
 					var stEmpty = $$('decide_filter_status')
 					if (stEmpty && stEmpty.classList
 						&& stEmpty.classList.contains('decide_filter_empty'))
@@ -10596,8 +10622,9 @@ async function decide_onload(decide_args) {
 			}
 		}
 
-		// digits 1-9 select options 1-9 (only when filter empty — else digits extend filter above)
-		if (!decide_filter_text && keycode >= 49 && keycode <= 57 && !event.altKey && !event.ctrlKey) {
+		// digits 1-9 select options 1-9 only if <=9 options originally and filter empty
+		if (!decide_filter_text && decide_noptions_orig <= 9
+			&& keycode >= 49 && keycode <= 57 && !event.altKey && !event.ctrlKey) {
 
 			var optionn = keycode - 48
 			if (optionn == 0)
