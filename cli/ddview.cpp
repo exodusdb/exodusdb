@@ -82,13 +82,13 @@ func main() {
 
 	select("dict." ^ filename ^ " by FMC WITH FMC " ^ filterfieldnos ^ " (SR)");
 	if (not LISTACTIVE) {
-		printl("No Records found!");
+		printl("No dict field records found!");
 	}
 
 	// Print column headings
 	printl(redcolour ^ "  F|SM  |DICT NAME                |DATA in " ^ filename.ucase() ^ ":" ^ key ^ endcolour);
 
-	// Print lines
+	// Print Field | Value lines
 	while (readnext(RECORD, ID, MV)) {
 
 		let dictfieldno = RECORD.f(2);
@@ -108,6 +108,40 @@ func main() {
 		line ^= datarec.f(dictfieldno).convert(_ALL_FMS, _VISIBLE_FMS);
 		printl(line);
 	}
+
+
+	// Calculated fields!
+	if (OPTIONS.contains("S")) {
+		select("dict." ^ filename ^ " with TYPE \"S\" (SR)");
+		if (not LISTACTIVE) {
+			printl("No dict symbolic records found!");
+		}
+
+		DICT   = "dict." ^ filename;
+		RECORD = datarec;
+		MV     = 0;
+
+		// Print Symbolic | Symbolic Value lines
+		var symbolic_rec;
+		while (readnext(symbolic_rec, ID, MV)) {
+
+			// Skip any calcs that assume they are executed under a service level env
+			if (symbolic_rec.f(8).match("(agy|fin)\\."_rex)) {
+				if (not OPTIONS.contains("Q")) {
+					printl("   |S  |" ^ ID ^ " SKIPPED symbolic, only works in service env");
+				}
+				continue;
+			}
+
+			var line = "";
+			line ^= oconv("", "R#3") ^ "|";
+			line ^= "S"_var.oconv("T#4") ^ "|";
+			line ^= ID.first(25).oconv("T#25") ^ "|";
+			line ^= calculate(ID).convert(_ALL_FMS, _VISIBLE_FMS);
+			printl(line);
+		}
+	}
+
 
 	return 0;
 }
