@@ -983,7 +983,8 @@ function modalblock_scrollpane_under(event) {
 	if (!confirm || !confirm.contains(event.target))
 		return null
 
-	var scrollpane = confirm.querySelector('.exoconfirm_body')
+	var scrollpane = confirm.querySelector('.decide_options_scroll')
+		|| confirm.querySelector('.exoconfirm_body')
 	if (!scrollpane || !(scrollpane === event.target || scrollpane.contains(event.target)))
 		return null
 
@@ -7684,7 +7685,12 @@ function exo_getinnertext(element) {
 
 function exoconfirm_scrollpane() {
 	var div = $$('exoconfirmdiv')
-	return div && (div.querySelector('.exoconfirm_body') || div)
+	if (!div)
+		return null
+	// Decide: options pane scrolls; question + filter stay put
+	return div.querySelector('.decide_options_scroll')
+		|| div.querySelector('.exoconfirm_body')
+		|| div
 }
 
 // Move (icon/question) + resize (four borders). No position/size memory —
@@ -8781,9 +8787,11 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 	var footerhtml = ''
 
 	if (decide_args) {
+		// Filter stays outside options scroll (does not cover question; stays while list scrolls)
 		bodyinner += '\
 			<div class="exoconfirm_decideblock">\
 			<div id="decide_filter_status" class="decide_filter_status" style="display:none"></div>\
+			<div class="decide_options_scroll">\
 			<table id="decide_table1" xwidth=100% xclass="exoform">\
 				<thead onclick="decide_sorttable2_sync(event)" style="cursor: pointer">\
 					<tr id="decide_table1head1row1">\
@@ -8792,6 +8800,7 @@ async function exoconfirm2(questionx, defaultbuttonn, positivebuttonx, negativeb
 				<tbody id="decide_table1body1">\
 				</tbody>\
 			</table>\
+			</div>\
 			</div>'
 		// Icon+label graphicbuttons (mask-tinted mono icons).
 		// "Select" not "OK" — avoids confusion when an option is itself named Cancel.
@@ -10373,7 +10382,6 @@ async function decide_onload(decide_args) {
 			}
 		}
 		var st = $$('decide_filter_status')
-		var decideRoot = $$('exoconfirmdiv')
 		if (st) {
 			if (filter) {
 				st.style.display = ''
@@ -10382,15 +10390,10 @@ async function decide_onload(decide_args) {
 					: ('"' + decide_filter_text + '" - no matches')
 				st.className = 'decide_filter_status '
 					+ (vis ? 'decide_filter_ok' : 'decide_filter_empty')
-				// Sticky filter height → thead top offset while scrolling
-				if (decideRoot)
-					decideRoot.style.setProperty('--decide-filter-sticky-h', st.offsetHeight + 'px')
 			} else {
 				st.style.display = 'none'
 				st.textContent = ''
 				st.className = 'decide_filter_status'
-				if (decideRoot)
-					decideRoot.style.setProperty('--decide-filter-sticky-h', '0px')
 			}
 		}
 		// Focus: keep current if still matching; else nearest above, else nearest below.

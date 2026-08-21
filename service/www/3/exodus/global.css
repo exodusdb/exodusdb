@@ -582,14 +582,8 @@ TABLE[exogroupno] > thead {
     /* bottom edge while stuck (border-collapse drops cell bottoms under scroll) */
     box-shadow: 0 1px 0 lightgrey;
 }
-/* Decide list + typeahead: sticky in panel scroll, not page menubar offset.
- * Decide thead sits under sticky filter when --decide-filter-sticky-h is set. */
-.exoconfirmdiv #decide_table1 > thead {
-    position: sticky;
-    top: var(--decide-filter-sticky-h, 0px);
-    z-index: 11;
-    box-shadow: 0 1px 0 lightgrey;
-}
+/* Decide list + typeahead: sticky in panel scroll, not page menubar offset */
+.exoconfirmdiv #decide_table1 > thead,
 .exo_typeahead_table > thead {
     position: sticky;
     top: 0;
@@ -1711,26 +1705,35 @@ input[type=checkbox]:focus-visible {
     max-width: calc(100vw - 40px);
 }
 .exoconfirmdiv.exoconfirm_decide .exoconfirm_body {
-    overflow-x: auto;
+    /* Question + filter stay put; only .decide_options_scroll scrolls */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     text-align: left;
 }
 /* Option table shares promptcol left edge with title + footer buttons */
 .exoconfirm_decideblock {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
     text-align: left;
     vertical-align: top;
     margin-top: 1.1em; /* air between question and column titles */
 }
+.decide_options_scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
 /* Type-to-filter status (letters filter options; Esc clears).
- * Sticky at scrollport top above col heads; full-width opaque so rows do not bleed.
+ * Outside options scroll — visible while list scrolls; does not cover question.
  * Not a focus target — no outline/ring. */
 .decide_filter_status {
     display: inline-block;
-    position: sticky;
-    top: 0;
-    z-index: 12;
-    box-sizing: border-box;
-    width: 100%;
+    flex: 0 0 auto;
     font-size: 0.9em;
     margin: 0 0 0.4em 0;
     padding: 0.2em 0.5em;
@@ -1738,7 +1741,6 @@ input[type=checkbox]:focus-visible {
     font-weight: 600;
     outline: none;
     box-shadow: none;
-    background-color: var(--exopopup-bg-color);
 }
 .decide_filter_status:focus {
     outline: none;
@@ -1748,11 +1750,11 @@ input[type=checkbox]:focus-visible {
     color: #0a7a0a;
     background: rgba(34, 176, 20, 0.12);
 }
-/* No matches: red text; keep opaque popup bg for sticky (no row bleed) */
+/* No matches: red text only — no fill, no focus chrome */
 .decide_filter_status.decide_filter_empty {
     color: #b00000;
-    background-color: var(--exopopup-bg-color);
-    padding: 0.2em 0.5em;
+    background: none;
+    padding: 0.2em 0;
 }
 :root[data-theme="dark_mode"] .decide_filter_status.decide_filter_ok {
     color: #3ec848;
@@ -1760,7 +1762,7 @@ input[type=checkbox]:focus-visible {
 }
 :root[data-theme="dark_mode"] .decide_filter_status.decide_filter_empty {
     color: #ff6b6b;
-    background-color: var(--exopopup-bg-color);
+    background: none;
 }
 .exoconfirmdiv.exoconfirm_decide #decide_table1 {
     width: auto;
