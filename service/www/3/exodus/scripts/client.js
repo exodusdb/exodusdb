@@ -10461,6 +10461,17 @@ async function decide_onload(decide_args) {
 		// No matches: do not move focus or refit (rows unchanged; fit was landing on Select)
 		if (!filter || vis)
 			exoconfirm_fit_decide_popup(true)
+		// Keep focused row in view (e.g. bksp reveals rows above and pushes it off the bottom)
+		if (vis && decide_last_option_element) {
+			var scrollpaneF = exoconfirm_scrollpane()
+			if (scrollpaneF) {
+				try {
+					var trF = getancestor(decide_last_option_element, 'tr')
+					if (trF)
+						exo_scroll_row_below_sticky_thead(trF, scrollpaneF)
+				} catch (eF) { }
+			}
+		}
 	}
 
 	function decide_document_onkeydown(event) {
