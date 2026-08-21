@@ -510,9 +510,16 @@ async function login_dataset_popup_onclick(event) {
 async function login_dataset_decide() {
     if (gdataset_element.disabled)
         return
-    var rows = glogin_dataset_rows || []
-    if (!rows.length)
+    var src = glogin_dataset_rows || []
+    if (!src.length)
         return await exoui_invalid('No databases available')
+    // Popup shows Code column — drop trailing "(xxx)" from names (select keeps them)
+    var rows = []
+    for (var i = 0; i < src.length; i++) {
+        var code = src[i][0]
+        var name = String(src[i][1] || '').replace(/\s*\([^)]*\)\s*$/, '')
+        rows.push([code, name || code])
+    }
     // Name first (not Code) — same orientation as system_pop_datasetcode
     var cols = [[1, 'Name'], [0, 'Code']]
     var reply = await exoui_decide(
