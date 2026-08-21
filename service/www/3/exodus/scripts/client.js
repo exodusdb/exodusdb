@@ -10399,10 +10399,9 @@ async function decide_onload(decide_args) {
 					firstVis.checked = true
 			}
 		}
-		// No matches: do not focus Select (Space would OK while still filtering).
-		// Prior rows stay visible; leave focus on the list.
-		// Refit + refresh ▼ (fit calls update_scroll_hints)
-		exoconfirm_fit_decide_popup(true)
+		// No matches: do not move focus or refit (rows unchanged; fit was landing on Select)
+		if (!filter || vis)
+			exoconfirm_fit_decide_popup(true)
 	}
 
 	function decide_document_onkeydown(event) {
