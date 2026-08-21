@@ -10373,6 +10373,7 @@ async function decide_onload(decide_args) {
 			}
 		}
 		var st = $$('decide_filter_status')
+		var decideRoot = $$('exoconfirmdiv')
 		if (st) {
 			if (filter) {
 				st.style.display = ''
@@ -10381,10 +10382,15 @@ async function decide_onload(decide_args) {
 					: ('"' + decide_filter_text + '" - no matches')
 				st.className = 'decide_filter_status '
 					+ (vis ? 'decide_filter_ok' : 'decide_filter_empty')
+				// Sticky filter height → thead top offset while scrolling
+				if (decideRoot)
+					decideRoot.style.setProperty('--decide-filter-sticky-h', st.offsetHeight + 'px')
 			} else {
 				st.style.display = 'none'
 				st.textContent = ''
 				st.className = 'decide_filter_status'
+				if (decideRoot)
+					decideRoot.style.setProperty('--decide-filter-sticky-h', '0px')
 			}
 		}
 		// Focus: keep current if still matching; else nearest above, else nearest below.

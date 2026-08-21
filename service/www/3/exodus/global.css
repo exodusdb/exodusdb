@@ -582,8 +582,14 @@ TABLE[exogroupno] > thead {
     /* bottom edge while stuck (border-collapse drops cell bottoms under scroll) */
     box-shadow: 0 1px 0 lightgrey;
 }
-/* Decide list + typeahead: sticky in panel scroll, not page menubar offset */
-.exoconfirmdiv #decide_table1 > thead,
+/* Decide list + typeahead: sticky in panel scroll, not page menubar offset.
+ * Decide thead sits under sticky filter when --decide-filter-sticky-h is set. */
+.exoconfirmdiv #decide_table1 > thead {
+    position: sticky;
+    top: var(--decide-filter-sticky-h, 0px);
+    z-index: 11;
+    box-shadow: 0 1px 0 lightgrey;
+}
 .exo_typeahead_table > thead {
     position: sticky;
     top: 0;
@@ -1716,10 +1722,15 @@ input[type=checkbox]:focus-visible {
     margin-top: 1.1em; /* air between question and column titles */
 }
 /* Type-to-filter status (letters filter options; Esc clears).
- * inline-block so the box is text-width only (not a full dialog bar).
+ * Sticky at scrollport top above col heads; full-width opaque so rows do not bleed.
  * Not a focus target — no outline/ring. */
 .decide_filter_status {
     display: inline-block;
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    box-sizing: border-box;
+    width: 100%;
     font-size: 0.9em;
     margin: 0 0 0.4em 0;
     padding: 0.2em 0.5em;
@@ -1727,6 +1738,7 @@ input[type=checkbox]:focus-visible {
     font-weight: 600;
     outline: none;
     box-shadow: none;
+    background-color: var(--exopopup-bg-color);
 }
 .decide_filter_status:focus {
     outline: none;
@@ -1736,11 +1748,11 @@ input[type=checkbox]:focus-visible {
     color: #0a7a0a;
     background: rgba(34, 176, 20, 0.12);
 }
-/* No matches: red text only — no fill, no focus chrome */
+/* No matches: red text; keep opaque popup bg for sticky (no row bleed) */
 .decide_filter_status.decide_filter_empty {
     color: #b00000;
-    background: none;
-    padding: 0.2em 0;
+    background-color: var(--exopopup-bg-color);
+    padding: 0.2em 0.5em;
 }
 :root[data-theme="dark_mode"] .decide_filter_status.decide_filter_ok {
     color: #3ec848;
@@ -1748,7 +1760,7 @@ input[type=checkbox]:focus-visible {
 }
 :root[data-theme="dark_mode"] .decide_filter_status.decide_filter_empty {
     color: #ff6b6b;
-    background: none;
+    background-color: var(--exopopup-bg-color);
 }
 .exoconfirmdiv.exoconfirm_decide #decide_table1 {
     width: auto;
