@@ -10387,16 +10387,75 @@ async function decide_onload(decide_args) {
 				st.className = 'decide_filter_status'
 			}
 		}
-		if (firstVis) {
+		// Focus: keep current if still matching; else nearest above, else nearest below.
+		// No matches: leave focus alone (rows unchanged).
+		if (vis) {
 			var cur = document.activeElement
-			var needFocus = !cur || cur.name != 'decide_selection' || decide_selection_row_hidden(cur)
-			if (needFocus) {
-				decide_last_option_element = firstVis
-				try {
-					client_focuson(firstVis)
-				} catch (e) { }
+			if (!cur || cur.name != 'decide_selection')
+				cur = decide_last_option_element
+			var curi = -1
+			if (cur && cur.name == 'decide_selection') {
+				for (i = 0; i < rows.length; ++i) {
+					var inputsC = rows[i].getElementsByTagName('input')
+					for (var ic = 0; ic < inputsC.length; ++ic) {
+						if (inputsC[ic] == cur) {
+							curi = i
+							break
+						}
+					}
+					if (curi >= 0)
+						break
+				}
+			}
+			var focusSel = null
+			if (curi >= 0 && matchAt[curi]) {
+				focusSel = cur
+			} else {
+				if (curi >= 0) {
+					for (i = curi - 1; i >= 0; --i) {
+						if (!matchAt[i])
+							continue
+						var inputsA = rows[i].getElementsByTagName('input')
+						for (var ia = 0; ia < inputsA.length; ++ia) {
+							if (inputsA[ia].name == 'decide_selection'
+								&& inputsA[ia].style.visibility != 'hidden') {
+								focusSel = inputsA[ia]
+								break
+							}
+						}
+						if (focusSel)
+							break
+					}
+				}
+				if (!focusSel) {
+					var start = curi >= 0 ? curi + 1 : 0
+					for (i = start; i < rows.length; ++i) {
+						if (!matchAt[i])
+							continue
+						var inputsB = rows[i].getElementsByTagName('input')
+						for (var ib = 0; ib < inputsB.length; ++ib) {
+							if (inputsB[ib].name == 'decide_selection'
+								&& inputsB[ib].style.visibility != 'hidden') {
+								focusSel = inputsB[ib]
+								break
+							}
+						}
+						if (focusSel)
+							break
+					}
+				}
+				if (!focusSel)
+					focusSel = firstVis
+			}
+			if (focusSel) {
+				decide_last_option_element = focusSel
+				if (document.activeElement != focusSel) {
+					try {
+						client_focuson(focusSel)
+					} catch (e) { }
+				}
 				if (!decide_returnmany)
-					firstVis.checked = true
+					focusSel.checked = true
 			}
 		}
 		// No matches: do not move focus or refit (rows unchanged; fit was landing on Select)
