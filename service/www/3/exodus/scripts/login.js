@@ -408,9 +408,8 @@ async function login_onclick() {
 }
 
 /*
- * Login database: <select> always shows current DB. Alt+Down opens ordinary
- * exoui_decide (client.js; no dbform). Letters left to native select.
- * Similar: system_pop_datasetcode (inverted Name/Code layout there).
+ * Login database: <select> always shows current DB (name; value=code).
+ * F7 / Alt+Down → exoui_decide (Name then Code). Letters left to native select.
  */
 async function login_dataset_load(request, selectedcode) {
     db.request = request
@@ -436,16 +435,9 @@ function login_dataset_rows_from_obj(dataobj) {
     }
 }
 
-function login_dataset_option_label(code, name) {
-    code = String(code || '')
-    name = String(name || '')
-    if (name && name != code)
-        return code + ' — ' + name
-    return code
-}
-
 function login_dataset_init_field(selectedcode) {
     // Rebuild <select> options from local rows (always show a selected value)
+    // Display name only — same as former setdropdown2(..., ["code","name"])
     while (gdataset_element.options && gdataset_element.options.length)
         gdataset_element.remove(0)
     for (var i = 0; i < glogin_dataset_rows.length; i++) {
@@ -453,7 +445,7 @@ function login_dataset_init_field(selectedcode) {
         var name = glogin_dataset_rows[i][1]
         var opt = document.createElement('option')
         opt.value = code
-        opt.text = login_dataset_option_label(code, name)
+        opt.text = name || code
         gdataset_element.appendChild(opt)
     }
     var code = selectedcode ? String(selectedcode) : ''
@@ -477,7 +469,7 @@ function login_dataset_init_field(selectedcode) {
 function login_dataset_size_field() {
     var longest = 8
     for (var i = 0; i < glogin_dataset_rows.length; i++) {
-        var label = login_dataset_option_label(glogin_dataset_rows[i][0], glogin_dataset_rows[i][1])
+        var label = String(glogin_dataset_rows[i][1] || glogin_dataset_rows[i][0] || '')
         if (label.length > longest)
             longest = label.length
     }
@@ -521,7 +513,8 @@ async function login_dataset_decide() {
     var rows = glogin_dataset_rows || []
     if (!rows.length)
         return await exoui_invalid('No databases available')
-    var cols = [[0, 'Code'], [1, 'Name']]
+    // Name first (not Code) — same orientation as system_pop_datasetcode
+    var cols = [[1, 'Name'], [0, 'Code']]
     var reply = await exoui_decide(
         'Which database?',
         rows,
