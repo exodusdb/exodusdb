@@ -463,17 +463,6 @@ function login_dataset_init_field(selectedcode) {
     } else if (glogin_dataset_rows.length) {
         gdataset_element.selectedIndex = 0
     }
-    login_dataset_size_field()
-}
-
-function login_dataset_size_field() {
-    var longest = 8
-    for (var i = 0; i < glogin_dataset_rows.length; i++) {
-        var label = String(glogin_dataset_rows[i][1] || glogin_dataset_rows[i][0] || '')
-        if (label.length > longest)
-            longest = label.length
-    }
-    gdataset_element.style.width = Math.min(52, Math.max(12, longest + 5)) + 'ch'
 }
 
 function login_dataset_selected_code() {

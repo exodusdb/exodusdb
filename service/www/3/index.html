@@ -23,7 +23,7 @@
 		:root {
 			--login-shell-radius: 0.75rem;
 			--login-image-margin: 5px;
-			--login-section-gap: 0.75rem;
+			--login-section-gap: 1rem;
 			--login-bg: #f1eee0;
 		}
 
@@ -80,11 +80,11 @@
 			border-radius: 0 var(--login-shell-radius) var(--login-shell-radius) 0;
 		}
 
-		/* Inner: gutter (F7) | controls */
+		/* Inner: gutter (F7) | controls — full width so col2 fields share one L/R edge */
 		.login-fields-table {
 			border-collapse: collapse;
 			border-spacing: 0;
-			width: auto;
+			width: 100%;
 		}
 		.login-fields-table td {
 			padding: 0;
@@ -139,6 +139,9 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
+			gap: 0.75rem;
+			width: 100%;
+			box-sizing: border-box;
 			font-size: 9pt;
 		}
 
@@ -191,19 +194,19 @@
 			--login-bg: #28304a;
 		}
 		:root[data-theme="dark_mode"] body.login-page {
-			background: #000;
+			background: var(--exopage-bg-color);
 			color: #c5c8d4;
 		}
 		:root[data-theme="dark_mode"] #logindiv.login-shell-table {
-			border-color: #7070e0;
+			border-color: var(--exoform-border-color);
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 			color: #c5c8d4;
 		}
 		:root[data-theme="dark_mode"] #logindiv .loginfield {
 			-webkit-appearance: none;
 			appearance: none;
-			background-color: #353b52;
-			border-color: #7070e0;
+			background-color: var(--exoform-bg-color);
+			border-color: var(--exoform-border-color);
 			color: #d0d3dc;
 		}
 		:root[data-theme="dark_mode"] #logindiv .loginfield::placeholder {
@@ -211,7 +214,7 @@
 			opacity: 1;
 		}
 		:root[data-theme="dark_mode"] #logindiv select.loginfield {
-			background-color: #353b52;
+			background-color: var(--exoform-bg-color);
 			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23c5c8d4' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
 			background-repeat: no-repeat;
 			background-position: right 0.75em center;
@@ -219,7 +222,7 @@
 			padding-right: 2.5em;
 		}
 		:root[data-theme="dark_mode"] #logindiv input.loginfield:-webkit-autofill {
-			-webkit-box-shadow: 0 0 0 1000px #353b52 inset;
+			-webkit-box-shadow: 0 0 0 1000px var(--exoform-bg-color) inset;
 			-webkit-text-fill-color: #d0d3dc;
 		}
 		:root[data-theme="dark_mode"] #logindiv .toggle-password img {
