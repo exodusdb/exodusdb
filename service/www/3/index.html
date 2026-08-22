@@ -79,6 +79,9 @@
 			width: auto;
 			border-radius: 0 var(--login-shell-radius) var(--login-shell-radius) 0;
 		}
+		.login-image-cell img.login-image-dm { display: none; }
+		:root[data-theme="dark_mode"] .login-image-cell img.login-image-lm { display: none; }
+		:root[data-theme="dark_mode"] .login-image-cell img.login-image-dm { display: block; }
 
 		/* Inner: gutter (F7) | controls — full width so col2 fields share one L/R edge */
 		.login-fields-table {
@@ -322,7 +325,8 @@
 					</table>
 				</td>
 				<td class="login-image-cell">
-					<img src="../exodus/images/theme2/login.webp" alt="" />
+					<img class="login-image-lm" src="../exodus/images/theme2/login.webp" alt="" />
+					<img class="login-image-dm" src="../exodus/images/theme2/login-dm.webp" alt="" />
 				</td>
 			</tr>
 		</table>
