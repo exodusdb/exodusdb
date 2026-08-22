@@ -360,6 +360,10 @@ if (!hasCurrency) {
     check('ICONV GBP auto ndecs', NUMBER('ICONV', '1000000GBP', 'CURRENCY'), '1000000GBP')
     check('ICONV unit-only letters GBP', NUMBER('ICONV', '100GBP', 'CURRENCY'), '100GBP')
     check('ICONV negative+unit', NUMBER('ICONV', '-1234567.5USD', '2,SIGNED,CURRENCY'), '-1234567.50USD')
+    // exo_dict_number emits flags after min/max: [NUMBER,,SIGNED,,CURRENCY]
+    check('dict trailing SIGNED+CURRENCY -100', NUMBER('ICONV', '-100', ',SIGNED,,CURRENCY'), '-100')
+    check('dict trailing SIGNED+CURRENCY unit', NUMBER('ICONV', '-100AED', ',SIGNED,,CURRENCY'), '-100AED')
+    check('dict trailing NDECS+SIGNED+CURRENCY', NUMBER('ICONV', '-100.5', 'NDECS,SIGNED,,CURRENCY'), '-100.50')
     check('ICONV grouped+unit', NUMBER('ICONV', '1,234,567.50USD', '2,CURRENCY'), '1234567.50USD')
     check('ICONV bare amount', NUMBER('ICONV', '1234567', '2,CURRENCY'), '1234567.00')
     check('ICONV empty', NUMBER('ICONV', '', '2,CURRENCY'), '')

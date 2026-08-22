@@ -104,7 +104,7 @@ Bag → conversion string (`exo_dict_number`):
 
 | Bag | Conversion min/max slots |
 |-----|--------------------------|
-| `signed: true`, no min, **no** max | min = `SIGNED` (e.g. `[NUMBER,CURRENCY,SIGNED]`) |
+| `signed: true`, no min, **no** max | min = `SIGNED`; `CURRENCY`/`UNIT` from decimals go **after** min/max (e.g. `[NUMBER,,SIGNED,,CURRENCY]`) |
 | `signed: true`, no min, **numeric max** | min = **−max**, max unchanged (e.g. `{ signed: true, max: 100 }` → `…,-100,100`) — **no** `SIGNED` token; standard min/max ICONV |
 | `min` set | `signed` ignored |
 
@@ -118,9 +118,9 @@ Prefer **`signed: true`** at the bag over raw `min: 'SIGNED'` or hand-written fl
 [NUMBER|DECIMAL|INTEGER, <decimals>, <min>, <max>]
 ```
 
-Examples: `[NUMBER,2]`, `[DECIMAL,2,0,100]`, `[INTEGER]`, `[INTEGER,Z]`, `[INTEGER,0,0,999999]`, `[NUMBER,CURRENCY,SIGNED]`.
+Examples: `[NUMBER,2]`, `[DECIMAL,2,0,100]`, `[INTEGER]`, `[INTEGER,Z]`, `[INTEGER,0,0,999999]`, `[NUMBER,,SIGNED,,CURRENCY]`.
 
-`CURRENCY` / `UNIT` may appear in any slot (they are filtered out of the numeric slots; mid-list tokens can shift min/max — see tests).
+`CURRENCY` / `UNIT` are flags after decimals/min/max (`exo_dict_number` emits them last). NUMBER trims them with compact — mid-list still shifts slots (see tests); prefer trailing.
 
 | Param | Effect |
 |-------|--------|

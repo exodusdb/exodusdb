@@ -396,8 +396,8 @@ function exo_dict_date(dicti,params) {
 //                       omit/false → [NUMBER,…] (amounts; grouping when BASEFMT groups)
 //   INTEGER forces ndecs 0 at runtime; conversion string omits lone ,0 when no min/max
 //
-//   exo_dict_number(di, { decimals: 'CURRENCY' })
-//   exo_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → min SIGNED
+//   exo_dict_number(di, { decimals: 'CURRENCY' })              // → [NUMBER,,,CURRENCY]
+//   exo_dict_number(di, { decimals: 'CURRENCY', signed: true })  // → [NUMBER,,SIGNED,CURRENCY]
 //   exo_dict_number(di, { signed: true, max: 100 })             // → min -100, max 100
 //   exo_dict_integer(di, { max: 100 })         // counts: decimals 0 + plain
 //   exo_dict_decimal(di, { decimals: 2 })      // plain fractional (via dict_number)
@@ -405,6 +405,9 @@ function exo_dict_date(dicti,params) {
 //   exo_dict_percent(di, { decimals: 2 })      // e.g. COMMISSION_PERCENT
 //   exo_dict_number(di, { max: 100 })
 //   exo_dict_number(di)  // all defaults
+//
+// CURRENCY/UNIT are flags: peeled from decimals and appended after min/max
+// (never in a positional slot — NUMBER trims them with compact).
 //
 // Counts / days / sequences. Bag only. Via dict_number (decimals 0 + plain if unset).
 function exo_dict_integer(dicti, opts) {
@@ -476,6 +479,21 @@ function exo_dict_number(dicti, opts) {
  if (typeof maximum == 'undefined' || maximum == null)
   maximum = ''
 
+ // Flags out of decimals → trailing after min/max (e.g. CURRENCY, or NDECS,CURRENCY).
+ var currencyTail = []
+ if (decimals !== '' && decimals !== 0) {
+  var decParts = String(decimals).split(',')
+  var decKept = []
+  for (var dpi = 0; dpi < decParts.length; dpi++) {
+   var dpt = String(decParts[dpi]).toUpperCase().replace(/\s/g, '')
+   if (dpt == 'CURRENCY' || dpt == 'UNIT')
+    currencyTail.push(dpt)
+   else
+    decKept.push(decParts[dpi])
+  }
+  decimals = decKept.join(',')
+ }
+
  // signed: true, min omitted → allow negatives via normal slots (no invent).
  //  - numeric max → min = -max (symmetric range; SIGNED not used)
  //  - else → min SIGNED (unbounded below)
@@ -488,16 +506,17 @@ function exo_dict_number(dicti, opts) {
 
  var plain = !!opts.plain
  var zeroDp = (decimals === 0 || decimals === '0')
+ var flagSuffix = currencyTail.length ? ',' + currencyTail.join(',') : ''
  if (plain && zeroDp) {
   // INTEGER forces ndecs 0 in shim; omit lone ,0 from string when no min/max
-  if (minimum === '' && maximum === '')
+  if (minimum === '' && maximum === '' && !flagSuffix)
    dicti.conversion = '[INTEGER]'
   else
    // same slots as NUMBER: decimals,min,max — decimals kept as 0 for arg positions
-   dicti.conversion = '[INTEGER,0,' + minimum + ',' + maximum + ']'
+   dicti.conversion = '[INTEGER,0,' + minimum + ',' + maximum + flagSuffix + ']'
  } else {
   var kind = plain ? 'DECIMAL' : 'NUMBER'
-  dicti.conversion = '[' + kind + ',' + String(decimals) + ',' + minimum + ',' + maximum + ']'
+  dicti.conversion = '[' + kind + ',' + String(decimals) + ',' + minimum + ',' + maximum + flagSuffix + ']'
  }
 
  // Style axis for dbform paint (exostyle number). Prefer dict_number over
