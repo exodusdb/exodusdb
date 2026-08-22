@@ -29,6 +29,8 @@
     --exoform-bg-color: #fdf5e6;
     --exoform-border-radius: 10px;
     --exoform-border-color: #d0d0d0;
+    /* Internal form cell grid (th/td) — not the pane chrome edge */
+    --exoform-cell-border-color: lightgrey;
     --exoform-pane-padding: 0.375em;
     --exoform-pane-margin: 0.125em;
     /* Horizontal: equal L/R (was all in left — 0.5em / nested 0.3em).
@@ -145,6 +147,7 @@
      */
     --exoform-bg-color: #303a5a;
     --exoform-border-color: #7070e0;
+    --exoform-cell-border-color: #5a6090;
     --exoform-label-font-style: italic;
     --exoform-data-font-style: normal;
     --exoform-data-font-size: 1rem;
@@ -153,7 +156,7 @@
     --exoinformbutton-bg-color: #354060;
     --exoinformbutton-hover-bg-color: #455880;
     --exoinformbutton-hover-border-color: #9898f8;
-    --exoinformbutton-border-color: #7070e0;
+    --exoinformbutton-border-color: var(--exoform-border-color);
     --exoinformbutton-border-style: solid;
     --exoinformbutton-color: #ffffff;
     /* Role tints only (DM). Greys stay var(--exotext-color) from LM :root. */
@@ -188,7 +191,7 @@ TABLE.exoform
 .exoform > * > tr > th,
 .exoform > tr > td,
 .exoform > tr > th {
-    border: 1px solid lightgrey;
+    border: 1px solid var(--exoform-cell-border-color);
     /* Equal L/R: was all left (0.5em); share so text is not jammed on the right border */
     padding-left: var(--exoform-cell-padding-x);
     padding-right: var(--exoform-cell-padding-x);
@@ -580,7 +583,7 @@ TABLE[exogroupno] > thead {
     top: var(--exosticky-top, 0);
     z-index: 11;
     /* bottom edge while stuck (border-collapse drops cell bottoms under scroll) */
-    box-shadow: 0 1px 0 lightgrey;
+    box-shadow: 0 1px 0 var(--exoform-cell-border-color);
 }
 /* Decide list + typeahead: sticky in panel scroll, not page menubar offset */
 .exoconfirmdiv #decide_table1 > thead,
@@ -588,7 +591,7 @@ TABLE[exogroupno] > thead {
     position: sticky;
     top: 0;
     z-index: 11;
-    box-shadow: 0 1px 0 lightgrey;
+    box-shadow: 0 1px 0 var(--exoform-cell-border-color);
 }
 /* Sticky on th + opaque paint: less bleed of body text through/above heads while scrolling */
 .exo_typeahead_table > thead th {
@@ -599,7 +602,7 @@ TABLE[exogroupno] > thead {
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead,
 :root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 > thead,
 :root[data-theme="dark_mode"] .exo_typeahead_table > thead {
-    box-shadow: 0 1px 0 #5a6090;
+    box-shadow: 0 1px 0 var(--exoform-cell-border-color);
 }
 /*
  * Sticky group thead: same chrome as pane (not data body). Opaque so rows do
@@ -1161,8 +1164,7 @@ a.menuitem
 .menu hr,
 .menu_hr
 {
-    /*border:1px dotted lightgrey*/
-    border:1px solid lightgrey;
+    border: 1px solid var(--exoform-cell-border-color);
     margin: 0.35em 0;
 }
 
@@ -1554,7 +1556,7 @@ input[type=checkbox]:checked {
 
 input:disabled {
     background-color:#eee !important;
-    border-color: lightgrey;
+    border-color: var(--exoform-cell-border-color);
 }
 
 /* Disabled radio/checkbox: sit on form/data well, not page grey. Ring muted but visible. */
@@ -1948,12 +1950,13 @@ input[type=checkbox]:focus-visible {
     --exoform-bg-color: #303a5a;
     --exoform-th-bg-color: #28304a;
     --exoform-border-color: #7070e0;
+    --exoform-cell-border-color: #5a6090;
     background-color: var(--exoform-th-bg-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exoform {
     /* No fill (pane base); body only .exodata */
-    border-color: #7070e0 !important;
+    border-color: var(--exoform-border-color) !important;
 }
 
 /* schedules_calendar: booked/certified dates — red in light mode, warm accent in dark */
@@ -1978,7 +1981,7 @@ SPAN.calendar-date-committed[contenteditable] {
 :root[data-theme="dark_mode"] .exoform > :is(thead, tbody, tfoot) > tr > :is(td, th),
 :root[data-theme="dark_mode"] .exoform > tr > td,
 :root[data-theme="dark_mode"] .exoform > tr > th {
-    border-color: #5a6090 !important;
+    border-color: var(--exoform-cell-border-color) !important;
 }
 
 /* Dark mode: transparent field fill; text inherits BODY white. */
@@ -2301,6 +2304,7 @@ SPAN.calendar-date-committed[contenteditable] {
         --exopage-bg-color: #ffffff;
         --exoform-bg-color: #ffffff;
         --exoform-border-color: #333333;
+        --exoform-cell-border-color: #333333;
         --exotext-color: #000000;
         color-scheme: only light;
     }
