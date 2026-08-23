@@ -1991,11 +1991,96 @@ function theme_toggle(theme = 'default') {
 	if (xform_postload) {
 		exo_swap_tool_icons()
 		exo_refresh_sortimages()
+		exo_ckeditor_apply_theme()
 	}
 
 	exo_set_theme_icons()
 
 	return true
+}
+
+// CKEditor editable iframe colours (parent CSS cannot style the iframe doc).
+// Chrome: :root[data-theme=dark_mode] .cke_* in global.css.
+function exo_ckeditor_theme_colors() {
+	var dark = typeof gisdarktheme != 'undefined' && gisdarktheme
+	var bg = '#ffffff'
+	var fg = '#333333'
+	if (dark) {
+		bg = '#303a5a'
+		fg = '#ffffff'
+		try {
+			var cs = getComputedStyle(document.documentElement)
+			bg = (cs.getPropertyValue('--exoform-bg-color') || '').trim() || bg
+			fg = (cs.getPropertyValue('--exotext-color') || '').trim() || fg
+		} catch (e) { }
+	}
+	return { dark: dark, bg: bg, fg: fg }
+}
+
+// contentsCss for first paint — avoids white flash before contentDom theme inject.
+function exo_ckeditor_contents_css() {
+	var c = exo_ckeditor_theme_colors()
+	var base = (typeof CKEDITOR != 'undefined' && CKEDITOR.getUrl)
+		? CKEDITOR.getUrl('contents.css')
+		: 'contents.css'
+	if (!c.dark)
+		return base
+	var override = 'data:text/css,' + encodeURIComponent(
+		'body,body.cke_editable,html{background-color:' + c.bg
+		+ '!important;color:' + c.fg + '!important}')
+	return [base, override]
+}
+
+// Inject/update #exo_ckeditor_theme in each instance doc; reveal iframe after.
+function exo_ckeditor_apply_theme() {
+	if (typeof CKEDITOR == 'undefined' || !CKEDITOR.instances)
+		return
+	var c = exo_ckeditor_theme_colors()
+	var css = 'body, body.cke_editable, html { background-color: ' + c.bg
+		+ ' !important; color: ' + c.fg + ' !important; }'
+	for (var id in CKEDITOR.instances) {
+		var ed = CKEDITOR.instances[id]
+		if (!ed)
+			continue
+		try {
+			var editable = ed.editable && ed.editable()
+			var doc = (editable && editable.getDocument && editable.getDocument())
+				|| ed.document
+			if (doc) {
+				var head = doc.getHead && doc.getHead()
+				if (head) {
+					var st = head.findOne && head.findOne('#exo_ckeditor_theme')
+					if (!st) {
+						st = new CKEDITOR.dom.element('style')
+						st.setAttribute('id', 'exo_ckeditor_theme')
+						st.setAttribute('type', 'text/css')
+						head.append(st)
+					}
+					if (st.setHtml)
+						st.setHtml(css)
+					else if (st.$.textContent != null)
+						st.$.textContent = css
+					else
+						st.$.innerHTML = css
+				}
+				var body = doc.getBody && doc.getBody()
+				if (body) {
+					body.setStyle('background-color', c.bg)
+					body.setStyle('color', c.fg)
+				}
+			}
+			// Reveal iframe (DM hides until themed — see global.css)
+			var container = ed.container
+			var contents = container && container.findOne
+				&& container.findOne('.cke_contents')
+			if (contents) {
+				if (c.dark)
+					contents.addClass('exo_ck_themed')
+				else
+					contents.removeClass('exo_ck_themed')
+			}
+		} catch (e) { }
+	}
 }
 
 // Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).

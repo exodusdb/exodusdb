@@ -1951,6 +1951,75 @@ input[type=checkbox]:focus-visible {
 }
 }
 
+/* CKEditor 4 moono chrome (jobs BRIEF, …). Editable iframe: exo_ckeditor_apply_theme(). */
+@media screen {
+:root[data-theme="dark_mode"] .cke_chrome {
+    border-color: var(--exoform-border-color) !important;
+    box-shadow: none !important;
+}
+:root[data-theme="dark_mode"] .cke_inner {
+    background: var(--exoform-bg-color) !important;
+}
+:root[data-theme="dark_mode"] .cke_top,
+:root[data-theme="dark_mode"] .cke_bottom {
+    background: #28304a !important;
+    background-image: none !important;
+    border-color: var(--exoform-cell-border-color) !important;
+    box-shadow: none !important;
+}
+:root[data-theme="dark_mode"] .cke_toolgroup {
+    background: #303a5a !important;
+    background-image: none !important;
+    border-color: var(--exoform-cell-border-color) !important;
+    box-shadow: none !important;
+}
+:root[data-theme="dark_mode"] a.cke_button_off:hover,
+:root[data-theme="dark_mode"] a.cke_button_off:focus,
+:root[data-theme="dark_mode"] a.cke_button_off:active {
+    background: #455880 !important;
+    background-image: none !important;
+    border-color: var(--exoform-border-color) !important;
+}
+:root[data-theme="dark_mode"] a.cke_button_on {
+    background: #455880 !important;
+    background-image: none !important;
+    border-color: var(--exoform-border-color) !important;
+}
+/* Moono toolbar icons are dark PNGs — invert for DM chrome */
+:root[data-theme="dark_mode"] .cke_button_icon,
+:root[data-theme="dark_mode"] .cke_button_arrow,
+:root[data-theme="dark_mode"] .cke_combo_arrow {
+    filter: invert(1);
+}
+:root[data-theme="dark_mode"] .cke_combo_button {
+    background: #303a5a !important;
+    background-image: none !important;
+    border-color: var(--exoform-cell-border-color) !important;
+    box-shadow: none !important;
+}
+:root[data-theme="dark_mode"] .cke_combo_text,
+:root[data-theme="dark_mode"] .cke_path_item,
+:root[data-theme="dark_mode"] .cke_path_empty {
+    color: var(--exotext-color) !important;
+    text-shadow: none !important;
+}
+:root[data-theme="dark_mode"] .cke_resizer {
+    border-color: transparent transparent var(--exoform-cell-border-color) !important;
+}
+:root[data-theme="dark_mode"] .cke_contents {
+    background: var(--exoform-bg-color) !important;
+    border-color: var(--exoform-cell-border-color) !important;
+}
+/* Hide iframe until exo_ckeditor_apply_theme marks .exo_ck_themed —
+ * contents area already form-coloured so no white flash. */
+:root[data-theme="dark_mode"] .cke_contents iframe {
+    opacity: 0;
+}
+:root[data-theme="dark_mode"] .cke_contents.exo_ck_themed iframe {
+    opacity: 1;
+}
+}
+
 :root[data-theme="dark_mode"] .exoformpane {
     /* Scoped vars override inline LM screencolor on <html>.
      * base (pane) = old data #28304a; data (exodata) = #28304a + Δ → #303a5a

@@ -1696,6 +1696,8 @@ async function formfunctions_onload() {
                         CKEDITOR.on('instanceReady', function (event) {
                             gCKEDITOR_EDITOR = event.editor
                             gCKEDITOR_EDITOR.setReadOnly(!glocked)//also in await opendoc2() post read document_onfocus
+                            if (typeof exo_ckeditor_apply_theme == 'function')
+                                exo_ckeditor_apply_theme()
                         })
 
                         var verticalpercent = 100
@@ -1705,10 +1707,27 @@ async function formfunctions_onload() {
                         //var ockeditor = new CKEDITOR(element.id,'100%',verticalpercent+'%','EXODUS')
 
                         //http://docs.cksource.com/Talk:CKEditor_3.x/Developers_Guide
-                        ockeditor = CKEDITOR.replace(element.id, {
+                        // contentsCss: DM override on first paint (no white flash before contentDom)
+                        var ckCfg = {
                             extraPlugins: 'autogrow'
                             , autoGrow_maxHeight: 800
-                            //                            , autoGrow_minHeight: 100
+                        }
+                        if (typeof exo_ckeditor_contents_css == 'function')
+                            ckCfg.contentsCss = exo_ckeditor_contents_css()
+                        ockeditor = CKEDITOR.replace(element.id, ckCfg)
+
+                        // iframe body: re-theme after setData / focus (framework only)
+                        ockeditor.on('contentDom', function () {
+                            if (typeof exo_ckeditor_apply_theme == 'function')
+                                exo_ckeditor_apply_theme()
+                        })
+                        ockeditor.on('dataReady', function () {
+                            if (typeof exo_ckeditor_apply_theme == 'function')
+                                exo_ckeditor_apply_theme()
+                        })
+                        ockeditor.on('focus', function () {
+                            if (typeof exo_ckeditor_apply_theme == 'function')
+                                exo_ckeditor_apply_theme()
                         })
 
                         //element.id is passed as data on event to document_onfocus_sync
