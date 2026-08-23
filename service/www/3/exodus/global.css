@@ -1254,6 +1254,11 @@ img[id^="deleterowbutton"] {
     width: 100%;
     max-width: 100%;
 }
+/* Type S name glued after code host (form_glue_name_to_prev_code_chrome) —
+ * flex siblings otherwise touch; small air between code and name. */
+.exofieldrow > [exostyle="code"] + SPAN {
+    margin-inline-start: 0.35em;
+}
 /* Icons only — trailing air = cell left pad (icon took the border pad) */
 .exofieldchrome {
     display: inline-flex;
