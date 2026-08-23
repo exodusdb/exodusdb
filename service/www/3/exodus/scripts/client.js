@@ -7584,14 +7584,16 @@ function systemerror(functionname, e) {
 	} catch (e2) { }
 
 	// Report on its own side dblink (not main db). No global lock — concurrent
-	// systemerrors each report independently. Report path must not call systemerror
-	// (catch + console only) or we recurse.
+	// systemerrors each report independently. quiet: skip modal/gchildwin/gxhttp
+	// (same as typeahead) so overlapping reports do not clobber transport UI state.
+	// Report path must not call systemerror (catch + console only) or we recurse.
 	// Send OK → friendly "support informed"; fail → alert full technical text.
 	return (async function systemerror_report_and_alert() {
 		var reported = false
 		if (!gonunload && typeof exodblink == 'function') {
 			try {
 				var reportdb = new exodblink()
+				reportdb.quiet = true
 				reportdb.request = 'EXECUTE\rGENERAL\rSYSTEM_ERROR'
 				// data = full technical text; xhttp.php hijacks this request (not listen)
 				reported = !!(await reportdb.send(technical))
