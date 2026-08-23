@@ -40,20 +40,10 @@
             margin-left: auto;
             margin-right: auto;
         }
-        /* Cap Keys / IP Numbers column — td limit + span must not enforce dbform min-width */
-        .authorisation_users_table[exogroupno] {
-            table-layout: fixed;
-        }
-        .authorisation_users_table .authorisation_keys_col {
-            width: 12rem;
-            max-width: 12rem;
-            overflow-wrap: anywhere;
-        }
-        .authorisation_users_table .exoid_KEYS,
-        .authorisation_users_table .exoid_IP_NUMBERS {
-            min-width: 0 !important;
-            max-width: 100%;
-            box-sizing: border-box;
+        /* Compact like schedules.htm .schedule_line_btn / action-stack exobuttons */
+        #button_password,
+        #button_tasks {
+            font-size: 72%;
         }
     </style>
 </head>
@@ -115,7 +105,7 @@
                         <input id="EMAIL_ADDRESS" />
                     </td>
                     <td>
-                        <span id="LAST_LOGIN_DATE_TIME"></span>
+                        <span id="LAST_LOGIN_DATE_TIME"></span><br />
                         <span id="LAST_LOGIN_LOCATION"></span>
                     </td>
                     <td class="authorisation_keys_col">
