@@ -4876,6 +4876,15 @@ function form_radio_tab_target(radio) {
 	return first || radio
 }
 
+// Form action face SPANs (OK/Cancel): tabIndex 0 = stop; -1 = skip. Enter never.
+function focusdirection_form_action_tab_stop(el) {
+    return !!(el && el.classList
+        && (el.classList.contains('graphicbutton') || el.classList.contains('menubutton'))
+        && el.getAttribute('exo_onclick')
+        && el.tabIndex >= 0
+        && gkeycode != 13)
+}
+
 // Shared “would classic focusdirection accept this as next stop?”
 // Includes form-action faces (OK/Cancel). Tabindex inequality is NOT here.
 function focusdirection_is_stop(el, fromEl, notgroupno) {
@@ -4888,13 +4897,7 @@ function focusdirection_is_stop(el, fromEl, notgroupno) {
             return false
     }
 
-    // Form action face SPANs (no id). tabIndex 0 = stop; -1 = skip.
-    // Tab/arrows land on them. Enter never.
-    var formActionTabStop = el.classList
-        && (el.classList.contains('graphicbutton') || el.classList.contains('menubutton'))
-        && el.getAttribute('exo_onclick')
-        && el.tabIndex >= 0
-        && gkeycode != 13
+    var formActionTabStop = focusdirection_form_action_tab_stop(el)
 
     if (!formActionTabStop) {
         if (!el.id || !el.tagName.match(gdatatagnames))
@@ -4942,14 +4945,6 @@ function focusdirection_is_stop(el, fromEl, notgroupno) {
     return true
 }
 
-function focusdirection_is_form_action_stop(el) {
-    return !!(el && el.classList
-        && (el.classList.contains('graphicbutton') || el.classList.contains('menubutton'))
-        && el.getAttribute('exo_onclick')
-        && el.tabIndex >= 0
-        && gkeycode != 13)
-}
-
 // First focusdirection stop with exact tabIndex (L/R column jump ±exo_tabindex_col_step).
 function focusdirection_find_tabindex(wantTi, fromEl, notgroupno) {
     if (wantTi == null || wantTi === '' || wantTi < 0)
@@ -4980,7 +4975,7 @@ function focusdirection_tabindexed(direction, startEl, fromTi, notgroupno, scope
         el = scope[i]
         if (!focusdirection_is_stop(el, startEl, notgroupno))
             continue
-        if (focusdirection_is_form_action_stop(el))
+        if (focusdirection_form_action_tab_stop(el))
             continue
         ti = el.tabIndex
         if (ti == 0 || ti == exo_tabindex_default || ti < 0)
