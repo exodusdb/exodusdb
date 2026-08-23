@@ -412,6 +412,16 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
 
 		gosub getcss(dataio, version, stationery);
 
+	} else if (mode == "GETCSS3") {
+
+		// Same as GETCSS then append screen prefers-color-scheme dark + print/PDF light.
+		// Opt-in for printtx/list/nlist — does not change GETCSS callers (invoices etc.).
+		let& version = params0;
+		let& stationery = params20;
+
+		gosub getcss(dataio, version, stationery);
+		gosub getcss3_amend(dataio);
+
 	} else if (mode == "COLROWSPAN") {
 
 		//wire up accurate names to the given parameters
@@ -727,6 +737,114 @@ func getcss(io css, in version = "", in stationery = "") {
 
 	return 0;
 
+}
+
+// GETCSS3 only: follow browser/OS light|dark on screen; keep print/PDF light.
+// Prefers-color-scheme updates live when the user switches dm/lm — no JS.
+subr getcss3_amend(io css) {
+
+	css ^= R"V0G0N(
+<style type="text/css">
+/*GETCSS3 — screen dm/lm via prefers-color-scheme; print/PDF stay light*/
+:root {
+	color-scheme: light dark;
+	--exo-rpt-page-bg: #ffffff;
+	--exo-rpt-text: #000000;
+	--exo-rpt-th-bg: #fff099;
+	--exo-rpt-td-bg: #fdf5e6;
+	--exo-rpt-border: #808080;
+	--exo-rpt-border-light: #d3d3d3;
+	--exo-rpt-link: blue;
+	--exo-rpt-link-visited: purple;
+	--exo-rpt-link-hover: red;
+}
+@media screen and (prefers-color-scheme: dark) {
+	:root {
+		--exo-rpt-page-bg: #1a2030;
+		--exo-rpt-text: #e8e8f0;
+		--exo-rpt-th-bg: #303a5a;
+		--exo-rpt-td-bg: #28304a;
+		--exo-rpt-border: #7070e0;
+		--exo-rpt-border-light: #5a6090;
+		--exo-rpt-link: #6aa3e8;
+		--exo-rpt-link-visited: #b39ddb;
+		--exo-rpt-link-hover: #ff8a80;
+	}
+	body {
+		background-color: var(--exo-rpt-page-bg) !important;
+		color: var(--exo-rpt-text) !important;
+	}
+	/* Letterhead: ignore LM hardcoded colours (e.g. font color=purple) */
+	#letterhead, #letterhead font,
+	#letterhead a, #letterhead a:visited, #letterhead a:hover {
+		color: var(--exo-rpt-text) !important;
+	}
+	table.exotable th {
+		background-color: var(--exo-rpt-th-bg) !important;
+		border-color: var(--exo-rpt-border) !important;
+		color: var(--exo-rpt-text) !important;
+	}
+	table.exotable > thead th {
+		outline-color: var(--exo-rpt-border) !important;
+		box-shadow: 0 2px 2px rgba(0, 0, 0, 0.45);
+	}
+	table.exotable > tbody > tr > td {
+		background-color: var(--exo-rpt-td-bg) !important;
+		border-color: var(--exo-rpt-border-light) !important;
+		color: var(--exo-rpt-text) !important;
+	}
+	table.exotable > tbody > tr > td:first-child {
+		border-left-color: var(--exo-rpt-border) !important;
+	}
+	table.exotable > tbody > tr > td:last-child {
+		border-right-color: var(--exo-rpt-border) !important;
+	}
+	table.exotable hr {
+		border-top-color: var(--exo-rpt-border-light) !important;
+	}
+	.pagedivider {
+		border-top-color: var(--exo-rpt-border) !important;
+	}
+	a { color: var(--exo-rpt-link) !important; }
+	a:visited { color: var(--exo-rpt-link-visited) !important; }
+	a:hover { color: var(--exo-rpt-link-hover) !important; }
+	/* nlist headtab cell sometimes inlined white */
+	th[style*="background-color:white"],
+	th[style*="background-color: white"] {
+		background-color: var(--exo-rpt-th-bg) !important;
+		color: var(--exo-rpt-text) !important;
+	}
+}
+@media print {
+	:root {
+		color-scheme: light;
+		--exo-rpt-page-bg: #ffffff;
+		--exo-rpt-text: #000000;
+		--exo-rpt-th-bg: #fff099;
+		--exo-rpt-td-bg: #fdf5e6;
+		--exo-rpt-border: #808080;
+		--exo-rpt-border-light: #d3d3d3;
+	}
+	body {
+		background-color: #ffffff !important;
+		color: #000000 !important;
+	}
+	table.exotable th {
+		background-color: #fff099 !important;
+		border-color: #808080 !important;
+		color: #000000 !important;
+	}
+	table.exotable > tbody > tr > td {
+		background-color: #fdf5e6 !important;
+		border-color: #d3d3d3 !important;
+		color: #000000 !important;
+	}
+	a, a:visited, a:hover { color: blue !important; }
+}
+</style>
+)V0G0N";
+
+	return;
 }
 
 func getvogonpoetry_css(in version) {

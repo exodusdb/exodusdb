@@ -96,7 +96,9 @@ var head_or_foot;
 // STUBS to pass old function calls to htmllib2 modes
 /////////////////////////////////////////////////////
 subroutine getcss(io css, in version = "") {
-	call htmllib2("GETCSS", css, version, stationery);
+	// GETCSS3 = GETCSS + screen prefers-color-scheme dark / print light (list/nlist).
+	// Stationery docs that call htmllib2("GETCSS") directly are unchanged.
+	call htmllib2("GETCSS3", css, version, stationery);
 	return;
 }
 
@@ -304,7 +306,8 @@ subroutine printtx2() {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
 
-			tx.prefixer("<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
+			// Body colours from GETCSS3 vars (light default; dm via prefers-color-scheme)
+			tx.prefixer("<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<meta name=\"color-scheme\" content=\"light dark\" />" ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:var(--exo-rpt-page-bg,#ffffff);color:var(--exo-rpt-text,#000000)\"><div align=\"center\">" ^ FM);
 
 			call docmods(tx);
 
