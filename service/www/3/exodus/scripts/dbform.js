@@ -992,9 +992,9 @@ async function formfunctions_onload() {
         if (typeof element.getAttribute == 'unknown' || !element.getAttribute)
             continue
 
-        //ensure buttons have tabIndex 9999 - to make them come last
+        //ensure buttons have tabIndex exo_tabindex_default - to make them come last
         if (element.tagName == 'BUTTON' && !element.tabIndex)
-            element.tabIndex = 9999
+            element.tabIndex = exo_tabindex_default
 
         //backward compatible with old style datafld attributes
         var datafld = null
@@ -1094,7 +1094,7 @@ async function formfunctions_onload() {
                 newspan.tabIndex = element.tabIndex
                 //commented out because it prevent setting to -1 if readonly below
                 //if (!newspan.tabIndex)
-                // newspan.tabIndex=9999
+                // newspan.tabIndex=exo_tabindex_default
                 if (typeof element.length != 'undefined')
                     newspan.length = element.length
                 newspan.id = element.id
@@ -1418,7 +1418,7 @@ async function formfunctions_onload() {
                     element.contentEditable = 'true'
                     //element.contentEditable = true
                     if (!(element.getAttribute('tabindex')))
-                        element.setAttribute('tabindex', 9999)
+                        element.setAttribute('tabindex', exo_tabindex_default)
                 }
             }
 
@@ -1772,13 +1772,13 @@ async function formfunctions_onload() {
                 // only focus elements that have tabindex
                 //make them all the same and tab will work nicely
                 //tabindex can also be hard coded in the form design
-                //use <9999 to come before defaults and >9999 to come after
+                //use <exo_tabindex_default to come before defaults and > to come after
                 if (!element.tabIndex) {
                     if (element.getAttribute('exoreadonly')) {
                         element.tabIndex = -1
                     }
                     else {
-                        element.tabIndex = 9999
+                        element.tabIndex = exo_tabindex_default
                     }
                 }
 
@@ -4547,11 +4547,11 @@ async function document_onkeydown2(event) {
 
         //left or right not in tables
         if (ggroupno == 0 && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-            // Design tabindex island (not 0/9999): try ti∓1000 / ti±1000 (grid columns).
-            // Prefer direction; if miss, try the other (±1000) so edge columns still toggle.
+            // Design tabindex island (not 0/default): ±exo_tabindex_col_step (grid columns).
+            // Prefer direction; if miss, try the other so edge columns still toggle.
             var curTi = element.tabIndex
-            if (curTi > 0 && curTi != 9999) {
-                var prefer = keycode == 37 ? -1000 : 1000
+            if (curTi > 0 && curTi != exo_tabindex_default) {
+                var prefer = keycode == 37 ? -exo_tabindex_col_step : exo_tabindex_col_step
                 var sideEl = focusdirection_find_tabindex(curTi + prefer, element, '')
                     || focusdirection_find_tabindex(curTi - prefer, element, '')
                 if (sideEl) {
@@ -4950,7 +4950,7 @@ function focusdirection_is_form_action_stop(el) {
         && gkeycode != 13)
 }
 
-// First focusdirection stop with exact tabIndex (L/R column jump ±1000).
+// First focusdirection stop with exact tabIndex (L/R column jump ±exo_tabindex_col_step).
 function focusdirection_find_tabindex(wantTi, fromEl, notgroupno) {
     if (wantTi == null || wantTi === '' || wantTi < 0)
         return null
@@ -4965,10 +4965,10 @@ function focusdirection_find_tabindex(wantTi, fromEl, notgroupno) {
     return null
 }
 
-// Nav when start field has a design tabindex (not 0, not 9999).
+// Nav when start field has a design tabindex (not 0, not exo_tabindex_default).
 // Forward: next higher island peer; else next DOM stop; else wrap from start.
 // Backward: prev lower island peer; else prev DOM stop; else wrap from end.
-// Peers ignore ti 0 and 9999 and form-action faces. Returns element or null.
+// Peers ignore ti 0 and default and form-action faces. Returns element or null.
 function focusdirection_tabindexed(direction, startEl, fromTi, notgroupno, scope, scopeindex, scopex) {
     var best = null
     var bestTi = direction > 0 ? Infinity : -Infinity
@@ -4983,7 +4983,7 @@ function focusdirection_tabindexed(direction, startEl, fromTi, notgroupno, scope
         if (focusdirection_is_form_action_stop(el))
             continue
         ti = el.tabIndex
-        if (ti == 0 || ti == 9999 || ti < 0)
+        if (ti == 0 || ti == exo_tabindex_default || ti < 0)
             continue
         if (direction > 0) {
             if (ti <= fromTi)
@@ -5082,14 +5082,14 @@ function focusdirection(direction, element, notgroupno, scopex) {
         return
     }
 
-    // Island = design tabindex only. 0 = browser default input; 9999 = dbform SPAN default;
+    // Island = design tabindex only. 0 = browser default input; exo_tabindex_default = SPAN default;
     // -1 / unset-as--1 = not a tab stop for this ladder (classic path or skip elsewhere).
-    if (elementtabindex > 0 && elementtabindex != 9999) {
+    if (elementtabindex > 0 && elementtabindex != exo_tabindex_default) {
         nextelement = focusdirection_tabindexed(direction, startEl, elementtabindex, notgroupno, scope, scopeindex, scopex)
         if (!nextelement)
             return
     } else {
-        // Ordinary path (ti 0/9999): next focusable in DOM order.
+        // Ordinary path (ti 0/default): next focusable in DOM order.
         var passzero = scopeindex
 
         while (true) {
@@ -8298,7 +8298,7 @@ async function document_onfocus(event) {
     // Horizontal radio Up keeps gkeycode 38 so back-nav works without a dir flag.
     if (gkeycode == 9 || gkeycode == 13 || gkeycode == 38 || gkeycode == 40) {
         if (element.getAttribute('exoreadonly')
-            && (element.tabIndex == 9999 || element.tabIndex == -1
+            && (element.tabIndex == exo_tabindex_default || element.tabIndex == -1
                 || element.getAttribute('oldtabindex'))) {
             form_scroll_log_msg('document_onfocus EXIT readonly skip to next',
                 form_scroll_el_label(element))
@@ -8772,13 +8772,13 @@ async function earlyupdate() {
 // no prior field look "before" it — skipped required checks and opendoc side effects.
 function form_effective_tabindex(el) {
     if (!el)
-        return 9999
+        return exo_tabindex_default
     var t = Number(el.tabIndex)
     if (t == -1 || isNaN(t)) {
         var ot = el.getAttribute('oldtabindex')
         if (ot != null && ot !== '' && !isNaN(Number(ot)))
             return Number(ot)
-        return 9999
+        return exo_tabindex_default
     }
     return t
 }
@@ -8841,7 +8841,7 @@ async function checkrequired(elements, element, groupno) {
 
         if (Number(element2.getAttribute('exogroupno')) == groupno) {
             var element2_tab = form_effective_tabindex(element2)
-            // form_effective_tabindex never returns -1 (maps to oldtabindex or 9999)
+            // form_effective_tabindex never returns -1 (maps to oldtabindex or exo_tabindex_default)
             if ((!foundelement && element2_tab <= element_tab) || (element2_tab < element_tab)) {
                 //if (element&&element2.getAttribute('exorequired')&&gds.getcells(element2,grecn)[0].text=='')
                 //if (element&&element2.getAttribute('exorequired')&&getvalue(element2)=='')
@@ -9333,8 +9333,8 @@ function exosetreadonly(elements, msg, options, recn) {
     //move onto next field if setting current focus field to readonly
     //but only if default tabindex since focusnext cant find the next tabindex properly
     //activeElement not available everywhere
-    //if (document.activeElement.getAttribute('exoreadonly')&&gpreviouselement&&document.activeElement.tabIndex==9999)
-    if (gevent && typeof gevent.target != 'undefined' && gevent.target.getAttribute && gevent.target.getAttribute('exoreadonly') && gpreviouselement && document.activeElement.tabIndex == 9999)
+    //if (document.activeElement.getAttribute('exoreadonly')&&gpreviouselement&&document.activeElement.tabIndex==exo_tabindex_default)
+    if (gevent && typeof gevent.target != 'undefined' && gevent.target.getAttribute && gevent.target.getAttribute('exoreadonly') && gpreviouselement && document.activeElement.tabIndex == exo_tabindex_default)
         focusnext(gpreviouselement)
 
     return true

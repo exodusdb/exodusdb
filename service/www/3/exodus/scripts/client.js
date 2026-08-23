@@ -210,6 +210,12 @@ var gdatasetname
 var gtz = [0, 0]
 gtz[0] = new Date().getTimezoneOffset() * -60
 
+// Field tabindex: default sentinel; design islands use other positives; L/R ±col_step.
+// Menubutton after-default slot. HTM may still hardcode the numeric values.
+var exo_tabindex_default = 9999
+var exo_tabindex_col_step = 1000
+var exo_tabindex_menubutton = exo_tabindex_default * 10 + 9 // 99999
+
 var gnpendingscripts = 0
 
 // Filled in exo_client_init from modal bag (and URL query). Prefer this over dialogArguments.
@@ -5367,7 +5373,7 @@ function menuclose() {
 		xmenubutton.style.background = ''
 		xmenubutton.style.backgroundColor = ''
 		xmenubutton.style.color = ''
-		xmenubutton.tabIndex = 99999
+		xmenubutton.tabIndex = exo_tabindex_menubutton
 	}
 
 }
