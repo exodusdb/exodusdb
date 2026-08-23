@@ -635,8 +635,17 @@ function form_place_menubar_session() {
     for (var ci = 0; ci < clears.length; ci++)
         clears[ci].parentNode.removeChild(clears[ci])
 
-    var text = (gdatasetname || '') + ' - ' + (gusername || '')
-    if (text === ' - ' || text === '-')
+    // Dataset: "name - code" unless same text (case-insensitive) → name only.
+    var dsname = gdatasetname || ''
+    var dscode = gdataset || ''
+    var dslabel = dsname || dscode
+    if (dsname && dscode
+        && String(dsname).toLowerCase() != String(dscode).toLowerCase())
+        dslabel = dsname + ' - ' + dscode
+    var text = dslabel
+    if (gusername)
+        text = text ? (text + ' - ' + gusername) : String(gusername)
+    if (!text || text === ' - ' || text === '-')
         return
 
     var span = document.createElement('span')
