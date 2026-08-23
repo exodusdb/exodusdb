@@ -1598,7 +1598,8 @@ input[type=checkbox]:focus-visible {
     background: var(--exopopup-bg-color);
     border: 2px solid var(--exopopup-border-color);
     border-radius: var(--exoform-border-radius);
-    padding: 10px;
+    /* Extra bottom air so OK/Cancel clear the south resize hit strip (6px). */
+    padding: 10px 10px 16px;
     box-shadow: var(--exopopup-box-shadow);
     display: flex;
     flex-direction: column;
@@ -1823,6 +1824,8 @@ input[type=checkbox]:focus-visible {
 }
 .exoconfirm_footer {
     flex: 0 0 auto;
+    position: relative;
+    z-index: 4; /* above .exo_confirm_rsz (3) — button hover/click, not resize cursor */
     padding-top: 10px;
     min-width: min-content;
     text-align: left;
