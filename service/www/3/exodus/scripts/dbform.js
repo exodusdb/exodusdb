@@ -4547,13 +4547,24 @@ async function document_onkeydown2(event) {
 
         //left or right not in tables
         if (ggroupno == 0 && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-            // Design tabindex island (not 0/default): ±exo_tabindex_col_step (grid columns).
-            // Prefer direction; if miss, try the other so edge columns still toggle.
+            // Island L/R: Left → ti-step if present; else walk +step while present (last wins);
+            // else normal. Right: ti+step; else walk -step while present; else normal.
             var curTi = element.tabIndex
             if (curTi > 0 && curTi != exo_tabindex_default) {
-                var prefer = keycode == 37 ? -exo_tabindex_col_step : exo_tabindex_col_step
-                var sideEl = focusdirection_find_tabindex(curTi + prefer, element, '')
-                    || focusdirection_find_tabindex(curTi - prefer, element, '')
+                var step = exo_tabindex_col_step
+                var first = keycode == 37 ? -step : step
+                var walk = -first
+                var sideEl = focusdirection_find_tabindex(curTi + first, element, '')
+                if (!sideEl) {
+                    var t = curTi + walk
+                    while (true) {
+                        var el = focusdirection_find_tabindex(t, element, '')
+                        if (!el)
+                            break
+                        sideEl = el
+                        t += walk
+                    }
+                }
                 if (sideEl) {
                     focuson(sideEl)
                     return exocancelevent(event)
@@ -4945,11 +4956,11 @@ function focusdirection_is_stop(el, fromEl, notgroupno) {
     return true
 }
 
-// First focusdirection stop with exact tabIndex (L/R column jump ±exo_tabindex_col_step).
+// Exact tabIndex stop (island L/R). Ignores 0 / default / negative — not column peers.
 function focusdirection_find_tabindex(wantTi, fromEl, notgroupno) {
-    if (wantTi == null || wantTi === '' || wantTi < 0)
+    if (wantTi == null || wantTi === '' || wantTi <= 0 || wantTi == exo_tabindex_default)
         return null
-    var scope = document.all || document.getElementsByTagName('*')
+    var scope = document.getElementsByTagName('*')
     for (var i = 0; i < scope.length; i++) {
         var el = scope[i]
         if (el.tabIndex != wantTi)
