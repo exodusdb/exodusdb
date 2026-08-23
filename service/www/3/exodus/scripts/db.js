@@ -55,7 +55,9 @@ async function exo_val_html() {
 
 function exo_dict_ipno(di,many,wildcard,plus) {
 
+ // Fold like text; uppercase codes (dots/digits/separators via validcharacters).
  exo_dict_text(di)
+ di.lowercase = false
  var tt='.0123456789'
  if (many) tt+=' ;,'
  if (wildcard) tt+='*'

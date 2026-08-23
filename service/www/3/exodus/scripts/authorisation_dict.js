@@ -16,6 +16,7 @@ async function dict_AUTHORISATION(parameters) {
     var usersgroupn = 1
 
     di = dict[++din] = dictrec('USER_ID', 'F', 1, '', usersgroupn)
+    exo_dict_code(di)
     di.required = true
     di.validation = 'await user_val_userid()'
     di.link = 'await windowopenkey("../exodus/users.htm")'
@@ -30,7 +31,9 @@ async function dict_AUTHORISATION(parameters) {
 
     di = dict[++din] = dictrec('KEYS', 'F', 2, '', usersgroupn)
     if (!(await exoui_security('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
-    exo_dict_code(di)
+    // Fold under column cap; still codes (uppercase + validcharacters).
+    exo_dict_text(di)
+    di.lowercase = false
     di.validation = 'await user_val_keys()'
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
     di.validcharacters='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ '
@@ -65,6 +68,7 @@ async function dict_AUTHORISATION(parameters) {
     var tasksgroupn = 2
 
     di = dict[++din] = dictrec('TASK_ID', 'F', 10, '', tasksgroupn)
+    exo_dict_code(di)
     di.required = true
     di.unique = true
     di.length = 40
@@ -89,6 +93,7 @@ async function dict_AUTHORISATION(parameters) {
     }
 
     di = dict[++din] = dictrec('LOCKS', 'F', 11, '', tasksgroupn)
+    exo_dict_code(di)
     di.validation = 'await task_val_lock()'
     if (!(await exoui_security('AUTHORISATION UPDATE LOCKS'))) di.readonly = gmsg
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)
