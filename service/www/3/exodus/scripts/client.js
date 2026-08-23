@@ -7524,9 +7524,6 @@ async function exointerval_async_sync(command) {
 	}, 'interval ' + command)
 }
 
-// Guard: SYSTEM_ERROR report must not re-enter systemerror if the side request fails.
-var gexo_reporting_system_error = false
-
 function systemerror(functionname, e) {
 	if (typeof functionname == 'undefined')
 		functionname = 'undefined'
@@ -7586,12 +7583,13 @@ function systemerror(functionname, e) {
 		console.log('EXODUS systemerror:\n' + technical)
 	} catch (e2) { }
 
-	// Report on a side dblink (not main db). Awaitable if callers use await systemerror().
+	// Report on its own side dblink (not main db). No global lock — concurrent
+	// systemerrors each report independently. Report path must not call systemerror
+	// (catch + console only) or we recurse.
 	// Send OK → friendly "support informed"; fail → alert full technical text.
 	return (async function systemerror_report_and_alert() {
 		var reported = false
-		if (!gexo_reporting_system_error && !gonunload && typeof exodblink == 'function') {
-			gexo_reporting_system_error = true
+		if (!gonunload && typeof exodblink == 'function') {
 			try {
 				var reportdb = new exodblink()
 				reportdb.request = 'EXECUTE\rGENERAL\rSYSTEM_ERROR'
@@ -7599,8 +7597,9 @@ function systemerror(functionname, e) {
 				reported = !!(await reportdb.send(technical))
 			} catch (e4) {
 				reported = false
-			} finally {
-				gexo_reporting_system_error = false
+				try {
+					console.log('EXODUS systemerror report failed:\n' + e4)
+				} catch (e5) { }
 			}
 		}
 		if (!gonunload) {
