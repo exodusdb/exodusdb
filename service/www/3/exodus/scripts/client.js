@@ -5367,7 +5367,7 @@ function menuclose() {
 		xmenubutton.style.background = ''
 		xmenubutton.style.backgroundColor = ''
 		xmenubutton.style.color = ''
-		xmenubutton.tabIndex = 9999
+		xmenubutton.tabIndex = 99999
 	}
 
 }

@@ -983,9 +983,9 @@ async function formfunctions_onload() {
         if (typeof element.getAttribute == 'unknown' || !element.getAttribute)
             continue
 
-        //ensure buttons havew tabIndex 999 - to make them come last
+        //ensure buttons have tabIndex 9999 - to make them come last
         if (element.tagName == 'BUTTON' && !element.tabIndex)
-            element.tabIndex = 999
+            element.tabIndex = 9999
 
         //backward compatible with old style datafld attributes
         var datafld = null
@@ -1085,7 +1085,7 @@ async function formfunctions_onload() {
                 newspan.tabIndex = element.tabIndex
                 //commented out because it prevent setting to -1 if readonly below
                 //if (!newspan.tabIndex)
-                // newspan.tabIndex=999
+                // newspan.tabIndex=9999
                 if (typeof element.length != 'undefined')
                     newspan.length = element.length
                 newspan.id = element.id
@@ -1409,7 +1409,7 @@ async function formfunctions_onload() {
                     element.contentEditable = 'true'
                     //element.contentEditable = true
                     if (!(element.getAttribute('tabindex')))
-                        element.setAttribute('tabindex', 999)
+                        element.setAttribute('tabindex', 9999)
                 }
             }
 
@@ -1763,13 +1763,13 @@ async function formfunctions_onload() {
                 // only focus elements that have tabindex
                 //make them all the same and tab will work nicely
                 //tabindex can also be hard coded in the form design
-                //use <999 to come before defaults and >999 to come after
+                //use <9999 to come before defaults and >9999 to come after
                 if (!element.tabIndex) {
                     if (element.getAttribute('exoreadonly')) {
                         element.tabIndex = -1
                     }
                     else {
-                        element.tabIndex = 999
+                        element.tabIndex = 9999
                     }
                 }
 
@@ -2431,7 +2431,7 @@ async function formfunctions_onload() {
     //remove record orientated buttons if no key fields
     if (!gKeyNodes) {
 
-        // Unbound OK/Cancel: field-nav stop (DOM order; not historical 9998)
+        // Unbound OK/Cancel: field-nav stop (DOM order; not historical 9998/99998)
         saverecord.tabIndex = 0
         closerecord.tabIndex = 0
 
@@ -4538,6 +4538,18 @@ async function document_onkeydown2(event) {
 
         //left or right not in tables
         if (ggroupno == 0 && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+            // Design tabindex island (not 0/9999): try ti∓1000 / ti±1000 (grid columns).
+            // Prefer direction; if miss, try the other (±1000) so edge columns still toggle.
+            var curTi = element.tabIndex
+            if (curTi > 0 && curTi != 9999) {
+                var prefer = keycode == 37 ? -1000 : 1000
+                var sideEl = focusdirection_find_tabindex(curTi + prefer, element, '')
+                    || focusdirection_find_tabindex(curTi - prefer, element, '')
+                if (sideEl) {
+                    focuson(sideEl)
+                    return exocancelevent(event)
+                }
+            }
             if (keycode == 37)
                 focusprevious()
             else
@@ -4855,6 +4867,156 @@ function form_radio_tab_target(radio) {
 	return first || radio
 }
 
+// Shared “would classic focusdirection accept this as next stop?”
+// Includes form-action faces (OK/Cancel). Tabindex inequality is NOT here.
+function focusdirection_is_stop(el, fromEl, notgroupno) {
+    if (!el || el == fromEl)
+        return false
+
+    var p
+    for (p = el; p; p = p.parentNode) {
+        if (p.classList && p.classList.contains('exo_formbuttons_source'))
+            return false
+    }
+
+    // Form action face SPANs (no id). tabIndex 0 = stop; -1 = skip.
+    // Tab/arrows land on them. Enter never.
+    var formActionTabStop = el.classList
+        && (el.classList.contains('graphicbutton') || el.classList.contains('menubutton'))
+        && el.getAttribute('exo_onclick')
+        && el.tabIndex >= 0
+        && gkeycode != 13
+
+    if (!formActionTabStop) {
+        if (!el.id || !el.tagName.match(gdatatagnames))
+            return false
+    }
+
+    if (el.tagName != 'INPUT' && !el.isContentEditable && el.tagName != 'SELECT' && el.tagName != 'TEXTAREA') {
+        if (!formActionTabStop)
+            return false
+    }
+
+    if (notgroupno !== '' && Number(el.getAttribute('exogroupno')) == notgroupno)
+        return false
+
+    if (el.getAttribute('exoreadonly'))
+        return false
+
+    if (el.disabled)
+        return false
+
+    if (!el.offsetWidth)
+        return false
+
+    if (!formActionTabStop && el.tabIndex == -1)
+        return false
+
+    if (!exoenabledandvisible(el))
+        return false
+
+    if ((gkeycode == 37 || gkeycode == 39 || gkeycode == 38 || gkeycode == 40)
+        && (el.tagName == 'SELECT' || el.type == 'radio')) {
+        if (!(el.type == 'radio'
+            && el.getAttribute('exohorizontal')
+            && (gkeycode == 38 || gkeycode == 40)))
+            return false
+    }
+
+    if (gkeycode == 13 && el.type == 'button')
+        return false
+
+    if (fromEl && fromEl.type == 'radio' && el.type == 'radio'
+        && form_radio_same_group(fromEl, el))
+        return false
+
+    return true
+}
+
+function focusdirection_is_form_action_stop(el) {
+    return !!(el && el.classList
+        && (el.classList.contains('graphicbutton') || el.classList.contains('menubutton'))
+        && el.getAttribute('exo_onclick')
+        && el.tabIndex >= 0
+        && gkeycode != 13)
+}
+
+// First focusdirection stop with exact tabIndex (L/R column jump ±1000).
+function focusdirection_find_tabindex(wantTi, fromEl, notgroupno) {
+    if (wantTi == null || wantTi === '' || wantTi < 0)
+        return null
+    var scope = document.all || document.getElementsByTagName('*')
+    for (var i = 0; i < scope.length; i++) {
+        var el = scope[i]
+        if (el.tabIndex != wantTi)
+            continue
+        if (focusdirection_is_stop(el, fromEl, notgroupno))
+            return el
+    }
+    return null
+}
+
+// Nav when start field has a design tabindex (not 0, not 9999).
+// Forward: next higher island peer; else next DOM stop; else wrap from start.
+// Backward: prev lower island peer; else prev DOM stop; else wrap from end.
+// Peers ignore ti 0 and 9999 and form-action faces. Returns element or null.
+function focusdirection_tabindexed(direction, startEl, fromTi, notgroupno, scope, scopeindex, scopex) {
+    var best = null
+    var bestTi = direction > 0 ? Infinity : -Infinity
+    var bestIdx = direction > 0 ? Infinity : -Infinity
+    var i
+    var el
+    var ti
+    for (i = 0; i < scope.length; i++) {
+        el = scope[i]
+        if (!focusdirection_is_stop(el, startEl, notgroupno))
+            continue
+        if (focusdirection_is_form_action_stop(el))
+            continue
+        ti = el.tabIndex
+        if (ti == 0 || ti == 9999 || ti < 0)
+            continue
+        if (direction > 0) {
+            if (ti <= fromTi)
+                continue
+            if (ti < bestTi || (ti == bestTi && i < bestIdx)) {
+                best = el
+                bestTi = ti
+                bestIdx = i
+            }
+        } else {
+            if (ti >= fromTi)
+                continue
+            if (ti > bestTi || (ti == bestTi && i > bestIdx)) {
+                best = el
+                bestTi = ti
+                bestIdx = i
+            }
+        }
+    }
+    if (best)
+        return best
+
+    var passzero = scopeindex
+    while (true) {
+        scopeindex = scopeindex + direction
+        if (passzero == scopeindex)
+            return null
+        if (scopeindex < 0) {
+            if (typeof scopex == 'undefined')
+                window.scrollBy(0, 999999)
+            scopeindex = scope.length - 1
+        } else if (scopeindex > scope.length - 1) {
+            if (typeof scopex == 'undefined')
+                window.scrollBy(0, -999999)
+            scopeindex = 0
+        }
+        el = scope[scopeindex]
+        if (focusdirection_is_stop(el, startEl, notgroupno))
+            return el
+    }
+}
+
 function focusdirection(direction, element, notgroupno, scopex) {
     if (typeof notgroupno == 'undefined')
         notgroupno = ''
@@ -4869,9 +5031,10 @@ function focusdirection(direction, element, notgroupno, scopex) {
             return
     }
     // if (!element) return
-    var elementtabindex = nextelement ? nextelement.tabIndex : 999999999999
+    var startEl = nextelement
+    var elementtabindex = startEl ? startEl.tabIndex : 999999999999
 
-    var origgroupno = nextelement.getAttribute('exogroupno')
+    var origgroupno = startEl.getAttribute('exogroupno')
 
     var scope = scopex
     if (!scope)
@@ -4910,152 +5073,38 @@ function focusdirection(direction, element, notgroupno, scopex) {
         return
     }
 
-    //test to prevent endless loop
-    var passzero = scopeindex
-
-    while (true) {
-        var scopeindex = scopeindex + direction
-
-        //prevent infinite loop
-        if (passzero == scopeindex) {
-            //break
+    // Island = design tabindex only. 0 = browser default input; 9999 = dbform SPAN default;
+    // -1 / unset-as--1 = not a tab stop for this ladder (classic path or skip elsewhere).
+    if (elementtabindex > 0 && elementtabindex != 9999) {
+        nextelement = focusdirection_tabindexed(direction, startEl, elementtabindex, notgroupno, scope, scopeindex, scopex)
+        if (!nextelement)
             return
-        }
+    } else {
+        // Ordinary path (ti 0/9999): next focusable in DOM order.
+        var passzero = scopeindex
 
-        //wrap/scroll to the bottom
-        if (scopeindex < 0) {
-            if (typeof scopex == 'undefined')
-                window.scrollBy(0, 999999)
-            scopeindex = scope.length - 1
-        }
+        while (true) {
+            scopeindex = scopeindex + direction
 
-        //wrap/scroll to the top
-        else if (scopeindex > scope.length - 1) {
-            if (typeof scopex == 'undefined')
-                window.scrollBy(0, -999999)
-            scopeindex = 0
-        }
+            if (passzero == scopeindex)
+                return
 
-        //get the next possible element by scopeindex
-        nextelement = scope[scopeindex]
-        var nextid = nextelement.id
-
-        // Hidden source bar (face is the tab stop). Source is 1×1 off-screen so
-        // offsetWidth checks do not skip it — must skip by class or focus sticks.
-        var inFormbuttonsSource = false
-        for (var p = nextelement; p; p = p.parentNode) {
-            if (p.classList && p.classList.contains('exo_formbuttons_source')) {
-                inFormbuttonsSource = true
-                break
+            if (scopeindex < 0) {
+                if (typeof scopex == 'undefined')
+                    window.scrollBy(0, 999999)
+                scopeindex = scope.length - 1
+            } else if (scopeindex > scope.length - 1) {
+                if (typeof scopex == 'undefined')
+                    window.scrollBy(0, -999999)
+                scopeindex = 0
             }
-        }
-        if (inFormbuttonsSource)
-            continue
 
-        // Form action face SPANs (no id). tabIndex 0 = stop (unbound OK/Cancel); -1 = skip (bound tools).
-        // Tab/arrows land on them. Enter never — gfinalinputelement is highest tabIndex, often a later
-        // *hidden* field, so "last" visible (e.g. STATIONERY) uses focusdirection and would hit OK.
-        var formActionTabStop = nextelement.classList
-            && (nextelement.classList.contains('graphicbutton') || nextelement.classList.contains('menubutton'))
-            && nextelement.getAttribute('exo_onclick')
-            && nextelement.tabIndex >= 0
-            && gkeycode != 13
-
-        //skip uninteresting tags with no id or non-data entry tag
-        if (!formActionTabStop) {
-            if (!nextelement.id || !nextelement.tagName.match(gdatatagnames)) {
-                //console.log('SKIP '+nextid+' '+nextelement.tagName+' skipped')
+            nextelement = scope[scopeindex]
+            if (!focusdirection_is_stop(nextelement, startEl, notgroupno))
                 continue
-            }
+
+            break
         }
-
-        //skip uneditable elements (except tabbable form actions on nav keys)
-        if (nextelement.tagName != 'INPUT' && !nextelement.isContentEditable && nextelement.tagName != 'SELECT' && nextelement.tagName != 'TEXTAREA') {
-            if (!formActionTabStop) {
-                //console.log('SKIP '+nextid+' is not contentEditable')
-                continue
-            }
-        }
-
-        //skip undesired group
-        if (notgroupno !== '' && Number(nextelement.getAttribute('exogroupno')) == notgroupno) {
-            //console.log('SKIP '+nextid+' is group '+notgroupno)
-            continue
-        }
-
-        //skip readonly
-        if (nextelement.getAttribute('exoreadonly')) {
-            //console.log('SKIP '+nextid+' is readonly')
-            continue
-        }
-
-        //skip disabled
-        if (nextelement.disabled) {
-            //console.log('SKIP '+nextid+' is disabled')
-            continue
-        }
-
-        //skip invisible
-        if (!nextelement.offsetWidth) {
-            //console.log('SKIP '+nextid+' no offsetWidth (not displayed)')
-            continue
-        }
-
-        //skip tabindex -1 (form actions use 0+; bound menubar tools stay -1)
-        if (!formActionTabStop && nextelement.tabIndex == -1) {
-            //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex)
-            continue
-        }
-
-        // Field tabIndex ladder (999 etc.) — not for form-action stops (0 after last field)
-        if (!formActionTabStop) {
-            //skip lower tabindex if forward direction
-            if (direction > 0 && elementtabindex && nextelement.tabIndex < elementtabindex) {
-                //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' < '+elementtabindex)
-                continue
-            }
-
-            //skip higher tabindex if backward direction
-            if (direction < 0 && elementtabindex && nextelement.tabIndex > elementtabindex) {
-                //console.log('SKIP '+nextid+' tabindex '+nextelement.tabIndex+' > '+elementtabindex)
-                continue
-            }
-        }
-
-        if (!exoenabledandvisible(nextelement))
-            continue
-
-
-        // Cursor keys skip SELECT / radio — browser would change value if pressed again.
-        // Exception: Up/Down may land on horizontal radios (options are Left/Right only;
-        // Up/Down field-nav — pairs with keydown early-return exception).
-        if ((gkeycode == 37 || gkeycode == 39 || gkeycode == 38 || gkeycode == 40)
-            && (nextelement.tagName == 'SELECT' || nextelement.type == 'radio')) {
-            if (!(nextelement.type == 'radio'
-                && nextelement.getAttribute('exohorizontal')
-                && (gkeycode == 38 || gkeycode == 40))) {
-                //console.log('SKIP '+nextid+' cursor keys skip over SELECT or radio items')
-                continue
-            }
-        }
-
-        //enter key skips over buttons to avoid pressing them on the next press
-        if (gkeycode == 13 && nextelement.type == 'button') {
-            //console.log('SKIP '+nextid+' Enter key skips over buttons')
-            continue
-        }
-
-        // Tab: one stop per radio group — skip sibling options of the field we are leaving
-        if (element && element.type == 'radio' && nextelement.type == 'radio'
-            && form_radio_same_group(element, nextelement)) {
-            //console.log('SKIP '+nextid+' same radio group as current')
-            continue
-        }
-
-        if (nextelement == element)
-            continue
-
-        break
     }
 
     //if arrived on last column and row of a table using up then focus on the first column last row
@@ -5087,7 +5136,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
     //found it. focus on it
     //console.log('focusdirection ' + nextelement.tagName + ' ' + nextelement.id)
     form_scroll_log_msg('focusdirection', direction > 0 ? '+1' : '-1',
-        'from', form_scroll_el_label(element),
+        'from', form_scroll_el_label(startEl),
         'to', form_scroll_el_label(nextelement),
         'gkeycode=', gkeycode)
     focuson(nextelement)
@@ -8240,7 +8289,7 @@ async function document_onfocus(event) {
     // Horizontal radio Up keeps gkeycode 38 so back-nav works without a dir flag.
     if (gkeycode == 9 || gkeycode == 13 || gkeycode == 38 || gkeycode == 40) {
         if (element.getAttribute('exoreadonly')
-            && (element.tabIndex == 999 || element.tabIndex == -1
+            && (element.tabIndex == 9999 || element.tabIndex == -1
                 || element.getAttribute('oldtabindex'))) {
             form_scroll_log_msg('document_onfocus EXIT readonly skip to next',
                 form_scroll_el_label(element))
@@ -8714,13 +8763,13 @@ async function earlyupdate() {
 // no prior field look "before" it — skipped required checks and opendoc side effects.
 function form_effective_tabindex(el) {
     if (!el)
-        return 999
+        return 9999
     var t = Number(el.tabIndex)
     if (t == -1 || isNaN(t)) {
         var ot = el.getAttribute('oldtabindex')
         if (ot != null && ot !== '' && !isNaN(Number(ot)))
             return Number(ot)
-        return 999
+        return 9999
     }
     return t
 }
@@ -8783,7 +8832,7 @@ async function checkrequired(elements, element, groupno) {
 
         if (Number(element2.getAttribute('exogroupno')) == groupno) {
             var element2_tab = form_effective_tabindex(element2)
-            // form_effective_tabindex never returns -1 (maps to oldtabindex or 999)
+            // form_effective_tabindex never returns -1 (maps to oldtabindex or 9999)
             if ((!foundelement && element2_tab <= element_tab) || (element2_tab < element_tab)) {
                 //if (element&&element2.getAttribute('exorequired')&&gds.getcells(element2,grecn)[0].text=='')
                 //if (element&&element2.getAttribute('exorequired')&&getvalue(element2)=='')
@@ -9275,8 +9324,8 @@ function exosetreadonly(elements, msg, options, recn) {
     //move onto next field if setting current focus field to readonly
     //but only if default tabindex since focusnext cant find the next tabindex properly
     //activeElement not available everywhere
-    //if (document.activeElement.getAttribute('exoreadonly')&&gpreviouselement&&document.activeElement.tabIndex==999)
-    if (gevent && typeof gevent.target != 'undefined' && gevent.target.getAttribute && gevent.target.getAttribute('exoreadonly') && gpreviouselement && document.activeElement.tabIndex == 999)
+    //if (document.activeElement.getAttribute('exoreadonly')&&gpreviouselement&&document.activeElement.tabIndex==9999)
+    if (gevent && typeof gevent.target != 'undefined' && gevent.target.getAttribute && gevent.target.getAttribute('exoreadonly') && gpreviouselement && document.activeElement.tabIndex == 9999)
         focusnext(gpreviouselement)
 
     return true
