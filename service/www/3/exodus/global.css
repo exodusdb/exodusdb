@@ -665,7 +665,7 @@ TABLE
     width: auto;
     max-width: 100%;
 }
-/* Column air + fold long cells (brand/description) — same idea as decide_datacol */
+/* Column air + fold long cells (brand/description). Decide dropped its 22em cap. */
 .exo_typeahead_table th,
 .exo_typeahead_table td {
     padding: 0.25em 0.5em;
@@ -1788,8 +1788,8 @@ input[type=checkbox]:focus-visible {
 .exoconfirmdiv.exoconfirm_decide #decide_table1 input[type=checkbox] {
     vertical-align: top;
 }
+/* No per-cell em cap — fit_decide sizes the shell up to viewport; wrap only when capped. */
 .exoconfirmdiv.exoconfirm_decide #decide_table1 .decide_datacol {
-    max-width: 22em;
     white-space: normal;
     overflow-wrap: break-word;
 }
