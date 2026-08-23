@@ -150,7 +150,7 @@ Deploying **dictionary records, pgsql functions, and btree/XREF indexes** is a *
 |------|------|
 | **Service startup** | e.g. `serve_*` → `perform("initgeneral LOGIN")` (and related serve paths). |
 | **`syncdat`** | Invoked from **`initgeneral`** (`osshell("syncdat")`) and install. Scans `dat/` (dict trees), writes changed `dict.*` records into the DB. |
-| **`dict2sql`** | **`syncdat` shells `dict2sql`** for dict items with `/*pgsql…*/` (and generates FTS/XREF helpers where needed). Installs/replaces Postgres dict functions. **If that field’s function body changed and it was indexed, `dict2sql` reindexes** (`deleteindex` + **`createindex`**). |
+| **`dict2sql`** | **`syncdat` shells `dict2sql`** for dict items with `/*pgsql…*/` (and generates FTS/XREF helpers where needed). Installs/replaces Postgres dict functions. **If that field’s function body changed, `dict2sql` reindexes** any index on that dict id **and**, for a non-`.XREF` base (e.g. `UPPERCASE_NAME`), also **`BASENAME.XREF`** when present (`deleteindex` + **`createindex`**). Needed because GIN sits on the `.XREF` wrapper while the searchable text lives in the base IMMUTABLE function. |
 | **`createindex`** | Builds the physical index. For **`…XREF` / full text**, uses **GIN** on `to_tsvector(…, dict_…_xref(key,data))` (expression from the dict — not a hand-maintained wrapper you edit for every base-field change). |
 | **App init (`initacc`, `initagency`, …)** | Called from **`initgeneral`** via `systemsubs`. May **`createindex` when an index is missing** only. |
 

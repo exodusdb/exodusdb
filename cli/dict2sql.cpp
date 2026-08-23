@@ -373,7 +373,12 @@ subr replace_FM_etc(io sql) {
 
 }
 
-subr create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate0) {
+// datafilename / dictid: data file (e.g. accounts) + dict id when installing a
+// dict pgsql function. Empty for exodus.* utilities. Used to reindex the right
+// GIN/btree after an IMMUTABLE function body changes (Postgres will not refresh
+// expression indexes on its own). Prefer these over reverse-parsing the SQL name
+// (dict ids are lowercased in the function name → a-z strip left field empty).
+subr create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate0, in datafilename = "", in dictid = "") {
 
 //	printl(functionname_and_args, " -> ", return_sqltype);
 
@@ -397,24 +402,21 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 	let schemaname = functionname0.contains(".") ? field(functionname0, ".", 1) : "public";
 	let functionname = field(functionname0, ".", functionname0.contains(".") ? 2 : 1);
 
-	//decide if reindex is required - only if function has changed
+	// Reindex if function body changed and an index uses this dict (or its .XREF).
 	var reindex_if_indexed = false;
-	var was_indexed = false;
-	//drop any index using the previous function
-	//TODO identify file/fields like production_orders_date_time
-	//var filename=functionname_and_args.field("_",2);
-	//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
-	var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
-	//var fieldname = filename.convert(LOWERCASE, "").trim("_");
-	let fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
-	//filename = filename.convert(UPPERCASE, "").trim("_");
-	if (filename and fieldname) {
-		filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
-		filename.trimmer("_");
-		if (filename.listindex(filename, fieldname)) {
-			was_indexed = true;
+	var indexfields = "";
+	if (datafilename and dictid) {
+		if (datafilename.listindex(datafilename, dictid))
+			indexfields ^= dictid ^ FM;
+		// Base FTS dict (e.g. UPPERCASE_NAME): GIN lives on BASENAME.XREF, which
+		// wraps this function. Changing the base must rebuild that index.
+		if (not dictid.ucase().ends("XREF")) {
+			let xrefid = dictid ^ ".XREF";
+			if (datafilename.listindex(datafilename, xrefid))
+				indexfields ^= xrefid ^ FM;
 		}
 	}
+	indexfields.trimmerlast(FM);
 
 	// Split out new argtypes and argnames
 	var argtypes = "";
@@ -597,17 +599,17 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 //		rm_duplicate_func(functionname_and_args);
 //	}
 
-	// Reindex was indexed and the function was changed
-	if (reindex_if_indexed and was_indexed) {
-//		logputl("deleteindex " ^ filename ^ " " ^ fieldname);
-//		if (not filename.deleteindex(fieldname)) {
-//			abort(lasterror());
-//		}
-		if (listindex(filename, fieldname) and not filename.deleteindex(fieldname))
-			loglasterror();
-		logputl("createindex " ^ filename ^ " " ^ fieldname);
-		if (not filename.createindex(fieldname))
-			abort(lasterror());
+	// Reindex: function body changed and we know which file/dict indexes use it
+	if (reindex_if_indexed and indexfields) {
+		for (var indexfield : indexfields) {
+			if (not indexfield)
+				continue;
+			if (datafilename.listindex(datafilename, indexfield) and not datafilename.deleteindex(indexfield))
+				loglasterror();
+			logputl("createindex " ^ datafilename ^ " " ^ indexfield);
+			if (not datafilename.createindex(indexfield))
+				abort(lasterror());
+		}
 	}
 
 	return;
@@ -1077,9 +1079,8 @@ COST 10;
 		sqltemplate.replacer("\n temp_xlate_key text;", "");
 	}
 
-	//upload pgsql function to postgres
-	//create_function(dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
-	create_function(function_name_and_args, dict_returns, sql, sqltemplate);
+	//upload pgsql function to postgres (data file + dict id → reindex base and/or .XREF)
+	create_function(function_name_and_args, dict_returns, sql, sqltemplate, dictfilename.field(".", 2, 999), dictid);
 
 	// delete calc_fields
 
