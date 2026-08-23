@@ -6708,8 +6708,8 @@ function form_typeahead_dblink() {
         gform_typeahead_db = new exodblink()
         // Quiet: no blockmodalui on send (avoids scroll-to-top every key)
         gform_typeahead_db.quiet = true
-        // Typeahead I/O is client-cacheable by full request string (gcache cleared
-        // on refresh / Alt+R). exo_typeahead also prefixes CACHE\r.
+        // Typeahead I/O is client-cacheable by full request string (gcache: Alt+R,
+        // or reload attach then clearcache()). exo_typeahead prefixes CACHE\r.
         var _ta_send = gform_typeahead_db.send
         gform_typeahead_db.send = async function form_typeahead_send(data) {
             if (this.request && String(this.request).slice(0, 6) != 'CACHE\r')

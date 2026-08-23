@@ -3874,7 +3874,8 @@ async function exo_typeahead(request, cols, coln, options) {
 		rows = exo_typeahead_parserows(options.data, colids)
 	} else {
 		var tdb = (typeof form_typeahead_dblink == 'function') ? form_typeahead_dblink() : db
-		// Client CACHE by full request string (gcache cleared on page refresh / Alt+R).
+		// Client CACHE by full request string (gcache: Alt+R, or reload attach
+		// then clearcache() — see loadcache / gcache_nav_is_reload).
 		var req = String(request)
 		if (req.slice(0, 6) != 'CACHE\r')
 			req = 'CACHE\r' + req
@@ -4631,6 +4632,23 @@ function wstatus(msg) {
 	console.log(msg);
 }
 
+// True when this document was loaded by reload (Ctrl+R / Ctrl+Shift+R).
+// Not true for mere open/navigate — those still share opener.gcache.
+function gcache_nav_is_reload() {
+	try {
+		var nav = (typeof performance !== 'undefined' && performance.getEntriesByType)
+			? performance.getEntriesByType('navigation')
+			: null
+		if (nav && nav.length && nav[0].type === 'reload')
+			return true
+		// legacy PerformanceNavigation.TYPE_RELOAD === 1
+		if (typeof performance !== 'undefined' && performance.navigation
+			&& performance.navigation.type === 1)
+			return true
+	} catch (e) { }
+	return false
+}
+
 function loadcache() {
 
 	//if gcache available already
@@ -4648,10 +4666,16 @@ function loadcache() {
 	try {
 		//if (window.opener && window.opener.gcache) {
 		if (window.opener && window.opener.gcache && gdataset && window.opener.gdataset == gdataset) {
+			// Attach shared store as normal (mere open and reload).
 			gcache = window.opener.gcache
 			// parent may be closed — gcache.values access can throw permission denied
-			if (gcache.values)
-				temp = true
+			if (!gcache.values)
+				gcache.values = new Object
+			// Reload: attach then clear via free clearcache() (skips loadcache when
+			// gcache already bound — no recursion). Mere open: keep puts.
+			if (gcache_nav_is_reload())
+				clearcache()
+			temp = true
 		}
 	} catch (e) {
 		gcache = null
@@ -4894,9 +4918,13 @@ function clearcache() {
 	//force refresh security table
 	gtasks = null
 
-	if (!(loadcache())) {
-		//logout('clearcache loadcache failed')
-		return false
+	// If gcache already bound (e.g. loadcache just attached opener), skip
+	// loadcache to avoid recursion when reload calls clearcache() after attach.
+	if (!(gcache && gcache.values)) {
+		if (!(loadcache())) {
+			//logout('clearcache loadcache failed')
+			return false
+		}
 	}
 
 	try {
