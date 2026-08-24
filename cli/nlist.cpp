@@ -241,6 +241,7 @@ var underline2;
 var cell;//num
 //var colbreakn;
 var bottomline2;
+var html_ownmark;  // OWN footer once; getmark(OWN) must not be re-fed its own output
 var char1;//num
 var char2;//num
 var char3;
@@ -1875,8 +1876,12 @@ x2exit:
 
 	bodyln = 1;
 
-	if (html and not(bottomline.unassigned())) {
+	// (b) Close data table at end only if bottomline still present (no pagebreaks,
+	// or never moved). If pagebreaks ran, the last printbreaks (a) already emitted
+	// close+OWN+outer — do not re-seed here or OWN appears twice at the end.
+	if (html and bottomline) {
 		tx(-1) = _FM ^ bottomline ^ _FM;
+		bottomline = "";
 	}
 
 	// Print number of records and elapsed time
@@ -2368,17 +2373,15 @@ subr printbreaks() {
 			}
 		}
 
-		// Ensure </td></tr></table> gets printed instead endless nesting every table
-		// resulting in only first part of any long report being shown in browser
+		// (a) Close data table (+ OWN mark) then outer, just before next page head opens.
+		// bottomline is seeded in printtx with </tbody></table>; move() so printtx does not
+		// prefix the same close again before the new head. Re-seed each break — a one-shot
+		// move left later pages nested (missing </tbody></table>).
 		if ((newhead and html) and printptr) {
 
 			gosub newheadreplacements();
 
-			// Take over the bottomline so that we can print footer after it
-			if (bottomline.unassigned()) {
-				bottomline = "";
-			}
-//			bottomline.move(bottomline2);
+			gosub ensure_html_bottomline();
 			bottomline2 = bottomline.move();
 
 			tx(-1) = bottomline2;
@@ -2440,6 +2443,35 @@ subr addstr() {
 		}
 	} //ii;
 
+	return;
+}
+
+subr ensure_html_bottomline() {
+	// printtx seeds bottomline once (</tbody></table> + OWN). Page-break move()
+	// clears it — rebuild the table close every time. OWN mark: capture once and
+	// reuse. getmark("OWN") appends/wraps its io mark; re-passing printtxmark
+	// nested "Software by NEOSYS.COM" every page.
+	if (not html or rawtable) {
+		return;
+	}
+	if (not bottomline.unassigned() and bottomline) {
+		if ((html_ownmark.unassigned() or not html_ownmark) and bottomline.f(2)) {
+			html_ownmark = bottomline.f(2);
+		}
+		return;
+	}
+	bottomline = "</tbody></table>";
+	if (html_ownmark.unassigned() or not html_ownmark) {
+		// Fresh mark from module prefix only (nlist may have set printtxmark plain).
+		// Do not pass prior getmark HTML back into getmark.
+		var ownmark = "";
+		if (not printtxmark.unassigned() and printtxmark and not printtxmark.contains("<")) {
+			ownmark = printtxmark;
+		}
+		call getmark("OWN", html, ownmark);
+		html_ownmark = ownmark;
+	}
+	bottomline(-1) = html_ownmark;
 	return;
 }
 
