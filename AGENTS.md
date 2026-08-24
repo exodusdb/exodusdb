@@ -48,12 +48,32 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 
 Exodus is **production** shared code. Wrong event/gate/popup changes cost **~10×** later. Net speed = allow discovery, force cleanup at named gates.
 
+Same hard blocks as **`~/.grok/AGENTS.md`** (restated here so they are in-tree):
+
+### Hard block: do not invent underspec (always on)
+
+1. **Only what was said.** Explicit request only — no “while I’m here” refactors, no rewriting working idioms (e.g. split-string `replacer` → `rex`) unless asked.
+2. **Ask, don’t guess.** Ambiguous name/polarity/scope → one short question and stop.
+3. **No parallel systems** for a small ask.
+4. **Reset means named scope only.**
+5. **Commits are not thrash pads.** Land the requested outcome.
+
+### Hard block: ask size ↔ change size (always on)
+
+1. **Match size.** Small ask → one existing seam. No scaffolding “in case.”
+2. **Simple first, in text:** `Simple: …` then `Heavier because: …` only if needed.
+3. **Stop if mismatch** — implement the simple case or ask; do not prove diagnosis with scaffolding.
+4. **Commit the simple outcome** — do not ship thrash as the answer.
+
+### Hard block: notice extra work — recommend or note (always on)
+
+Extra work is welcome **with discussion**, never silent: prefer `Also noticed: … Suggest: …` and wait; if you shipped extras same turn, **name them in the closing comment**.
+
 ### While building
 
 - **KISS at the seam:** one more case on the real machine (walker, startevent, icon map). Not a new parallel policy.
 - **Blast radius first** on `client.js` / `dbform.js` / Gate A / confirm-decide / focus: smallest change; name what else can break; never “fix” by swallowing whole key classes.
-- **Hard block (global AGENTS):** ask size ↔ change size — small ask → one existing seam; no parallel systems. Simple option in text before heavier path; do not commit thrash as the answer. See `~/.grok/AGENTS.md` “Hard block: ask size ↔ change size”.
-- **One-shot helpers:** do not extract; inline + comment with lost name/intent (global AGENTS).
+- **One-shot helpers:** do not extract; inline + comment with lost name/intent.
 - **Technical debt is allowed for discovery** — thrash, try A then B, short WIP. Keep it local and reversible.
 - **Commit freely** after substantive turns (small, descriptive; easy to bisect). Checkpoints are **not** a claim the path is finished. Do **not** push unless asked.
 
