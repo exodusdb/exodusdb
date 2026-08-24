@@ -96,8 +96,7 @@ var head_or_foot;
 // STUBS to pass old function calls to htmllib2 modes
 /////////////////////////////////////////////////////
 subroutine getcss(io css, in version = "") {
-	// GETCSS3 = GETCSS + screen prefers-color-scheme dark / print light (list/nlist).
-	// Stationery docs that call htmllib2("GETCSS") directly are unchanged.
+	// GETCSS3 = getcss ver1/ver2 + dm/print vars (htmllib2 "GETCSS" is obsolete)
 	call htmllib2("GETCSS3", css, version, stationery);
 	return;
 }

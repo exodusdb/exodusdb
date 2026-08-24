@@ -1428,7 +1428,8 @@ x1exit:
 		call htmllib2("TABLE.MAKE", headtab, tt, "");
 		headtab.replacer("</TR>", "</TR>" _EOL);
 		if (headtabperpage) {
-			colhdg.replacer(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:white\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
+			// Headtab strip in thead (BREAK/HEADING); white→th-bg in dm via GETCSS3 vars
+			colhdg.replacer(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:var(--exo-rpt-th-bg,#ffffff)\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
 		} else {
 			headtab.replacer(posttheadmark, "");
 			head ^= _FM ^ headtab ^ _FM;

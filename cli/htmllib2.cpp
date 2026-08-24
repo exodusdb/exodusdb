@@ -404,18 +404,16 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
 
 		dataio.replacer("gdateformat='d/M/yyyy'", "gdateformat='" ^ jsdatefmt ^ "'");
 
-	} else if (mode == "GETCSS") {
-
-		//wire up accurate names to the given parameters
-		let& version = params0;
-		let& stationery = params20;
-
-		gosub getcss(dataio, version, stationery);
+	// OBSOLETE — use GETCSS3 (getcss ver1/ver2 poetry + dm/print var amend).
+	// Plain GETCSS left callers without theme vars; all printers use GETCSS3 now.
+	//} else if (mode == "GETCSS") {
+	//	let& version = params0;
+	//	let& stationery = params20;
+	//	gosub getcss(dataio, version, stationery);
 
 	} else if (mode == "GETCSS3") {
 
-		// Same as GETCSS then append screen prefers-color-scheme dark + print/PDF light.
-		// Opt-in for printtx/list/nlist — does not change GETCSS callers (invoices etc.).
+		// getcss(ver1|ver2) then assign --exo-rpt-* for dark screen / light print
 		let& version = params0;
 		let& stationery = params20;
 
@@ -628,7 +626,7 @@ if (!document.swapNode) {
 
 }
 
-func getcss(io css, in version = "", in stationery = "") {
+subr getcss(io css, in version = "", in stationery = "") {
 
 	//NB quirk in ie mimiced by mozilla table dont inherit size
 	//but work around is TABLE {FONT-SIZE:100%} in css
@@ -735,29 +733,21 @@ func getcss(io css, in version = "", in stationery = "") {
 		css.replacer("xborder-collapse", "border-collapse");
 	}
 
-	return 0;
+	return;
 
 }
 
-// GETCSS3 only: follow browser/OS light|dark on screen; keep print/PDF light.
-// Prefers-color-scheme updates live when the user switches dm/lm — no JS.
+// GETCSS3: poetry uses var(--exo-rpt-*, #lm-hex). Amend assigns dark vars on
+// screen only; print just asks for light (fallbacks = same LM as getcss).
 subr getcss3_amend(io css) {
 
 	css ^= R"V0G0N(
 <style type="text/css">
-/*GETCSS3 — screen dm/lm via prefers-color-scheme; print/PDF stay light*/
+/*GETCSS3 — screen dm via prefers-color-scheme; print = light (poetry fallbacks)*/
 :root {
 	color-scheme: light dark;
-	--exo-rpt-page-bg: #ffffff;
-	--exo-rpt-text: #000000;
-	--exo-rpt-th-bg: #fff099;
-	--exo-rpt-td-bg: #fdf5e6;
-	--exo-rpt-border: #808080;
-	--exo-rpt-border-light: #d3d3d3;
-	--exo-rpt-link: blue;
-	--exo-rpt-link-visited: purple;
-	--exo-rpt-link-hover: red;
 }
+/* screen only — does not apply when printing */
 @media screen and (prefers-color-scheme: dark) {
 	:root {
 		--exo-rpt-page-bg: #1a2030;
@@ -770,76 +760,22 @@ subr getcss3_amend(io css) {
 		--exo-rpt-link-visited: #b39ddb;
 		--exo-rpt-link-hover: #ff8a80;
 	}
+	/* One text colour in dm (off-white); body + letterhead (stationery hardcodes) */
 	body {
 		background-color: var(--exo-rpt-page-bg) !important;
 		color: var(--exo-rpt-text) !important;
 	}
-	/* Letterhead: ignore LM hardcoded colours (e.g. font color=purple) */
 	#letterhead, #letterhead font,
 	#letterhead a, #letterhead a:visited, #letterhead a:hover {
 		color: var(--exo-rpt-text) !important;
 	}
-	table.exotable th {
-		background-color: var(--exo-rpt-th-bg) !important;
-		border-color: var(--exo-rpt-border) !important;
-		color: var(--exo-rpt-text) !important;
-	}
-	table.exotable > thead th {
-		outline-color: var(--exo-rpt-border) !important;
-		box-shadow: 0 2px 2px rgba(0, 0, 0, 0.45);
-	}
-	table.exotable > tbody > tr > td {
-		background-color: var(--exo-rpt-td-bg) !important;
-		border-color: var(--exo-rpt-border-light) !important;
-		color: var(--exo-rpt-text) !important;
-	}
-	table.exotable > tbody > tr > td:first-child {
-		border-left-color: var(--exo-rpt-border) !important;
-	}
-	table.exotable > tbody > tr > td:last-child {
-		border-right-color: var(--exo-rpt-border) !important;
-	}
-	table.exotable hr {
-		border-top-color: var(--exo-rpt-border-light) !important;
-	}
-	.pagedivider {
-		border-top-color: var(--exo-rpt-border) !important;
-	}
-	a { color: var(--exo-rpt-link) !important; }
-	a:visited { color: var(--exo-rpt-link-visited) !important; }
-	a:hover { color: var(--exo-rpt-link-hover) !important; }
-	/* nlist headtab cell sometimes inlined white */
-	th[style*="background-color:white"],
-	th[style*="background-color: white"] {
-		background-color: var(--exo-rpt-th-bg) !important;
-		color: var(--exo-rpt-text) !important;
-	}
 }
+/* Print = LM: do not set --exo-rpt-* here; unset vars → poetry fallbacks
+   (incl. company SYSTEM.f(46,*) th/td). Dark block is screen-only above. */
 @media print {
 	:root {
 		color-scheme: light;
-		--exo-rpt-page-bg: #ffffff;
-		--exo-rpt-text: #000000;
-		--exo-rpt-th-bg: #fff099;
-		--exo-rpt-td-bg: #fdf5e6;
-		--exo-rpt-border: #808080;
-		--exo-rpt-border-light: #d3d3d3;
 	}
-	body {
-		background-color: #ffffff !important;
-		color: #000000 !important;
-	}
-	table.exotable th {
-		background-color: #fff099 !important;
-		border-color: #808080 !important;
-		color: #000000 !important;
-	}
-	table.exotable > tbody > tr > td {
-		background-color: #fdf5e6 !important;
-		border-color: #d3d3d3 !important;
-		color: #000000 !important;
-	}
-	a, a:visited, a:hover { color: blue !important; }
 }
 </style>
 )V0G0N";
@@ -854,17 +790,17 @@ func getvogonpoetry_css(in version) {
 		return
 R"V0G0N(
 <style type="text/css">
-/*ver2 for reports e.g list of invoices*/
+/*ver2 for reports — colours via --exo-rpt-* (GETCSS3 sets dm/print)*/
 .BHEAD {display:none}
 .BHEAD2 {}
-body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
+body {background-color:var(--exo-rpt-page-bg, #ffffff); color:var(--exo-rpt-text, #000000); font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
 table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
-a {color:blue;}
-a:visited {color:purple;}
-a:hover {color:red;}
+a {color:var(--exo-rpt-link, blue);}
+a:visited {color:var(--exo-rpt-link-visited, purple);}
+a:hover {color:var(--exo-rpt-link-hover, red);}
 tt {font-family:courier new,courier;font-size:80%}
 //xth {background-color:#ffff80;}
-xth {background-color:#fff099;}
+xth {background-color:var(--exo-rpt-th-bg, #fff099);}
 thead {display:table-header-group}
 tfoot {page-break-inside:avoid}
 td.nb {border-bottom:none}
@@ -887,36 +823,38 @@ table.exotable {
 
 table.exotable th {
  //background-color:#ffff80;
- background-color:#fff099;
+ background-color:var(--exo-rpt-th-bg, #fff099);
+ color:var(--exo-rpt-text, #000000);
  padding:2px;
- border:1px solid #808080;}
+ border:1px solid var(--exo-rpt-border, #808080);}
 
 @media screen{
  table.exotable > thead th {
   top: 0;
   z-index: 2;
   position: sticky;
-  outline: 1px solid #808080;
+  outline: 1px solid var(--exo-rpt-border, #808080);
   outline-offset: -0.5px;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);}}
 
 table.exotable > tbody > tr > td {
  //background-color:#ffffc0;
- background-color:#fdf5e6;
+ background-color:var(--exo-rpt-td-bg, #fdf5e6);
+ color:var(--exo-rpt-text, #000000);
  padding:2px;
- border:1px solid #d3d3d3;}
+ border:1px solid var(--exo-rpt-border-light, #d3d3d3);}
 
 table.exotable > tbody > tr > td:first-child {
- border-left:1px solid #808080}
+ border-left:1px solid var(--exo-rpt-border, #808080)}
 
 table.exotable > tbody > tr > td:last-child {
- border-right:1px solid #808080}
+ border-right:1px solid var(--exo-rpt-border, #808080)}
 
-table.exotable hr {height:0px; border:0px; border-top:1px solid #d3d3d3}
+table.exotable hr {height:0px; border:0px; border-top:1px solid var(--exo-rpt-border-light, #d3d3d3)}
 
 table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top; border-collapse:collapse; border:0px;}
 
-.pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
+.pagedivider {border-top:1px dashed var(--exo-rpt-border, #808080); border-bottom:0px;}
 
 </style>
 
@@ -1008,17 +946,17 @@ window.onload=function (){
 		return
 R"V0G0N(
 <style type="text/css">
-/*ver1 for documents like invoices*/
+/*ver1 for documents — colours via --exo-rpt-* (GETCSS3 sets dm/print)*/
 .BHEAD {display:none}
 .BHEAD2 {}
-body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
+body {background-color:var(--exo-rpt-page-bg, #ffffff); color:var(--exo-rpt-text, #000000); font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
 table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
-a {color:blue;}
-a:visited {color:purple;}
-a:hover {color:red;}
+a {color:var(--exo-rpt-link, blue);}
+a:visited {color:var(--exo-rpt-link-visited, purple);}
+a:hover {color:var(--exo-rpt-link-hover, red);}
 tt {font-family:courier new,courier;font-size:80%}
 //th {background-color:#ffff80;}
-th {background-color:#fff099;}
+th {background-color:var(--exo-rpt-th-bg, #fff099); color:var(--exo-rpt-text, #000000);}
 thead {display:table-header-group}
 td.nb {border-bottom:none}
 td.nt {border-top:none}
@@ -1029,9 +967,9 @@ td.nx {border-top:none;border-bottom:none}
 .nobr {white-space:nowrap;}
 .num {text-align:right;mso-number-format:General}
 //.exotable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
-.exotable {background-color:#fdf5e6; border-width:2px; border-collapse:collapse; padding:1px}
+.exotable {background-color:var(--exo-rpt-td-bg, #fdf5e6); color:var(--exo-rpt-text, #000000); border-width:2px; border-collapse:collapse; padding:1px}
 .hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
-.pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
+.pagedivider {border-top:1px dashed var(--exo-rpt-border, #808080); border-bottom:0px;}
 </style>
 
 <style type="text/css" media="print">
