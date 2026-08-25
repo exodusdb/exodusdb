@@ -1013,6 +1013,7 @@ async function exo_run_waitcancel(source) {
 			if (gchildwin && gchildwin.xhttprequestid)
 				requestid = gchildwin.xhttprequestid
 			exo_flight_log('WAITCANCEL CANCEL B#' + n)
+			// Same abort contract as typeahead: abort() → onabort → 'Cancelled' (not an error).
 			try {
 				xhttp.abort()
 			} catch (e) { }
@@ -3399,8 +3400,14 @@ async function exodblink_send_byhttp_using_xmlhttp(data) {
 					resolve(detail);
 				};
 				xhttp.onabort = function (e) {
-					// Intentional cancel (typeahead supersede, Wait/Cancel, unload) — not an error.
-					// Use 'Cancelled' so systemerror / callers match the post-await abort path.
+					// Abort contract (Wait/Cancel, typeahead supersede, unload):
+					//   xhttp.abort() is normal cancel — NOT a system error.
+					//   Always finish as response/resolve 'Cancelled' (post-await path
+					//   also sets Cancelled when xhttpaborted). Callers and systemerror
+					//   already treat Cancelled as non-failure. Do not console.error or
+					//   invent an ABORT… string here — that made typeahead look broken
+					//   while Wait/Cancel seemed fine (same abort, wrong label).
+					// Modal waits: also dbsend_cancel_xhttp (PHP-FPM may not see abort).
 					xhttpaborted = true
 					if (self) {
 						self.response = 'Cancelled';
@@ -7723,9 +7730,9 @@ async function exointerval_async_sync(command) {
 function systemerror(functionname, e) {
 	if (typeof functionname == 'undefined')
 		functionname = 'undefined'
-	// User/client cancelled or aborted a server request (db.send abort, xhttp .5
-	// "Error: Client cancelled request in EXODUS xhttp.php …", legacy ABORT…).
-	// Not a system failure — typeahead supersede, unload, Gate A race.
+	// Cancel / abort is not a system failure (Wait/Cancel, typeahead supersede, unload).
+	// Contract: xhttp.abort() → response 'Cancelled' (see onabort). Also ignore xhttp.php
+	// "Client cancelled…" and legacy ABORT… labels if anything still surfaces them.
 	var fns = String(functionname)
 	if (fns == 'Cancelled' || fns.indexOf('ABORT') >= 0 || fns.indexOf('Client cancelled') >= 0)
 		return

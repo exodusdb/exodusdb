@@ -6740,6 +6740,8 @@ function form_typeahead_dblink() {
 }
 
 // Drop an in-flight typeahead send so a newer query can use the private link.
+// abort() is OK — same contract as Wait/Cancel (onabort → 'Cancelled', not an error).
+// See client.js xhttp.onabort.
 function form_typeahead_dblink_reset() {
     var tdb = gform_typeahead_db
     if (!tdb)
