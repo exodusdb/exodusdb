@@ -739,17 +739,43 @@ subr getcss(io css, in version = "", in stationery = "") {
 
 // GETCSS3: poetry uses var(--exo-rpt-*, #lm-hex). Amend assigns dark vars on
 // screen only; print just asks for light (fallbacks = same LM as getcss).
+// Theme: EXODUStheme/dt cookie (dbform lm/dm) if present, else prefers-color-scheme.
 subr getcss3_amend(io css) {
 
+	// Script first — sets data-exo-rpt-theme before CSS applies (same cookie as client.js).
 	css ^= R"V0G0N(
+<script type="text/javascript">
+(function(){try{
+	/* Same as client.js exogetcookie: unescape so dt%3D1 → dt=1 */
+	var forced=null; /* null=no cookie → browser */
+	var cookies=unescape(document.cookie||'').split('; ');
+	for(var i=0;i<cookies.length;i++){
+		var eq=cookies[i].indexOf('=');
+		if(eq<0)continue;
+		if(cookies[i].slice(0,eq)!=='EXODUStheme')continue;
+		var crumbs=cookies[i].slice(eq+1).split('&');
+		forced='light';
+		for(var j=0;j<crumbs.length;j++){
+			var kv=crumbs[j].split('=');
+			if(kv[0]==='dt'&&kv[1]&&kv[1]!=='0'){forced='dark';break;}
+		}
+		break;
+	}
+	var dark=forced!==null?(forced==='dark')
+		:(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+	var html=document.documentElement;
+	html.setAttribute('data-exo-rpt-theme',dark?'dark':'light');
+	html.style.colorScheme=dark?'dark':'light';
+}catch(e){}})();
+</script>
 <style type="text/css">
-/*GETCSS3 — screen dm via prefers-color-scheme; print = light (poetry fallbacks)*/
+/*GETCSS3 — screen dm: cookie EXODUStheme/dt if set, else prefers-color-scheme; print = light*/
 :root {
 	color-scheme: light dark;
 }
 /* screen only — does not apply when printing */
-@media screen and (prefers-color-scheme: dark) {
-	:root {
+@media screen {
+	:root[data-exo-rpt-theme="dark"] {
 		--exo-rpt-page-bg: #1a2030;
 		--exo-rpt-text: #e8e8f0;
 		--exo-rpt-th-bg: #303a5a;
@@ -761,12 +787,15 @@ subr getcss3_amend(io css) {
 		--exo-rpt-link-hover: #ff8a80;
 	}
 	/* One text colour in dm (off-white); body + letterhead (stationery hardcodes) */
-	body {
+	:root[data-exo-rpt-theme="dark"] body {
 		background-color: var(--exo-rpt-page-bg) !important;
 		color: var(--exo-rpt-text) !important;
 	}
-	#letterhead, #letterhead font,
-	#letterhead a, #letterhead a:visited, #letterhead a:hover {
+	:root[data-exo-rpt-theme="dark"] #letterhead,
+	:root[data-exo-rpt-theme="dark"] #letterhead font,
+	:root[data-exo-rpt-theme="dark"] #letterhead a,
+	:root[data-exo-rpt-theme="dark"] #letterhead a:visited,
+	:root[data-exo-rpt-theme="dark"] #letterhead a:hover {
 		color: var(--exo-rpt-text) !important;
 	}
 }
