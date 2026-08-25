@@ -766,10 +766,16 @@ subr getcss3_amend(io css) {
 		else pref='auto';
 		break;
 	}
-	var dark=pref==='dark'||(pref==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
-	var html=document.documentElement;
-	html.setAttribute('data-exo-rpt-theme',dark?'dark':'light');
-	html.style.colorScheme=dark?'dark':'light';
+	function apply(){
+		var dark=pref==='dark'||(pref==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+		var html=document.documentElement;
+		html.setAttribute('data-exo-rpt-theme',dark?'dark':'light');
+		html.style.colorScheme=dark?'dark':'light';
+	}
+	apply();
+	/* Auto: keep report windows in sync when OS/browser lm/dm changes (one-shot was not enough) */
+	if(pref==='auto'&&window.matchMedia)
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',apply);
 }catch(e){}})();
 </script>
 <style type="text/css">
