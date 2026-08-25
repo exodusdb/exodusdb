@@ -1564,11 +1564,35 @@ input:disabled {
     border-color: var(--exoform-cell-border-color);
 }
 
-/* Disabled radio/checkbox: sit on form/data well, not page grey. Ring muted but visible. */
-input[type=radio]:disabled,
-input[type=checkbox]:disabled {
-    background-color: var(--exoform-bg-color) !important;
-    border-color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
+/* Disabled radio: same paint as enabled (unchecked or checked), overall dimmed */
+input[type=radio]:disabled:not(:checked) {
+    background-color: var(--exobg-color) !important;
+    border: calc(var(--exocheck-size) * 1 / 14) solid var(--exoradio-ring-border-color) !important;
+    opacity: 0.5;
+    cursor: default;
+}
+input[type=radio]:disabled:checked {
+    background-color: var(--exobg-color) !important;
+    border: calc(var(--exocheck-size) * 4 / 14) solid var(--exoradio-color) !important;
+    opacity: 0.5;
+    cursor: default;
+}
+/* Disabled checkbox: same paint as enabled (unchecked or checked), overall dimmed */
+input[type=checkbox]:disabled:not(:checked) {
+    background-color: var(--exobg-color) !important;
+    border: calc(var(--exocheck-size) * 1 / 14) solid var(--exoradio-ring-border-color) !important;
+    opacity: 0.5;
+    cursor: default;
+}
+input[type=checkbox]:disabled:checked {
+    background-color: var(--exoradio-color) !important;
+    border: 0 !important;
+    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
+    background-size: 100%;
+    background-clip: padding-box;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
     cursor: default;
 }
 
@@ -2189,34 +2213,32 @@ SPAN.calendar-date-committed[contenteditable] {
     background-color: #1f1f1f !important;
     border-color: #343434;
 }
-/* Disabled radio/checkbox face: form fill + muted ring (beat input:disabled greys) */
-:root[data-theme="dark_mode"] input[type=radio]:disabled:not(:checked),
-:root[data-theme="dark_mode"] input[type=checkbox]:disabled {
+/* Disabled radio: same paint as enabled (unchecked or checked), overall dimmed */
+:root[data-theme="dark_mode"] input[type=radio]:disabled:not(:checked) {
     background-color: var(--exoform-bg-color) !important;
-    border: calc(var(--exocheck-size) * 1.5 / 14) solid
-        color-mix(in srgb, var(--exotext-color) 45%, transparent) !important;
+    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+    opacity: 0.5;
 }
-/* Checked+disabled radio: keep light pill, fade blue inset slightly */
 :root[data-theme="dark_mode"] input[type=radio]:disabled:checked {
     background-color: var(--exoradio-checked-bg-color) !important;
-    border-color: color-mix(in srgb, var(--exotext-color) 45%, transparent);
-    box-shadow: inset 0 0 0 calc(var(--exocheck-size) * 2 / 14)
-        color-mix(in srgb, var(--exoradio-color) 55%, transparent);
+    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+    box-shadow: inset 0 0 0 calc(var(--exocheck-size) * 2 / 14) var(--exoradio-color);
+    opacity: 0.5;
 }
-/* Checked+disabled checkbox: same face as unchecked; tick dim like the ring */
-:root[data-theme="dark_mode"] input[type=checkbox]:disabled:checked {
+/* Disabled checkbox: same paint as enabled (unchecked or checked), overall dimmed */
+:root[data-theme="dark_mode"] input[type=checkbox]:disabled:not(:checked) {
     background-color: var(--exoform-bg-color) !important;
-    border: calc(var(--exocheck-size) * 1.5 / 14) solid
-        color-mix(in srgb, var(--exotext-color) 45%, transparent) !important;
-    /* White tick + form wash ≈ border brightness (no blue fill) */
-    background-image:
-        linear-gradient(
-            color-mix(in srgb, var(--exoform-bg-color) 55%, transparent),
-            color-mix(in srgb, var(--exoform-bg-color) 55%, transparent)),
-        url("../../exodus/images/theme2/checkbox-tick.svg");
-    background-size: 100% 100%, 90%;
-    background-position: center, center;
-    background-repeat: no-repeat, no-repeat;
+    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+    opacity: 0.5;
+}
+:root[data-theme="dark_mode"] input[type=checkbox]:disabled:checked {
+    background-color: var(--exoradio-color) !important;
+    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
+    background-size: 90%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
 }
 
 :root[data-theme="dark_mode"] #uiblockerdiv {
