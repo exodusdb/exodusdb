@@ -9597,7 +9597,7 @@ TIMESTAMP can be updated using ostimestamp() as and when desired.
 .PP
 \fBExample:\fR
 .EX \"<code>
-var v1 = elapsedtimetext(); // e.g. "< 1ms"
+var v1 = elapsedtimetext(); // e.g. "83 ms"
 .EE \"</code>
 .sp 0
 .sp 0
@@ -9615,11 +9615,15 @@ Between two given timestamps
 \fBWarning:\fR Use ostimestamp() not ostime(). The first is in days and the second is in seconds.
 .sp 0
 .PP
+Text is only expressed to 1% precision for brevity.
+.sp 0
+.PP
 .PP
 \fBExample:\fR
 .EX \"<code>
-let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
-let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
+let v1 = elapsedtimetext(0, 83.0/86400000); // "83 ms"
+let v2 = elapsedtimetext(0, 1.51); // "1 day, 12 hours, 14 mins"
+let v3 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
 .EE \"</code>
 .sp 0
 .sp 0

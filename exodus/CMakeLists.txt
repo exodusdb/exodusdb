@@ -132,6 +132,7 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 	add_library(exodus SHARED
 		# Big ones first for efficient parallel compilation
 		exoprog.cpp
+		elapsedtime.cpp
 		exoenv.cpp
 		exofuncs.cpp
 		exocallable.cpp

@@ -492,16 +492,18 @@ ND	var  timedate2();
 	// TIMESTAMP is initialised with ostimestamp() at program/thread startup.
 	// TIMESTAMP can be updated using ostimestamp() as and when desired.
 	//
-	// `var v1 = elapsedtimetext(); // e.g. "< 1ms"`
+	// `var v1 = elapsedtimetext(); // e.g. "83 ms"`
 	//
 ND	var  elapsedtimetext() const;
 
 	// Get text of elapsed time.
 	// Between two given timestamps
 	// Warning: Use ostimestamp() not ostime(). The first is in days and the second is in seconds.
+	// Text is only expressed to 1% precision for brevity.
 	//
-	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
-	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
+	// `let v1 = elapsedtimetext(0, 83.0/86400000); // "83 ms"
+	//  let v2 = elapsedtimetext(0, 1.51); // "1 day, 12 hours, 14 mins"
+	//  let v3 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
 	//
 ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 

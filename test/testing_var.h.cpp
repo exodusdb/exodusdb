@@ -2572,13 +2572,14 @@ func main() {
 
 	printl("elapsedtimetext() const;");
 	{
-		var v1 = elapsedtimetext(); // e.g. "< 1ms"
+		var v1 = elapsedtimetext(); // e.g. "83 ms"
 	}
 
 	printl("elapsedtimetext(in timestamp1, in timestamp2) const;");
 	{
-				let v1 = elapsedtimetext(0, 0.55); assert(v1.errputl() == "13 hours, 12 mins");
-		let v2 = elapsedtimetext(0, 0.001); assert(v2.errputl() == "1 min, 26 secs");
+				let v1 = elapsedtimetext(0, 83.0/86400000); assert(v1.errputl() == "83 ms");
+		let v2 = elapsedtimetext(0, 1.51); assert(v2.errputl() == "1 day, 12 hours, 14 mins");
+		let v3 = elapsedtimetext(0, 0.001); assert(v3.errputl() == "1 min, 26 secs");
 	}
 
 	printl("note(in msg, in options, io response) const;");
