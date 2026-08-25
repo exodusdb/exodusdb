@@ -69,17 +69,17 @@ var gthemeimage = gimagetheme + 'shell-theme_lm.svg' // painted sun/moon chrome
 var gcompanyimage = gimagetheme + 'shell-company_lm.svg'
 
 var gisdarktheme
-// LM/DM preference cookie — global per browser (not glogincode / dataset / user)
+// Preference: 'light' | 'dark' | 'auto' (browser prefers-color-scheme). Effective LM/DM → gisdarktheme.
+var gtheme_pref = 'auto'
+// LM/DM/Auto preference cookie — global per browser (not glogincode / dataset / user)
 var gthemecookiekey = 'EXODUStheme'
+var gtheme_mql = null
+var gtheme_mql_handler = null
 
-// First paint: apply EXODUStheme/dt before the rest of this file parses and before
-// body HTML is reached. Hard refresh otherwise flashes browser-default white
-// (especially with OS + Exodus both in night mode). Full theme_toggle runs later.
-;(function exo_theme_firstpaint() {
+// dt crumb: 1=dark, 0=light, auto (or absent cookie)=browser. unescape like exogetcookie.
+function exo_theme_pref_from_cookie() {
 	try {
-		var dark = false
-		var raw = document.cookie || ''
-		var cookies = raw.split('; ')
+		var cookies = unescape(document.cookie || '').split('; ')
 		for (var i = 0; i < cookies.length; i++) {
 			var eq = cookies[i].indexOf('=')
 			if (eq < 0)
@@ -88,22 +88,87 @@ var gthemecookiekey = 'EXODUStheme'
 			if (name !== 'EXODUStheme' && name !== gthemecookiekey)
 				continue
 			var crumbs = cookies[i].slice(eq + 1).split('&')
+			var dt = ''
+			var saw_dt = false
 			for (var j = 0; j < crumbs.length; j++) {
 				var kv = crumbs[j].split('=')
-				if (kv[0] === 'dt' && kv[1] && kv[1] !== '0') {
-					dark = true
+				if (kv[0] === 'dt') {
+					saw_dt = true
+					dt = kv[1] || ''
 					break
 				}
 			}
-			break
+			if (dt === '1')
+				return 'dark'
+			if (dt === '0')
+				return 'light'
+			if (dt === 'auto')
+				return 'auto'
+			// Legacy: cookie present with empty dt meant forced light
+			if (saw_dt && dt === '')
+				return 'light'
+			return 'auto'
 		}
-		if (!dark)
+	} catch (e) { }
+	return 'auto'
+}
+
+function exo_os_prefers_dark() {
+	return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+}
+
+function exo_theme_effective_dark(pref) {
+	pref = pref || gtheme_pref
+	if (pref === 'dark')
+		return true
+	if (pref === 'light')
+		return false
+	return exo_os_prefers_dark()
+}
+
+function exo_theme_pref_to_cookie(pref) {
+	var dt = pref === 'dark' ? '1' : (pref === 'light' ? '0' : 'auto')
+	exosetcookie('', gthemecookiekey, dt, 'dt', true)
+}
+
+function exo_theme_bind_os_listener() {
+	if (gtheme_mql && gtheme_mql_handler) {
+		try {
+			gtheme_mql.removeEventListener('change', gtheme_mql_handler)
+		} catch (e) { }
+		gtheme_mql = null
+		gtheme_mql_handler = null
+	}
+	if (gtheme_pref !== 'auto' || !window.matchMedia)
+		return
+	gtheme_mql = window.matchMedia('(prefers-color-scheme: dark)')
+	gtheme_mql_handler = function () {
+		if (gtheme_pref !== 'auto')
+			return
+		theme_toggle(exo_theme_effective_dark('auto') ? 'dark_mode' : 'default')
+		exo_sync_theme_btn_icon()
+	}
+	gtheme_mql.addEventListener('change', gtheme_mql_handler)
+}
+
+function exo_theme_apply_pref(pref) {
+	if (pref)
+		gtheme_pref = pref
+	theme_toggle(exo_theme_effective_dark(gtheme_pref) ? 'dark_mode' : 'default')
+	exo_sync_theme_btn_icon()
+	exo_theme_bind_os_listener()
+}
+
+// First paint: apply theme before body HTML. Cookie (dt) if set, else OS when auto.
+;(function exo_theme_firstpaint() {
+	try {
+		gtheme_pref = exo_theme_pref_from_cookie()
+		if (!exo_theme_effective_dark(gtheme_pref))
 			return
 		var html = document.documentElement
 		html.setAttribute('data-theme', 'dark_mode')
 		html.style.colorScheme = 'dark'
 		html.style.background = '#000'
-		// Style block before body exists — stops white canvas on hard refresh
 		var st = document.createElement('style')
 		st.id = 'exo_dm_firstpaint'
 		st.textContent = '@media screen{'
@@ -394,7 +459,8 @@ function exo_client_init() {
 		if (window.matchMedia)
 			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { theme_toggle(login_theme()) })
 	} else {
-		theme_toggle(exogetcookie2('dt', gthemecookiekey, null) ? 'dark_mode' : 'default')
+		gtheme_pref = exo_theme_pref_from_cookie()
+		exo_theme_apply_pref()
 	}
 
 	// Before global.css: page/form body only. No field color/border !important —
@@ -1779,12 +1845,18 @@ async function exoui_warning(msg) {
 	return await exoui_note(msg, 'warning')
 }
 
-function theme_toggle_title(dark) {
-	return dark ? 'Switch to light mode' : 'Switch to dark mode'
+// Titles: next click in light → dark → auto → light cycle.
+function theme_toggle_title(pref) {
+	pref = pref || gtheme_pref
+	if (pref === 'light')
+		return 'Light mode — click for dark mode'
+	if (pref === 'dark')
+		return 'Dark mode — click for auto (browser)'
+	return 'Following browser (' + (exo_os_prefers_dark() ? 'dark' : 'light') + ') — click for light mode'
 }
 
 // Menubar theme control: theme-sun / theme-moon glyph inside shell-theme host.
-// Show current mode: sun in light, moon in dark (same as knob.innerHTML before).
+// Show current mode: sun in light, moon in dark; greyscale when auto.
 // Optional img/btn: required while building the control (not in document yet — getElementById fails).
 function exo_sync_theme_btn_icon(img, btn) {
 
@@ -1793,8 +1865,12 @@ function exo_sync_theme_btn_icon(img, btn) {
 	if (!img)
 		return
 	img.src = gimagetheme + (gisdarktheme ? 'theme-moon.svg' : 'theme-sun.svg')
+	if (gtheme_pref === 'auto')
+		img.classList.add('theme-auto')
+	else
+		img.classList.remove('theme-auto')
 	if (btn)
-		btn.title = theme_toggle_title(gisdarktheme)
+		btn.title = theme_toggle_title(gtheme_pref)
 }
 
 function exo_swap_tool_icons() {
@@ -1907,7 +1983,7 @@ function add_theme_toggle_btn() {
 	btn.className = 'theme_button'
 	btn.setAttribute('role', 'button')
 	btn.tabIndex = 0
-	btn.title = theme_toggle_title(gisdarktheme)
+	btn.title = theme_toggle_title(gtheme_pref)
 
 	var img = document.createElement('img')
 	img.id = 'theme_toggle_icon'
@@ -1919,9 +1995,10 @@ function add_theme_toggle_btn() {
 	exo_sync_theme_btn_icon(img, btn)
 
 	function flip() {
-		theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
-		exosetcookie('', gthemecookiekey, (gisdarktheme ? 1 : ''), 'dt', true)
-		exo_sync_theme_btn_icon(img, btn)
+		// Cycle: light → dark → auto → light
+		gtheme_pref = gtheme_pref === 'light' ? 'dark' : (gtheme_pref === 'dark' ? 'auto' : 'light')
+		exo_theme_pref_to_cookie(gtheme_pref)
+		exo_theme_apply_pref()
 	}
 	btn.addEventListener('click', flip)
 	btn.addEventListener('keydown', function (e) {

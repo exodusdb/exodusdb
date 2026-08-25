@@ -746,30 +746,34 @@ subr getcss3_amend(io css) {
 	css ^= R"V0G0N(
 <script type="text/javascript">
 (function(){try{
-	/* Same as client.js exogetcookie: unescape so dt%3D1 → dt=1 */
-	var forced=null; /* null=no cookie → browser */
+	/* Same truth as client.js: dt=1 dark, dt=0 light, dt=auto/absent → browser. unescape so dt%3D1 → dt=1 */
+	var pref='auto';
 	var cookies=unescape(document.cookie||'').split('; ');
 	for(var i=0;i<cookies.length;i++){
 		var eq=cookies[i].indexOf('=');
 		if(eq<0)continue;
 		if(cookies[i].slice(0,eq)!=='EXODUStheme')continue;
 		var crumbs=cookies[i].slice(eq+1).split('&');
-		forced='light';
+		var saw_dt=false,dt='';
 		for(var j=0;j<crumbs.length;j++){
 			var kv=crumbs[j].split('=');
-			if(kv[0]==='dt'&&kv[1]&&kv[1]!=='0'){forced='dark';break;}
+			if(kv[0]==='dt'){saw_dt=true;dt=kv[1]||'';break;}
 		}
+		if(dt==='1')pref='dark';
+		else if(dt==='0')pref='light';
+		else if(dt==='auto')pref='auto';
+		else if(saw_dt&&dt==='')pref='light'; /* legacy empty dt = forced light */
+		else pref='auto';
 		break;
 	}
-	var dark=forced!==null?(forced==='dark')
-		:(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+	var dark=pref==='dark'||(pref==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
 	var html=document.documentElement;
 	html.setAttribute('data-exo-rpt-theme',dark?'dark':'light');
 	html.style.colorScheme=dark?'dark':'light';
 }catch(e){}})();
 </script>
 <style type="text/css">
-/*GETCSS3 — screen dm: cookie EXODUStheme/dt if set, else prefers-color-scheme; print = light*/
+/*GETCSS3 — screen dm: dt=1 dark, dt=0 light, auto/absent → prefers-color-scheme; print = light*/
 :root {
 	color-scheme: light dark;
 }

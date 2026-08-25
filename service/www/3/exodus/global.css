@@ -1940,6 +1940,10 @@ input[type=checkbox]:focus-visible {
     box-shadow: none;
     object-fit: contain;
 }
+/* Auto pref: grey sun/moon (effective glyph) — following browser */
+.theme_button img.theme-auto {
+    filter: grayscale(1) opacity(0.55);
+}
 
 /* ========== Dark mode (component rules; tokens are at top of file) ========== */
 /* Screen only — print block at EOF forces black-on-white for paper */
