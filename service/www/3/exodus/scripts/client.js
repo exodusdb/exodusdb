@@ -2715,7 +2715,7 @@ Array.prototype.exoxlate = async function arrayxlate(filename, fieldno, mode) {
 			// Keep any cached partials already filled above.
 			this.exoresponse = db.response
 			var r = String(db.response || '')
-			if (r == 'Cancelled' || r.indexOf('Client cancelled') >= 0)
+			if (r == 'Cancelled' || r.indexOf('ABORT') >= 0 || r.indexOf('Client cancelled') >= 0)
 				return results
 			systemerror(db.response)
 			return []
@@ -3399,17 +3399,17 @@ async function exodblink_send_byhttp_using_xmlhttp(data) {
 					resolve(detail);
 				};
 				xhttp.onabort = function (e) {
-					const detail = 'ABORT exodblink_send_byhttp_using_xmlhttp ' + (xhttp.statusText || '');
-					console.error(detail);
+					// Intentional cancel (typeahead supersede, Wait/Cancel, unload) — not an error.
+					// Use 'Cancelled' so systemerror / callers match the post-await abort path.
 					xhttpaborted = true
 					if (self) {
-						self.response = detail;
+						self.response = 'Cancelled';
 						self.result = '';
 					}
 					if (!gonunload) {
 						if (gchildwin && gchildwin.xhttp === xhttp)
 							dbsend_cancel_xhttp(gchildwin.xhttprequestid)
-						resolve(detail);
+						resolve('Cancelled');
 					}
 				};
 			});
@@ -7724,15 +7724,15 @@ function systemerror(functionname, e) {
 	if (typeof functionname == 'undefined')
 		functionname = 'undefined'
 	// User/client cancelled or aborted a server request (db.send abort, xhttp .5
-	// "Error: Client cancelled request in EXODUS xhttp.php …"). Not a system failure —
-	// typeahead supersede, unload, Gate A race. Match exact 'Cancelled' or the xhttp text.
+	// "Error: Client cancelled request in EXODUS xhttp.php …", legacy ABORT…).
+	// Not a system failure — typeahead supersede, unload, Gate A race.
 	var fns = String(functionname)
-	if (fns == 'Cancelled' || fns.indexOf('Client cancelled') >= 0)
+	if (fns == 'Cancelled' || fns.indexOf('ABORT') >= 0 || fns.indexOf('Client cancelled') >= 0)
 		return
 	if (typeof e == 'undefined')
 		e = ''
 	var msg = e.toString()
-	if (msg == 'Cancelled' || msg.indexOf('Client cancelled') >= 0)
+	if (msg == 'Cancelled' || msg.indexOf('ABORT') >= 0 || msg.indexOf('Client cancelled') >= 0)
 		return
 	//if (e.name)
 	//	msg+='\n'+e.name
