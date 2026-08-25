@@ -449,19 +449,10 @@ function exo_client_init() {
 		document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/server.js"></scr' + 'ipt>')
 	}
 
-	// Pre-emptively set CSS screen theme to avoid flash of switching from
-	// default theme (light or user color) mode to dark theme if dark theme is active
-	if (document.title.toUpperCase() == 'EXODUS LOGIN') {
-		var login_theme = function () {
-			return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark_mode' : 'default'
-		}
-		theme_toggle(login_theme())
-		if (window.matchMedia)
-			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { theme_toggle(login_theme()) })
-	} else {
-		gtheme_pref = exo_theme_pref_from_cookie()
-		exo_theme_apply_pref()
-	}
+	// Same theme truth as forms / GETCSS3: dt=0|1|auto (absent → auto → browser).
+	// Login used to be OS-only; now follows the three-way cookie like reports.
+	gtheme_pref = exo_theme_pref_from_cookie()
+	exo_theme_apply_pref()
 
 	// Before global.css: page/form body only. No field color/border !important —
 	// that stays after load and blocks focus underline and miss Highlight.
