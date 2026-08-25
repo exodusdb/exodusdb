@@ -396,23 +396,36 @@ func main() {
 			printl(e.message);
 		}
 
-		try {
-			--minint;
-			throw VarError("Uncaught error VarNumUnderflow");
-		} catch (VarNumUnderflow& e) {
-			printl(e.message);
-		}
-		try {
-			minint--;
-			throw VarError("Uncaught error VarNumUnderflow");
-		} catch (VarNumUnderflow& e) {
-			printl(e.message);
-		}
-		try {
-			maxint++;
-			throw VarError("Uncaught error VarNumOverflow");
-		} catch (VarNumOverflow& e) {
-			printl(e.message);
+		// ++/-- wrap at int64 limits like + - * (see var_base_op2.cpp policy).
+		if (false) {
+			try {
+				--minint;
+				throw VarError("Uncaught error VarNumUnderflow");
+			} catch (VarNumUnderflow& e) {
+				printl(e.message);
+			}
+			try {
+				minint--;
+				throw VarError("Uncaught error VarNumUnderflow");
+			} catch (VarNumUnderflow& e) {
+				printl(e.message);
+			}
+			try {
+				maxint++;
+				throw VarError("Uncaught error VarNumOverflow");
+			} catch (VarNumOverflow& e) {
+				printl(e.message);
+			}
+		} else {
+			var vmin = minint;
+			--vmin;
+			assert(vmin.toInt64() eq std::numeric_limits<mvint_t>::max());
+			vmin = minint;
+			vmin--;
+			assert(vmin.toInt64() eq std::numeric_limits<mvint_t>::max());
+			var vmax = maxint;
+			vmax++;
+			assert(vmax.toInt64() eq std::numeric_limits<mvint_t>::min());
 		}
 
 		try {

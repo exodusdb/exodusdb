@@ -57,12 +57,18 @@ func main() {
 			assert(i64_min.toInt64()    eq std::numeric_limits<std::int64_t>::min());
 			assert(i64_min.toString() eq "-9223372036854775808");
 
-			try {
+			// ++/-- wrap at int64 limits like + - * (see var_base_op2.cpp policy).
+			if (false) {
+				try {
+					i64_min--;
+					assert(false and var("i64_min--"));
+					i64_min.dump().outputl();
+				} catch (VarNumUnderflow& e) {
+					printl("Successfully caught deliberate error", e.message);
+				}
+			} else {
 				i64_min--;
-				assert(false and var("i64_min--"));
-				i64_min.dump().outputl();
-			} catch (VarNumUnderflow& e) {
-				printl("Successfully caught deliberate error", e.message);
+				assert(i64_min.toInt64() eq std::numeric_limits<std::int64_t>::max()); // wrap
 			}
 		}
 
@@ -106,12 +112,18 @@ func main() {
 			assert(i64_max.toInt64()    eq std::numeric_limits<std::int64_t>::max());
 			assert(i64_max.toString() eq "9223372036854775807");
 
-			try {
+			// ++/-- wrap at int64 limits like + - * (see var_base_op2.cpp policy).
+			if (false) {
+				try {
+					i64_max++;
+					assert(false and var("i64_max++"));
+					i64_max.dump().outputl();
+				} catch (VarNumOverflow& e) {
+					printl("Successfully caught deliberate error", e.message);
+				}
+			} else {
 				i64_max++;
-				assert(false and var("i64_max++"));
-				i64_max.dump().outputl();
-			} catch (VarNumOverflow& e) {
-				printl("Successfully caught deliberate error", e.message);
+				assert(i64_max.toInt64() eq std::numeric_limits<std::int64_t>::min()); // wrap
 			}
 		}
 

@@ -274,6 +274,13 @@ VBR1 VB1::operator^=(SV sv1) & {
 // SELF INCREMENT/DECREMENT POSTFIX
 ///////////////////////////////////
 
+// Overflow/underflow policy (int64 ++/--):
+// No portable free CPU trap for signed overflow. Soft bounds checks on arith
+// are not worth the hot-path cost for almost-never cases; + - * already wrap
+// with no check. Keep ++/-- the same (wrap). Prefer UBSan/debug or checks at
+// ingress/boundaries if overflow must be found — not throw on every ++/--.
+// Former limit checks left commented below (do not delete).
+
 // VAR ++
 
 // You must *not* make the postfix version return the 'this' object by reference
@@ -291,9 +298,9 @@ RETVAR VB1::operator++(int) & {
 tryagain:
 	// Prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			UNLIKELY
-			throw VarNumOverflow("operator++");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::max())
+		// 	UNLIKELY
+		// 	throw VarNumOverflow("operator++");
 		priorvalue = var(var_int);
 		var_int++;
 		var_typ = VARTYP_INT;  // Reset to one unique type
@@ -338,9 +345,9 @@ var var::operator++(int) & {
 tryagain:
 	// Prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			UNLIKELY
-			throw VarNumOverflow("operator++");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::max())
+		// 	UNLIKELY
+		// 	throw VarNumOverflow("operator++");
 		priorvalue = var(var_int);
 		var_int++;
 		var_typ = VARTYP_INT;  // Reset to one unique type
@@ -381,9 +388,9 @@ RETVAR VB1::operator--(int) & {
 tryagain:
 	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			UNLIKELY
-			throw VarNumUnderflow("operator--");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::min())
+		// 	UNLIKELY
+		// 	throw VarNumUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
 		var_typ = VARTYP_INT;  // Reset to one unique type
@@ -424,9 +431,9 @@ var var::operator--(int) & {
 tryagain:
 	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			UNLIKELY
-			throw VarNumUnderflow("operator--");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::min())
+		// 	UNLIKELY
+		// 	throw VarNumUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
 		var_typ = VARTYP_INT;  // Reset to one unique type
@@ -468,9 +475,9 @@ VARBASEREF VB1::operator++() & {
 tryagain:
 	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			UNLIKELY
-			throw VarNumOverflow("operator++");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::max())
+		// 	UNLIKELY
+		// 	throw VarNumOverflow("operator++");
 		var_int++;
 		var_typ = VARTYP_INT;  // Reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
@@ -505,9 +512,9 @@ var& var::operator++() & {
 tryagain:
 	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			UNLIKELY
-			throw VarNumOverflow("operator++");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::max())
+		// 	UNLIKELY
+		// 	throw VarNumOverflow("operator++");
 		var_int++;
 		var_typ = VARTYP_INT;  // Reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
@@ -546,9 +553,9 @@ VARBASEREF VB1::operator--() & {
 tryagain:
 	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			UNLIKELY
-			throw VarNumUnderflow("operator--");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::min())
+		// 	UNLIKELY
+		// 	throw VarNumUnderflow("operator--");
 		var_int--;
 		var_typ = VARTYP_INT;  // Reset to one unique type
 
@@ -585,9 +592,9 @@ var& var::operator--() & {
 tryagain:
 	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
-		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			UNLIKELY
-			throw VarNumUnderflow("operator--");
+		// if (var_int == std::numeric_limits<decltype(var_int)>::min())
+		// 	UNLIKELY
+		// 	throw VarNumUnderflow("operator--");
 		var_int--;
 		var_typ = VARTYP_INT;  // Reset to one unique type
 
