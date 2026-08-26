@@ -241,6 +241,14 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 
 	if (authorised("EDIT PRINTOUTS")) {
 
+		// report.js — column ± fold (optional; emailed HTM may 404 the src)
+		var reportjs = SYSTEM.f(114, 1);
+		if (reportjs and not reportjs.ends("/"))
+			reportjs ^= "/";
+		reportjs ^= "3/exodus/scripts/report.js";
+		tt = "<script src=" ^ reportjs.quote() ^ "></script>";
+		letterhead.prefixer(tt);
+
 		// button
 		var onclick = "javascript:";
 		onclick ^= "if (document.body.getAttribute('contentEditable')) {";
@@ -252,6 +260,8 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 		onclick ^= " edithtml.innerHTML='Edit is On';";
 		onclick ^= " document.body.setAttribute('contenteditable','true')";
 		onclick ^= "}";
+		// Single hook into report.js (no-op if script missing)
+		onclick ^= ";typeof exo_report_onedit==='function'&&exo_report_onedit(!!document.body.getAttribute('contenteditable'))";
 
 		tt = "<button id=edithtml class=\"noprint\"";
 		tt ^= " style=\"position:fixed;top:2px;left:2px;font-size:60%;display:none\"";
@@ -262,7 +272,8 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 		// click logos to switch on/off editing
 		onclick = "javascript:edithtml.click()";
 		letterhead.replacer("<IMG", "<img");
-		letterhead.replacer("<img", "<img style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
+		// title here (not report.js) so tip works even when report.js cannot load
+		letterhead.replacer("<img", "<img title=\"Click to toggle report edit mode\" style=\"cursor:pointer\" onclick=" ^ (onclick.quote()));
 	}
 
 	// Performed: return letterhead as perform()'s result (and ANS).

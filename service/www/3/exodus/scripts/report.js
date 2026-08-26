@@ -1,0 +1,388 @@
+// Report HTM extras (linked, not embedded). Missing script → no feature.
+// Logo → existing edit mode → exo_report_onedit(true|false).
+//
+// Collapsed column:
+//   edit ON  — narrow stub + ±; body text invisible (not a white hole)
+//   edit OFF — visibility:collapse on <col> so the column takes no space
+
+(function () {
+	'use strict'
+
+	var STYLE_ID = 'exo-rpt-colfold-style'
+	var TABLE_CLASS = 'exo-rpt-cols'
+	var EDITING_CLASS = 'exo-rpt-editing'
+	var COL_CLASS = 'exo-rpt-col'
+	var COLLAPSED = 'exo-rpt-col-collapsed'
+	var LABEL_CLASS = 'exo-rpt-foldlabel'
+	var BTN_CLASS = 'exo-rpt-foldbtn'
+	var GLYPH_CLASS = 'exo-rpt-foldglyph'
+	var STUB = '1.35em'
+
+	function ensureCss() {
+		var style = document.getElementById(STYLE_ID)
+		if (!style) {
+			style = document.createElement('style')
+			style.id = STYLE_ID
+			;(document.head || document.documentElement).appendChild(style)
+		}
+		style.textContent = [
+			'table.' + TABLE_CLASS + ' {',
+			'  table-layout: fixed;',
+			'}',
+			'th.' + COLLAPSED + ',',
+			'td.' + COLLAPSED + ' {',
+			'  box-sizing: border-box;',
+			'  overflow: hidden;',
+			'  padding: 0;',
+			'}',
+			/* Edit on: hide glyphs in td AND body/total th (nlist break rows use th) */
+			'table.' + EDITING_CLASS + ' td.' + COLLAPSED + ',',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' {',
+			'  color: transparent;',
+			'}',
+			'table.' + EDITING_CLASS + ' td.' + COLLAPSED + ' *,',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' * {',
+			'  visibility: hidden;',
+			'}',
+			'th.' + COLLAPSED + ' .' + LABEL_CLASS + ' {',
+			'  display: none;',
+			'}',
+			'th.' + TABLE_CLASS + '-ready {',
+			'  position: relative;',
+			'}',
+			'.' + BTN_CLASS + ' {',
+			'  position: absolute;',
+			'  top: 0;',
+			'  left: 50%;',
+			'  transform: translateX(-50%);',
+			'  box-sizing: border-box;',
+			'  display: flex;',
+			'  align-items: center;',
+			'  justify-content: center;',
+			'  width: 1.15em;',
+			'  height: 1.15em;',
+			'  padding: 0;',
+			'  margin: 0;',
+			'  background: #eee;',
+			'  border: 1px solid #888;',
+			'  border-radius: 2px;',
+			'  cursor: pointer;',
+			'  user-select: none;',
+			'  z-index: 3;',
+			'}',
+			/* Drawn bars — same geometry for + and − (no font metrics) */
+			'.' + GLYPH_CLASS + ' {',
+			'  position: relative;',
+			'  display: block;',
+			'  width: 0.55em;',
+			'  height: 0.55em;',
+			'}',
+			'.' + GLYPH_CLASS + '::before,',
+			'.' + GLYPH_CLASS + '::after {',
+			'  content: \"\";',
+			'  position: absolute;',
+			'  left: 50%;',
+			'  top: 50%;',
+			'  transform: translate(-50%, -50%);',
+			'  background: #333;',
+			'}',
+			'.' + GLYPH_CLASS + '::before {',
+			'  width: 100%;',
+			'  height: 2px;',
+			'}',
+			'.' + GLYPH_CLASS + '--plus::after {',
+			'  width: 2px;',
+			'  height: 100%;',
+			'}',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' .' + BTN_CLASS + ',',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' .' + BTN_CLASS + ' *,',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' .' + BTN_CLASS + ' *::before,',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' .' + BTN_CLASS + ' *::after {',
+			'  visibility: visible;',
+			'}',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' .' + GLYPH_CLASS + '::before,',
+			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' .' + GLYPH_CLASS + '::after {',
+			'  background: #333;',
+			'}',
+			'@media print {',
+			'  .' + BTN_CLASS + ' { display: none; }',
+			'  /* collapsed cols stay collapsed in print via col visibility */',
+			'}'
+		].join('\n')
+	}
+
+	function dataHeaderRow(table) {
+		var thead = table.tHead
+		if (!thead || !thead.rows.length)
+			return null
+		for (var r = thead.rows.length - 1; r >= 0; r--) {
+			var row = thead.rows[r]
+			var n = 0
+			for (var c = 0; c < row.cells.length; c++) {
+				if ((row.cells[c].colSpan || 1) === 1)
+					n++
+			}
+			if (n > 1)
+				return row
+		}
+		return thead.rows[thead.rows.length - 1]
+	}
+
+	function columnCount(table) {
+		var row = dataHeaderRow(table)
+		if (row)
+			return row.cells.length
+		if (table.tBodies[0] && table.tBodies[0].rows[0])
+			return table.tBodies[0].rows[0].cells.length
+		return 0
+	}
+
+	function ensureColgroup(table) {
+		var ncols = columnCount(table)
+		if (!ncols)
+			return null
+		var cg = table.getElementsByTagName('colgroup')[0]
+		if (!cg) {
+			cg = document.createElement('colgroup')
+			table.insertBefore(cg, table.firstChild)
+		}
+		while (cg.children.length < ncols) {
+			var col = document.createElement('col')
+			col.className = COL_CLASS
+			cg.appendChild(col)
+		}
+		return cg
+	}
+
+	function pinCellWidth(cell, width) {
+		if (width) {
+			cell.style.width = width
+			cell.style.minWidth = width
+			cell.style.maxWidth = width
+		} else {
+			cell.style.width = ''
+			cell.style.minWidth = ''
+			cell.style.maxWidth = ''
+		}
+	}
+
+	// editOn: stub for ±. edit off: col visibility:collapse (no space).
+	function layoutCollapsedCol(table, colIndex, editOn) {
+		var cg = ensureColgroup(table)
+		if (!cg || !cg.children[colIndex])
+			return
+		var col = cg.children[colIndex]
+		if (!col.classList.contains(COLLAPSED)) {
+			col.style.width = ''
+			col.style.visibility = ''
+			return
+		}
+		if (editOn) {
+			col.style.visibility = ''
+			col.style.width = STUB
+			for (var r = 0; r < table.rows.length; r++) {
+				var cell = table.rows[r].cells[colIndex]
+				if (!cell || (cell.colSpan || 1) > 1)
+					continue
+				pinCellWidth(cell, STUB)
+			}
+		} else {
+			col.style.visibility = 'collapse'
+			col.style.width = '0'
+			for (var r2 = 0; r2 < table.rows.length; r2++) {
+				var cell2 = table.rows[r2].cells[colIndex]
+				if (!cell2 || (cell2.colSpan || 1) > 1)
+					continue
+				pinCellWidth(cell2, '0')
+			}
+		}
+	}
+
+	function layoutAllCollapsed(table, editOn) {
+		var cg = ensureColgroup(table)
+		if (!cg)
+			return
+		for (var i = 0; i < cg.children.length; i++) {
+			if (cg.children[i].classList.contains(COLLAPSED))
+				layoutCollapsedCol(table, i, editOn)
+		}
+	}
+
+	function thLabelText(th) {
+		var label = th.querySelector('.' + LABEL_CLASS)
+		var t = ''
+		if (label)
+			t = label.innerText || label.textContent || ''
+		else
+			t = th.innerText || th.textContent || ''
+		return String(t).replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '')
+	}
+
+	function foldTitle(th, collapsed) {
+		var name = thLabelText(th)
+		if (collapsed)
+			return name ? ('Expand ' + name) : 'Expand column'
+		return name ? ('Collapse ' + name) : 'Collapse column'
+	}
+
+	function prepareTh(th) {
+		var existing = th.querySelector('.' + BTN_CLASS)
+		if (existing)
+			return existing
+
+		var label = th.querySelector('.' + LABEL_CLASS)
+		if (!label) {
+			label = document.createElement('span')
+			label.className = LABEL_CLASS
+			while (th.firstChild)
+				label.appendChild(th.firstChild)
+			th.appendChild(label)
+		}
+
+		th.classList.add(TABLE_CLASS + '-ready')
+
+		var btn = document.createElement('span')
+		btn.className = BTN_CLASS + ' noprint'
+		btn.setAttribute('contenteditable', 'false')
+		setFoldGlyph(btn, false)
+		btn.title = foldTitle(th, false)
+		btn.onmousedown = function (e) {
+			e = e || window.event
+			if (e.preventDefault) e.preventDefault()
+			if (e.stopPropagation) e.stopPropagation()
+			return false
+		}
+		btn.onclick = foldClick
+		th.appendChild(btn)
+		return btn
+	}
+
+	function setFoldGlyph(btn, collapsed) {
+		var span = btn.firstChild
+		if (!span || span.nodeType != 1 || span.tagName != 'SPAN') {
+			btn.textContent = ''
+			span = document.createElement('span')
+			btn.appendChild(span)
+		}
+		span.className = GLYPH_CLASS + (collapsed ? '' : (' ' + GLYPH_CLASS + '--plus'))
+		span.textContent = ''
+	}
+
+	function setCollapsed(table, colIndex, collapsed) {
+		var cg = ensureColgroup(table)
+		if (!cg || !cg.children[colIndex])
+			return
+
+		var col = cg.children[colIndex]
+		var editOn = table.classList.contains(EDITING_CLASS)
+
+		if (collapsed) {
+			col.classList.add(COLLAPSED)
+			for (var r = 0; r < table.rows.length; r++) {
+				var cell = table.rows[r].cells[colIndex]
+				if (!cell || (cell.colSpan || 1) > 1)
+					continue
+				cell.classList.add(COLLAPSED)
+			}
+		} else {
+			col.classList.remove(COLLAPSED)
+			col.style.width = ''
+			col.style.visibility = ''
+			for (var r2 = 0; r2 < table.rows.length; r2++) {
+				var cell2 = table.rows[r2].cells[colIndex]
+				if (!cell2 || (cell2.colSpan || 1) > 1)
+					continue
+				cell2.classList.remove(COLLAPSED)
+				pinCellWidth(cell2, '')
+			}
+		}
+		if (collapsed)
+			layoutCollapsedCol(table, colIndex, editOn)
+	}
+
+	function foldClick(event) {
+		event = event || window.event
+		if (event.preventDefault) event.preventDefault()
+		if (event.stopPropagation) event.stopPropagation()
+
+		var btn = event.currentTarget || event.target
+		while (btn && !(btn.classList && btn.classList.contains(BTN_CLASS)))
+			btn = btn.parentNode
+		if (!btn)
+			return false
+
+		var th = btn.parentNode
+		while (th && th.tagName != 'TH')
+			th = th.parentNode
+		if (!th)
+			return false
+
+		var table = th
+		while (table && table.tagName != 'TABLE')
+			table = table.parentNode
+		if (!table)
+			return false
+
+		var colIndex = th.cellIndex
+		var collapsed = !th.classList.contains(COLLAPSED)
+		setCollapsed(table, colIndex, collapsed)
+		setFoldGlyph(btn, collapsed)
+		btn.title = foldTitle(th, collapsed)
+		return false
+	}
+
+	function armTable(table) {
+		if (!table || table.tagName != 'TABLE')
+			return
+		table.classList.add(TABLE_CLASS)
+		table.classList.add(EDITING_CLASS)
+		ensureColgroup(table)
+		layoutAllCollapsed(table, true)
+
+		var row = dataHeaderRow(table)
+		if (!row)
+			return
+		for (var c = 0; c < row.cells.length; c++) {
+			var th = row.cells[c]
+			if ((th.colSpan || 1) > 1)
+				continue
+			var btn = prepareTh(th)
+			var collapsed = th.classList.contains(COLLAPSED)
+			setFoldGlyph(btn, collapsed)
+			btn.title = foldTitle(th, collapsed)
+		}
+	}
+
+	function disarmTable(table) {
+		var btns = table.querySelectorAll('.' + BTN_CLASS)
+		for (var i = btns.length - 1; i >= 0; i--) {
+			if (btns[i].parentNode)
+				btns[i].parentNode.removeChild(btns[i])
+		}
+		table.classList.remove(EDITING_CLASS)
+		// Collapsed columns take no space when not editing
+		layoutAllCollapsed(table, false)
+	}
+
+	function eachReportTable(fn) {
+		var tables = document.querySelectorAll('table.exotable, table')
+		var seen = []
+		for (var i = 0; i < tables.length; i++) {
+			var t = tables[i]
+			if (!t.tHead)
+				continue
+			if (seen.indexOf(t) >= 0)
+				continue
+			seen.push(t)
+			fn(t)
+		}
+	}
+
+	window.exo_report_onedit = function (on) {
+		ensureCss()
+		if (on)
+			eachReportTable(armTable)
+		else
+			eachReportTable(disarmTable)
+	}
+})()
