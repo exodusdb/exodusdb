@@ -10,6 +10,22 @@ libraryinit()
 var text;
 var is_exodus;	 // num
 
+// Program contract — about
+//
+// Purpose: build human-readable build / install info text.
+//
+// Inputs (read-only):
+//   USERNAME — if "EXODUS", full version() + paths; else version() line 1 only
+//   EXECPATH, PLATFORM, _OS_NAME, _OS_VERSION, _COMPILER, _COMPILER_VERSION,
+//   _CPP_STANDARD; env EXO_HOME then HOME; dirs under service/www/3 and
+//   $EXO_HOME/{bin,lib} (or HOME)
+//
+// Outputs (always; returns 0):
+//   data_ — about text, FM-delimited (copyright; sections: EXODUS library,
+//           Build, Web modules, Service). Missing optional paths become
+//           literal lines "(not found)" / "(EXO_HOME/HOME not set)", not abort.
+//
+// Does not set response_ or USER4. Does not abort/stop for missing optional paths.
 func main() {
 
 	is_exodus = USERNAME == "EXODUS";
@@ -66,10 +82,10 @@ func main() {
 		text ^= FM ^ "(EXO_HOME/HOME not set)";
 	}
 
-	// Prefer data_ so client displayresponsedata shows the body cleanly
-	// (exoui_note converts FM to newlines on the browser)
+	// Prefer data_ so the body is the success payload (not USER4/note).
+	// Callers (e.g. generalproxy + WUI displayresponsedata) show data_ on OK;
+	// exoui_note converts FM to newlines on the browser.
 	data_ = text;
-	call note(text);
 
 	return 0;
 }
