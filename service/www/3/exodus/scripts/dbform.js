@@ -7905,10 +7905,16 @@ async function writedoc(unlock) {
     //if a cached is written then remove it from the cache (could update it instead?)
     deletecacherecord(gdatafilename, gkey)
 
-    //option to unlock after saving
-    if (unlock)
+    //option to unlock after saving (WRITEU). Mirror unlockdoc chrome — saveandorcleardoc
+    // skips unlockdoc when glocked is already false, so face would stay on Release.
+    if (unlock) {
         glocked = false
-    else
+        setdisabledandhidden(deleterecord, true)
+        setdisabledandhidden(saverecord, true)
+        setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
+        if (typeof render_formbuttons == 'function')
+            render_formbuttons()
+    } else
         //restart the relocker if failed to save
         startrelocker()
 
@@ -7998,6 +8004,8 @@ async function relockdoc() {
             setdisabledandhidden(saverecord, true)
             setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
             setdisabledandhidden(deleterecord, true)
+            if (typeof render_formbuttons == 'function')
+                render_formbuttons()
             await exoui_warning(response)
         }
         else {
@@ -8043,6 +8051,11 @@ async function unlockdoc() {
     setdisabledandhidden(saverecord, true)
     //setdisabledandhidden(editreleaserecord,true)
     setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
+    // Visible bar is #formbuttonsdiv_face (clone). Callers like schedule_book →
+    // saveandunlockdoc are not formbutton_op, so must refresh face here or it
+    // keeps showing Release after unlock (doc is read-only, button lies).
+    if (typeof render_formbuttons == 'function')
+        render_formbuttons()
 
     //logout('unlockdoc')
 
