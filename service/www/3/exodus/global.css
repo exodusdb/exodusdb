@@ -310,10 +310,9 @@ div[align="center"] > .exoformpane {
     width: max-content;
     margin: var(--exoform-pane-margin) auto;
 }
-/* Unbound form OK/List + Close bar — face is visible; source is .exo_formbuttons_source */
+/* Unbound form OK/List + Close bar */
 .exoformactions,
-body > #formbuttonsdiv.exoformactions,
-body > #formbuttonsdiv_face.exoformactions {
+body > #formbuttonsdiv.exoformactions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -327,15 +326,13 @@ body > #formbuttonsdiv_face.exoformactions {
 }
 
 .exoformactions > span,
-body > #formbuttonsdiv.exoformactions > span,
-body > #formbuttonsdiv_face.exoformactions > span {
+body > #formbuttonsdiv.exoformactions > span {
     display: inline-flex;
     align-items: center;
 }
 
 .exoformactions .graphicbutton,
-body > #formbuttonsdiv .graphicbutton,
-body > #formbuttonsdiv_face .graphicbutton {
+body > #formbuttonsdiv .graphicbutton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -350,8 +347,7 @@ body > #formbuttonsdiv_face .graphicbutton {
 }
 
 .exoformactions .graphicbutton img,
-body > #formbuttonsdiv .graphicbutton img,
-body > #formbuttonsdiv_face .graphicbutton img {
+body > #formbuttonsdiv .graphicbutton img {
     height: var(--exoui-icon-size);
     width: var(--exoui-icon-size);
     box-sizing: border-box;
@@ -362,27 +358,9 @@ body > #formbuttonsdiv_face .graphicbutton img {
 }
 
 .exoformactions .graphicbutton [id$="_label"],
-body > #formbuttonsdiv .graphicbutton [id$="_label"],
-body > #formbuttonsdiv_face .graphicbutton [data-source-id$="_label"] {
+body > #formbuttonsdiv .graphicbutton [id$="_label"] {
     display: inline-block;
     line-height: 1.2;
-}
-
-/* Real form-action strip: mutated by existing code; out of layout (face is shown). */
-#formbuttonsdiv.exo_formbuttons_source {
-    position: fixed !important;
-    left: -10000px !important;
-    top: 0 !important;
-    width: 1px !important;
-    height: 1px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    border: 0 !important;
-    float: none !important;
-    display: block !important;
-    pointer-events: none;
 }
 
 .exoformactions .exobutton {
@@ -1337,8 +1315,8 @@ img[id^="deleterowbutton"] {
     display: block;
 }
 
-/* Form actions in menubar: face is the visible strip. */
-#exo_menu #formbuttonsdiv_face {
+/* Form actions in menubar */
+#exo_menu #formbuttonsdiv {
     float: left;
     display: inline-flex;
     align-items: center;
@@ -1347,21 +1325,21 @@ img[id^="deleterowbutton"] {
 
 /* Extra air when actions were moved up from under the form (unbound).
    No vertical rule — reads as an unwanted separator after Menu. */
-#exo_menu #formbuttonsdiv_face.exo_formbuttons_relocated {
+#exo_menu #formbuttonsdiv.exo_formbuttons_relocated {
     margin-left: 8px;
     padding-left: 8px;
 }
 
 /* Form chrome in menubar: bound tools (menubutton) + unbound actions (graphicbutton) */
-#exo_menu #formbuttonsdiv_face .menubutton,
-#exo_menu #formbuttonsdiv_face .graphicbutton {
+#exo_menu #formbuttonsdiv .menubutton,
+#exo_menu #formbuttonsdiv .graphicbutton {
     float: none;
     margin-left: 4px;
     margin-right: 4px;
 }
 
 /* Record nav: more air on the left so the group reads separate from New/Open… */
-#exo_menu #formbuttonsdiv_face .exo_recordnav_group {
+#exo_menu #formbuttonsdiv .exo_recordnav_group {
     margin-left: 12px;
     margin-right: 4px;
 }

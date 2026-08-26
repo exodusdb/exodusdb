@@ -722,107 +722,24 @@ function form_place_menubar_session() {
         adjust_bodymargin()
 }
 
-// Form action strip: real #formbuttonsdiv = source (existing code mutates it; hidden).
-// #formbuttonsdiv_face = visible deep clone (ids + accesskeys stripped). Menu not copied.
-// Initiation: formbutton_op(handler) → op → render_formbuttons. Also paint after bind (opendoc2/cleardoc).
+// Form action strip: single live #formbuttonsdiv (no hidden source / visible face clone).
+// formbutton_op kept as a thin await wrapper for Alt+letter / key paths.
 
-function formbuttons_place_face(source) {
-    if (!source)
-        return null
-    var face = $$('formbuttonsdiv_face')
-    if (!face || face.tagName !== source.tagName) {
-        var next = document.createElement(source.tagName === 'DIV' ? 'DIV' : 'SPAN')
-        next.id = 'formbuttonsdiv_face'
-        if (face && face.parentNode)
-            face.parentNode.replaceChild(next, face)
-        face = next
-    }
-    if (source.parentNode && (face.parentNode !== source.parentNode || face.previousSibling !== source))
-        source.parentNode.insertBefore(face, source.nextSibling)
-    return face
-}
-
-function formbuttons_install() {
-    var source = $$('formbuttonsdiv')
-    if (!source)
-        return
-    source.classList.add('exo_formbuttons_source')
-    source.inert = true
-    formbuttons_place_face(source)
-    render_formbuttons()
-}
-
-// True while inside formbutton_op (nested settouched etc. must not re-enter formbutton_op).
-var gin_form_op
-
-// Run a form-action handler, then always refresh the visible face from source.
 async function formbutton_op(op, event) {
-    gin_form_op = true
-    try {
-        if (typeof op == 'function') {
-            if (arguments.length > 1)
-                return await op(event)
-            return await op()
-        }
-    } finally {
-        gin_form_op = false
-        render_formbuttons()
-    }
-}
-
-// Deep-clone source → face; strip id and accesskey; wrap exo_onclick via formbutton_op.
-function render_formbuttons() {
-    var source = $$('formbuttonsdiv')
-    var face = $$('formbuttonsdiv_face')
-    if (!source || !face)
+    if (typeof op != 'function')
         return
-
-    var clone = source.cloneNode(true)
-    clone.classList.remove('exo_formbuttons_source')
-
-    function scrub(node) {
-        if (!node || node.nodeType !== 1)
-            return
-        if (node.id) {
-            node.setAttribute('data-source-id', node.id)
-            node.removeAttribute('id')
-        }
-        if (node.getAttribute('accesskey'))
-            node.removeAttribute('accesskey')
-        // await openrecord_onclick(event) → await formbutton_op(openrecord_onclick, event)
-        var oc = node.getAttribute('exo_onclick')
-        if (oc) {
-            var m = oc.match(/^\s*await\s+([A-Za-z_$][\w$]*)\s*\((.*)\)\s*$/)
-            if (m) {
-                var args = m[2].replace(/^\s+|\s+$/g, '')
-                if (args)
-                    node.setAttribute('exo_onclick', 'await formbutton_op(' + m[1] + ', ' + args + ')')
-                else
-                    node.setAttribute('exo_onclick', 'await formbutton_op(' + m[1] + ')')
-            }
-        }
-    }
-    scrub(clone)
-    var nodes = clone.querySelectorAll('*')
-    for (var i = 0; i < nodes.length; ++i)
-        scrub(nodes[i])
-
-    face.innerHTML = ''
-    while (clone.firstChild)
-        face.appendChild(clone.firstChild)
-
-    face.classList.toggle('exoformactions', source.classList.contains('exoformactions'))
-    face.classList.toggle('exo_formbuttons_relocated', source.classList.contains('exo_formbuttons_relocated'))
+    if (arguments.length > 1)
+        return await op(event)
+    return await op()
 }
 
 // Call after form_postdisplay / custom buttons / pane wrap: if the action bar is
 // under the form but not fully on-screen, put it in the top menubar.
 // Idempotent when already top. client.js re-runs this after exowrapformpanes.
-// Geometry from the *face* (source is off-screen).
 function form_keep_action_buttons_on_screen() {
     if (gformbuttonsplace !== 'bottom')
         return
-    var bar = $$('formbuttonsdiv_face') || $$('formbuttonsdiv')
+    var bar = $$('formbuttonsdiv')
     if (!bar)
         return
     var vh = window.innerHeight || document.documentElement.clientHeight || 0
@@ -848,6 +765,7 @@ function form_move_action_buttons_to_top() {
 
     add_exo_menubar()
 
+    // Drop leftover face node from the old clone architecture (if any)
     var oldface = $$('formbuttonsdiv_face')
     if (oldface && oldface.parentNode)
         oldface.parentNode.removeChild(oldface)
@@ -870,7 +788,6 @@ function form_move_action_buttons_to_top() {
 
     // Mark relocated so CSS can add spacing after Menu (not for native top bars)
     topbar.classList.add('exo_formbuttons_relocated')
-    topbar.classList.add('exo_formbuttons_source')
 
     // Order: Menu | form actions (List/…) | trailing. Never left of Menu.
     // Race: form_keep / rAF often runs *after* client.js inserts .hamburger_menu;
@@ -882,8 +799,6 @@ function form_move_action_buttons_to_top() {
     else
         gexo_menubar.insertBefore(topbar, gexo_menubar.firstChild)
     form_place_menubar_session()
-
-    formbuttons_install()
 
     if (typeof adjust_bodymargin == 'function')
         adjust_bodymargin()
@@ -2437,9 +2352,6 @@ async function formfunctions_onload() {
         window[buttonname] = buttonelement
     }
 
-    // Visible face = clone of source; source stays mutation target (1s timer re-clones)
-    formbuttons_install()
-
     //program the various buttons to be visible when enabled
     exosetexpression(saverecord, 'style:display', 'saverecord.getAttribute("disabled")?"none":""')
     exosetexpression(closerecord, 'style:display', 'closerecord.getAttribute("disabled")?"none":""')
@@ -2548,15 +2460,13 @@ async function formfunctions_onload() {
             setdisabledandhidden(closerecord, true)
         }
         else {
-            // Same accesskey C as bound Close (menubuttonhtml2 … 'C'); show it on the face + tip.
+            // Same accesskey C as bound Close (menubuttonhtml2 … 'C'); show it on the tip.
             var AltorCtrl = 'Alt'
             setgraphicbutton(closerecord, '<u>C</u>ancel')
             closerecord.title = 'Cancel and exit. ' + AltorCtrl + '+C or Esc'
             setdisabledandhidden(closerecord, false)
         }
 
-        // Face needs tabIndex from source (install ran before unbound tabIndex set)
-        render_formbuttons()
     }
 
     var temp = document.createElement('div')
@@ -3970,7 +3880,7 @@ async function document_onkeydown2(event) {
         //else if (gkeycode==76) exosettimeout('await exologout_onclick()',1)
         //Logout and List swapped to be G and L respectively
         else if (gkeycode == 71) await exologout_onclick()//g
-        // Form-action bar: same path as face clicks (formbutton_op → render)
+        // Form-action bar Alt+letter
         else if (gkeycode == 78) await formbutton_op(newrecord_onclick)//n
         else if (gkeycode == 79) await formbutton_op(openrecord_onclick)//o
         else if (gkeycode == 83) await formbutton_op(saverecord_onclick)//s
@@ -4968,12 +4878,6 @@ function focusdirection_form_action_tab_stop(el) {
 function focusdirection_is_stop(el, fromEl, notgroupno) {
     if (!el || el == fromEl)
         return false
-
-    var p
-    for (p = el; p; p = p.parentNode) {
-        if (p.classList && p.classList.contains('exo_formbuttons_source'))
-            return false
-    }
 
     var formActionTabStop = focusdirection_form_action_tab_stop(el)
 
@@ -6238,9 +6142,6 @@ async function opendoc2(newkey0) {
     if (typeof form_update_wide_layout == 'function')
         form_update_wide_layout()
 
-    // Record bound to form (buttons already updated on source) — refresh face
-    render_formbuttons()
-
     //logout('opendoc2')
 
     return true
@@ -6653,9 +6554,6 @@ async function cleardoc() {
     // .exoform-wide before first record paints — avoids crushed→wide flash.
     if (typeof form_update_wide_layout == 'function')
         form_update_wide_layout()
-
-    // Empty/default record bound (bound clear + unbound open both use cleardoc)
-    render_formbuttons()
 
     //logout('cleardoc')
 
@@ -7905,15 +7803,12 @@ async function writedoc(unlock) {
     //if a cached is written then remove it from the cache (could update it instead?)
     deletecacherecord(gdatafilename, gkey)
 
-    //option to unlock after saving (WRITEU). Mirror unlockdoc chrome — saveandorcleardoc
-    // skips unlockdoc when glocked is already false, so face would stay on Release.
+    //option to unlock after saving (WRITEU)
     if (unlock) {
         glocked = false
         setdisabledandhidden(deleterecord, true)
         setdisabledandhidden(saverecord, true)
         setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
-        if (typeof render_formbuttons == 'function')
-            render_formbuttons()
     } else
         //restart the relocker if failed to save
         startrelocker()
@@ -8004,8 +7899,6 @@ async function relockdoc() {
             setdisabledandhidden(saverecord, true)
             setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
             setdisabledandhidden(deleterecord, true)
-            if (typeof render_formbuttons == 'function')
-                render_formbuttons()
             await exoui_warning(response)
         }
         else {
@@ -8051,11 +7944,6 @@ async function unlockdoc() {
     setdisabledandhidden(saverecord, true)
     //setdisabledandhidden(editreleaserecord,true)
     setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
-    // Visible bar is #formbuttonsdiv_face (clone). Callers like schedule_book →
-    // saveandunlockdoc are not formbutton_op, so must refresh face here or it
-    // keeps showing Release after unlock (doc is read-only, button lies).
-    if (typeof render_formbuttons == 'function')
-        render_formbuttons()
 
     //logout('unlockdoc')
 
@@ -9843,19 +9731,7 @@ function form_try_insert_tab_char(element) {
 }
 
 //var gautofitwindowpending
-// Touch / clear-touch: if not already in formbutton_op, run via formbutton_op so face re-renders.
 function settouched(value, savebuttonactive) {
-    if (!gin_form_op) {
-        // Fire formbutton_op (async); callers historically ignore settouched return
-        formbutton_op(function () {
-            settouched_core(value, savebuttonactive)
-        })
-        return
-    }
-    settouched_core(value, savebuttonactive)
-}
-
-function settouched_core(value, savebuttonactive) {
     gtouched = value
     if (!gtouched)
         gelementthatjustcalledsettouched = null
