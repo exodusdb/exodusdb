@@ -865,7 +865,7 @@ table.exotable th {
  //background-color:#ffff80;
  background-color:var(--exo-rpt-th-bg, #fff099);
  color:var(--exo-rpt-text, #000000);
- padding:2px;
+ padding:4px;
  border:1px solid var(--exo-rpt-border, #808080);}
 
 @media screen{
@@ -881,7 +881,7 @@ table.exotable > tbody > tr > td {
  //background-color:#ffffc0;
  background-color:var(--exo-rpt-td-bg, #fdf5e6);
  color:var(--exo-rpt-text, #000000);
- padding:2px;
+ padding:4px;
  border:1px solid var(--exo-rpt-border-light, #d3d3d3);}
 
 table.exotable > tbody > tr > td:first-child {
