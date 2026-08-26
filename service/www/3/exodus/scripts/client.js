@@ -10050,11 +10050,20 @@ async function decide_onload(decide_args) {
 		var checking = !allVisibleChecked
 
 		if (!checking) {
+			// None: do not call decide_checkbox_select per row — that renumbers all
+			// higher ranks each time (O(n²) DOM writes; 1000+ rows feels stuck).
+			// Same fast path as check-all: selectone, then one compact pass for any
+			// still-checked rows (e.g. type-filtered / hidden).
 			for (ii = 0; ii < selections.length; ii++) {
 				if (decide_selection_row_hidden(selections[ii]))
 					continue
 				if (selections[ii].checked)
-					decide_checkbox_select(event, selections[ii], false, ii)
+					decide_checkbox_selectone(selections[ii], false, ii, ranks, 0)
+			}
+			var nrank = 0
+			for (ii = 0; ii < selections.length; ii++) {
+				if (selections[ii].checked)
+					ranks[ii].innerText = ++nrank
 			}
 			return
 		}
