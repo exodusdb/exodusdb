@@ -241,6 +241,7 @@ func main() {
 	// system<138> agency last day of week mon-sun 1-7
 	// system<139> domain name prefix eg d- t-
 	// system<140> cid eg 79350001
+	// system<141> APP_DOMAIN eg www.neosys.com (%APP_DOMAIN%; %SCRIPT_URL%=https://domain/scripts)
 
 	call log2("*init.general obtaining exclusive access:", logtime);
 	var	 voc;

@@ -173,6 +173,11 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 	letterhead.replacer("%URL%", SYSTEM.f(114, 1));
 	letterhead.replacer("%DATABASE%", SYSTEM.f(17, 1));
 
+	// similar code in GENERALMACROS — SYSTEM<141> APP_DOMAIN
+	var appdomain = SYSTEM.f(141);
+	letterhead.replacer("%APP_DOMAIN%", appdomain);
+	letterhead.replacer("%SCRIPT_URL%", appdomain ? ("https://" ^ appdomain ^ "/scripts") : "");
+
 	// QR code (requires apt-get install qrencode)
 	if (letterhead.contains("%QR%")) {
 
@@ -241,12 +246,19 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 
 	if (authorised("EDIT PRINTOUTS")) {
 
-		// report.js — column ± fold (optional; emailed HTM may 404 the src)
-		var reportjs = SYSTEM.f(114, 1);
-		if (reportjs and not reportjs.ends("/"))
-			reportjs ^= "/";
-		reportjs ^= "3/exodus/scripts/report.js";
-		tt = "<script src=" ^ reportjs.quote() ^ "></script>";
+		// report.js — column ± fold (optional).
+		// Same-host /3/… first on http(s); then %SCRIPT_URL%/report.js (full URL
+		// so "Web Page, Complete" can save it into _files/). On file: skip /3/…
+		// and start at the CDN/local-saved entry.
+		tt = "['/3/exodus/scripts/report.js'";
+		if (appdomain)
+			tt ^= ",'https://" ^ appdomain ^ "/scripts/report.js'";
+		tt ^= "]";
+		tt = "<script>(function(a){var s=document.createElement('script'),i="
+			 "(location.protocol==='file:'&&a.length>1)?1:0;"
+			 "s.onerror=function(){if(++i<a.length)s.src=a[i]};"
+			 "s.src=a[i];(document.head||document.documentElement).appendChild(s)}"
+			 ")(" ^ tt ^ ")</script>";
 		letterhead.prefixer(tt);
 
 		// button
