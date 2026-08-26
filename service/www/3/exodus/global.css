@@ -722,7 +722,7 @@ TABLE
     }
 }
 
-/* Size: cookie fs → html font-size % (exo_chrome_apply_font). Empty = 100%. */
+/* Size: cookie fs → html font-size % (exo_chrome_apply_font). Empty → 90%. */
 HTML {
     font-size: 100%;
 }
@@ -1075,6 +1075,18 @@ TABLE.exoform SPAN.clsReadOnly:empty::before {
     display: inline-block;
     width: 1ch;
     border-bottom: 2.5px solid color-mix(in srgb, var(--exodot-border-color) 33%, transparent);
+}
+
+/* Constant dict default (build-time): ghost text when empty — not the saved value.
+   data-placeholder set in form_apply_default_placeholder. ::before is not in textContent/getvalue. */
+TABLE.exoform SPAN[contenteditable][data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
+    pointer-events: none;
+}
+TABLE.exoform INPUT[placeholder]::placeholder {
+    color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
+    opacity: 1;
 }
 
 #menudiv > button[accesskey="M"] {

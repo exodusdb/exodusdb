@@ -150,6 +150,51 @@ function form_dictitem_wants_text_span(dictitem) {
     return st === 'code' || st === 'text' || st === 'number'
 }
 
+// Build-time constant string for ghost placeholder (not filldefaults).
+// Prefer di.placeholder / exoplaceholder. Else constant exodefaultvalue
+// ("90" / '90' / bare 90) — only when not required (required defaults still fill).
+function form_placeholder_text(element) {
+    if (!element || !element.getAttribute)
+        return ''
+    var ph = element.getAttribute('exoplaceholder')
+    if (ph != null && String(ph) !== '')
+        return String(ph)
+    // Indicator from constant default only if optional — required fields use
+    // defaultvalue for filldefaults, not as empty ghost.
+    if (element.getAttribute('exorequired'))
+        return ''
+    var expr = element.getAttribute('exodefaultvalue')
+    if (expr == null || expr === '')
+        return ''
+    expr = String(expr).trim()
+    if (expr === '""' || expr === "''")
+        return ''
+    var m = expr.match(/^"([^"]*)"$/) || expr.match(/^'([^']*)'$/)
+    if (m)
+        return m[1]
+    if (/^-?\d+(\.\d+)?$/.test(expr))
+        return expr
+    return ''
+}
+
+// Ghost text when empty — not the saved value; filldefaults unchanged.
+// type F, not readonly; text from form_placeholder_text.
+function form_apply_default_placeholder(element) {
+    if (!element || !element.getAttribute)
+        return
+    if (element.getAttribute('exotype') != 'F')
+        return
+    if (element.getAttribute('exoreadonly'))
+        return
+    var c = form_placeholder_text(element)
+    if (!c)
+        return
+    if (element.tagName == 'SPAN' && (element.isContentEditable || element.getAttribute('contenteditable')))
+        element.setAttribute('data-placeholder', c)
+    else if (element.tagName == 'INPUT' && (element.type == 'text' || !element.type))
+        element.setAttribute('placeholder', c)
+}
+
 function form_input_width_char(element) {
     var conv = (element.getAttribute('exoconversion') || '').toUpperCase()
     // Pure DATE handled by form_apply via sample string — not length×glyph
@@ -1421,6 +1466,9 @@ async function formfunctions_onload() {
                         element.setAttribute('tabindex', exo_tabindex_default)
                 }
             }
+
+            // Constant default → CSS/native placeholder when empty (see form_apply_default_placeholder)
+            form_apply_default_placeholder(element)
 
             // Type S display SPANs: not tabbable (empty chrome is CSS :empty::before only)
             if (element.tagName == 'SPAN' && element.getAttribute('exotype') == 'S')

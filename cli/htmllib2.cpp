@@ -700,8 +700,9 @@ subr getcss(io css, in version = "", in stationery = "") {
 		font ^= ",";
 	}
 	var fontsize = SYSTEM.f(46, 8);
+	// Empty REPORT_FONT_SIZE → 90% (same default as screen fs / exo_chrome_apply_font)
 	if (not fontsize) {
-		fontsize = 100;
+		fontsize = 90;
 	}
 	if (fontsize and fontsize.isnum()) {
 		fontsize ^= "%";

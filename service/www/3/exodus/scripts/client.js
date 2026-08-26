@@ -2217,7 +2217,9 @@ function exo_chrome_apply_color(value) {
 	html.style.removeProperty('--exocardcolor')
 }
 
-// Font family + size %. Empty family/size → CSS / browser default (remove override).
+// Font family + size %. Empty family → CSS face fallback.
+// Size % (cookie fs / SCREEN_FONT_SIZE): empty → default 90%; 100 → no override
+// (browser 100%); other N → html { font-size: N% }.
 function exo_chrome_apply_font(family, size) {
 	var html = document.documentElement
 	if (exo_chrome_is_empty(family))
@@ -2225,10 +2227,8 @@ function exo_chrome_apply_font(family, size) {
 	else
 		html.style.setProperty('--exoscreen-font-family', String(family).trim())
 
-	if (exo_chrome_is_empty(size)) {
-		html.style.removeProperty('font-size')
-		return
-	}
+	if (exo_chrome_is_empty(size))
+		size = 90
 	var n = Number(size)
 	if (!n) {
 		html.style.removeProperty('font-size')

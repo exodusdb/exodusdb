@@ -610,7 +610,7 @@ function exorecord(dictarray,filename) {
  var ngroups=0
  var nfields=0
 
- var validpropnames = /(^sequence$)|(^openfunction$)|(^dropdown$)|(^test$)|(^name$)|(^type$)|(^fieldno$)|(^title$)|(^groupno$)|(^keypart$)|(^conversion$)|(^functioncode$)|(^length$)|(^align$)|(^wordsep$)|(^wordno$)|(^nwords$)|(^validation$)|(^popup$)|(^onchange$)|(^conversion$)|(^checkbox$)|(^radio$)|(^horizontal$)|(^required$)|(^rowrequired$)|(^unique$)|(^nonuniquewarning$)|(^defaultvalue$)|(^validcharacters$)|(^invalidcharacters$)|(^display$)|(^lowercase$)|(^exostyle$)|(^readonly$)|(^maxlength$)|(^printfunction$)|(^listfunction$)|(^filename$)|(^rows$)|(^noinsertrow$)|(^nodeleterow$)|(^allowemptyrows$)|(^copyable$)|(^link$)|(^nochangeswarning$)|(^allowduplicatefieldno$)|(^allowcursor$)|(^afterupdate$)|(^image$)/
+ var validpropnames = /(^sequence$)|(^openfunction$)|(^dropdown$)|(^test$)|(^name$)|(^type$)|(^fieldno$)|(^title$)|(^groupno$)|(^keypart$)|(^conversion$)|(^functioncode$)|(^length$)|(^align$)|(^wordsep$)|(^wordno$)|(^nwords$)|(^validation$)|(^popup$)|(^onchange$)|(^conversion$)|(^checkbox$)|(^radio$)|(^horizontal$)|(^required$)|(^rowrequired$)|(^unique$)|(^nonuniquewarning$)|(^defaultvalue$)|(^placeholder$)|(^validcharacters$)|(^invalidcharacters$)|(^display$)|(^lowercase$)|(^exostyle$)|(^readonly$)|(^maxlength$)|(^printfunction$)|(^listfunction$)|(^filename$)|(^rows$)|(^noinsertrow$)|(^nodeleterow$)|(^allowemptyrows$)|(^copyable$)|(^link$)|(^nochangeswarning$)|(^allowduplicatefieldno$)|(^allowcursor$)|(^afterupdate$)|(^image$)/
  
  //parse the dict array to get the number of fields and number of groups etc.
  for (var dictn=0;dictn<this.dict.length;dictn++) {

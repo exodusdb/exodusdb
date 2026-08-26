@@ -2005,7 +2005,8 @@ function exo_dict_colorfontsize(dict, fn) {
     di.wordno = 7
     di.nwords = 1
     di.validation = 'await colors_val_screenfontsize()'
-    //di.defaultvalue='100'
+    // Ghost only (not filldefaults): empty field + empty fs cookie → 90% apply
+    di.placeholder = '90'
     exo_dict_integer(di, { min: 50, max: 200 })
     di.allowcursor = true
 
@@ -2013,7 +2014,7 @@ function exo_dict_colorfontsize(dict, fn) {
     di.wordsep = vm
     di.wordno = 8
     di.nwords = 1
-    //di.defaultvalue='100'
+    di.placeholder = '90'
     exo_dict_integer(di, { min: 50, max: 200 })
     di.allowcursor = true
 
