@@ -11175,11 +11175,18 @@ async function nextrecord2_step(event, direction) {
 
     //switch to new key if new and user accepts to close the current one
     if (nextkey != gkey) {
-        //do not change key if user chooses not to unload an existing document
-        if (!(await closedoc('OPEN')))
-            return false
-        await setgkeyn(nextkeyn)
-        await opendoc(nextkey)
+        // Nav-only: defer formbutton display across close/open awaits; flush always
+        // (cancel close, throw, or success) so hide+show paint once — no empty bar mid-DB.
+        g_formbuttons_defer_hide = true
+        try {
+            //do not change key if user chooses not to unload an existing document
+            if (!(await closedoc('OPEN')))
+                return false
+            await setgkeyn(nextkeyn)
+            await opendoc(nextkey)
+        } finally {
+            formbuttons_flush_pending_hidden()
+        }
     }
 
     await setgkeys(nextkeys, nextkeyn)
@@ -11511,12 +11518,13 @@ async function setgkeys(keys, keyn) {
         keys = [keys]
     }
     gkeys = keys
-    var tt = gkeys.length > 1 ? "" : "none"
-    firstrecord.style.display = tt
-    previousrecord.style.display = tt
-    selectrecord.style.display = tt
-    nextrecord.style.display = tt
-    lastrecord.style.display = tt
+    // Respect g_formbuttons_defer_hide (pending_hidden) — same seam as setdisabledandhidden
+    var navhidden = gkeys.length <= 1
+    formbuttons_apply_display(firstrecord, navhidden)
+    formbuttons_apply_display(previousrecord, navhidden)
+    formbuttons_apply_display(selectrecord, navhidden)
+    formbuttons_apply_display(nextrecord, navhidden)
+    formbuttons_apply_display(lastrecord, navhidden)
     if (typeof keyn == 'undefined') {
         for (keyn = 0; keyn < gkeys.length; ++keyn) {
             if (keys[keyn] == gkey) {

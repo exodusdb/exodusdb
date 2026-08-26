@@ -772,6 +772,14 @@ async function exosetexpression2c(elements, style, attributename, expression) {
 		1 == 1
 	for (var ii = 0; ii < elements.length; ii++) {
 		var element = elements[ii]
+		// Do not paint form-action display while opendoc is deferring — pending only
+		if (style && attributename == 'display'
+			&& typeof g_formbuttons_defer_hide != 'undefined' && g_formbuttons_defer_hide
+			&& typeof formbuttons_is_action_control == 'function'
+			&& formbuttons_is_action_control(element)) {
+			formbuttons_set_pending_hidden(element, result == 'none')
+			continue
+		}
 		if (style)
 			element = element.style
 		element[attributename] = result
@@ -5924,6 +5932,26 @@ function setgraphicbutton(button, labeltext, src) {
 
 	if (!button)
 		return
+	// Nav defer: Edit↔Release (and any form-action face change) shifts strip width —
+	// queue label+icon; formbuttons_flush_pending_hidden applies with display.
+	if (typeof g_formbuttons_defer_hide != 'undefined' && g_formbuttons_defer_hide
+		&& typeof formbuttons_is_action_control == 'function'
+		&& formbuttons_is_action_control(button)
+		&& (labeltext || (src != null && typeof src != 'undefined'))) {
+		if (!g_formbuttons_pending_graphic)
+			g_formbuttons_pending_graphic = new Map()
+		var cur = g_formbuttons_pending_graphic.get(button) || {}
+		if (labeltext) {
+			cur.labeltext = labeltext
+			cur.hasLabel = true
+		}
+		if (src != null && typeof src != 'undefined') {
+			cur.src = src
+			cur.hasSrc = true
+		}
+		g_formbuttons_pending_graphic.set(button, cur)
+		return
+	}
 	if (labeltext) {
 		var label = $$(button.id + '_label')
 		if (label)
@@ -7833,19 +7861,75 @@ function $class(elementid, element) {
 	return
 }
 
+// Form-action display+face defer (nav anti-flicker):
+// While g_formbuttons_defer_hide, #formbuttonsdiv display → data-exo-pending-hidden
+// and setgraphicbutton label/icon → g_formbuttons_pending_graphic (Edit↔Release
+// width). Flush applies both in one sync pass (nextrecord2_step finally).
+var g_formbuttons_defer_hide = false
+var g_formbuttons_pending_graphic = null // Map button -> { labeltext?, src?, hasLabel?, hasSrc? }
+
+function formbuttons_is_action_control(element) {
+	return !!(element && element.closest && element.closest('#formbuttonsdiv'))
+}
+
+function formbuttons_set_pending_hidden(element, hidden) {
+	if (!element || !element.setAttribute)
+		return
+	element.setAttribute('data-exo-pending-hidden', hidden ? '1' : '0')
+}
+
+// hidden true → display none (or pending); false → display '' (or pending clear).
+function formbuttons_apply_display(element, hidden) {
+	if (!element || !element.style)
+		return
+	if (g_formbuttons_defer_hide && formbuttons_is_action_control(element)) {
+		formbuttons_set_pending_hidden(element, !!hidden)
+		return
+	}
+	element.style.display = hidden ? 'none' : ''
+}
+
+function formbuttons_flush_pending_hidden() {
+	g_formbuttons_defer_hide = false
+	// Faces first (Edit/Release width), then display — one paint, final geometry
+	var pendinggraphic = g_formbuttons_pending_graphic
+	g_formbuttons_pending_graphic = null
+	if (pendinggraphic) {
+		pendinggraphic.forEach(function (cur, button) {
+			if (!cur || !button)
+				return
+			setgraphicbutton(
+				button,
+				cur.hasLabel ? cur.labeltext : null,
+				cur.hasSrc ? cur.src : undefined
+			)
+		})
+	}
+	var bar = (typeof $$ == 'function') ? $$('formbuttonsdiv') : document.getElementById('formbuttonsdiv')
+	if (!bar || !bar.querySelectorAll)
+		return
+	var nodes = bar.querySelectorAll('[data-exo-pending-hidden]')
+	for (var i = 0; i < nodes.length; i++) {
+		var el = nodes[i]
+		var pending = el.getAttribute('data-exo-pending-hidden')
+		el.style.display = (pending === '1') ? 'none' : ''
+		el.removeAttribute('data-exo-pending-hidden')
+	}
+}
+
 function setdisabledandhidden(element, truefalse) {
 	if (!element)
 		return
 	if (truefalse) {
 		element.disabled = true//this seems to have the effect of setting attribute disabled to "" in modern browsers!
 		element.setAttribute('disabled', 'disabled')
-		element.style.display = 'none'
+		formbuttons_apply_display(element, true)
 	}
 	else {
 		element.disabled = false
 		if (element.removeAttribute)
 			element.removeAttribute('disabled')
-		element.style.display = ''
+		formbuttons_apply_display(element, false)
 	}
 }
 
