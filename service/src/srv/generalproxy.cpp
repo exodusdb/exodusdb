@@ -628,9 +628,14 @@ badsetcodepage:
 
 	} else if (mode == "ABOUT") {
 		perform("ABOUT");
-		// ABOUT sets data_ (and note → USER4); prefer data_ for clean client display
+		// ABOUT sets data_ and call note → USER4/msg_. listen wraps any msg_ as
+		// "Error: …" and clears data_, so Help→About showed the Error (critical)
+		// icon via exoui_invalid. Prefer data_ for displayresponsedata → exoui_note
+		// (info icon); clear msg_ when data_ already has the body.
 		if (not data_)
 			msg_.move(data_);
+		else
+			msg_ = "";
 		response_ = "OK";
 
 	} else if (mode == "UTIL") {
