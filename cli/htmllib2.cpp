@@ -616,24 +616,16 @@ subr getcss(io css, in version = "", in stationery = "") {
 // Theme first paint: OS prefers-color-scheme only; EXODUStheme cookie in report.js.
 subr getcss3_amend(io css) {
 
-	// Sync first paint: browser dm/lm only (no cookie). report.js overrides from
-	// EXODUStheme cookie when it loads. One-shot — no OS listener here (avoids
-	// fighting report.js after cookie apply).
+	// No theme JS here. OS dm/lm via CSS prefers-color-scheme (live, no cookie).
+	// report.js may set data-exo-rpt-theme=light|dark from EXODUStheme cookie;
+	// auto clears the attribute so CSS media keeps following the browser.
 	css ^= R"V0G0N(
-<script type="text/javascript">
-(function(){try{
-	var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
-	var html=document.documentElement;
-	html.setAttribute('data-exo-rpt-theme',dark?'dark':'light');
-	html.style.colorScheme=dark?'dark':'light';
-}catch(e){}})();
-</script>
 <style type="text/css">
-/*GETCSS3 — screen dm via data-exo-rpt-theme; print = light. Cookie apply in report.js.*/
+/*GETCSS3 — screen dm: OS media query, or forced via data-exo-rpt-theme; print = light*/
 :root {
 	color-scheme: light dark;
 }
-/* screen only — does not apply when printing */
+/* Forced dark (cookie) */
 @media screen {
 	:root[data-exo-rpt-theme="dark"] {
 		--exo-rpt-page-bg: #1a2030;
@@ -646,7 +638,6 @@ subr getcss3_amend(io css) {
 		--exo-rpt-link-visited: #b39ddb;
 		--exo-rpt-link-hover: #ff8a80;
 	}
-	/* One text colour in dm (off-white); body + letterhead (stationery hardcodes) */
 	:root[data-exo-rpt-theme="dark"] body {
 		background-color: var(--exo-rpt-page-bg) !important;
 		color: var(--exo-rpt-text) !important;
@@ -659,8 +650,31 @@ subr getcss3_amend(io css) {
 		color: var(--exo-rpt-text) !important;
 	}
 }
-/* Print = LM: do not set --exo-rpt-* here; unset vars → poetry fallbacks
-   (incl. company SYSTEM.f(46,*) th/td). Dark block is screen-only above. */
+/* Browser dm when not forced light (no attr, or dark attr). No report.js needed. */
+@media screen and (prefers-color-scheme: dark) {
+	:root:not([data-exo-rpt-theme="light"]) {
+		--exo-rpt-page-bg: #1a2030;
+		--exo-rpt-text: #e8e8f0;
+		--exo-rpt-th-bg: #303a5a;
+		--exo-rpt-td-bg: #28304a;
+		--exo-rpt-border: #7070e0;
+		--exo-rpt-border-light: #5a6090;
+		--exo-rpt-link: #6aa3e8;
+		--exo-rpt-link-visited: #b39ddb;
+		--exo-rpt-link-hover: #ff8a80;
+	}
+	:root:not([data-exo-rpt-theme="light"]) body {
+		background-color: var(--exo-rpt-page-bg) !important;
+		color: var(--exo-rpt-text) !important;
+	}
+	:root:not([data-exo-rpt-theme="light"]) #letterhead,
+	:root:not([data-exo-rpt-theme="light"]) #letterhead font,
+	:root:not([data-exo-rpt-theme="light"]) #letterhead a,
+	:root:not([data-exo-rpt-theme="light"]) #letterhead a:visited,
+	:root:not([data-exo-rpt-theme="light"]) #letterhead a:hover {
+		color: var(--exo-rpt-text) !important;
+	}
+}
 @media print {
 	:root {
 		color-scheme: light;

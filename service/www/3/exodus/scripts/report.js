@@ -592,8 +592,8 @@
 	}
 	window.addEventListener('load', fixOpenerNwinLinks)
 
-	// ——— Theme from EXODUStheme cookie (embedded script only did OS dm/lm) ———
-	// Same dt crumb truth as client.js. May briefly flash OS theme then cookie.
+	// ——— Theme from EXODUStheme cookie ———
+	// light/dark force attribute; auto clears it so CSS prefers-color-scheme applies.
 	var rpt_theme_mql = null
 	var rpt_theme_mql_handler = null
 
@@ -633,12 +633,8 @@
 
 	function rpt_theme_apply(pref) {
 		pref = pref || 'auto'
-		var dark = pref === 'dark'
-			|| (pref === 'auto' && window.matchMedia
-				&& window.matchMedia('(prefers-color-scheme: dark)').matches)
 		var html = document.documentElement
-		html.setAttribute('data-exo-rpt-theme', dark ? 'dark' : 'light')
-		html.style.colorScheme = dark ? 'dark' : 'light'
+		// Drop OS listener if any prior apply installed one
 		if (rpt_theme_mql && rpt_theme_mql_handler) {
 			try {
 				rpt_theme_mql.removeEventListener('change', rpt_theme_mql_handler)
@@ -646,13 +642,19 @@
 			rpt_theme_mql = null
 			rpt_theme_mql_handler = null
 		}
-		if (pref === 'auto' && window.matchMedia) {
-			rpt_theme_mql = window.matchMedia('(prefers-color-scheme: dark)')
-			rpt_theme_mql_handler = function () {
-				rpt_theme_apply('auto')
-			}
-			rpt_theme_mql.addEventListener('change', rpt_theme_mql_handler)
+		if (pref === 'light') {
+			html.setAttribute('data-exo-rpt-theme', 'light')
+			html.style.colorScheme = 'light'
+			return
 		}
+		if (pref === 'dark') {
+			html.setAttribute('data-exo-rpt-theme', 'dark')
+			html.style.colorScheme = 'dark'
+			return
+		}
+		// auto: clear force so GETCSS3 @media (prefers-color-scheme) drives theme
+		html.removeAttribute('data-exo-rpt-theme')
+		html.style.colorScheme = 'light dark'
 	}
 
 	rpt_theme_apply(rpt_theme_pref_from_cookie())
