@@ -1438,8 +1438,7 @@ async function exoui_showmodaldialog(url, dialogargs, dialogstyle) {
 		*/
 		dialogstyle = '' // now always show in a tab
 
-		//open the child window async
-		gchildwin = window.open(url, '', dialogstyle)
+		gchildwin = await exo_window_open_themed(url, dialogstyle)
 
 		if (!gchildwin) {
 			alert('Unable to show popup window - please enable popups; disable your popup blocker.')
@@ -1687,21 +1686,10 @@ async function windowopen(url, parameters, style) {
 		gwindowopenparameters._openhtm = ''
 	}
 	try {
-
-		var result = window.open(url, '', style)
-
-		// Closed / blocked popup — no window handle (null or undefined)
+		var result = await exo_window_open_themed(url, style)
 		if (result == null)
 			throw (url)
-
-		// Empty url → about:blank. Some browsers pair dark canvas with black text
-		// under prefers-color-scheme: dark (broken default contrast). Fix the blank
-		// document once; callers just write content.
-		if (!url)
-			exo_ensure_readable_blank(result)
-
 		return result
-
 	}
 	catch (e) {
 		//alert('Please enable popups for this site (2)\n\nError:'+(e.description?e.description:e))
@@ -1710,9 +1698,95 @@ async function windowopen(url, parameters, style) {
 
 }
 
+// Open themed blob splash (parent lm/dm), wait until it can paint, then href.
+// Empty url (F12 dumps etc.): about:blank + readable blank — no splash race.
+async function exo_window_open_themed(url, style) {
+	if (!url) {
+		var blank = window.open('', '', style || '')
+		if (blank)
+			exo_ensure_readable_blank(blank)
+		return blank
+	}
+	var splash = exo_theme_splash_blob_url()
+	var win = window.open(splash, '', style || '')
+	if (!win) {
+		try { URL.revokeObjectURL(splash) } catch (e0) { }
+		return null
+	}
+	// open(blob) often still about:blank when open returns
+	await exo_wait_splash_ready(win)
+	await exo_after_paint()
+	win.location.href = url
+	window.setTimeout(function () {
+		try { URL.revokeObjectURL(splash) } catch (e1) { }
+	}, 60000)
+	return win
+}
+
+function exo_theme_splash_blob_url() {
+	var dark = (typeof exo_theme_effective_dark === 'function')
+		? exo_theme_effective_dark(gtheme_pref)
+		: !!gisdarktheme
+	var scheme = dark ? 'dark' : 'light'
+	var bg = dark ? '#1a2030' : '#ffffff'
+	var fg = dark ? '#e8e8f0' : '#000000'
+	var html = '<!DOCTYPE html><html style="color-scheme:only ' + scheme
+		+ ';background:' + bg + ';color:' + fg + '"><head><meta charset="utf-8">'
+		+ '<meta name="color-scheme" content="' + scheme + '">'
+		+ '<style>html,body{margin:0;background:' + bg + ';color:' + fg + ';height:100%}</style>'
+		+ '</head><body></body></html>'
+	return URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+}
+
+function exo_wait_splash_ready(win) {
+	return new Promise(function (resolve) {
+		var done = false
+		var finish = function () {
+			if (done)
+				return
+			done = true
+			resolve()
+		}
+		try {
+			var href0 = win.location && win.location.href
+			if (href0 && href0.indexOf('blob:') === 0) {
+				finish()
+				return
+			}
+		} catch (e0) { }
+		var onLoad = function () {
+			try { win.removeEventListener('load', onLoad) } catch (e1) { }
+			finish()
+		}
+		try {
+			win.addEventListener('load', onLoad)
+		} catch (e2) {
+			finish()
+			return
+		}
+		window.setTimeout(function () {
+			try {
+				if (win.location && win.location.href.indexOf('blob:') === 0)
+					finish()
+			} catch (e3) { }
+		}, 0)
+		window.setTimeout(finish, 300)
+	})
+}
+
+function exo_after_paint() {
+	return new Promise(function (resolve) {
+		if (typeof requestAnimationFrame !== 'function') {
+			window.setTimeout(resolve, 0)
+			return
+		}
+		requestAnimationFrame(function () {
+			requestAnimationFrame(resolve)
+		})
+	})
+}
+
 // Readable defaults for a blank document (about:blank or raw window.open()).
-// Use system Canvas/CanvasText so light and dark both contrast — not hard-coded
-// light, and not a debug-only patch on individual dump sites.
 function exo_ensure_readable_blank(win) {
 	if (!win || !win.document)
 		return
