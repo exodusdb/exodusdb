@@ -613,47 +613,23 @@ subr getcss(io css, in version = "", in stationery = "") {
 
 // GETCSS3: poetry uses var(--exo-rpt-*, #lm-hex). Amend assigns dark vars on
 // screen only; print just asks for light (fallbacks = same LM as getcss).
-// Theme: EXODUStheme/dt cookie (dbform lm/dm) if present, else prefers-color-scheme.
+// Theme first paint: OS prefers-color-scheme only; EXODUStheme cookie in report.js.
 subr getcss3_amend(io css) {
 
-	// Script first — sets data-exo-rpt-theme before CSS applies (same cookie as client.js).
+	// Sync first paint: browser dm/lm only (no cookie). report.js overrides from
+	// EXODUStheme cookie when it loads. One-shot — no OS listener here (avoids
+	// fighting report.js after cookie apply).
 	css ^= R"V0G0N(
 <script type="text/javascript">
 (function(){try{
-	/* Same truth as client.js: dt=1 dark, dt=0 light, dt=auto/absent → browser. unescape so dt%3D1 → dt=1 */
-	var pref='auto';
-	var cookies=unescape(document.cookie||'').split('; ');
-	for(var i=0;i<cookies.length;i++){
-		var eq=cookies[i].indexOf('=');
-		if(eq<0)continue;
-		if(cookies[i].slice(0,eq)!=='EXODUStheme')continue;
-		var crumbs=cookies[i].slice(eq+1).split('&');
-		var saw_dt=false,dt='';
-		for(var j=0;j<crumbs.length;j++){
-			var kv=crumbs[j].split('=');
-			if(kv[0]==='dt'){saw_dt=true;dt=kv[1]||'';break;}
-		}
-		if(dt==='1')pref='dark';
-		else if(dt==='0')pref='light';
-		else if(dt==='auto')pref='auto';
-		else if(saw_dt&&dt==='')pref='light'; /* legacy empty dt = forced light */
-		else pref='auto';
-		break;
-	}
-	function apply(){
-		var dark=pref==='dark'||(pref==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
-		var html=document.documentElement;
-		html.setAttribute('data-exo-rpt-theme',dark?'dark':'light');
-		html.style.colorScheme=dark?'dark':'light';
-	}
-	apply();
-	/* Auto: keep report windows in sync when OS/browser lm/dm changes (one-shot was not enough) */
-	if(pref==='auto'&&window.matchMedia)
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',apply);
+	var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+	var html=document.documentElement;
+	html.setAttribute('data-exo-rpt-theme',dark?'dark':'light');
+	html.style.colorScheme=dark?'dark':'light';
 }catch(e){}})();
 </script>
 <style type="text/css">
-/*GETCSS3 — screen dm: dt=1 dark, dt=0 light, auto/absent → prefers-color-scheme; print = light*/
+/*GETCSS3 — screen dm via data-exo-rpt-theme; print = light. Cookie apply in report.js.*/
 :root {
 	color-scheme: light dark;
 }
