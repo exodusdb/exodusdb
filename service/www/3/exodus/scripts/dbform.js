@@ -594,6 +594,7 @@ var gformdigitaccesskey_capture_installed = false
 var gform_scroll_viewport_capture_installed = false
 // Radio/checkbox: focus on mouseup only (not mousedown). Capture/sync outside Gate A.
 var gform_radio_md_target = null
+var gform_radio_was_checked = false // optional radio: re-activate clears (click or Space)
 var gform_radio_mouseup_focus_installed = false
 var gtouched = false//set true in validateupdate exit and delete row (not insert row)
 var gelementthatjustcalledsettouched
@@ -1105,6 +1106,10 @@ async function formfunctions_onload() {
                     temp += ' name=' + fieldname
                     // mark for mouseup-focus handler (expanded radios have no other marker)
                     temp += ' exotype=F'
+                    // Keep required on each option (original input is replaced by the span)
+                    if (element.getAttribute('exorequired')
+                        && element.getAttribute('exorequired') != 'false')
+                        temp += ' exorequired=true'
                     if (typeof (options[ii][0]) != 'undefined')
                         temp += ' value=' + options[ii][0].toString().exoquote()
 
@@ -5151,6 +5156,8 @@ function form_ensure_radio_mouseup_focus() {
     gform_radio_mouseup_focus_installed = true
     document.addEventListener('mousedown', form_radio_mousedown_nofocus, true)
     document.addEventListener('mouseup', form_radio_mouseup_focus, true)
+    // Space synthesizes click without mousedown — same was_checked snapshot
+    document.addEventListener('keydown', form_radio_keydown_space_snapshot, true)
 }
 
 function form_radio_is_exo_toggle(el) {
@@ -5168,11 +5175,23 @@ function form_radio_mousedown_nofocus(event) {
     var t = event.target
     if (!form_radio_is_exo_toggle(t)) {
         gform_radio_md_target = null
+        gform_radio_was_checked = false
         return
     }
     gform_radio_md_target = t
+    // Snapshot before click — optional radios uncheck on re-activate of the same option
+    gform_radio_was_checked = (t.type == 'radio' && !!t.checked)
     if (event.preventDefault)
         event.preventDefault()
+}
+
+function form_radio_keydown_space_snapshot(event) {
+    if (event.keyCode != 32 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey)
+        return
+    var t = event.target
+    if (!form_radio_is_exo_toggle(t) || t.type != 'radio')
+        return
+    gform_radio_was_checked = !!t.checked
 }
 
 function form_radio_mouseup_focus(event) {
@@ -5181,8 +5200,11 @@ function form_radio_mouseup_focus(event) {
     var t = event.target
     var md = gform_radio_md_target
     gform_radio_md_target = null
-    if (!md || t != md || !form_radio_is_exo_toggle(t))
+    // Abort (drag away / different target): drop was_checked so a later gesture cannot clear
+    if (!md || t != md || !form_radio_is_exo_toggle(t)) {
+        gform_radio_was_checked = false
         return
+    }
     if (document.activeElement != t)
         form_focus_noscroll(t)
 }
@@ -8422,6 +8444,14 @@ async function onclickradiocheckbox(event) {
 
     //wstatus(getvalue(event.target.id)+' '+gpreviousvalue)
     //space or arrow keys also simulate a click event
+
+    // Optional radio: re-activate already-checked option (click or Space) → clear
+    if (event.target.type == 'radio'
+        && gform_radio_was_checked
+        && !(event.target.getAttribute('exorequired')
+            && event.target.getAttribute('exorequired') != 'false'))
+        event.target.checked = false
+    gform_radio_was_checked = false
 
     //handle case where onfocus has not been called before onclick
     if (gpreviouselement != event.target) {
