@@ -397,17 +397,29 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
 		}
 		dataio = "<script>var gdateformat='" ^ jsdatefmt ^ "'</script>";
 
+		// Primary /3/… ; fallback %URL%/3/… (SYSTEM 114, same as old gethtml);
+		// then https://{141}/3/scripts/report.js (CDN).
+		var siteurl	  = SYSTEM.f(114, 1);
 		var appdomain = SYSTEM.f(141);
 		var paths	  = "['/3/exodus/scripts/report.js'";
+		if (siteurl) {
+			if (not siteurl.ends("/"))
+				siteurl ^= "/";
+			paths ^= ",'" ^ siteurl ^ "3/exodus/scripts/report.js'";
+		}
 		if (appdomain) {
-			paths ^= ",'https://" ^ appdomain ^ "/scripts/report.js'";
+			paths ^= ",'https://" ^ appdomain ^ "/3/scripts/report.js'";
 		}
 		paths ^= "]";
-		dataio ^= "<script>(function(a){if(window.__exo_rpt_ld)return;window.__exo_rpt_ld=1;"
-				  "var s=document.createElement('script'),i="
-				  "(location.protocol==='file:'&&a.length>1)?1:0;"
-				  "s.onerror=function(){if(++i<a.length)s.src=a[i]};"
-				  "s.src=a[i];(document.head||document.documentElement).appendChild(s)}"
+		// New <script> per attempt — reusing one element and resetting src
+		// often stops the chain after ORB/network fail from file:.
+		// Skip if report.js already ran (HTML-Complete injects xxx_files/report_….js
+		// in <head>; that must not still walk the CDN fallbacks).
+		dataio ^= "<script>(function(a){if(window.__exo_rpt_ld||typeof exo_report_onedit==='function')return;"
+				  "window.__exo_rpt_ld=1;"
+				  "var i=(location.protocol==='file:'&&a.length>1)?1:0,h=document.head||document.documentElement;"
+				  "function load(){if(i>=a.length)return;var s=document.createElement('script');"
+				  "s.onerror=function(){++i;load()};s.src=a[i];h.appendChild(s)}load()}"
 				  ")(" ^ paths ^ ")</script>";
 
 	// OBSOLETE — use GETCSS3 (getcss ver1/ver2 poetry + dm/print var amend).

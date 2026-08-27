@@ -594,18 +594,10 @@
 
 	// ——— Theme from EXODUStheme cookie ———
 	// light/dark force attribute; auto clears it so CSS prefers-color-scheme applies.
-	var rpt_theme_mql = null
-	var rpt_theme_mql_handler = null
-
-	function rpt_theme_os_dark() {
-		return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-	}
-
 	function rpt_theme_pref_from_cookie() {
 		try {
 			var raw = document.cookie || ''
 			var cookies = unescape(raw).split('; ')
-			console.log('[exo-rpt-theme] document.cookie length=', raw.length, 'unescape sample=', unescape(raw).slice(0, 200))
 			for (var i = 0; i < cookies.length; i++) {
 				var eq = cookies[i].indexOf('=')
 				if (eq < 0)
@@ -625,7 +617,6 @@
 						break
 					}
 				}
-				console.log('[exo-rpt-theme] EXODUStheme raw=', val, 'saw_dt=', saw_dt, 'dt=', JSON.stringify(dt))
 				if (dt === '1')
 					return 'dark'
 				if (dt === '0')
@@ -636,25 +627,13 @@
 					return 'light' // legacy empty dt = forced light
 				return 'auto'
 			}
-			console.log('[exo-rpt-theme] no EXODUStheme cookie found')
-		} catch (e) {
-			console.log('[exo-rpt-theme] cookie parse error', e)
-		}
+		} catch (e) { }
 		return 'auto'
 	}
 
 	function rpt_theme_apply(pref) {
 		pref = pref || 'auto'
 		var html = document.documentElement
-		var before = html.getAttribute('data-exo-rpt-theme')
-		var osDark = rpt_theme_os_dark()
-		if (rpt_theme_mql && rpt_theme_mql_handler) {
-			try {
-				rpt_theme_mql.removeEventListener('change', rpt_theme_mql_handler)
-			} catch (e2) { }
-			rpt_theme_mql = null
-			rpt_theme_mql_handler = null
-		}
 		if (pref === 'light') {
 			html.setAttribute('data-exo-rpt-theme', 'light')
 			html.style.colorScheme = 'light'
@@ -666,14 +645,11 @@
 			html.removeAttribute('data-exo-rpt-theme')
 			html.style.colorScheme = 'light dark'
 		}
-		console.log('[exo-rpt-theme] apply pref=', pref,
-			'osDark=', osDark,
-			'attr before=', before,
-			'attr after=', html.getAttribute('data-exo-rpt-theme'),
-			'colorScheme=', html.style.colorScheme)
 	}
 
-	var _rpt_pref = rpt_theme_pref_from_cookie()
-	console.log('[exo-rpt-theme] resolved pref=', _rpt_pref, 'osDark=', rpt_theme_os_dark())
-	rpt_theme_apply(_rpt_pref)
+	rpt_theme_apply(rpt_theme_pref_from_cookie())
+
+	// Mark loaded so GETSORTJS fallback chain skips (e.g. HTML-Complete
+	// already injected xxx_files/report_….js ahead of the loader).
+	window.__exo_rpt_ld = 1
 })()
