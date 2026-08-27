@@ -597,16 +597,24 @@
 	var rpt_theme_mql = null
 	var rpt_theme_mql_handler = null
 
+	function rpt_theme_os_dark() {
+		return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+	}
+
 	function rpt_theme_pref_from_cookie() {
 		try {
-			var cookies = unescape(document.cookie || '').split('; ')
+			var raw = document.cookie || ''
+			var cookies = unescape(raw).split('; ')
+			console.log('[exo-rpt-theme] document.cookie length=', raw.length, 'unescape sample=', unescape(raw).slice(0, 200))
 			for (var i = 0; i < cookies.length; i++) {
 				var eq = cookies[i].indexOf('=')
 				if (eq < 0)
 					continue
-				if (cookies[i].slice(0, eq) !== 'EXODUStheme')
+				var name = cookies[i].slice(0, eq)
+				if (name !== 'EXODUStheme')
 					continue
-				var crumbs = cookies[i].slice(eq + 1).split('&')
+				var val = cookies[i].slice(eq + 1)
+				var crumbs = val.split('&')
 				var dt = ''
 				var saw_dt = false
 				for (var j = 0; j < crumbs.length; j++) {
@@ -617,6 +625,7 @@
 						break
 					}
 				}
+				console.log('[exo-rpt-theme] EXODUStheme raw=', val, 'saw_dt=', saw_dt, 'dt=', JSON.stringify(dt))
 				if (dt === '1')
 					return 'dark'
 				if (dt === '0')
@@ -627,14 +636,18 @@
 					return 'light' // legacy empty dt = forced light
 				return 'auto'
 			}
-		} catch (e) { }
+			console.log('[exo-rpt-theme] no EXODUStheme cookie found')
+		} catch (e) {
+			console.log('[exo-rpt-theme] cookie parse error', e)
+		}
 		return 'auto'
 	}
 
 	function rpt_theme_apply(pref) {
 		pref = pref || 'auto'
 		var html = document.documentElement
-		// Drop OS listener if any prior apply installed one
+		var before = html.getAttribute('data-exo-rpt-theme')
+		var osDark = rpt_theme_os_dark()
 		if (rpt_theme_mql && rpt_theme_mql_handler) {
 			try {
 				rpt_theme_mql.removeEventListener('change', rpt_theme_mql_handler)
@@ -645,17 +658,22 @@
 		if (pref === 'light') {
 			html.setAttribute('data-exo-rpt-theme', 'light')
 			html.style.colorScheme = 'light'
-			return
-		}
-		if (pref === 'dark') {
+		} else if (pref === 'dark') {
 			html.setAttribute('data-exo-rpt-theme', 'dark')
 			html.style.colorScheme = 'dark'
-			return
+		} else {
+			// auto: clear force so GETCSS3 @media (prefers-color-scheme) drives theme
+			html.removeAttribute('data-exo-rpt-theme')
+			html.style.colorScheme = 'light dark'
 		}
-		// auto: clear force so GETCSS3 @media (prefers-color-scheme) drives theme
-		html.removeAttribute('data-exo-rpt-theme')
-		html.style.colorScheme = 'light dark'
+		console.log('[exo-rpt-theme] apply pref=', pref,
+			'osDark=', osDark,
+			'attr before=', before,
+			'attr after=', html.getAttribute('data-exo-rpt-theme'),
+			'colorScheme=', html.style.colorScheme)
 	}
 
-	rpt_theme_apply(rpt_theme_pref_from_cookie())
+	var _rpt_pref = rpt_theme_pref_from_cookie()
+	console.log('[exo-rpt-theme] resolved pref=', _rpt_pref, 'osDark=', rpt_theme_os_dark())
+	rpt_theme_apply(_rpt_pref)
 })()
