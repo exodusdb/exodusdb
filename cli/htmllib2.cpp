@@ -718,8 +718,15 @@ R"V0G0N(
 <style type="text/css">
 .BHEAD {display:none}
 .BHEAD2 {}
-body {background-color:var(--exo-rpt-page-bg, #ffffff); color:var(--exo-rpt-text, #000000); font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
-table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
+body {
+	background-color:var(--exo-rpt-page-bg, #ffffff);
+	color:var(--exo-rpt-text, #000000);
+	font-family:exodusfont,verdana,sans-serif,arial,helvetica;
+	font-size:exodussize;
+}
+table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {
+	font-size:100%;
+}
 a {color:var(--exo-rpt-link, blue);}
 a:visited {color:var(--exo-rpt-link-visited, purple);}
 a:hover {color:var(--exo-rpt-link-hover, red);}
@@ -740,42 +747,63 @@ td.nx {border-top:none;border-bottom:none}
 .num {text-align:right;white-space:nowrap;}
 
 table.exotable {
- margin:0px;
- padding:0px;
- border-collapse:collapse;}
+	margin:0px;
+	padding:0px;
+	border-collapse:collapse;
+}
 
 table.exotable th {
- background-color:var(--exo-rpt-th-bg, #fff099);
- color:var(--exo-rpt-text, #000000);
- padding:4px;
- border:1px solid var(--exo-rpt-border, #808080);}
+	background-color:var(--exo-rpt-th-bg, #fff099);
+	color:var(--exo-rpt-text, #000000);
+	padding:4px;
+	border:1px solid var(--exo-rpt-border, #808080);
+}
 
-@media screen{
- table.exotable > thead th {
-  top: 0;
-  z-index: 2;
-  position: sticky;
-  outline: 1px solid var(--exo-rpt-border, #808080);
-  outline-offset: -0.5px;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);}}
+@media screen {
+	table.exotable > thead th {
+		top:0;
+		z-index:2;
+		position:sticky;
+		outline:1px solid var(--exo-rpt-border, #808080);
+		outline-offset:-0.5px;
+		box-shadow:0 2px 2px rgba(0, 0, 0, 0.2);
+	}
+}
 
 table.exotable > tbody > tr > td {
- background-color:var(--exo-rpt-td-bg, #fdf5e6);
- color:var(--exo-rpt-text, #000000);
- padding:4px;
- border:1px solid var(--exo-rpt-border-light, #d3d3d3);}
+	background-color:var(--exo-rpt-td-bg, #fdf5e6);
+	color:var(--exo-rpt-text, #000000);
+	padding:4px;
+	border:1px solid var(--exo-rpt-border-light, #d3d3d3);
+}
 
 table.exotable > tbody > tr > td:first-child {
- border-left:1px solid var(--exo-rpt-border, #808080)}
+	border-left:1px solid var(--exo-rpt-border, #808080);
+}
 
 table.exotable > tbody > tr > td:last-child {
- border-right:1px solid var(--exo-rpt-border, #808080)}
+	border-right:1px solid var(--exo-rpt-border, #808080);
+}
 
-table.exotable hr {height:0px; border:0px; border-top:1px solid var(--exo-rpt-border-light, #d3d3d3)}
+table.exotable hr {
+	height:0px;
+	border:0px;
+	border-top:1px solid var(--exo-rpt-border-light, #d3d3d3);
+}
 
-table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top; border-collapse:collapse; border:0px;}
+table.hashtable td {
+	padding:0px;
+	margin:0px;
+	text-align:left;
+	vertical-align:top;
+	border-collapse:collapse;
+	border:0px;
+}
 
-.pagedivider {border-top:1px dashed var(--exo-rpt-border, #808080); border-bottom:0px;}
+.pagedivider {
+	border-top:1px dashed var(--exo-rpt-border, #808080);
+	border-bottom:0px;
+}
 
 </style>
 <!--[if gte mso 9]><style type="text/css">
@@ -783,7 +811,7 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 </style><![endif]-->
 
 <style type="text/css" media="print">
- .noprint {display:none}
+.noprint {display:none}
 </style>
 )V0G0N";
 
@@ -795,13 +823,23 @@ R"V0G0N(
 <style type="text/css">
 .BHEAD {display:none}
 .BHEAD2 {}
-body {background-color:var(--exo-rpt-page-bg, #ffffff); color:var(--exo-rpt-text, #000000); font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
-table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
+body {
+	background-color:var(--exo-rpt-page-bg, #ffffff);
+	color:var(--exo-rpt-text, #000000);
+	font-family:exodusfont,verdana,sans-serif,arial,helvetica;
+	font-size:exodussize;
+}
+table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {
+	font-size:100%;
+}
 a {color:var(--exo-rpt-link, blue);}
 a:visited {color:var(--exo-rpt-link-visited, purple);}
 a:hover {color:var(--exo-rpt-link-hover, red);}
 tt {font-family:courier new,courier;font-size:80%}
-th {background-color:var(--exo-rpt-th-bg, #fff099); color:var(--exo-rpt-text, #000000);}
+th {
+	background-color:var(--exo-rpt-th-bg, #fff099);
+	color:var(--exo-rpt-text, #000000);
+}
 thead {display:table-header-group}
 td.nb {border-bottom:none}
 td.nt {border-top:none}
@@ -811,9 +849,24 @@ td.nx {border-top:none;border-bottom:none}
 .acenter {text-align:center}
 .nobr {white-space:nowrap;}
 .num {text-align:right}
-.exotable {background-color:var(--exo-rpt-td-bg, #fdf5e6); color:var(--exo-rpt-text, #000000); border-width:2px; border-collapse:collapse; padding:1px}
-.hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
-.pagedivider {border-top:1px dashed var(--exo-rpt-border, #808080); border-bottom:0px;}
+.exotable {
+	background-color:var(--exo-rpt-td-bg, #fdf5e6);
+	color:var(--exo-rpt-text, #000000);
+	border-width:2px;
+	border-collapse:collapse;
+	padding:1px;
+}
+.hashtable td {
+	padding:0px;
+	margin:0px;
+	vertical-align:top;
+	border-collapse:collapse;
+	border:0px solid lightgrey;
+}
+.pagedivider {
+	border-top:1px dashed var(--exo-rpt-border, #808080);
+	border-bottom:0px;
+}
 </style>
 <!--[if gte mso 9]><style type="text/css">
 .num {mso-number-format:General}
