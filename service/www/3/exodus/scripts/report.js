@@ -592,63 +592,6 @@
 	}
 	window.addEventListener('load', fixOpenerNwinLinks)
 
-	// ——— Theme from EXODUStheme cookie ———
-	// light/dark force attribute; auto clears it so CSS prefers-color-scheme applies.
-	function rpt_theme_pref_from_cookie() {
-		try {
-			var raw = document.cookie || ''
-			var cookies = unescape(raw).split('; ')
-			for (var i = 0; i < cookies.length; i++) {
-				var eq = cookies[i].indexOf('=')
-				if (eq < 0)
-					continue
-				var name = cookies[i].slice(0, eq)
-				if (name !== 'EXODUStheme')
-					continue
-				var val = cookies[i].slice(eq + 1)
-				var crumbs = val.split('&')
-				var dt = ''
-				var saw_dt = false
-				for (var j = 0; j < crumbs.length; j++) {
-					var kv = crumbs[j].split('=')
-					if (kv[0] === 'dt') {
-						saw_dt = true
-						dt = kv[1] || ''
-						break
-					}
-				}
-				if (dt === '1')
-					return 'dark'
-				if (dt === '0')
-					return 'light'
-				if (dt === 'auto')
-					return 'auto'
-				if (saw_dt && dt === '')
-					return 'light' // legacy empty dt = forced light
-				return 'auto'
-			}
-		} catch (e) { }
-		return 'auto'
-	}
-
-	function rpt_theme_apply(pref) {
-		pref = pref || 'auto'
-		var html = document.documentElement
-		if (pref === 'light') {
-			html.setAttribute('data-exo-rpt-theme', 'light')
-			html.style.colorScheme = 'light'
-		} else if (pref === 'dark') {
-			html.setAttribute('data-exo-rpt-theme', 'dark')
-			html.style.colorScheme = 'dark'
-		} else {
-			// auto: clear force so GETCSS3 @media (prefers-color-scheme) drives theme
-			html.removeAttribute('data-exo-rpt-theme')
-			html.style.colorScheme = 'light dark'
-		}
-	}
-
-	rpt_theme_apply(rpt_theme_pref_from_cookie())
-
 	// Mark loaded so GETSORTJS fallback chain skips (e.g. HTML-Complete
 	// already injected xxx_files/report_….js ahead of the loader).
 	window.__exo_rpt_ld = 1

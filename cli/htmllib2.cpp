@@ -625,12 +625,12 @@ subr getcss(io css, in version = "", in stationery = "") {
 
 // GETCSS3: poetry uses var(--exo-rpt-*, #lm-hex). Amend assigns dark vars on
 // screen only; print just asks for light (fallbacks = same LM as getcss).
-// Theme first paint: OS prefers-color-scheme only; EXODUStheme cookie in report.js.
+// Theme: OS prefers-color-scheme via CSS; forced EXODUStheme cookie via
+// sync head script once before body — not changed later (report.js leaves it).
 subr getcss3_amend(io css) {
 
-	// No theme JS here. OS dm/lm via CSS prefers-color-scheme (live, no cookie).
-	// report.js may set data-exo-rpt-theme=light|dark from EXODUStheme cookie;
-	// auto clears the attribute so CSS media keeps following the browser.
+	// CSS: auto / OS dark via @media; forced light|dark via data-exo-rpt-theme.
+	// Inline script: cookie → attribute once in head; theme never re-applied in htm.
 	css ^= R"V0G0N(
 <style type="text/css">
 :root {
@@ -690,6 +690,20 @@ subr getcss3_amend(io css) {
 	}
 }
 </style>
+<script>
+(function () {
+	try {
+		// EXODUStheme=…&dt=1|0… (or dt= as first crumb)
+		var m = unescape(document.cookie || '').match(/EXODUStheme=[^;]*\bdt=(1|0)\b/)
+		if (!m)
+			return
+		var pref = m[1] === '1' ? 'dark' : 'light'
+		var html = document.documentElement
+		html.setAttribute('data-exo-rpt-theme', pref)
+		html.style.colorScheme = pref
+	} catch (e) { }
+})()
+</script>
 )V0G0N";
 
 	return;
