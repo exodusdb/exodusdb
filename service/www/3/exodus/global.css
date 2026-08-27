@@ -106,7 +106,6 @@
     --exofield-focus-width: 2px;
     --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
     --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
-    --exotextarea-border-color: var(--exofield-border-color);
     --exoradio-color: rgba(0, 84, 187, 0.596);
     /* Unchecked ring: strong contrast from form host (not field border) */
     --exoradio-ring-border-color: color-mix(in oklch, var(--exoform-bg-color) 30%, black);
@@ -152,7 +151,6 @@
     --exofield-focus-width: 2px;
     --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
     --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
-    --exotextarea-border-color: var(--exofield-border-color);
     /*
      * DM form pair (same sense as LM: data well lighter than pane chrome).
      * Old: data #28304a, base #303a5a. New base = old data; new data = old data
@@ -167,7 +165,6 @@
     --exoform-label-font-style: italic;
     --exoform-data-font-style: normal;
     --exoform-data-font-size: 1rem;
-    --exotextarea-border-color: #6070b8;
     /* Normal buttons (exobutton + graphicbutton): fixed DM fill (not form-mix) */
     --exoinformbutton-bg-color: #354060;
     --exoinformbutton-hover-bg-color: #455880;
