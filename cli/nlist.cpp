@@ -1920,16 +1920,16 @@ x2exit:
 		}
 
 		tx(-1) = "<script type=\"text/javascript\">" _FM;
-		tx ^= "function nwin(key,url,readonly) {";
-		tx ^= _FM " gwindowopenparameters={};";
-		tx ^= _FM " if (readonly) gwindowopenparameters.readonlymode=true;";
-		tx ^= _FM " gwindowopenparameters.key=key;";
-		tx ^= _FM " glogincode=\"" ^ SYSTEM.f(17) ^ "*" ^ USERNAME ^ "*\";";
-		// Similar code in NLIST and LEDGER2
-		tx ^= _FM " var vhtm=window.opener.location.toString().split(\"/\");";
-		tx ^= _FM " vhtm[vhtm.length-1]=url;";
-		tx ^= _FM " window.open(vhtm.join(\"/\"));";
-		tx ^= "}";
+		tx ^= "function nwin(key, url, readonly) {";
+		tx ^= _FM "\tgwindowopenparameters = {};";
+		tx ^= _FM "\tif (readonly)";
+		tx ^= _FM "\t\tgwindowopenparameters.readonlymode = true;";
+		tx ^= _FM "\tgwindowopenparameters.key = key;";
+		tx ^= _FM "\tglogincode = \"" ^ SYSTEM.f(17) ^ "*" ^ USERNAME ^ "*\";";
+		tx ^= _FM "\tvar vhtm = window.opener.location.toString().split(\"/\");";
+		tx ^= _FM "\tvhtm[vhtm.length - 1] = url;";
+		tx ^= _FM "\twindow.open(vhtm.join(\"/\"));";
+		tx ^= _FM "}";
 		tx ^= _FM "</script>";
 	}
 
