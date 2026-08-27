@@ -44,11 +44,32 @@ That file explains runtime DOM (dbform, panes, `td` vs `tr` borders, flowing spa
 | Web HTML notes | `service/www/exodus/doc/forms.htm` (and peers) |
 | C++/var docs | `doc/` (see `doc/README.md`) |
 
+## Working with this user
+
+Canonical copy (also in **`~/neosys/AGENTS.md`**). Global **`~/.grok/AGENTS.md`** links here — do not rely on `.grok` alone for these rules.
+
+- **Size hints are constraints.** Words like *lightly*, *simple*, *trivial*, *adapt existing*, *is it possible* mean: prefer a small change at the existing seam. If the first plan needs a new helper plus special-case call sites, it is probably the wrong plan — keep looking.
+- **State the simple option first.** Before implementing a heavier path, name the one-line / category-extension option and only then say why it is insufficient (if it is).
+- **Do not invent parallel policy.** Prefer one more accepted case in an existing filter, walker, or hook over a new router, oracle, or named helper.
+- **Avoid one-shot helpers.** Do not extract a named function that has a single call site. Inline at the seam. **If the block would have had a clear name, put that name/intent in a short comment above the inlined lines** so the idea is not lost (`// Radio group arrival snapshot — …`).
+- **Pushback is design input.** If the user questions complexity, simplify toward the existing machine rather than defending the clever path.
+- **Commits:** commit freely after substantive turns (small, descriptive; easy to bisect). Do **not** push unless asked.
+  - **Prefix with the user request.** First line of the subject (and keep it in the body notes): a short reminder of **what the user asked** that triggered this commit, then the technical summary. Do **not** drop existing summary/detail — add the request prefix in front. Example: `row L like T: SPAN only for text inputs (fix estimates hang)`.
+  - **Exclude squash / history instructions from that prefix.** Asks like “squash …”, “squash related”, “clean history”, “rebase …” are process, not product — do **not** put them in the subject (no `squash fallback:` …). Surviving squash commit = product/`Fix:` summary of the seam; squash mechanics stay out of the message.
+  - **`Fix:` subject** when landing a corrected product/bug outcome (after thrash or on squash of related thrash).
+- **Quality model:** allow short **technical debt for discovery**; land quality at **`review`** / **squash** (user need not re-spell KISS).
+  - **While building:** KISS at the existing seam; name **blast radius** on shared/framework code; thrash locally if needed.
+  - **On plain `review`:** judge net local/unpushed work for KISS + maintainability + blast radius; **fix cheap debt** same turn; brief report. Not the formal `/review` skill unless they say so / PR target.
+  - **On squash / big-bang / clean history:** same gate, then squash the cleaned outcome.
+  - **`squash related` (hard):** **related = same root cause / same product seam only** — not “same session” or “same general pain.” One root cause → one surviving commit (often `Fix: …`). **Different seams stay different commits** (e.g. VAL allownew 0≠00 vs PENDING_INVOICING2). Do **not** kitchen-sink squash. If the set is ambiguous, list proposed groups/hashes and wait — do not invent “related.”
+  - **DRY loses to KISS when differences are real:** prefer local duplication + `// Similar: A, B` over abstracting tiny variants into one helper (easier parallel maintenance). Unify only when the contract is truly identical.
+- **Debt as finish line is wrong.** Exploratory thrash is fine; shipping the experiment is not.
+
 ## Quality model (debt allowed → clean on **review** / **squash**)
 
-Exodus is **production** shared code. Wrong event/gate/popup changes cost **~10×** later. Net speed = allow discovery, force cleanup at named gates.
+Exodus is **production** shared code. Wrong event/gate/popup changes cost **~10×** later. Net speed = allow discovery, force cleanup at named gates. Shared working-style rules: **Working with this user** above.
 
-Same hard blocks as **`~/.grok/AGENTS.md`** (restated here so they are in-tree):
+Hard blocks (also in **`~/neosys/AGENTS.md`** / tip in **`~/.grok/AGENTS.md`**):
 
 ### Hard block: do not invent underspec (always on)
 
