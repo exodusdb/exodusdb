@@ -392,8 +392,8 @@
 		if (document.body.getAttribute('contenteditable'))
 			return true
 		event = event || window.event
-		event.target = event.target || event.srcElement
-		var th = event.target
+		// do not assign event.target — getter-only in modern browsers
+		var th = event.target || event.srcElement
 		while (th && th.tagName != 'TH' && th !== document.body)
 			th = th.parentNode
 		if (!th || th.tagName != 'TH')
