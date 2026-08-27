@@ -621,11 +621,9 @@ subr getcss3_amend(io css) {
 	// auto clears the attribute so CSS media keeps following the browser.
 	css ^= R"V0G0N(
 <style type="text/css">
-/*GETCSS3 — screen dm: OS media query, or forced via data-exo-rpt-theme; print = light*/
 :root {
 	color-scheme: light dark;
 }
-/* Forced dark (cookie) */
 @media screen {
 	:root[data-exo-rpt-theme="dark"] {
 		--exo-rpt-page-bg: #1a2030;
@@ -650,7 +648,6 @@ subr getcss3_amend(io css) {
 		color: var(--exo-rpt-text) !important;
 	}
 }
-/* Browser dm when not forced light (no attr, or dark attr). No report.js needed. */
 @media screen and (prefers-color-scheme: dark) {
 	:root:not([data-exo-rpt-theme="light"]) {
 		--exo-rpt-page-bg: #1a2030;
@@ -693,7 +690,6 @@ func getvogonpoetry_css(in version) {
 		return
 R"V0G0N(
 <style type="text/css">
-/*ver2 for reports — colours via --exo-rpt-* (GETCSS3 sets dm/print)*/
 .BHEAD {display:none}
 .BHEAD2 {}
 body {background-color:var(--exo-rpt-page-bg, #ffffff); color:var(--exo-rpt-text, #000000); font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
@@ -768,7 +764,6 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 		return
 R"V0G0N(
 <style type="text/css">
-/*ver1 for documents — colours via --exo-rpt-* (GETCSS3 sets dm/print)*/
 .BHEAD {display:none}
 .BHEAD2 {}
 body {background-color:var(--exo-rpt-page-bg, #ffffff); color:var(--exo-rpt-text, #000000); font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
