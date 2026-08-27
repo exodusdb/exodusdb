@@ -34,8 +34,10 @@
 			'  box-sizing: border-box;',
 			'  overflow: hidden;',
 			'  padding: 0;',
+			/* prevent narrow col from wrapping cell text into a tall stack */
+			'  white-space: nowrap;',
 			'}',
-			/* Edit on: hide glyphs in td AND body/total th (nlist break rows use th) */
+			/* Edit on: hide glyphs; nowrap above keeps row height stable */
 			'table.' + EDITING_CLASS + ' td.' + COLLAPSED + ',',
 			'table.' + EDITING_CLASS + ' th.' + COLLAPSED + ' {',
 			'  color: transparent;',
