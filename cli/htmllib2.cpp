@@ -712,7 +712,6 @@ a {color:var(--exo-rpt-link, blue);}
 a:visited {color:var(--exo-rpt-link-visited, purple);}
 a:hover {color:var(--exo-rpt-link-hover, red);}
 tt {font-family:courier new,courier;font-size:80%}
-/*xth {background-color:#ffff80;}*/
 xth {background-color:var(--exo-rpt-th-bg, #fff099);}
 thead {display:table-header-group}
 tfoot {page-break-inside:avoid}
@@ -731,11 +730,9 @@ td.nx {border-top:none;border-bottom:none}
 table.exotable {
  margin:0px;
  padding:0px;
- /*border-spacing:0px;*/
  border-collapse:collapse;}
 
 table.exotable th {
- /*background-color:#ffff80;*/
  background-color:var(--exo-rpt-th-bg, #fff099);
  color:var(--exo-rpt-text, #000000);
  padding:4px;
@@ -751,7 +748,6 @@ table.exotable th {
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);}}
 
 table.exotable > tbody > tr > td {
- /*background-color:#ffffc0;*/
  background-color:var(--exo-rpt-td-bg, #fdf5e6);
  color:var(--exo-rpt-text, #000000);
  padding:4px;
