@@ -385,4 +385,137 @@
 		else
 			eachReportTable(disarmTable)
 	}
+
+	// ——— Column sort (was GETSORTJS poetry) ———
+	// Hand cursor / click only after this file loads.
+	function sorttable(event) {
+		if (document.body.getAttribute('contenteditable'))
+			return true
+		event = event || window.event
+		event.target = event.target || event.srcElement
+		var th = event.target
+		while (th && th.tagName != 'TH' && th !== document.body)
+			th = th.parentNode
+		if (!th || th.tagName != 'TH')
+			return 0
+		var table = th.parentElement.parentElement.parentElement
+		if (!table || !table.tBodies || !table.tBodies[0])
+			return 0
+		var rows = table.tBodies[0].getElementsByTagName('tr')
+		var coln = th.cellIndex
+		var nrows = rows.length
+		var fromrown = 0
+		var uptorown = nrows - 1
+		var rowchildNodes
+		while ((uptorown < nrows) && rows[uptorown + 1] && (rowchildNodes = rows[uptorown + 1].cells)
+			&& (rowchildNodes.length > coln) && (rowchildNodes[coln].tagName == 'TD'))
+			uptorown++
+
+		var dfmt = (typeof window.gdateformat != 'undefined' && window.gdateformat)
+			? window.gdateformat : 'd/M/yyyy'
+		var dateformat
+		if (dfmt == 'M/d/yyyy')
+			dateformat = [2, 0, 1]
+		else if (dfmt == 'yyyy/M/d')
+			dateformat = [0, 1, 2]
+		else
+			dateformat = [2, 1, 0]
+		var yy = dateformat[0] + 1
+		var mm = dateformat[1] + 1
+		var dd = dateformat[2] + 1
+
+		var dateregex = / ?(\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
+		var periodregex = / ?(\d{1,2})\/(\d{4})/g
+		for (var ii = fromrown; ii <= uptorown; ++ii) {
+			var cell = rows[ii].cells[coln]
+			if (cell.getAttribute('sortvalue'))
+				break
+			var value = (cell.textContent || cell.innerText || '').toUpperCase()
+			var match
+			while (match = value.match(dateregex)) {
+				value = value.replace(dateregex,
+					('0000' + match[yy]).slice(-4) + '|'
+					+ ('00' + match[mm]).slice(-2) + '|'
+					+ ('00' + match[dd]).slice(-2))
+			}
+			value = value.replace(periodregex, '$2|$1')
+			value = value.replace(/([-+]?[1234567890.,]+)([A-Z]{2,3})/g, '$2$1')
+			value = value.replace(
+				/[-+]?[1234567890.,]+/g,
+				function (x) {
+					x = x.replace(/,/g, '')
+					var y
+					if (x.slice(0, 1) == '-') {
+						y = '-'
+						x = (999999999999.999 + Number(x.replace(/,/g, ''))).toString()
+					} else {
+						y = ''
+					}
+					x = x.split('.')
+					y += ('00000000000000000000' + x[0]).slice(-20)
+					if (x[1])
+						y += '.' + (x[1] + '0000000000').slice(0, 10)
+					return y
+				}
+			)
+			value += ('000000000000' + ii).slice(-10)
+			cell.setAttribute('sortvalue', value)
+		}
+		QuickSort(rows, coln, fromrown, uptorown)
+	}
+
+	function QuickSort(rows, coln, min, max) {
+		if (max <= min)
+			return true
+		var low = min
+		var high = max
+		var mid = rows[Math.floor((low + high) / 2)].cells[coln].getAttribute('sortvalue')
+		do {
+			while (rows[low].cells[coln].getAttribute('sortvalue') < mid)
+				low++
+			while (rows[high].cells[coln].getAttribute('sortvalue') > mid)
+				high--
+			if (low <= high) {
+				rows[low].swapNode(rows[high])
+				low++
+				high--
+			}
+		} while (low <= high)
+		if (high > min)
+			QuickSort(rows, coln, min, high)
+		if (low < max)
+			QuickSort(rows, coln, low, max)
+	}
+
+	if (!document.swapNode) {
+		Node.prototype.swapNode = function (node) {
+			var p = node.parentNode
+			var s = node.nextSibling
+			this.parentNode.replaceChild(node, this)
+			p.insertBefore(this, s)
+			return this
+		}
+	}
+
+	window.sorttable = sorttable
+
+	function armSortableTheads() {
+		var theads = document.querySelectorAll('table.exotable > thead')
+		for (var i = 0; i < theads.length; i++) {
+			var thead = theads[i]
+			if (thead.getAttribute('data-exo-rpt-sort') == '1')
+				continue
+			thead.setAttribute('data-exo-rpt-sort', '1')
+			thead.style.cursor = 'pointer'
+			thead.addEventListener('click', sorttable)
+		}
+	}
+
+	function whenDomReady(fn) {
+		if (document.readyState == 'loading')
+			document.addEventListener('DOMContentLoaded', fn)
+		else
+			fn()
+	}
+	whenDomReady(armSortableTheads)
 })()

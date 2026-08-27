@@ -246,20 +246,7 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 
 	if (authorised("EDIT PRINTOUTS")) {
 
-		// report.js — column ± fold (optional).
-		// Same-host /3/… first on http(s); then %SCRIPT_URL%/report.js (full URL
-		// so "Web Page, Complete" can save it into _files/). On file: skip /3/…
-		// and start at the CDN/local-saved entry.
-		tt = "['/3/exodus/scripts/report.js'";
-		if (appdomain)
-			tt ^= ",'https://" ^ appdomain ^ "/scripts/report.js'";
-		tt ^= "]";
-		tt = "<script>(function(a){var s=document.createElement('script'),i="
-			 "(location.protocol==='file:'&&a.length>1)?1:0;"
-			 "s.onerror=function(){if(++i<a.length)s.src=a[i]};"
-			 "s.src=a[i];(document.head||document.documentElement).appendChild(s)}"
-			 ")(" ^ tt ^ ")</script>";
-		letterhead.prefixer(tt);
+		// report.js loader is emitted by GETSORTJS (sort + fold). Avoid a second tag here.
 
 		// button
 		var onclick = "javascript:";

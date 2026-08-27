@@ -1366,7 +1366,8 @@ x1exit:
 		htmlcode ^= _FM "<colgroup>" ^ coltags ^ "</colgroup>";
 		// <thead> may be hardcoded elsewhere for page heading
 		//!!!if you change it here, search and change it there too
-		htmlcode ^= _FM "<thead style=\"cursor:pointer\" onclick=\"sorttable(event)\">";
+		// cursor/onclick added by report.js when sorttable is available
+		htmlcode ^= _FM "<thead>";
 		posttheadmark = "<postthead/>";
 		if (headtab) {
 			htmlcode ^= posttheadmark;
