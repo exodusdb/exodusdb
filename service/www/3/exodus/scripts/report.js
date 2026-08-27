@@ -518,4 +518,75 @@
 			fn()
 	}
 	whenDomReady(armSortableTheads)
+
+	// ——— Break-row toggle + opener nwin link fix (was GETCSS poetry) ———
+	// nlist may set window.togglendisplayed = nblocks after load
+	if (typeof window.togglendisplayed == 'undefined')
+		window.togglendisplayed = 0
+	function toggle(t, mode) {
+		if (typeof t == 'string') {
+			if (document.getElementsByClassName)
+				t = document.getElementsByClassName(t)
+			else
+				t = document.getElementsByName(t)
+		}
+		if (t && t.tagName)
+			t = [t]
+		if (!t || !t.length)
+			return
+
+		var display = 'none'
+		for (var ii = t.length - 1; ii >= 0; ii--) {
+			if (t[ii].style.display == '') {
+				t[ii].style.display = 'none'
+			} else {
+				t[ii].style.display = ''
+				display = ''
+			}
+		}
+
+		if (!mode) {
+			var toggleheading = false
+			if (display == '') {
+				window.togglendisplayed++
+				if (window.togglendisplayed == 1)
+					toggleheading = true
+			} else {
+				window.togglendisplayed--
+				if (window.togglendisplayed == 0)
+					toggleheading = true
+			}
+			if (toggleheading) {
+				var rules = document.styleSheets[0].cssRules || document.styleSheets[0].rules
+				var bheads = [rules[0], rules[1]]
+				toggle(bheads, true)
+			}
+		}
+	}
+	window.toggle = toggle
+
+	function fixOpenerNwinLinks() {
+		if (!window.opener)
+			return
+		var links = document.getElementsByTagName('a')
+		var vhtm
+		for (var ii = 0; ii < links.length; ++ii) {
+			var href = links[ii].href.toString()
+			if (href.indexOf('nwin') < 0)
+				continue
+			href = href.toString().split("'")
+			if (href[3] == 'V')
+				href[3] = 'finance/vouchers.htm'
+			if (!vhtm) {
+				vhtm = window.opener.location.toString().split('/')
+				vhtm.pop()
+				if (href[3].indexOf('/') >= 0)
+					vhtm.pop()
+				vhtm = vhtm.join('/')
+			}
+			links[ii].href = vhtm + '/' + href[3] + '?key=' + href[1] + '&openreadonly=true'
+			links[ii].target = '_blank'
+		}
+	}
+	window.addEventListener('load', fixOpenerNwinLinks)
 })()

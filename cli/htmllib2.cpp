@@ -770,81 +770,6 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 <style type="text/css" media="print">
  .noprint {display:none}
 </style>
-
-<script type="text/javascript">
-var togglendisplayed=0
-function toggle(t, mode) {
-
-	if (typeof t == 'string') {
-		if (document.getElementsByClassName)
-			t = document.getElementsByClassName(t)
-		else
-			t = document.getElementsByName(t)
-	}
-
-	if (t.tagName) t=[t]
-	if (!t.length) return
-
-	var display = "none"
-	for (var ii = t.length - 1; ii>=0; ii--) {
-		if (t[ii].style.display == "") {
-			t[ii].style.display = "none"
-		} else {
-			t[ii].style.display = ""
-			display = ""
-		}
-	}
-
-	if (!mode)  {
-		var toggleheading=false
-		if (display == '') {
-			togglendisplayed++
-			if (togglendisplayed == 1)
-				toggleheading = true
-
-		} else {
-			togglendisplayed--
-			if (togglendisplayed == 0)
-				toggleheading = true
-		}
-		if (toggleheading) {
-			//toggle(document.getElementsByName('BHEAD'),true)
-			var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
-			var bheads=[rules[0],rules[1]]
-			toggle(bheads,true)
-		}
-	}
-}
-
-window.onload=function (){
- if (!window.opener)
-  return
- //ctrl+click doesnt provide window.opener
- //glogincode="DEVDTEST*EXODUS*"
- //gwindowopenparameters={}
- //glogincode=window.opener.glogincode
- //gwindowopenparameters.readonlymode=true
- var links=document.getElementsByTagName('a')
- var vhtm
- for ( var ii=0;ii<links.length;++ii){
-  var href=links[ii].href.toString()
-  if (href.indexOf('nwin')<0)
-   continue
-  href=href.toString().split("'")
-  if (href[3]=='V')
-   href[3]='finance/vouchers.htm'
-  if (!vhtm) {
-   vhtm=window.opener.location.toString().split("/")
-   vhtm.pop()
-   if (href[3].indexOf('/')>=0)
-    vhtm.pop()
-   vhtm=vhtm.join('/')
-  }
-  links[ii].href=vhtm+'/'+href[3]+'?key='+href[1]+'&openreadonly=true'
-  links[ii].target='_blank'
- }
-}
-</script>
 )V0G0N";
 
 
@@ -880,52 +805,6 @@ td.nx {border-top:none;border-bottom:none}
 <style type="text/css" media="print">
 .noprint {display:none}
 </style>
-
-<script type="text/javascript">
-var togglendisplayed=0
-function toggle(t, mode) {
-
-    if (typeof t == 'string') {
-        if (document.getElementsByClassName)
-            t = document.getElementsByClassName(t)
-        else
-            t = document.getElementsByName(t)
-    }
-
-    if (t.tagName) t=[t]
-    if (!t.length) return
-
-    var display = "none"
-    for (var ii = t.length - 1; ii>=0; ii--) {
-        if (t[ii].style.display == "") {
-            t[ii].style.display = "none"
-        } else {
-            t[ii].style.display = ""
-            display = ""
-        }
-    }
-
-    if (!mode)  {
-        var toggleheading=false
-        if (display == '') {
-            togglendisplayed++
-            if (togglendisplayed == 1)
-                toggleheading = true
-
-        } else {
-            togglendisplayed--
-            if (togglendisplayed == 0)
-                toggleheading = true
-        }
-        if (toggleheading) {
-            //toggle(document.getElementsByName('BHEAD'),true)
-            var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
-            var bheads=[rules[0],rules[1]]
-            toggle(bheads,true)
-        }
-    }
-}
-</script>
 )V0G0N";
 
 	}
