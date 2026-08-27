@@ -723,7 +723,7 @@ td.nx {border-top:none;border-bottom:none}
 .nobr {white-space:nowrap;}
 .bold {font-weight:bold;}
 .vbottom {vertical-align:bottom}
-.num {text-align:right;mso-number-format:General;white-space:nowrap;}
+.num {text-align:right;white-space:nowrap;}
 
 table.exotable {
  margin:0px;
@@ -764,6 +764,9 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 .pagedivider {border-top:1px dashed var(--exo-rpt-border, #808080); border-bottom:0px;}
 
 </style>
+<!--[if gte mso 9]><style type="text/css">
+.num {mso-number-format:General}
+</style><![endif]-->
 
 <style type="text/css" media="print">
  .noprint {display:none}
@@ -793,11 +796,14 @@ td.nx {border-top:none;border-bottom:none}
 .aleft {text-align:left}
 .acenter {text-align:center}
 .nobr {white-space:nowrap;}
-.num {text-align:right;mso-number-format:General}
+.num {text-align:right}
 .exotable {background-color:var(--exo-rpt-td-bg, #fdf5e6); color:var(--exo-rpt-text, #000000); border-width:2px; border-collapse:collapse; padding:1px}
 .hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
 .pagedivider {border-top:1px dashed var(--exo-rpt-border, #808080); border-bottom:0px;}
 </style>
+<!--[if gte mso 9]><style type="text/css">
+.num {mso-number-format:General}
+</style><![endif]-->
 
 <style type="text/css" media="print">
 .noprint {display:none}
