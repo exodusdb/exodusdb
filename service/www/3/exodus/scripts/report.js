@@ -591,4 +591,69 @@
 		}
 	}
 	window.addEventListener('load', fixOpenerNwinLinks)
+
+	// ——— Theme from EXODUStheme cookie (embedded script only did OS dm/lm) ———
+	// Same dt crumb truth as client.js. May briefly flash OS theme then cookie.
+	var rpt_theme_mql = null
+	var rpt_theme_mql_handler = null
+
+	function rpt_theme_pref_from_cookie() {
+		try {
+			var cookies = unescape(document.cookie || '').split('; ')
+			for (var i = 0; i < cookies.length; i++) {
+				var eq = cookies[i].indexOf('=')
+				if (eq < 0)
+					continue
+				if (cookies[i].slice(0, eq) !== 'EXODUStheme')
+					continue
+				var crumbs = cookies[i].slice(eq + 1).split('&')
+				var dt = ''
+				var saw_dt = false
+				for (var j = 0; j < crumbs.length; j++) {
+					var kv = crumbs[j].split('=')
+					if (kv[0] === 'dt') {
+						saw_dt = true
+						dt = kv[1] || ''
+						break
+					}
+				}
+				if (dt === '1')
+					return 'dark'
+				if (dt === '0')
+					return 'light'
+				if (dt === 'auto')
+					return 'auto'
+				if (saw_dt && dt === '')
+					return 'light' // legacy empty dt = forced light
+				return 'auto'
+			}
+		} catch (e) { }
+		return 'auto'
+	}
+
+	function rpt_theme_apply(pref) {
+		pref = pref || 'auto'
+		var dark = pref === 'dark'
+			|| (pref === 'auto' && window.matchMedia
+				&& window.matchMedia('(prefers-color-scheme: dark)').matches)
+		var html = document.documentElement
+		html.setAttribute('data-exo-rpt-theme', dark ? 'dark' : 'light')
+		html.style.colorScheme = dark ? 'dark' : 'light'
+		if (rpt_theme_mql && rpt_theme_mql_handler) {
+			try {
+				rpt_theme_mql.removeEventListener('change', rpt_theme_mql_handler)
+			} catch (e2) { }
+			rpt_theme_mql = null
+			rpt_theme_mql_handler = null
+		}
+		if (pref === 'auto' && window.matchMedia) {
+			rpt_theme_mql = window.matchMedia('(prefers-color-scheme: dark)')
+			rpt_theme_mql_handler = function () {
+				rpt_theme_apply('auto')
+			}
+			rpt_theme_mql.addEventListener('change', rpt_theme_mql_handler)
+		}
+	}
+
+	rpt_theme_apply(rpt_theme_pref_from_cookie())
 })()
