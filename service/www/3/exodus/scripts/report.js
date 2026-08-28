@@ -406,7 +406,7 @@
 			'  width: 0.85em;',
 			'  height: 0.85em;',
 			'  margin-left: 0.35em;',
-			'  border: 2px solid #888;',
+			'  border: 2px solid currentColor;',
 			'  border-top-color: transparent;',
 			'  border-radius: 50%;',
 			'  vertical-align: -0.1em;',
