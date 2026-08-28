@@ -390,6 +390,50 @@
 
 	// ——— Column sort (was GETSORTJS poetry) ———
 	// Hand cursor / click only after this file loads.
+	var last_sort_th = null
+	var SORT_SPIN_STYLE = 'exo-rpt-sortspin-style'
+
+	function ensureSortSpinCss() {
+		if (document.getElementById(SORT_SPIN_STYLE))
+			return
+		var style = document.createElement('style')
+		style.id = SORT_SPIN_STYLE
+		style.textContent = [
+			'@keyframes exo-rpt-spin { to { transform: rotate(360deg); } }',
+			'.exo-rpt-sortspin {',
+			'  display: inline-block;',
+			'  box-sizing: border-box;',
+			'  width: 0.85em;',
+			'  height: 0.85em;',
+			'  margin-left: 0.35em;',
+			'  border: 2px solid #888;',
+			'  border-top-color: transparent;',
+			'  border-radius: 50%;',
+			'  vertical-align: -0.1em;',
+			'  animation: exo-rpt-spin 0.6s linear infinite;',
+			'}',
+			'.exo-rpt-sortspin-rev { animation-direction: reverse; }'
+		].join('\n')
+		;(document.head || document.documentElement).appendChild(style)
+	}
+
+	function clearSortSpin(th) {
+		if (!th)
+			return
+		var n = th.querySelector('.exo-rpt-sortspin')
+		if (n && n.parentNode)
+			n.parentNode.removeChild(n)
+	}
+
+	function showSortSpin(th, reverse) {
+		ensureSortSpinCss()
+		clearSortSpin(th)
+		var n = document.createElement('span')
+		n.className = 'exo-rpt-sortspin noprint' + (reverse ? ' exo-rpt-sortspin-rev' : '')
+		n.setAttribute('aria-hidden', 'true')
+		th.appendChild(n)
+	}
+
 	function sorttable(event) {
 		if (document.body.getAttribute('contenteditable'))
 			return true
@@ -413,90 +457,100 @@
 			&& (rowchildNodes.length > coln) && (rowchildNodes[coln].tagName == 'TD'))
 			uptorown++
 
-		var dfmt = (typeof window.gdateformat != 'undefined' && window.gdateformat)
-			? window.gdateformat : 'd/M/yyyy'
-		var dateformat
-		if (dfmt == 'M/d/yyyy')
-			dateformat = [2, 0, 1]
-		else if (dfmt == 'yyyy/M/d')
-			dateformat = [0, 1, 2]
-		else
-			dateformat = [2, 1, 0]
-		var yy = dateformat[0] + 1
-		var mm = dateformat[1] + 1
-		var dd = dateformat[2] + 1
+		if (nrows === 0 || uptorown < fromrown)
+			return 0
 
-		var dateregex = / ?(\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
-		var periodregex = / ?(\d{1,2})\/(\d{4})/g
-		for (var ii = fromrown; ii <= uptorown; ++ii) {
-			var cell = rows[ii].cells[coln]
-			if (cell.getAttribute('sortvalue'))
-				break
-			var value = (cell.textContent || cell.innerText || '').toUpperCase()
-			var match
-			while (match = value.match(dateregex)) {
-				value = value.replace(dateregex,
-					('0000' + match[yy]).slice(-4) + '|'
-					+ ('00' + match[mm]).slice(-2) + '|'
-					+ ('00' + match[dd]).slice(-2))
+		var parent = rows[fromrown].parentNode
+		var after = (uptorown + 1 < nrows) ? rows[uptorown + 1] : null
+		var list = []
+		for (var ri = fromrown; ri <= uptorown; ri++)
+			list.push(rows[ri])
+
+		var reverse = (th === last_sort_th)
+		showSortSpin(th, reverse)
+		window.setTimeout(function () {
+			if (reverse) {
+				list.reverse()
+				for (var rj = 0; rj < list.length; rj++)
+					parent.insertBefore(list[rj], after)
+				last_sort_th = null
+				clearSortSpin(th)
+				return
 			}
-			value = value.replace(periodregex, '$2|$1')
-			value = value.replace(/([-+]?[1234567890.,]+)([A-Z]{2,3})/g, '$2$1')
-			value = value.replace(
-				/[-+]?[1234567890.,]+/g,
-				function (x) {
-					x = x.replace(/,/g, '')
-					var y
-					if (x.slice(0, 1) == '-') {
-						y = '-'
-						x = (999999999999.999 + Number(x.replace(/,/g, ''))).toString()
-					} else {
-						y = ''
+
+			var dfmt = (typeof window.gdateformat != 'undefined' && window.gdateformat)
+				? window.gdateformat : 'd/M/yyyy'
+			var dateformat
+			if (dfmt == 'M/d/yyyy')
+				dateformat = [2, 0, 1]
+			else if (dfmt == 'yyyy/M/d')
+				dateformat = [0, 1, 2]
+			else
+				dateformat = [2, 1, 0]
+			var yy = dateformat[0] + 1
+			var mm = dateformat[1] + 1
+			var dd = dateformat[2] + 1
+
+			var dateregex = / ?(\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
+			var periodregex = / ?(\d{1,2})\/(\d{4})/g
+			// Parallel {row, key} — comparator never touches the DOM.
+			var keyed = []
+			var col_keyed = rows[fromrown].cells[coln].getAttribute('sortvalue')
+			for (var ii = fromrown; ii <= uptorown; ++ii) {
+				var cell = rows[ii].cells[coln]
+				var value
+				if (col_keyed) {
+					value = cell.getAttribute('sortvalue')
+				} else {
+					value = (cell.textContent || cell.innerText || '').toUpperCase()
+					var match
+					while (match = value.match(dateregex)) {
+						value = value.replace(dateregex,
+							('0000' + match[yy]).slice(-4) + '|'
+							+ ('00' + match[mm]).slice(-2) + '|'
+							+ ('00' + match[dd]).slice(-2))
 					}
-					x = x.split('.')
-					y += ('00000000000000000000' + x[0]).slice(-20)
-					if (x[1])
-						y += '.' + (x[1] + '0000000000').slice(0, 10)
-					return y
+					value = value.replace(periodregex, '$2|$1')
+					value = value.replace(/([-+]?[1234567890.,]+)([A-Z]{2,3})/g, '$2$1')
+					// gnumformat = thousand+decimal (',.' Anglo / '.,' Euro); default ',.'
+					var numfmt = (typeof window.gnumformat == 'string' && window.gnumformat.length >= 2)
+						? window.gnumformat : ',.'
+					var thou = numfmt.charAt(0)
+					var dec = numfmt.charAt(1)
+					value = value.replace(
+						/[-+]?[1234567890.,]+/g,
+						function (x) {
+							if (thou && thou != ' ')
+								x = x.split(thou).join('')
+							if (dec && dec != '.')
+								x = x.split(dec).join('.')
+							var y
+							if (x.slice(0, 1) == '-') {
+								y = '-'
+								x = (999999999999.999 + Number(x)).toString()
+							} else {
+								y = ''
+							}
+							x = x.split('.')
+							y += ('00000000000000000000' + x[0]).slice(-20)
+							if (x[1])
+								y += '.' + (x[1] + '0000000000').slice(0, 10)
+							return y
+						}
+					)
+					cell.setAttribute('sortvalue', value)
 				}
-			)
-			value += ('000000000000' + ii).slice(-10)
-			cell.setAttribute('sortvalue', value)
-		}
-		QuickSort(rows, coln, fromrown, uptorown)
-	}
-
-	function QuickSort(rows, coln, min, max) {
-		if (max <= min)
-			return true
-		var low = min
-		var high = max
-		var mid = rows[Math.floor((low + high) / 2)].cells[coln].getAttribute('sortvalue')
-		do {
-			while (rows[low].cells[coln].getAttribute('sortvalue') < mid)
-				low++
-			while (rows[high].cells[coln].getAttribute('sortvalue') > mid)
-				high--
-			if (low <= high) {
-				rows[low].swapNode(rows[high])
-				low++
-				high--
+				keyed.push({ row: rows[ii], key: value })
 			}
-		} while (low <= high)
-		if (high > min)
-			QuickSort(rows, coln, min, high)
-		if (low < max)
-			QuickSort(rows, coln, low, max)
-	}
-
-	if (!document.swapNode) {
-		Node.prototype.swapNode = function (node) {
-			var p = node.parentNode
-			var s = node.nextSibling
-			this.parentNode.replaceChild(node, this)
-			p.insertBefore(this, s)
-			return this
-		}
+			// Stable Array.sort keeps equal keys in document order (no row-index suffix).
+			keyed.sort(function (a, b) {
+				return a.key < b.key ? -1 : (a.key > b.key ? 1 : 0)
+			})
+			for (var rk = 0; rk < keyed.length; rk++)
+				parent.insertBefore(keyed[rk].row, after)
+			last_sort_th = th
+			clearSortSpin(th)
+		}, 0)
 	}
 
 	window.sorttable = sorttable

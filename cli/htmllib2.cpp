@@ -385,7 +385,7 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
 
 	} else if (mode == "GETSORTJS") {
 
-		// sorttable lives in report.js — emit date fmt + script loader only.
+		// sorttable lives in report.js — emit date/num fmt + script loader only.
 		// Hand cursor is applied by report.js when it loads (not baked into thead).
 		var jsdatefmt;
 		if (DATEFMT.contains("E")) {
@@ -395,7 +395,14 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
 		} else {
 			jsdatefmt = "M/d/yyyy";
 		}
-		dataio = "<script>var gdateformat='" ^ jsdatefmt ^ "'</script>";
+		// Thousand then decimal from MC/MD: MC → 1.234,56; MD → 1,234.56 (grouping optional)
+		var jsnumfmt;
+		if (BASEFMT.starts("MC")) {
+			jsnumfmt = ".,";
+		} else {
+			jsnumfmt = ",.";
+		}
+		dataio = "<script>var gdateformat='" ^ jsdatefmt ^ "';var gnumformat='" ^ jsnumfmt ^ "'</script>";
 
 		// Primary /3/… ; fallback %URL%/3/… (SYSTEM 114, same as old gethtml);
 		// then https://{141}/3/scripts/report.js (CDN).
