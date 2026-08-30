@@ -4668,11 +4668,28 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 			throw VarDBException(errmsg);
 		}
 
-		// Readnext the keys into a temporary table
+		// Readnext the keys into a temporary table (batched INSERT — fewer round-trips)
 		var key;
+		var batchsql = "";
+		var batchn = 0;
+		constexpr int batch_max = 500;
 		while (this->readnext(key)) {
 			//std::clog<<key<<std::endl;
-			if (not this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')")) UNLIKELY
+			if (batchn)
+				batchsql ^= ",";
+			else
+				batchsql = "INSERT INTO " ^ temptablename ^ "(KEY) VALUES";
+			batchsql ^= "('" ^ key.replace("'", "''") ^ "')";
+			batchn += 1;
+			if (batchn >= batch_max) {
+				if (not this->sqlexec(batchsql)) UNLIKELY
+					throw VarDBException(var::lasterror());
+				batchn = 0;
+				batchsql = "";
+			}
+		}
+		if (batchn) {
+			if (not this->sqlexec(batchsql)) UNLIKELY
 				throw VarDBException(var::lasterror());
 		}
 
