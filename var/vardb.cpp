@@ -4653,7 +4653,9 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		//TRACE(actualfile)
 	}
 	//TRACE(*this)
-	// Save any active selection in a temporary table and INNER JOIN to it to avoid complete selection of primary file
+	// Save any active selection in a temporary table and join it as the key drive
+	// (pseudo-index). Empty unless hasnext() fills it below.
+	var keytable = "";
 	if (this->hasnext()) {
 
 		// Create a temporary sql table to hold the preselected keys
@@ -4679,7 +4681,11 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		}
 		//must be empty!
 
-		joins.inserter(1, 1, "\n RIGHT JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");
+		// Do not RIGHT JOIN the key table onto the main file — Postgres may drive
+		// from a secondary index on the main file (e.g. date) and only join-filter
+		// to the keys. FROM keytable + fenced LATERAL PK probe keeps the temp keys
+		// as the primary filter. OFFSET 0 prevents planner pull-up.
+		keytable = temptablename;
 	}
 
 	// Check file exists on the same connection
@@ -4711,9 +4717,18 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		sql ^= selects;
 
 	//SQL FROM - filename and any specially related files
-	sql ^= " \nFROM\n " ^ actualfilename;
+	// When keytable is set (prior selection), drive from those keys and PK-probe the
+	// main file via LATERAL … OFFSET 0 so secondary indexes cannot become the drive.
+	if (keytable) {
+		sql ^= " \nFROM\n " ^ keytable;
+		sql ^= " \nLEFT JOIN LATERAL (\n SELECT * FROM " ^ actualfilename;
+		sql ^= " WHERE " ^ actualfilename ^ ".key = " ^ keytable ^ ".key OFFSET 0\n";
+		sql ^= ") AS " ^ actualfilename ^ " ON true";
+	} else {
+		sql ^= " \nFROM\n " ^ actualfilename;
+	}
 
-	//SQL JOIN - (1)?
+	//SQL JOIN - (1)? (legacy; SELECT_CURSOR no longer uses this — see keytable LATERAL)
 	if (joins.f(1))
 		sql ^= " " ^ joins.f(1).convert(VM, "\n");
 
@@ -4762,12 +4777,6 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 	// Final catch of obsolete function that was replaced by COLLATE keyword
 	sql.replacer("exodus.extract_sort\\("_rex, "exodus.extract_text(");
-
-	//sql.logputl("sql=");
-
-	// DEBUG_LOG_SQL0
-	// if (DBTRACE>1)
-	//	exo::logputl(sql);
 
 	// First close any existing cursor with the same name, otherwise cannot create  new cursor
 	// Avoid generating sql errors since they abort transactions
@@ -4982,7 +4991,7 @@ static bool readnextx(in cursor, DBconn_ptr pgconn, int direction, PGresult*& pg
 
 	// If no rows returned
 	//if (not PQntuples(*dbresult))
-	//	return false;
+	//return false;
 
 	// 1. Do NOT clear the cursor even if forward since we may be testing it
 	// 2. DO NOT clear since the dbresult2 is needed by the caller
