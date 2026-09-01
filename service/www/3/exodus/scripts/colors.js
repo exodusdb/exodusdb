@@ -1532,12 +1532,12 @@ function colors_popup_place(field) {
 	div.style.top = Math.round(topPos) + 'px'
 }
 
-// Snapshot live form body (--exoform-data-bg-color / cookie) for cancel restore.
+// Snapshot live form/pane colour (--exoform-bg-color / cookie) for cancel restore.
 // The popup must not leave the form body changed unless the user OK/Defaults.
 function colors_popup_capture_form_body() {
 	try {
 		var formBody = getComputedStyle(document.documentElement)
-			.getPropertyValue('--exoform-data-bg-color').trim()
+			.getPropertyValue('--exoform-bg-color').trim()
 		if (formBody)
 			return formBody
 	} catch (e) { }
@@ -1628,7 +1628,7 @@ async function colors_popup_ok() {
 		}
 		// Prefer chrome hex (exact field seed until user picks a continuum cell)
 		var hex = colors_popup._hex || colors_popup_current_hex()
-		// Empty store only for the fixed system form body — not live --exoform-data-bg-color
+		// Empty store only for the fixed system form body — not live --exoform-bg-color
 		// (live form body follows preview, so hex===formBody would always store "").
 		var sys = colors_system_default_body_hex()
 		var store = (hex && hex === sys) ? '' : hex
@@ -1978,14 +1978,14 @@ function exo_dict_colorfontsize(dict, fn) {
     // SCREEN_HEAD_COLOR — UNUSED in the live UI (no cookie, no set_style, no HTM
     // input on Screens row). Kept as word 4 so SYSTEM 46,* field layout stays stable
     // (see initgeneral formheadcolor). Sticky thead tint is CSS: slightly darker
-    // mix of --exoform-data-bg-color (body colour), not this field.
+    // mix of --exoform-data-bg-color (field-cell colour), not this field.
     di = dict[++din] = dictrec('SCREEN_HEAD_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 4
     di.nwords = 1
     exo_dict_color(di)
 
-    // SCREEN_BODY_COLOR — users preview → --exoform-data-bg-color; cookie fc on Save.
+    // SCREEN_BODY_COLOR — users preview → --exoform-bg-color; cookie fc on Save.
     di = dict[++din] = dictrec('SCREEN_BODY_COLOR', 'F', fn)
     di.wordsep = vm
     di.wordno = 5
@@ -2059,12 +2059,12 @@ function colors_system_default_body_hex() {
 	return '#fdf5e6'
 }
 
-// Empty field swatch paint = live form body colour (cookie fc / --exoform-data-bg-color).
+// Empty field swatch paint = live form/pane colour (cookie fc / --exoform-bg-color).
 // After live preview this follows the popup selection — do not use for "is default?".
 function colors_default_swatch_hex() {
 	try {
 		var formBody = getComputedStyle(document.documentElement)
-			.getPropertyValue('--exoform-data-bg-color').trim()
+			.getPropertyValue('--exoform-bg-color').trim()
 		var hex = colors_css_to_hex6(formBody)
 		if (hex)
 			return hex

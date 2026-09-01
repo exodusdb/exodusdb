@@ -26,11 +26,10 @@
 :root {
 
     /*
-     * Form fill: --exoform-bg-color is primary (pane).
-     * --exoform-data-bg-color is derived (field cells). Default pane = old
-     * step-from-#fdf5e6 so derived data stays #fdf5e6.
+     * --exoform-bg-color: form/pane colour (screencolor / cookie fc / default).
+     * --exoform-data-bg-color: derived for field cells.
      */
-    --exoform-bg-color: oklch(from #fdf5e6 calc(l * 0.985) calc(c * 1.175 + 0.0075) h);
+    --exoform-bg-color: #fdf5e6;
     --exoform-data-bg-color: oklch(from var(--exoform-bg-color)
         calc(l / 0.985)
         calc((c - 0.0075) / 1.175)
@@ -302,7 +301,7 @@ TABLE.exohelp-table th {
  * Form bgcolor — two paints:
  *   1. .exoformpane — --exoform-bg-color (primary)
  *   2. .exodata     — --exoform-data-bg-color (derived from pane)
- * Screencolor sets --exoform-bg-color (see client.js); must not paint TABLE.exoform.
+ * Screencolor / fc sets --exoform-bg-color directly (client.js); not TABLE.exoform.
  */
 .exoformpane {
     display: inline-block;

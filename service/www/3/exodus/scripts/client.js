@@ -2281,9 +2281,8 @@ function exo_chrome_cookie_store(v) {
 	return exo_chrome_is_empty(v) ? '' : String(v).trim()
 }
 
-// LM form colour only. Empty → removeProperty so CSS :root defaults apply.
-// Screencolor is field-cell intent: set pane (--exoform-bg-color) to the old
-// forward step from that colour; CSS derives --exoform-data-bg-color back.
+// LM form/pane colour only. Empty → removeProperty so CSS :root defaults apply.
+// Screencolor / fc → --exoform-bg-color; CSS derives --exoform-data-bg-color.
 function exo_chrome_apply_color(value) {
 	if (typeof gisdarktheme != 'undefined' && gisdarktheme)
 		return
@@ -2297,8 +2296,7 @@ function exo_chrome_apply_color(value) {
 		return
 	}
 	value = String(value).trim()
-	html.style.setProperty('--exoform-bg-color',
-		'oklch(from ' + value + ' calc(l * 0.985) calc(c * 1.175 + 0.0075) h)')
+	html.style.setProperty('--exoform-bg-color', value)
 	html.style.removeProperty('--exoform-data-bg-color')
 	html.style.setProperty('--exoform-border-color', '#d0d0d0')
 	exo_set_form_head_direction(value)
