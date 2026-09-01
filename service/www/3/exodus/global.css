@@ -25,8 +25,16 @@
  */
 :root {
 
-    /* field-cell / form-body colour (screencolor / cookie fc) */
-    --exoform-data-bg-color: #fdf5e6;
+    /*
+     * Form fill: --exoform-bg-color is primary (pane).
+     * --exoform-data-bg-color is derived (field cells). Default pane = old
+     * step-from-#fdf5e6 so derived data stays #fdf5e6.
+     */
+    --exoform-bg-color: oklch(from #fdf5e6 calc(l * 0.985) calc(c * 1.175 + 0.0075) h);
+    --exoform-data-bg-color: oklch(from var(--exoform-bg-color)
+        calc(l / 0.985)
+        calc((c - 0.0075) / 1.175)
+        h);
     --exoform-border-radius: 10px;
     --exoform-border-color: #d0d0d0;
     /* Internal form cell grid (th/td) — not the pane chrome edge */
@@ -164,6 +172,7 @@
      *   base  = #28304a
      *   data  = #28304a + Δ = #303a5a
      */
+    --exoform-bg-color: #28304a;
     --exoform-data-bg-color: #303a5a;
     /* Was #7070e0 / #5a6090 — same luma, navy-slate not violet */
     --exoform-border-color: #70778d;
@@ -290,10 +299,10 @@ TABLE.exohelp-table th {
 }
 
 /*
- * Form bgcolor — two paints only:
- *   1. .exoformpane — chrome base (step from --exoform-data-bg-color)
- *   2. .exodata        — data tint (--exoform-data-bg-color / screencolor)
- * Screencolor sets the CSS var; it must not paint TABLE.exoform (client.js).
+ * Form bgcolor — two paints:
+ *   1. .exoformpane — --exoform-bg-color (primary)
+ *   2. .exodata     — --exoform-data-bg-color (derived from pane)
+ * Screencolor sets --exoform-bg-color (see client.js); must not paint TABLE.exoform.
  */
 .exoformpane {
     display: inline-block;
@@ -304,10 +313,10 @@ TABLE.exohelp-table th {
      * (journals multi-col line grid, etc.). Do not max-width/overflow the pane;
      * the page scrolls if the shell is wider than the window. */
     width: max-content;
-    --exoform-bg-color: var(--exoform-data-bg-color, #fdf5e6);
-    --exoform-bg-color: oklch(from var(--exoform-data-bg-color, #fdf5e6)
-        calc(l * 0.985)
-        calc(c * 1.175 + 0.0075)
+    /* Re-derive data when pane bg is overridden on this element */
+    --exoform-data-bg-color: oklch(from var(--exoform-bg-color)
+        calc(l / 0.985)
+        calc((c - 0.0075) / 1.175)
         h);
     background-color: var(--exoform-bg-color);
     border: 1px solid var(--exoform-border-color);
@@ -317,12 +326,16 @@ TABLE.exohelp-table th {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 :root[data-form-head="lighter"] .exoformpane {
-    --exoform-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 90%, white);
+    --exoform-bg-color: color-mix(in oklch, var(--exoform-bg-color) 90%, white);
+    --exoform-data-bg-color: oklch(from var(--exoform-bg-color)
+        calc(l / 0.985)
+        calc((c - 0.0075) / 1.175)
+        h);
     background-color: var(--exoform-bg-color);
 }
 TABLE.exoform td.exodata,
 TABLE.exoform th.exodata {
-    background-color: var(--exoform-data-bg-color, #fdf5e6);
+    background-color: var(--exoform-data-bg-color);
 }
 /* Centered popup/dialog: form pane stacks above sibling buttons (e.g. schedules_calendar) */
 div[align="center"] > .exoformpane {
@@ -2061,11 +2074,9 @@ input[type=checkbox]:focus-visible {
 }
 
 :root[data-theme="dark_mode"] .exoformpane {
-    /* Scoped vars override inline LM screencolor on <html>.
-     * base (pane) = old data #28304a; data (exodata) = #28304a + Δ → #303a5a
-     * (Δ = old base − old data). Pane darker, wells lighter — same sense as LM. */
-    --exoform-data-bg-color: #303a5a;
+    /* Pane primary; data explicit (DM pair is not the LM oklch step). */
     --exoform-bg-color: #28304a;
+    --exoform-data-bg-color: #303a5a;
     --exoform-border-color: #70778d;
     --exoform-cell-border-color: #5a627b;
     background-color: var(--exoform-bg-color);
