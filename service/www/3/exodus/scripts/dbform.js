@@ -2120,8 +2120,10 @@ async function formfunctions_onload() {
 					// Full theory: FORM-UI-WIDE-NARROW.md § Multivalue col0 / Nest left-pack override.
 					if (nestfill)
 						insertdeletebuttons.width = '1%'
-					if (hasIns || hasDel)
+					if (hasIns || hasDel) {
+						insertdeletebuttons.className += ' exodata'
 						insertdeletebuttons.style.paddingRight = '3px'
+					}
 
 					//locate the TR element in the parents
 					var trx = getancestor(element, 'tr')
