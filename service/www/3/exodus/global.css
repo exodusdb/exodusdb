@@ -172,7 +172,8 @@
      *   data  = #28304a + Δ = #303a5a
      */
     --exoform-bg-color: #28304a;
-    --exoform-data-bg-color: #303a5a;
+    /* Was #303a5a; 50% closer to pane (50% of old delta) */
+    --exoform-data-bg-color: #2c3552;
     /* Was #7070e0 / #5a6090 — same luma, navy-slate not violet */
     --exoform-border-color: #70778d;
     --exoform-cell-border-color: #5a627b;
@@ -2075,7 +2076,7 @@ input[type=checkbox]:focus-visible {
 :root[data-theme="dark_mode"] .exoformpane {
     /* Pane primary; data explicit (DM pair is not the LM oklch step). */
     --exoform-bg-color: #28304a;
-    --exoform-data-bg-color: #303a5a;
+    --exoform-data-bg-color: #2c3552;
     --exoform-border-color: #70778d;
     --exoform-cell-border-color: #5a627b;
     background-color: var(--exoform-bg-color);
