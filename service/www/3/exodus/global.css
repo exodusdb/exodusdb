@@ -133,17 +133,18 @@
     --exopopup-hover-bg-color: color-mix(in srgb, var(--exotext-color) 18%, transparent);
     --exocalendar-today-color: #ff8a80;
     --exomenu-bg: linear-gradient(to top, #303a5a, #1a2035);
-    --exooutline-color: #5058a0;
+    /* Outline / flyout edges: lighter slate of navy chrome — not periwinkle */
+    --exooutline-color: color-mix(in oklch, var(--exoform-bg-color) 50%, white);
     --exomenu-box-shadow: #000 0px 1px 10px;
     --exomenu-hover-bg-color: #354060;
     /* Burger dropdown / flyouts — slightly above form chrome */
     --exoflyout-bg-color: #303c5c;
-    --exoflyout-border-color: #8888f0;
+    --exoflyout-border-color: color-mix(in oklch, var(--exoflyout-bg-color) 40%, white);
     --exoflyout-hover-bg-color: #4a5880;
     --exodot-border-color: #c8c0b0;
     /* DM: subtle lift vs form well; border readable against fill */
     --exofield-bg-color: color-mix(in oklch, var(--exoform-bg-color) 96%, white);
-    --exofield-border-color: color-mix(in oklch, var(--exoform-bg-color) 50%, #9aa4c4);
+    --exofield-border-color: color-mix(in oklch, var(--exoform-bg-color) 50%, white);
     --exofield-border: 1px solid var(--exofield-border-color);
     --exofield-border-radius: 0.2rem;
     --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
@@ -160,15 +161,19 @@
      *   data  = #28304a + Δ = #303a5a
      */
     --exoform-bg-color: #303a5a;
-    --exoform-border-color: #7070e0;
-    --exoform-cell-border-color: #5a6090;
+    /*
+     * Borders: same navy family as pane/data (#28304a / #303a5a), lighter mix with
+     * white — not violet #7070e0 / #8888f0. Outer frame lighter than cell grid.
+     */
+    --exoform-border-color: color-mix(in oklch, var(--exoform-bg-color) 42%, white);
+    --exoform-cell-border-color: color-mix(in oklch, var(--exoform-bg-color) 68%, white);
     --exoform-label-font-style: italic;
     --exoform-data-font-style: normal;
     --exoform-data-font-size: 1rem;
     /* Normal buttons (exobutton + graphicbutton): fixed DM fill (not form-mix) */
     --exoinformbutton-bg-color: #354060;
     --exoinformbutton-hover-bg-color: #455880;
-    --exoinformbutton-hover-border-color: #9898f8;
+    --exoinformbutton-hover-border-color: color-mix(in oklch, var(--exoform-bg-color) 28%, white);
     --exoinformbutton-border-color: var(--exoform-border-color);
     --exoinformbutton-border-style: solid;
     --exoinformbutton-color: #ffffff;
@@ -2060,8 +2065,8 @@ input[type=checkbox]:focus-visible {
      * (Δ = old base − old data). Pane darker, wells lighter — same sense as LM. */
     --exoform-bg-color: #303a5a;
     --exoform-th-bg-color: #28304a;
-    --exoform-border-color: #7070e0;
-    --exoform-cell-border-color: #5a6090;
+    --exoform-border-color: color-mix(in oklch, var(--exoform-bg-color) 42%, white);
+    --exoform-cell-border-color: color-mix(in oklch, var(--exoform-bg-color) 68%, white);
     background-color: var(--exoform-th-bg-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
@@ -2130,7 +2135,7 @@ SPAN.calendar-date-committed[contenteditable] {
 
 :root[data-theme="dark_mode"] .menu_hr,
 :root[data-theme="dark_mode"] .menu hr {
-    border-color: #646ca8;
+    border-color: color-mix(in oklch, var(--exoflyout-bg-color) 55%, white);
 }
 
 /* Bare BUTTON only — .graphicbutton uses --exoinformbutton-* like .exobutton.
