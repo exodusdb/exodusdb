@@ -25,8 +25,8 @@
  */
 :root {
 
-    /* form body fill (screencolor / cookie fc); pane derives --exoform-th-bg-color */
-    --exoform-bg-color: #fdf5e6;
+    /* field-cell / form-body colour (screencolor / cookie fc) */
+    --exoform-data-bg-color: #fdf5e6;
     --exoform-border-radius: 10px;
     --exoform-border-color: #d0d0d0;
     /* Internal form cell grid (th/td) — not the pane chrome edge */
@@ -52,13 +52,13 @@
      * First line = fallback if color-mix/oklch unsupported.
      */
     --exoinformbutton-bg-color: #f0f0f0;
-    --exoinformbutton-bg-color: color-mix(in oklch, var(--exoform-bg-color) 72%, white);
+    --exoinformbutton-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 72%, white);
     --exoinformbutton-hover-bg-color: #f5f5f5;
-    --exoinformbutton-hover-bg-color: color-mix(in oklch, var(--exoform-bg-color) 58%, white);
+    --exoinformbutton-hover-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 58%, white);
     --exoinformbutton-border-color: #cccccc;
-    --exoinformbutton-border-color: color-mix(in oklch, var(--exoform-bg-color) 55%, #888888);
+    --exoinformbutton-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 55%, #888888);
     --exoinformbutton-hover-border-color: #bbbbbb;
-    --exoinformbutton-hover-border-color: color-mix(in oklch, var(--exoform-bg-color) 45%, #666666);
+    --exoinformbutton-hover-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 45%, #666666);
     --exoinformbutton-border-style: solid;
     --exoinformbutton-color: inherit;
     /* Toolbar/field icons (see AGENTS.md § Menubar / form icons):
@@ -95,8 +95,8 @@
      */
     --exodot-border-color: #5a4a3a;
     /* Subtle lift like DM — closer to form, not near-white */
-    --exofield-bg-color: color-mix(in oklch, var(--exoform-bg-color) 88%, white);
-    --exofield-border-color: color-mix(in oklch, var(--exoform-bg-color) 49%, #848484);
+    --exofield-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 88%, white);
+    --exofield-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 49%, #848484);
     --exofield-border: 1px solid var(--exofield-border-color);
     --exofield-border-radius: 0.2rem;
     /* Legacy alias (empty readonly strut / older rules) */
@@ -108,10 +108,10 @@
     --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
     --exoradio-color: rgba(0, 84, 187, 0.596);
     /* Unchecked ring: strong contrast from form host (not field border) */
-    --exoradio-ring-border-color: color-mix(in oklch, var(--exoform-bg-color) 30%, black);
+    --exoradio-ring-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 30%, black);
     --exopage-bg-color: #f9f9f9;
     /* DOMUI popup shells (confirm/decide, calendar, colour continuum) — define once here */
-    --exopopup-bg-color: var(--exoform-bg-color);
+    --exopopup-bg-color: var(--exoform-data-bg-color);
     --exopopup-border-color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
     --exopopup-box-shadow: 0 4px 24px color-mix(in srgb, black 35%, transparent);
     --exopopup-divider-border-color: color-mix(in srgb, var(--exotext-color) 12%, transparent);
@@ -146,9 +146,9 @@
     --exoflyout-hover-bg-color: #4a5880;
     --exodot-border-color: #c8c0b0;
     /* DM: subtle lift vs form well; border readable against fill */
-    --exofield-bg-color: color-mix(in oklch, var(--exoform-bg-color) 96%, white);
+    --exofield-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 96%, white);
     /* Field edge: restore pre-retint mix (contrast ~LM); partner is slate not violet */
-    --exofield-border-color: color-mix(in oklch, var(--exoform-bg-color) 50%, #9aa4c4);
+    --exofield-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 50%, #9aa4c4);
     --exofield-border: 1px solid var(--exofield-border-color);
     --exofield-border-radius: 0.2rem;
     --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
@@ -164,7 +164,7 @@
      *   base  = #28304a
      *   data  = #28304a + Δ = #303a5a
      */
-    --exoform-bg-color: #303a5a;
+    --exoform-data-bg-color: #303a5a;
     /* Was #7070e0 / #5a6090 — same luma, navy-slate not violet */
     --exoform-border-color: #70778d;
     --exoform-cell-border-color: #5a627b;
@@ -188,14 +188,14 @@
     --exoradio-color: rgba(36, 100, 173, 1);
     --exoradio-checked-bg-color: #f0f0f0;
     /* Unchecked ring: strong contrast from form host */
-    --exoradio-ring-border-color: color-mix(in oklch, var(--exoform-bg-color) 30%, white);
+    --exoradio-ring-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 30%, white);
 }
 
 html:not(.exopanes-ready) TABLE.exoform,
 html:not(.exopanes-ready) .exoformpane {
 	visibility: hidden;
 }
-/* No table fill — pane + .exodata; screencolor is --exoform-bg-color only. */
+/* No table fill — pane + .exodata; screencolor is --exoform-data-bg-color only. */
 TABLE.exoform
 {
     margin: 1px;
@@ -278,7 +278,7 @@ TABLE[exogroupno] tr {
  */
 TABLE.exohelp-table {
     border-collapse: collapse;
-    background-color: var(--exoform-bg-color, #fdf5e6);
+    background-color: var(--exoform-data-bg-color, #fdf5e6);
     border: 1px solid var(--exoform-border-color, #d0d0d0);
     text-align: left;
 }
@@ -291,8 +291,8 @@ TABLE.exohelp-table th {
 
 /*
  * Form bgcolor — two paints only:
- *   1. .exoformpane — chrome base (step from --exoform-bg-color)
- *   2. .exodata        — data tint (--exoform-bg-color / screencolor)
+ *   1. .exoformpane — chrome base (step from --exoform-data-bg-color)
+ *   2. .exodata        — data tint (--exoform-data-bg-color / screencolor)
  * Screencolor sets the CSS var; it must not paint TABLE.exoform (client.js).
  */
 .exoformpane {
@@ -304,12 +304,12 @@ TABLE.exohelp-table th {
      * (journals multi-col line grid, etc.). Do not max-width/overflow the pane;
      * the page scrolls if the shell is wider than the window. */
     width: max-content;
-    --exoform-th-bg-color: var(--exoform-bg-color, #fdf5e6);
-    --exoform-th-bg-color: oklch(from var(--exoform-bg-color, #fdf5e6)
+    --exoform-bg-color: var(--exoform-data-bg-color, #fdf5e6);
+    --exoform-bg-color: oklch(from var(--exoform-data-bg-color, #fdf5e6)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
-    background-color: var(--exoform-th-bg-color);
+    background-color: var(--exoform-bg-color);
     border: 1px solid var(--exoform-border-color);
     border-radius: var(--exoform-border-radius);
     padding: var(--exoform-pane-padding);
@@ -317,12 +317,12 @@ TABLE.exohelp-table th {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 :root[data-form-head="lighter"] .exoformpane {
-    --exoform-th-bg-color: color-mix(in oklch, var(--exoform-bg-color) 90%, white);
-    background-color: var(--exoform-th-bg-color);
+    --exoform-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 90%, white);
+    background-color: var(--exoform-bg-color);
 }
 TABLE.exoform td.exodata,
 TABLE.exoform th.exodata {
-    background-color: var(--exoform-bg-color, #fdf5e6);
+    background-color: var(--exoform-data-bg-color, #fdf5e6);
 }
 /* Centered popup/dialog: form pane stacks above sibling buttons (e.g. schedules_calendar) */
 div[align="center"] > .exoformpane {
@@ -605,11 +605,11 @@ TABLE[exogroupno] > thead {
 /*
  * Sticky group thead: same chrome as pane (not data body). Opaque so rows do
  * not bleed under sticky heads while scrolling. data-form-head only retargets
- * the pane token; heads consume --exoform-th-bg-color.
+ * the pane token; heads consume --exoform-bg-color.
  */
 TABLE[exogroupno] > thead th,
 TABLE[exogroupno] > thead td {
-    background-color: var(--exoform-th-bg-color, var(--exoform-bg-color, #fdf5e6));
+    background-color: var(--exoform-bg-color, var(--exoform-data-bg-color, #fdf5e6));
 }
 /* Decide + typeahead heads: step from popup shell (not form) */
 .exoconfirmdiv #decide_table1 > thead th,
@@ -1998,7 +1998,7 @@ input[type=checkbox]:focus-visible {
     box-shadow: none !important;
 }
 :root[data-theme="dark_mode"] .cke_inner {
-    background: var(--exoform-bg-color) !important;
+    background: var(--exoform-data-bg-color) !important;
 }
 :root[data-theme="dark_mode"] .cke_top,
 :root[data-theme="dark_mode"] .cke_bottom {
@@ -2047,7 +2047,7 @@ input[type=checkbox]:focus-visible {
     border-color: transparent transparent var(--exoform-cell-border-color) !important;
 }
 :root[data-theme="dark_mode"] .cke_contents {
-    background: var(--exoform-bg-color) !important;
+    background: var(--exoform-data-bg-color) !important;
     border-color: var(--exoform-cell-border-color) !important;
 }
 /* Hide iframe until exo_ckeditor_apply_theme marks .exo_ck_themed —
@@ -2064,11 +2064,11 @@ input[type=checkbox]:focus-visible {
     /* Scoped vars override inline LM screencolor on <html>.
      * base (pane) = old data #28304a; data (exodata) = #28304a + Δ → #303a5a
      * (Δ = old base − old data). Pane darker, wells lighter — same sense as LM. */
-    --exoform-bg-color: #303a5a;
-    --exoform-th-bg-color: #28304a;
+    --exoform-data-bg-color: #303a5a;
+    --exoform-bg-color: #28304a;
     --exoform-border-color: #70778d;
     --exoform-cell-border-color: #5a627b;
-    background-color: var(--exoform-th-bg-color);
+    background-color: var(--exoform-bg-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 :root[data-theme="dark_mode"] TABLE.exoform {
@@ -2087,7 +2087,7 @@ SPAN.calendar-date-committed[contenteditable] {
 /* DM sticky group head: pane chrome token (same as LM sticky) */
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead th,
 :root[data-theme="dark_mode"] TABLE[exogroupno] > thead td {
-    background-color: var(--exoform-th-bg-color, #303a5a);
+    background-color: var(--exoform-bg-color, #303a5a);
 }
 :root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 > thead th,
 :root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 > thead td,
@@ -2185,7 +2185,7 @@ SPAN.calendar-date-committed[contenteditable] {
 /* DM unchecked radio/checkbox face = form/data well (not page black) */
 :root[data-theme="dark_mode"] input[type=radio]:not(:checked),
 :root[data-theme="dark_mode"] input[type=checkbox]:not(:checked) {
-    background-color: var(--exoform-bg-color);
+    background-color: var(--exoform-data-bg-color);
     border-width: calc(var(--exocheck-size) * 1.5 / 14);
 }
 
@@ -2216,7 +2216,7 @@ SPAN.calendar-date-committed[contenteditable] {
 
 /* Disabled radio: same paint as enabled (unchecked or checked), overall dimmed */
 :root[data-theme="dark_mode"] input[type=radio]:disabled:not(:checked) {
-    background-color: var(--exoform-bg-color) !important;
+    background-color: var(--exoform-data-bg-color) !important;
     border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
     opacity: 0.5;
 }
@@ -2228,7 +2228,7 @@ SPAN.calendar-date-committed[contenteditable] {
 }
 /* Disabled checkbox: same paint as enabled (unchecked or checked), overall dimmed */
 :root[data-theme="dark_mode"] input[type=checkbox]:disabled:not(:checked) {
-    background-color: var(--exoform-bg-color) !important;
+    background-color: var(--exoform-data-bg-color) !important;
     border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
     opacity: 0.5;
 }
@@ -2320,7 +2320,7 @@ SPAN.calendar-date-committed[contenteditable] {
 .calendarBody th.weekDayHead {
     font-weight: bold;
     border-bottom: 1px solid var(--exoform-border-color);
-    background: var(--exoform-bg-color);
+    background: var(--exoform-data-bg-color);
     padding: 4px 6px;
 }
 .calendarBody td.weekNumber {
@@ -2406,7 +2406,7 @@ SPAN.calendar-date-committed[contenteditable] {
     :root,
     :root[data-theme="dark_mode"] {
         --exopage-bg-color: #ffffff;
-        --exoform-bg-color: #ffffff;
+        --exoform-data-bg-color: #ffffff;
         --exoform-border-color: #333333;
         --exoform-cell-border-color: #333333;
         --exotext-color: #000000;

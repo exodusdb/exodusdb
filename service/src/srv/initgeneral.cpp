@@ -160,7 +160,7 @@ func main() {
 	// equ tdcolor=system<46,2>
 	// equ reportfont=system<46,3>
 	// equ formheadcolor=system<46,4>  // UNUSED client-side (no cookie/UI apply; thead is CSS mix of formbody)
-	// equ formbodycolor=system<46,5>  // login cookie fc → LM form body (--exoform-bg-color)
+	// equ formbodycolor=system<46,5>  // login cookie fc → LM form body (--exoform-data-bg-color)
 	// equ formfont=system<46,6>
 	// equ formfontsize=system<46,7>
 	// equ reportfontsize to system<46,8>

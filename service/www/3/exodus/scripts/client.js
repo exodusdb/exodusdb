@@ -2130,7 +2130,7 @@ function theme_toggle(theme = 'default') {
 		html.setAttribute('data-theme', theme)
 		html.style.removeProperty('--exocardcolor')
 		// Inline LM colour on <html> would override DM :root tokens
-		html.style.removeProperty('--exoform-bg-color')
+		html.style.removeProperty('--exoform-data-bg-color')
 		html.style.removeProperty('--exoform-border-color')
 		html.removeAttribute('data-form-head')
 	}
@@ -2161,7 +2161,7 @@ function exo_ckeditor_theme_colors() {
 		fg = '#ffffff'
 		try {
 			var cs = getComputedStyle(document.documentElement)
-			bg = (cs.getPropertyValue('--exoform-bg-color') || '').trim() || bg
+			bg = (cs.getPropertyValue('--exoform-data-bg-color') || '').trim() || bg
 			fg = (cs.getPropertyValue('--exotext-color') || '').trim() || fg
 		} catch (e) { }
 	}
@@ -2236,7 +2236,7 @@ function exo_ckeditor_apply_theme() {
 
 // Sticky thead tint direction for LM (see global.css “LM sticky thead tint”).
 // Deeper vs lighter from body luma; CSS owns the two formulas.
-// Call when setting a non-empty --exoform-bg-color.
+// Call when setting a non-empty --exoform-data-bg-color.
 function exo_set_form_head_direction(cssColor) {
 	var s = String(cssColor == null ? '' : cssColor).replace(/\s+/g, '')
 	if (/^[0-9a-fA-F]{3}$/.test(s) || /^[0-9a-fA-F]{6}$/.test(s))
@@ -2286,14 +2286,14 @@ function exo_chrome_apply_color(value) {
 		return
 	var html = document.documentElement
 	if (exo_chrome_is_empty(value)) {
-		html.style.removeProperty('--exoform-bg-color')
+		html.style.removeProperty('--exoform-data-bg-color')
 		html.style.removeProperty('--exoform-border-color')
 		html.removeAttribute('data-form-head')
 		html.style.removeProperty('--exocardcolor')
 		return
 	}
 	value = String(value).trim()
-	html.style.setProperty('--exoform-bg-color', value)
+	html.style.setProperty('--exoform-data-bg-color', value)
 	html.style.setProperty('--exoform-border-color', '#d0d0d0')
 	exo_set_form_head_direction(value)
 	html.style.removeProperty('--exocardcolor')

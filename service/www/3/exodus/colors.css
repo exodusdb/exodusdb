@@ -210,7 +210,7 @@ button.exonative-color:focus {
     cursor: pointer;
     border-radius: 0.25rem;
     border: 1px solid var(--exopopup-border-color, #666);
-    background: var(--exoform-bg-color, #fdf5e6);
+    background: var(--exoform-data-bg-color, #fdf5e6);
     color: inherit;
 }
 .exocolor-popup-actions button:focus {
