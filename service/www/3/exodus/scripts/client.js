@@ -5464,6 +5464,94 @@ function menuhide(element) {
 
 var gnmenus = 0
 var gmenutimeout = ''
+var gmenu_hover_delay = ''
+/*
+ * Flyout aim (submenu opens to the right). Adapted from jQuery-menu-aim
+ * by Ben Kamens, MIT License — https://github.com/kamens/jQuery-menu-aim
+ * (v1.1 constants: tolerance 75, delay 300ms, track 3 mouse locs).
+ */
+var gmenu_mouse_locs = []
+var gmenu_aim_last_delay_loc = null
+var gmenu_aim_mousemove_on = false
+var MENU_AIM_TOLERANCE = 75
+var MENU_AIM_DELAY = 300
+var MENU_AIM_LOCS = 3
+
+function menu_has_open_flyout(menu) {
+	if (!menu || !menu.childNodes)
+		return false
+	for (var i = 0; i < menu.childNodes.length; i++) {
+		var c = menu.childNodes[i]
+		if (c.className == 'menu' && c.style.display != 'none')
+			return true
+	}
+	return false
+}
+
+function menu_aim_track_mouse(e) {
+	if (!e || typeof e.clientX != 'number')
+		return
+	gmenu_mouse_locs.push({ x: e.clientX, y: e.clientY })
+	if (gmenu_mouse_locs.length > MENU_AIM_LOCS)
+		gmenu_mouse_locs.shift()
+}
+
+function menu_aim_ensure_tracking() {
+	if (gmenu_aim_mousemove_on)
+		return
+	gmenu_aim_mousemove_on = true
+	document.addEventListener('mousemove', menu_aim_track_mouse, true)
+}
+
+function menu_aim_stop_tracking() {
+	if (!gmenu_aim_mousemove_on)
+		return
+	gmenu_aim_mousemove_on = false
+	document.removeEventListener('mousemove', menu_aim_track_mouse, true)
+	gmenu_mouse_locs = []
+	gmenu_aim_last_delay_loc = null
+}
+
+// 0 = switch now; else ms to wait then re-check (upstream possiblyActivate).
+function menu_aim_delay(menu) {
+	if (!menu_has_open_flyout(menu))
+		return 0
+	var loc = gmenu_mouse_locs[gmenu_mouse_locs.length - 1]
+	var prevLoc = gmenu_mouse_locs[0]
+	if (!loc)
+		return 0
+	if (!prevLoc)
+		prevLoc = loc
+
+	var r = menu.getBoundingClientRect()
+	var upperRight = { x: r.right, y: r.top - MENU_AIM_TOLERANCE }
+	var lowerRight = { x: r.right, y: r.bottom + MENU_AIM_TOLERANCE }
+
+	if (prevLoc.x < r.left || prevLoc.x > r.right
+		|| prevLoc.y < r.top || prevLoc.y > r.bottom)
+		return 0
+
+	if (gmenu_aim_last_delay_loc
+		&& loc.x == gmenu_aim_last_delay_loc.x
+		&& loc.y == gmenu_aim_last_delay_loc.y)
+		return 0
+
+	function slope(a, b) {
+		return (b.y - a.y) / (b.x - a.x)
+	}
+	var decreasingSlope = slope(loc, upperRight)
+	var increasingSlope = slope(loc, lowerRight)
+	var prevDecreasingSlope = slope(prevLoc, upperRight)
+	var prevIncreasingSlope = slope(prevLoc, lowerRight)
+
+	if (decreasingSlope < prevDecreasingSlope
+		&& increasingSlope > prevIncreasingSlope) {
+		gmenu_aim_last_delay_loc = loc
+		return MENU_AIM_DELAY
+	}
+	gmenu_aim_last_delay_loc = null
+	return 0
+}
 
 function menufitviewport(submenu) {
 
@@ -5499,9 +5587,9 @@ async function menu_onclick(event) {
 	return
 }
 
-function menuonmouseover(event, menuoption) {
+function menuonmouseover(event, menuoption, force) {
 
-	//also called from onkeydown for alt+M keyboard shortcut
+	// force === 'recheck': aim timer — re-test delay (menu-aim possiblyActivate)
 
 	//quit if the menu is not loaded from the web site yet
 	if (!gmenuloaded)
@@ -5518,13 +5606,17 @@ function menuonmouseover(event, menuoption) {
 	}
 
 	//indicate menuing and cancel any request to close menus
-	var keyboarding = menuoption
+	// keyboarding: Alt+M / keys passed menuoption (not aim recheck)
+	var keyboarding = !!menuoption && force !== 'recheck'
 	gnmenus = 1
 	window.clearTimeout(gmenutimeout)
+	menu_aim_ensure_tracking()
+	if (event)
+		menu_aim_track_mouse(event)
 
 	//get the menuoption
 	if (!menuoption) {
-		menuoption = event.target
+		menuoption = event && event.target
 		if (!menuoption || typeof menuoption != 'object')
 			return
 	}
@@ -5534,6 +5626,21 @@ function menuonmouseover(event, menuoption) {
 		menuoption = menuoption.parentNode
 
 	var menu = menuoption.parentNode
+
+	// Right-edge aim only for nested flyouts. #menudiv opens below — skip aim.
+	if (!keyboarding && menu.id != 'menudiv') {
+		var delay = menu_aim_delay(menu)
+		if (delay) {
+			window.clearTimeout(gmenu_hover_delay)
+			gmenu_hover_delay = exosettimeout(function () {
+				gmenu_hover_delay = ''
+				menuonmouseover(null, menuoption, 'recheck')
+			}, delay)
+			return false
+		}
+	}
+	window.clearTimeout(gmenu_hover_delay)
+	gmenu_hover_delay = ''
 
 	//window.status=new Date()+' '+menu.clientLeft+' '+menu.clientWidth
 	var leftoffset
@@ -5571,10 +5678,9 @@ function menuonmouseover(event, menuoption) {
 			break
 	}
 	if (!submenu || submenu.className != 'menu') {
-		if (!submenu)
-			submenu = event.target
-		if (!submenu)
-			return
+		// Leaf row / no flyout sibling — close other flyouts; never use event.target
+		menuhide(menu)
+		return
 	}
 
 	//close any other submenus
@@ -5634,6 +5740,9 @@ function menufocus(menu) {
 function menuonmouseout(event) {
 	event = getevent(event)
 
+	// Cancel aim recheck so it cannot revive gnmenus and abort menuclose
+	window.clearTimeout(gmenu_hover_delay)
+	gmenu_hover_delay = ''
 	gnmenus = 0
 	gmenutimeout = exosettimeout('menuclose()', 1000)
 	//window.event.srcElement.style.color='black'
@@ -5642,6 +5751,9 @@ function menuonmouseout(event) {
 function menuclose() {
 
 	if (gnmenus == 0) {
+		window.clearTimeout(gmenu_hover_delay)
+		gmenu_hover_delay = ''
+		menu_aim_stop_tracking()
 		menuhide()
 		var xmenubutton = $$('menubutton')
 		xmenubutton.style.background = ''
