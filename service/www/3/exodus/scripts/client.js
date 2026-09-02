@@ -1164,13 +1164,17 @@ function modalblock_create() {
 
 	//keep focus off parent window and on child window or exodiv
 	var guiblockermousedown = false
-	blocker.onmousedown = function uiblockerdiv_onmousedown() {
+	blocker.onmousedown = function uiblockerdiv_onmousedown(event) {
 		guiblockermousedown = true
+		// Confirm/decide: do not steal focus from OK / current control
+		if ($$('exoconfirmdiv') && event && event.preventDefault)
+			event.preventDefault()
 	}
 	blocker.onclick = function uiblockerdiv_onclick_sync(event) {
 
+		// Confirm/decide: outside click ignored — dialog stays open (Cancel/Esc to dismiss).
 		if ($$('exoconfirmdiv')) {
-			window.setTimeout(exo_confirm_outside_click_sync, 10)
+			return
 		}
 		// Date picker: click outside (on modal shield) dismisses without commit
 		else if (typeof calendar_checkInDatePicker != 'undefined' && calendar_checkInDatePicker
@@ -9496,19 +9500,6 @@ function exo_confirm_function2_sync(event) {
 //return 0
 function exo_confirm_function3_sync(event) {
 	return exo_confirm_function(0, event)
-}
-
-// Click on modal blocker outside confirm: last footer action (Cancel/No), not OK/Select.
-// Matches Esc-ish "leave" rather than affirming the default/first button.
-function exo_confirm_outside_click_sync(event) {
-	if ($$('decide_cancelbutton'))
-		return resolvePendingConfirm('', 'exo_confirm_outside_click_sync')
-	if ($$('cancelbutton'))
-		return exo_confirm_function3_sync(event)
-	if ($$('negativebutton'))
-		return exo_confirm_function2_sync(event)
-	// Only one action button (e.g. OK alone)
-	return exo_confirm_function1_sync(event)
 }
 
 // expectedOwner: optional 'A' | 'B' — when set, only resolve if gpendingConfirmOwner matches
