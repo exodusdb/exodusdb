@@ -521,7 +521,7 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		DECLARE
 		 ans text;
 		BEGIN
-		 ans:=upper(translate(substring(dict_vouchers_text(key,data),0,1000),E'\x1D\x1E .,-/()\+$%&*+={}[<>?;:|"''`~!#^_@\x1A\x1B\x1C\x1F',repeat(' ',78)));
+		 ans:=upper(translate(substring(dict_vouchers_text(key,data),0,65536),E'\x1D\x1E .,-/()\+$%&*+={}[<>?;:|"''`~!#^_@\x1A\x1B\x1C\x1F',repeat(' ',78)));
 		  RETURN ans;
 		 END;
 	*/
@@ -533,7 +533,7 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		DECLARE
 		 ans text;
 		BEGIN
-		 ans:=upper(translate(substring(dict_vouchers_text(key,data),0,1000),E'\x1D\x1E .,-/()\+$%&*+={}[<>?;:|"''`~!#^_@\x1A\x1B\x1C\x1F',repeat(' ',78)));
+		 ans:=upper(translate(substring(dict_vouchers_text(key,data),0,65536),E'\x1D\x1E .,-/()\+$%&*+={}[<>?;:|"''`~!#^_@\x1A\x1B\x1C\x1F',repeat(' ',78)));
 		  RETURN ans;
 		 END;
 		$$
@@ -716,8 +716,9 @@ subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 		sourcecode(1, -1) = "/" "*pgsql";
 		//note postgres string prefix E'...'
 		// E is required to enable \xFF hex decoding
-		//LIMIT TO 1000 characters since postgres index limit is around 2700 BYTES
-		sourcecode(1, -1) = "ans:=upper(translate(substring(public." ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid.lcase() ^ "(key,data),0,1000)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));";
+		// Cap source text before to_tsvector('simple', …). Old 1000 was for btree ~2700-byte
+		// keys; GIN FTS is bounded by tsvector ~1MB — 64KiB is ample for Neosys docs.
+		sourcecode(1, -1) = "ans:=upper(translate(substring(public." ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid.lcase() ^ "(key,data),0,65536)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));";
 //		sourcecode.r(1, -1,
 //					 "*"
 //					 "/");
@@ -773,8 +774,8 @@ subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 
 	// Fix missing schema for functions that will be used in indexing
 	// since 26.04 the search_path is not used so only system funcs are valid without schema
-	// upper(translate(substring(dict_schedules_text(key,data),0,1000)
-	// upper(translate(substring(public.dict_schedules_text(key,data),0,1000)
+	// upper(translate(substring(dict_schedules_text(key,data),0,65536)
+	// upper(translate(substring(public.dict_schedules_text(key,data),0,65536)
 //	if (dictid.ends("XREF")) {
 		sql.replacer("(dict_", "(public.dict_");
 		sql.replacer(" dict_", " public.dict_");
