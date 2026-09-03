@@ -899,9 +899,11 @@ async function formfunctions_onload() {
 			return
 	}
 
-	//make sure we are logged in
-	if (!gusername)
-		db.login()
+	//make sure we are logged in (await — bookmark/onload must not race form_postdisplay)
+	if (!gusername) {
+		if (!(await db.login()))
+			return false
+	}
 
 	//done in client.js after db
 	//gbasecurr=exogetcookie2('bc')
