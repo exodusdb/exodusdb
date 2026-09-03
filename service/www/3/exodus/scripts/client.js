@@ -6393,6 +6393,9 @@ function exo_reveal_form_panes() {
  */
 var gform_wide_layout_resize_wired = false
 var gform_wide_crush_slack_px = 32
+// Stay-wide band: leave .exoform-wide only when content clearly fits (stops
+// narrow↔wide thrash and losing 30ch soft-max while the form still sprawls).
+var gform_wide_hysteresis_px = 64
 var gform_wide_exomax_px_cache = null
 var gform_wide_last_geom_snap = ''
 
@@ -6484,10 +6487,22 @@ function form_record_is_displayed() {
 }
 
 // Skeleton first (floor); crush only adds wide when skeleton fits.
+// Hysteresis: once wide, require a clearer fit before returning to narrow so
+// 30ch soft-max is not dropped while the form still exceeds the soft ceiling.
 function form_table_wants_wide(table, ceiling) {
-	if (form_table_skeleton_wants_wide(table, ceiling))
+	if (!table || !(ceiling > 0))
+		return false
+	var hadWide = form_table_is_wide(table)
+	var band = hadWide ? (ceiling - gform_wide_hysteresis_px) : ceiling
+	if (!(band > 0))
+		band = 1
+	if (form_table_skeleton_wants_wide(table, band))
 		return true
-	if (form_record_is_displayed() && form_table_crush_wants_wide(table, ceiling))
+	if (form_record_is_displayed() && form_table_crush_wants_wide(table, band))
+		return true
+	// Content already past the soft ceiling → wide (so 30ch fold applies)
+	var sw = table.scrollWidth || 0
+	if (sw > ceiling + gform_wide_crush_slack_px)
 		return true
 	return false
 }

@@ -11958,6 +11958,8 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 		tablex.exo_filter_colid = ''
 		tablex.exo_filter_value = ''
 		await calcfields()
+		if (typeof form_update_wide_layout == 'function')
+			form_update_wide_layout()
 		return true
 	}
 
@@ -12052,6 +12054,10 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
 	//window.status = ''
 	console.log('');
+
+	// Row show/hide changes crush/skeleton — re-decide narrow vs wide (all forms)
+	if (typeof form_update_wide_layout == 'function')
+		form_update_wide_layout()
 
 	return true
 
