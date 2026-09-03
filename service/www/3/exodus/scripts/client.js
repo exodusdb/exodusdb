@@ -6500,11 +6500,24 @@ function form_table_wants_wide(table, ceiling) {
 		return true
 	if (form_record_is_displayed() && form_table_crush_wants_wide(table, band))
 		return true
-	// Content already past the soft ceiling → wide (so 30ch fold applies)
-	var sw = table.scrollWidth || 0
-	if (sw > ceiling + gform_wide_crush_slack_px)
-		return true
-	return false
+	// Sprawl past soft ceiling → wide. Enter: trust current scrollWidth.
+	// Stay-wide: measure without .exoform-wide so max-content / 30ch cannot
+	// fake a fit (narrow↔wide thrash on myjobs and similar lists).
+	var slack = gform_wide_crush_slack_px
+	if (!hadWide) {
+		var swIn = table.scrollWidth || 0
+		return swIn > ceiling + slack
+	}
+	var swOut = 0
+	try {
+		form_table_set_wide_class(table, false)
+		form_table_apply_freetext_wide_max(table, false)
+		swOut = table.scrollWidth || 0
+	} finally {
+		form_table_set_wide_class(table, true)
+		form_table_apply_freetext_wide_max(table, true)
+	}
+	return swOut > band + slack
 }
 
 function form_wide_layout_tables() {

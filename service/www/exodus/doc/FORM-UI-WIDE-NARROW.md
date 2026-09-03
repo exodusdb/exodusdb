@@ -66,14 +66,24 @@ The two strategies give the **best UI depending on form and screen size**.
 
 ```
 soft_ceiling = 100vw − 2rem   (current zoom)
+band = already .exoform-wide
+     ? soft_ceiling − hysteresis (~64px)   // stay-wide: need a clearer fit to leave
+     : soft_ceiling
 
 wantWide =
     skeleton_width(free-text floors @ 6ch, table width max-content)
-      > soft_ceiling
+      > band
     OR
     (record displayed
      AND form already at soft ceiling
      AND free-text column is crushed below its preferred width)
+    OR
+    sprawl scrollWidth past ceiling (enter) / past band (leave)
+
+Leave-wide sprawl check: temporarily clear .exoform-wide (and 30ch soft max),
+measure scrollWidth, restore. Do not trust scrollWidth under wide-only CSS
+(max-content / cell min-width max-content / 30ch) — that understates sprawl
+and causes narrow↔wide thrash (e.g. myjobs after filter).
 
 if wantWide:
     add .exoform-wide
@@ -83,7 +93,7 @@ else:
     free-text style.maxWidth = 100%   // fold under cell / ceiling
 ```
 
-**30ch is not “fold on narrow screens.”** Fold on narrow is **`max-width: 100%` + pre-wrap + soft ceiling**. 30ch is only a **soft cap in wide mode** so multi-col grids stay usable.
+**30ch is not “fold on narrow screens.”** Fold on narrow is **`max-width: 100%` + pre-wrap + soft ceiling**. 30ch is only a **soft cap in wide mode** so multi-col grids stay usable. It must not drive a false leave-wide.
 
 ---
 
