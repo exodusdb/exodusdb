@@ -7019,9 +7019,8 @@ var gblockevents
 var gblockevents_hist = []
 var gblockevents_hist_max = 48
 var gblockevents_nonzero_since = 0
-// Continuous raw flight: only (no modal_dialog / db_send / db_requesting /
-// gds_loading / confirm / …). Open→search for minutes then READU must not
-// inherit dialog age as "long flight".
+// Continuous raw flight: only (no modal_dialog / db_send / confirm / …).
+// Open→search for minutes then READU must not inherit dialog age as "long flight".
 var gblockevents_raw_flight_since = 0
 var gblockevents_skipped_n = 0
 var gblockevents_heartbeat_id = 0
@@ -7165,16 +7164,6 @@ function exo_gblockevents_holder() {
 		if (typeof gchildwin != 'undefined' && gchildwin && gchildwin.lazy && gchildwin.xhttp)
 			return 'db_send'
 	} catch (e1b) { }
-	// Any in-flight db.send (incl. quiet / lost lazy stub) — XHR may run up to timeout.
-	try {
-		if (typeof db != 'undefined' && db && db.requesting)
-			return 'db_requesting'
-	} catch (e1c) { }
-	// gds.load/bind (e.g. myjobs refresh after GETMYJOBS) — can be long with no XHR.
-	try {
-		if (typeof gds != 'undefined' && gds && gds.loading)
-			return 'gds_loading'
-	} catch (e1d) { }
 	// In-DOM confirm / decide while Gate A awaits resolvePendingConfirm
 	try {
 		if (document.getElementById('exoconfirmdiv'))
@@ -7260,9 +7249,8 @@ function exo_gblockevents_heartbeat() {
 			gblockevents_stuck_reported = false
 	}
 	if (holder) {
-		// modal_dialog / modal_child / db_send / db_requesting / gds_loading /
-		// confirm / colors / calendar: legitimate hold — no warn.
-		// flight: only continuous raw flight age.
+		// modal_dialog / modal_child / db_send / confirm / colors / calendar:
+		// legitimate hold — no warn. flight: only continuous raw flight age.
 		var rawAge = gblockevents_raw_flight_since
 			? (now - gblockevents_raw_flight_since) : 0
 		if (holder.indexOf('flight:') == 0
