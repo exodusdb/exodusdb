@@ -15,6 +15,8 @@ async function dict_USERS() {
  var updateallowed=false
 
  di=dict[++din]=dictrec('USER_ID','F',0)
+ // Key field — code host (same as JOB_NO / authorisation USER_ID), not free-text
+ exo_dict_code(di)
  di.required=true
  // Default / open own user for everyone (including EXODUS).
  // gparameters.key is the normal form-init path to opendoc (see dbform after form_postinit).
