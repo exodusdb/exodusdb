@@ -7019,16 +7019,11 @@ var gblockevents
 var gblockevents_hist = []
 var gblockevents_hist_max = 48
 var gblockevents_nonzero_since = 0
-// Continuous raw flight: only (no modal_dialog / db_send / confirm / …).
-// Open→search for minutes then READU must not inherit dialog age as "long flight".
-var gblockevents_raw_flight_since = 0
 var gblockevents_skipped_n = 0
 var gblockevents_heartbeat_id = 0
 var gblockevents_stuck_reported = false
 // Orphan depth (no known holder): alert + force clear after this.
 var gblockevents_orphan_ms = 8000
-// Continuous raw flight this long: systemerror dump only (do not force-clear).
-var gblockevents_flight_warn_ms = 120000
 
 // ---------------------------------------------------------------------------
 // Browser chrome vs app events (modal / form open)
@@ -7139,9 +7134,8 @@ function form_blockevents_hist_push(kind, depth, callername, callinfo) {
 // Known long-lived holders of gblockevents (not orphans).
 // Order matters: real wait UI before raw flight — schedule Book line keeps Gate A
 // open for the whole exoui_showmodaldialog session; lazy db.send keeps it open
-// for the whole XHR (Wait/Cancel). Those are not stuck flights.
-// Confirm/decide also sit inside a flight; classify them before raw flight so
-// a long decide does not systemerror as "long flight".
+// for the whole XHR (Wait/Cancel). Confirm/decide also sit inside a flight;
+// classify them before raw flight so dumps name the wait UI.
 function exo_gblockevents_holder() {
 	// Parent awaiting exoui_showmodaldialog close (gpendingDialogResolve set)
 	try {
@@ -7187,12 +7181,10 @@ function exo_gblockevents_holder() {
 function exo_gblockevents_dump() {
 	var now = Date.now()
 	var age = gblockevents_nonzero_since ? (now - gblockevents_nonzero_since) : 0
-	var rawAge = gblockevents_raw_flight_since ? (now - gblockevents_raw_flight_since) : 0
 	var lines = []
 	lines.push(
 		'gblockevents=' + (gblockevents || 0)
 		+ ' nonzero_ms=' + age
-		+ ' raw_flight_ms=' + rawAge
 		+ ' skipped_events=' + gblockevents_skipped_n
 		+ ' flow=' + (typeof g_exo_flow != 'undefined' && g_exo_flow
 			? ('#' + g_exo_flow.n + ' ' + g_exo_flow.location) : 'null')
@@ -7219,7 +7211,6 @@ function exo_gblockevents_force0(reason) {
 	var was = gblockevents || 0
 	gblockevents = 0
 	gblockevents_nonzero_since = 0
-	gblockevents_raw_flight_since = 0
 	gblockevents_skipped_n = 0
 	gblockevents_stuck_reported = false
 	form_blockevents_hist_push('force0', 0, 'force0', reason || ('was=' + was))
@@ -7231,39 +7222,15 @@ function exo_gblockevents_force0(reason) {
 function exo_gblockevents_heartbeat() {
 	if (!gblockevents) {
 		gblockevents_stuck_reported = false
-		gblockevents_raw_flight_since = 0
 		return
 	}
 	var now = Date.now()
 	var age = gblockevents_nonzero_since ? (now - gblockevents_nonzero_since) : 0
 	var holder = exo_gblockevents_holder()
-	// Track continuous *raw* flight only. Long Open→search (modal_dialog) then
-	// READU must not use total nonzero_ms (~6 min) as the long-flight clock.
-	if (holder && holder.indexOf('flight:') == 0) {
-		if (!gblockevents_raw_flight_since)
-			gblockevents_raw_flight_since = now
-	} else {
-		gblockevents_raw_flight_since = 0
-		// Legitimate hold: allow a later true hang to report again
-		if (holder)
-			gblockevents_stuck_reported = false
-	}
 	if (holder) {
-		// modal_dialog / modal_child / db_send / confirm / colors / calendar:
-		// legitimate hold — no warn. flight: only continuous raw flight age.
-		var rawAge = gblockevents_raw_flight_since
-			? (now - gblockevents_raw_flight_since) : 0
-		if (holder.indexOf('flight:') == 0
-			&& rawAge >= gblockevents_flight_warn_ms
-			&& !gblockevents_stuck_reported) {
-			gblockevents_stuck_reported = true
-			systemerror(
-				'gblockevents long flight',
-				'Gate A raw flight ' + rawAge + 'ms under ' + holder
-				+ ' (nonzero_ms=' + age + '; no auto-reset — dump for bug report):\n'
-				+ exo_gblockevents_dump()
-			)
-		}
+		// In-progress flight or known wait UI — not an orphan. Do not systemerror
+		// for long raw flight (chain still running; only server requests are cancelable).
+		gblockevents_stuck_reported = false
 		return
 	}
 	// Orphan: depth without flight/confirm/colors/calendar → stuck keys.
@@ -7303,7 +7270,6 @@ function form_blockevents(truefalse, callinfo) {
 		++gblockevents
 		if (gblockevents == 1) {
 			gblockevents_nonzero_since = Date.now()
-			gblockevents_raw_flight_since = 0
 			gblockevents_skipped_n = 0
 			gblockevents_stuck_reported = false
 		}
@@ -7318,7 +7284,6 @@ function form_blockevents(truefalse, callinfo) {
 		form_blockevents_hist_push('unblock', gblockevents, callername, callinfo)
 		if (gblockevents == 0) {
 			gblockevents_nonzero_since = 0
-			gblockevents_raw_flight_since = 0
 			gblockevents_skipped_n = 0
 			gblockevents_stuck_reported = false
 		}
