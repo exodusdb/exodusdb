@@ -78,8 +78,10 @@ func main(io osfilename, in printopts0, out errors) {
 			abort(lasterror());
 		}
 		if (htm.match(("("^ RM ^"|"^ FM ^"|"^ VM ^"|"^ SM ^"|"^ TM ^"|"^ STM ^")"))) {
-			// remove ~ from new filename else file will be deleted after an hour
-			let badhtm_filename = osfilename.convert("~", "") ^ ".bad-with-delms";
+			//// remove ~ from new filename else file will be deleted after an hour
+			////let badhtm_filename = osfilename.convert("~", "") ^ ".bad-with-delms";
+			//listen5.cpp cleanup file if file type is 3|4 chars + age. Not if starts with ~
+			let badhtm_filename = osfilename ^ ".convpdf.bad-with-delms";
 			if (not osfilename.oscopy(badhtm_filename)) {
 				abort(lasterror());
 			}
@@ -90,7 +92,7 @@ func main(io osfilename, in printopts0, out errors) {
 			var msg = "WARNING: convpdf removed exo delimiters before converting htm file\n";
 			msg    ^= "Original htm:" ^ badhtm_filename ^ "\n";
 			msg    ^= "Backtrace added to help identify culprit program\n\n";
-			sysmsg(msg ^ backtrace(), "Delimiters removed from htm before convert to pdf");
+			sysmsg(msg , "Delimiters removed from htm before convert to pdf");
 		}
 	}
 
