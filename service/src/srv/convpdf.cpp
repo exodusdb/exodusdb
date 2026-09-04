@@ -98,6 +98,9 @@ func main(io osfilename, in printopts0, out errors) {
 	var pdffilename = osfilename;
 	pdffilename.paster(-3, 3, "pdf");
 
+	// Pre-flight check that chromium can embed url srced images in htm
+	gosub check_imgurl(osfilename);
+
 	// Test is duplicated in convpdf.cpp and htmllib2.cpp
 	// chromium might be aliased to google-chrome
 	pdfcmd = "chromium";
@@ -181,5 +184,60 @@ func main(io osfilename, in printopts0, out errors) {
 
 	return 0;
 }
+
+subroutine check_imgurl(in htmfilename) {
+
+	// Warn devs if <img> that use url as src will fail in PDF conversion due to connection issues
+	// If network hairpinning on router is not set up or the host's /etc/hosts is redirecting traffic elsewhere
+	// then chromium will fail to retrieve it and the pdf will silently be missing them
+
+	// TODO check that relative and absolute file paths can be read by chromium.
+	// if chromium installed with snap, relative paths sometimes cannot be read by chromium!
+
+	// Check/get any <img> with src using domain path
+	var htm_contents;
+	if (not htm_contents.osread(htmfilename)) {
+		sysmsg("convpdf.cpp says: " ^ lasterror());
+		abort("System error has occurred || Please contact support");
+	}
+	var all_imgsrcs = htm_contents.match(R"(<img .+? src=\"https?[^ ]+\.(png|PNG|jpeg|JPEG|jpg|JPG|gif|GIF|svg|SVG|webp|WEBP)\")"_rex);
+	if (not all_imgsrcs) {
+		return;
+	}
+
+	// Extract just the img url and for speed,
+	// assume all url use the same domain and test only one
+	var img_url = all_imgsrcs.f(0, 1);
+	img_url = img_url.match("src.+$").replace("(src=|\")"_rex, "");
+	// No option in chromium to say check if you can access this file url
+	// so simulate what chromium would do using wget/curl
+	var http_code = "";
+	if (osshell("which curl")) {
+		http_code = osshellread("curl -s -o /dev/null -w \"%{http_code}\" " ^ img_url);
+	} else {
+		http_code = osshellread("wget --server-response --spider " ^ img_url ^ " 2>&1 | awk '/^  HTTP/{print $2}' |tail -n1");
+	}
+
+	// Success, chromium *should* be able to embed url/img
+	if (http_code == "200") {
+		return;
+	}
+
+	// Save htm for investigation in work dir
+	let htmfile_copy = htmfilename.replace(".htm", ".broken_url");
+	if (not htmfilename.oscopy(htmfile_copy)) {
+		loglasterror();
+	}
+
+	// Warn dev
+	var errmsg	= "Warning from convpdf: Failed retrieve image from " ^ img_url.quote();
+	errmsg     ^= " || This image will be missing from PDF documents/reports.";
+	errmsg     ^= " || HTTP return code: " ^ http_code.quote();
+	errmsg     ^= " || Original htm file " ^ htmfile_copy.quote();
+	errmsg     ^= " || This may be a network hairpinning issue. Check host's /etc/hosts or router settings";
+	sysmsg(errmsg);
+
+	return;
+} // end of check_img_access()
 
 }; // libraryexit()
