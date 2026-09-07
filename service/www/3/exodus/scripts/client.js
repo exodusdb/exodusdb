@@ -1719,7 +1719,9 @@ async function exo_window_open_themed(url, style) {
 	}
 	// open(blob) often still about:blank when open returns
 	await exo_wait_splash_ready(win)
-	await exo_after_paint()
+	// Paint wait on the *new* tab — parent rAF freezes when Chrome backgrounds
+	// the opener (Job→Estimate stuck on blob until Job is focused again).
+	await exo_after_paint(win)
 	win.location.href = url
 	window.setTimeout(function () {
 		try { URL.revokeObjectURL(splash) } catch (e1) { }
@@ -1778,15 +1780,40 @@ function exo_wait_splash_ready(win) {
 	})
 }
 
-function exo_after_paint() {
+// Double-rAF so the splash document can paint before location.href.
+// Prefer win (the opened tab): opener rAF often never fires once Chrome
+// backgrounds that tab. 300ms cap — same idea as exo_wait_splash_ready —
+// so blob→href cannot hang forever if child rAF also stalls.
+function exo_after_paint(win) {
 	return new Promise(function (resolve) {
-		if (typeof requestAnimationFrame !== 'function') {
-			window.setTimeout(resolve, 0)
+		var done = false
+		var finish = function () {
+			if (done)
+				return
+			done = true
+			resolve()
+		}
+		window.setTimeout(finish, 300)
+		var rafWin = null
+		try {
+			if (win && typeof win.requestAnimationFrame == 'function')
+				rafWin = win
+		} catch (e0) { }
+		if (!rafWin) {
+			window.setTimeout(finish, 0)
 			return
 		}
-		requestAnimationFrame(function () {
-			requestAnimationFrame(resolve)
-		})
+		try {
+			rafWin.requestAnimationFrame(function () {
+				try {
+					rafWin.requestAnimationFrame(finish)
+				} catch (e1) {
+					finish()
+				}
+			})
+		} catch (e2) {
+			finish()
+		}
 	})
 }
 
