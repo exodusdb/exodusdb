@@ -104,13 +104,14 @@
     /* Subtle lift like DM — closer to form, not near-white */
     --exofield-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 88%, white);
     --exofield-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 49%, #848484);
-    --exofield-border: 1px solid var(--exofield-border-color);
     --exofield-border-radius: 0.2rem;
     /* Legacy alias (empty readonly strut / older rules) */
     --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
     --exofield-focus-color: #e04510;
     /* One stroke weight for field focus and chrome-button focus marks */
     --exofield-focus-width: 2px;
+    /* Same width resting and focused — 1px→2px on focus shrank rows on blur */
+    --exofield-border: var(--exofield-focus-width) solid var(--exofield-border-color);
     --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
     --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
     --exoradio-color: rgba(0, 84, 187, 0.596);
@@ -156,11 +157,12 @@
     --exofield-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 96%, white);
     /* Field edge: restore pre-retint mix (contrast ~LM); partner is slate not violet */
     --exofield-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 50%, #9aa4c4);
-    --exofield-border: 1px solid var(--exofield-border-color);
     --exofield-border-radius: 0.2rem;
     --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
     --exofield-focus-color: #ff7a40;
     --exofield-focus-width: 2px;
+    /* Same width resting/focused as LM --exofield-border */
+    --exofield-border: var(--exofield-focus-width) solid var(--exofield-border-color);
     --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
     --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
     /*
