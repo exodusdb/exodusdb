@@ -1719,9 +1719,7 @@ async function exo_window_open_themed(url, style) {
 	}
 	// open(blob) often still about:blank when open returns
 	await exo_wait_splash_ready(win)
-	// Paint wait on the *new* tab — parent rAF freezes when Chrome backgrounds
-	// the opener (Job→Estimate stuck on blob until Job is focused again).
-	await exo_after_paint(win)
+	await exo_after_paint(win) // child win — see exo_after_paint
 	win.location.href = url
 	window.setTimeout(function () {
 		try { URL.revokeObjectURL(splash) } catch (e1) { }
