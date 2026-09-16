@@ -1239,12 +1239,30 @@ function modalblock_destroy() {
 
 }
 
-// Pin body so the form stays visually at (sx,sy) while popup/db wait is up.
-// window.scrollY may read 0 while pinned — restore real scroll on unpin.
+// Skip pin when not scrollable (pin changes body geometry; wheel capture still
+// blocks). When pinning: width = clientWidth − horizontal margins (match pre-pin).
 function modalblock_pin_body() {
-	var sx = window.pageXOffset || document.documentElement.scrollLeft || 0
-	var sy = window.pageYOffset || document.documentElement.scrollTop || 0
-	var layoutW = document.documentElement.clientWidth
+	var docEl = document.documentElement
+	var sx = window.pageXOffset || docEl.scrollLeft || 0
+	var sy = window.pageYOffset || docEl.scrollTop || 0
+	var scrollable = sx > 0 || sy > 0
+		|| (docEl.scrollHeight > docEl.clientHeight + 1)
+		|| (docEl.scrollWidth > docEl.clientWidth + 1)
+	if (!scrollable) {
+		gmodalblock_pin = { nopin: true, x: 0, y: 0 }
+		return
+	}
+	var layoutW = docEl.clientWidth
+	var ml = 0
+	var mr = 0
+	try {
+		var cs = window.getComputedStyle(document.body)
+		ml = parseFloat(cs.marginLeft) || 0
+		mr = parseFloat(cs.marginRight) || 0
+	} catch (e0) { }
+	var contentW = layoutW - ml - mr
+	if (!(contentW > 0))
+		contentW = layoutW
 	gmodalblock_pin = {
 		position: document.body.style.position,
 		top: document.body.style.top,
@@ -1256,12 +1274,16 @@ function modalblock_pin_body() {
 	document.body.style.position = 'fixed'
 	document.body.style.top = (-sy) + 'px'
 	document.body.style.left = (-sx) + 'px'
-	document.body.style.width = layoutW + 'px'
+	document.body.style.width = contentW + 'px'
 }
 
 function modalblock_unpin_body() {
 	if (!gmodalblock_pin)
 		return
+	if (gmodalblock_pin.nopin) {
+		gmodalblock_pin = null
+		return
+	}
 	var sx = gmodalblock_pin.x || 0
 	var sy = gmodalblock_pin.y || 0
 	document.body.style.position = gmodalblock_pin.position
@@ -1274,7 +1296,7 @@ function modalblock_unpin_body() {
 
 // Key-field home while a modal pin is active: remember 0,0 for unpin + move pin.
 function modalblock_note_scroll_home() {
-	if (!gmodalblock_pin)
+	if (!gmodalblock_pin || gmodalblock_pin.nopin)
 		return
 	gmodalblock_pin.x = 0
 	gmodalblock_pin.y = 0
