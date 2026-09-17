@@ -5384,9 +5384,9 @@ function scrollintoview_viewport(element) {
 /*
  * Horizontal target: field's TD/TH + consecutive preceding TH prompts in the row.
  * Multirow body TDs are not expanded (previous siblings are TDs → pure column).
- * First focussable column of a multirow: also include the row's first TD
- * (ins/del buttons) so those stay in the free band — not document left; works
- * when the table is not at the left of the form.
+ * First focussable column: include leading ins/del TD only when it is the
+ * previous sibling (true left column). Mid-row first-input (certify
+ * CERTIFICATE_NO) must not span the whole row — that forced scroll-left.
  */
 function scrollintoview_hrect(element, cell) {
 	var elR = element.getBoundingClientRect()
@@ -5404,7 +5404,7 @@ function scrollintoview_hrect(element, cell) {
 		} catch (e) { }
 		p = p.previousElementSibling
 	}
-	// First focussable field of a multirow → include leading ins/del TD.
+	// First focussable + adjacent leading TD (ins/del) → keep buttons in band.
 	var groupno = Number(element.getAttribute && element.getAttribute('exogroupno'))
 	if (groupno > 0 && typeof gtables != 'undefined' && gtables[groupno]) {
 		var firstSfn = null
@@ -5420,12 +5420,8 @@ function scrollintoview_hrect(element, cell) {
 				&& (element.id == gfields[firstSfn].id
 					|| String(element.getAttribute('exo_screenfn')) == String(firstSfn)))
 		if (isFirst) {
-			var tr = null
-			try {
-				tr = typeof getancestor === 'function' ? getancestor(element, 'tr') : null
-			} catch (e) { }
-			var btnTd = tr && tr.firstElementChild
-			if (btnTd && btnTd.tagName == 'TD' && btnTd != cell) {
+			var btnTd = cell.previousElementSibling
+			if (btnTd && btnTd.tagName == 'TD') {
 				try {
 					var br = btnTd.getBoundingClientRect()
 					left = Math.min(left, br.left)
