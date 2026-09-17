@@ -5420,8 +5420,11 @@ function scrollintoview_hrect(element, cell) {
 				&& (element.id == gfields[firstSfn].id
 					|| String(element.getAttribute('exo_screenfn')) == String(firstSfn)))
 		if (isFirst) {
+			// Only real ins/del column (not prior data TD e.g. AD_POSITION).
 			var btnTd = cell.previousElementSibling
-			if (btnTd && btnTd.tagName == 'TD') {
+			if (btnTd && btnTd.tagName == 'TD'
+				&& btnTd.querySelector
+				&& btnTd.querySelector('[id^="insertrowbutton"], [id^="deleterowbutton"]')) {
 				try {
 					var br = btnTd.getBoundingClientRect()
 					left = Math.min(left, br.left)
@@ -8062,14 +8065,15 @@ function focuson2() {
 			focusonelement.select()
 
 		// Scroll after every programmatic land — not only after document_onfocus
-		// finishes (that path early-exits often and skipped scroll). Same rule as
-		// document_onfocus: key fields home (0,0); others scrollintoview.
+		// finishes (that path early-exits often and skipped scroll). Key field 0
+		// homes (0,0); others scrollintoview. Do not use gstartelement — on
+		// certify it is first-row CERTIFICATE_NO (no key) and scrollTo(0,0)
+		// yanked horizontally scrolled work off-screen.
 		if (focusonelement.tagName
 			&& focusonelement.tagName.match(gdatatagnames)
 			&& focusonelement.getAttribute
 			&& focusonelement.getAttribute('exotype')) {
-			if (focusonelement == gstartelement
-				|| focusonelement.getAttribute('exofieldno') === '0') {
+			if (focusonelement.getAttribute('exofieldno') === '0') {
 				form_scroll_log_msg('focuson2 scroll home key field',
 					form_scroll_el_label(focusonelement))
 				window.scrollTo(0, 0)
@@ -8313,9 +8317,8 @@ async function document_onfocus(event) {
 	///log('scroll to top left if the key field')
 	// Strict === '0': loose == 0 also matches missing attribute (null).
 	// modalblock_note_scroll_home: unpin must not restore pre-home scroll.
-	// focuson2 applies the same key-home / scrollintoview split for programmatic
-	// focus when this handler early-exits; still run here for click/tab.
-	if (element == gstartelement || element.getAttribute('exofieldno') === '0') {
+	// Not gstartelement — line fields can be start (certify CERTIFICATE_NO).
+	if (element.getAttribute('exofieldno') === '0') {
 		form_scroll_log_msg('document_onfocus scroll home key field', form_scroll_el_label(element))
 		window.scrollTo(0, 0)
 		if (typeof modalblock_note_scroll_home == 'function')
@@ -8718,8 +8721,7 @@ function focusongpreviouselement2() {
 		&& gpreviouselement.tagName.match(gdatatagnames)
 		&& gpreviouselement.getAttribute
 		&& gpreviouselement.getAttribute('exotype')) {
-		if (gpreviouselement == gstartelement
-			|| gpreviouselement.getAttribute('exofieldno') === '0') {
+		if (gpreviouselement.getAttribute('exofieldno') === '0') {
 			window.scrollTo(0, 0)
 			if (typeof modalblock_note_scroll_home == 'function')
 				modalblock_note_scroll_home()
