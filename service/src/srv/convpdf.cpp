@@ -215,7 +215,7 @@ subroutine check_imgurl(in htmfilename) {
 	// so simulate what chromium would do using wget/curl
 	var http_code = "";
 	if (osshell("which curl")) {
-		http_code = osshellread("curl -s -o /dev/null -w \"%{http_code}\" " ^ img_url);
+		http_code = osshellread("curl --follow -s -o /dev/null -w \"%{http_code}\" " ^ img_url);
 	} else {
 		http_code = osshellread("wget --server-response --spider " ^ img_url ^ " 2>&1 | awk '/^  HTTP/{print $2}' |tail -n1");
 	}
