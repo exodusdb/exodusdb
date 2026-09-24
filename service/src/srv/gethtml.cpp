@@ -183,7 +183,7 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 
 		// Check qrencoder installed
 		if (not osshell("which qrencode > /dev/null")) {
-			call note("qrencode not installed!");
+			call note("QR Encoder is not installed|PLEASE CONTACT SUPPORT");
 		}
 
 		var svg = "";

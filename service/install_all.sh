@@ -255,6 +255,11 @@ function APT_INSTALL {
 		rm /root/snap/chromium -rf
 	fi
 :
+: Install QR code encoder
+: ───────────────────────
+	APT_INSTALL qrencoder
+
+:
 : Determine local ip number for info
 : ────────────────────────────────────────
 	IPNO=`ip -4 address|grep -v 127.0.0.1|grep -P '\d+\.\d+\.\d+\.\d+' -o|head -n1`
