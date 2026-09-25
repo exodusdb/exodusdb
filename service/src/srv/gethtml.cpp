@@ -181,13 +181,20 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 	// QR code (requires apt-get install qrencode)
 	if (letterhead.contains("%QR%")) {
 
-		// Check qrencoder installed
-		if (not osshell("which qrencode > /dev/null")) {
-			call note("QR Encoder is not installed|PLEASE CONTACT SUPPORT");
-		}
+		//// Check qrencoder installed
+		//if (not osshell("which qrencode > /dev/null")) {
+		//	call note("QR Encoder is not installed|PLEASE CONTACT SUPPORT");
+		//}
+		// Moved below, should only warn during KSA e-invoicing when qr_text is set
+		// Installation of package done by service/install_all.sh
 
 		var svg = "";
 		if (qr_text) {
+
+			// Check qrencoder installed
+			if (not osshell("which qrencode > /dev/null")) {
+				call note("QR Encoder is not installed|PLEASE CONTACT SUPPORT");
+			}
 
 			let qr_body = qr_text.f(1);
 			let qr_tip	= qr_text.f(2) ^ qr_body;
