@@ -109,8 +109,8 @@
     --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
     --exofield-focus-color: #e04510;
     /* One stroke weight for field focus and chrome-button focus marks */
-    --exofield-focus-width: 2px;
-    /* Same width resting and focused — 1px→2px on focus shrank rows on blur */
+    --exofield-focus-width: 1px;
+    /* Same width resting and focused — otherwise row expands on focus */
     --exofield-border: var(--exofield-focus-width) solid var(--exofield-border-color);
     --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
     --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
@@ -160,7 +160,7 @@
     --exofield-border-radius: 0.2rem;
     --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
     --exofield-focus-color: #ff7a40;
-    --exofield-focus-width: 2px;
+    --exofield-focus-width: 1px;
     /* Same width resting/focused as LM --exofield-border */
     --exofield-border: var(--exofield-focus-width) solid var(--exofield-border-color);
     --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
@@ -828,7 +828,7 @@ BODY
     background-color: var(--exoinformbutton-bg-color);
     color: var(--exoinformbutton-color);
     padding: 0.2em 0.45em;
-    border: 2px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
+    border: 1px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
     border-radius: 0.3rem;
     cursor: pointer;
     /* In-form: inherit TABLE.exoform / cell label italic; outside form body is normal */
@@ -842,7 +842,7 @@ BODY
 .graphicbutton:disabled,
 input.exobutton:disabled {
     background-color: var(--exoinformbutton-bg-color);
-    border: 2px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
+    border: 1px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
     color: var(--exoinformbutton-color);
     opacity: 0.55;
     cursor: not-allowed;
