@@ -12102,6 +12102,9 @@ async function form_popcalendar2() {
 
 	if (!calendar_checkInDatePicker) {
 		calendar_checkInDatePicker = msdate ? new Calendar(msdate) : new Calendar()
+		// set this._firstDayOfWeek before calling create(),
+		// because this property is used by create() to write the weekday headings.
+		calendar_checkInDatePicker.setFirstDayOfWeek(Number(gfirstdayofweek));
 		calendar_checkInDatePicker.create()
 		//dont use addeventlistener here because onchange is special to DatePicker
 		calendar_checkInDatePicker.onchange = calendar_checkInDatePicker_onchange_sync
@@ -12112,7 +12115,8 @@ async function form_popcalendar2() {
 	}
 
 	calendar_checkInDatePicker.setFormat(gdateformat);
-	calendar_checkInDatePicker.setFirstDayOfWeek(Number(gfirstdayofweek));
+	//calendar_checkInDatePicker.setFirstDayOfWeek(Number(gfirstdayofweek));
+	// Moved just above, before create()
 	calendar_checkInDatePicker.setMinimalDaysInFirstWeek(1);
 	calendar_checkInDatePicker.setIncludeWeek(false);
 
