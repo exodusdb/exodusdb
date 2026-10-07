@@ -266,7 +266,7 @@
 			span = document.createElement('span')
 			btn.appendChild(span)
 		}
-		span.className = GLYPH_CLASS + (collapsed ? '' : (' ' + GLYPH_CLASS + '--plus'))
+		span.className = GLYPH_CLASS + (collapsed ? (' ' + GLYPH_CLASS + '--plus') : '')
 		span.textContent = ''
 	}
 
