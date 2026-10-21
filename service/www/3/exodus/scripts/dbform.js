@@ -405,8 +405,12 @@ function form_field_from_chrome_icon(iconEl) {
 	return host[0] || null
 }
 
-// Type S name after a code with F7/F6: append to prior .exofieldrow (host line).
-// Skip if a <br> or other real content is between them (e.g. Brand + <br> + name).
+//// Type S name after a code with F7/F6: append to prior .exofieldrow (host line).
+//// Skip if a <br> or other real content is between them (e.g. Brand + <br> + name)
+//
+// Move symbolics (Type S) into the exofieldrow where its corresponding code (with F7/F6) resides
+// Ensure that symbolics next to its corresponding code are always inline unless there
+// is some divider to escape this behaviour (e.g. Brand + <br> + name)
 function form_glue_name_to_prev_code_chrome(nameEl) {
 	if (!nameEl || !nameEl.parentNode)
 		return
@@ -432,8 +436,29 @@ function form_glue_name_to_prev_code_chrome(nameEl) {
 		return
 	if (nameEl.style.display === 'block')
 		nameEl.style.display = ''
-	nameEl.style.flexShrink = '1'
-	nameEl.style.minWidth = '0'
+
+	//nameEl.style.flexShrink = '1'
+	//nameEl.style.minWidth = '0'
+	// Email ref: 'Number/Code field alignment'
+	// Undo field uniformity styling when in a column, if the field has inline symbolic span value
+	{
+		nameEl.style.flexShrink = '0'
+		nameEl.style.flexGrow = '0'
+		// TODO: understand how the combination of 3 properties below behave when td dispay type is inline
+		nameEl.style.minWidth = ''
+		nameEl.style.maxWidth = 'none'
+		nameEl.style.whiteSpace = 'nowrap'
+		//nameEl.style.width = '' // redundant
+
+		// If symbolic is glued to a code field, remove width styling on it otherwise
+		// it will shrink the code field that is to its left
+		let codeEl = prev.querySelector('[exostyle="code"]')
+		if (codeEl) {
+			codeEl.style.width = ''
+		}
+		nameEl.style.width = ''
+	}
+
 	prev.appendChild(nameEl)
 }
 
@@ -1512,6 +1537,67 @@ async function formfunctions_onload() {
 			// e.g. MARKET_CODE + MARKET_NAME; Brand uses <br> so stays stacked.
 			if (element.tagName == 'SPAN' && element.getAttribute('exotype') == 'S')
 				form_glue_name_to_prev_code_chrome(element)
+
+			// Email ref: 'Number/Code field alignment'
+			// Make number/code fields in an exogroupno column match the widest field in that column
+			// (unless the cell has many fields). Otherwise side-by-side fields wrap e.g. (- -) > (  ̲̅ )
+			// because width:100% forces every field to fill the column width
+			// Done so columns line up vertically and are easier to scan.
+			if (
+				(fieldStyle === 'number' || fieldStyle === 'code')
+				&& element.parentNode && element.parentNode.classList
+				&& Number(element.getAttribute("exogroupno")) > 0
+			) {
+
+				// If a field has buttons it parent is a span with class exofieldrow
+				// If a field has no buttons its parent a td with class exodata
+				//
+				// field without buttons:  | field with buttons:
+				// <td class="exodata">    | <td class="exodata">
+				//   <span id="FIELD_ID">  |   <span class="exofieldrow">
+				//                         |     <span class="exofieldchrome">
+				//                         |     <span id="FIELD_ID">
+				let el_parent = element.parentNode
+
+				let span_parent = el_parent.tagName.toLowerCase() === 'span'
+				let td_parent   = el_parent.tagName.toLowerCase() === 'td'
+
+				// Determine if field has an adjacent field in its column/cell only when it does not have buttons
+				// otherwise has_peer will falsely be set to true in this check because it has found a button instead of a field
+				let has_peer = false
+				if (!span_parent) {
+					has_peer = element.nextElementSibling
+					while (has_peer && has_peer.tagName.toLowerCase() === 'br') {
+						has_peer = has_peer.nextElementSibling
+					}
+					if (!has_peer) {
+						has_peer = element.previousElementSibling
+						while (has_peer && has_peer.tagName.toLowerCase() === 'br') {
+							has_peer = has_peer.previousElementSibling
+						}
+					}
+				}
+
+				// Set width 100% on fields and its parent so they take up the available space in the column
+				if (span_parent && !has_peer) {
+
+					// Only set width: 100% if td/cell is not  'display: inline' because
+					// at that point td has been turned into a row not a regular column anymore
+					let hostTd = el_parent
+					while (hostTd && hostTd.tagName && hostTd.tagName.toLowerCase() !== 'td') {
+						hostTd = hostTd.parentNode
+					}
+					if (!hostTd || hostTd.style.display !== 'inline') {
+						el_parent.style.width = '100%'
+						element.style.width   = '100%'
+					}
+				}
+				// when the parent is a td only set width: 100% on the field, because a td already takes all the
+				// space in its cell and setting width: 100% on it means take all the space in the entire table
+				if (td_parent && !has_peer) {
+					element.style.width = '100%'
+				}
+			}
 
 			// conversion "color": text + swatch after id is set (swatch id = field_swatch)
 			if (element.getAttribute('data-exo-color-pending') == '1') {
