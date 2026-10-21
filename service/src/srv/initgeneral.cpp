@@ -1765,6 +1765,12 @@ subr dosystests() {
 // bakpars.f(6) tech emails; bakpars.f(10) may append after "/"; take field("/",1);
 // replace backups@neosys.com → sysmsg@neosys.com; if still empty → sysmsg@neosys.com.
 // We do not apply per-user EXODUS-session restrictions here — this is install-level.
+// ----Post Feature Change-----
+//  support.cfg will only contain sysmsg@neosys.com
+//  Only DEVs need to be informed and spamming users with the same errors whilst they're
+//  being worked on, while good in the sense of keeping pressure up on DEVS to fix,
+//  reinforces the idea that NEOSYS is buggy. While users still get a error alert(),
+//  this reduces who sees the bugs, primarily department heads in Sys config alert list
 //
 // File format (read by xhttp SYSTEM_ERROR path — same conventions as sendmail.cpp)
 // -----------------------------------------------------------------------------
@@ -1809,7 +1815,11 @@ subr writesupportcfg() {
 		if (emailaddrs == "") {
 			emailaddrs = "sysmsg@neosys.com";
 		}
+
+		// See comment above '--Post Feature Change--'
+		emailaddrs = "sysmsg@neosys.com";
 	}
+
 
 	// work/support.cfg only (cwd = ~/hosts/<host>/work)
 	if (not oswrite(emailaddrs, "support.cfg")) {
