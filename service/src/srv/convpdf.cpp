@@ -90,8 +90,7 @@ func main(io osfilename, in printopts0, out errors) {
 				abort(lasterror());
 			}
 			var msg = "WARNING: convpdf removed exo delimiters before converting htm file\n";
-			msg    ^= "Original htm:" ^ badhtm_filename ^ "\n";
-			msg    ^= "Backtrace added to help identify culprit program\n\n";
+			msg    ^= "Original htm:" ^ badhtm_filename.field(OSSLASH, -3, 3) ^ "\n";
 			sysmsg(msg , "Delimiters removed from htm before convert to pdf");
 		}
 	}
