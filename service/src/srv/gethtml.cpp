@@ -203,6 +203,9 @@ func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 
 			// remove everything like xml and comments before the opening <svg tag
 			svg.cutter(svg.index("<svg") - 1);
+			// Standardise the size of the QR code, by default size adjusts to length of qr_text i.e big invoice == big qrcode
+			svg.replacer(R"(<svg width=\"[0-9\.cm]+\" height=\"[0-9\.cm]+\")"_rex, "<svg width=\"4.00cm\" height=\"4.00cm\"");
+
 
 			// 			#tooltip1 { position: relative; }
 			// 			#tooltip1 a span { display: none; color: #FFFFFF; }
