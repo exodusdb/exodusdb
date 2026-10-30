@@ -6,19 +6,23 @@ let syntax =
 "\n	edir - Edit records"
 "\n"
 "\nSYNOPSIS"
-"\n	edir DBFILENAME [KEYS,...] [FIELDNO] {OPTIONS}"
+"\n	edir DBFILENAME [KEYS,...] [FIELDNO] [TEXT] {OPTIONS}"
 "\n	edir OSFILEPATH [LINENO] {OPTIONS}"
 "\n"
 "\nDESCRIPTION"
-"\n	Allows editing exodus database records using a standard text editor."
+"\n	Allows editing exodus database records using a standard text editor unless TEXT is provided"
 "\n	Keys is optional for dict. files. All keys will be edited."
 "\n	Keys is optional if a default select list available."
 "\n	Multiple keys must be separated by commas, not spaces."
 "\n	Keys with spaces in them must be quoted."
+"\n	Write TEXT and skip editor:"
+"\n	 Provide one key and a field number."
+"\n	 Quote TEXT if contains spaces. Empty TEXT clears the field."
+"\n	 Visual delims converted to non visual ones."
 "\n"
 "\nOPTIONS"
 "\n	R	Show raw VM, SM etc."
-"\n	T	Print to standard output (terminal)";
+"\n	T	Skip editor and print to standard output";
 
 func main() {
 
@@ -31,9 +35,24 @@ func main() {
 		COMMAND.inserter(2, "DOS");
 
 	// Extract main args
-	let dbfilename = COMMAND.f(2);
-	let keys       = COMMAND.f(3).convert(",", FM);
-	let fieldno    = COMMAND.f(4);
+	let dbfilename   = COMMAND.f(2);
+	let keys         = COMMAND.f(3).convert(",", FM);
+	let fieldno      = COMMAND.f(4);
+	let inputtext    = COMMAND.f(5).convert("]}|~", VM ^ SM ^ TM ^ STM);
+
+	let has_text_arg = COMMAND.fcount(FM) ge 5;
+	if (has_text_arg) {
+		if (COMMAND.fcount(FM) gt 5)
+			abort("TEXT must be one argument. Quote it if it contains spaces.");
+		if (dbfilename == "DOS")
+			abort("TEXT is only supported for database files, not OS file paths.");
+		if (keys.fcount(FM) ne 1)
+			abort("For safety, you can only update one record when updating a record's field using arg TEXT");
+		if (not fieldno)
+			abort("fieldno is required when updating a record's field using arg TEXT");
+		if (OPTIONS.contains("T"))
+			abort("TEXT and option T cannot be used together.");
+	}
 
 	// (R)aw option only converts FM to NL and leaves VM SM TM STM untouched
 	let txtfmt = OPTIONS.contains("R") ? "TX1" : "TX";
@@ -135,6 +154,12 @@ func main() {
 			return 0;
 		}
 
+		if (has_text_arg) {
+			text = inputtext;
+			if (fieldno)
+				text.raiser();
+		}
+
 		// Escape data format to text format
 		converttext = dbfilename != "DOS" or text.contains(FM);
 		if (converttext)
@@ -154,12 +179,17 @@ func main() {
 		}
 
 		// Write the osfile
-		if (not is_new_record and not oswrite(text, temposfilename))
+		//if (not is_new_record and not oswrite(text, temposfilename))
+		//	abort(lasterror());
+		// A new record has no temp file until the editor saves. TEXT must write one.
+		if ((not is_new_record or has_text_arg) and not oswrite(text, temposfilename))
 			abort(lasterror());
 
 		// Record osfile update time
 		let fileinfo_old = osfile(temposfilename);
-		if (not is_new_record and not fileinfo_old)
+		//if (not is_new_record and not fileinfo_old)
+		//	abort("Could not write local copy for editing " ^ temposfilename);
+		if ((not is_new_record or has_text_arg) and not fileinfo_old)
 			abort("Could not write local copy for editing " ^ temposfilename);
 
 		// Keep these stricty in parallel for use in the post edit processing
@@ -177,9 +207,11 @@ func main() {
 
 	let isdict = not fieldno and ( dbfilename.starts("dict.") or (dbfilename == "DOS" and ID.contains("dat/dict.")));
 
-	//fire up the editor initially for all temposfilenames, IDs
-	if (not osshell(editor ^ " " ^ osfilenames))
-		lasterror().errputl("edir:");
+	// Open the editor only when TEXT arg was omitted
+	if (not has_text_arg) {
+		if (not osshell(editor ^ " " ^ osfilenames))
+			lasterror().errputl("edir2:");
+	}
 
 	var IDno = 0;
 
@@ -204,11 +236,13 @@ func main() {
 
 			passno++;
 
-			//fire up the editor to handle issues
+			// Fire up the editor to handle issues
 			if (passno > 1) {
 				printl(editcmd);
+				if (has_text_arg)
+					abort("Something went wrong in the editing...");
 				if (not osshell(editor ^ " " ^ temposfilename))
-					lasterror().errputl("edir:");
+					lasterror().errputl("edir3:");
 			}
 
 			// Get the original current unupdated dbrecord in case it has been updated since we started
@@ -239,12 +273,16 @@ func main() {
 				return 0;
 			}
 
-			//osfile has been edited
-			else if (fileinfo_new != fileinfo_old) {
+			////osfile has been edited
+			//else if (fileinfo_new != fileinfo_old) {
+			// TEXT is written before fileinfo_old is taken, so size and time still match.
+			else if (has_text_arg or fileinfo_new != fileinfo_old) {
 
 				let edited_text = osread(temposfilename);
 
-				if (edited_text == "") {
+				//if (edited_text == "") {
+				// Empty TEXT is an intentional clear. Do not ask.
+				if (edited_text == "" and not has_text_arg) {
 
 					//abort("Could not read local copy after editing " ^ temposfilename);
 					var reply;
@@ -294,11 +332,11 @@ func main() {
 				if (isdict) {
 					var dictrec = deconverted_text;
 
-//					// Convert to FMs to check dict item format
-//					if (dbfilename == "DOS") {
-//						trimmerlast(dictrec, _EOL);
-//						dictrec = dictrec.iconv(txtfmt);
-//					}
+					//// Convert to FMs to check dict item format
+					//if (dbfilename == "DOS") {
+					//	trimmerlast(dictrec, _EOL);
+					//	dictrec = dictrec.iconv(txtfmt);
+					//}
 
 					// Very similar code in edir and syncdat
 					if (var("FS").contains(dictrec.f(1))) {
@@ -349,7 +387,7 @@ func main() {
 																													"*pgsql")) {
 								let oscmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
 								if (not osshell(oscmd))
-									lasterror().errputl("edir:");
+									lasterror().errputl("edir4:");
 							}
 
 							break;
