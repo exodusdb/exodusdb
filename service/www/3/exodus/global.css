@@ -2519,6 +2519,85 @@ SPAN.calendar-date-committed[contenteditable] {
     color: var(--exotext-color);
 }
 
+/*===============================-================================*/
+/*=========================== TOOLTIP ============================*/
+/*================================================================*/
+
+button.exotooltip_icon {
+    appearance: none;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: middle;
+    width: 14px;
+    height: 14px;
+    min-height: 0;
+    margin: 0 5px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><circle cx='7' cy='7' r='5.15' fill='none' stroke='%23666' stroke-width='1.15' opacity='0.45'/><circle cx='7' cy='4.55' r='0.7' fill='%23666' stroke='none' opacity='0.45'/><path d='M7 6.35v3.7' fill='none' stroke='%23666' stroke-width='1.15' stroke-linecap='round' opacity='0.45'/></svg>");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 14px 14px;
+    line-height: 0;
+    box-shadow: none;
+    font-size: 0;
+    &:focus {
+        outline: none;
+    }
+    & img {
+        display: none;
+        width: 14px;
+        height: 14px;
+    }
+    :root[data-theme="dark_mode"] & {
+        background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><circle cx='7' cy='7' r='5.15' fill='none' stroke='%23606a89' stroke-width='1.15'/><circle cx='7' cy='4.55' r='0.7' fill='%23606a89' stroke='none'/><path d='M7 6.35v3.7' fill='none' stroke='%23606a89' stroke-width='1.15' stroke-linecap='round'/></svg>");
+        /* opacity: 0.45; */
+    }
+}
+
+.exotooltip {
+    margin-top: 10px;
+    position: fixed;
+    background: var(--exoform-bg-color);
+    border: 1px solid var(--exoform-border-color);
+    color: var(--exotext-color);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+    &::after {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: 25px;
+        transform: translateX(-50%) rotate(45deg); /* Centers the arrow horizontally */
+        width: 12px;
+        height: 12px;
+        background: var(--exoform-bg-color);
+        border-width: 1px;
+        border-style: solid;
+        border-color: var(--exoform-border-color) transparent transparent var(--exoform-border-color);
+    }
+}
+
+.exotooltip_blur {
+    position: fixed;
+    inset: 0;
+    z-index: 990; /* under #exo_menu and .exotooltip (1000); over sticky heads (12) */
+    pointer-events: none;
+    backdrop-filter: blur(0px);
+    /* Use 1s minimum so that on accidental hovers of the tooltip icon, the screen will not be blurred */
+    transition: backdrop-filter 1s ease;
+    &.exotooltip_blur_on {
+        backdrop-filter: blur(1px);
+    }
+}
+
 /*must be last (except print — print must beat DM !important screen rules)*/
 .demotext {
     display: none;

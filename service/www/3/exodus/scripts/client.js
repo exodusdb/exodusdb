@@ -12182,4 +12182,174 @@ function exo_dump_styles(sel, props) {
 	return out
 }
 
+gexotooltip_pending = []
+async function exo_dict_tooltip(di, wiki_query_str) {
+
+	// How to use:
+	//
+	// 1. Setup:
+	//     di = dict[++din] = dictrec('PEPPOL_ENDPOINT_ID', 'F', 30)
+	//     exo_dict_text(di)
+	//  >  di.tooltip = "If UAE address and registered with PEPPOL enter..."
+	//  >  await exo_dict_tooltip(di, "Media_FAQ#I_dont_exist_yet_added_just_for_example")
+	//
+	// 2. Create function get_wiki_domain() if doesnt exist returning default wiki domain
+	//    get_wiki_domain() exists to prevent app developers from referrencing unvetted sources
+	//
+	// 3. Give field label element an ID eq to field.id + "_title" e.g. PEPPOL_ENDPOINT_ID_title
+	//
+	// How its done:
+	//   1. Create tooltip icon
+	//   2. Adds tooltip icon to right of a field's label/<th>
+	//   3. Adds on hover to show tooltip text popup (blurs everything but popup and field)
+	//   4. Makes icon open a provided wiki link (Optional)
+	//   * Works on colheaders too
+	//
+	// IDEAS:
+	// 1. Make the tooltip box sensitive to edges of window i.e wrap or flip above or below field
+
+	if (typeof get_wiki_domain !== "function") {
+		await exoui_invalid("Please read setup instructions in exo_dict_tooltip()")
+	}
+	const wiki_domain = get_wiki_domain()
+
+	if (typeof wiki_query_str != "string") {
+		wiki_query_str = ""
+	}
+	let full_url = wiki_query_str ? wiki_domain + wiki_query_str : ''
+
+	let tooltip_footer
+	let button = document.createElement('button')
+	button.classList.add('exotooltip_icon')
+	button.id = di.name + "_tooltip_icon"
+	button.tabIndex = -1 // Exclude this button from the tab index
+	if (full_url) {
+		tooltip_footer = document.createElement('div')
+		tooltip_footer.className = 'exotooltip_footer'
+		tooltip_footer.innerHTML = '|Click the icon to go to the User Wiki for more information'.replace(/[\|\r\n]/g, '<br />')
+		tooltip_footer.style.fontSize = '10px'
+		tooltip_footer.style.opacity  = '0.5'
+		button.addEventListener('click', (event) => {
+			event.preventDefault()
+			// Security measure, prevent new window from manipulating of previous window
+			// e.g. window.opener.location = "https://fake-login.com"
+			// Users might think their session expired and was kicked out and will re-login,
+			// now that fake login site (phising site) now has user credentials.
+			window.open(full_url, '_blank', 'noopener,noreferrer')
+		})
+	} else {
+		button.style.cursor = 'default'
+	}
+
+	let tip = document.createElement('div')
+	tip.classList.add('exotooltip')
+
+	let title_el = document.getElementById(di.name + '_title')
+	if (title_el === null) {
+		return await exoui_invalid(`DEV WARNING: The Title of '${di.name}' does not have an ID||Add an id by appending '_title' to field ID||e.g. "${di.name}_title"`)
+	}
+	title_el.appendChild(button)
+
+	// Create blur overlay only once
+	let blur = document.getElementById('exotooltip_blur')
+	if (!blur) {
+		blur = document.createElement('div')
+		blur.id = 'exotooltip_blur'
+		blur.className = 'exotooltip_blur'
+		document.body.appendChild(blur)
+	}
+
+	const unfocus_timeout = (el_to_restore, orig_el_val, style_prop, ms) => {
+		// Keep the focused elements raised while the blur fades. 1000ms of the 1s transition.
+		let curr_timeout_id = setTimeout(() => {
+			el_to_restore.style[style_prop] = orig_el_val
+			gexotooltip_pending = gexotooltip_pending.filter(item => item.id !== curr_timeout_id)
+		}, ms)
+		gexotooltip_pending.push({
+			"owner" : di.name,
+			"el"    : el_to_restore,
+			"prop"  : style_prop,
+			"val"   : orig_el_val,
+			"id"    : curr_timeout_id
+		})
+	}
+
+	// set/unset title, field and its sibling elements as the focal point when tooltip is shown
+	const focal_point = (func) => {
+		func(title_el)
+		field_els.forEach((field_el) => {
+			func(field_el.parentNode)
+		})
+	}
+
+	// Used Map() instead of plain {} so that elements themselves can be the key, as we cannot simply use
+	// el.id as key to the obj entry, because some siblings of a field do not have an id like radio labels
+	let exotooltip_orig = new Map()
+
+	const raise = (el) => {
+		if (!exotooltip_orig.has(el)) {
+			exotooltip_orig.set(el, {
+				position: el.style.position,
+				zIndex: el.style.zIndex
+			})
+		}
+		el.style.position = "relative"
+		el.style.zIndex = 999
+	}
+
+	const release = (el) => {
+		let prev = exotooltip_orig.get(el)
+		if (!prev)
+			return
+		unfocus_timeout(el, prev.position, "position", 1000)
+		unfocus_timeout(el, prev.zIndex,   "zIndex",   1000)
+	}
+
+	// Assign only on mouseenter, because *_dict.js calls this function before dbform.js
+	// modifies the di element and writes exoattributes (in this case we need exotooltip)
+	let field_els
+	button.addEventListener('mouseenter', async () => {
+		field_els = document.querySelectorAll("#" + di.name)
+		if (field_els.length === 0) {
+			await exoui_note("Tooltip broken :/");
+		} else {
+			let text_content = field_els[0].getAttribute('exotooltip')
+			if (text_content !== null) {
+				tip.innerHTML = text_content.replace(/[\|\r\n]/g, '<br />')
+				if (tooltip_footer) {
+					tip.appendChild(tooltip_footer)
+				}
+			}
+			if (tip.parentNode !== document.body) {
+				document.body.appendChild(tip)
+			}
+
+			let first_field_rect = field_els[0].getBoundingClientRect()
+			tip.style.left       = first_field_rect.left + 'px'
+			tip.style.top        = (+first_field_rect.bottom + 5) + 'px'
+			tip.style.opacity    = 1
+
+			// Another icon's restore must land before raise. This icon's own
+			// timers are dropped so a quick re-enter does not put the field down.
+			gexotooltip_pending.forEach(item => {
+				clearTimeout(item.id)
+				if (item.owner !== di.name)
+					item.el.style[item.prop] = item.val
+			})
+			gexotooltip_pending = []
+
+			// set focal point before turning on blur so that focal_point wont be buried by blur for a split second
+			focal_point(raise)
+			blur.classList.add('exotooltip_blur_on')
+		}
+	})
+
+	button.addEventListener('mouseleave', () => {
+		// remove blur before removing focal point so that focal_point wont be buried by flur for a split second
+		blur.classList.remove('exotooltip_blur_on')
+		tip.style.opacity = 0
+		focal_point(release)
+	})
+}
+
 //end of client.js
