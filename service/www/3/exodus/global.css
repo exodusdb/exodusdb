@@ -1,3 +1,7 @@
+/*================================-================================*/
+/*============================ THEMES =============================*/
+/*=================================================================*/
+
 /*
  * Form frame model (keep this simple)
  * -----------------------------------
@@ -24,7 +28,6 @@
  * except element-scoped derivations (pane th-bg, icon roles, print).
  */
 :root {
-
     /*
      * --exoform-bg-color: form/pane colour (screencolor / cookie fc / default).
      * --exoform-data-bg-color: derived for field cells.
@@ -43,16 +46,19 @@
     /* Horizontal: equal L/R (was all in left — 0.5em / nested 0.3em).
      * +0.125em L/R: old .clsReadOnly host pad moved onto the cell so th and td
      * share the same air (host pad is 0; do not put it only on display spans). */
-    --exoform-cell-padding-x: 0.375em; /* was 0.25em + 0.125em host */
+    /* was 0.25em + 0.125em host */
+    --exoform-cell-padding-x: 0.375em;
     --exoform-cell-padding-y: 0.35em;
-    --exoform-nested-cell-padding-x: 0.275em; /* was 0.15em + 0.125em host */
+    /* was 0.15em + 0.125em host */
+    --exoform-nested-cell-padding-x: 0.275em;
     --exoform-nested-cell-padding-y: 0.2em;
     /* Aliases: older rules / popup icon gap after find/link */
     --exoform-cell-padding-left: var(--exoform-cell-padding-x);
     --exoform-nested-cell-padding-left: var(--exoform-nested-cell-padding-x);
     --exoform-label-font-style: italic;
     --exoform-data-font-style: normal;
-    --exoform-data-font-size: 1rem; /* INPUT and display SPANs share this */
+    /* INPUT and display SPANs share this */
+    --exoform-data-font-size: 1rem;
     /*
      * LM buttons: form body with a light neutral lift so hue shows through
      * on form body, th, and page-bg (not a pure grey slab).
@@ -81,10 +87,11 @@
      * so neutral/darkgrey are visibly the same token as body text.
      */
     --exoicon-green: #22b014;
-    --exoicon-red: #ad1a1b; /* sole 16×16 red — LM */
-    --exoicon-orange: #e04510; /* also confirm No when Cancel is shown */
+    /* sole 16×16 red — LM */
+    --exoicon-red: #ad1a1b;
+    /* also confirm No when Cancel is shown */
+    --exoicon-orange: #e04510;
     --exoicon-blue: #1e97cc;
-
     --exobg-color: #fff;
     --exoh-color: #000;
     --exotext-color: #000000;
@@ -126,46 +133,44 @@
     --exopopup-hover-bg-color: color-mix(in srgb, var(--exotext-color) 12%, transparent);
     /* Calendar-only accent (today / committed dates) */
     --exocalendar-today-color: #c03030;
-}
-
-:root[data-theme="dark_mode"] {
-
-    color-scheme: dark;
-    --exopage-bg-color: #000000;
-    --exotext-color: #ffffff; /* greys: --exoicon-neutral → this (see LM :root) */
-    /* popup border/hover/divider recompute from textcolor; shadow stronger in DM */
-    --exopopup-border-color: color-mix(in srgb, var(--exotext-color) 55%, transparent);
-    --exopopup-box-shadow: 0 8px 40px color-mix(in srgb, black 90%, transparent),
+    &[data-theme="dark_mode"] {
+        color-scheme: dark;
+        --exopage-bg-color: #000000;
+        /* greys: --exoicon-neutral → this (see LM :root) */
+        --exotext-color: #ffffff;
+        /* popup border/hover/divider recompute from textcolor; shadow stronger in DM */
+        --exopopup-border-color: color-mix(in srgb, var(--exotext-color) 55%, transparent);
+        --exopopup-box-shadow: 0 8px 40px color-mix(in srgb, black 90%, transparent),
         0 0 0 1px color-mix(in srgb, white 12%, transparent);
-    --exopopup-divider-border-color: color-mix(in srgb, var(--exotext-color) 18%, transparent);
-    --exopopup-hover-bg-color: color-mix(in srgb, var(--exotext-color) 18%, transparent);
-    --exocalendar-today-color: #ff8a80;
-    --exomenu-bg: linear-gradient(to top, #303a5a, #1a2035);
-    /*
+        --exopopup-divider-border-color: color-mix(in srgb, var(--exotext-color) 18%, transparent);
+        --exopopup-hover-bg-color: color-mix(in srgb, var(--exotext-color) 18%, transparent);
+        --exocalendar-today-color: #ff8a80;
+        --exomenu-bg: linear-gradient(to top, #303a5a, #1a2035);
+        /*
      * Borders: same lightness as old violet chrome, hue shifted to navy-slate
      * (no periwinkle). Do not mix toward white — that blew field/frame contrast.
      */
-    --exooutline-color: #535c76;
-    --exomenu-box-shadow: #000 0px 1px 10px;
-    --exomenu-hover-bg-color: #354060;
-    /* Burger dropdown / flyouts — slightly above form chrome */
-    --exoflyout-bg-color: #303c5c;
-    --exoflyout-border-color: #898fa2;
-    --exoflyout-hover-bg-color: #4a5880;
-    --exodot-border-color: #c8c0b0;
-    /* DM: subtle lift vs form well; border readable against fill */
-    --exofield-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 96%, white);
-    /* Field edge: restore pre-retint mix (contrast ~LM); partner is slate not violet */
-    --exofield-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 50%, #9aa4c4);
-    --exofield-border-radius: 0.2rem;
-    --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
-    --exofield-focus-color: #ff7a40;
-    --exofield-focus-width: 1px;
-    /* Same width resting/focused as LM --exofield-border */
-    --exofield-border: var(--exofield-focus-width) solid var(--exofield-border-color);
-    --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
-    --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
-    /*
+        --exooutline-color: #535c76;
+        --exomenu-box-shadow: #000 0px 1px 10px;
+        --exomenu-hover-bg-color: #354060;
+        /* Burger dropdown / flyouts — slightly above form chrome */
+        --exoflyout-bg-color: #303c5c;
+        --exoflyout-border-color: #898fa2;
+        --exoflyout-hover-bg-color: #4a5880;
+        --exodot-border-color: #c8c0b0;
+        /* DM: subtle lift vs form well; border readable against fill */
+        --exofield-bg-color: color-mix(in oklch, var(--exoform-data-bg-color) 96%, white);
+        /* Field edge: restore pre-retint mix (contrast ~LM); partner is slate not violet */
+        --exofield-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 50%, #9aa4c4);
+        --exofield-border-radius: 0.2rem;
+        --exofield-border-bottom: 2.5px dotted var(--exodot-border-color);
+        --exofield-focus-color: #ff7a40;
+        --exofield-focus-width: 1px;
+        /* Same width resting/focused as LM --exofield-border */
+        --exofield-border: var(--exofield-focus-width) solid var(--exofield-border-color);
+        --exofield-focus-border-bottom: var(--exofield-focus-width) solid var(--exofield-focus-color);
+        --exofield-focus-border: var(--exofield-focus-width) solid var(--exofield-focus-color);
+        /*
      * DM form pair (same sense as LM: data well lighter than pane chrome).
      * Old: data #28304a, base #303a5a. New base = old data; new data = old data
      * + (old base − old data) so the chrome step is inverted onto the wells:
@@ -173,80 +178,84 @@
      *   base  = #28304a
      *   data  = #28304a + Δ = #303a5a
      */
-    --exoform-bg-color: #28304a;
-    /* Was #303a5a; 50% closer to pane (50% of old delta) */
-    --exoform-data-bg-color: #2c3552;
-    /* Was #7070e0 / #5a6090 — same luma, navy-slate not violet */
-    --exoform-border-color: #70778d;
-    --exoform-cell-border-color: #5a627b;
-    --exoform-label-font-style: italic;
-    --exoform-data-font-style: normal;
-    --exoform-data-font-size: 1rem;
-    /* Normal buttons (exobutton + graphicbutton): fixed DM fill (not form-mix) */
-    --exoinformbutton-bg-color: #354060;
-    --exoinformbutton-hover-bg-color: #455880;
-    --exoinformbutton-hover-border-color: #999eae;
-    --exoinformbutton-border-color: var(--exoform-border-color);
-    --exoinformbutton-border-style: solid;
-    --exoinformbutton-color: #ffffff;
-    /* Role tints only (DM). Greys stay var(--exotext-color) from LM :root. */
-    --exoicon-green: #3ec848;
-    --exoicon-red: #ff442a; /* sole 16×16 red — DM (matches painted Delete minus) */
-    --exoicon-orange: #ff7a40;
-    --exoicon-blue: #6aa3e8;
-    --exobg-color: #1e1e1e;
-    --exoh-color: #ffffff;
-    --exoradio-color: rgba(36, 100, 173, 1);
-    --exoradio-checked-bg-color: #f0f0f0;
-    /* Unchecked ring: strong contrast from form host */
-    --exoradio-ring-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 30%, white);
+        --exoform-bg-color: #28304a;
+        /* Was #303a5a; 50% closer to pane (50% of old delta) */
+        --exoform-data-bg-color: #2c3552;
+        /* Was #7070e0 / #5a6090 — same luma, navy-slate not violet */
+        --exoform-border-color: #70778d;
+        --exoform-cell-border-color: #5a627b;
+        --exoform-label-font-style: italic;
+        --exoform-data-font-style: normal;
+        --exoform-data-font-size: 1rem;
+        /* Normal buttons (exobutton + graphicbutton): fixed DM fill (not form-mix) */
+        --exoinformbutton-bg-color: #354060;
+        --exoinformbutton-hover-bg-color: #455880;
+        --exoinformbutton-hover-border-color: #999eae;
+        --exoinformbutton-border-color: var(--exoform-border-color);
+        --exoinformbutton-border-style: solid;
+        --exoinformbutton-color: #ffffff;
+        /* Role tints only (DM). Greys stay var(--exotext-color) from LM :root. */
+        --exoicon-green: #3ec848;
+        /* sole 16×16 red — DM (matches painted Delete minus) */
+        --exoicon-red: #ff442a;
+        --exoicon-orange: #ff7a40;
+        --exoicon-blue: #6aa3e8;
+        --exobg-color: #1e1e1e;
+        --exoh-color: #ffffff;
+        --exoradio-color: rgba(36, 100, 173, 1);
+        --exoradio-checked-bg-color: #f0f0f0;
+        /* Unchecked ring: strong contrast from form host */
+        --exoradio-ring-border-color: color-mix(in oklch, var(--exoform-data-bg-color) 30%, white);
+    }
 }
 
-html:not(.exopanes-ready) TABLE.exoform,
-html:not(.exopanes-ready) .exoformpane {
-	visibility: hidden;
+/*================================-================================*/
+/*========================== FORM FRAME ===========================*/
+/*=================================================================*/
+
+html:not(.exopanes-ready) {
+    TABLE.exoform, .exoformpane {
+        visibility: hidden;
+    }
 }
+
 /* No table fill — pane + .exodata; screencolor is --exoform-data-bg-color only. */
-TABLE.exoform
-{
+TABLE.exoform {
     margin: 1px;
     border-collapse: collapse;
-    border: none; /* outer frame is .exoformpane only */
+    /* outer frame is .exoformpane only */
+    border: none;
     padding: 0.125em;
     text-align: left;
     font-style: var(--exoform-label-font-style);
 }
 
 /* STANDARD — internal grid: every direct form cell (all sections the same) */
-.exoform > * > tr > td,
-.exoform > * > tr > th,
-.exoform > tr > td,
-.exoform > tr > th {
-    border: 1px solid var(--exoform-cell-border-color);
-    /* Equal L/R: was all left (0.5em); share so text is not jammed on the right border */
-    padding-left: var(--exoform-cell-padding-x);
-    padding-right: var(--exoform-cell-padding-x);
-    padding-top: var(--exoform-cell-padding-y);
-    padding-bottom: var(--exoform-cell-padding-y);
+.exoform {
+    & > * > tr > td, & > * > tr > th, & > tr > td, & > tr > th {
+        border: 1px solid var(--exoform-cell-border-color);
+        /* Equal L/R: was all left (0.5em); share so text is not jammed on the right border */
+        padding-left: var(--exoform-cell-padding-x);
+        padding-right: var(--exoform-cell-padding-x);
+        padding-top: var(--exoform-cell-padding-y);
+        padding-bottom: var(--exoform-cell-padding-y);
+    }
 }
 
 /* Form-in-form (charts header, companies sections, …): no cell grid — outer pane is the frame.
  * Nested form still gets STANDARD pad; only border suppressed. */
-TABLE.exoform TABLE.exoform > * > tr > td,
-TABLE.exoform TABLE.exoform > * > tr > th,
-TABLE.exoform TABLE.exoform > tr > td,
-TABLE.exoform TABLE.exoform > tr > th {
-    border: none;
-}
-
-TABLE.exoform th,
-TABLE.exofieldstrip th,
-TABLE.exotable th,
-TABLE[exogroupno] th {
-    white-space: nowrap;
-}
-
-/*
+TABLE {
+    &.exoform TABLE.exoform {
+        & > * > tr > td, & > * > tr > th, & > tr > td, & > tr > th {
+            border: none;
+        }
+    }
+    & {
+        &.exoform th, &.exofieldstrip th, &.exotable th, &[exogroupno] th {
+            white-space: nowrap;
+        }
+    }
+    /*
  * Section title rows use a real <h2> in a full-width prompt th.
  * There is no project h2 rule (never was): size/weight/margin are browser UA.
  *   Chromium/Firefox html.css: h2 { font-size: 1.5em; font-weight: bold;
@@ -254,50 +263,44 @@ TABLE[exogroupno] th {
  * Cell bg = prompt th tint; italic = TABLE.exoform inheritance.
  * Do not re-specify size/margin here unless deliberately diverging from UA.
  */
-
-/* Prompt/label text — all form cells; bound inputs/spans reset to normal below */
-TABLE.exoform td,
-TABLE.exoform th {
-    font-style: var(--exoform-label-font-style);
-}
-
-/* Plain nested tables in cells (code + name pickers) — not group/exotable */
-TABLE.exoform TABLE:not([exogroupno]):not(.exotable) td,
-TABLE.exoform TABLE:not([exogroupno]):not(.exotable) th {
-    padding-top: var(--exoform-nested-cell-padding-y);
-    padding-bottom: var(--exoform-nested-cell-padding-y);
-    padding-left: var(--exoform-nested-cell-padding-x);
-    padding-right: var(--exoform-nested-cell-padding-x);
-}
-/* Top alignment throughout forms and line grids (nested tables inherit) */
-TABLE.exoform td,
-TABLE.exoform th,
-TABLE.exoform tr,
-TABLE.exotable td,
-TABLE.exotable th,
-TABLE.exotable tr,
-TABLE[exogroupno] td,
-TABLE[exogroupno] th,
-TABLE[exogroupno] tr {
-    vertical-align: top;
-}
-
-/*
+    /* Prompt/label text — all form cells; bound inputs/spans reset to normal below */
+    &.exoform {
+        td, th {
+            font-style: var(--exoform-label-font-style);
+        }
+    }
+    /* Plain nested tables in cells (code + name pickers) — not group/exotable */
+    &.exoform TABLE:not([exogroupno]):not(.exotable) {
+        td, th {
+            padding-top: var(--exoform-nested-cell-padding-y);
+            padding-bottom: var(--exoform-nested-cell-padding-y);
+            padding-left: var(--exoform-nested-cell-padding-x);
+            padding-right: var(--exoform-nested-cell-padding-x);
+        }
+    }
+    /* Top alignment throughout forms and line grids (nested tables inherit) */
+    & {
+        &.exoform td, &.exoform th, &.exoform tr, &.exotable td, &.exotable th,
+        &.exotable tr, &[exogroupno] td, &[exogroupno] th, &[exogroupno] tr {
+            vertical-align: top;
+        }
+        /*
  * Help / reference tables (e.g. helpkeyboard crosstab).
  * Fill and border follow form theme tokens so day/night stays readable.
  * Do not use fixed pastel backgrounds (#ffffcc etc.).
  */
-TABLE.exohelp-table {
-    border-collapse: collapse;
-    background-color: var(--exoform-data-bg-color, #fdf5e6);
-    border: 1px solid var(--exoform-border-color, #d0d0d0);
-    text-align: left;
-}
-TABLE.exohelp-table td,
-TABLE.exohelp-table th {
-    border: 1px solid var(--exoform-border-color, #d0d0d0);
-    padding: 0.25em 0.5em;
-    vertical-align: top;
+        &.exohelp-table {
+            border-collapse: collapse;
+            background-color: var(--exoform-data-bg-color, #fdf5e6);
+            border: 1px solid var(--exoform-border-color, #d0d0d0);
+            text-align: left;
+            td, th {
+                border: 1px solid var(--exoform-border-color, #d0d0d0);
+                padding: 0.25em 0.5em;
+                vertical-align: top;
+            }
+        }
+    }
 }
 
 /*
@@ -327,6 +330,7 @@ TABLE.exohelp-table th {
     margin: var(--exoform-pane-margin);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 :root[data-form-head="lighter"] .exoformpane {
     --exoform-bg-color: color-mix(in oklch, var(--exoform-bg-color) 90%, white);
     --exoform-data-bg-color: oklch(from var(--exoform-bg-color)
@@ -335,19 +339,26 @@ TABLE.exohelp-table th {
         h);
     background-color: var(--exoform-bg-color);
 }
-TABLE.exoform td.exodata,
-TABLE.exoform th.exodata {
-    background-color: var(--exoform-data-bg-color);
+
+TABLE.exoform {
+    td.exodata, th.exodata {
+        background-color: var(--exoform-data-bg-color);
+    }
 }
+
 /* Centered popup/dialog: form pane stacks above sibling buttons (e.g. schedules_calendar) */
 div[align="center"] > .exoformpane {
     display: block;
     width: max-content;
     margin: var(--exoform-pane-margin) auto;
 }
+
+/*================================-================================*/
+/*========================= FORM ACTIONS ==========================*/
+/*=================================================================*/
+
 /* Unbound form OK/List + Close bar */
-.exoformactions,
-body > #formbuttonsdiv.exoformactions {
+.exoformactions, body > #formbuttonsdiv.exoformactions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -360,14 +371,12 @@ body > #formbuttonsdiv.exoformactions {
     box-sizing: border-box;
 }
 
-.exoformactions > span,
-body > #formbuttonsdiv.exoformactions > span {
+.exoformactions > span, body > #formbuttonsdiv.exoformactions > span {
     display: inline-flex;
     align-items: center;
 }
 
-.exoformactions .graphicbutton,
-body > #formbuttonsdiv .graphicbutton {
+.exoformactions .graphicbutton, body > #formbuttonsdiv .graphicbutton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -381,8 +390,7 @@ body > #formbuttonsdiv .graphicbutton {
     white-space: nowrap;
 }
 
-.exoformactions .graphicbutton img,
-body > #formbuttonsdiv .graphicbutton img {
+.exoformactions .graphicbutton img, body > #formbuttonsdiv .graphicbutton img {
     height: var(--exoui-icon-size);
     width: var(--exoui-icon-size);
     box-sizing: border-box;
@@ -401,6 +409,11 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
 .exoformactions .exobutton {
     margin: 0.125em 4px;
 }
+
+/*================================-================================*/
+/*========================= NESTED TABLES =========================*/
+/*=================================================================*/
+
 /*
  * Nested host tables (exotable / exogroup / fieldstrip) when HTM has no width=:
  * ---------------------------------------------------------------------------
@@ -430,55 +443,63 @@ body > #formbuttonsdiv .graphicbutton [id$="_label"] {
  * form_table_set_wide) — never from this rule.
  * See soft-ceiling tradeoff note on .exoformpane > TABLE.exoform (B).
  */
-TABLE.exoform TABLE.exotable:not([width]),
-TABLE.exoform TABLE[exogroupno]:not([width]),
-TABLE.exoform TABLE.exofieldstrip:not([width]) {
-    /* Do NOT add width:max-content — free-text fold regression (see comment). */
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-/* Host cell: flush padding; min-width 0 so % width can resolve when width=100%.
+TABLE.exoform {
+    TABLE {
+        &.exotable:not([width]), &[exogroupno]:not([width]),
+        &.exofieldstrip:not([width]) {
+            /* Do NOT add width:max-content — free-text fold regression (see comment). */
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+    }
+    /* Host cell: flush padding; min-width 0 so % width can resolve when width=100%.
  * Includes nested TABLE.exoform (charts/companies form-in-form). */
-TABLE.exoform > tbody > tr > td:has(> TABLE[exogroupno]),
-TABLE.exoform > tbody > tr > td:has(> TABLE.exotable),
-TABLE.exoform > tbody > tr > td:has(> TABLE.exofieldstrip),
-TABLE.exoform > tbody > tr > td:has(> TABLE.exoform),
-TABLE.exoform > tbody > tr > th:has(> TABLE[exogroupno]),
-TABLE.exoform > tbody > tr > th:has(> TABLE.exotable),
-TABLE.exoform > tbody > tr > th:has(> TABLE.exofieldstrip),
-TABLE.exoform > tbody > tr > th:has(> TABLE.exoform),
-TABLE.exoform > thead > tr > td:has(> TABLE[exogroupno]),
-TABLE.exoform > thead > tr > td:has(> TABLE.exotable),
-TABLE.exoform > thead > tr > td:has(> TABLE.exofieldstrip),
-TABLE.exoform > thead > tr > td:has(> TABLE.exoform),
-TABLE.exoform > thead > tr > th:has(> TABLE[exogroupno]),
-TABLE.exoform > thead > tr > th:has(> TABLE.exotable),
-TABLE.exoform > thead > tr > th:has(> TABLE.exofieldstrip),
-TABLE.exoform > thead > tr > th:has(> TABLE.exoform),
-TABLE.exoform > tr > td:has(> TABLE[exogroupno]),
-TABLE.exoform > tr > td:has(> TABLE.exotable),
-TABLE.exoform > tr > td:has(> TABLE.exofieldstrip),
-TABLE.exoform > tr > td:has(> TABLE.exoform),
-TABLE.exoform > tr > th:has(> TABLE[exogroupno]),
-TABLE.exoform > tr > th:has(> TABLE.exotable),
-TABLE.exoform > tr > th:has(> TABLE.exofieldstrip),
-TABLE.exoform > tr > th:has(> TABLE.exoform) {
-    padding: 0;
-    max-width: 100%;
-    min-width: 0;
+	/*
+	 * Do not nest these > td:has() / > th:has() selectors any deeper.
+	 * A further & adds the parent selector in front and raises specificity.
+	 * A later bare td:has() or th:has() then has lower weight and does not apply.
+	*/
+    & > tbody > tr {
+        > td:has(> TABLE[exogroupno]), > td:has(> TABLE.exotable),
+        > td:has(> TABLE.exofieldstrip), > td:has(> TABLE.exoform),
+        > th:has(> TABLE[exogroupno]), > th:has(> TABLE.exotable),
+        > th:has(> TABLE.exofieldstrip), > th:has(> TABLE.exoform) {
+            padding: 0;
+            max-width: 100%;
+            min-width: 0;
+        }
+    }
+    & > thead > tr {
+        > td:has(> TABLE[exogroupno]), > td:has(> TABLE.exotable),
+        > td:has(> TABLE.exofieldstrip), > td:has(> TABLE.exoform),
+        > th:has(> TABLE[exogroupno]), > th:has(> TABLE.exotable),
+        > th:has(> TABLE.exofieldstrip), > th:has(> TABLE.exoform) {
+            padding: 0;
+            max-width: 100%;
+            min-width: 0;
+        }
+    }
+    & > tr {
+        > td:has(> TABLE[exogroupno]), > td:has(> TABLE.exotable),
+        > td:has(> TABLE.exofieldstrip), > td:has(> TABLE.exoform),
+        > th:has(> TABLE[exogroupno]), > th:has(> TABLE.exotable),
+        > th:has(> TABLE.exofieldstrip), > th:has(> TABLE.exoform) {
+            padding: 0;
+            max-width: 100%;
+            min-width: 0;
+        }
+    }
+    /* Group/exotable line grids (costs, jobs, schedules, …) */
+    TABLE {
+        &[exogroupno] td, &[exogroupno] th, &.exotable td, &.exotable th {
+            padding-top: var(--exoform-nested-cell-padding-y);
+            padding-bottom: var(--exoform-nested-cell-padding-y);
+            padding-left: var(--exoform-nested-cell-padding-x);
+            padding-right: var(--exoform-nested-cell-padding-x);
+        }
+    }
 }
 
-/* Group/exotable line grids (costs, jobs, schedules, …) */
-TABLE.exoform TABLE[exogroupno] td,
-TABLE.exoform TABLE[exogroupno] th,
-TABLE.exoform TABLE.exotable td,
-TABLE.exoform TABLE.exotable th {
-    padding-top: var(--exoform-nested-cell-padding-y);
-    padding-bottom: var(--exoform-nested-cell-padding-y);
-    padding-left: var(--exoform-nested-cell-padding-x);
-    padding-right: var(--exoform-nested-cell-padding-x);
-}
 .exoformpane > TABLE.exoform {
     margin: 0;
     padding: 0;
@@ -515,23 +536,24 @@ TABLE.exoform TABLE.exotable th {
      * form_update_wide_layout() decides extreme-wide — not a default.
      */
     max-width: calc(100vw - 2rem);
-}
-
-/*
+    /*
  * Extreme-wide forms (.exoform-wide) — form_update_wide_layout() only.
  * Doc: service/www/exodus/doc/FORM-UI-WIDE-NARROW.md
  * Empty-length free-text 30ch soft max: JS form_table_set_wide / apply_freetext_wide_max
  * ONLY when this class is on. Narrow forms must keep style.maxWidth 100% (never 30ch).
  * Do not put 30ch or max-content free-text rules here for non-wide forms.
  */
-.exoformpane > TABLE.exoform.exoform-wide {
-    max-width: none;
-    width: max-content;
+    &.exoform-wide {
+        max-width: none;
+        width: max-content;
+    }
 }
-TABLE.exoform.exoform-wide td:has(> span[contenteditable]),
-TABLE.exoform.exoform-wide td:has(> span.clsReadOnly),
-TABLE.exoform.exoform-wide td:has(> span[exoalign="T"]) {
-    min-width: max-content;
+
+TABLE.exoform.exoform-wide td {
+    &:has(> span[contenteditable]), &:has(> span.clsReadOnly),
+    &:has(> span[exoalign="T"]) {
+        min-width: max-content;
+    }
 }
 
 /*
@@ -539,18 +561,23 @@ TABLE.exoform.exoform-wide td:has(> span[exoalign="T"]) {
  * Fill cell (width 100% from dbform). NO ch cap here — fold under cell budget.
  * 30ch is wide-mode only (attribute exomaxwidth + form_table_apply_freetext_wide_max).
  */
-SPAN.clsRequired[contenteditable],
-SPAN.clsNotRequired[contenteditable] {
-    box-sizing: border-box;
-    max-width: 100%;
-    overflow-wrap: break-word;
+SPAN {
+    &.clsRequired[contenteditable], &.clsNotRequired[contenteditable] {
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
 }
+
 /* Free-text columns shrink under form soft ceiling (pair with span max-width 100%). */
-TABLE.exotable td:has(> span[contenteditable]),
-TABLE[exogroupno] td:has(> span[contenteditable]),
-TABLE.exoform td:has(> span[contenteditable]) {
-    min-width: 0;
+TABLE {
+    &.exotable td:has(> span[contenteditable]),
+    &[exogroupno] td:has(> span[contenteditable]),
+    &.exoform td:has(> span[contenteditable]) {
+        min-width: 0;
+    }
 }
+
 /*
  * No outer cell borders (pane is the frame). Border only — never background.
  *   L/R — .exoform-edge-left/right from exo_mark_form_edge_rows()
@@ -559,21 +586,23 @@ TABLE.exoform td:has(> span[contenteditable]) {
  *         last *visible* side-by-side fieldstrip with a false right grid edge.
  *   T/B — .exoform-edge-top/bottom (first/last visible non-spacer row).
  */
-.exoformpane > TABLE.exoform > :is(thead, tbody, tfoot) > tr > .exoform-edge-left,
-.exoformpane > TABLE.exoform > tr > .exoform-edge-left {
-    border-left: none;
-}
-.exoformpane > TABLE.exoform > :is(thead, tbody, tfoot) > tr > .exoform-edge-right,
-.exoformpane > TABLE.exoform > tr > .exoform-edge-right {
-    border-right: none;
-}
-.exoformpane > TABLE.exoform > :is(thead, tbody, tfoot) > tr.exoform-edge-top > *,
-.exoformpane > TABLE.exoform > tr.exoform-edge-top > * {
-    border-top: none;
-}
-.exoformpane > TABLE.exoform > :is(thead, tbody, tfoot) > tr.exoform-edge-bottom > *,
-.exoformpane > TABLE.exoform > tr.exoform-edge-bottom > * {
-    border-bottom: none;
+.exoformpane > TABLE.exoform {
+    & > :is(thead, tbody, tfoot) > tr > .exoform-edge-left,
+    & > tr > .exoform-edge-left {
+        border-left: none;
+    }
+    & > :is(thead, tbody, tfoot) > tr > .exoform-edge-right,
+    & > tr > .exoform-edge-right {
+        border-right: none;
+    }
+    & > :is(thead, tbody, tfoot) > tr.exoform-edge-top > *,
+    & > tr.exoform-edge-top > * {
+        border-top: none;
+    }
+    & > :is(thead, tbody, tfoot) > tr.exoform-edge-bottom > *,
+    & > tr.exoform-edge-bottom > * {
+        border-bottom: none;
+    }
 }
 
 /*
@@ -582,68 +611,83 @@ TABLE.exoform td:has(> span[contenteditable]) {
  * Residual (no ins/del): table.exogroup_col0_hide hides the whole col via CSS —
  * filter Show All removes that class so thead/tbody/tfoot stay aligned.
  */
-TABLE.exogroup_col0_hide > :is(thead, tbody, tfoot) > tr > .exogroup_col0,
-TABLE.exogroup_col0_hide > tr > .exogroup_col0 {
-    display: none;
+TABLE {
+    &.exogroup_col0_hide {
+        & > :is(thead, tbody, tfoot) > tr > .exogroup_col0,
+        & > tr > .exogroup_col0 {
+            display: none;
+        }
+    }
+    /* Multirow tables (exogroupno): sticky column headings while scrolling */
+    & {
+        &.exoform[exogroupno] {
+            padding-top: 0;
+        }
+        &[exogroupno] > thead {
+            position: sticky;
+            top: var(--exosticky-top, 0);
+            z-index: 11;
+            /* bottom edge while stuck (border-collapse drops cell bottoms under scroll) */
+            box-shadow: 0 1px 0 var(--exoform-cell-border-color);
+        }
+    }
 }
 
-/* Multirow tables (exogroupno): sticky column headings while scrolling */
-TABLE.exoform[exogroupno] {
-    padding-top: 0;
-}
-TABLE[exogroupno] > thead {
-    position: sticky;
-    top: var(--exosticky-top, 0);
-    z-index: 11;
-    /* bottom edge while stuck (border-collapse drops cell bottoms under scroll) */
-    box-shadow: 0 1px 0 var(--exoform-cell-border-color);
-}
+/*================================-================================*/
+/*=========================== TYPEAHEAD ===========================*/
+/*=================================================================*/
+
 /* Decide list + typeahead: sticky in panel scroll, not page menubar offset */
-.exoconfirmdiv #decide_table1 > thead,
-.exo_typeahead_table > thead {
+.exoconfirmdiv #decide_table1 > thead, .exo_typeahead_table > thead {
     position: sticky;
     top: 0;
     z-index: 11;
     box-shadow: 0 1px 0 var(--exoform-cell-border-color);
 }
+
 /* Sticky on th + opaque paint: less bleed of body text through/above heads while scrolling */
 .exo_typeahead_table > thead th {
     position: sticky;
     top: 0;
     z-index: 12;
 }
-:root[data-theme="dark_mode"] TABLE[exogroupno] > thead,
-:root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 > thead,
-:root[data-theme="dark_mode"] .exo_typeahead_table > thead {
-    box-shadow: 0 1px 0 var(--exoform-cell-border-color);
+
+:root[data-theme="dark_mode"] {
+    TABLE[exogroupno] > thead, .exoconfirmdiv #decide_table1 > thead,
+    .exo_typeahead_table > thead {
+        box-shadow: 0 1px 0 var(--exoform-cell-border-color);
+    }
 }
+
 /*
  * Sticky group thead: same chrome as pane (not data body). Opaque so rows do
  * not bleed under sticky heads while scrolling. data-form-head only retargets
  * the pane token; heads consume --exoform-bg-color.
  */
-TABLE[exogroupno] > thead th,
-TABLE[exogroupno] > thead td {
-    background-color: var(--exoform-bg-color, var(--exoform-data-bg-color, #fdf5e6));
+TABLE[exogroupno] > thead {
+    th, td {
+        background-color: var(--exoform-bg-color, var(--exoform-data-bg-color, #fdf5e6));
+    }
 }
+
 /* Decide + typeahead heads: step from popup shell (not form) */
 .exoconfirmdiv #decide_table1 > thead th,
-.exoconfirmdiv #decide_table1 > thead td,
-.exo_typeahead_table > thead th {
+.exoconfirmdiv #decide_table1 > thead td, .exo_typeahead_table > thead th {
     background-color: var(--exopopup-bg-color);
     background-color: oklch(from var(--exopopup-bg-color)
         calc(l * 0.985)
         calc(c * 1.175 + 0.0075)
         h);
 }
-:root[data-form-head="lighter"] .exoconfirmdiv #decide_table1 > thead th,
-:root[data-form-head="lighter"] .exoconfirmdiv #decide_table1 > thead td,
-:root[data-form-head="lighter"] .exo_typeahead_table > thead th {
-    background-color: color-mix(in oklch, var(--exopopup-bg-color) 90%, white);
+
+:root[data-form-head="lighter"] {
+    .exoconfirmdiv #decide_table1 > thead th,
+    .exoconfirmdiv #decide_table1 > thead td, .exo_typeahead_table > thead th {
+        background-color: color-mix(in oklch, var(--exopopup-bg-color) 90%, white);
+    }
 }
 
-TABLE
-{
+TABLE {
     border-collapse: collapse;
     border-width: 0px;
 }
@@ -663,6 +707,7 @@ TABLE
     /* No top padding: scrolled rows paint in that gap above sticky heads (flicker) */
     padding: 0 4px 4px 4px;
 }
+
 /* Hit typeahead_limitn — footer copy only (no thick accent bar; was focus-orange) */
 .exo_typeahead_truncated {
     padding: 0.35em 0.5em 0.15em;
@@ -671,44 +716,47 @@ TABLE
     border-top: 1px solid var(--exopopup-divider-border-color);
     text-align: center;
 }
+
 .exo_typeahead_table {
     /* separate: sticky heads paint a solid layer (collapse lets row text bleed) */
     border-collapse: separate;
     border-spacing: 0;
     width: auto;
     max-width: 100%;
+    /* Column air + fold long cells (brand/description). Decide dropped its 22em cap. */
+    th, td {
+        padding: 0.25em 0.5em;
+        max-width: 22em;
+        vertical-align: top;
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        /* Allow drag-select + Ctrl+C / right-click Copy (pick is left-click only) */
+        -webkit-user-select: text;
+        user-select: text;
+    }
+    th {
+        font-weight: bold;
+        text-align: left;
+    }
+    /* thead tint/sticky: shared with decide (#decide_table1 > thead) above */
+    tr[data-ta-row] {
+        cursor: pointer;
+    }
 }
-/* Column air + fold long cells (brand/description). Decide dropped its 22em cap. */
-.exo_typeahead_table th,
-.exo_typeahead_table td {
-    padding: 0.25em 0.5em;
-    max-width: 22em;
-    vertical-align: top;
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    /* Allow drag-select + Ctrl+C / right-click Copy (pick is left-click only) */
-    -webkit-user-select: text;
-    user-select: text;
-}
-.exo_typeahead_table th {
-    font-weight: bold;
-    text-align: left;
-}
-/* thead tint/sticky: shared with decide (#decide_table1 > thead) above */
-.exo_typeahead_table tr[data-ta-row] {
-    cursor: pointer;
-}
+
 /* Row highlight: match decide_row_hover */
 /* Miss tint: quiet no-match. Bold + system Highlight (red-ish). */
-:is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_miss {
-    color: Highlight;
-    font-weight: bold;
-}
-/* Allownew no-match: green — typed value is a candidate new key/record. */
-:is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]).exotypeahead_new {
-    color: var(--exoicon-green, #22b014);
-    font-weight: bold;
+:is(INPUT, SELECT, TEXTAREA, SPAN[contenteditable]) {
+    &.exotypeahead_miss {
+        color: Highlight;
+        font-weight: bold;
+    }
+    /* Allownew no-match: green — typed value is a candidate new key/record. */
+    &.exotypeahead_new {
+        color: var(--exoicon-green, #22b014);
+        font-weight: bold;
+    }
 }
 
 /* JS class only (decide_row_hover pattern). No :hover — stationary mouse +
@@ -717,13 +765,19 @@ TABLE
     background-color: var(--exopopup-hover-bg-color);
 }
 
+/*================================-================================*/
+/*========================== PRINT EARLY ==========================*/
+/*=================================================================*/
+
 /* Print: keep form tables printable; hide fixed menubar; paper is white (DM screen CSS is @media screen only). */
 @media print {
-    TABLE.exoform {
-        display: block;
-    }
-    TABLE[exogroupno] > thead {
-        position: static;
+    TABLE {
+        &.exoform {
+            display: block;
+        }
+        &[exogroupno] > thead {
+            position: static;
+        }
     }
     #exo_menu {
         display: none !important;
@@ -735,13 +789,16 @@ TABLE
     }
 }
 
+/*================================-================================*/
+/*=========================== DOCUMENT ============================*/
+/*=================================================================*/
+
 /* Size: cookie fs → html font-size % (exo_chrome_apply_font). Empty → 90%. */
 HTML {
     font-size: 100%;
 }
 
-BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
-{
+BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG {
     /* Face: cookie ff → --exoscreen-font-family. Empty = fallback stack. */
     font-family: var(--exoscreen-font-family, verdana, sans-serif, arial, helvetica);
     font-size: 1rem;
@@ -750,13 +807,11 @@ BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
 /* Not radio/checkbox — fixed square dimensions; min-height would squash them oval */
 /* TD/TH omitted — row height from padding + line-height (browser table rhythm) */
 BODY, BUTTON, SELECT, TEXTAREA, SPAN, DIV, P, BR, A, SMALL, BIG,
-INPUT:not([type=radio]):not([type=checkbox])
-{
+INPUT:not([type=radio]):not([type=checkbox]) {
     min-height: 1.3em;
 }
 
-BUTTON:focus, SPAN:focus
-{
+BUTTON:focus, SPAN:focus {
     /*box-shadow: 0px 0px 10px #666666;
     border-color: #9393f3;
     opacity: 1;*/
@@ -772,8 +827,8 @@ BUTTON:focus, SPAN:focus
 html {
     background-color: var(--exopage-bg-color, #f9f9f9);
 }
-BODY
-{
+
+BODY {
     background-color: var(--exopage-bg-color, #f9f9f9);
     color: #000000;
 }
@@ -808,13 +863,34 @@ BODY
     box-shadow: none !important;
     overflow: visible;
 }
-.exoicon-green { --exoicon-bg-color: var(--exoicon-green); }
-.exoicon-red { --exoicon-bg-color: var(--exoicon-red); }
-.exoicon-orange { --exoicon-bg-color: var(--exoicon-orange); }
-.exoicon-blue { --exoicon-bg-color: var(--exoicon-blue); }
-.exoicon-darkgrey { --exoicon-bg-color: var(--exoicon-darkgrey); }
-.exoicon-lightgrey { --exoicon-bg-color: var(--exoicon-lightgrey); }
-.exoicon-neutral { --exoicon-bg-color: var(--exoicon-neutral); }
+
+.exoicon-green {
+    --exoicon-bg-color: var(--exoicon-green);
+}
+
+.exoicon-red {
+    --exoicon-bg-color: var(--exoicon-red);
+}
+
+.exoicon-orange {
+    --exoicon-bg-color: var(--exoicon-orange);
+}
+
+.exoicon-blue {
+    --exoicon-bg-color: var(--exoicon-blue);
+}
+
+.exoicon-darkgrey {
+    --exoicon-bg-color: var(--exoicon-darkgrey);
+}
+
+.exoicon-lightgrey {
+    --exoicon-bg-color: var(--exoicon-lightgrey);
+}
+
+.exoicon-neutral {
+    --exoicon-bg-color: var(--exoicon-neutral);
+}
 
 /*
  * Normal button face — one set of tokens for all raised actions:
@@ -822,9 +898,7 @@ BODY
  *   .graphicbutton             — unbound form Save/Close, confirm/decide
  * Restyle via --exoinformbutton-* (LM :root / DM dark_mode) to hit all of them.
  */
-.exobutton,
-.exotab,
-.graphicbutton {
+.exobutton, .exotab, .graphicbutton {
     background-color: var(--exoinformbutton-bg-color);
     color: var(--exoinformbutton-color);
     padding: 0.2em 0.45em;
@@ -837,9 +911,7 @@ BODY
 }
 
 /* Keep raised face when disabled (generic input:disabled greys strip button look in DM). */
-.exobutton:disabled,
-.exotab:disabled,
-.graphicbutton:disabled,
+.exobutton:disabled, .exotab:disabled, .graphicbutton:disabled,
 input.exobutton:disabled {
     background-color: var(--exoinformbutton-bg-color);
     border: 1px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
@@ -848,40 +920,36 @@ input.exobutton:disabled {
     cursor: not-allowed;
 }
 
-BUTTON
-{
+BUTTON {
     cursor: pointer;
     background-color: var(--exoinformbutton-bg-color);
     border-radius:0.3rem;
 }
 
-TH
-{
+TH {
     font-weight: normal;
     text-align: left;
     /*deprecated in html5 - removed to fix alignment issue in schedules*/
     /*vertical-align: baseline;*/
 }
+
 /* Normal links: colour + underline (login Reset Password, docs, …).
  * Menu anchors keep underline off — see .menu a / a.menuitem below. */
-A:link
-{
-    color: #003399;
-    text-decoration: underline;
-}
-A:visited
-{
-    color: #6699cc;
-    text-decoration: underline;
-}
-A:hover
-{
-    text-decoration: underline;
+A {
+    &:link {
+        color: #003399;
+        text-decoration: underline;
+    }
+    &:visited {
+        color: #6699cc;
+        text-decoration: underline;
+    }
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
-
-P
-{
+P {
     margin-top: 0.5em;
     margin-bottom: 1em;
     line-height: 1.5em;
@@ -889,18 +957,18 @@ P
 
 /* Help lists in form tables: UA default padding (~40px) sits far right of
    neighbouring <p> text. Keep a small marker gutter only. */
-TABLE.exoform ul,
-TABLE.exoform ol {
-    margin: 0.35em 0 0.75em 0;
-    padding-left: 1.35em;
-    line-height: 1.5em;
-}
-TABLE.exoform li {
-    margin: 0.2em 0;
+TABLE.exoform {
+    ul, ol {
+        margin: 0.35em 0 0.75em 0;
+        padding-left: 1.35em;
+        line-height: 1.5em;
+    }
+    li {
+        margin: 0.2em 0;
+    }
 }
 
-PRE
-{
+PRE {
     padding-right: 5pt;
     margin-top: 1em;
     padding-left: 5pt;
@@ -911,41 +979,38 @@ PRE
     padding-top: 5pt;
 }
 
-H1
-{
+H1 {
     margin: 0px 0px 5px;
     font-weight: normal;
     font-size: 165%;
 }
-H2
-{
+
+H2 {
     margin-top: 1em;
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 125%;
 }
 
-
-H3
-{
+H3 {
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 115%;
 }
-H4
-{
+
+H4 {
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 100%;
 }
-H5
-{
+
+H5 {
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 67%;
 }
-H6
-{
+
+H6 {
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 50%;
@@ -966,19 +1031,23 @@ H6
 /*    margin: 0px;*/
 /*    padding: 0px;*/
 /*}*/
+
+/*================================-================================*/
+/*============================ FIELDS =============================*/
+/*=================================================================*/
+
 /*
  * clsRequired / clsNotRequired: still used by framework logic (and index.html).
  * Visual chrome is the single underline block below — not separate box borders.
  */
-INPUT.clsRequired, INPUT.clsNotRequired,
-SELECT.clsRequired, SELECT.clsNotRequired,
-SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
+INPUT.clsRequired, INPUT.clsNotRequired, SELECT.clsRequired,
+SELECT.clsNotRequired, SPAN.clsRequired[contenteditable],
+SPAN.clsNotRequired[contenteditable] {
     margin: 0;
     padding: 0 0.125em;
 }
 
-.clsReadOnly
-{
+.clsReadOnly {
     background: transparent !important;
     border: none;
     border-radius: 0;
@@ -989,35 +1058,28 @@ SPAN.clsRequired[contenteditable], SPAN.clsNotRequired[contenteditable] {
 }
 
 /* bound data — shared size/style for entry + display fields */
-TABLE.exoform INPUT.clsRequired,
-TABLE.exoform INPUT.clsNotRequired,
-TABLE.exoform SELECT.clsRequired,
-TABLE.exoform SELECT.clsNotRequired,
-TABLE.exoform TEXTAREA.clsRequired,
-TABLE.exoform TEXTAREA.clsNotRequired,
-TABLE.exoform SPAN.clsRequired,
-TABLE.exoform SPAN.clsNotRequired,
-TABLE.exoform SPAN.clsRequired[contenteditable],
-TABLE.exoform SPAN.clsNotRequired[contenteditable],
-TABLE.exoform .clsReadOnly {
-    font-style: var(--exoform-data-font-style);
-    font-size: var(--exoform-data-font-size);
-}
-/*
+TABLE.exoform {
+    INPUT.clsRequired, INPUT.clsNotRequired, SELECT.clsRequired,
+    SELECT.clsNotRequired, TEXTAREA.clsRequired, TEXTAREA.clsNotRequired,
+    SPAN.clsRequired, SPAN.clsNotRequired, SPAN.clsRequired[contenteditable],
+    SPAN.clsNotRequired[contenteditable], .clsReadOnly {
+        font-style: var(--exoform-data-font-style);
+        font-size: var(--exoform-data-font-size);
+    }
+    /*
  * Leaf data cell (.exodata — same mark as body bg): all element children share top.
  * td/th vertical-align only places the cell in the row, not siblings inside it.
  * Text nodes are not elements; .exofieldrow uses flex-start for chrome+host.
  * Nested tables count as one child unit. Radio option labels keep inline middle.
  */
-TABLE.exoform td.exodata > *,
-TABLE.exoform th.exodata > * {
-    vertical-align: top;
+    td.exodata > *, th.exodata > * {
+        vertical-align: top;
+    }
 }
 
 /* UA forms.css shrinks controls after screenfont strips font-size from font-family rules */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exobutton):not(.graphicbutton),
-SELECT,
-TEXTAREA {
+SELECT, TEXTAREA {
     font-size: var(--exoform-data-font-size);
 }
 
@@ -1028,8 +1090,7 @@ TEXTAREA {
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exobutton):not(.graphicbutton):not(.loginfield):not(:focus),
 SELECT:not(.loginfield):not(.calendarSelect):not(:focus),
 SPAN.clsRequired[contenteditable]:not(:focus),
-SPAN.clsNotRequired[contenteditable]:not(:focus),
-.exoid_textinput:not(:focus) {
+SPAN.clsNotRequired[contenteditable]:not(:focus), .exoid_textinput:not(:focus) {
     background-color: var(--exofield-bg-color);
     border: var(--exofield-border);
     border-radius: var(--exofield-border-radius);
@@ -1048,22 +1109,21 @@ SELECT:not(.loginfield):not(.calendarSelect) {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
 }
 
-TEXTAREA:not(:focus),
-TEXTAREA.clsRequired:not(:focus),
-TEXTAREA.clsNotRequired:not(:focus) {
-    background-color: var(--exofield-bg-color);
-    border: var(--exofield-border);
-    border-radius: var(--exofield-border-radius);
-    margin: 0;
-    padding: 0.15em 0.3em;
+TEXTAREA {
+    &:not(:focus), &.clsRequired:not(:focus), &.clsNotRequired:not(:focus) {
+        background-color: var(--exofield-bg-color);
+        border: var(--exofield-border);
+        border-radius: var(--exofield-border-radius);
+        margin: 0;
+        padding: 0.15em 0.3em;
+    }
 }
 
 /* Focus: same fill, accent border */
 INPUT:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exobutton):not(.graphicbutton):not(.loginfield):focus,
 SELECT:not(.loginfield):not(.calendarSelect):focus,
 SPAN.clsRequired[contenteditable]:focus,
-SPAN.clsNotRequired[contenteditable]:focus,
-.exoid_textinput:focus,
+SPAN.clsNotRequired[contenteditable]:focus, .exoid_textinput:focus,
 .exoconfirmdiv #exoconfirmdiv_textinput:focus {
     outline: none;
     background-color: var(--exofield-bg-color);
@@ -1081,59 +1141,62 @@ TEXTAREA:focus {
 }
 
 /* Empty type-S: nbsp strut (height) + 1ch solid subliminal line (was 50% of dot; half again) */
-TABLE.exoform SPAN.clsReadOnly:empty::before {
-    content: "\00a0";
-    display: inline-block;
-    width: 1ch;
-    border-bottom: 2.5px solid color-mix(in srgb, var(--exodot-border-color) 33%, transparent);
+TABLE.exoform {
+    SPAN {
+        &.clsReadOnly:empty::before {
+            content: "\00a0";
+            display: inline-block;
+            width: 1ch;
+            border-bottom: 2.5px solid color-mix(in srgb, var(--exodot-border-color) 33%, transparent);
+        }
+        /* Constant dict default (build-time): ghost text when empty — not the saved value.
+   data-placeholder set in form_apply_default_placeholder. ::before is not in textContent/getvalue. */
+        &[contenteditable][data-placeholder]:empty::before {
+            content: attr(data-placeholder);
+            color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
+            pointer-events: none;
+        }
+    }
+    INPUT[placeholder]::placeholder {
+        color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
+        opacity: 1;
+    }
 }
 
-/* Constant dict default (build-time): ghost text when empty — not the saved value.
-   data-placeholder set in form_apply_default_placeholder. ::before is not in textContent/getvalue. */
-TABLE.exoform SPAN[contenteditable][data-placeholder]:empty::before {
-    content: attr(data-placeholder);
-    color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
-    pointer-events: none;
-}
-TABLE.exoform INPUT[placeholder]::placeholder {
-    color: color-mix(in srgb, var(--exotext-color) 40%, transparent);
-    opacity: 1;
-}
+/*================================-================================*/
+/*============================= MENU ==============================*/
+/*=================================================================*/
 
 #menudiv > button[accesskey="M"] {
     display: none !important;
 }
 
-.menu:focus 
-{
-    outline: 0;
-}
-
-.menu
-{
-    font-size: 1rem;
-    position: absolute;
-    /*background-color: #F4F4F4;*/
-    background-color: #EEEEEE;
-    opacity: 0.98;
-    /*color: black;*/
-    color: #b0b0b0;
-    /*border-width: 2px;*/
-    border-width: 0.5px;
-    /*border-style: outset;*/
-    border-style: solid;
-    border-radius: 0.3rem;
-    /*border-color: Menu;*/
-    /*z-index: 999;*/
-    padding: 0.35em 0.5em;
-    box-shadow: 1.5px 1.5px 1px rgba(0, 0, 0, 0.125);
-}
-
-/* Flyout lists (menu.htm + client.js menuok): block rows, not inline+<br> line boxes */
-.menu a.menuitem {
-    display: block;
-    padding: 0.45em 0.65em;
-    line-height: 1.35;
+.menu {
+    &:focus {
+        outline: 0;
+    }
+	font-size: 1rem;
+	position: absolute;
+	/*background-color: #F4F4F4;*/
+	background-color: #EEEEEE;
+	opacity: 0.98;
+	/*color: black;*/
+	color: #b0b0b0;
+	/*border-width: 2px;*/
+	border-width: 0.5px;
+	/*border-style: outset;*/
+	border-style: solid;
+	border-radius: 0.3rem;
+	/*border-color: Menu;*/
+	/*z-index: 999;*/
+	padding: 0.35em 0.5em;
+	box-shadow: 1.5px 1.5px 1px rgba(0, 0, 0, 0.125);
+	/* Flyout lists (menu.htm + client.js menuok): block rows, not inline+<br> line boxes */
+	& a.menuitem {
+		display: block;
+		padding: 0.45em 0.65em;
+		line-height: 1.35;
+	}
 }
 
 /* Top-level module bar in #menudiv stays horizontal (menuonkeydown left/right) */
@@ -1148,8 +1211,7 @@ TABLE.exoform INPUT[placeholder]::placeholder {
     display: none;
 }
 
-.menuitem
-{
+.menuitem {
     /*border: thin;*/
     border-radius: 0.3rem;
     white-space: nowrap;
@@ -1160,33 +1222,26 @@ TABLE.exoform INPUT[placeholder]::placeholder {
 }
 
 /* Menu links: no underline (access-key <u> already marks hotkeys) */
-.menu a,
-a.menuitem
-{
+.menu a, a.menuitem {
     text-decoration: none;
 }
 
-.menuitem:link
-{
-    color: black;
-    text-decoration: none;
-}
-.menuitem:visited
-{
-    color: black;
-    text-decoration: none;
-}
-
-
-.menuitem:hover
-{
-    cursor: pointer;
-    text-decoration: none;
+.menuitem {
+    &:link {
+        color: black;
+        text-decoration: none;
+    }
+    &:visited {
+        color: black;
+        text-decoration: none;
+    }
+    &:hover {
+        cursor: pointer;
+        text-decoration: none;
+    }
 }
 
-.menu hr,
-.menu_hr
-{
+.menu hr, .menu_hr {
     border: 1px solid var(--exoform-cell-border-color);
     margin: 0.35em 0;
 }
@@ -1196,12 +1251,12 @@ a.menuitem
     float: left;
     font-size: inherit;
     margin: 0.125em;
-    padding: 0.35em 0.55em; /* slightly roomier for icon+label */
+    /* slightly roomier for icon+label */
+    padding: 0.35em 0.55em;
 }
 
 /* Menubar tools only (Menu, Refresh, Logout) — flat, no button chrome */
-.menubutton
-{
+.menubutton {
     float: left;
     background-color: inherit;
     border: none;
@@ -1209,24 +1264,23 @@ a.menuitem
     cursor: pointer;
     padding: 0.35em 0.55em;
     border-radius: 0.3rem;
-}
-
-.menubutton:hover {
-    background-color: var(--exomenu-hover-bg-color);
+    &:hover {
+        background-color: var(--exomenu-hover-bg-color);
+    }
 }
 
 /* Normal button hover/focus (exobutton + graphicbutton share informbutton tokens) */
-.exobutton:hover:enabled,
-.graphicbutton:hover {
+.exobutton:hover:enabled, .graphicbutton:hover {
     background-color: var(--exoinformbutton-hover-bg-color);
     border-color: var(--exoinformbutton-hover-border-color);
 }
-.exobutton:focus:enabled,
-.graphicbutton:focus {
+
+.exobutton:focus:enabled, .graphicbutton:focus {
     outline: none;
     background-color: var(--exoinformbutton-hover-bg-color);
     box-shadow: 0 0 0 2px var(--exofield-focus-color);
 }
+
 /* Flat menubar tools: highlight fill + same focus ring */
 .menubutton:focus {
     outline: none;
@@ -1243,13 +1297,8 @@ a.menuitem
 }
 
 /* Scale fixed-pixel SVG/PNG icons with text (see --exoui-icon-size / glyph). */
-.graphicbutton img,
-.menubutton img,
-img[isexopopup="1"],
-img[isexolink="1"],
-img[exotype="B"],
-img[exo_onclick],
-img[id^="insertrowbutton"],
+.graphicbutton img, .menubutton img, img[isexopopup="1"], img[isexolink="1"],
+img[exotype="B"], img[exo_onclick], img[id^="insertrowbutton"],
 img[id^="deleterowbutton"] {
     height: var(--exoui-icon-size);
     width: var(--exoui-icon-size);
@@ -1257,31 +1306,35 @@ img[id^="deleterowbutton"] {
     padding: calc(var(--exoui-icon-size) * (1 - var(--exoui-icon-glyph)) / 2);
     object-fit: contain;
 }
+
 /* Monochrome mask icons (same footprint as toolbar imgs) */
-.exoicon[isexopopup="1"],
-.exoicon[isexolink="1"],
-.exoicon[exo_onclick],
-.exoicon[id^="insertrowbutton"],
-.exoicon[id^="deleterowbutton"] {
-    height: var(--exoui-icon-size);
-    width: var(--exoui-icon-size);
-    cursor: pointer;
+.exoicon {
+    &[isexopopup="1"], &[isexolink="1"], &[exo_onclick],
+    &[id^="insertrowbutton"], &[id^="deleterowbutton"] {
+        height: var(--exoui-icon-size);
+        width: var(--exoui-icon-size);
+        cursor: pointer;
+    }
 }
+
 /* Field row: chrome strip (popup|link|pad only) + host (+ optional glued name) */
 .exofieldrow {
     display: inline-flex;
     align-items: flex-start;
 }
+
 .exofieldrow-fill {
     display: flex;
     width: 100%;
     max-width: 100%;
 }
+
 /* Type S name glued after code host (form_glue_name_to_prev_code_chrome) —
  * flex siblings otherwise touch; small air between code and name. */
 .exofieldrow > [exostyle="code"] + SPAN {
     margin-inline-start: 0.35em;
 }
+
 /* Icons only — trailing air = cell left pad (icon took the border pad) */
 .exofieldchrome {
     display: inline-flex;
@@ -1289,6 +1342,7 @@ img[id^="deleterowbutton"] {
     align-items: flex-start;
     margin-inline-end: var(--exoform-cell-padding-x);
 }
+
 /* Column sort chevrons after title text — tight to label (margin, not glyph pad). */
 :is(.exoicon, img)[id^="sortbutton_"] {
     margin-left: 0.15em;
@@ -1297,14 +1351,12 @@ img[id^="deleterowbutton"] {
 }
 
 /* Mask icons inside buttons: size box already set; keep tint on menubar hover */
-.graphicbutton .exoicon,
-.menubutton .exoicon {
+.graphicbutton .exoicon, .menubutton .exoicon {
     margin-inline-end: 0.25em;
 }
-.menubutton:hover .exoicon,
-.menubutton:focus .exoicon,
-.graphicbutton:hover .exoicon,
-.graphicbutton:focus .exoicon {
+
+.menubutton:hover .exoicon, .menubutton:focus .exoicon,
+.graphicbutton:hover .exoicon, .graphicbutton:focus .exoicon {
     background-color: var(--exoicon-bg-color, currentColor) !important;
 }
 
@@ -1318,63 +1370,51 @@ img[id^="deleterowbutton"] {
     box-shadow: var(--exomenu-box-shadow);
     color: var(--exotext-color) !important;
     z-index: 999;
-}
-
-#exo_menu .menubutton,
-#exo_menu .graphicbutton {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25em;
-    box-sizing: border-box;
-}
-
-/* Same 2px box as face buttons; stroke invisible so Menu lines up with Save/OK. */
-#exo_menu .menubutton {
-    border: 2px solid transparent;
-}
-
-#exo_menu .menubutton,
-#exo_menu [id$="_label"] {
-    color: inherit;
-}
-
-#exo_menu .menubutton img,
-#exo_menu .graphicbutton img {
-    height: var(--exoui-icon-size);
-    width: var(--exoui-icon-size);
-    box-sizing: border-box;
-    padding: calc(var(--exoui-icon-size) * (1 - var(--exoui-icon-glyph)) / 2);
-    object-fit: contain;
-    display: block;
-}
-
-/* Form actions in menubar */
-#exo_menu #formbuttonsdiv {
-    float: left;
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-/* Extra air when actions were moved up from under the form (unbound).
+    & .menubutton, & .graphicbutton {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25em;
+        box-sizing: border-box;
+    }
+    /* Same 2px box as face buttons; stroke invisible so Menu lines up with Save/OK. */
+    & .menubutton {
+        border: 2px solid transparent;
+    }
+    & .menubutton, & [id$="_label"] {
+        color: inherit;
+    }
+    & .menubutton img, & .graphicbutton img {
+        height: var(--exoui-icon-size);
+        width: var(--exoui-icon-size);
+        box-sizing: border-box;
+        padding: calc(var(--exoui-icon-size) * (1 - var(--exoui-icon-glyph)) / 2);
+        object-fit: contain;
+        display: block;
+    }
+    /* Form actions in menubar */
+    & #formbuttonsdiv {
+        float: left;
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    /* Extra air when actions were moved up from under the form (unbound).
    No vertical rule — reads as an unwanted separator after Menu. */
-#exo_menu #formbuttonsdiv.exo_formbuttons_relocated {
-    margin-left: 8px;
-    padding-left: 8px;
-}
-
-/* Form chrome in menubar: bound tools (menubutton) + unbound actions (graphicbutton) */
-#exo_menu #formbuttonsdiv .menubutton,
-#exo_menu #formbuttonsdiv .graphicbutton {
-    float: none;
-    margin-left: 4px;
-    margin-right: 4px;
-}
-
-/* Record nav: more air on the left so the group reads separate from New/Open… */
-#exo_menu #formbuttonsdiv .exo_recordnav_group {
-    margin-left: 12px;
-    margin-right: 4px;
+    & #formbuttonsdiv.exo_formbuttons_relocated {
+        margin-left: 8px;
+        padding-left: 8px;
+    }
+    /* Form chrome in menubar: bound tools (menubutton) + unbound actions (graphicbutton) */
+    & #formbuttonsdiv .menubutton, & #formbuttonsdiv .graphicbutton {
+        float: none;
+        margin-left: 4px;
+        margin-right: 4px;
+    }
+    /* Record nav: more air on the left so the group reads separate from New/Open… */
+    & #formbuttonsdiv .exo_recordnav_group {
+        margin-left: 12px;
+        margin-right: 4px;
+    }
 }
 
 /*
@@ -1388,53 +1428,46 @@ img[id^="deleterowbutton"] {
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
-    gap: 0.15em; /* equal air between every control (icons and n-of-m) */
-}
-
-.exo_recordnav_group > span {
-    display: inline-flex;
-    align-items: center;
-}
-
-.exo_recordnav_group .menubutton,
-.exo_recordnav_group .graphicbutton {
-    float: none !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box !important;
-    height: calc(var(--exoui-icon-size) + 10px) !important;
-    margin: 0.125em 0 !important; /* no L/R — gap owns horizontal */
-    padding: 0 !important;        /* icon hit target = icon box; n-of-m pads itself */
-    /* beat #exo_menu .menubutton { gap: 0.25em } so no phantom icon/label gap */
-    gap: 0 !important;
-}
-
-/* Icon-only nav: kill the usual label gap after the mask (no text sibling). */
-.exo_recordnav_group .menubutton .exoicon,
-.exo_recordnav_group .graphicbutton .exoicon,
-.exo_recordnav_group .menubutton > img,
-.exo_recordnav_group .graphicbutton > img {
-    margin-inline-end: 0 !important;
-}
-
-/* "n of m" — equal text pad; outer spacing still from group gap.
+    /* equal air between every control (icons and n-of-m) */
+    gap: 0.15em;
+    & > span {
+        display: inline-flex;
+        align-items: center;
+    }
+    & .menubutton, & .graphicbutton {
+        float: none !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box !important;
+        height: calc(var(--exoui-icon-size) + 10px) !important;
+        /* no L/R — gap owns horizontal */
+        margin: 0.125em 0 !important;
+        /* icon hit target = icon box; n-of-m pads itself */
+        padding: 0 !important;
+        /* beat #exo_menu .menubutton { gap: 0.25em } so no phantom icon/label gap */
+        gap: 0 !important;
+    }
+    /* Icon-only nav: kill the usual label gap after the mask (no text sibling). */
+    & .menubutton .exoicon, & .graphicbutton .exoicon, & .menubutton > img,
+    & .graphicbutton > img {
+        margin-inline-end: 0 !important;
+    }
+    /* "n of m" — equal text pad; outer spacing still from group gap.
  * Face clone uses data-source-id (ids stay on hidden source). */
-.exo_recordnav_group #selectrecordbutton,
-.exo_recordnav_group [data-source-id="selectrecordbutton"] {
-    padding-left: 0.3em !important;
-    padding-right: 0.3em !important;
-}
-
-.exo_recordnav_group #selectrecordbutton_label,
-.exo_recordnav_group [data-source-id="selectrecordbutton_label"] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: var(--exoui-icon-size);
-    line-height: 1;
-    margin: 0;
-    padding: 0;
+    & #selectrecordbutton, & [data-source-id="selectrecordbutton"] {
+        padding-left: 0.3em !important;
+        padding-right: 0.3em !important;
+    }
+    & #selectrecordbutton_label, & [data-source-id="selectrecordbutton_label"] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--exoui-icon-size);
+        line-height: 1;
+        margin: 0;
+        padding: 0;
+    }
 }
 
 /* Menu | form tools: keep air after the Menu rule (New|Open stay 4px; this needs more). */
@@ -1453,7 +1486,8 @@ img[id^="deleterowbutton"] {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0; /* per-item margins below — not equal */
+    /* per-item margins below — not equal */
+    gap: 0;
     margin-right: 10px;
     margin-left: 10px;
 }
@@ -1461,23 +1495,27 @@ img[id^="deleterowbutton"] {
 /* Database name + username: first flex child of .exo_menubar_trailing */
 .exo_menubar_session {
     float: none;
-    margin: 0 10px 0 0; /* keep session → theme a bit open */
+    /* keep session → theme a bit open */
+    margin: 0 10px 0 0;
     line-height: var(--exoui-icon-size, 1.325em);
     white-space: nowrap;
     color: inherit;
 }
 
 /* theme → refresh tight; refresh → logout a touch more open */
-.exo_menubar_trailing > .theme_button {
-    margin-right: 4px;
+.exo_menubar_trailing {
+    & > .theme_button {
+        margin-right: 4px;
+    }
+    .refresh_wrapper {
+        float: none;
+        margin: 0 6px 0 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+    }
 }
-.exo_menubar_trailing .refresh_wrapper {
-    float: none;
-    margin: 0 6px 0 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-}
+
 .logout_wrapper {
     float: none;
     margin: 0;
@@ -1488,15 +1526,18 @@ img[id^="deleterowbutton"] {
 }
 
 /* Strip menubutton chrome so margins alone set spacing */
-.exo_menubar_trailing .logout_wrapper .menubutton,
-.exo_menubar_trailing .refresh_wrapper .menubutton {
-    margin: 0 !important;
-    padding-left: 0.25em !important;
-    padding-right: 0.25em !important;
+.exo_menubar_trailing {
+    .logout_wrapper .menubutton, .refresh_wrapper .menubutton {
+        margin: 0 !important;
+        padding-left: 0.25em !important;
+        padding-right: 0.25em !important;
+    }
 }
+
 .exo_menubar_session_test {
     color: red;
 }
+
 /* After all floated menubar children so the bar's height includes them.
    clear:both (not only left) — session-only bars have float:right trailing
    and no left floats; clear:left left the bar height collapsed so body
@@ -1506,6 +1547,9 @@ img[id^="deleterowbutton"] {
     min-height: 1px;
 }
 
+/*================================-================================*/
+/*============================ CHOICES ============================*/
+/*=================================================================*/
 
 input[type=radio] {
     /*how to override radio/checkbox style*/
@@ -1528,15 +1572,12 @@ input[type=radio] {
     background-color: var(--exobg-color);
     /*transition: 0.1s all linear;*/
     vertical-align: middle;
-
     /*radio only*/
     border-radius: 50%;
-    
-}
-
-input[type=radio]:checked {
-    border: calc(var(--exocheck-size) * 4 / 14) solid var(--exoradio-color);
-    /*transition: 0.1s all linear;*/
+    &:checked {
+        border: calc(var(--exocheck-size) * 4 / 14) solid var(--exoradio-color);
+        /*transition: 0.1s all linear;*/
+    }
 }
 
 :checked+label {
@@ -1569,72 +1610,78 @@ input[type=checkbox] {
     vertical-align: middle;
     /*border-radius: 20%;*/
     border-radius: calc(var(--exocheck-size) * 2 / 14);
-}
-
-input[type=checkbox]:checked {
-    background-color:var(--exoradio-color);
-    border: 0px;
-    /* U+2714 heavy check mark glyph */
-    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
-    background-size: 100%;
-    background-clip: padding-box;
-    background-position: center;
-    background-repeat: no-repeat;
+    &:checked {
+        background-color:var(--exoradio-color);
+        border: 0px;
+        /* U+2714 heavy check mark glyph */
+        background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
+        background-size: 100%;
+        background-clip: padding-box;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
 }
 
 /* Disabled text controls: same fill as enabled; no border — border alone distinguishes */
 input:disabled:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit]):not([type=image]):not(.exobutton):not(.graphicbutton),
-select:disabled,
-textarea:disabled {
+select:disabled, textarea:disabled {
     background-color: var(--exofield-bg-color) !important;
     border: none !important;
     border-radius: 0;
 }
 
 /* Disabled radio: same paint as enabled (unchecked or checked), overall dimmed */
-input[type=radio]:disabled:not(:checked) {
-    background-color: var(--exobg-color) !important;
-    border: calc(var(--exocheck-size) * 1 / 14) solid var(--exoradio-ring-border-color) !important;
-    opacity: 0.5;
-    cursor: default;
-}
-input[type=radio]:disabled:checked {
-    background-color: var(--exobg-color) !important;
-    border: calc(var(--exocheck-size) * 4 / 14) solid var(--exoradio-color) !important;
-    opacity: 0.5;
-    cursor: default;
-}
-/* Disabled checkbox: same paint as enabled (unchecked or checked), overall dimmed */
-input[type=checkbox]:disabled:not(:checked) {
-    background-color: var(--exobg-color) !important;
-    border: calc(var(--exocheck-size) * 1 / 14) solid var(--exoradio-ring-border-color) !important;
-    opacity: 0.5;
-    cursor: default;
-}
-input[type=checkbox]:disabled:checked {
-    background-color: var(--exoradio-color) !important;
-    border: 0 !important;
-    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
-    background-size: 100%;
-    background-clip: padding-box;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.5;
-    cursor: default;
+input {
+    &[type=radio]:disabled {
+        &:not(:checked) {
+            background-color: var(--exobg-color) !important;
+            border: calc(var(--exocheck-size) * 1 / 14) solid var(--exoradio-ring-border-color) !important;
+            opacity: 0.5;
+            cursor: default;
+        }
+        &:checked {
+            background-color: var(--exobg-color) !important;
+            border: calc(var(--exocheck-size) * 4 / 14) solid var(--exoradio-color) !important;
+            opacity: 0.5;
+            cursor: default;
+        }
+    }
+    /* Disabled checkbox: same paint as enabled (unchecked or checked), overall dimmed */
+    &[type=checkbox]:disabled {
+        &:not(:checked) {
+            background-color: var(--exobg-color) !important;
+            border: calc(var(--exocheck-size) * 1 / 14) solid var(--exoradio-ring-border-color) !important;
+            opacity: 0.5;
+            cursor: default;
+        }
+        &:checked {
+            background-color: var(--exoradio-color) !important;
+            border: 0 !important;
+            background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
+            background-size: 100%;
+            background-clip: padding-box;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            cursor: default;
+        }
+    }
+    & {
+        &[type="radio"], &[type="checkbox"] {
+            cursor:pointer;
+        }
+        /* Focus: thick orange ring only (field focus colour). No brighter white halo. */
+        &[type=radio]:focus, &[type=checkbox]:focus,
+        &[type=radio]:focus-visible, &[type=checkbox]:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--exofield-focus-color);
+        }
+    }
 }
 
-input[type="radio"],input[type="checkbox"]{
-    cursor:pointer;
-}
-
-/* Focus: thick orange ring only (field focus colour). No brighter white halo. */
-input[type=radio]:focus,
-input[type=checkbox]:focus,
-input[type=radio]:focus-visible,
-input[type=checkbox]:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px var(--exofield-focus-color);
-}
+/*================================-================================*/
+/*============================ CONFIRM ============================*/
+/*=================================================================*/
 
 /* ========== In-window confirm/decide popups ========== */
 /* Shell: one-row two-col table — icon | (title + options + ▼ + buttons).
@@ -1661,58 +1708,91 @@ input[type=checkbox]:focus-visible {
     flex-direction: column;
     align-items: stretch;
     overflow: hidden;
-}
-/* Drag handle: icon only (not question / body list / footer).
+    /* Drag handle: icon only (not question / body list / footer).
  * grab/grabbing — not move (often a four-arrow “resize” glyph). */
-.exoconfirmdiv .exoconfirm_iconcol {
-    cursor: grab;
-    cursor: -webkit-grab;
-    -webkit-user-select: none;
-    user-select: none;
+    .exoconfirm_iconcol {
+        cursor: grab;
+        cursor: -webkit-grab;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    &.exo_confirm_dragging, &.exo_confirm_dragging .exoconfirm_iconcol {
+        cursor: grabbing;
+        cursor: -webkit-grabbing;
+    }
 }
-.exoconfirmdiv.exo_confirm_dragging,
-.exoconfirmdiv.exo_confirm_dragging .exoconfirm_iconcol {
-    cursor: grabbing;
-    cursor: -webkit-grabbing;
-}
+
 /* Resize hit strips: four borders + corners (positioned on .exoconfirmdiv). */
 .exo_confirm_rsz {
     position: absolute;
     z-index: 3;
     background: transparent;
 }
+
 .exo_confirm_rsz_n {
-    top: 0; left: 8px; right: 8px; height: 6px;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    height: 6px;
     cursor: ns-resize;
 }
+
 .exo_confirm_rsz_s {
-    bottom: 0; left: 8px; right: 8px; height: 6px;
+    bottom: 0;
+    left: 8px;
+    right: 8px;
+    height: 6px;
     cursor: ns-resize;
 }
+
 .exo_confirm_rsz_e {
-    right: 0; top: 8px; bottom: 8px; width: 6px;
+    right: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 6px;
     cursor: ew-resize;
 }
+
 .exo_confirm_rsz_w {
-    left: 0; top: 8px; bottom: 8px; width: 6px;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 6px;
     cursor: ew-resize;
 }
+
 .exo_confirm_rsz_ne {
-    top: 0; right: 0; width: 10px; height: 10px;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
     cursor: nesw-resize;
 }
+
 .exo_confirm_rsz_nw {
-    top: 0; left: 0; width: 10px; height: 10px;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
     cursor: nwse-resize;
 }
+
 .exo_confirm_rsz_se {
-    bottom: 0; right: 0; width: 10px; height: 10px;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
     cursor: nwse-resize;
 }
+
 .exo_confirm_rsz_sw {
-    bottom: 0; left: 0; width: 10px; height: 10px;
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
     cursor: nesw-resize;
 }
+
 /* Outer shell: icon + prompt column (divs — not a table, so option <tr> hit-testing stays local) */
 .exoconfirm_layout {
     width: 100%;
@@ -1723,12 +1803,15 @@ input[type=checkbox]:focus-visible {
     flex-direction: row;
     align-items: stretch;
 }
+
 .exoconfirm_iconcol {
     width: var(--exoconfirm-iconcol-width);
     flex: 0 0 auto;
-    padding: 0.35em 12px 0 2px; /* match question top air */
+    /* match question top air */
+    padding: 0.35em 12px 0 2px;
     white-space: nowrap;
 }
+
 .exoconfirm_promptcol {
     flex: 1 1 auto;
     min-width: 0;
@@ -1737,6 +1820,7 @@ input[type=checkbox]:focus-visible {
     display: flex;
     flex-direction: column;
 }
+
 /* Nested stack in col2: scrollable body + pinned scrollhint + footer */
 .exoconfirm_promptstack {
     display: flex;
@@ -1747,6 +1831,7 @@ input[type=checkbox]:focus-visible {
     width: 100%;
     text-align: left;
 }
+
 .exoconfirm_body {
     flex: 1 1 auto;
     min-height: 0;
@@ -1755,21 +1840,24 @@ input[type=checkbox]:focus-visible {
     overscroll-behavior: contain;
     text-align: left;
 }
+
 #uiblockerdiv {
     z-index: 1000;
     pointer-events: auto;
     overscroll-behavior: none;
 }
+
 .exoconfirmdiv.exoconfirm_decide {
     max-width: calc(100vw - 40px);
+    .exoconfirm_body {
+        /* Question + filter stay put; only .decide_options_scroll scrolls */
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
 }
-.exoconfirmdiv.exoconfirm_decide .exoconfirm_body {
-    /* Question + filter stay put; only .decide_options_scroll scrolls */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
+
 /* Option table shares promptcol left edge with title + footer buttons */
 .exoconfirm_decideblock {
     display: flex;
@@ -1778,8 +1866,10 @@ input[type=checkbox]:focus-visible {
     min-height: 0;
     text-align: left;
     vertical-align: top;
-    margin-top: 1.1em; /* air between question and column titles */
+    /* air between question and column titles */
+    margin-top: 1.1em;
 }
+
 .decide_options_scroll {
     flex: 1 1 auto;
     min-height: 0;
@@ -1787,6 +1877,7 @@ input[type=checkbox]:focus-visible {
     overflow-y: auto;
     overscroll-behavior: contain;
 }
+
 /* Type-to-filter status (letters filter options; Esc clears).
  * Outside options scroll — visible while list scrolls; does not cover question.
  * Not a focus target — no outline/ring. */
@@ -1800,72 +1891,77 @@ input[type=checkbox]:focus-visible {
     font-weight: 600;
     outline: none;
     box-shadow: none;
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    &.decide_filter_ok {
+        color: #0a7a0a;
+        background: rgba(34, 176, 20, 0.12);
+    }
+    /* No matches: red text only — no fill, no focus chrome */
+    &.decide_filter_empty {
+        color: #b00000;
+        background: none;
+        padding: 0.2em 0;
+    }
 }
-.decide_filter_status:focus {
-    outline: none;
-    box-shadow: none;
+
+:root[data-theme="dark_mode"] .decide_filter_status {
+    &.decide_filter_ok {
+        color: #3ec848;
+        background: rgba(62, 200, 72, 0.15);
+    }
+    &.decide_filter_empty {
+        color: #ff6b6b;
+        background: none;
+    }
 }
-.decide_filter_status.decide_filter_ok {
-    color: #0a7a0a;
-    background: rgba(34, 176, 20, 0.12);
-}
-/* No matches: red text only — no fill, no focus chrome */
-.decide_filter_status.decide_filter_empty {
-    color: #b00000;
-    background: none;
-    padding: 0.2em 0;
-}
-:root[data-theme="dark_mode"] .decide_filter_status.decide_filter_ok {
-    color: #3ec848;
-    background: rgba(62, 200, 72, 0.15);
-}
-:root[data-theme="dark_mode"] .decide_filter_status.decide_filter_empty {
-    color: #ff6b6b;
-    background: none;
-}
+
 .exoconfirmdiv.exoconfirm_decide #decide_table1 {
     width: auto;
     max-width: 100%;
     margin: 0;
-}
-/* Extra horizontal air in decide dialog columns.
+    /* Extra horizontal air in decide dialog columns.
  * tbody padding-top: radio focus ring is 3px box-shadow; without air it
  * sits under sticky thead (scroll slack cannot help at scrollTop 0). */
-.exoconfirmdiv.exoconfirm_decide #decide_table1 th,
-.exoconfirmdiv.exoconfirm_decide #decide_table1 td {
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    vertical-align: top;
+    th, td {
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        vertical-align: top;
+    }
+    tbody td {
+        padding-top: 4px;
+        padding-bottom: 2px;
+    }
+    input {
+        &[type=radio], &[type=checkbox] {
+            vertical-align: top;
+        }
+    }
+    /* No per-cell em cap — fit_decide sizes the shell up to viewport; wrap only when capped. */
+    .decide_datacol {
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+    /* Allow drag-select + Ctrl+C / right-click Copy (same as typeahead list) */
+    th, td {
+        -webkit-user-select: text;
+        user-select: text;
+    }
 }
-.exoconfirmdiv.exoconfirm_decide #decide_table1 tbody td {
-    padding-top: 4px;
-    padding-bottom: 2px;
-}
-.exoconfirmdiv.exoconfirm_decide #decide_table1 input[type=radio],
-.exoconfirmdiv.exoconfirm_decide #decide_table1 input[type=checkbox] {
-    vertical-align: top;
-}
-/* No per-cell em cap — fit_decide sizes the shell up to viewport; wrap only when capped. */
-.exoconfirmdiv.exoconfirm_decide #decide_table1 .decide_datacol {
-    white-space: normal;
-    overflow-wrap: break-word;
-}
-/* Allow drag-select + Ctrl+C / right-click Copy (same as typeahead list) */
-.exoconfirmdiv.exoconfirm_decide #decide_table1 th,
-.exoconfirmdiv.exoconfirm_decide #decide_table1 td {
-    -webkit-user-select: text;
-    user-select: text;
-}
+
 /* Already in promptcol — slight inset from shared left edge */
 .exoconfirm_scrollhint_wrap {
     flex: 0 0 auto;
     display: none;
     text-align: left;
     padding-left: 0.5em;
+    &.can_scroll_down {
+        display: block;
+    }
 }
-.exoconfirm_scrollhint_wrap.can_scroll_down {
-    display: block;
-}
+
 .exoconfirm_scrollhint {
     display: inline-block;
     min-height: 0;
@@ -1878,18 +1974,21 @@ input[type=checkbox]:focus-visible {
     color: rgba(0, 0, 0, 0.4);
     vertical-align: middle;
 }
+
 .exoconfirm_footer {
     flex: 0 0 auto;
     position: relative;
-    z-index: 4; /* above .exo_confirm_rsz (3) — button hover/click, not resize cursor */
+    /* above .exo_confirm_rsz (3) — button hover/click, not resize cursor */
+    z-index: 4;
     padding-top: 10px;
     min-width: min-content;
     text-align: left;
 }
-#yesnocancelbuttons,
-.exoconfirm_footer {
+
+#yesnocancelbuttons, .exoconfirm_footer {
     white-space: nowrap;
 }
+
 #yesnocancelbuttons {
     display: inline-flex;
     flex-wrap: nowrap;
@@ -1897,6 +1996,7 @@ input[type=checkbox]:focus-visible {
     gap: 0.25em;
     min-width: min-content;
 }
+
 /* Confirm Yes/No/Cancel and decide Select/Cancel: same graphicbutton chrome
    (filled outset face). Icons: check / cross / goback. Inline flow — not flex —
    so hotkey markup (<u>Y</u>es) stays normal text. */
@@ -1908,53 +2008,64 @@ input[type=checkbox]:focus-visible {
     margin: 0.125em 4px 0.125em 0;
     padding: 0.35em 0.55em;
     line-height: 1.2;
+    /* Icon→label space (painted <img> or tinted .exoicon mask) */
+    img, .exoicon {
+        height: var(--exoui-icon-size);
+        width: var(--exoui-icon-size);
+        box-sizing: border-box;
+        display: inline-block;
+        vertical-align: middle;
+        margin-inline-end: 0.25em;
+    }
+    img {
+        padding: calc(var(--exoui-icon-size) * (1 - var(--exoui-icon-glyph)) / 2);
+        object-fit: contain;
+    }
+    [id$="_label"] {
+        vertical-align: middle;
+    }
 }
-/* Icon→label space (painted <img> or tinted .exoicon mask) */
-.exoconfirm_footer .graphicbutton img,
-.exoconfirm_footer .graphicbutton .exoicon {
-    height: var(--exoui-icon-size);
-    width: var(--exoui-icon-size);
-    box-sizing: border-box;
-    display: inline-block;
-    vertical-align: middle;
-    margin-inline-end: 0.25em;
-}
-.exoconfirm_footer .graphicbutton img {
-    padding: calc(var(--exoui-icon-size) * (1 - var(--exoui-icon-glyph)) / 2);
-    object-fit: contain;
-}
-.exoconfirm_footer .graphicbutton [id$="_label"] {
-    vertical-align: middle;
-}
+
 /* hover/focus face: shared .graphicbutton rules (informbutton tokens) */
 .exoconfirm_iconcol img {
     display: block;
     height: calc(2 * var(--exoui-icon-size));
     width: auto;
 }
+
 /* Text-input popups: air after prompt, and between field and OK/Cancel */
-.exoconfirmdiv.exoconfirm_textinput .exoconfirm_body {
-    padding-bottom: 10px;
+.exoconfirmdiv {
+    &.exoconfirm_textinput {
+        .exoconfirm_body {
+            padding-bottom: 10px;
+        }
+        #exoconfirmdiv_textinput {
+            display: block;
+            margin-top: 0.75em;
+        }
+    }
+    & {
+        .statementclass {
+            color: #000000;
+            text-align: left;
+            /* not flush against dialog top */
+            padding-top: 0.35em;
+            margin-bottom: 0.15em;
+        }
+        /* Type (info/critical/warning/question): icon only — no face/border tint */
+        /* decide thead sticky + tint: shared with TABLE[exogroupno] > thead above */
+        #decide_table1 tbody tr.decide_row_hover {
+            background-color: var(--exopopup-hover-bg-color);
+        }
+    }
 }
-.exoconfirmdiv.exoconfirm_textinput #exoconfirmdiv_textinput {
-    display: block;
-    margin-top: 0.75em;
-}
-.exoconfirmdiv .statementclass {
-    color: #000000;
-    text-align: left;
-    padding-top: 0.35em; /* not flush against dialog top */
-    margin-bottom: 0.15em;
-}
-/* Type (info/critical/warning/question): icon only — no face/border tint */
 
-/* decide thead sticky + tint: shared with TABLE[exogroupno] > thead above */
-
-.exoconfirmdiv #decide_table1 tbody tr.decide_row_hover {
-    background-color: var(--exopopup-hover-bg-color);
-}
+/*================================-================================*/
+/*========================= THEME BUTTON ==========================*/
+/*=================================================================*/
 
 /* ========== Theme toggle (top-right menubar): sun/moon icon only, no slider ========== */
+
 .theme_button {
     float: none;
     display: flex;
@@ -1971,298 +2082,306 @@ input[type=checkbox]:focus-visible {
     line-height: 0;
     cursor: pointer;
     flex-shrink: 0;
+    &:focus, &:focus-visible, &:active {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    /* Same outer box as menubar 16×16 full-bleed SVGs (--exoui-icon-size) */
+    img {
+        width: var(--exoui-icon-size);
+        height: var(--exoui-icon-size);
+        display: block;
+        margin: 0;
+        padding: 0;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        object-fit: contain;
+        /* Auto pref: grey sun/moon (effective glyph) — following browser */
+        &.theme-auto {
+            filter: grayscale(1) opacity(0.55);
+        }
+    }
 }
-.theme_button:focus,
-.theme_button:focus-visible,
-.theme_button:active {
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-/* Same outer box as menubar 16×16 full-bleed SVGs (--exoui-icon-size) */
-.theme_button img {
-    width: var(--exoui-icon-size);
-    height: var(--exoui-icon-size);
-    display: block;
-    margin: 0;
-    padding: 0;
-    border: none;
-    outline: none;
-    box-shadow: none;
-    object-fit: contain;
-}
-/* Auto pref: grey sun/moon (effective glyph) — following browser */
-.theme_button img.theme-auto {
-    filter: grayscale(1) opacity(0.55);
-}
+
+/*================================-================================*/
+/*========================== DARK SCREEN ==========================*/
+/*=================================================================*/
 
 /* ========== Dark mode (component rules; tokens are at top of file) ========== */
 /* Screen only — print block at EOF forces black-on-white for paper */
 @media screen {
-:root[data-theme="dark_mode"],
-:root[data-theme="dark_mode"] BODY {
-    background-color: var(--exopage-bg-color) !important;
-    color: #ffffff;
-}
+    :root[data-theme="dark_mode"] {
+        &, BODY {
+            background-color: var(--exopage-bg-color) !important;
+            color: #ffffff;
+        }
+    }
 }
 
 /* CKEditor 4 moono chrome (jobs BRIEF, …). Editable iframe: exo_ckeditor_apply_theme(). */
 @media screen {
-:root[data-theme="dark_mode"] .cke_chrome {
-    border-color: var(--exoform-border-color) !important;
-    box-shadow: none !important;
-}
-:root[data-theme="dark_mode"] .cke_inner {
-    background: var(--exoform-data-bg-color) !important;
-}
-:root[data-theme="dark_mode"] .cke_top,
-:root[data-theme="dark_mode"] .cke_bottom {
-    background: #28304a !important;
-    background-image: none !important;
-    border-color: var(--exoform-cell-border-color) !important;
-    box-shadow: none !important;
-}
-:root[data-theme="dark_mode"] .cke_toolgroup {
-    background: #303a5a !important;
-    background-image: none !important;
-    border-color: var(--exoform-cell-border-color) !important;
-    box-shadow: none !important;
-}
-:root[data-theme="dark_mode"] a.cke_button_off:hover,
-:root[data-theme="dark_mode"] a.cke_button_off:focus,
-:root[data-theme="dark_mode"] a.cke_button_off:active {
-    background: #455880 !important;
-    background-image: none !important;
-    border-color: var(--exoform-border-color) !important;
-}
-:root[data-theme="dark_mode"] a.cke_button_on {
-    background: #455880 !important;
-    background-image: none !important;
-    border-color: var(--exoform-border-color) !important;
-}
-/* Moono toolbar icons are dark PNGs — invert for DM chrome */
-:root[data-theme="dark_mode"] .cke_button_icon,
-:root[data-theme="dark_mode"] .cke_button_arrow,
-:root[data-theme="dark_mode"] .cke_combo_arrow {
-    filter: invert(1);
-}
-:root[data-theme="dark_mode"] .cke_combo_button {
-    background: #303a5a !important;
-    background-image: none !important;
-    border-color: var(--exoform-cell-border-color) !important;
-    box-shadow: none !important;
-}
-:root[data-theme="dark_mode"] .cke_combo_text,
-:root[data-theme="dark_mode"] .cke_path_item,
-:root[data-theme="dark_mode"] .cke_path_empty {
-    color: var(--exotext-color) !important;
-    text-shadow: none !important;
-}
-:root[data-theme="dark_mode"] .cke_resizer {
-    border-color: transparent transparent var(--exoform-cell-border-color) !important;
-}
-:root[data-theme="dark_mode"] .cke_contents {
-    background: var(--exoform-data-bg-color) !important;
-    border-color: var(--exoform-cell-border-color) !important;
-}
-/* Hide iframe until exo_ckeditor_apply_theme marks .exo_ck_themed —
+    :root[data-theme="dark_mode"] {
+        .cke_chrome {
+            border-color: var(--exoform-border-color) !important;
+            box-shadow: none !important;
+        }
+        .cke_inner {
+            background: var(--exoform-data-bg-color) !important;
+        }
+        .cke_top, .cke_bottom {
+            background: #28304a !important;
+            background-image: none !important;
+            border-color: var(--exoform-cell-border-color) !important;
+            box-shadow: none !important;
+        }
+        .cke_toolgroup {
+            background: #303a5a !important;
+            background-image: none !important;
+            border-color: var(--exoform-cell-border-color) !important;
+            box-shadow: none !important;
+        }
+        a {
+            &.cke_button_off {
+                &:hover, &:focus, &:active {
+                    background: #455880 !important;
+                    background-image: none !important;
+                    border-color: var(--exoform-border-color) !important;
+                }
+            }
+            &.cke_button_on {
+                background: #455880 !important;
+                background-image: none !important;
+                border-color: var(--exoform-border-color) !important;
+            }
+        }
+        /* Moono toolbar icons are dark PNGs — invert for DM chrome */
+        .cke_button_icon, .cke_button_arrow, .cke_combo_arrow {
+            filter: invert(1);
+        }
+        .cke_combo_button {
+            background: #303a5a !important;
+            background-image: none !important;
+            border-color: var(--exoform-cell-border-color) !important;
+            box-shadow: none !important;
+        }
+        .cke_combo_text, .cke_path_item, .cke_path_empty {
+            color: var(--exotext-color) !important;
+            text-shadow: none !important;
+        }
+        .cke_resizer {
+            border-color: transparent transparent var(--exoform-cell-border-color) !important;
+        }
+        .cke_contents {
+            background: var(--exoform-data-bg-color) !important;
+            border-color: var(--exoform-cell-border-color) !important;
+            /* Hide iframe until exo_ckeditor_apply_theme marks .exo_ck_themed —
  * contents area already form-coloured so no white flash. */
-:root[data-theme="dark_mode"] .cke_contents iframe {
-    opacity: 0;
-}
-:root[data-theme="dark_mode"] .cke_contents.exo_ck_themed iframe {
-    opacity: 1;
-}
+            iframe {
+                opacity: 0;
+            }
+            &.exo_ck_themed iframe {
+                opacity: 1;
+            }
+        }
+    }
 }
 
-:root[data-theme="dark_mode"] .exoformpane {
-    /* Pane primary; data explicit (DM pair is not the LM oklch step). */
-    --exoform-bg-color: #28304a;
-    --exoform-data-bg-color: #2c3552;
-    --exoform-border-color: #70778d;
-    --exoform-cell-border-color: #5a627b;
-    background-color: var(--exoform-bg-color);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-}
-:root[data-theme="dark_mode"] TABLE.exoform {
-    /* No fill (pane base); body only .exodata */
-    border-color: var(--exoform-border-color) !important;
+/*================================-================================*/
+/*======================== DARK COMPONENTS ========================*/
+/*=================================================================*/
+
+:root[data-theme="dark_mode"] {
+    .exoformpane {
+        /* Pane primary; data explicit (DM pair is not the LM oklch step). */
+        --exoform-bg-color: #28304a;
+        --exoform-data-bg-color: #2c3552;
+        --exoform-border-color: #70778d;
+        --exoform-cell-border-color: #5a627b;
+        background-color: var(--exoform-bg-color);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+    }
+    TABLE.exoform {
+        /* No fill (pane base); body only .exodata */
+        border-color: var(--exoform-border-color) !important;
+    }
 }
 
 /* schedules_calendar: booked/certified dates — red in light mode, warm accent in dark */
 SPAN.calendar-date-committed[contenteditable] {
     color: #c00000;
 }
-:root[data-theme="dark_mode"] SPAN.calendar-date-committed[contenteditable] {
-    color: var(--exocalendar-today-color);
-}
 
-/* DM sticky group head: pane chrome token (same as LM sticky) */
-:root[data-theme="dark_mode"] TABLE[exogroupno] > thead th,
-:root[data-theme="dark_mode"] TABLE[exogroupno] > thead td {
-    background-color: var(--exoform-bg-color, #303a5a);
-}
-:root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 > thead th,
-:root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 > thead td,
-:root[data-theme="dark_mode"] .exo_typeahead_table > thead th {
-    background-color: #303a5a;
-}
-
-:root[data-theme="dark_mode"] .exoform > :is(thead, tbody, tfoot) > tr > :is(td, th),
-:root[data-theme="dark_mode"] .exoform > tr > td,
-:root[data-theme="dark_mode"] .exoform > tr > th {
-    border-color: var(--exoform-cell-border-color) !important;
-}
-
-/* Dark mode: field fill/border from --exofield-* (lifted well); text inherits BODY white. */
-
-:root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect) {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23fdfdfd' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
-}
-
-:root[data-theme="dark_mode"] SELECT:not(.loginfield):not(.calendarSelect) option {
-    background-color: #28304a;
-    color: #ffffff;
-}
-
-:root[data-theme="dark_mode"] .clsReadOnly {
-    background: transparent !important;
-    border: none;
-    color: #ffffff;
-}
-
-:root[data-theme="dark_mode"] .menu {
-    /* menuchangeoption() uses var(--exomenu-hover-bg-color) — override per flyout */
-    --exomenu-hover-bg-color: var(--exoflyout-hover-bg-color);
-    background-color: var(--exoflyout-bg-color) !important;
-    color: #ffffff;
-    opacity: 1 !important;
-    border: 1px solid var(--exoflyout-border-color) !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-}
-
-:root[data-theme="dark_mode"] .menuitem,
-:root[data-theme="dark_mode"] .menuitem:link,
-:root[data-theme="dark_mode"] .menuitem:visited {
-    color: #ffffff !important;
-}
-
-:root[data-theme="dark_mode"] .menu_hr,
-:root[data-theme="dark_mode"] .menu hr {
-    border-color: #676e86; /* was #646ca8 — same luma, not violet */
-}
-
-/* Bare BUTTON only — .graphicbutton uses --exoinformbutton-* like .exobutton.
+:root[data-theme="dark_mode"] {
+    SPAN.calendar-date-committed[contenteditable] {
+        color: var(--exocalendar-today-color);
+    }
+    /* DM sticky group head: pane chrome token (same as LM sticky) */
+    TABLE[exogroupno] > thead {
+        th, td {
+            background-color: var(--exoform-bg-color, #303a5a);
+        }
+    }
+    .exoconfirmdiv #decide_table1 > thead th,
+    .exoconfirmdiv #decide_table1 > thead td, .exo_typeahead_table > thead th {
+        background-color: #303a5a;
+    }
+    .exoform {
+        & > :is(thead, tbody, tfoot) > tr > :is(td, th), & > tr > td,
+        & > tr > th {
+            border-color: var(--exoform-cell-border-color) !important;
+        }
+    }
+    /* Dark mode: field fill/border from --exofield-* (lifted well); text inherits BODY white. */
+    SELECT:not(.loginfield):not(.calendarSelect) {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23fdfdfd' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+        option {
+            background-color: #28304a;
+            color: #ffffff;
+        }
+    }
+    .clsReadOnly {
+        background: transparent !important;
+        border: none;
+        color: #ffffff;
+    }
+    .menu {
+        /* menuchangeoption() uses var(--exomenu-hover-bg-color) — override per flyout */
+        --exomenu-hover-bg-color: var(--exoflyout-hover-bg-color);
+        background-color: var(--exoflyout-bg-color) !important;
+        color: #ffffff;
+        opacity: 1 !important;
+        border: 1px solid var(--exoflyout-border-color) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+    }
+    .menuitem {
+        &, &:link, &:visited {
+            color: #ffffff !important;
+        }
+    }
+    .menu_hr, .menu hr {
+        /* was #646ca8 — same luma, not violet */
+        border-color: #676e86;
+    }
+    /* Bare BUTTON only — .graphicbutton uses --exoinformbutton-* like .exobutton.
  * Continuum swatches are <button class="exocolor-cell"> for a11y, not chrome. */
-:root[data-theme="dark_mode"] BUTTON:not(.exobutton):not(.exotab):not(.exocolor-cell) {
-    background-color: var(--exoinformbutton-bg-color);
-    border: 2px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
-    color: var(--exoinformbutton-color);
-}
-
-:root[data-theme="dark_mode"] #exo_menu .menubutton:hover,
-:root[data-theme="dark_mode"] #exo_menu .menubutton:focus {
-    background-color: var(--exomenu-hover-bg-color);
-}
-
-:root[data-theme="dark_mode"] A:link { color: #8ab4f8; }
-:root[data-theme="dark_mode"] A:visited { color: #9db4cc; }
-
-:root[data-theme="dark_mode"] .exoconfirmdiv {
-    /* shell tokens from :root[data-theme=dark_mode]; no local colour sprinkles */
-    border: 2px solid var(--exopopup-border-color);
-    color: var(--exotext-color);
-    box-shadow: var(--exopopup-box-shadow);
-}
-
-:root[data-theme="dark_mode"] .exoconfirm_scrollhint {
-    color: rgba(255, 255, 255, 0.45);
-}
-:root[data-theme="dark_mode"] .exoconfirmdiv .statementclass {
-    color: #ffffff;
-}
-:root[data-theme="dark_mode"] .exoconfirmdiv #exoconfirmdiv_textinput:not(:focus) {
-    color: #ffffff;
-    background-color: var(--exofield-bg-color);
-    border: var(--exofield-border);
-    border-radius: var(--exofield-border-radius);
-}
-:root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 {
-    border-color: var(--exopopup-border-color);
-}
-:root[data-theme="dark_mode"] .exoconfirmdiv #decide_table1 tbody tr.decide_row_hover {
-    background-color: var(--exopopup-hover-bg-color);
-}
-/* DM: type classes no longer recolour the shell (same neutral fill as base) */
-
-/* DM unchecked radio/checkbox face = form/data well (not page black) */
-:root[data-theme="dark_mode"] input[type=radio]:not(:checked),
-:root[data-theme="dark_mode"] input[type=checkbox]:not(:checked) {
-    background-color: var(--exoform-data-bg-color);
-    border-width: calc(var(--exocheck-size) * 1.5 / 14);
-}
-
-:root[data-theme="dark_mode"] input[type=radio]:checked,
-:root[data-theme="dark_mode"] input[type=checkbox]:checked {
-    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color);
-}
-
-:root[data-theme="dark_mode"] input[type=checkbox]:checked {
-    background-color: var(--exoradio-color);
-    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
-    background-size: 90%;
-}
-
-/* Checked radio: light pill + blue inset (original DM look) */
-:root[data-theme="dark_mode"] input[type=radio]:checked {
-    background-color: var(--exoradio-checked-bg-color);
-    box-shadow: inset 0 0 0 calc(var(--exocheck-size) * 2 / 14) var(--exoradio-color);
-}
-
-/* Keep DM checked-radio inset when focused; orange focus ring only outside */
-:root[data-theme="dark_mode"] input[type=radio]:checked:focus,
-:root[data-theme="dark_mode"] input[type=radio]:checked:focus-visible {
-    box-shadow:
+    BUTTON:not(.exobutton):not(.exotab):not(.exocolor-cell):not(.exotooltip_icon) {
+        background-color: var(--exoinformbutton-bg-color);
+        border: 2px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
+        color: var(--exoinformbutton-color);
+    }
+    #exo_menu .menubutton {
+        &:hover, &:focus {
+            background-color: var(--exomenu-hover-bg-color);
+        }
+    }
+    A {
+        &:link {
+            color: #8ab4f8;
+        }
+        &:visited {
+            color: #9db4cc;
+        }
+    }
+    .exoconfirmdiv {
+        /* shell tokens from :root[data-theme=dark_mode]; no local colour sprinkles */
+        border: 2px solid var(--exopopup-border-color);
+        color: var(--exotext-color);
+        box-shadow: var(--exopopup-box-shadow);
+    }
+    .exoconfirm_scrollhint {
+        color: rgba(255, 255, 255, 0.45);
+    }
+    .exoconfirmdiv {
+        .statementclass {
+            color: #ffffff;
+        }
+        #exoconfirmdiv_textinput:not(:focus) {
+            color: #ffffff;
+            background-color: var(--exofield-bg-color);
+            border: var(--exofield-border);
+            border-radius: var(--exofield-border-radius);
+        }
+        #decide_table1 {
+            border-color: var(--exopopup-border-color);
+            tbody tr.decide_row_hover {
+                background-color: var(--exopopup-hover-bg-color);
+            }
+        }
+    }
+    /* DM: type classes no longer recolour the shell (same neutral fill as base) */
+    /* DM unchecked radio/checkbox face = form/data well (not page black) */
+    input {
+        &[type=radio]:not(:checked), &[type=checkbox]:not(:checked) {
+            background-color: var(--exoform-data-bg-color);
+            border-width: calc(var(--exocheck-size) * 1.5 / 14);
+        }
+        &[type=radio]:checked, &[type=checkbox]:checked {
+            border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color);
+        }
+        &[type=checkbox]:checked {
+            background-color: var(--exoradio-color);
+            background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
+            background-size: 90%;
+        }
+        /* Checked radio: light pill + blue inset (original DM look) */
+        &[type=radio] {
+            &:checked {
+                background-color: var(--exoradio-checked-bg-color);
+                box-shadow: inset 0 0 0 calc(var(--exocheck-size) * 2 / 14) var(--exoradio-color);
+                /* Keep DM checked-radio inset when focused; orange focus ring only outside */
+                &:focus, &:focus-visible {
+                    box-shadow:
         inset 0 0 0 calc(var(--exocheck-size) * 2 / 14) var(--exoradio-color),
         0 0 0 3px var(--exofield-focus-color);
+                }
+            }
+            /* Disabled radio: same paint as enabled (unchecked or checked), overall dimmed */
+            &:disabled:not(:checked) {
+                background-color: var(--exoform-data-bg-color) !important;
+                border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+                opacity: 0.5;
+            }
+            &:disabled:checked {
+                background-color: var(--exoradio-checked-bg-color) !important;
+                border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+                box-shadow: inset 0 0 0 calc(var(--exocheck-size) * 2 / 14) var(--exoradio-color);
+                opacity: 0.5;
+            }
+        }
+        /* Disabled checkbox: same paint as enabled (unchecked or checked), overall dimmed */
+        &[type=checkbox]:disabled {
+            &:not(:checked) {
+                background-color: var(--exoform-data-bg-color) !important;
+                border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+                opacity: 0.5;
+            }
+            &:checked {
+                background-color: var(--exoradio-color) !important;
+                border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
+                background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
+                background-size: 90%;
+                background-position: center;
+                background-repeat: no-repeat;
+                opacity: 0.5;
+            }
+        }
+    }
+    #uiblockerdiv {
+        background: rgba(0, 0, 0, 0.08) !important;
+    }
 }
 
-/* Disabled radio: same paint as enabled (unchecked or checked), overall dimmed */
-:root[data-theme="dark_mode"] input[type=radio]:disabled:not(:checked) {
-    background-color: var(--exoform-data-bg-color) !important;
-    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
-    opacity: 0.5;
-}
-:root[data-theme="dark_mode"] input[type=radio]:disabled:checked {
-    background-color: var(--exoradio-checked-bg-color) !important;
-    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
-    box-shadow: inset 0 0 0 calc(var(--exocheck-size) * 2 / 14) var(--exoradio-color);
-    opacity: 0.5;
-}
-/* Disabled checkbox: same paint as enabled (unchecked or checked), overall dimmed */
-:root[data-theme="dark_mode"] input[type=checkbox]:disabled:not(:checked) {
-    background-color: var(--exoform-data-bg-color) !important;
-    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
-    opacity: 0.5;
-}
-:root[data-theme="dark_mode"] input[type=checkbox]:disabled:checked {
-    background-color: var(--exoradio-color) !important;
-    border: calc(var(--exocheck-size) * 1.5 / 14) solid var(--exoradio-ring-border-color) !important;
-    background-image: url("../../exodus/images/theme2/checkbox-tick.svg");
-    background-size: 90%;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.5;
-}
-
-:root[data-theme="dark_mode"] #uiblockerdiv {
-    background: rgba(0, 0, 0, 0.08) !important;
-}
+/*================================-================================*/
+/*=========================== CALENDAR ============================*/
+/*=================================================================*/
 
 /* ========== Date picker popup (calendar.js); colour continuum reuses .calendar ==========
  * Shell/hover/divider = --exopopup-*; buttons = --exoinformbutton-*.
  * Only calendar-specific colour token: --exocalendar-today-color (defined on :root).
  */
+
 .calendar {
     text-align: center;
     background: var(--exopopup-bg-color);
@@ -2275,13 +2394,13 @@ SPAN.calendar-date-committed[contenteditable] {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* tabindex=1 + .focus() for keyboard nav — hide browser focus ring */
+    &:focus, &:focus-visible {
+        outline: none;
+        border-color: var(--exopopup-border-color);
+    }
 }
-/* tabindex=1 + .focus() for keyboard nav — hide browser focus ring */
-.calendar:focus,
-.calendar:focus-visible {
-    outline: none;
-    border-color: var(--exopopup-border-color);
-}
+
 .calendarHeader {
     position: sticky;
     top: 0;
@@ -2292,11 +2411,13 @@ SPAN.calendar-date-committed[contenteditable] {
     padding: 2px 0 6px;
     border-bottom: 1px solid var(--exopopup-divider-border-color);
 }
+
 .calendarBody {
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
 }
+
 .calendarHeader select.calendarSelect {
     background-color: var(--exopopup-bg-color);
     color: var(--exotext-color);
@@ -2305,9 +2426,9 @@ SPAN.calendar-date-committed[contenteditable] {
     font: inherit;
     max-width: 9em;
 }
+
 /* Same raised chrome as confirm/decide / form actions (DOMUI informbutton) */
-.calendarHeader button,
-.calendarFooter button {
+.calendarHeader button, .calendarFooter button {
     background-color: var(--exoinformbutton-bg-color);
     color: var(--exoinformbutton-color);
     border: 2px var(--exoinformbutton-border-style) var(--exoinformbutton-border-color);
@@ -2316,86 +2437,96 @@ SPAN.calendar-date-committed[contenteditable] {
     font: inherit;
     font-size: var(--exoform-data-font-size, 1rem);
 }
+
 .calendarHeader button {
     padding: 2px 8px;
 }
-.calendarBody table.grid {
-    color: inherit;
-    cursor: default;
-    text-align: center;
-    border-collapse: collapse;
+
+.calendarBody {
+    table.grid {
+        color: inherit;
+        cursor: default;
+        text-align: center;
+        border-collapse: collapse;
+        & > thead {
+            position: sticky;
+            top: 0;
+            z-index: 11;
+        }
+    }
+    th.weekDayHead {
+        font-weight: bold;
+        border-bottom: 1px solid var(--exoform-border-color);
+        background: var(--exoform-data-bg-color);
+        padding: 4px 6px;
+    }
+    td {
+        &.weekNumber {
+            border-right: 1px solid var(--exoform-border-color);
+            padding: 2px 6px;
+        }
+        &.calendarDay {
+            cursor: pointer;
+            color: inherit;
+            font-weight: normal;
+            border: none;
+            padding: 3px 6px;
+            &.empty {
+                cursor: default;
+            }
+            &:not(.empty):hover {
+                background-color: var(--exopopup-hover-bg-color);
+            }
+            &.today {
+                color: var(--exocalendar-today-color);
+                font-weight: bold;
+            }
+            /* Cursor (.current): keyboard / wheel / hover — system selection colour (UA) */
+            &.current {
+                font-weight: bold;
+                box-shadow: inset 0 0 0 3px Highlight;
+            }
+        }
+    }
 }
-.calendarBody table.grid > thead {
-    position: sticky;
-    top: 0;
-    z-index: 11;
-}
-.calendarBody th.weekDayHead {
-    font-weight: bold;
-    border-bottom: 1px solid var(--exoform-border-color);
-    background: var(--exoform-data-bg-color);
-    padding: 4px 6px;
-}
-.calendarBody td.weekNumber {
-    border-right: 1px solid var(--exoform-border-color);
-    padding: 2px 6px;
-}
-.calendarBody td.calendarDay {
-    cursor: pointer;
-    color: inherit;
-    font-weight: normal;
-    border: none;
-    padding: 3px 6px;
-}
-.calendarBody td.calendarDay.empty {
-    cursor: default;
-}
-.calendarBody td.calendarDay:not(.empty):hover {
-    background-color: var(--exopopup-hover-bg-color);
-}
-.calendarBody td.calendarDay.today {
-    color: var(--exocalendar-today-color);
-    font-weight: bold;
-}
-/* Cursor (.current): keyboard / wheel / hover — system selection colour (UA) */
-.calendarBody td.calendarDay.current {
-    font-weight: bold;
-    box-shadow: inset 0 0 0 3px Highlight;
-}
+
 .calendarFooter {
     flex: 0 0 auto;
     padding-top: 8px;
     border-top: 1px solid var(--exopopup-divider-border-color);
+    .footerTable {
+        width: auto;
+        margin: 0 auto;
+        tr {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            gap: 0.25em;
+        }
+        td {
+            display: block;
+        }
+    }
+    button {
+        margin: 2px 4px;
+        padding: 4px 10px;
+        white-space: nowrap;
+    }
 }
-.calendarFooter .footerTable {
-    width: auto;
-    margin: 0 auto;
-}
-.calendarFooter .footerTable tr {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 0.25em;
-}
-.calendarFooter .footerTable td {
-    display: block;
-}
-.calendarFooter button {
-    margin: 2px 4px;
-    padding: 4px 10px;
-    white-space: nowrap;
-}
+
 :root[data-theme="dark_mode"] .calendarHeader select.calendarSelect option {
     background-color: var(--exopopup-bg-color);
     color: var(--exotext-color);
 }
 
 /*must be last (except print — print must beat DM !important screen rules)*/
-
-.demotext
-{
+.demotext {
     display: none;
 }
+
+/*================================-================================*/
+/*========================== PRINT PAPER ==========================*/
+/*=================================================================*/
 
 /*
  * Print only (@media print) — does not change screen LM/DM.
@@ -2405,87 +2536,83 @@ SPAN.calendar-date-committed[contenteditable] {
  */
 @media print {
     /* Original framework print behaviour */
-    TABLE.exoform {
-        display: block;
+    TABLE {
+        &.exoform {
+            display: block;
+        }
+        &[exogroupno] > thead {
+            position: static;
+        }
     }
-    TABLE[exogroupno] > thead {
-        position: static;
-    }
-
     #exo_menu {
         display: none !important;
     }
-
-    :root,
-    :root[data-theme="dark_mode"] {
-        --exopage-bg-color: #ffffff;
-        --exoform-data-bg-color: #ffffff;
-        --exoform-border-color: #333333;
-        --exoform-cell-border-color: #333333;
-        --exotext-color: #000000;
-        color-scheme: only light;
+    :root {
+        &, &[data-theme="dark_mode"] {
+            --exopage-bg-color: #ffffff;
+            --exoform-data-bg-color: #ffffff;
+            --exoform-border-color: #333333;
+            --exoform-cell-border-color: #333333;
+            --exotext-color: #000000;
+            color-scheme: only light;
+        }
     }
-
-    HTML, BODY,
-    :root[data-theme="dark_mode"],
-    :root[data-theme="dark_mode"] HTML,
-    :root[data-theme="dark_mode"] BODY {
+    HTML, BODY {
         background: #ffffff !important;
         background-color: #ffffff !important;
         color: #000000 !important;
         margin-top: 0 !important;
         padding-top: 0 !important;
     }
-
+    :root[data-theme="dark_mode"] {
+        &, HTML, BODY {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+    }
     /* Explicit selectors: beat DM form/pane !important greys (not a * free-for-all) */
-    TABLE.exoform,
-    TABLE.exoform td,
-    TABLE.exoform th,
-    .exoformpane,
-    TABLE.exohelp-table,
-    TABLE.exohelp-table td,
-    TABLE.exohelp-table th,
-    :root[data-theme="dark_mode"] TABLE.exoform,
-    :root[data-theme="dark_mode"] TABLE.exoform td,
-    :root[data-theme="dark_mode"] TABLE.exoform th,
-    :root[data-theme="dark_mode"] .exoformpane,
-    :root[data-theme="dark_mode"] TABLE.exohelp-table,
-    :root[data-theme="dark_mode"] TABLE.exohelp-table td,
-    :root[data-theme="dark_mode"] TABLE.exohelp-table th {
+    TABLE.exoform, TABLE.exoform td, TABLE.exoform th, .exoformpane,
+    TABLE.exohelp-table, TABLE.exohelp-table td, TABLE.exohelp-table th {
         background: #ffffff !important;
         background-color: #ffffff !important;
         color: #000000 !important;
         box-shadow: none !important;
     }
-
-    TABLE.exohelp-table,
-    TABLE.exohelp-table td,
-    TABLE.exohelp-table th,
-    :root[data-theme="dark_mode"] TABLE.exohelp-table,
-    :root[data-theme="dark_mode"] TABLE.exohelp-table td,
-    :root[data-theme="dark_mode"] TABLE.exohelp-table th {
+    :root[data-theme="dark_mode"] {
+        TABLE.exoform, TABLE.exoform td, TABLE.exoform th, .exoformpane,
+        TABLE.exohelp-table, TABLE.exohelp-table td, TABLE.exohelp-table th {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: none !important;
+        }
+    }
+    TABLE.exohelp-table, TABLE.exohelp-table td, TABLE.exohelp-table th {
         border-color: #333333 !important;
     }
-
-    h1, h2, h3, b, strong, p, div, span, a,
-    :root[data-theme="dark_mode"] h1,
-    :root[data-theme="dark_mode"] h2,
-    :root[data-theme="dark_mode"] h3,
-    :root[data-theme="dark_mode"] b,
-    :root[data-theme="dark_mode"] strong,
-    :root[data-theme="dark_mode"] p,
-    :root[data-theme="dark_mode"] div,
-    :root[data-theme="dark_mode"] span,
-    :root[data-theme="dark_mode"] a {
+    :root[data-theme="dark_mode"] {
+        TABLE.exohelp-table, TABLE.exohelp-table td, TABLE.exohelp-table th {
+            border-color: #333333 !important;
+        }
+    }
+    h1, h2, h3, b, strong, p, div, span, a {
         color: #000000 !important;
         background: transparent !important;
         background-color: transparent !important;
     }
-
+    :root[data-theme="dark_mode"] {
+        h1, h2, h3, b, strong, p, div, span, a {
+            color: #000000 !important;
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+    }
     BR {
         min-height: 0 !important;
     }
-
     HTML, BODY {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
