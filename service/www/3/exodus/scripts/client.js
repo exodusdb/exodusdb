@@ -12326,7 +12326,10 @@ async function exo_dict_tooltip(di, wiki_query_str) {
 
 			let first_field_rect = field_els[0].getBoundingClientRect()
 			tip.style.left       = first_field_rect.left + 'px'
-			tip.style.top        = (+first_field_rect.bottom + 5) + 'px'
+			// Put the popup on top of the field
+			var field_top_pos    = (window.innerHeight - first_field_rect.top + 5) + 'px'
+			tip.style.top        = ''
+			tip.style.bottom     = field_top_pos
 			tip.style.opacity    = 1
 
 			// Another icon's restore must land before raise. This icon's own

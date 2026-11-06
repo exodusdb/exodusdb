@@ -2558,7 +2558,7 @@ button.exotooltip_icon {
 }
 
 .exotooltip {
-    margin-top: 10px;
+    margin-bottom: 10px;
     position: fixed;
     background: var(--exoform-bg-color);
     border: 1px solid var(--exoform-border-color);
@@ -2573,7 +2573,7 @@ button.exotooltip_icon {
     &::after {
         content: "";
         position: absolute;
-        top: -8px;
+        bottom: -7px;
         left: 25px;
         transform: translateX(-50%) rotate(45deg); /* Centers the arrow horizontally */
         width: 12px;
@@ -2581,7 +2581,7 @@ button.exotooltip_icon {
         background: var(--exoform-bg-color);
         border-width: 1px;
         border-style: solid;
-        border-color: var(--exoform-border-color) transparent transparent var(--exoform-border-color);
+        border-color:  transparent var(--exoform-border-color) var(--exoform-border-color) transparent;
     }
 }
 
