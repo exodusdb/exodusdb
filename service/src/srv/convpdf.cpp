@@ -91,7 +91,10 @@ func main(io osfilename, in printopts0, out errors) {
 			}
 			var msg = "WARNING: convpdf removed exo delimiters before converting htm file\n";
 			msg    ^= "Original htm:" ^ badhtm_filename.field(OSSLASH, -3, 3) ^ "\n";
-			sysmsg(msg , "Delimiters removed from htm before convert to pdf");
+			// Dont change subject below, it is being used as an if condition in sysmsg.cpp
+			// to redirect sysmsgs to support instead of users, to avoid spamming users inbox
+			// because these are only warnings. search for "Delimiters removed"
+			call sysmsg(msg , "Delimiters removed from htm before convert to pdf");
 		}
 	}
 

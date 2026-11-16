@@ -85,6 +85,9 @@ nextrec:
 		if (capped) {
 			// "maximum" token for selectbtree / LISTSCHED / AGENCY.SUBS rewrite
 			msg_ = "maximum " ^ maxhits ^ " " ^ filename ^ " keys for " ^ fieldname;
+			// Dont change subject below, it is being used as an if condition in sysmsg.cpp
+			// to redirect sysmsgs to support instead of users, to avoid spamming users inbox
+			// because these are only warnings. search for "BTREEEXTRACT"
 			call sysmsg(msg_, "BTREEEXTRACT");
 		}
 	}

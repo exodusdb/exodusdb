@@ -163,6 +163,12 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 		emailaddrs = "sysmsg@neosys.com";
 	}
 
+	// Show WUI Typeahead 10k records found and convpdf removed exo delimiters warning to DEVs only
+	if (subjectin.contains("BTREEEXTRACT") or subjectin.contains("Delimiters removed")) {
+		emailaddrs = "sysmsg@neosys.com";
+		useremail = "";
+	}
+
 	// determine subject
 	var subject = "EXODUS System: " ^ datasetcode;
 	let tt		= msg.index("ERROR NO:");
